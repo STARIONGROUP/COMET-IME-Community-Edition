@@ -1,0 +1,5 @@
+﻿<ribbonxml>
+  <group id="CDP4ProductTree" label="Product Tree">
+  <dynamicMenu id="ShowProductTree_" size="large" label="Product Tree" screentip="Show or Hide the product tree for an option of an Iteration"  imageMso="ServerConnection" getEnabled="GetEnabled" getContent="GetContent"/>
+  </group>
+</ribbonxml>

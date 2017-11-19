@@ -1,0 +1,175 @@
+﻿<dx:DXWindow x:Class="BasicRdl.Views.BinaryRelationshipRuleDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+             xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             Width="600"
+             Height="450"
+             navigation:DialogCloser.DialogResult="{Binding DialogResult}"
+             mc:Ignorable="d">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/ErrorTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+    <lc:LayoutControl Margin="5"
+                      Orientation="Vertical"
+                      ScrollBars="None">
+        <lc:LayoutGroup Margin="-10,-7,-10,-5"
+                        Orientation="Vertical"
+                        View="Tabs"
+                        lc:LayoutControl.AllowHorizontalSizing="True">
+            <lc:LayoutGroup Header="Basic" Orientation="Vertical">
+                <items:ShortNameLayoutItem />
+                <items:NameLayoutItem />
+
+                <lc:LayoutItem Label="Forward Relationship Name: ">
+                    <dxe:TextEdit Name="ForwardRelationshipName"
+                                  IsReadOnly="{Binding IsReadOnly}"
+                                  Text="{Binding Path=ForwardRelationshipName,
+                                                 Mode=TwoWay,
+                                                 ValidatesOnDataErrors=True,
+                                                 UpdateSourceTrigger=PropertyChanged}" 
+                                  ShowError="True"/>
+                </lc:LayoutItem>
+
+                <lc:LayoutItem Label="Inverse Relationship Name: ">
+                    <dxe:TextEdit Name="InverseRelationshipName"
+                                  IsReadOnly="{Binding IsReadOnly}"
+                                  Text="{Binding Path=InverseRelationshipName,
+                                                 Mode=TwoWay,
+                                                 ValidatesOnDataErrors=True,
+                                                 UpdateSourceTrigger=PropertyChanged}" 
+                                  ShowError="True"/>
+                </lc:LayoutItem>
+
+                <lc:LayoutItem Label="Relationship Category: ">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+                        <dxe:ComboBoxEdit Name="RelationshipCategory"
+                                          DisplayMember="ShortName"
+                                          EditValue="{Binding Path=SelectedRelationshipCategory,
+                                                              Mode=TwoWay,
+                                                              UpdateSourceTrigger=PropertyChanged}"
+                                          IsReadOnly="{Binding IsReadOnly}"
+                                          IsTextEditable="False"
+                                          ItemsSource="{Binding Path=PossibleRelationshipCategory}"
+                                          ShowCustomItems="False" />
+                        <Button Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Command="{Binding InspectSelectedRelationshipCategoryCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </lc:LayoutItem>
+
+                <lc:LayoutItem Label="Source Category: ">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+                        <dxe:ComboBoxEdit Name="SourceCategory"
+                                          DisplayMember="ShortName"
+                                          EditValue="{Binding Path=SelectedSourceCategory,
+                                                              Mode=TwoWay,
+                                                              UpdateSourceTrigger=PropertyChanged}"
+                                          IsReadOnly="{Binding IsReadOnly}"
+                                          IsTextEditable="False"
+                                          ItemsSource="{Binding Path=PossibleSourceCategory}"
+                                          ShowCustomItems="False" />
+                        <Button Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Command="{Binding InspectSelectedSourceCategoryCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </lc:LayoutItem>
+
+                <lc:LayoutItem Label="Target Category: ">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+                        <dxe:ComboBoxEdit Name="TargetCategory"
+                                          DisplayMember="ShortName"
+                                          EditValue="{Binding Path=SelectedTargetCategory,
+                                                              Mode=TwoWay,
+                                                              UpdateSourceTrigger=PropertyChanged}"
+                                          IsReadOnly="{Binding IsReadOnly}"
+                                          IsTextEditable="False"
+                                          ItemsSource="{Binding Path=PossibleTargetCategory}"
+                                          ShowCustomItems="False" />
+                        <Button Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Command="{Binding InspectSelectedTargetCategoryCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </lc:LayoutItem>
+
+                <items:IsDeprecatedLayoutItem />
+
+                <items:ShortNameContainerLayoutItem />
+
+            </lc:LayoutGroup>
+
+            <items:AliasLayoutGroup />
+            <items:DefinitionLayoutGroup />
+            <items:HyperLinkLayoutGroup />
+            <items:AdvancedLayoutGroup />
+        </lc:LayoutGroup>
+        <items:UserValidationButtonsLayoutGroup />
+        <items:ErrorMessageLayoutGroup />
+    </lc:LayoutControl>
+</dx:DXWindow>

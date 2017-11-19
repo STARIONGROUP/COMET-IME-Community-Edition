@@ -1,0 +1,62 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="NotConverterTestFixture.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015 RHEA System S.A.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace CDP4Composition.Tests.Converters
+{
+    using System;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Composition.Converters;
+    using NUnit.Framework;
+
+    [TestFixture, RequiresSTA]
+    public class NotConverterTestFixture
+    {
+        /// <summary>
+        /// the <see cref="NotConverter"/> under test
+        /// </summary>
+        private NotConverter converter;
+
+        [SetUp]
+        public void SetUp()
+        {
+            this.converter = new NotConverter();
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidCastException))]
+        public void VerifyThatConvertProvidesTheExpectedString()
+        {
+            const string Binrelstring = "Binary Relationship Rule";
+            var brr = new BinaryRelationshipRule();
+            var converterResult = this.converter.Convert(brr.ClassKind, null, null, null);
+
+            Assert.AreEqual(Binrelstring, converterResult);
+        }
+
+        [Test]
+        public void VerifyThatConvertProvidesTheExpectedBooleanValue()
+        {
+            var result = this.converter.Convert(true, null, null, null);
+            Assert.IsNotNull(result);
+            var shouldBeFalse = (bool)result;
+            Assert.IsNotNull(shouldBeFalse);
+            Assert.IsFalse(shouldBeFalse);
+
+            result = this.converter.Convert(false, null, null, null);
+            Assert.IsNotNull(result);
+            var shouldBeTrue = (bool)result;
+            Assert.IsNotNull(shouldBeTrue);
+            Assert.IsTrue(shouldBeTrue);
+        }
+
+        [Test]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void VerifyThatConvertBackThrowsException()
+        {
+            this.converter.ConvertBack(null, null, null, null);
+        }
+    }
+}

@@ -1,0 +1,42 @@
+﻿<dxr1:RibbonPageGroup
+    x:Class="CDP4Requirements.Views.RequirementBrowserRibbon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxr1="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+    xmlns:av="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:bars="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+    Name="RequirementViewRibbonPageGroup"
+    Caption="Requirements"
+    ShowCaptionButton="True"
+    MergeOrder="8000">
+
+    <dxr1:RibbonPageGroup.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/RibbonMenuItemTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </dxr1:RibbonPageGroup.Resources>
+
+    <bars:BarSplitButtonItem Name="OpenRequirementRibbonGalleryBarItem"
+                            Content="Open"
+                            Hint="Open a requirement Browser"
+                            IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
+                            LargeGlyph="{dx:DXImage Image=BOReport_32x32.png}"
+                            RibbonStyle="Large"
+                            ActAsDropDown="True">
+        <bars:BarSplitButtonItem.PopupControl>
+            <dxr1:GalleryDropDownPopupMenu>
+                <dxr1:GalleryDropDownPopupMenu.Gallery>
+                    <bars:Gallery GroupsSource="{av:Binding OpenModels}"
+                                  GroupTemplate="{StaticResource groupTemplate}"
+                                  ItemCheckMode="Multiple"
+                                  IsGroupCaptionVisible="True"
+                                  ColCount="1">
+                    </bars:Gallery>
+                </dxr1:GalleryDropDownPopupMenu.Gallery>
+            </dxr1:GalleryDropDownPopupMenu>
+        </bars:BarSplitButtonItem.PopupControl>
+    </bars:BarSplitButtonItem>
+</dxr1:RibbonPageGroup>

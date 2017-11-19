@@ -1,0 +1,74 @@
+﻿<dx:DXWindow x:Class="CDP4ShellDialogs.Views.UriManager"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             SizeToContent="WidthAndHeight"
+             mc:Ignorable="d"
+             dx:ThemeManager.ThemeName="Seven"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
+             Title="Uri Manager">
+    <dxlc:LayoutControl Height="Auto"
+                        Background="White"
+                        Orientation="Vertical">
+        
+    <Grid>
+        <StackPanel>
+            <GroupBox Margin="5" Header="Uris">
+                <dxg:GridControl Height="200"
+					AllowLiveDataShaping="False"
+                    AllowUpdateTwoWayBoundPropertiesOnSynchronization="True"
+					ItemsSource="{Binding UriRowList}"
+					SelectedItem="{Binding SelectedUriRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+					SelectionMode="Row">
+                    <dxg:GridControl.View>
+                        <dxg:TableView AllowEditing="True"
+							AllowGrouping="False"
+                            NewItemRowPosition="Bottom"
+							IsDetailButtonVisibleBinding="{x:Null}"
+							ShowGroupPanel="False">
+                            <dxg:TableView.FocusedRow>
+                                <Dynamic:ExpandoObject />
+                            </dxg:TableView.FocusedRow>
+                        </dxg:TableView>
+                    </dxg:GridControl.View>
+                    <dxg:GridControl.Columns>
+                        <dxg:GridColumn FieldName="Alias" />
+                        <dxg:GridColumn Width="300" FieldName="Uri" />
+                         <dxg:GridColumn FieldName="ProxyUri" />
+                         <dxg:GridColumn FieldName="DalType" >
+                            <dxg:GridColumn.EditSettings>
+                                <dxe:ComboBoxEditSettings ItemsSource="{Binding DalTypesList}" />
+                            </dxg:GridColumn.EditSettings>
+                        </dxg:GridColumn>
+                    </dxg:GridControl.Columns>
+                </dxg:GridControl>
+            </GroupBox>
+                <dxlc:LayoutGroup Orientation="Horizontal">
+
+                <Button Width="103"
+            		Margin="5"
+            		HorizontalAlignment="Left"
+            		Command="{Binding DeleteRowCommand}"
+            		Content="Delete Row" />
+                <Button Width="75"
+            		Margin="5"
+            		Command="{Binding ApplyCommand}"
+            		Content="Apply" HorizontalAlignment="Right" />
+                <Button Width="75"
+            		Margin="5"
+            		HorizontalAlignment="Right"
+            		Command="{Binding CloseCommand}"
+            		Content="Cancel" />
+                </dxlc:LayoutGroup>
+            </StackPanel>
+    </Grid>
+    </dxlc:LayoutControl>
+</dx:DXWindow>

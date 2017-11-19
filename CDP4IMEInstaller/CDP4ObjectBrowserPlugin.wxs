@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <ComponentGroup Id="OBJECTBROWSER_CG" Directory="OBJECTBROWSER">
+      <Component Id="comp_ObjectBrowser" Guid="{719F4DCB-3ED3-4E6D-99FC-3FAC87742536}" Location="local">
+        <File Id="fil_ObjectBrowser"  Vital="yes" Source="$(var.CDP4ObjectBrowser.TargetPath)" KeyPath="yes"></File>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

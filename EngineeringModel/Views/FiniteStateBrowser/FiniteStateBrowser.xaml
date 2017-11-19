@@ -1,0 +1,215 @@
+<UserControl x:Class="CDP4EngineeringModel.Views.FiniteStateBrowser"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
+             xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             dx:ThemeManager.ThemeName="{Binding ThemeName}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/RibbonMenuItemTemplate.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+
+            <HierarchicalDataTemplate DataType="{x:Type cdp4Composition:FolderRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <dx:MeasurePixelSnapper>
+                <StackPanel Orientation="Horizontal">
+                    <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                    <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                </StackPanel>
+            </dx:MeasurePixelSnapper>
+        </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:PossibleFiniteStateListRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <dx:MeasurePixelSnapper>
+                <StackPanel Orientation="Horizontal">
+                    <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                    <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                </StackPanel>
+            </dx:MeasurePixelSnapper>
+        </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:PossibleFiniteStateRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <dx:MeasurePixelSnapper>
+                <StackPanel Orientation="Horizontal">
+                    <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                    <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                </StackPanel>
+            </dx:MeasurePixelSnapper>
+        </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ActualFiniteStateListRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <dx:MeasurePixelSnapper>
+                <StackPanel Orientation="Horizontal">
+                    <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                    <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                </StackPanel>
+            </dx:MeasurePixelSnapper>
+        </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ActualFiniteStateRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <dx:MeasurePixelSnapper>
+                <StackPanel Orientation="Horizontal">
+                    <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                    <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                </StackPanel>
+            </dx:MeasurePixelSnapper>
+        </HierarchicalDataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <views:CommonThingControl GridView="{Binding ElementName=FiniteStateView}" />
+
+        <views:BrowserHeader Grid.Row="1" />
+
+        <dxg:TreeListControl Grid.Row="2"
+                             MaxHeight="1080"
+                             ItemsSource="{Binding FiniteStateList}"
+                             SelectedItem="{Binding SelectedThing}"
+                             SelectionMode="Row"
+                             services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
+            <i:Interaction.Behaviors>
+                <dragDrop:FrameworkElementDragBehavior />
+                <dragDrop:FrameworkElementDropBehavior />
+            </i:Interaction.Behaviors>
+            <dxmvvm:Interaction.Behaviors>
+                <cdp4Composition:ContextMenuBehavior />
+            </dxmvvm:Interaction.Behaviors>
+            <dxg:TreeListControl.View>
+                <dxg:TreeListView x:Name="FiniteStateView"
+                                  MaxHeight="1080"
+                                  AllowEditing="False"
+                                  AutoWidth="False"
+                                  ExpandCollapseNodesOnNavigation="True"
+                                  HorizontalScrollbarVisibility="Auto"
+                                  NavigationStyle="Cell"
+                                  ShowHorizontalLines="False"
+                                  ShowIndicator="False"
+                                  ShowNodeImages="False"
+                                  ShowVerticalLines="False"
+                                  TreeDerivationMode="HierarchicalDataTemplate"
+                                  TreeLineStyle="Solid"
+                                  VerticalScrollbarVisibility="Auto">
+                    <dxg:TreeListView.FocusedRow>
+                        <dynamic:ExpandoObject />
+                    </dxg:TreeListView.FocusedRow>
+                    <dxg:TreeListView.ContextMenu>
+                        <ContextMenu Name="RowContextMenu" />
+                    </dxg:TreeListView.ContextMenu>
+                    <dxg:TreeListView.RowStyle>
+                        <Style TargetType="{x:Type dxg:RowControl}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                    <Setter Property="FontWeight" Value="Normal" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
+                                    <Setter Property="Background" Value="Yellow"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Row.IsExpanded}" Value="True">
+                                    <Setter Property="mvvm:TreeListNodesExpander.IsExpanded" Value="True"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </dxg:TreeListView.RowStyle>
+                </dxg:TreeListView>
+            </dxg:TreeListControl.View>
+            <dxg:TreeListControl.Columns>
+                <dxg:TreeListColumn FieldName="Name" />
+                <dxg:TreeListColumn FieldName="ShortName" Header="Short Name" />
+                <dxg:TreeListColumn FieldName="OwnerShortName" Header="Owner" />
+                <dxg:TreeListColumn FieldName="Kind" Header="State Kind" />
+            </dxg:TreeListControl.Columns>
+            <dxg:TreeListControl.InputBindings>
+                <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
+                <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
+            </dxg:TreeListControl.InputBindings>
+        </dxg:TreeListControl>
+    </Grid>
+</UserControl>

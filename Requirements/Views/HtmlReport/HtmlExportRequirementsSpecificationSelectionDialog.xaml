@@ -1,0 +1,83 @@
+﻿<dx:DXWindow x:Class="CDP4Requirements.Views.HtmlExportRequirementsSpecificationSelectionDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             mc:Ignorable="d" 
+             Title="Requirements HTML Report"
+             d:DesignHeight="200" d:DesignWidth="500"
+             Width="350"
+             Height="220"
+             dx:ThemeManager.ThemeName="Seven"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}" >
+
+    <dx:DXWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </dx:DXWindow.Resources>
+
+    <dxlc:LayoutControl Orientation="Vertical">
+        <dxlc:LayoutItem AddColonToLabel="True" Name="EngineeringModelSelection" Label="Engineering Model" ToolTip="Select an Engineering Model">
+            <dxe:ComboBoxEdit ItemsSource="{Binding PossibleEngineeringModels}" 
+                              SelectedItem="{Binding SelectedEngineeringModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }"    
+                              DisplayMember="EngineeringModelSetup.ShortName"
+                ></dxe:ComboBoxEdit>
+        </dxlc:LayoutItem>
+        <dxlc:LayoutItem AddColonToLabel="True" Name="IterationSelection" Label="Iteration" ToolTip="Select an Iteration">
+            <dxe:ComboBoxEdit ItemsSource="{Binding PossibleIterations}"
+                              SelectedItem="{Binding SelectedIteration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              DisplayMember="IterationSetup.IterationNumber"></dxe:ComboBoxEdit>
+        </dxlc:LayoutItem>
+        <dxlc:LayoutItem AddColonToLabel="True" Name="RequirementsSpecificationSelection"  Label="Requirements Specification" ToolTip="Select a Requirements Specification">
+            <dxe:ComboBoxEdit ItemsSource="{Binding PossibleRequirementsSpecifications}"
+                              SelectedItem="{Binding SelectedRequirementsSpecification, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              DisplayMember="ShortName"></dxe:ComboBoxEdit>
+        </dxlc:LayoutItem>
+
+        <dxlc:LayoutItem AddColonToLabel="True" 
+                                 LabelPosition="Left"
+                                 Label="Path">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="55" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0"
+                                 MinWidth="150"
+                                 IsEnabled="False"
+                                 Text="{Binding HtmlReportPath,
+                                                UpdateSourceTrigger=PropertyChanged,
+                                                Mode=TwoWay}" />
+                <Button Grid.Column="1"
+                                Margin="5,0,0,0"
+                                Command="{Binding BrowseCommand}"
+                                Content="..." />
+            </Grid>
+
+        </dxlc:LayoutItem>
+
+        <dxlc:LayoutGroup Orientation="Horizontal" Margin="3,3,0,0">
+
+            <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=OkCommand}"
+                    Content="Export" />
+            <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=CancelCommand}"
+                    Content="Cancel" />
+        </dxlc:LayoutGroup>
+    </dxlc:LayoutControl>
+            
+    
+</dx:DXWindow>
+

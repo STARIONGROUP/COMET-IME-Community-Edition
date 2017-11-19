@@ -1,0 +1,85 @@
+﻿<av:ResourceDictionary x:Class="CDP4CommonView.Resources.RibbonMenuItemTemplate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:av="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                       xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:menuItems="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             >
+    <DataTemplate x:Key="menuItemTemplate" DataType="{x:Type menuItems:RibbonMenuItemIterationDependentViewModel}">
+        <ContentControl>
+            <dxb:GalleryItem Caption="{Binding MenuItemContent}"
+                                 Glyph="{dx:DXImage Image=GroupFieldCollection_32x32.png}"
+                                 Description="{Binding Description}"
+                                 Command="{Binding ShowOrClosePanelCommand}"
+                                 IsChecked="{Binding IsChecked, Mode=TwoWay}">
+            </dxb:GalleryItem>
+        </ContentControl>
+    </DataTemplate>
+    <DataTemplate x:Key="optionMenuItemTemplate" DataType="{x:Type menuItems:RibbonMenuItemOptionDependentViewModel}">
+        <ContentControl>
+            <dxb:GalleryItem Caption="{Binding MenuItemContent}"
+                            Glyph="{dx:DXImage Image=Properties_32x32.png}"
+                            Description="{Binding Description}"
+                            Command="{Binding ShowOrClosePanelCommand}"
+                            IsChecked="{Binding IsChecked, Mode=TwoWay}">
+            </dxb:GalleryItem>
+        </ContentControl>
+    </DataTemplate>
+
+    <DataTemplate x:Key="engineeringModelItemTemplate" DataType="{x:Type menuItems:RibbonMenuItemEngineeringModelDependentViewModel}">
+        <ContentControl>
+            <dxb:GalleryItem Caption="{Binding Name}"
+                             Glyph="{dx:DXImage Image=Technology_32x32.png}"
+                             Description="{Binding Description}"
+                             Command="{Binding ShowOrClosePanelCommand}"
+                             IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+        </ContentControl>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="engineeringModelSetupItemTemplate" DataType="{x:Type menuItems:RibbonMenuItemEngineeringModelSetupDependentViewModel}">
+        <ContentControl>
+            <dxb:GalleryItem Caption="{Binding MenuItemContent}"
+                             Glyph="{dx:DXImage Image=Team_32x32.png}"
+                             Command="{Binding ShowOrClosePanelCommand}"
+                             IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+        </ContentControl>
+    </DataTemplate>
+
+    <DataTemplate x:Key="groupTemplate" DataType="{x:Type menuItems:EngineeringModelMenuGroupViewModel}">
+        <ContentControl>
+            <dxb:GalleryItemGroup Caption="{Binding Name}"
+                                IsCaptionVisible="True"
+                                ItemTemplate="{StaticResource menuItemTemplate}"
+                                ItemsSource="{Binding SelectedIterations}" />
+        </ContentControl>
+    </DataTemplate>
+    <DataTemplate x:Key="iterationGroupTemplate" DataType="{x:Type menuItems:IterationMenuGroupViewModel}">
+        <ContentControl>
+            <dxb:GalleryItemGroup Caption="{Binding Name}"
+                                IsCaptionVisible="True"
+                                ItemTemplate="{StaticResource optionMenuItemTemplate}"
+                                ItemsSource="{Binding SelectedOptions}" />
+        </ContentControl>
+    </DataTemplate>
+
+    <DataTemplate x:Key="sessionGroupTemplate" DataType="{x:Type menuItems:SessionMenuGroupViewModel}">
+        <ContentControl>
+            <dxb:GalleryItemGroup Caption="{Binding Name}"
+                                IsCaptionVisible="True"
+                                ItemTemplate="{StaticResource engineeringModelItemTemplate}"
+                                ItemsSource="{Binding EngineeringModels}" />
+        </ContentControl>
+    </DataTemplate>
+
+    
+    <DataTemplate x:Key="sessionEngineeringModelSetupGroupTemplate" DataType="{x:Type menuItems:SessionEngineeringModelSetupMenuGroupViewModel}">
+        <ContentControl>
+            <dxb:GalleryItemGroup Caption="{Binding Name}"
+                                  IsCaptionVisible="True"
+                                  ItemTemplate="{StaticResource engineeringModelSetupItemTemplate}"
+                                  ItemsSource="{Binding EngineeringModelSetups}"/>
+        </ContentControl>
+    </DataTemplate>
+
+</av:ResourceDictionary>

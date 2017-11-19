@@ -1,0 +1,42 @@
+<dxlc:LayoutItem x:Class="CDP4CommonView.Items.ScaleLayoutItem"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                  xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+                  MaxWidth="1000"
+                  HorizontalAlignment="Stretch"
+                  Height="200"
+                  mc:Ignorable="d"
+                  Label="Possible Scales: "
+                  LabelPosition="Top">
+    <dxlc:LayoutItem>
+        <dxlc:LayoutItem.Resources>
+            <ResourceDictionary>
+                <converters:NotConverter x:Key="NotConverter" />
+            </ResourceDictionary>
+        </dxlc:LayoutItem.Resources>
+        <dxg:GridControl x:Name="ScalesGrid"
+                         ItemsSource="{Binding PossiblePossibleScale}"
+                         SelectionMode="Row"
+                         SelectedItems="{Binding PossibleScale}">
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn FieldName="Name" ReadOnly="True"/>
+                <dxg:GridColumn FieldName="NumberSet" Header="Number set" ReadOnly="True" />
+                <dxg:GridColumn FieldName="Unit.ShortName" Header="Unit" ReadOnly="True"/>
+                <dxg:GridColumn FieldName="Container.ShortName" Header="RDL" ReadOnly="True"/>
+            </dxg:GridControl.Columns>
+            <dxg:GridControl.View>
+                <dxg:TableView x:Name="ScalesView" 
+                                AllowEditing="{Binding IsReadOnly, Converter={StaticResource NotConverter}, Mode=OneWay}"
+                                AutoWidth="True"
+                                ShowGroupPanel="False"
+                                AllowGrouping="False"
+                                HorizontalScrollbarVisibility="Visible"
+                                ShowCheckBoxSelectorColumn="True"/>
+            </dxg:GridControl.View>
+        </dxg:GridControl>
+    </dxlc:LayoutItem>
+</dxlc:LayoutItem>

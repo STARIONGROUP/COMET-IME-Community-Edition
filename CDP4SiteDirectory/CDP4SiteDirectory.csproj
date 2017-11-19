@@ -1,0 +1,513 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C268DF5F-FB28-46AE-AA9B-08E074E6AEF5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CDP4SiteDirectory</RootNamespace>
+    <AssemblyName>CDP4SiteDirectory</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\CDP4IME\bin\Debug\plugins\CDP4SiteDirectory\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\CDP4IME\bin\Debug\plugins\CDP4SiteDirectory\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CDP4Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.1.0.0-rc6\lib\net452\CDP4Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CDP4Dal, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.1.0.0-rc6\lib\net452\CDP4Dal.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CDP4JsonSerializer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.1.0.0-rc6\lib\net452\CDP4JsonSerializer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Data.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Printing.v15.2.Core, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Mvvm.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.SpellChecker.v15.2.Core, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Core.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Printing.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v15.2.Core, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.LayoutControl.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Ribbon.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.SpellChecker.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraPrinting.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraLayout.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.Composition">
+      <HintPath>..\packages\Prism.Composition.5.0.0\lib\NET45\Microsoft.Practices.Prism.Composition.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.Interactivity">
+      <HintPath>..\packages\Prism.Interactivity.5.0.0\lib\NET45\Microsoft.Practices.Prism.Interactivity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.MefExtensions">
+      <HintPath>..\packages\Prism.MEFExtensions.5.0.0\lib\NET45\Microsoft.Practices.Prism.MefExtensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.Mvvm">
+      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.Mvvm.Desktop">
+      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.Desktop.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.PubSubEvents">
+      <HintPath>..\packages\Prism.PubSubEvents.1.1.2\lib\portable-sl5+windowsphone8+windows8+net40+wpa81\Microsoft.Practices.Prism.PubSubEvents.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.SharedInterfaces">
+      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.SharedInterfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.5.0.0-beta11\lib\net45\NLog.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="ReactiveUI">
+      <HintPath>..\packages\reactiveui-core.6.4.0\lib\Net45\ReactiveUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Splat">
+      <HintPath>..\packages\Splat.1.6.0\lib\Net45\Splat.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Reactive.Core">
+      <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading">
+      <HintPath>..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Expression.Blend.Sdk.1.0.2\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Comparer\DomainRowComparer.cs" />
+    <Compile Include="Converters\VCardTypeConverter.cs" />
+    <Compile Include="Converters\DomainListToObjectListConverter.cs" />
+    <Compile Include="OfficeRibbon\SiteDirectoryRibbonPart.cs" />
+    <Compile Include="SiteDirectoryModule.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\Dialogs\EngineeringModelSetupSelectionResult.cs" />
+    <Compile Include="ViewModels\Dialogs\IterationSetupDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\Row\IterationSetupListBoxItem.cs" />
+    <Compile Include="ViewModels\Dialogs\Row\TelephoneNumberRowViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\SiteReferenceDataLibraryDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\DomainOfExpertiseDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\EmailAddressDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\NaturalLanguageDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\OrganizationDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\ParticipantDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\ParticipantRoleDialogViewModel.cs" />
+    <Compile Include="ViewModels\DomainOfExpertiseBrowser\DomainOfExpertiseRibbonViewModel.cs" />
+    <Compile Include="ViewModels\ModelBrowser\ModelBrowserViewModel.cs" />
+    <Compile Include="ViewModels\ModelBrowser\ModelRibbonViewModel.cs" />
+    <Compile Include="ViewModels\ModelBrowser\Rows\EngineeringModelSetupRowViewModel.cs" />
+    <Compile Include="ViewModels\ModelBrowser\Rows\IterationSetupRowViewModel.cs" />
+    <Compile Include="ViewModels\ModelBrowser\Rows\ModelParticipantRowViewModel.cs" />
+    <Compile Include="ViewModels\NaturalLanguages\NaturalLanguageBrowserViewModel.cs" />
+    <Compile Include="ViewModels\NaturalLanguages\NaturalLanguageRibbonViewModel.cs" />
+    <Compile Include="ViewModels\DomainOfExpertiseBrowser\DomainOfExpertiseBrowserViewModel.cs" />
+    <Compile Include="ViewModels\OrganizationBrowser\PersonRowViewModel.cs" />
+    <Compile Include="ViewModels\RoleBrowser\ParticipantPermissionRowViewModel.cs" />
+    <Compile Include="ViewModels\RoleBrowser\ParticipantRoleRowViewModel.cs" />
+    <Compile Include="ViewModels\RoleBrowser\PersonPermissionRowViewModel.cs" />
+    <Compile Include="ViewModels\RoleBrowser\PersonRoleRowViewModel.cs" />
+    <Compile Include="ViewModels\HighlightingRibbonViewModel.cs" />
+    <Compile Include="ViewModels\ShowDeprecatedRibbonViewModel.cs" />
+    <Compile Include="ViewModels\SiteRdlBrowser\SiteRdlBrowserRibbonViewModel.cs" />
+    <Compile Include="ViewModels\SiteRdlBrowser\SiteRdlBrowserViewModel.cs" />
+    <Compile Include="ViewModels\SiteRdlBrowser\SiteRdlRowViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\EngineeringModelSetupSelectionDialogViewModel.cs" />
+    <Compile Include="ViewModels\TeamComposition\TeamCompositionBrowserViewModel.cs" />
+    <Compile Include="ViewModels\TeamComposition\TeamCompositionBrowserRibbonViewModel.cs" />
+    <Compile Include="ViewModels\TeamComposition\TeamCompositionCardViewModel.cs" />
+    <Compile Include="Views\Dialogs\EngineeringModelSetupSelectionDialog.xaml.cs">
+      <DependentUpon>EngineeringModelSetupSelectionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\SiteReferenceDataLibraryDialog.xaml.cs">
+      <DependentUpon>SiteReferenceDataLibraryDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\ParticipantDialog.xaml.cs">
+      <DependentUpon>ParticipantDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\DomainOfExpertiseDialog.xaml.cs">
+      <DependentUpon>DomainOfExpertiseDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\Dialogs\PersonDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\PersonRoleDialogViewModel.cs" />
+    <Compile Include="ViewModels\PersonBrowser\PersonBrowserRibbonViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\TelephoneNumberDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\UserPreferenceDialogViewModel.cs" />
+    <Compile Include="Views\Dialogs\EmailAddressDialog.xaml.cs">
+      <DependentUpon>EmailAddressDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\NaturalLanguageDialog.xaml.cs">
+      <DependentUpon>NaturalLanguageDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\OrganizationDialog.xaml.cs">
+      <DependentUpon>OrganizationDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\OrganizationBrowser\OrganizationBrowserRibbonViewModel.cs" />
+    <Compile Include="ViewModels\OrganizationBrowser\OrganizationBrowserViewModel.cs" />
+    <Compile Include="ViewModels\PersonBrowser\ParticipantRowViewModel.cs" />
+    <Compile Include="ViewModels\PersonBrowser\PersonBrowserViewModel.cs" />
+    <Compile Include="ViewModels\PersonBrowser\PersonRowViewModel.cs" />
+    <Compile Include="ViewModels\RoleBrowser\RoleBrowserRibbonViewModel.cs" />
+    <Compile Include="ViewModels\RoleBrowser\RoleBrowserViewModel.cs" />
+    <Compile Include="Views\Dialogs\ParticipantRoleDialog.xaml.cs">
+      <DependentUpon>ParticipantRoleDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\PersonRoleDialog.xaml.cs">
+      <DependentUpon>PersonRoleDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\PersonDialog.xaml.cs">
+      <DependentUpon>PersonDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\IterationSetupDialog.xaml.cs">
+      <DependentUpon>IterationSetupDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DomainOfExpertiseBrowser\DomainOfExpertiseBrowser.xaml.cs">
+      <DependentUpon>DomainOfExpertiseBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DomainOfExpertiseBrowser\DomainOfExpertiseRibbon.xaml.cs">
+      <DependentUpon>DomainOfExpertiseRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\HighlightingRibbon.xaml.cs">
+      <DependentUpon>HighlightingRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ModelBrowser\ModelRibbon.xaml.cs">
+      <DependentUpon>ModelRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ModelBrowser\ModelBrowser.xaml.cs">
+      <DependentUpon>ModelBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NaturalLanguages\NaturalLanguageBrowser.xaml.cs">
+      <DependentUpon>NaturalLanguageBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\TelephoneNumberDialog.xaml.cs">
+      <DependentUpon>TelephoneNumberDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NaturalLanguages\NaturalLanguageRibbon.xaml.cs">
+      <DependentUpon>NaturalLanguageRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\UserPreferenceDialog.xaml.cs">
+      <DependentUpon>UserPreferenceDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\OrganizationBrowser\OrganizationBrowser.xaml.cs">
+      <DependentUpon>OrganizationBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\OrganizationBrowser\OrganizationBrowserRibbon.xaml.cs">
+      <DependentUpon>OrganizationBrowserRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PersonBrowser\PersonBrowserRibbon.xaml.cs">
+      <DependentUpon>PersonBrowserRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PersonBrowser\PersonBrowser.xaml.cs">
+      <DependentUpon>PersonBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RoleBrowser\RoleBrowser.xaml.cs">
+      <DependentUpon>RoleBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RoleBrowser\RoleBrowserRibbon.xaml.cs">
+      <DependentUpon>RoleBrowserRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ShowDeprecatedRibbon.xaml.cs">
+      <DependentUpon>ShowDeprecatedRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SiteDirectoryRibbon.xaml.cs">
+      <DependentUpon>SiteDirectoryRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SiteRdlBrowser\SiteRdlBrowserRibbon.xaml.cs">
+      <DependentUpon>SiteRdlBrowserRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SiteRdlBrowser\SiteRdlBrowser.xaml.cs">
+      <DependentUpon>SiteRdlBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TeamComposition\TeamCompositionBrowser.xaml.cs">
+      <DependentUpon>TeamCompositionBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TeamComposition\TeamCompositionBrowserRibbon.xaml.cs">
+      <DependentUpon>TeamCompositionBrowserRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserManagementRibbonControls.xaml.cs">
+      <DependentUpon>UserManagementRibbonControls.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
+      <Project>{5e0e5c30-df40-4708-abae-4da03ec9b881}</Project>
+      <Name>CDP4CommonView</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
+      <Project>{866D3D1A-DEA1-4C0D-A2EC-972CF450D0C4}</Project>
+      <Name>CDP4Composition</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Page Include="Views\Dialogs\EngineeringModelSetupSelectionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\SiteReferenceDataLibraryDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\ParticipantDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\DomainOfExpertiseDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\EmailAddressDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\NaturalLanguageDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\OrganizationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\ParticipantRoleDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\PersonRoleDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\IterationSetupDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\DomainOfExpertiseBrowser\DomainOfExpertiseBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DomainOfExpertiseBrowser\DomainOfExpertiseRibbon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\HighlightingRibbon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ModelBrowser\ModelRibbon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ModelBrowser\ModelBrowser.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\NaturalLanguages\NaturalLanguageBrowser.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\NaturalLanguages\NaturalLanguageRibbon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\PersonDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\TelephoneNumberDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\UserPreferenceDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\OrganizationBrowser\OrganizationBrowser.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\OrganizationBrowser\OrganizationBrowserRibbon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PersonBrowser\PersonBrowserRibbon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PersonBrowser\PersonBrowser.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\RoleBrowser\RoleBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RoleBrowser\RoleBrowserRibbon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ShowDeprecatedRibbon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SiteDirectoryRibbon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SiteRdlBrowser\SiteRdlBrowserRibbon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SiteRdlBrowser\SiteRdlBrowser.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TeamComposition\TeamCompositionBrowser.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TeamComposition\TeamCompositionBrowserRibbon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserManagementRibbonControls.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RibbonXml\SiteDirectoryRibbon.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

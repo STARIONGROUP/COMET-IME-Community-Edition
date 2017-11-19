@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <ComponentGroup Id="PARAMETERSHEETGENERATOR_CG" Directory="PARAMETERSHEETGENERATOR">
+      <Component Id="comp_ParameterSheetGenerator" Guid="{6D18C516-993E-4C05-A9FF-045FDA734439}" Location="local">
+        <File Id="fil_ParameterSheetGenerator"  Vital="yes" Source="$(var.CDP4ParameterSheetGenerator.TargetPath)" KeyPath="yes"></File>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

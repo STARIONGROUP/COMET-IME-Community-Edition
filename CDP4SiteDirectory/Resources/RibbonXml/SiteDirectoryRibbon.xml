@@ -1,0 +1,11 @@
+﻿<ribbonxml>
+  <group id="SiteDirectory" label="Site Directory">
+    <button id="ShowDomainsOfExpertise" size="large" label="Domains of expertise" supertip="Manage Domains of expertise" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
+    <button id="ShowModels" size="large" label="Models" supertip="Manage Engineering Models" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
+    <button id="ShowLanguages" size="large" label="Languages" supertip="Manage Languages" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
+    <button id="ShowOrganizations" size="large" label="Organizations" supertip="Manage Organizations" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
+    <button id="ShowPersons" size="large" label="Persons" supertip="Manage Persons" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
+    <button id="ShowRoles" size="large" label="Roles" supertip="Manage Roles" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
+    <button id="ShowSiteRDLs" size="large" label="Site RDLs" supertip="Manage Site RDLs" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
+  </group>
+</ribbonxml>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<nlog xmlns="NLog.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- See http://nlog-project.org/wiki/Configuration_file for information on customizing logging rules and outputs. -->
+  <targets>
+    <!--
+    <target name="logfile" xsi:type="File" createDirs="true" 
+            fileName="${specialfolder:LocalApplicationData}/RHEA/CDP4/Addin.log" 
+            archiveFileName="${specialfolder:LocalApplicationData}/RHEA/CDP4/Addin.log.{#}" 
+            archiveEvery="Day" 
+            archiveNumbering="Rolling"
+            layout="${longdate}|${level:uppercase=true}|${logger}|${message}">     
+    </target>
+    -->
+    <target name="logfile" xsi:type="File" createDirs="true"
+            fileName="C:\Temp\CDP4IME.log"
+            archiveFileName="C:\Temp\CDP4IME.log.{#}"
+            archiveEvery="Day"
+            archiveNumbering="Rolling"
+            layout="${longdate}|${level:uppercase=true}|${logger}|${callsite}|${message}">
+    </target>
+    <target name="console" xsi:type="Console" layout="${level}: ${message}"/>
+  </targets>
+  <rules>
+    <logger name="*" minlevel="Fatal" writeTo="logfile"/>
+    <!-- <logger name="*" minlevel="Warn" writeTo="console"/> -->
+  </rules>
+</nlog>

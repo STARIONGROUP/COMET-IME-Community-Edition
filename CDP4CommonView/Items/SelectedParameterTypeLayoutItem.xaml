@@ -1,0 +1,62 @@
+﻿<dxlc:LayoutItem x:Class="CDP4CommonView.Items.SelectedParameterTypeLayoutItem"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                 xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                 xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:local="clr-namespace:CDP4CommonView.Converters"
+                 Label="Parameter Type:"
+                 mc:Ignorable="d">
+    <dxlc:LayoutItem.Resources>
+        <local:ParameterTypeToDescriptionConverter x:Key="ParameterTypeToDescriptionConverter"></local:ParameterTypeToDescriptionConverter>
+    </dxlc:LayoutItem.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="35" />
+        </Grid.ColumnDefinitions>
+        <dxe:ComboBoxEdit Name="SelectedParameterType"
+                          DisplayTextConverter="{StaticResource ParameterTypeToDescriptionConverter}"
+                          EditValue="{Binding Path=SelectedParameterType,
+                                              Mode=TwoWay,
+                                              UpdateSourceTrigger=PropertyChanged}"
+                          IsReadOnly="{Binding IsParameterTypeReadOnly}"
+                          IsTextEditable="False"
+                          ItemsSource="{Binding Path=PossibleParameterType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                          ShowCustomItems="False" >
+
+            <dxe:ComboBoxEdit.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Path=ShortName}" />
+                        <TextBlock Text=" - " />
+                        <TextBlock Text="{Binding Path=Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </dxe:ComboBoxEdit.ItemTemplate>
+
+        </dxe:ComboBoxEdit>
+        
+            <Button Grid.Column="1"
+                Width="25"
+                Height="25"
+                Margin="3"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Command="{Binding InspectSelectedParameterTypeCommand}">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="Padding" Value="1"/>
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Button.Style>
+        </Button>
+    </Grid>
+</dxlc:LayoutItem>

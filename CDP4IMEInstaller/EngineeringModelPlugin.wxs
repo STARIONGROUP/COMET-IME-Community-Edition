@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <ComponentGroup Id="ENGINEERINGMODEL_CG" Directory="ENGINEERINGMODEL">
+      <Component Id="comp_EngineeringModel" Guid="{6FBD347F-FE92-4A1C-9FCD-5AF3900F60E7}" Location="local">
+        <File Id="fil_EngineeringModel"  Vital="yes" Source="$(var.EngineeringModel.TargetPath)" KeyPath="yes"></File>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

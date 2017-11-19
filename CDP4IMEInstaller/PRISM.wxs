@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+    <ComponentGroup Id="PRISM" Directory="BIN">
+      <Component Id="comp_prism_composition" Guid="{2BB4DF29-2F9E-43F0-8195-E4F4D2F8E267}" Location="local">
+        <File Id="fil_prism_composition" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.Prism.Composition.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_prism_Interactivity" Guid="{228ECD3D-365E-4EEF-A4AE-0DB3C1D59DC0}" Location="local">
+        <File Id="fil_prism_Interactivity" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.Prism.Interactivity.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_prism_MefExtensions" Guid="{9EAD0AE0-C1B9-4A2E-A473-5FD1012A4576}" Location="local">
+        <File Id="fil_prism_MefExtensions" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.Prism.MefExtensions.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_prism_Mvvm_Desktop" Guid="{5851F498-FAD5-41D7-AEFA-EF6B6D5E1AEA}" Location="local">
+        <File Id="fil_prism_Mvvm_Desktop" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.Prism.Mvvm.Desktop.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_prism_Mvvm" Guid="{DC380E3C-7480-46F3-95F4-FFE816380CB8}" Location="local">
+        <File Id="fil_prism_Mvvm" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.Prism.Mvvm.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_prism_PubSubEvents" Guid="{DA930744-9C5C-482C-8402-C11C19CAB3B4}" Location="local">
+        <File Id="fil_prism_PubSubEvents" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.Prism.PubSubEvents.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_prism_SharedInterfaces" Guid="{A45D6E5C-D53B-4087-803F-45A764FE1CA2}" Location="local">
+        <File Id="fil_prism_SharedInterfaces" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.Prism.SharedInterfaces.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_prism_ServiceLocation" Guid="{BD87EF72-75C3-49F8-B720-911947894B5C}" Location="local">
+        <File Id="fil_prism_ServiceLocation" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.ServiceLocation.dll" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

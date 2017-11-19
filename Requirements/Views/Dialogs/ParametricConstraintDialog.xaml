@@ -1,0 +1,96 @@
+﻿<dx:DXWindow
+    x:Class="CDP4Requirements.Views.ParametricConstraintDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+    xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+    xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
+    xmlns:viewModels="clr-namespace:CDP4Requirements.ViewModels"
+    Title="Parametric constraint" Height="350" Width="525"
+    navigation:DialogCloser.DialogResult="{Binding DialogResult}">
+    <dx:DXWindow.Resources>
+        <DataTemplate DataType="{x:Type mvvm:ContextMenuItemViewModel}">
+            <ContentControl>
+                <dxb:BarButtonItem Command="{Binding MenuCommand}" 
+                                       Content="{Binding Header}"
+                                       Glyph="{dx:DXImage Image=Add_16x16.png}">
+                </dxb:BarButtonItem>
+            </ContentControl>
+        </DataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:RelationalExpressionRowViewModel}"/>
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:AndExpressionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}"/>
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:OrExpressionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}"/>
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:NotExpressionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}"/>
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:ExclusiveOrExpressionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}"/>
+    </dx:DXWindow.Resources>
+    <dxlc:LayoutControl Margin="5"
+                      Orientation="Vertical"
+                      ScrollBars="None">
+        <dxlc:LayoutGroup Margin="-10,-7,-10,-5"
+                        Orientation="Vertical"
+                        View="Tabs"
+                        dxlc:LayoutControl.AllowHorizontalSizing="True">
+            <dxlc:LayoutGroup Header="Basic" Orientation="Vertical">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <dxlc:LayoutItem>
+                        <dxb:ToolBarControl Height="30" Background="Transparent">
+                            <dxb:BarSplitButtonItem Glyph="{dx:DXImage Image=Add_16x16.png}" 
+                                                    Hint="Create an expression.">
+                                <dxb:BarSplitButtonItem.PopupControl>
+                                    <dxb:PopupMenu ItemLinksSource="{Binding Path=CreateContextMenu, Mode=OneWay}" />
+                                </dxb:BarSplitButtonItem.PopupControl>
+                            </dxb:BarSplitButtonItem>
+                            <dxb:BarButtonItem x:Name="DeleteExpressionButton"
+                                           Command="{Binding DeleteExpressionCommand}"
+                                           Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                           Hint="Deprecate the selected Expression" />
+                            <dxb:BarButtonItem x:Name="EditExpressionButton"
+                                           Command="{Binding EditExpressionCommand}"
+                                           Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                           Hint="Edit the selected Expression" />
+                            <dxb:BarButtonItem Command="{Binding InspectExpressionCommand}"
+                                           Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                           Hint="Inspect the selected Expression" />
+                        </dxb:ToolBarControl>
+                    </dxlc:LayoutItem>
+                    <dxg:TreeListControl x:Name="ParametricConstraintTreeListControl"
+                             Grid.Row="1"
+                             ItemsSource="{Binding Path=Expression}"
+                             SelectedItem="{Binding SelectedExpression,  Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <dxg:TreeListControl.Columns>
+                            <dxg:TreeListColumn Binding="{Binding Thing.StringValue}" Header="Value" Width="444"/>
+                        </dxg:TreeListControl.Columns>
+                        <dxg:TreeListControl.View>
+                            <dxg:TreeListView x:Name="View"
+                                  AllowEditing="False"
+                                  AutoWidth="False"
+                                  HorizontalScrollbarVisibility="Auto"
+                                  NavigationStyle="Cell"
+                                  ShowFilterPanelMode="Never"
+                                  ShowHorizontalLines="False"
+                                  ShowIndicator="False"
+                                  ShowNodeImages="False"
+                                  AutoExpandAllNodes="True"
+                                  ShowVerticalLines="False"
+                                  TreeDerivationMode="HierarchicalDataTemplate"
+                                  TreeLineStyle="Solid"
+                                  VerticalScrollbarVisibility="Auto">
+                            </dxg:TreeListView>
+                        </dxg:TreeListControl.View>
+                    </dxg:TreeListControl>
+                </Grid>
+            </dxlc:LayoutGroup>
+            <items:AdvancedLayoutGroup/>
+        </dxlc:LayoutGroup>
+        <items:UserValidationButtonsLayoutGroup/>
+        <items:ErrorMessageLayoutGroup/>
+    </dxlc:LayoutControl>
+</dx:DXWindow>

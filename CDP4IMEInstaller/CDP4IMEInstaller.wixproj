@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.9</ProductVersion>
+    <ProjectGuid>2ee90906-5978-4c5a-a9be-1d8feb5adce9</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>CDP4IMEInstaller</OutputName>
+    <OutputType>Package</OutputType>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DefineConstants>Debug</DefineConstants>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CDP4IME.wxs" />
+    <Compile Include="CDP4Addin.wxs" />
+    <Compile Include="BasicRDLPlugin.wxs" />
+    <Compile Include="CDP4LogInfoPlugin.wxs" />
+    <Compile Include="CDP4ObjectBrowserPlugin.wxs" />
+    <Compile Include="CDP4PropertyGridPlugin.wxs" />
+    <Compile Include="CDP4RelationshipEditor.wxs" />
+    <Compile Include="CDP4Scripting.wxs" />
+    <Compile Include="CDP4SiteDirectoryPlugin.wxs" />
+    <Compile Include="CDP4WspDalPlugin.wxs" />
+    <Compile Include="CDP4JsonFileDalPlugin.wxs" />
+    <Compile Include="CDP4ServicesDal.wxs" />
+    <Compile Include="Dependencies.wxs" />
+    <Compile Include="EngineeringModelPlugin.wxs" />
+    <Compile Include="CDP4BuiltInRules.wxs" />
+    <Compile Include="ParameterSheetGeneratorPlugin.wxs" />
+    <Compile Include="PRISM.wxs" />
+    <Compile Include="Plugins.wxs" />
+    <Compile Include="Directories.wxs" />
+    <Compile Include="Product.wxs" />
+    <Compile Include="ProductTreePlugin.wxs" />
+    <Compile Include="RequirementsPlugin.wxs" />
+    <Compile Include="Resources.wxs" />
+    <Compile Include="Shortcuts.wxs" />
+    <Compile Include="thirdpartylicenses.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="background.bmp" />
+    <Content Include="banner.bmp" />
+    <Content Include="cdplogo_48x48.ico" />
+    <Content Include="license.rtf" />
+    <Content Include="ThirdPartyLicense\AvalonEdit.txt" />
+    <Content Include="ThirdPartyLicense\CastleCore.txt" />
+    <Content Include="ThirdPartyLicense\CommonServiceLocator.txt" />
+    <Content Include="ThirdPartyLicense\CsvHelper.txt" />
+    <Content Include="ThirdPartyLicense\dotliquid.txt" />
+    <Content Include="ThirdPartyLicense\DotNetZip.txt" />
+    <Content Include="ThirdPartyLicense\DynamicLanguageRuntime.txt" />
+    <Content Include="ThirdPartyLicense\ExceptionReporter.txt" />
+    <Content Include="ThirdPartyLicense\Hardcodet.Wpf.TaskbarNotification.txt" />
+    <Content Include="ThirdPartyLicense\IronPython.txt" />
+    <Content Include="ThirdPartyLicense\MoonSharp.txt" />
+    <Content Include="ThirdPartyLicense\NetOffice.txt" />
+    <Content Include="ThirdPartyLicense\Newtonsoft.Json.txt" />
+    <Content Include="ThirdPartyLicense\NLog.txt" />
+    <Content Include="ThirdPartyLicense\Prism.Composition.txt" />
+    <Content Include="ThirdPartyLicense\Prism.Interactivity.txt" />
+    <Content Include="ThirdPartyLicense\Prism.MEFExtensions.txt" />
+    <Content Include="ThirdPartyLicense\Prism.Mvvm.txt" />
+    <Content Include="ThirdPartyLicense\Prism.PubSubEvents.txt" />
+    <Content Include="ThirdPartyLicense\Prism.txt" />
+    <Content Include="ThirdPartyLicense\reactiveui-core.txt" />
+    <Content Include="ThirdPartyLicense\reactiveui.txt" />
+    <Content Include="ThirdPartyLicense\Rx-Core.txt" />
+    <Content Include="ThirdPartyLicense\Rx-Interfaces.txt" />
+    <Content Include="ThirdPartyLicense\Rx-Linq.txt" />
+    <Content Include="ThirdPartyLicense\Rx-Main.txt" />
+    <Content Include="ThirdPartyLicense\Rx-PlatformServices.txt" />
+    <Content Include="ThirdPartyLicense\Rx-XAML.txt" />
+    <Content Include="ThirdPartyLicense\Splat.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BasicRdl\BasicRdl.csproj">
+      <Name>BasicRdl</Name>
+      <Project>{bedcc5c5-83b2-41ed-ac9f-895757553bf2}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4Addin\CDP4Addin.csproj">
+      <Name>CDP4Addin</Name>
+      <Project>{161e536a-db05-4bfd-badd-a5b9ef605da5}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4BuiltInRules\CDP4BuiltInRules.csproj">
+      <Name>CDP4BuiltInRules</Name>
+      <Project>{1caceea5-d398-419d-b88b-d4cc4ea67eed}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
+      <Name>CDP4CommonView</Name>
+      <Project>{5e0e5c30-df40-4708-abae-4da03ec9b881}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
+      <Name>CDP4Composition</Name>
+      <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4IME\CDP4IME-CE.csproj">
+      <Name>CDP4IME-CE</Name>
+      <Project>{e8a6c54e-80c1-42e3-a2c2-d698b97be7c2}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4JsonFileDal\CDP4JsonFileDal.csproj">
+      <Name>CDP4JsonFileDal</Name>
+      <Project>{7c432d61-867c-4dd2-8b14-ee8aefd0b3a4}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4LogInfo\CDP4LogInfo.csproj">
+      <Name>CDP4LogInfo</Name>
+      <Project>{d619e973-c080-4b58-8e69-565bf7218f4b}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4ObjectBrowser\CDP4ObjectBrowser.csproj">
+      <Name>CDP4ObjectBrowser</Name>
+      <Project>{c6b4a2b4-5dd4-45d8-93b4-17df82641b86}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4ParameterSheetGenerator\CDP4ParameterSheetGenerator.csproj">
+      <Name>CDP4ParameterSheetGenerator</Name>
+      <Project>{05b9fb71-dffd-40bc-bf35-f05a1f3cf217}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4PropertyGrid\CDP4PropertyGrid.csproj">
+      <Name>CDP4PropertyGrid</Name>
+      <Project>{4b9058f7-6acc-4c1e-b1cd-969b04a9cd9c}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4RelationshipEditor\CDP4RelationshipEditor.csproj">
+      <Name>CDP4RelationshipEditor</Name>
+      <Project>{e8bef8ce-68cb-4ab7-93c9-70679b9b4d83}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4Scripting\CDP4Scripting.csproj">
+      <Name>CDP4Scripting</Name>
+      <Project>{da9183ab-d060-488f-89e9-dec1f0177b1e}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4ServicesDal\CDP4ServicesDal.csproj">
+      <Name>CDP4ServicesDal</Name>
+      <Project>{03c264a0-398b-4c78-83ba-edea6ba7f679}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4ShellDialogs\CDP4ShellDialogs.csproj">
+      <Name>CDP4ShellDialogs</Name>
+      <Project>{1aed77dd-0626-410d-a5ed-8b8f7d8a1aac}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4SiteDirectory\CDP4SiteDirectory.csproj">
+      <Name>CDP4SiteDirectory</Name>
+      <Project>{c268df5f-fb28-46ae-aa9b-08e074e6aef5}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4WspDal\CDP4WspDal.csproj">
+      <Name>CDP4WspDal</Name>
+      <Project>{3e0504f1-b0ce-4115-bcfc-7f462b14e5a1}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\EngineeringModel\EngineeringModel.csproj">
+      <Name>EngineeringModel</Name>
+      <Project>{7b0f3699-960f-4a9c-bc32-6a5b73a5b895}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\ProductTree\ProductTree.csproj">
+      <Name>ProductTree</Name>
+      <Project>{2fff0b74-7e29-41a2-a1ff-5004ce27d22a}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\Requirements\Requirements.csproj">
+      <Name>Requirements</Name>
+      <Project>{cb6f4ad4-4dfa-4f99-a2e8-9b468820266e}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ThirdPartyLicense" />
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+  <!--
+	To modify your build process, add your task inside one of the targets below and uncomment it.
+	Other similar extension points exist, see Wix.targets.
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+</Project>

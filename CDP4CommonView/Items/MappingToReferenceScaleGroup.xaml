@@ -1,0 +1,72 @@
+<dxlc:LayoutGroup x:Class="CDP4CommonView.Items.MappingToReferenceScaleLayoutGroup"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+                  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                  xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                  xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+                  d:DesignWidth="390"
+                  Header="Mappings"
+                  Orientation="Vertical"
+                  mc:Ignorable="d">
+    <dxlc:LayoutGroup.Resources>
+    </dxlc:LayoutGroup.Resources>
+    <dxlc:LayoutItem>
+        <dxb:ToolBarControl Height="30" Background="Transparent">
+            <dxb:BarButtonItem x:Name="CreateMappingToReferenceScaleButton"
+                               Command="{Binding CreateMappingToReferenceScaleCommand}"
+                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                               Hint="Create a new Mapping To Reference Scale " />
+            <dxb:BarButtonItem x:Name="DeleteMappingToReferenceScaleButton"
+                               Command="{Binding DeleteMappingToReferenceScaleCommand}"
+                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                               Hint="Delete the selected Mapping To Reference Scale " />
+            <dxb:BarButtonItem x:Name="EditMappingToReferenceScaleButton"
+                               Command="{Binding EditMappingToReferenceScaleCommand}"
+                               Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                               Hint="Edit the selected Mapping To Reference Scale " />
+            <dxb:BarButtonItem x:Name="InspectMappingToReferenceScaleCommand"
+                               Command="{Binding InspectMappingToReferenceScaleCommand}"
+                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                               Hint="Inspect the selected Mapping To Reference Scale " />
+            <dxb:BarButtonItem x:Name="HelpMappingToReferenceScaleButton"
+                               Command="{Binding HelpMappingToReferenceScaleCommand}"
+                               Glyph="{dx:DXImage Image=Info_16x16.png}"
+                               Hint="Show Help" />
+        </dxb:ToolBarControl>
+    </dxlc:LayoutItem>
+
+    <dxlc:LayoutItem>
+        <dxg:GridControl AllowLiveDataShaping="False"
+                         ItemsSource="{Binding MappingToReferenceScale }"
+                         SelectedItem="{Binding SelectedMappingToReferenceScale , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         SelectionMode="Row">
+            <dxg:GridControl.View>
+                <dxg:TableView Name="MappingToReferenceScaleView"
+                               Height="150"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               AllowColumnMoving="True"
+                               AllowEditing="False"
+                               AllowGrouping="True"
+                               AutoWidth="False"
+                               IsDetailButtonVisibleBinding="{x:Null}"
+                               ShowGroupPanel="False"
+                               VerticalScrollbarVisibility="Auto">
+                    <dxg:TableView.FocusedRow>
+                        <dynamic:ExpandoObject />
+                    </dxg:TableView.FocusedRow>
+                </dxg:TableView>
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn FieldName="ReferenceScaleValue.ShortName" Header="Reference"/>
+                <dxg:GridColumn FieldName="ReferenceScaleValue.Value" Header="Reference value"/>
+                <dxg:GridColumn FieldName="DependentScaleValue.ShortName" Header="Dependent"/>
+                <dxg:GridColumn FieldName="DependentScaleValue.Value" Header="Dependent value"/>
+            </dxg:GridControl.Columns>
+        </dxg:GridControl>
+    </dxlc:LayoutItem>
+</dxlc:LayoutGroup>

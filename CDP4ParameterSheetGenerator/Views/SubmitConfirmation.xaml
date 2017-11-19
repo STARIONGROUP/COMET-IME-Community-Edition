@@ -1,0 +1,230 @@
+﻿<dx:DXWindow x:Class="CDP4ParameterSheetGenerator.Views.SubmitConfirmation"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:common="clr-namespace:CDP4Common.SiteDirectoryData;assembly=CDP4Common"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:viewModels="clr-namespace:CDP4ParameterSheetGenerator.ViewModels"
+             xmlns:views="clr-namespace:CDP4ParameterSheetGenerator.Views"
+             Title="{Binding DialogTitle}"
+             Width="600"
+             Height="600"
+             dx:ThemeManager.ThemeName="Seven"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             Background="White"
+             WindowStartupLocation="CenterOwner"
+             mc:Ignorable="d">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <dx:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+            <DataTemplate x:Key="CheckEditTemplate">
+                <CheckBox x:Name="PART_Editor"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center" />
+            </DataTemplate>
+
+            <DataTemplate x:Key="CheckBoxDisplayTemplate">
+                <dxe:CheckEdit EditMode="InplaceInactive"
+                               IsChecked="{Binding EditValue,
+                                                   Mode=TwoWay,
+                                                   RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                               IsEnabled="{Binding Path=DataContext.RowData.Row.IsSelected,
+                                                   Mode=OneTime}" />
+            </DataTemplate>
+
+            <DataTemplate x:Key="CheckBoxEditTemplate">
+                <dxe:CheckEdit x:Name="PART_Editor"
+                               EditMode="InplaceActive"
+                               IsChecked="{Binding EditValue,
+                                                   Mode=TwoWay,
+                                                   UpdateSourceTrigger=PropertyChanged,
+                                                   RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                               IsEnabled="{Binding Path=DataContext.RowData.Row.IsSelected,
+                                                   Mode=OneTime}" />
+            </DataTemplate>
+
+            <DataTemplate x:Key="ValidationErrorTemplate">
+                <Image x:Name="PART_Editor"
+                       Width="16"
+                       Height="16"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Source="{dx:DXImage Image=Cancel_16x16.png}" />
+            </DataTemplate>
+            
+            <DataTemplate x:Key="ValidationSuccessTemplate">
+                <Image x:Name="PART_Editor"
+                       Width="16"
+                       Height="16"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Source="{dx:DXImage Image=Apply_16x16.png}" />
+            </DataTemplate>
+
+            <views:SubmitRowDataTemplateSelector x:Key="DataTemplateSelector"
+                                                 SuccessImageTemplate="{StaticResource ValidationSuccessTemplate}"
+                                                 ErrorImageTemplate="{StaticResource ValidationErrorTemplate}" />
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+
+    <dxlc:LayoutControl Height="Auto"
+                        Background="White"
+                        Orientation="Vertical">
+
+        <GroupBox Header="Submit Message" Padding="5">
+            <dxe:TextEdit Name="SubmitMessageText" Text="{Binding SubmitMessage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        </GroupBox>
+
+        <dxlc:LayoutItem Background="#FFE0C5C5"
+                         Padding="5"
+                         Visibility="{Binding IsInformationMessageVisible,
+                                              Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Image Grid.Column="0"
+                       Width="16"
+                       Height="16"
+                       Source="pack://application:,,,/CDP4Composition;component/Resources/Images/Log/Warning_16x16.png" />
+                <TextBlock Grid.Column="1" Text="{Binding InformationMessage}" />
+            </Grid>
+        </dxlc:LayoutItem>
+
+        <GroupBox Header="Parameters and ParameterOverrides" Visibility="{Binding IsParameterOrOVerrideVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <dxg:GridControl Margin="5" ItemsSource="{Binding ParameterOrOverrideWorkbookRebuildRowViewModels}" SelectedItems="{Binding SelectedParameters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionMode="MultipleRow">
+
+                <dxg:GridControl.View>
+                    <dxg:TableView Name="ParameterOrOverrideWorkbookRebuildRowViewModelsView"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   AllowGrouping="False"
+                                   AutoWidth="true"
+                                   IsDetailButtonVisibleBinding="{x:Null}"
+                                   ShowGroupPanel="False" ShowCheckBoxSelectorColumn="True">
+                        <dxg:TableView.FocusedRow>
+                            <dynamic:ExpandoObject />
+                        </dxg:TableView.FocusedRow>
+                        <dxg:TableView.LayoutCalculatorFactory>
+                            <dxg:GridTableViewLayoutCalculatorFactory />
+                        </dxg:TableView.LayoutCalculatorFactory>
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn Width="80"
+                                    AllowAutoFilter="False"
+                                    AllowColumnFiltering="False"
+                                    AllowEditing="True"
+                                    AllowSorting="False"
+                                    CellTemplateSelector="{StaticResource DataTemplateSelector}"
+                                    Header="Valid"
+                                    HorizontalHeaderContentAlignment="Center">
+                        
+                    </dxg:GridColumn>
+                    <dxg:GridColumn FieldName="ModelCode"
+                                    Header="Model Code"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="FormulaValue"
+                                    Header="Formula Value"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="ComputedValue"
+                                    Header="Computed Value"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="ManualValue"
+                                    Header="Manual Value"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="ReferenceValue"
+                                    Header="Reference Value"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="Switch"
+                                    Header="Switch"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="ActualValue"
+                                    Header="Actual Value"
+                                    ReadOnly="True" />
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
+        </GroupBox>
+
+        <GroupBox Header="ParameterSubscriptions" Visibility="{Binding IsParameterSubscriptionVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <dxg:GridControl Margin="5" ItemsSource="{Binding ParameterSubscriptionWorkbookRebuildRowViewModels}" SelectedItems="{Binding SelectedSubscriptions, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionMode="MultipleRow">
+                <dxg:GridControl.View>
+                    <dxg:TableView Name="ParameterSubscriptionWorkbookRebuildRowViewModelsView"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   AllowGrouping="False"
+                                   ShowCheckBoxSelectorColumn="True"
+                                   AutoWidth="true"
+                                   IsDetailButtonVisibleBinding="{x:Null}"
+                                   ShowGroupPanel="False">
+                        <dxg:TableView.FocusedRow>
+                            <dynamic:ExpandoObject />
+                        </dxg:TableView.FocusedRow>
+                        <dxg:TableView.LayoutCalculatorFactory>
+                            <dxg:GridTableViewLayoutCalculatorFactory />
+                        </dxg:TableView.LayoutCalculatorFactory>
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn Width="80"
+                                    AllowAutoFilter="False"
+                                    AllowColumnFiltering="False"
+                                    AllowEditing="True"
+                                    AllowSorting="False"
+                                    CellTemplateSelector="{StaticResource DataTemplateSelector}"
+                                    Header="Valid"
+                                    HorizontalHeaderContentAlignment="Center" >
+                    </dxg:GridColumn>
+                    <dxg:GridColumn FieldName="ModelCode"
+                                    Header="Model Code"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="FormulaValue"
+                                    Header="Formula Value"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="ComputedValue"
+                                    Header="Computed Value"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="ManualValue"
+                                    Header="Manual Value"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="ReferenceValue"
+                                    Header="Reference Value"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="Switch"
+                                    Header="Switch"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn FieldName="ActualValue"
+                                    Header="Actual Value"
+                                    ReadOnly="True" />
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
+        </GroupBox>
+
+        <dxlc:LayoutGroup Orientation="Horizontal">
+            <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=OkCommand}"
+                    Content="OK" IsDefault="True" />
+            <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=CancelCommand}"
+                    Content="Cancel" IsCancel="True" />
+        </dxlc:LayoutGroup>
+    </dxlc:LayoutControl>
+</dx:DXWindow>

@@ -1,0 +1,112 @@
+﻿<dx:DXWindow x:Class="BasicRdl.Views.EnumerationParameterTypeDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             d:DesignHeight="300"
+             d:DesignWidth="395"
+             navigation:DialogCloser.DialogResult="{Binding DialogResult}"
+             mc:Ignorable="d">
+    <dx:DXWindow.Resources>
+    </dx:DXWindow.Resources>
+    <dxlc:LayoutControl Margin="5"
+                        Orientation="Vertical"
+                        ScrollBars="None">
+        <dxlc:LayoutGroup Margin="-10,-7,-10,-5"
+                          Orientation="Vertical"
+                          View="Tabs"
+                          dxlc:LayoutControl.AllowHorizontalSizing="True">
+            <dxlc:LayoutGroup Header="Basic" Orientation="Vertical">
+                <items:NameLayoutItem />
+                <items:ShortNameLayoutItem />
+                <items:SymbolLayoutItem/>
+                <items:ShortNameContainerLayoutItem />
+                <dxlc:LayoutItem Label="Multi select:">
+                    <dxe:CheckEdit Name="AllowMultiSelect" IsChecked="{Binding Path=AllowMultiSelect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </dxlc:LayoutItem>
+                <items:IsDeprecatedLayoutItem />
+            </dxlc:LayoutGroup>
+            <dxlc:LayoutGroup Name="EnumerationValueDefinitions" Header="Values" Orientation="Vertical">
+                <dxlc:LayoutItem>
+                    <dxb:ToolBarControl Height="30" Background="Transparent">
+                        <dxb:BarButtonItem x:Name="CreateValueDefinitionButton"
+                                               Command="{Binding CreateValueDefinitionCommand}"
+                                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                               Hint="Create a new Value Definition" />
+                        <dxb:BarButtonItem x:Name="DeleteValueDefinitionButton"
+                                               Command="{Binding DeleteValueDefinitionCommand}"
+                                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                               Hint="Delete the selected Value Definition" />
+                        <dxb:BarButtonItem x:Name="EditValueDefinitionButton"
+                                               Command="{Binding EditValueDefinitionCommand}"
+                                               Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                               Hint="Edit the selected Value Definition" />
+                        <dxb:BarButtonItem x:Name="InspectValueDefinitionCommand"
+                                               Command="{Binding InspectValueDefinitionCommand}"
+                                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                               Hint="Inspect the selected Value Definition" />
+                        <dxb:BarButtonItem x:Name="MoveUpValueDefinitionButton"
+                                               Command="{Binding MoveUpValueDefinitionCommand}"
+                                               Glyph="{dx:DXImage Image=MoveUp_16x16.png}"
+                                               Hint="Move the selected Value Definition up" />
+                        <dxb:BarButtonItem x:Name="MoveDownValueDefinitionButton"
+                                               Command="{Binding MoveDownValueDefinitionCommand}"
+                                               Glyph="{dx:DXImage Image=MoveDown_16x16.png}"
+                                               Hint="Move the selected Value Definition down" />
+                        <dxb:BarButtonItem x:Name="HelpValueDefinitionButton"
+                                               Command="{Binding HelpValueDefinitionCommand}"
+                                               Glyph="{dx:DXImage Image=Info_16x16.png}"
+                                               Hint="Show Help" />
+                    </dxb:ToolBarControl>
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutItem>
+                    <dxg:GridControl AllowLiveDataShaping="False"
+                                         ItemsSource="{Binding ValueDefinition}"
+                                         SelectedItem="{Binding SelectedValueDefinition,
+                                                                Mode=TwoWay,
+                                                                UpdateSourceTrigger=PropertyChanged}"
+                                         SelectionMode="Row">
+
+                        <dxg:GridControl.View>
+                            <dxg:TableView Name="EnumerationValueDefinitionView"
+                                               Height="150"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch"
+                                               AllowColumnMoving="True"
+                                               AllowEditing="False"
+                                               AllowGrouping="True"
+                                               AutoWidth="False"
+                                               IsDetailButtonVisibleBinding="{x:Null}"
+                                               ShowGroupPanel="False"
+                                               VerticalScrollbarVisibility="Auto">
+                                <dxg:TableView.FocusedRow>
+                                    <dynamic:ExpandoObject />
+                                </dxg:TableView.FocusedRow>
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn FieldName="Name" Header="Name"/>
+                            <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+            <items:CategoryLayoutGroup />
+            <items:AliasLayoutGroup />
+            <items:DefinitionLayoutGroup />
+            <items:HyperLinkLayoutGroup />
+            <items:AdvancedLayoutGroup />
+        </dxlc:LayoutGroup>
+        <items:UserValidationButtonsLayoutGroup />
+        <items:ErrorMessageLayoutGroup />
+    </dxlc:LayoutControl>
+</dx:DXWindow>

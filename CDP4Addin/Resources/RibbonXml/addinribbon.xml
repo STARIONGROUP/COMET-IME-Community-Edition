@@ -1,0 +1,6 @@
+﻿<ribbonxml> 
+  <group id="CDP4login" label="Data Source">
+    <button id="CDP4_Open" label="Open" screentip="Select a data-source to open" imageMso="ServerConnection" onAction="OnAction" getEnabled="GetEnabled"/>
+    <button id="CDP4_Close" label="Close" screentip="Close the data-source" imageMso="FileDropSqlDatabase" onAction="OnAction" getEnabled="GetEnabled"/>
+  </group>
+</ribbonxml>

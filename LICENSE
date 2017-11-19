@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see http://www.gnu.org/licenses/
 
 Additional permission under GNU GPL version 3 section 7
 
@@ -117,101 +117,3 @@ If you modify this Program, or any covered work, by linking or combining it with
 If you modify this Program, or any covered work, by linking or combining it with DevExpress.Xpf.Ribbon.v15.2 (or a modified version of that library), containing parts covered by the terms of DevExpress EULA, the licensors of this Program grant you additional permission to convey the resulting work.
 
 If you modify this Program, or any covered work, by linking or combining it with DevExpress.Xpf.SpellChecker.v15.2 (or a modified version of that library), containing parts covered by the terms of DevExpress EULA, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Autofac (or a modified version of that library), containing parts covered by the terms of MIT License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Mono.Posix-4.5 (or a modified version of that library), containing parts covered by the terms of MIT License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Nancy (or a modified version of that library), containing parts covered by the terms of MIT License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Nancy.Bootstrapper.Autofac (or a modified version of that library), containing parts covered by the terms of MIT License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Nancy.Owin (or a modified version of that library), containing parts covered by the terms of MIT License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Npgsql (or a modified version of that library), containing parts covered by the terms of PostgreSQL license, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Owin-Contrib (or a modified version of that library), containing parts covered by the terms of Apache 2 License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.NETCore.Platforms (or a modified version of that library), containing parts covered by the terms of MIT License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with NETStandard.Library (or a modified version of that library), containing parts covered by the terms of MIT License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Collections (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Collections.Concurrent (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Diagnostics.Debug (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Diagnostics.Tools (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Diagnostics.Tracing (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Globalization (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.IO (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.IO.Compression (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Linq (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Linq.Expressions (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Net.Http (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Net.Primitives (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.ObjectModel (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Reflection (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Reflection.Extensions (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Reflection.Primitives (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Resources.ResourceManager (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Runtime (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Runtime.Extensions (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Runtime.InteropServices (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Runtime.InteropServices.RuntimeInformation (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Runtime.Numerics (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Text.Encoding (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Text.Encoding.Extensions (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Text.RegularExpressions (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Threading (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Threading.Tasks (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Threading.Tasks.Extensions (or a modified version of that library), containing parts covered by the terms of MIT License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Threading.Timer (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Xml.ReaderWriter (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with System.Xml.XDocument (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.AspNet.WebApi.Client (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library-JS License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.AspNet.WebApi.Core (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library-JS License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.AspNet.WebApi.Owin (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library-JS License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.AspNet.WebApi.OwinSelfHost (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library-JS License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.Owin (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.Owin.Diagnostics (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.Owin.Host.HttpListener (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.Owin.Hosting (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.
-
-If you modify this Program, or any covered work, by linking or combining it with Microsoft.Owin.SelfHost (or a modified version of that library), containing parts covered by the terms of MS-.NET-Library License, the licensors of this Program grant you additional permission to convey the resulting work.

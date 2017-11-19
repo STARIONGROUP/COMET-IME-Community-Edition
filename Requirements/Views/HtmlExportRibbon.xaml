@@ -1,0 +1,17 @@
+﻿<dxr:RibbonPageGroup x:Class="CDP4Requirements.Views.HtmlExportRibbon"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             Caption="HTML"
+             ShowCaptionButton="True"
+             MergeOrder="60">
+    <dxb:BarButtonItem Name="HtmlExport"
+                        Command="{Binding ExportCommand}"
+                        Content="Export"
+                        Description="Export to HTML Report."
+                        Hint="Export to HTML Report."
+                        LargeGlyph="{dx:DXImage Image=ExportToHTML_32x32.png}"                        
+                        RibbonStyle="Large" />
+</dxr:RibbonPageGroup>

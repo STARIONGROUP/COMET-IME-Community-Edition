@@ -1,0 +1,2725 @@
+﻿
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                    xmlns:cdp4ObjectBrowser="clr-namespace:CDP4ObjectBrowser"
+                    xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition">
+			<cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParticipantPermissionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:SiteDirectoryRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParticipantRoleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:PersonRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:OrganizationRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:EngineeringModelSetupRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParticipantRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ArrayParameterTypeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:CyclicRatioScaleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:EnumerationParameterTypeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:GlossaryRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:OrdinalScaleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ReferencerRuleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:BooleanParameterTypeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ScaleReferenceQuantityValueRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:MappingToReferenceScaleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:RatioScaleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:CompoundParameterTypeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DateParameterTypeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:LinearConversionUnitRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:TermRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:FileTypeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DerivedUnitRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:BinaryRelationshipRuleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:QuantityKindFactorRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:TextParameterTypeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:UnitFactorRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:IntervalScaleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:SpecializedQuantityKindRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:SimpleUnitRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:MultiRelationshipRuleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DomainOfExpertiseRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:SimpleQuantityKindRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:PrefixedUnitRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DateTimeParameterTypeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ScaleValueDefinitionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParameterTypeComponentRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:TimeOfDayParameterTypeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DecompositionRuleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:CategoryRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DerivedQuantityKindRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:LogarithmicScaleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:UnitPrefixRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParameterizedCategoryRuleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:EnumerationValueDefinitionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:PersonPermissionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:SiteReferenceDataLibraryRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ModelReferenceDataLibraryRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:PersonRoleRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:SiteLogEntryRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DomainOfExpertiseGroupRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:IterationSetupRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:TelephoneNumberRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:EmailAddressRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ReferenceSourceRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ConstantRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:UserPreferenceRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:NaturalLanguageRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:HyperLinkRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DefinitionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:AliasRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:CitationRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:PossibleFiniteStateRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParameterRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:OptionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParameterSubscriptionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParameterGroupRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:PublicationRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:PossibleFiniteStateListRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:FileRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:EngineeringModelRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParameterValueSetRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ElementDefinitionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ElementUsageRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParametricConstraintRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:RequirementRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ExternalIdentifierMapRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:NestedElementRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:FolderRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:IdCorrespondenceRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:CommonFileStoreRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DomainFileStoreRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:MultiRelationshipRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:BinaryRelationshipRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:SimpleParameterValueRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParameterOverrideRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParameterSubscriptionValueSetRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ActualFiniteStateRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ModelLogEntryRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:IterationRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ActualFiniteStateListRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:OrExpressionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:NotExpressionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:AndExpressionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ExclusiveOrExpressionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:RelationalExpressionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ParameterOverrideValueSetRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:NestedParameterRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:FileRevisionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:RuleVerificationListRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:UserRuleVerificationRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:BuiltInRuleVerificationRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:RuleViolationRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:GoalRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:StakeholderRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ValueGroupRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:StakeholderValueRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:StakeHolderValueMapRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:StakeHolderValueMapSettingsRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:BookRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:SectionRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:PageRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:BinaryNoteRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:TextualNoteRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:RequestForWaiverRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:RequestForDeviationRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ChangeRequestRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ReviewItemDiscrepancyRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ActionItemRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ModellingThingReferenceRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:SiteDirectoryThingReferenceRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ChangeProposalRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ContractChangeNoticeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:PointRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:BoundsRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:ColorRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+			<HierarchicalDataTemplate DataType="{x:Type cdp4ObjectBrowser:DiagramEdgeRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+            </HierarchicalDataTemplate>
+
+
+
+
+
+
+
+
+
+</ResourceDictionary>

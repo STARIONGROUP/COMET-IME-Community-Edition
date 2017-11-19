@@ -1,0 +1,128 @@
+﻿<dx:DXWindow x:Class="BasicRdl.Views.DerivedUnitDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             d:DesignHeight="475"
+             d:DesignWidth="395"
+             navigation:DialogCloser.DialogResult="{Binding DialogResult}"
+             mc:Ignorable="d">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+    <dxlc:LayoutControl Margin="5"
+                        Orientation="Vertical"
+                        ScrollBars="None">
+        <dxlc:LayoutGroup Margin="-10,-7,-10,-5"
+                          Orientation="Vertical"
+                          View="Tabs"
+                          dxlc:LayoutControl.AllowHorizontalSizing="True">
+            <dxlc:LayoutGroup Header="Basic" Orientation="Vertical">
+                <items:NameLayoutItem />
+                <items:ShortNameLayoutItem />
+                <items:ShortNameContainerLayoutItem />
+                <items:IsDeprecatedLayoutItem />
+                <dxb:ToolBarControl Height="30" Background="Transparent">
+                    <dxb:BarButtonItem x:Name="CreateUnitFactorButton"
+                                               Command="{Binding CreateUnitFactorCommand}"
+                                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                               Hint="Create a new Unit Factor" />
+                    <dxb:BarButtonItem x:Name="DeleteUnitFactorButton"
+                                               Command="{Binding DeleteUnitFactorCommand}"
+                                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                               Hint="Delete the selected Unit Factor" />
+                    <dxb:BarButtonItem x:Name="EditUnitFactorButton"
+                                               Command="{Binding EditUnitFactorCommand}"
+                                               Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                               Hint="Edit the selected Unit Factor" />
+
+                    <dxb:BarButtonItem x:Name="InspectUnitFactorCommand"
+                                               Command="{Binding InspectUnitFactorCommand}"
+                                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                               Hint="Inspect the selected Unit Factor" />
+
+                    <dxb:BarButtonItem x:Name="MoveUpUnitFactorButton"
+                                               Command="{Binding MoveUpUnitFactorCommand}"
+                                               Glyph="{dx:DXImage Image=MoveUp_16x16.png}"
+                                               Hint="Move the selected Unit Factor up" />
+
+                    <dxb:BarButtonItem x:Name="MoveDownUnitFactorButton"
+                                               Command="{Binding MoveDownUnitFactorCommand}"
+                                               Glyph="{dx:DXImage Image=MoveDown_16x16.png}"
+                                               Hint="Move the selected Unit Factor down" />
+
+                    <dxb:BarButtonItem x:Name="HelpUnitFactorButton"
+                                               Command="{Binding HelpUnitFactorCommand}"
+                                               Glyph="{dx:DXImage Image=Info_16x16.png}"
+                                               Hint="Show Help" />
+                </dxb:ToolBarControl>
+                <dxg:GridControl AllowLiveDataShaping="False"                                      
+                                         ItemsSource="{Binding UnitFactor}"
+                                         SelectedItem="{Binding SelectedUnitFactor,
+                                                                Mode=TwoWay,
+                                                                UpdateSourceTrigger=PropertyChanged}"
+                                         SelectionMode="Row">
+
+                    <dxg:GridControl.View>
+                        <dxg:TableView Name="UnitFactorView"
+                                               Height="150"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch"
+                                               AllowColumnMoving="True"
+                                               AllowEditing="False"
+                                               AllowGrouping="True"
+                                               AutoWidth="False"
+                                               IsDetailButtonVisibleBinding="{x:Null}"
+                                               ShowGroupPanel="False"
+                                               VerticalScrollbarVisibility="Auto">
+                            <dxg:TableView.FocusedRow>
+                                <dynamic:ExpandoObject />
+                            </dxg:TableView.FocusedRow>
+                        </dxg:TableView>
+                    </dxg:GridControl.View>
+                    <dxg:GridControl.Columns>
+
+                        <dxg:GridColumn Width="18"
+                                                MinWidth="18"
+                                                FixedWidth="True">
+                            <dxg:GridColumn.DisplayTemplate>
+                                <ControlTemplate>
+                                    <Image Width="16"
+                                               Height="16">
+                                        <Image.Source>
+                                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                                <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                            </MultiBinding>
+                                        </Image.Source>
+                                    </Image>
+                                </ControlTemplate>
+                            </dxg:GridColumn.DisplayTemplate>
+                        </dxg:GridColumn>
+
+                        <dxg:GridColumn FieldName="Unit.ShortName" Header="Measurement Unit"/>
+                        <dxg:GridColumn FieldName="Exponent" Header="Exponent" />
+
+                    </dxg:GridControl.Columns>
+                </dxg:GridControl>
+            </dxlc:LayoutGroup>
+
+            <items:AliasLayoutGroup />
+            <items:DefinitionLayoutGroup />
+            <items:HyperLinkLayoutGroup />
+            <items:AdvancedLayoutGroup />
+        </dxlc:LayoutGroup>
+        <items:UserValidationButtonsLayoutGroup />
+        <items:ErrorMessageLayoutGroup />
+    </dxlc:LayoutControl>
+</dx:DXWindow>

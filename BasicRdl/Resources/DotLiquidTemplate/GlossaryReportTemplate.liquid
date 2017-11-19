@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="css/rheaclassdocs.css" rel="stylesheet" type="text/css">
+    <title>Glossary HTML Report </title>
+</head>
+<body>
+
+<div class="wrap">
+
+	<article>
+		<div class="row text-center" style="margin-top: 40px;">
+			<img src="css/Images/rhea_logo_small.png">
+            <h1>Glossary Terms</h1>        
+            <p class="small">Powered By RHEA Group CDP4</p>
+		</div>
+		<div>
+
+            <table class="table table-striped">
+                <thead> 
+                    <tr>
+                        <th>Term</th>
+                        <th>Short Name</th>
+                        <th>Definition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for thing in content %}
+                        <tr>
+                            <td><b>{{ thing.Name }}</b></td>
+                            <td>{{ thing.ShortName }}</td>
+                            {% assign definitionText = "" %}
+
+							{% for definition in thing.Definition %}
+								{% if definition.LanguageCode contains "en" %}
+									{% assign definitionText = definition.Content %}
+								{% else %}
+									{% assign definitionText = definition.LanguageCode %}
+								{% endif %}
+							{% endfor %}
+
+							<td>{{ definitionText }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>		
+		</div>
+	</article>
+</div>
+
+</body>
+
+
+
+
+

@@ -1,0 +1,126 @@
+﻿<UserControl x:Class="CDP4LogInfo.Views.LogInfoPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:CDP4LogInfo.Views"
+             d:DesignHeight="300"
+             d:DesignWidth="415"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <views:LogLevelImageConverter x:Key="LogLevelImageConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+
+        <dxb:ToolBarControl Grid.Row="0" Height="30">
+
+            <dxb:BarEditItem x:Name="SelectedMinLogLevel"
+                             ClosePopupOnChangingEditValue="True"
+                             Content="Min. Log Level:"
+                             EditValue="{Binding Path=SelectedLogLevel}"
+                             EditWidth="100">
+                <dxb:BarEditItem.EditSettings>
+                    <dxe:ComboBoxEditSettings IsTextEditable="False"
+                                              ItemsSource="{Binding Path=PossibleLoglevels}"
+                                              PopupMaxHeight="250" />
+                </dxb:BarEditItem.EditSettings>
+            </dxb:BarEditItem>
+
+            <dxb:BarCheckItem Name="IsFatalLogelSelected"
+                              Glyph="{dx:DXImage Image=Cancel_16x16.png}"
+                              Hint="Show Fatal Logel Items"
+                              IsChecked="{Binding Path=IsFatalLogelSelected}"
+                              IsThreeState="False" />
+
+            <dxb:BarCheckItem Name="IsErrorLogelSelected"
+                              Glyph="pack://application:,,,/CDP4Composition;component/Resources/Images/Log/ExclamationRed_16x16.png"
+                              Hint="Show Error Level Logel Items"
+                              IsChecked="{Binding Path=IsErrorLogelSelected}"
+                              IsThreeState="False" />
+
+            <dxb:BarCheckItem Name="IsWarnLogelSelected"
+                              Glyph="pack://application:,,,/CDP4Composition;component/Resources/Images/Log/Warning_16x16.png"
+                              Hint="Show Warn Level Logel Items"
+                              IsChecked="{Binding Path=IsWarnLogelSelected}"
+                              IsThreeState="False" />
+
+            <dxb:BarCheckItem Name="IsInfoLogelSelected"
+                              Glyph="pack://application:,,,/CDP4Composition;component/Resources/Images/Log/Info_16x16.png"
+                              Hint="Show Info Level Logel Items"
+                              IsChecked="{Binding Path=IsInfoLogelSelected}"
+                              IsThreeState="False" />
+
+            <dxb:BarCheckItem Name="IsDebugLogelSelected"
+                              Glyph="{dx:DXImage Image=BugReport_16x16.png}"
+                              Hint="Show Debug Level Logel Items"
+                              IsChecked="{Binding Path=IsDebugLogelSelected}"
+                              IsThreeState="False" />
+
+            <dxb:BarCheckItem Name="IsTraceLogelSelected"
+                              Glyph="{dx:DXImage Image=Windows_16x16.png}"
+                              Hint="Show Trace Level Logel Items"
+                              IsChecked="{Binding Path=IsTraceLogelSelected}"
+                              IsThreeState="False" />
+
+            <dxb:BarButtonItem Name="LogPanelClearButton"
+                               Command="{Binding ClearCommand}"
+                               Glyph="{dx:DXImage Image=Clear_16x16.png}"
+                               Hint="Clear the Log Panel" />
+
+            <dxb:BarButtonItem Name="SaveAsButton"
+                               Command="{Binding ExportCommand}"
+                               Glyph="{dx:DXImage Image=ExportFile_16x16.png}"
+                               Hint="Export the Log to a file..." />
+        </dxb:ToolBarControl>
+
+
+        <dxg:GridControl Grid.Row="1"
+                         ItemsSource="{Binding Path=Data}"
+                         SelectionMode="Row">
+            <dxg:GridControl.View>
+                <dxg:TableView HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               AllowEditing="False"
+                               AllowGrouping="False"
+                               AutoWidth="True"
+                               IsDetailButtonVisibleBinding="{x:Null}"
+                               ShowGroupPanel="False">
+                    <dxg:TableView.RowStyle>
+                        <Style TargetType="dxg:RowControl">
+                            <Style.Setters>
+                                <Setter Property="MaxHeight" Value="20" />
+                            </Style.Setters>
+                        </Style>
+                    </dxg:TableView.RowStyle>
+                </dxg:TableView>
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn Width="16"
+                                MinWidth="16"
+                                FieldName="LogLevel"
+                                FixedWidth="True"
+                                ToolTip="{Binding LogLevel}">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding Path=Value, Converter={StaticResource LogLevelImageConverter}}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+                <dxg:GridColumn FieldName="Message" />
+                <dxg:GridColumn FieldName="TimeStamp" />
+                <dxg:GridColumn FieldName="Logger" />
+            </dxg:GridControl.Columns>
+        </dxg:GridControl>
+    </Grid>
+</UserControl>

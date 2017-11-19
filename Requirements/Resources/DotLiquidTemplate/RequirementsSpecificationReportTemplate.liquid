@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="css/rheaclassdocs.css" rel="stylesheet" type="text/css">
+    <title>Requirements Specification HTML Report </title>
+</head>
+<body>
+
+<div class="wrap">
+
+	<article>
+		<div class="row text-center" style="margin-top: 40px;">
+			<img src="css/Images/rhea_logo_small.png">
+			<h1>Requirements Specification Report</h1>				
+			<p class="small">Powered By RHEA Group CDP4</p>				
+		</div>
+		<div>
+
+{% for thing in content %}
+	{% if thing.ClassKind == 'RequirementsSpecification' %}
+		
+			{% assign relationships = thing.Container.Relationship %}
+		
+			{% comment %}
+			{% for rel in relationships %}
+				<p> {{ rel.Iid }} {{ rel.Target.Iid }} {{ rel.Source.Iid }} </p>
+			{% endfor %}		
+			{% endcomment %}
+	{% endif %}
+{% endfor %}
+
+{% for thing in content %}
+	
+	{% assign classKind = thing.ClassKind %}
+	{% case classKind %}
+	{% when 'RequirementsSpecification' %}
+
+		<h2> {{ thing.ShortName }} - {{ thing.Name }} </h2>
+
+	{% when 'RequirementsGroup' %}
+
+		<h3> {{ thing.ShortName }} - {{ thing.Name }} </h3>
+
+	{% when 'Requirement' %}
+			
+		{% if thing.IsDeprecated == false %}
+
+			{% assign isRequirement = false %}
+
+			{% for cat in thing.Category %}
+				{% if cat.ShortName == 'Requirements' %}	
+					{% assign isRequirement = true %}	
+				{% endif %}
+			{% endfor %}
+
+				{% if isRequirement == true %}
+					<h4 id="{{ thing.ShortName }}"> {{ thing.ShortName }} - {{ thing.Name }} </h4>
+				{% else %}
+					<h4> {{ thing.Name }} </h4>
+				{% endif %}
+
+					<p>
+						{% assign requirementText = "" %}
+
+							{% for definition in thing.Definition %}
+								{% if definition.LanguageCode contains "en" %}
+									{% assign requirementText = definition.Content %}
+								{% else %}
+									{% assign requirementText = definition.LanguageCode %}
+								{% endif %}
+							{% endfor %}
+
+							{{ requirementText }}
+					</p>
+
+					{% for rel in relationships %}						
+						
+						{% assign relname = '' %}
+
+						{% if thing.Iid == rel.Source.Iid %}
+							
+							{% for cat in rel.Category %}
+								{% if cat.ShortName == 'Refinements' %}	
+									{% assign relname = 'Refines' %}
+								{% endif %}
+
+								{% if cat.ShortName == 'Derivations' %}	
+									{% assign relname = 'Derives From' %}
+								{% endif %}
+							{% endfor %}
+
+							{% if relname != '' %}
+								<p> {{ relname }}: {{ rel.Target.ShortName }} </p>
+							{% else %}
+								<p> {{ rel.Target.ShortName }} </p>
+							{% endif %}
+						{% endif %}
+
+						{% if thing.Iid == rel.Target.Iid %}
+							{% for cat in rel.Category %}
+								{% if cat.ShortName == 'Refinements' %}	
+									{% assign relname = 'Is Refined By' %}
+								{% endif %}
+
+								{% if cat.ShortName == 'Derivations' %}	
+									{% assign relname = 'Is Derived By' %}
+								{% endif %}
+							{% endfor %}
+
+							{% if relname != '' %}
+								<p> {{ relname }}: {{ rel.Source.ShortName }} </p>
+							{% else %}
+								<p> {{ rel.Source.ShortName }} </p>
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+
+			{% endif %}
+	{% endcase %}
+
+{% endfor %}
+		
+		</div>
+	</article>
+</div>
+
+</body>
+
+
+
+
+

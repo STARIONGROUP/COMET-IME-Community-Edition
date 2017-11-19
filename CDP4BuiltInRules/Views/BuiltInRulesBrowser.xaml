@@ -1,0 +1,98 @@
+﻿<UserControl x:Class="CDP4BuiltInRules.Views.BuiltInRulesBrowser"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <dxb:ToolBarControl Height="30">
+
+            <dxb:BarButtonItem Command="{Binding InspectCommand}"
+                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                               Hint="Inspect the selected BuiltIn Rule" />
+            <dxb:BarButtonItem />
+
+            <dxb:BarButtonItem Command="{Binding HelpCommand}"
+                               Glyph="{dx:DXImage Image=Info_16x16.png}"
+                               Hint="Show Help" />
+
+            <dxb:BarButtonItem />
+
+        </dxb:ToolBarControl>
+
+        <dxg:GridControl Grid.Row="1"
+                         AllowLiveDataShaping="False"
+                         ItemsSource="{Binding BuiltInRules}"
+                         SelectedItem="{Binding SelectedRule,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                         SelectionMode="Row"
+                         services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted,
+                                                                            Mode=OneWay,
+                                                                            UpdateSourceTrigger=PropertyChanged}">
+
+
+            <i:Interaction.Behaviors>
+                <dragDrop:FrameworkElementDragBehavior />
+                <dragDrop:FrameworkElementDropBehavior />
+            </i:Interaction.Behaviors>
+
+            <dxg:GridControl.View>
+                <dxg:TableView Name="View"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               AllowColumnMoving="True"
+                               AllowEditing="False"
+                               AllowGrouping="True"
+                               AutoWidth="true"
+                               IsDetailButtonVisibleBinding="{x:Null}"
+                               ShowGroupPanel="False">
+                    <dxg:TableView.FocusedRow>
+                        <dynamic:ExpandoObject />
+                    </dxg:TableView.FocusedRow>
+                </dxg:TableView>
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+
+                <dxg:GridColumn Width="18"
+                                MinWidth="18"
+                                FixedWidth="True" />
+                <dxg:GridColumn FieldName="Name" Header="Name" />
+                <dxg:GridColumn FieldName="Description" Header="Description" />
+                <dxg:GridColumn FieldName="Author" Header="Author" />
+            </dxg:GridControl.Columns>
+
+            <dxg:GridControl.InputBindings>
+                <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
+                <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
+            </dxg:GridControl.InputBindings>
+        </dxg:GridControl>
+
+    </Grid>
+</UserControl>

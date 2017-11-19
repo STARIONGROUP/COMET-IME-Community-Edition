@@ -1,0 +1,15 @@
+﻿Thing\Organization_16x16.png http://icons.iconarchive.com/icons/designcontest/ecommerce-business/16/company-building-icon.png http://creativecommons.org/licenses/by/4.0/
+Thing\Organization_32x32.png http://icons.iconarchive.com/icons/designcontest/ecommerce-business/32/company-building-icon.png http://creativecommons.org/licenses/by/4.0/
+Thing\category_16x16.png https://www.iconfinder.com/icons/49488/category_icon#size=16 http://creativecommons.org/licenses/by/3.0/
+Thing\category_32x32.png https://www.iconfinder.com/icons/49488/category_icon#size=32 http://creativecommons.org/licenses/by/3.0/
+Thing\siteRdl_16x16.png https://www.iconfinder.com/icons/104617/book_learning_icon#size=16 Free for commercial use, Iconsdesigner unlimited
+Thing\siteRdl_32x32.png https://www.iconfinder.com/icons/104617/book_learning_icon#size=32 Free for commercial use, Iconsdesigner unlimited
+export_32x32.png https://www.iconfinder.com/icons/17388/export_icon#size=32 http://creativecommons.org/licenses/by-sa/3.0/us/ Abdylas Tynyshov
+import_32x32.png https://www.iconfinder.com/icons/17388/import_icon#size=32 http://creativecommons.org/licenses/by-sa/3.0/us/ Abdylas Tynyshov
+Thing\PossibleFiniteState_48x48.png https://www.iconfinder.com/icons/132172/alarm_clock_history_hour_minute_stopwatch_time_timer_watch_icon#size=48 http://creativecommons.org/licenses/by/3.0/ Ivlichev Viktor Petrovich
+Thing\ActualFiniteState_48x48.png https://www.iconfinder.com/icons/132172/alarm_clock_history_hour_minute_stopwatch_time_timer_watch_icon#size=48 http://creativecommons.org/licenses/by/3.0/ Ivlichev Viktor Petrovich
+trashcan_128x128.png https://www.iconfinder.com/icons/7503/recycle_bin_icon#size=128 GPL, Sergio Sanchez Lopez
+Warning_128x128.png https://www.iconfinder.com/icons/34248/achtung_alert_attention_exclamation_warning_icon#size=128, Free for commercial use, http://www.icons-land.com/
+Thing\Book.png https://www.iconfinder.com/icons/33986/blank_book_catalog_note_notebook_icon#size=128, free for commertial use, LazyCrazy http://lazymau.deviantart.com/?rnrd=179577
+Help_128x128.png https://www.iconfinder.com/icons/27853/help_question_support_icon#size=128, https://creativecommons.org/licenses/by-nd/3.0/, Visual Pharm https://icons8.com/
+Info_128x128.png https://www.iconfinder.com/icons/27854/about_i_information_icon#size=128, https://creativecommons.org/licenses/by-nd/3.0/, Visual Pharm https://icons8.com/

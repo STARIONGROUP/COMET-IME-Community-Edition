@@ -1,0 +1,40 @@
+﻿<ribbon:ExtendedRibbonPageGroup x:Class="CDP4ObjectBrowser.Views.ObjectBrowserRibbonPage"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                           xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
+                           xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+                           xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+                           xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
+                           Name="ObjectBrowserRibbon"
+                           Caption="Object Browser"
+                           ContainerRegionName="{x:Static cdp4Composition:RegionNames.HomeRibbonPageRegion}"
+                           MergeOrder="9000"
+                           mc:Ignorable="d">
+    <dxr:RibbonPageGroup.Resources>
+        <DataTemplate DataType="{x:Type mvvm:RibbonMenuItemViewModelBase}">
+            <ContentControl>
+                <dxb:BarCheckItem Command="{Binding Path=ShowOrClosePanelCommand}"
+                                  Content="{Binding MenuItemContent}"
+                                  IsChecked="{Binding Path=IsChecked}" />
+            </ContentControl>
+        </DataTemplate>
+    </dxr:RibbonPageGroup.Resources>
+
+    <dxb:BarSplitButtonItem Name="ShowObjectBrowser"
+                            Command="{Binding OpenSingleBrowserCommand}"
+                            IsEnabled="{Binding HasSession, UpdateSourceTrigger=PropertyChanged}"
+                            Content="Object Browser"
+                            Glyph="{dx:DXImage Image=Lookup&amp;Reference_16x16.png}"
+                            Hint="Open or Close the Object browser for the selected data source"
+                            LargeGlyph="{dx:DXImage Image=Lookup&amp;Reference_32x32.png}"
+                            RibbonStyle="Large">
+        <dxb:BarSplitButtonItem.PopupControl>
+            <dxb:PopupMenu ItemLinksSource="{Binding OpenSessions}" />
+        </dxb:BarSplitButtonItem.PopupControl>
+    </dxb:BarSplitButtonItem>
+</ribbon:ExtendedRibbonPageGroup>
+

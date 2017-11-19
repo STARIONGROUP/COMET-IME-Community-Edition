@@ -1,0 +1,44 @@
+﻿// -------------------------------------------------------------------------------------------------
+// <copyright file="RequirementDialog.xaml.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015 RHEA System S.A.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
+
+namespace CDP4Requirements.Views
+{
+    using CDP4Common.CommonData;
+    using CDP4Composition.Attributes;
+    using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
+
+    /// <summary>
+    /// Interaction logic for RequirementDialog.xaml
+    /// </summary>
+    [ThingDialogViewExport(ClassKind.Requirement)]
+    public partial class RequirementDialog : DXWindow, IThingDialogView
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RequirementDialog"/> class.
+        /// </summary>
+        public RequirementDialog()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RequirementDialog"/> class.
+        /// </summary>
+        /// <param name="initializeComponent">
+        /// a value indicating whether the contained Components shall be loaded
+        /// </param>
+        /// <remarks>
+        /// This constructor is called by the <see cref="IThingDialogNavigationService"/>.
+        /// </remarks>
+        public RequirementDialog(bool initializeComponent)
+        {
+            if (initializeComponent)
+            {
+                this.InitializeComponent();
+            }
+        }
+    }
+}

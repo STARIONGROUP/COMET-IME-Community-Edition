@@ -1,0 +1,29 @@
+<dxr:RibbonPageGroup x:Class="BasicRdl.Views.SiteRdlSelectionRibbon"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+                    xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                    Caption="Site RDLs"
+                    ShowCaptionButton="True"
+                    mc:Ignorable="d">
+
+    <dxb:BarButtonItem Command="{Binding OpenSiteRdlSelectorCommand}"
+                       Content="Open"
+                       Description="Open Reference Data libraries"
+                       Glyph="{dx:DXImage Image=MoreFunctions_16x16.png}"
+                       Hint="Opens the list of available RDLs"
+                       LargeGlyph="{dx:DXImage Image=MoreFunctions_32x32.png}"
+                       RibbonStyle="large" />
+
+    <dxb:BarButtonItem Content="Close"
+                       Command="{Binding CloseSiteRdlCommand}"
+                        Glyph="{dx:DXImage Image=Close_16x16.png}"
+                        Hint="Close Site Reference Data Libraries."
+                        LargeGlyph="{dx:DXImage Image=Close_32x32.png}"
+                        RibbonStyle="Large"/>
+
+</dxr:RibbonPageGroup>
+

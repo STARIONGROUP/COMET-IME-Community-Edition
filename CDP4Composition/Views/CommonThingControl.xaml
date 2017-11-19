@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="CDP4Composition.Views.CommonThingControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <DataTemplate DataType="{x:Type mvvm:ContextMenuItemViewModel}">
+                <ContentControl>
+                    <dxb:BarButtonItem Command="{Binding MenuCommand}" 
+                                       Content="{Binding Header}"
+                                       Glyph="{dx:DXImage Image=Add_16x16.png}">
+                    </dxb:BarButtonItem>
+                </ContentControl>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <dxb:ToolBarControl Height="30">
+        <dxb:BarSplitButtonItem Glyph="{dx:DXImage Image=Add_16x16.png}" 
+                                Hint="Create an item."
+                                IsEnabled="{Binding IsAddButtonEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            <dxb:BarSplitButtonItem.PopupControl>
+                <dxb:PopupMenu ItemLinksSource="{Binding Path=CreateContextMenu, Mode=OneWay}" />
+            </dxb:BarSplitButtonItem.PopupControl>
+        </dxb:BarSplitButtonItem>
+
+        <dxb:BarButtonItem Command="{Binding DeleteCommand}"
+                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                               Hint="{Binding SelectedThingClassKindString,
+            Converter={dx:FormatStringConverter FormatString={}Delete {0}}}" />
+
+        <dxb:BarButtonItem Command="{Binding UpdateCommand}"
+                               Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                               Hint="{Binding SelectedThingClassKindString,
+            Converter={dx:FormatStringConverter FormatString={}Edit {0}}}" />
+
+        <dxb:BarButtonItem Command="{Binding InspectCommand}"
+                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                               Hint="{Binding SelectedThingClassKindString,
+            Converter={dx:FormatStringConverter FormatString={}Inspect {0}}}" />
+
+        <dxb:BarButtonItem Command="{Binding RefreshCommand}"
+                               Glyph="{dx:DXImage Image=Refresh2_16x16.png}"
+                               Hint="{Binding SelectedThingClassKindString,
+            Converter={dx:FormatStringConverter FormatString={}Refresh {0}}}" />
+
+        <dxb:BarButtonItem Command="{Binding ExportCommand}"
+                               Glyph="{dx:DXImage Image=Export_16x16.png}"
+                               Hint="{Binding SelectedThingClassKindString,
+            Converter={dx:FormatStringConverter FormatString={}Export {0}}}" />
+
+        <dxb:BarSplitButtonItem />
+
+        <dxb:BarButtonItem Command="{Binding HelpCommand}"
+                           Glyph="{dx:DXImage Image=Info_16x16.png}"
+                           Hint="Show Help" />
+
+        <dxb:BarSplitButtonItem />
+
+        <dxb:BarButtonItem ItemClick="ButtonBase_OnClick"
+                           Glyph="{dx:DXImage Image=Zoom_16x16.png}"
+                           Hint="Show Search Panel" />
+    </dxb:ToolBarControl>
+</UserControl>

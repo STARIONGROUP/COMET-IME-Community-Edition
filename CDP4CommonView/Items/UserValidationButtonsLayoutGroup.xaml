@@ -1,0 +1,36 @@
+<dxlc:LayoutGroup x:Class="CDP4CommonView.Items.UserValidationButtonsLayoutGroup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             mc:Ignorable="d"
+             Width="165"
+             Name="OkCancel"
+             HorizontalAlignment="Right"
+             Orientation="Horizontal">
+    <dxlc:LayoutGroup.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        </ResourceDictionary>
+    </dxlc:LayoutGroup.Resources>
+
+    <Button Width="75"
+            Height="25"
+            Margin="3"
+            Name="OkButton"
+            IsDefault="True"
+            Command="{Binding Path=OkCommand}"
+            Content="Ok" 
+            HorizontalAlignment="Left"
+            Visibility="{Binding IsOkVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+    <Button Width="75"
+            Height="25"
+            Name="CancelButton"
+            Margin="3"
+            IsCancel="true"
+            Command="{Binding Path=CancelCommand}"
+            Content="Cancel" 
+            HorizontalAlignment="Right"/>
+</dxlc:LayoutGroup>

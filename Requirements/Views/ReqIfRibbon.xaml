@@ -1,0 +1,28 @@
+﻿<dxr1:RibbonPageGroup
+    x:Class="CDP4Requirements.Views.ReqIfRibbon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dxr1="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    Name="RequirementViewRibbonPageGroup"
+    Caption="ReqIF"
+    ShowCaptionButton="True"
+    MergeOrder="50">
+
+    <dxb:BarButtonItem Name="reqifImport"
+                        Command="{Binding ImportCommand}"
+                        Content="Import"
+                        Description="Import requirements from ReqIF file."
+                        Hint="Import from ReqIF file."
+                        LargeGlyph="{dx:DXImage Image=Inbox_32x32.png}"
+                        RibbonStyle="Large" />
+    
+    <dxb:BarButtonItem Name="reqifExport"
+                        Command="{Binding ExportCommand}"
+                        Content="Export"
+                        Description="Export to ReqIF file."
+                        Hint="Export to ReqIF file."
+                        LargeGlyph="{dx:DXImage Image=Outbox_32x32.png}"
+                        RibbonStyle="Large" />
+</dxr1:RibbonPageGroup>

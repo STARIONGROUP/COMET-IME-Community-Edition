@@ -1,0 +1,43 @@
+﻿<dxlc:LayoutGroup x:Class="CDP4CommonView.Items.ParameterSubscriptionLayoutGroup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             mc:Ignorable="d"
+             Header="Subscriptions" Orientation="Vertical"
+             Width="690">
+    <dxlc:LayoutItem>
+    </dxlc:LayoutItem>
+    <dxlc:LayoutItem>
+        <dxg:GridControl AllowLiveDataShaping="False"
+                         MaxHeight="300"
+                         ItemsSource="{Binding ParameterSubscription}"
+                         SelectedItem="{Binding SelectedParameterSubscription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         SelectionMode="Row">
+            <dxg:GridControl.View>
+                <dxg:TableView Name="ParameterSubscriptionsView"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               VerticalScrollbarVisibility="Auto"
+                               AllowColumnMoving="True"
+                               AllowEditing="False"
+                               AllowGrouping="True"
+                               AutoWidth="true"
+                               IsDetailButtonVisibleBinding="{x:Null}"
+                               ShowGroupPanel="False">
+                    <dxg:TableView.FocusedRow>
+                        <dynamic:ExpandoObject />
+                    </dxg:TableView.FocusedRow>
+                </dxg:TableView>
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn FieldName="Owner.ShortName" Header="Owner"/>
+                <dxg:GridColumn FieldName="Scale.ShortName" Header="Scale"/>
+                <dxg:GridColumn FieldName="ParameterType.ShortName" Header="Parameter type" />
+            </dxg:GridControl.Columns>
+        </dxg:GridControl>
+    </dxlc:LayoutItem>
+</dxlc:LayoutGroup>

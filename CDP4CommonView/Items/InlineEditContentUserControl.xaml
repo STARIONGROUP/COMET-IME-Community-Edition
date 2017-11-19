@@ -1,0 +1,196 @@
+﻿<UserControl x:Class="CDP4CommonView.Views.InlineEditContentUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:markdown="clr-namespace:MarkdownXAML;assembly=MarkdownXAML"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:spellChecker="clr-namespace:DevExpress.Xpf.SpellChecker;assembly=DevExpress.Xpf.SpellChecker.v15.2"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             x:Name="ContentUserControl"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MarkdownXaml;component/Resources/Markdown.Styles.Default.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:NotConverter x:Key="NotConverter" />
+
+            <markdown:XamlMarkdown x:Key="Markdown"
+                                   AssetPathRoot="{x:Static system:Environment.CurrentDirectory}"
+                                   CodeStyle="{StaticResource CodeStyle}"
+                                   DocumentStyle="{StaticResource DocumentStyle}"
+                                   Heading1Style="{StaticResource H1Style}"
+                                   Heading2Style="{StaticResource H2Style}"
+                                   Heading3Style="{StaticResource H3Style}"
+                                   Heading4Style="{StaticResource H4Style}"
+                                   ImageStyle="{StaticResource ImageStyle}"
+                                   LinkStyle="{StaticResource LinkStyle}"
+                                   SeparatorStyle="{StaticResource SeparatorStyle}" />
+
+            <markdown:StringToFlowDocumentConverter x:Key="StringToFlowDocumentConverter" Markdown="{StaticResource Markdown}" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--<spellChecker:SpellingSettings.SpellChecker>
+            <Binding Path="SpellChecker" />
+        </spellChecker:SpellingSettings.SpellChecker>
+
+        <spellChecker:SpellingSettings.CheckAsYouType>True</spellChecker:SpellingSettings.CheckAsYouType>
+        <spellChecker:SpellingSettings.ShowSpellCheckMenu>True</spellChecker:SpellingSettings.ShowSpellCheckMenu>
+        <spellChecker:SpellingSettings.UnderlineColor>Red</spellChecker:SpellingSettings.UnderlineColor>
+        <spellChecker:SpellingSettings.UnderlineStyle>WavyLine</spellChecker:SpellingSettings.UnderlineStyle>
+        <spellChecker:SpellingSettings.IgnoreMixedCaseWords>False</spellChecker:SpellingSettings.IgnoreMixedCaseWords>
+        <spellChecker:SpellingSettings.IgnoreRepeatedWords>False</spellChecker:SpellingSettings.IgnoreRepeatedWords>
+        <spellChecker:SpellingSettings.IgnoreUpperCaseWords>False</spellChecker:SpellingSettings.IgnoreUpperCaseWords>
+        <spellChecker:SpellingSettings.IgnoreUri>True</spellChecker:SpellingSettings.IgnoreUri>
+        <spellChecker:SpellingSettings.IgnoreWordsWithNumbers>False</spellChecker:SpellingSettings.IgnoreWordsWithNumbers>-->
+
+        <dxb:ToolBarControl Name="ToolBarControl"
+                            Grid.Row="0"
+                            BarItemDisplayMode="Default">
+            <dxb:BarButtonItem Glyph="{dx:DXImage Image=Bold_16x16.png}"
+                               IsEnabled="{Binding IsReadOnly, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotConverter}}"
+                               ItemClick="Bold_OnClick"
+                               ToolTip="Bold" />
+            <dxb:BarButtonItem Glyph="{dx:DXImage Image=Italic_16x16.png}"
+                               IsEnabled="{Binding IsReadOnly, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotConverter}}"
+                               ItemClick="Italics_OnClick"
+                               ToolTip="Italic" />
+            <dxb:BarButtonItem Glyph="{dx:DXImageGrayscale Image=Hyperlink_16x16.png}"
+                               IsEnabled="{Binding IsReadOnly, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotConverter}}"
+                               ItemClick="Link_OnClick"
+                               ToolTip="Hyperlink" />
+            <dxb:BarButtonItem Glyph="{dx:DXImage Image=Scripts_16x16.png}"
+                               IsEnabled="{Binding IsReadOnly, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotConverter}}"
+                               ItemClick="Code_OnClick"
+                               ToolTip="Code" />
+            <dxb:BarButtonItem Glyph="{dx:DXImage Image=ListBullets_16x16.png}"
+                               IsEnabled="{Binding IsReadOnly, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotConverter}}"
+                               ItemClick="BulletList_OnClick"
+                               ToolTip="Unordered List" />
+            <dxb:BarButtonItem Glyph="{dx:DXImage Image=ListNumbers_16x16.png}"
+                               IsEnabled="{Binding IsReadOnly, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotConverter}}"
+                               ItemClick="NumberList_OnClick"
+                               ToolTip="Ordered List" />
+            <dxb:BarItemSeparator />
+            <dxb:BarButtonItem Glyph="{dx:DXImage Image=Preview_16x16.png}"
+                               IsEnabled="{Binding IsReadOnly, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotConverter}}"
+                               ItemClick="Preview_OnClick"
+                               ToolTip="Preview" />
+            <dxb:BarButtonItem Command="{Binding SaveCommand, ElementName=ContentUserControl}"
+                               IsEnabled="{Binding IsReadOnly, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotConverter}}"
+                               Glyph="{dx:DXImage Image=Save_16x16.png}"
+                               IsVisible="{Binding InlineMode, ElementName=ContentUserControl}"
+                               ToolTip="Save" />
+            <dxb:BarButtonItem Command="{Binding CancelCommand, ElementName=ContentUserControl}"
+                               IsEnabled="{Binding IsReadOnly, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NotConverter}}"
+                               IsVisible="{Binding InlineMode, ElementName=ContentUserControl}"
+                               Glyph="{dx:DXImage Image=Cancel_16x16.png}"
+                               ToolTip="Cancel" />
+        </dxb:ToolBarControl>
+
+        <Button x:Name="EditButton"
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                Width="25"
+                Height="25"
+                Margin="0,20,20,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Background="#FFD8DCBB"
+                BorderBrush="#FF6EB9DC"
+                Click="Edit_OnClick"
+                Content="{dx:DXImageGrayscale Image=Edit_16x16.png}"
+                Foreground="#00000000"
+                Opacity="0.1"
+                Style="{StaticResource HidingButtonStyle}"
+                Template="{StaticResource HidingButtonControlTemplate}"
+                IsEnabled="{Binding IsReadOnly, Mode=OneWay, Converter={StaticResource NotConverter}}"
+                ToolTip="Edit Note" />
+
+        <FlowDocumentScrollViewer Name="FlowDocumentScrollViewer"
+                                  Grid.Row="0"
+                                  Grid.RowSpan="2"
+                                  Width="Auto"
+                                  Height="Auto"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  VerticalContentAlignment="Top"
+                                  HorizontalContentAlignment="Left"
+                                  Document="{Binding ElementName=ContentEditBox,
+                                                     Path=Text,
+                                                     Converter={StaticResource StringToFlowDocumentConverter}}"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto">
+            <FlowDocumentScrollViewer.BorderBrush>
+                <SolidColorBrush x:Name="FlowControlBorder"
+                                 Opacity="0.0"
+                                 Color="Black" />
+            </FlowDocumentScrollViewer.BorderBrush>
+            <FlowDocumentScrollViewer.Style>
+                <Style>
+                    <Style.Triggers>
+                        <EventTrigger RoutedEvent="Control.MouseMove">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Duration="0:0:0.5"
+                                                     Storyboard.Target="{x:Reference FlowControlBorder}"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="0.5" />
+                                    <DoubleAnimation Duration="0:0:0.5"
+                                                     Storyboard.Target="{x:Reference EditButton}"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="0.7" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Control.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Duration="0:0:1"
+                                                     Storyboard.Target="{x:Reference FlowControlBorder}"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="0.0" />
+                                    <DoubleAnimation Duration="0:0:1"
+                                                     Storyboard.Target="{x:Reference EditButton}"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="0.1" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Style.Triggers>
+                </Style>
+            </FlowDocumentScrollViewer.Style>
+        </FlowDocumentScrollViewer>
+        <dxe:TextEdit Name="ContentEditBox"
+                      Grid.Row="1"
+                      Height="Auto"
+                      AcceptsReturn="True"
+                      ShowError="True"
+                      VerticalContentAlignment="Top"
+                      HorizontalContentAlignment="Left"
+                      Text="{Binding ContentText, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ElementName=ContentUserControl}"
+                      IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
+                      TextWrapping="Wrap"
+                      VerticalScrollBarVisibility="Auto">
+            <dxe:TextEdit.EditCore>
+                <RichTextBox Foreground="CadetBlue" 
+                             Background="Brown" 
+                             AcceptsReturn="True" 
+                             AcceptsTab="True">
+                    <FlowDocument/>
+                </RichTextBox>
+            </dxe:TextEdit.EditCore>
+        </dxe:TextEdit>
+    </Grid>
+</UserControl>

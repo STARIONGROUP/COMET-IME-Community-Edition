@@ -1,0 +1,70 @@
+<dx:DXWindow x:Class="CDP4Composition.Views.GenericConfirmationDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:navigation1="clr-namespace:CDP4Composition.Navigation"
+             ResizeMode="NoResize"
+             SizeToContent="Height"
+             Width="500"
+             mc:Ignorable="d"
+             navigation1:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             Title="{Binding Title, Mode=OneWay}">
+
+    <dxlc:LayoutControl View="Group"
+                        Orientation="Vertical"
+                        ScrollBars="None"
+                        Height="Auto">
+
+        <dxlc:LayoutGroup VerticalAlignment="top"
+                          Margin="3"
+                          Height="Auto"
+                          View="Group"
+                          Orientation="Horizontal">
+
+            <dxlc:LayoutGroup HorizontalAlignment="Left"
+                              VerticalAlignment="Stretch"
+                              Orientation="Horizontal">
+                <dxlc:LayoutItem HorizontalAlignment="Left">
+                    <Image Source="pack://application:,,,/CDP4Composition;component/Resources/Images/Help_128x128.png"
+                           Height="100"/>
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutItem Height="Auto"
+                                 Width="Auto"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch">
+                    <TextBlock TextWrapping="Wrap"
+                               Text="{Binding Message, Mode=OneTime}"/>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+                    
+        </dxlc:LayoutGroup>
+        <dxlc:LayoutGroup VerticalAlignment="top"
+                          Margin="3"
+                          Height="35"
+                          View="Group"
+                          Orientation="Horizontal">
+            <dxlc:LayoutGroup Orientation="Horizontal"
+                                  VerticalAlignment="Bottom">
+                <dxlc:LayoutItem VerticalAlignment="Center">
+                    <Button Content="Yes"
+                            Width="75"
+                            Height="30"
+                            HorizontalAlignment="Right"
+                            Command="{Binding YesCommand}"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem HorizontalAlignment="Right"
+                                 VerticalAlignment="Center">
+                    <Button Content="No"
+                            Width="75"
+                            Height="30"
+                            Command="{Binding NoCommand}"
+                            IsDefault="True"/>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutGroup>
+    </dxlc:LayoutControl>
+</dx:DXWindow>

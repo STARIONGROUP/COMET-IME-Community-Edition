@@ -1,0 +1,293 @@
+﻿<UserControl x:Class="CDP4EngineeringModel.Views.RelationshipBrowser"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:CDP4CommonView="clr-namespace:CDP4CommonView;assembly=CDP4CommonView"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:views1="clr-namespace:CDP4EngineeringModel.Views"
+             xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/RibbonMenuItemTemplate.xaml"/>
+                    <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+            <HierarchicalDataTemplate DataType="{x:Type cdp4Composition:FolderRowViewModel}"
+                                  ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                <StackPanel Orientation="Horizontal">
+                    <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                    <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+            <DataTemplate DataType="{x:Type CDP4CommonView:MultiRelationshipRowViewModel}">
+                <StackPanel Orientation="Horizontal">
+                    <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                    <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type CDP4CommonView:BinaryRelationshipRowViewModel}">
+                <StackPanel Orientation="Horizontal">
+                    <dx:PixelSnapper>
+                        <Image Width="16"
+                               Height="16"
+                               Margin="3">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                    <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                </StackPanel>
+            </DataTemplate>            
+        </ResourceDictionary>        
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <views:CommonThingControl Grid.Row="0" GridView="{Binding ElementName=View}" />
+
+        <views:BrowserHeader Grid.Row="1" />
+
+        <dxg:TreeListControl x:Name="RelationShipTreeList"
+                             Grid.Row="2"
+                             SelectionMode="Row"
+                             SelectedItem="{Binding SelectedThing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             ItemsSource="{Binding Path=RelationshipTypes}">
+            <dxmvvm:Interaction.Behaviors>
+                <cdp4Composition:ContextMenuBehavior />
+            </dxmvvm:Interaction.Behaviors>
+            <i:Interaction.Behaviors>
+                <dragDrop:FrameworkElementDragBehavior />
+            </i:Interaction.Behaviors>
+            <dxg:TreeListControl.Columns>
+                <dxg:TreeListColumn FieldName="Name"/>
+            </dxg:TreeListControl.Columns>
+            <dxg:TreeListControl.View>
+                <dxg:TreeListView x:Name="View"
+                                      AllowEditing="False"
+                                      AutoWidth="True"
+                                      HorizontalScrollbarVisibility="Visible"
+                                      NavigationStyle="Cell"
+                                      ShowHorizontalLines="False"
+                                      ShowIndicator="False"
+                                      ShowNodeImages="False"
+                                      ShowVerticalLines="False"
+                                      TreeDerivationMode="HierarchicalDataTemplate"
+                                      TreeLineStyle="Solid">
+                    <dxg:TreeListView.FocusedRow>
+                        <dynamic:ExpandoObject />
+                    </dxg:TreeListView.FocusedRow>
+                    <dxg:TreeListView.ContextMenu>
+                        <ContextMenu Name="RowContextMenu" />
+                    </dxg:TreeListView.ContextMenu>
+                </dxg:TreeListView>
+            </dxg:TreeListControl.View>
+            <dxg:TreeListControl.InputBindings>
+                <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
+                <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
+            </dxg:TreeListControl.InputBindings>
+        </dxg:TreeListControl>
+        
+        <dxlc:LayoutGroup Grid.Row="3"
+                          MinHeight="100"
+                          Header="Create a Relationship"
+                          View="GroupBox"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          IsCollapsible="True"
+                          Orientation="Vertical"
+                          GroupBoxDisplayMode="Normal"
+                          DataContext="{Binding RelationshipCreator, Mode=OneWay}">
+            <dxlc:LayoutGroup.Resources>
+                <viewModels:CategoryListConverter x:Key="CategoryListConverter"/>
+                <DataTemplate x:Key="BinaryTemplate">
+                    <dxlc:LayoutGroup Orientation="Vertical">
+                        <dxlc:LayoutGroup Orientation="Horizontal">
+                            <TextBox DataContext="{Binding SourceViewModel}"
+                                     Text="{Binding RelatedThingDenomination, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                     IsReadOnly="True"
+                                     AllowDrop="True"
+                                     ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}">
+                                <i:Interaction.Behaviors>
+                                    <dragDrop:FrameworkElementDragBehavior />
+                                    <dragDrop:FrameworkElementDropBehavior />
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+                            <TextBox Text="→"
+                                     IsReadOnly="True"
+                                     HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center"
+                                     BorderThickness="0"
+                                     BorderBrush="Transparent"
+                                     Width="20"/>
+                            <TextBox DataContext="{Binding TargetViewModel}"
+                                     Text="{Binding RelatedThingDenomination, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                     IsReadOnly="True"
+                                     AllowDrop="True"
+                                     ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}">
+                                <i:Interaction.Behaviors>
+                                    <dragDrop:FrameworkElementDragBehavior />
+                                    <dragDrop:FrameworkElementDropBehavior />
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+                        </dxlc:LayoutGroup>
+
+                        <dxlc:LayoutItem Label="Categories: ">
+                            <dxe:ComboBoxEdit ItemsSource="{Binding PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                              DisplayMember="Name"
+                                              SeparatorString=", "
+                                              AllowNullInput="True"
+                                              ShowNullText="True"
+                                              NullText="No Categories"
+                                              EditValue="{Binding AppliedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource CategoryListConverter}}">
+                                <dxe:ComboBoxEdit.StyleSettings>
+                                    <dxe:CheckedComboBoxStyleSettings />
+                                </dxe:ComboBoxEdit.StyleSettings>
+                            </dxe:ComboBoxEdit>
+                        </dxlc:LayoutItem>
+                    </dxlc:LayoutGroup>
+                </DataTemplate>
+                <DataTemplate x:Key="MultiTemplate">
+                    <dxlc:LayoutGroup Orientation="Vertical">
+                        <dxlc:LayoutItem Label="Related Things:" LabelPosition="Top">
+                            <dxg:GridControl ItemsSource="{Binding RelatedThings, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                <dxg:GridControl.View>
+                                    <dxg:TableView Name="View"
+                                                   HorizontalAlignment="Stretch"
+                                                   VerticalAlignment="Stretch"
+                                                   AllowColumnMoving="False"
+                                                   AllowEditing="False"
+                                                   AllowGrouping="False"
+                                                   AutoWidth="true"
+                                                   MaxHeight="150"
+                                                   IsDetailButtonVisibleBinding="{x:Null}"
+                                                   ShowGroupPanel="False"/>
+                                    </dxg:GridControl.View>
+                                        <i:Interaction.Behaviors>
+                                    <dragDrop:FrameworkElementDragBehavior />
+                                    <dragDrop:FrameworkElementDropBehavior />
+                                </i:Interaction.Behaviors>
+                                <dxg:GridControl.Columns>
+                                    <dxg:GridColumn FieldName="ClassKind" AllowEditing="False"/>
+                                    <dxg:GridColumn FieldName="Denomination" AllowEditing="False"/>
+                                    <dxg:GridColumn>
+                                        <dxg:GridColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button x:Name="DeleteDomainObjectButton"
+                                                        VerticalAlignment="Center"
+                                                        Command="{Binding RowData.Row.RemoveRelatedThingCommand}"
+                                                        Style="{StaticResource NoBorderButton}"
+                                                        Height="16"
+                                                        Width="16">
+                                                    <Button.ContentTemplate>
+                                                        <DataTemplate>
+                                                            <Image Source="{dx:DXImage Image=Delete_16x16.png}"></Image>
+                                                        </DataTemplate>
+                                                    </Button.ContentTemplate>
+                                                </Button>
+                                            </DataTemplate>
+                                        </dxg:GridColumn.CellTemplate>
+                                    </dxg:GridColumn>
+                                </dxg:GridControl.Columns>
+                            </dxg:GridControl>
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem Label="Categories: ">
+                            <dxe:ComboBoxEdit ItemsSource="{Binding PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                              DisplayMember="Name"
+                                              SeparatorString=", "
+                                              AllowNullInput="True"
+                                              ShowNullText="True"
+                                              NullText="No Categories"
+                                              EditValue="{Binding AppliedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource CategoryListConverter}}">
+                                <dxe:ComboBoxEdit.StyleSettings>
+                                    <dxe:CheckedComboBoxStyleSettings />
+                                </dxe:ComboBoxEdit.StyleSettings>
+                            </dxe:ComboBoxEdit>
+                        </dxlc:LayoutItem>
+                    </dxlc:LayoutGroup>
+                </DataTemplate>
+
+                <views1:RelationshipCreatorTemplateSelector x:Key="RelationshipCreatorTemplateSelector"
+                                                            BinaryRelationshipTemplate="{StaticResource BinaryTemplate}"
+                                                            MultipleRelationshipTemplate="{StaticResource MultiTemplate}"/>
+            </dxlc:LayoutGroup.Resources>
+                <dxlc:LayoutGroup Orientation="Horizontal"
+                                  Height="24">
+                    <dxe:ComboBoxEdit Name="RelationshipCreatorSwitch"
+                                      AllowNullInput="False"
+                                      ShowCustomItems="False"
+                                      HorizontalAlignment="Left"
+                                      MinWidth="100"
+                                      DisplayMember="CreatorKind"
+                                      IsTextEditable="False"
+                                      EditValue="{Binding SelectedRelationshipCreator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemsSource="{Binding RelationshipCreators, Mode=OneWay}"/>
+                    <Button HorizontalAlignment="Right"
+                            Width="16"
+                            Height="16"
+                            Command="{Binding CreateRelationshipCommand, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource NoBorderButton}">
+                        <Button.ContentTemplate>
+                            <DataTemplate>
+                                <Image Source="{dx:DXImage Image=Save_16x16.png}"></Image>
+                            </DataTemplate>
+                        </Button.ContentTemplate>
+                    </Button>
+                </dxlc:LayoutGroup>
+
+                <GroupBox Header="Drop a Thing to set the related items of the relationship"
+                          Content="{Binding ElementName=RelationshipCreatorSwitch, Path=EditValue}"
+                          ContentTemplateSelector="{StaticResource RelationshipCreatorTemplateSelector}"/>
+        </dxlc:LayoutGroup>
+    </Grid>
+</UserControl>

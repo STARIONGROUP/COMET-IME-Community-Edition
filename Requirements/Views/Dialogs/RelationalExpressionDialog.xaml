@@ -1,0 +1,89 @@
+﻿<dx:DXWindow
+    x:Class="CDP4Requirements.Views.RelationalExpressionDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+    xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+    xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:common="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
+    Title="Relational expression" Height="350" Width="525"
+    navigation:DialogCloser.DialogResult="{Binding DialogResult}">
+    <dx:DXWindow.Resources>
+        <converters:UnderscoreCapitalsToSpacedTitleCaseConverter x:Key="UnderscoreCapitalsToSpacedTitleCaseConverter" />
+        <converters:NotConverter x:Key="NotConverter"/>
+    </dx:DXWindow.Resources>
+    <dxlc:LayoutControl Margin="5"
+                      Orientation="Vertical"
+                      ScrollBars="None">
+        <dxlc:LayoutGroup Margin="-10,-7,-10,-5"
+                        Orientation="Vertical"
+                        View="Tabs"
+                        dxlc:LayoutControl.AllowHorizontalSizing="True">
+            <dxlc:LayoutGroup Header="Basic" Orientation="Vertical">
+                <items:SelectedParameterTypeLayoutItem />
+                <items:SelectedScaleLayoutItem/>
+                <dxlc:LayoutItem Label="Operator:">
+                    <dxe:ComboBoxEdit Name="Operator"
+                                      ApplyItemTemplateToSelectedItem="True"
+                                      IsEnabled="{Binding IsReadOnly ,Converter={StaticResource NotConverter}}"
+                                      EditValue="{Binding Path=RelationalOperator,
+                                                          UpdateSourceTrigger=PropertyChanged,
+                                                          Mode=TwoWay}"
+                                      IsTextEditable="False">
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type common:RelationalOperatorKind}" />
+                        </dxmvvm:Interaction.Behaviors>
+                        <dxe:ComboBoxEdit.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name, Converter={StaticResource UnderscoreCapitalsToSpacedTitleCaseConverter}}" />
+                            </DataTemplate>
+                        </dxe:ComboBoxEdit.ItemTemplate>
+                    </dxe:ComboBoxEdit>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem>
+                    <dxlc:LayoutItem.Resources>
+                        <ResourceDictionary>
+                            <ResourceDictionary.MergedDictionaries>
+                                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/ValueSetTemplates.xaml"/>
+                            </ResourceDictionary.MergedDictionaries>
+                            <converters:NotConverter x:Key="NotConverter" />
+                        </ResourceDictionary>
+                    </dxlc:LayoutItem.Resources>
+                    <dxg:GridControl Width="520"
+                                     MaxHeight="150"
+                                     IsEnabled="{Binding IsReadOnly, Converter={StaticResource NotConverter}, Mode=OneWay}"
+                                     AllowLiveDataShaping="False"
+                                     ItemsSource="{Binding Value}"
+                                     SelectedItem="{Binding SelectedParametricConstraintValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     SelectionMode="Row">
+                        <dxg:GridControl.View>
+                            <dxg:TableView Name="ParametricConstraintValueView"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           VerticalScrollbarVisibility="Auto"
+                                           AllowColumnMoving="True"
+                                           EnableImmediatePosting="True"
+                                           AllowEditing="{Binding IsReadOnly, Converter={StaticResource NotConverter}, Mode=OneWay}"
+                                           AllowGrouping="True"
+                                           AutoWidth="true"
+                                           IsDetailButtonVisibleBinding="{x:Null}"
+                                           ShowGroupPanel="False">
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn FieldName="Value" CellTemplateSelector="{StaticResource ManualValueCellTemplateSelector}"/>
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+            <items:AdvancedLayoutGroup/>
+        </dxlc:LayoutGroup>
+        <items:UserValidationButtonsLayoutGroup/>
+        <items:ErrorMessageLayoutGroup/>
+    </dxlc:LayoutControl>
+</dx:DXWindow>

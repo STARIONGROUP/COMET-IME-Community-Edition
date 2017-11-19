@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <ComponentGroup Id="JSONFILEDAL_CG" Directory="JSONFILEDAL">
+      
+      <Component Id="comp_CDP4JsonFileDal" Guid="{F334064B-9494-4CC2-9FC8-A3FC999C038C}" Location="local">
+        <File Id="fil_CDP4JsonFileDal"  Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)CDP4JsonFileDal.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_ionicZip" Guid="{B3614A66-1BFF-47D9-A8E4-1B440172D18E}" Location="local">
+        <File Id="fil_IonicZip" Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)DotNetZip.dll" KeyPath="yes" />
+      </Component>
+      
+    </ComponentGroup>
+  </Fragment>
+</Wix>

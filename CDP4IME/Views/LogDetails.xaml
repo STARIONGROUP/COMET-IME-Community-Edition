@@ -1,0 +1,42 @@
+<dx:DXWindow
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+        x:Class="CDP4IME.Views.LogDetails"
+        mc:Ignorable="d"
+        SizeToContent="Height"
+        Width="300"
+        dx:ThemeManager.ThemeName="Seven"
+        Name="LogDetailView"
+        Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
+        navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+        Title="Log Details">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <dxg:GridControl Grid.Row="0" 
+                         Margin="5"
+                         ItemsSource="{Binding DetailRows}"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Stretch">
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn FieldName="Property"/>
+                <dxg:GridColumn FieldName="Content"/>
+            </dxg:GridControl.Columns>
+            <dxg:GridControl.View>
+                <dxg:TableView AllowPerPixelScrolling="True" 
+                               ShowTotalSummary="True" 
+                               AutoWidth="True"
+                               AllowEditing="False"
+                               ShowGroupPanel="False"
+                               NavigationStyle="Row"/>
+            </dxg:GridControl.View>
+        </dxg:GridControl>
+    </Grid>
+</dx:DXWindow>

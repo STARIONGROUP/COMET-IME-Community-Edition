@@ -1,0 +1,21 @@
+<dxlc:LayoutItem x:Class="CDP4CommonView.Items.PositiveValueConnotationLayoutItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             mc:Ignorable="d"
+             Label="Positive Value Connotation:">
+    <dxlc:LayoutItem.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/ErrorTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </dxlc:LayoutItem.Resources>
+    <dxe:TextEdit Name="PositiveValueConnotation" 
+                Text="{Binding Path=PositiveValueConnotation, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                IsReadOnly="{Binding IsReadOnly}"
+                  ShowError="True"/>
+</dxlc:LayoutItem>

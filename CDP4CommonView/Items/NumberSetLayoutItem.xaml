@@ -1,0 +1,26 @@
+<dxlc:LayoutItem x:Class="CDP4CommonView.Items.NumberSetLayoutItem"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                 xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:system="clr-namespace:System;assembly=mscorlib"
+                 xmlns:local="clr-namespace:CDP4Common.SiteDirectoryData;assembly=CDP4Common"
+                 Label="Number set:"
+                 mc:Ignorable="d">
+    <dxlc:LayoutItem.Resources>
+        <ObjectDataProvider x:Key="DataFromEnum" MethodName="GetValues"
+                            ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:NumberSetKind"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </dxlc:LayoutItem.Resources>
+    <dxe:ComboBoxEdit Name="SelectedNumberSet"
+                          EditValue="{Binding Path=NumberSet, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          IsReadOnly="{Binding IsReadOnly}"
+                          ItemsSource="{Binding Source={StaticResource DataFromEnum}}"
+                          IsTextEditable="False"
+                          ShowCustomItems="False" />
+</dxlc:LayoutItem>

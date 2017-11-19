@@ -1,0 +1,19 @@
+﻿<ribbon:ExtendedRibbonPage x:Class="CDP4Requirements.Views.RequirementsRibbon"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
+                           xmlns:views="clr-namespace:CDP4Requirements.Views"
+                           Name="RequirementRibbonPage"
+                           Caption="Requirements"
+                           CustomPageCategoryName="default"
+                           IsInDefaultPageCategory="True"
+                           mc:Ignorable="d"
+                           MergeOrder="5000">
+    
+    <views:RequirementBrowserRibbon/>
+    <views:ReqIfRibbon/>
+    <views:HtmlExportRibbon/> 
+    
+</ribbon:ExtendedRibbonPage>

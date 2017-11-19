@@ -1,0 +1,24 @@
+﻿<ribbon:ExtendedRibbonPage x:Class="CDP4SiteDirectory.Views.SiteDirectoryRibbon"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                           xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
+                           xmlns:views="clr-namespace:CDP4SiteDirectory.Views"
+                           Name="SiteDirectoryRibbonPage"
+                           Caption="Directory"
+                           CustomPageCategoryName="default"
+                           IsInDefaultPageCategory="True"
+                           mc:Ignorable="d"
+                           MergeOrder="4500">
+
+    <views:ModelRibbon/>
+    <views:SiteRdlBrowserRibbon/>
+    <views:DomainOfExpertiseRibbon/>
+    <views:OrganizationBrowserRibbon/>
+    <views:PersonBrowserRibbon/>
+    <views:RoleBrowserRibbon/>
+    <views:TeamCompositionBrowserRibbon/>
+    <views:NaturalLanguageRibbon/>
+
+</ribbon:ExtendedRibbonPage>

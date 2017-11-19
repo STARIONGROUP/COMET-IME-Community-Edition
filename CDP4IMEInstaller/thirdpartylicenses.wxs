@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+    <ComponentGroup Id="THIRDPARTYLICENSES" Directory="LICENSE">
+
+      <Component Id="comp_license_AvalonEdit" Guid="{570E6062-84F8-47E9-AAEE-A59344FB9CB6}" Location="local">
+        <File Id="fil_license_AvalonEdit" Vital="yes" Source="ThirdPartyLicense\AvalonEdit.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_CastleCore" Guid="{FB517D4F-9D25-40F8-993C-06D69A612777}" Location="local">
+        <File Id="fil_license_CastleCore" Vital="yes" Source="ThirdPartyLicense\CastleCore.txt" KeyPath="yes"></File>
+      </Component>
+      
+      <Component Id="comp_license_CommonServiceLocator" Guid="{53ED95A6-B511-44FF-AD7C-C6276653CC9A}" Location="local">
+        <File Id="fil_license_CommonServiceLocator" Vital="yes" Source="ThirdPartyLicense\CommonServiceLocator.txt" KeyPath="yes"></File>
+      </Component>
+      
+      <Component Id="comp_license_CsvHelper" Guid="{D0FE295F-4166-411D-8ACE-D0AD91ACAD72}" Location="local">
+        <File Id="fil_license_CsvHelper" Vital="yes" Source="ThirdPartyLicense\CsvHelper.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_dotliquid" Guid="{2D19A3AF-8E09-45F6-A42B-D055CDD3B6E8}" Location="local">
+        <File Id="fil_license_dotliquid" Vital="yes" Source="ThirdPartyLicense\dotliquid.txt" KeyPath="yes"></File>
+      </Component>
+      
+      <Component Id="comp_license_DotNetZip" Guid="{F85033D5-14C5-4714-9367-F1D65848B30A}" Location="local">
+        <File Id="fil_license_DotNetZip" Vital="yes" Source="ThirdPartyLicense\DotNetZip.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_DynamicLanguageRuntime" Guid="{656EB66E-847A-41A7-8802-9707C71A767E}" Location="local">
+        <File Id="fil_license_DynamicLanguageRuntime" Vital="yes" Source="ThirdPartyLicense\DynamicLanguageRuntime.txt" KeyPath="yes"></File>
+      </Component>
+      
+      <Component Id="comp_license_ExceptionReporter" Guid="{70CAF16C-E5A1-4928-8772-88BD944054F8}" Location="local">
+        <File Id="fil_license_ExceptionReporter" Vital="yes" Source="ThirdPartyLicense\ExceptionReporter.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Hardcodet_Wpf_TaskbarNotification" Guid="{DB9EFD5A-CDD1-48E7-8D36-E38A0F7AB60E}" Location="local">
+        <File Id="fil_license_Hardcodet_Wpf_TaskbarNotification" Vital="yes" Source="ThirdPartyLicense\Hardcodet.Wpf.TaskbarNotification.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_IronPython" Guid="{EA96D593-72DE-4557-A3F4-4B621927A51F}" Location="local">
+        <File Id="fil_license_IronPython" Vital="yes" Source="ThirdPartyLicense\IronPython.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_MoonSharp" Guid="{232D81F7-4871-4F44-95CE-0060BDBF266D}" Location="local">
+        <File Id="fil_license_MoonSharp" Vital="yes" Source="ThirdPartyLicense\MoonSharp.txt" KeyPath="yes"></File>
+      </Component>
+      
+      <Component Id="comp_license_NetOffice" Guid="{EBDA3F5F-1E4D-4B9C-A555-06D9DF991841}" Location="local">
+        <File Id="fil_license_NetOffice" Vital="yes" Source="ThirdPartyLicense\NetOffice.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Newtonsoft_Json" Guid="{A7632998-F4FF-4BF8-A4A7-D98E66898832}" Location="local">
+        <File Id="fil_license_Newtonsoft_Json" Vital="yes" Source="ThirdPartyLicense\Newtonsoft.Json.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_NLog" Guid="{FDCB34D8-0F89-494C-BFD5-1D8978CA5A3A}" Location="local">
+        <File Id="fil_license_NLog" Vital="yes" Source="ThirdPartyLicense\NLog.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Prism_Composition" Guid="{C6EDC87B-86F0-4864-A7F9-DA3B44EC460E}" Location="local">
+        <File Id="fil_license_Prism_Composition" Vital="yes" Source="ThirdPartyLicense\Prism.Composition.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Prism_Interactivity" Guid="{94134546-C994-486F-9215-EEECA79AA353}" Location="local">
+        <File Id="fil_license_Prism_Interactivity" Vital="yes" Source="ThirdPartyLicense\Prism.Interactivity.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Prism_MEFExtensions" Guid="{2187740D-D195-4842-AF96-E936C24FC615}" Location="local">
+        <File Id="fil_license_Prism_MEFExtensions" Vital="yes" Source="ThirdPartyLicense\Prism.MEFExtensions.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Prism_Mvvm" Guid="{C09DE975-D520-47DA-8A00-36FEE862F95F}" Location="local">
+        <File Id="fil_license_Prism_Mvvm" Vital="yes" Source="ThirdPartyLicense\Prism.Mvvm.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Prism_PubSubEvents" Guid="{985C058C-E31B-437B-AA56-4069195AE2D4}" Location="local">
+        <File Id="fil_license_Prism_PubSubEvents" Vital="yes" Source="ThirdPartyLicense\Prism.PubSubEvents.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Prism" Guid="{6873B089-1A4D-4F2F-B67F-21A6CFBA605D}" Location="local">
+        <File Id="fil_license_Prism" Vital="yes" Source="ThirdPartyLicense\Prism.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_reactiveui" Guid="{17E34DE4-4CDF-41D6-9FE9-C25703E34E89}" Location="local">
+        <File Id="fil_license_reactiveui" Vital="yes" Source="ThirdPartyLicense\reactiveui.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_reactiveui_core" Guid="{453DF17B-8CD4-47EA-BAB6-5EFC3FB43ADA}" Location="local">
+        <File Id="fil_license_reactiveui_core" Vital="yes" Source="ThirdPartyLicense\reactiveui-core.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Rx_Core" Guid="{4FBF7BAF-4EF4-4214-AD4F-675B4C2EF342}" Location="local">
+        <File Id="fil_license_Rx_Core" Vital="yes" Source="ThirdPartyLicense\Rx-Core.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Rx_Interfaces" Guid="{4A3DB852-8E47-4043-A28F-57A01D17114D}" Location="local">
+        <File Id="fil_license_Rx_Interfaces" Vital="yes" Source="ThirdPartyLicense\Rx-Interfaces.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Rx_Linq" Guid="{93493A84-2633-4AC6-BFFA-92A32897060D}" Location="local">
+        <File Id="fil_license_Rx_Linq" Vital="yes" Source="ThirdPartyLicense\Rx-Linq.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Rx_Main" Guid="{9312EB57-E082-4452-9E11-A56E6DAF443F}" Location="local">
+        <File Id="fil_license_Rx_Main" Vital="yes" Source="ThirdPartyLicense\Rx-Main.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Rx_PlatformServices" Guid="{EF4106DD-52D7-40B9-812E-F5F9A00F7C80}" Location="local">
+        <File Id="fil_license_Rx_PlatformServices" Vital="yes" Source="ThirdPartyLicense\Rx-PlatformServices.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Rx_XAML" Guid="{E4B00A6D-55CD-4123-BA97-02ABD04EF828}" Location="local">
+        <File Id="fil_license_Rx_XAML" Vital="yes" Source="ThirdPartyLicense\Rx-XAML.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Splat" Guid="{6C702C45-B36D-4105-92FC-E1FF3B03A911}" Location="local">
+        <File Id="fil_license_Splat" Vital="yes" Source="ThirdPartyLicense\Splat.txt" KeyPath="yes"></File>
+      </Component>
+
+    </ComponentGroup>
+	</Fragment>
+</Wix>

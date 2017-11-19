@@ -1,0 +1,232 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ReferenceSourceBrowserViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015 RHEA System S.A.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace BasicRdl.ViewModels
+{
+    using System;
+    using System.Linq;
+    using System.Reactive.Linq;
+    using CDP4Common.CommonData;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Composition;
+    using CDP4Composition.Mvvm;
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Dal;
+    using CDP4Dal.Events;
+    using ReactiveUI;
+
+    /// <summary>
+    /// The purpose of the <see cref="ReferenceSourceBrowserViewModel"/> is to represent the view-model for <see cref="ReferenceSource"/>s
+    /// </summary>
+    public class ReferenceSourceBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    {
+        #region Fields
+
+        /// <summary>
+        /// The Panel Caption
+        /// </summary>
+        private const string PanelCaption = "ReferenceSources";
+
+        /// <summary>
+        /// Backing field for <see cref="CanCreateRdlElement"/>
+        /// </summary>
+        private bool canCreateRdlElement;
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceSourceBrowserViewModel"/> class.
+        /// </summary>
+        /// <param name="session">the associated <see cref="ISession"/></param>
+        /// <param name="siteDir">The unique <see cref="SiteDirectory"/></param>
+        /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
+        /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
+        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
+        public ReferenceSourceBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        {
+            this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
+            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+
+            this.ReferenceSources.ChangeTrackingEnabled = true;
+
+            this.AddSubscriptions();
+        }
+
+        #endregion Constructors
+
+        #region Public properties
+
+        /// <summary>
+        /// Gets the <see cref="ReferenceSourceRowViewModel"/> that are contained by this view-model
+        /// </summary>
+        public ReactiveList<ReferenceSourceRowViewModel> ReferenceSources { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether a RDL element may be created
+        /// </summary>
+        public bool CanCreateRdlElement
+        {
+            get { return this.canCreateRdlElement; }
+            private set { this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value); }
+        }
+
+        #endregion Public properties
+        #region Methods
+
+        /// <summary>
+        /// Initializes the Commands that can be executed from this view model. The commands are initialized
+        /// before the <see cref="PopulateContextMenu"/> is invoked
+        /// </summary>
+        protected override void InitializeCommands()
+        {
+            base.InitializeCommands();
+            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<ReferenceSource>());
+        }
+
+        /// <summary>
+        /// Compute the permissions
+        /// </summary>
+        public override void ComputePermission()
+        {
+            base.ComputePermission();
+            this.CanCreateRdlElement = this.Session.OpenReferenceDataLibraries.Any();
+        }
+
+        /// <summary>
+        /// Populate the context menu
+        /// </summary>
+        public override void PopulateContextMenu()
+        {
+            base.PopulateContextMenu();
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a ReferenceSource", "", this.CreateCommand, MenuItemKind.Create, ClassKind.ReferenceSource));
+        }
+
+        /// <summary>
+        /// Loads the <see cref="ReferenceSource"/>es from the cache when the browser is instantiated.
+        /// </summary>
+        protected override void Initialize()
+        {
+            base.Initialize();
+            this.ReferenceSources = new ReactiveList<ReferenceSourceRowViewModel>();
+
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(x => x.Iid);
+            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
+            {
+                foreach (var referenceSource in referenceDataLibrary.ReferenceSource)
+                {
+                    this.AddReferenceSourceRowViewModel(referenceSource);
+                }
+            }
+
+            this.ReferenceSources.Sort((x, y) => string.CompareOrdinal(x.Name, y.Name));
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// a value indicating whether the class is being disposed of
+        /// </param>
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            foreach (var referenceSource in this.ReferenceSources)
+            {
+                referenceSource.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Add the necessary subscriptions for this view model.
+        /// </summary>
+        private void AddSubscriptions()
+        {
+            var addListener =
+                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceSource))
+                    .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Select(x => x.ChangedThing as ReferenceSource)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(this.AddReferenceSourceRowViewModel);
+            this.Disposables.Add(addListener);
+
+            var removeListener =
+                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceSource))
+                    .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Select(x => x.ChangedThing as ReferenceSource)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(this.RemoveReferenceSourceRowViewModel);
+            this.Disposables.Add(removeListener);
+
+            var rdlUpdateListener =
+                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Select(x => x.ChangedThing as ReferenceDataLibrary)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(this.RefreshContainerName);
+            this.Disposables.Add(rdlUpdateListener);
+        }
+
+        /// <summary>
+        /// Adds a <see cref="ReferenceSourceRowViewModel"/>
+        /// </summary>
+        /// <param name="referenceSource">
+        /// The associated <see cref="ReferenceSource"/> for which the row is to be added.
+        /// </param>
+        private void AddReferenceSourceRowViewModel(ReferenceSource referenceSource)
+        {
+            if (this.ReferenceSources.Any(x => x.Thing == referenceSource))
+            {
+                return;
+            }
+
+            var row = new ReferenceSourceRowViewModel(referenceSource, this.Session, this);
+            this.ReferenceSources.Add(row);
+        }
+
+        /// <summary>
+        /// Removes a <see cref="ReferenceSourceRowViewModel"/> from the view model
+        /// </summary>
+        /// <param name="referenceSource">
+        /// The <see cref="ReferenceSource"/> for which the row view model has to be removed
+        /// </param>
+        private void RemoveReferenceSourceRowViewModel(ReferenceSource referenceSource)
+        {
+            var row = this.ReferenceSources.SingleOrDefault(rowViewModel => rowViewModel.Thing == referenceSource);
+            if (row != null)
+            {
+                this.ReferenceSources.Remove(row);
+                row.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Refresh the displayed container name for the category rows
+        /// </summary>
+        /// <param name="rdl">
+        /// The updated <see cref="ReferenceDataLibrary"/>.
+        /// </param>
+        private void RefreshContainerName(ReferenceDataLibrary rdl)
+        {
+            foreach (var referenceSource in this.ReferenceSources)
+            {
+                if (referenceSource.Thing.Container != rdl)
+                {
+                    continue;
+                }
+
+                if (referenceSource.ContainerRdl != rdl.ShortName)
+                {
+                    referenceSource.ContainerRdl = rdl.ShortName;
+                }
+            }
+        }
+        #endregion Methods
+    }
+}

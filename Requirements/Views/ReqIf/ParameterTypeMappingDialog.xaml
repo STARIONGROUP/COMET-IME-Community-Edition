@@ -1,0 +1,167 @@
+﻿<dx:DXWindow x:Class="CDP4Requirements.Views.ParameterTypeMappingDialog"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+            xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+            xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+            xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+            xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+            xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+            xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
+            xmlns:viewModels="clr-namespace:CDP4Requirements.ViewModels"
+            Title="Create Parameter Type from ReqIF Datatype Definitions..." 
+            dx:ThemeManager.ThemeName="Seven"
+            navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+            Height="800" 
+            Width="900">
+    
+    <dx:DXWindow.Resources>
+        <BitmapImage x:Key="MappedImage" UriSource="pack://application:,,,/CDP4Composition;component/Resources/Images/Apply_16x16.png" />
+        <BitmapImage x:Key="UnmappedImage" UriSource="pack://application:,,,/CDP4Composition;component/Resources/Images/Cancel_16x16.png" />
+
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:DatatypeDefinitionMappingRowViewModel}" 
+                                  ItemsSource="{Binding EnumValue, UpdateSourceTrigger=PropertyChanged}">
+            <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+        </HierarchicalDataTemplate>
+
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:EnumValueMappingRowViewModel}">
+            <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+        </HierarchicalDataTemplate>
+
+        <DataTemplate DataType="{x:Type mvvm:ContextMenuItemViewModel}">
+            <ContentControl>
+                <dxb:BarButtonItem Command="{Binding MenuCommand}"
+                                   Content="{Binding Header}" />
+            </ContentControl>
+        </DataTemplate>
+    </dx:DXWindow.Resources>
+
+    <Grid>
+        <dxlc:LayoutControl Background="White" Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <dxlc:LayoutGroup Orientation="Vertical" 
+                              View="GroupBox" 
+                              Height="Auto"
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch">
+                <dxb:ToolBarControl Height="25">
+                    <dxb:BarSplitButtonItem Name="CreateParameterType"
+                                            Glyph="pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/parametertype_32x32.png"
+                                            Hint="Create a Parameter Type for the selected Datatype Definition."
+                                            RibbonStyle="SmallWithoutText">
+                        <dxb:BarSplitButtonItem.PopupControl>
+                            <dxb:PopupMenu ItemLinksSource="{Binding CreateParameterTypeCommands}" />
+                        </dxb:BarSplitButtonItem.PopupControl>
+                    </dxb:BarSplitButtonItem>
+
+                    <dxb:BarSplitButtonItem Name="CreateMeasurementScale"
+                                            Glyph="{dx:DXImage Image=ChartYAxisSettings_16x16.png}"
+                                            Hint="Create a measurement scale."
+                                            RibbonStyle="SmallWithoutText">
+                        <dxb:BarSplitButtonItem.PopupControl>
+                            <dxb:PopupMenu ItemLinksSource="{Binding CreateMeasurementScaleCommands}" />
+                        </dxb:BarSplitButtonItem.PopupControl>
+                    </dxb:BarSplitButtonItem>
+                </dxb:ToolBarControl>
+                
+                <dxlc:LayoutItem LabelVerticalAlignment="Top"
+                                 LabelPosition="Top"
+                                 Label="Select Parameter-Types associated to the datatypes described in the ReqIF file:"
+                                 Height="Auto">
+                    <dxg:TreeListControl ItemsSource="{Binding MappingRows}"
+                                     SelectedItem="{Binding SelectedRow,
+                                                            Mode=TwoWay,
+                                                            UpdateSourceTrigger=PropertyChanged}"
+                                     SelectionMode="Row"
+                                     VerticalAlignment="Stretch"
+                                     HorizontalAlignment="Stretch"
+                                     MaxHeight="1000">
+                        <dxg:TreeListControl.View>
+                            <dxg:TreeListView Name="View"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           AllowColumnMoving="True"
+                                           AllowEditing="False"
+                                           AutoWidth="true"
+                                           AutoExpandAllNodes="True"
+                                           TreeDerivationMode="HierarchicalDataTemplate"
+                                           EnableImmediatePosting="True">
+                            </dxg:TreeListView>
+                        </dxg:TreeListControl.View>
+                        <dxg:TreeListControl.Columns>
+                            <!--<dxg:TreeListColumn Width="18"
+                                            MinWidth="18"
+                                            Fixed="Left"
+                                            FixedWidth="True">
+                                <dxg:TreeListColumn.DisplayTemplate>
+                                    <ControlTemplate>
+                                        <Image Width="16"
+                                               Height="16">
+                                            <Image.Style>
+                                                <Style>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding DataContext.Row.IsMapped, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type dxg:RowControl}}}" 
+                                                                        Value="True">
+                                                            <Setter Property="Image.Source" 
+                                                                        Value="{StaticResource MappedImage}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding DataContext.Row.IsMapped, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type dxg:RowControl}}}" 
+                                                                        Value="False">
+                                                            <Setter Property="Image.Source" 
+                                                                        Value="{StaticResource UnmappedImage}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Image.Style>
+                                        </Image>
+                                    </ControlTemplate>
+                                </dxg:TreeListColumn.DisplayTemplate>
+                            </dxg:TreeListColumn>-->
+                            <dxg:TreeListColumn FieldName="Identifiable.LongName" Header="Name" />
+                            <dxg:TreeListColumn FieldName="Identifiable.Description" Header="Description" />
+                            <dxg:TreeListColumn Header="Associated Object" FieldName="MappedThing"  AllowEditing="True">
+                                <dxg:TreeListColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <dxe:ComboBoxEdit Name="PART_Editor"
+                                                          ItemsSource="{Binding DataContext.Row.PossibleThings, RelativeSource={RelativeSource AncestorType={x:Type dxg:RowControl}}, UpdateSourceTrigger=PropertyChanged}"
+                                                          ShowCustomItems="True"
+                                                          DisplayMember="Name"
+                                                          ShowBorder="True"
+                                                          IsReadOnly="False"
+                                                          IsTextEditable="False">
+                                        </dxe:ComboBoxEdit>
+                                    </DataTemplate>
+                                </dxg:TreeListColumn.CellTemplate>
+                            </dxg:TreeListColumn>
+                        </dxg:TreeListControl.Columns>  
+                    </dxg:TreeListControl>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+            
+            <dxlc:LayoutGroup Orientation="Horizontal" 
+                              Height="30"
+                              Margin="3,3,0,0"
+                              VerticalAlignment="Bottom">
+                <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=NextCommand}"
+                    Content="Next" />
+                <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=CancelCommand}"
+                    Content="Cancel" />
+
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+    </Grid>
+</dx:DXWindow>

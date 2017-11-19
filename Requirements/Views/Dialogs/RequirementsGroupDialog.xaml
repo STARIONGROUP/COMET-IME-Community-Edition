@@ -1,0 +1,128 @@
+﻿<dx:DXWindow
+    x:Class="CDP4Requirements.Views.RequirementsGroupDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+    xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+    xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+    Title="Requirement Group" Height="350" Width="525"
+    navigation:DialogCloser.DialogResult="{Binding DialogResult}"
+    >
+
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+
+    <dxlc:LayoutControl Margin="5"
+                      Orientation="Vertical"
+                      ScrollBars="None">
+        <dxlc:LayoutGroup Margin="-10,-7,-10,-5"
+                        Orientation="Vertical"
+                        View="Tabs"
+                        dxlc:LayoutControl.AllowHorizontalSizing="True">
+            <dxlc:LayoutGroup Header="Basic" Orientation="Vertical">
+                <items:ShortNameLayoutItem/>
+                <items:NameLayoutItem/>
+                <items:OwnerLayoutItem/>
+            </dxlc:LayoutGroup>
+            <items:AliasLayoutGroup/>
+            <items:DefinitionLayoutGroup/>
+            <items:HyperLinkLayoutGroup/>
+            <dxlc:LayoutGroup Header="Groups" Orientation="Vertical">
+                <dxlc:LayoutItem>
+                    <dxb:ToolBarControl Height="30" Background="Transparent">
+                        <dxb:BarButtonItem x:Name="CreateGroupButton"
+                                           Command="{Binding CreateGroupCommand}"
+                                           Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                           Hint="Create a new Group" />
+                        <dxb:BarButtonItem x:Name="DeleteGroupButton"
+                                           Command="{Binding DeleteGroupCommand}"
+                                           Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                           Hint="Deprecate the selected Group" />
+                        <dxb:BarButtonItem x:Name="EditGroupButton"
+                                           Command="{Binding EditGroupCommand}"
+                                           Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                           Hint="Edit the selected Group" />
+                        <dxb:BarSplitButtonItem />
+
+                        <dxb:BarButtonItem x:Name="RefreshGroupButton"
+                                           Command="{Binding RefreshGroupCommand}"
+                                           Glyph="{dx:DXImage Image=Refresh2_16x16.png}"
+                                           Hint="Refresh the selected Group" />
+
+                        <dxb:BarButtonItem x:Name="ExportGroupButton"
+                                           Command="{Binding ExportGroupCommand}"
+                                           Glyph="{dx:DXImage Image=Export_16x16.png}"
+                                           Hint="Export the Group" />
+
+                        <dxb:BarSplitButtonItem />
+
+                        <dxb:BarButtonItem x:Name="HelpGroupButton"
+                                           Command="{Binding HelpGroupCommand}"
+                                           Glyph="{dx:DXImage Image=Info_16x16.png}"
+                                           Hint="Show Help" />
+                    </dxb:ToolBarControl>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem>
+                    <dxg:GridControl Width="400"
+                                     Height="250"
+                                     AllowLiveDataShaping="False"
+                                     ItemsSource="{Binding Group}"
+                                     SelectedItem="{Binding SelectedGroup,
+                                                            Mode=TwoWay,
+                                                            UpdateSourceTrigger=PropertyChanged}"
+                                     SelectionMode="Row">
+
+                        <dxg:GridControl.View>
+                            <dxg:TableView HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           AllowColumnMoving="True"
+                                           AllowEditing="False"
+                                           AllowGrouping="True"
+                                           AutoWidth="true"
+                                           IsDetailButtonVisibleBinding="{x:Null}"
+                                           ShowGroupPanel="False">
+                                <dxg:TableView.FocusedRow>
+                                    <dynamic:ExpandoObject />
+                                </dxg:TableView.FocusedRow>
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+
+                            <dxg:GridColumn Width="18"
+                                            MinWidth="18"
+                                            FixedWidth="True">
+                                <dxg:GridColumn.DisplayTemplate>
+                                    <ControlTemplate>
+                                        <Image Width="16"
+                                               Height="16">
+                                            <Image.Source>
+                                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                                </MultiBinding>
+                                            </Image.Source>
+                                        </Image>
+                                    </ControlTemplate>
+                                </dxg:GridColumn.DisplayTemplate>
+                            </dxg:GridColumn>
+
+                            <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
+                            <dxg:GridColumn FieldName="Name" Header="Name" />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+
+            <items:AdvancedLayoutGroup/>
+        </dxlc:LayoutGroup>
+        <items:UserValidationButtonsLayoutGroup/>
+        <items:ErrorMessageLayoutGroup/>
+    </dxlc:LayoutControl>
+</dx:DXWindow>

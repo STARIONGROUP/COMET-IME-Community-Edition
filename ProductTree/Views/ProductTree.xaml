@@ -1,0 +1,326 @@
+﻿<UserControl xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"  x:Class="CDP4ProductTree.Views.ProductTree"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
+             xmlns:viewModels="clr-namespace:CDP4ProductTree.ViewModels"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             xmlns:cdp4ProductTree="clr-namespace:CDP4ProductTree"
+             xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:NotConverter x:Key="NotConverter" />
+            <cdp4ProductTree:ProductTreeIconUriConverter x:Key="ProductTreeIconUriConverter" />
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+            
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ElementDefinitionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <Image Width="16"
+                                   Height="16"
+                                   Margin="3">
+                                <Image.Source>
+                                    <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                    </MultiBinding>
+                                </Image.Source>
+                            </Image>
+                        </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ElementUsageRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <Image Width="16"
+                                   Height="16"
+                                   Margin="3">
+                                <Image.Source>
+                                    <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                    </MultiBinding>
+                                </Image.Source>
+                            </Image>
+                        </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ParameterGroupRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <Image Width="16"
+                                   Height="16"
+                                   Margin="3">
+                                <Image.Source>
+                                    <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                    </MultiBinding>
+                                </Image.Source>
+                            </Image>
+                        </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ParameterOrOverrideBaseRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <Image Width="16"
+                                   Height="16"
+                                   Margin="3">
+                                <Image.Source>
+                                    <MultiBinding Converter="{StaticResource ProductTreeIconUriConverter}" Mode="OneWay">
+                                        <Binding Path="DataContext.Row" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                        <Binding Path="DataContext.Row.Usage" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
+                                    </MultiBinding>
+                                </Image.Source>
+                            </Image>
+                        </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ActualFiniteStateRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <Image Width="16"
+                                   Height="16"
+                                   Margin="3">
+                                <Image.Source>
+                                    <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                    </MultiBinding>
+                                </Image.Source>
+                            </Image>
+                        </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ParameterTypeComponentRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <Image Width="16"
+                                   Height="16"
+                                   Margin="3"
+                                   Source="pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/parameterComponent_32x32.png"/>
+
+                        </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                              Content="{Binding}"
+                                              ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+       <dxlc:LayoutGroup>
+            <dxb:ToolBarControl Height="30" Width="45" Margin="0,0,-5,0">
+                <dxb:BarButtonItem Command="{Binding ToggleUsageNamesCommand}"
+                               Glyph="{dx:DXImageOffice2013 Image=Replace_16x16.png}"
+                               Hint="Toggle ElementUsages Long|Short name" />
+            </dxb:ToolBarControl>
+            <views:CommonThingControl GridView="{Binding ElementName=View}" />
+        </dxlc:LayoutGroup>
+        <Grid Grid.Row="1" Background="AliceBlue">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="Model: " />
+            <TextBlock Grid.Row="0"
+                       Grid.Column="1"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="{Binding CurrentModel}" />
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="2"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="Data-Source" />
+            <TextBlock Grid.Row="0"
+                       Grid.Column="3"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="{Binding DataSource}" />
+
+            <TextBlock Grid.Row="1"
+                       Grid.Column="0"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="Iteration: " />
+            <TextBlock Grid.Row="1"
+                       Grid.Column="1"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="{Binding CurrentIteration}" />
+
+            <TextBlock Grid.Row="1"
+                       Grid.Column="2"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="Person: " />
+            <TextBlock Grid.Row="1"
+                       Grid.Column="3"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="{Binding Person}" />
+
+            <TextBlock Grid.Row="2"
+                       Grid.Column="0"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="Option: " />
+            <TextBlock Grid.Row="2"
+                       Grid.Column="1"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="{Binding CurrentOption}" />
+
+            <TextBlock Grid.Row="2"
+                       Grid.Column="2"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="Domain Of Expertise" />
+            <TextBlock Grid.Row="2"
+                       Grid.Column="3"
+                       Height="Auto"
+                       Margin="3"
+                       FontSize="10"
+                       Text="{Binding DomainOfExpertise}" />
+        </Grid>
+
+        <dxg:TreeListControl Grid.Row="2"
+                             ItemsSource="{Binding TopElement}"
+                             SelectedItem="{Binding SelectedThing}"
+                             SelectionMode="Row"
+                             services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
+            <dxmvvm:Interaction.Behaviors>
+                <cdp4Composition:ContextMenuBehavior />
+            </dxmvvm:Interaction.Behaviors>
+            <dxg:TreeListControl.View>
+                <dxg:TreeListView x:Name="View"
+                                  AllowEditing="False"
+                                  AutoWidth="False"
+                                  ExpandCollapseNodesOnNavigation="True"
+                                  FixedLineWidth="0"
+                                  HorizontalScrollbarVisibility="Auto"
+                                  NavigationStyle="Cell"
+                                  ShowHorizontalLines="False"
+                                  ShowIndicator="False"
+                                  ShowNodeImages="False"
+                                  ShowVerticalLines="False"
+                                  TreeDerivationMode="HierarchicalDataTemplate"
+                                  TreeLineStyle="Solid"
+                                  VerticalScrollbarVisibility="Auto">
+                    <dxg:TreeListView.RowStyle>
+                        <Style TargetType="{x:Type dxg:RowControl}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Row.IsPublishable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="Foreground" Value="Blue" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
+                                    <Setter Property="Background" Value="Yellow"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Row.IsExpanded}" Value="True">
+                                    <Setter Property="mvvm:TreeListNodesExpander.IsExpanded" Value="True"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                        </Style>
+                    </dxg:TreeListView.RowStyle>
+                    <dxg:TreeListView.ContextMenu>
+                        <ContextMenu Name="RowContextMenu" />
+                    </dxg:TreeListView.ContextMenu>
+                </dxg:TreeListView>
+            </dxg:TreeListControl.View>
+            <dxg:TreeListControl.Columns>
+                <dxg:TreeListColumn FieldName="Name" 
+                                    Fixed="Left" 
+                                    Visible="{Binding IsDisplayShortNamesOn, Converter={StaticResource NotConverter}, Mode=OneWay}"/>
+                <dxg:TreeListColumn FieldName="ShortName"
+                                    Fixed="Left"
+                                    Visible="{Binding IsDisplayShortNamesOn, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <dxg:TreeListColumn FieldName="Value" />
+                <dxg:TreeListColumn FieldName="OwnerShortName" Header="Owner"/>
+                <dxg:TreeListColumn FieldName="Switch" />
+                <dxg:TreeListColumn FieldName="Description" />
+                <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
+            </dxg:TreeListControl.Columns>
+            <dxg:TreeListControl.InputBindings>
+                <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
+                <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
+            </dxg:TreeListControl.InputBindings>
+        </dxg:TreeListControl>
+    </Grid>
+</UserControl>

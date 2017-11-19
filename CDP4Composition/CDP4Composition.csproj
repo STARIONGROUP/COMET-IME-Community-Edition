@@ -1,0 +1,473 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{866D3D1A-DEA1-4C0D-A2EC-972CF450D0C4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CDP4Composition</RootNamespace>
+    <AssemblyName>CDP4Composition</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CDP4Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.1.0.0-rc6\lib\net452\CDP4Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CDP4Dal, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.1.0.0-rc6\lib\net452\CDP4Dal.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CDP4JsonSerializer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.1.0.0-rc6\lib\net452\CDP4JsonSerializer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Data.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Diagram.v15.2.Core, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Mvvm.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.SpellChecker.v15.2.Core, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Core.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.DataAccess.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Diagram.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Docking.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.LayoutControl.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Printing.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Printing.v15.2.Core, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Grid.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Grid.v15.2.Core, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Grid.v15.2.Extensions, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Layout.v15.2.Core, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Ribbon.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.SpellChecker.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Practices.Prism.Composition">
+      <HintPath>..\packages\Prism.Composition.5.0.0\lib\NET45\Microsoft.Practices.Prism.Composition.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.Interactivity">
+      <HintPath>..\packages\Prism.Interactivity.5.0.0\lib\NET45\Microsoft.Practices.Prism.Interactivity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.MefExtensions">
+      <HintPath>..\packages\Prism.MEFExtensions.5.0.0\lib\NET45\Microsoft.Practices.Prism.MefExtensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.Mvvm">
+      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.Mvvm.Desktop, Version=1.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.Desktop.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.PubSubEvents, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Prism.PubSubEvents.1.1.2\lib\portable-sl5+windowsphone8+windows8+net40+wpa81\Microsoft.Practices.Prism.PubSubEvents.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.SharedInterfaces">
+      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.SharedInterfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.5.0.0-beta11\lib\net45\NLog.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="ReactiveUI, Version=6.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\reactiveui-core.6.4.0\lib\Net45\ReactiveUI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Splat, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Splat.1.6.0\lib\Net45\Splat.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Expression.Blend.Sdk.1.0.2\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Adapters\DockManagerAdapter.cs" />
+    <Compile Include="Adapters\DocumentGroupAdapter.cs" />
+    <Compile Include="Adapters\LayoutGroupAdapter.cs" />
+    <Compile Include="Adapters\LayoutPanelAdapter.cs" />
+    <Compile Include="Adapters\RibbonAdapter.cs" />
+    <Compile Include="Adapters\TabbedGroupAdapter.cs" />
+    <Compile Include="Attributes\IClassKindMetaData.cs" />
+    <Compile Include="Attributes\IRegionMetaData.cs" />
+    <Compile Include="Attributes\ModuleExportNameAttribute.cs" />
+    <Compile Include="Attributes\PanelViewExportAttribute.cs" />
+    <Compile Include="Attributes\PanelViewModelExportAttribute.cs" />
+    <Compile Include="Attributes\ThingDialogViewExportAttribute.cs" />
+    <Compile Include="Attributes\ThingDialogViewModelExportAttribute.cs" />
+    <Compile Include="Attributes\ValidationOverrideAttribute.cs" />
+    <Compile Include="CompositionPoints.cs" />
+    <Compile Include="Converters\BooleanToFontWeightConverter.cs" />
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\CamelCaseToSpaceConverter.cs" />
+    <Compile Include="Converters\CdpVersionToVisibilityConverter.cs" />
+    <Compile Include="Converters\ClasskindToIconConverter.cs" />
+    <Compile Include="Converters\EnumerationValueDefinitionConverter.cs" />
+    <Compile Include="Converters\IncludeOptionListToObjectListConverter.cs" />
+    <Compile Include="Converters\GenericListToObjectListConverter.cs" />
+    <Compile Include="Converters\NotConverter.cs" />
+    <Compile Include="Converters\GenericObjectListConverter.cs" />
+    <Compile Include="Converters\ReactiveClassKindToObjectListConverter.cs" />
+    <Compile Include="Converters\ReactiveScaleToObjectListConverter.cs" />
+    <Compile Include="Converters\ReactiveCategoryToObjectListConverter.cs" />
+    <Compile Include="Converters\ThingToIconUriConverter.cs" />
+    <Compile Include="Converters\UnderscoreCapitalsToSpacedTitleCaseConverter.cs" />
+    <Compile Include="Diagram\IDiagramContainer.cs" />
+    <Compile Include="Diagram\IThingDiagramItem.cs" />
+    <Compile Include="Diagram\NamedThingDiagramContentItem.cs" />
+    <Compile Include="Diagram\ThingDiagramConnector.cs" />
+    <Compile Include="Diagram\ThingDiagramContentItem.cs" />
+    <Compile Include="DragDrop\Constants.cs" />
+    <Compile Include="DragDrop\DragDropKeyStatesExtensions.cs" />
+    <Compile Include="DragDrop\DragInfo.cs" />
+    <Compile Include="DragDrop\DropInfo.cs" />
+    <Compile Include="DragDrop\FrameworkElementDragBehavior.cs" />
+    <Compile Include="DragDrop\FrameworkElementDropBehavior.cs" />
+    <Compile Include="DragDrop\IDragInfo.cs" />
+    <Compile Include="DragDrop\IDragSource.cs" />
+    <Compile Include="DragDrop\IDropInfo.cs" />
+    <Compile Include="DragDrop\IDropTarget.cs" />
+    <Compile Include="DragDrop\SelectionHelper.cs" />
+    <Compile Include="DragDrop\VisualTreeExtensions.cs" />
+    <Compile Include="Events\CancelHighlightEvent.cs" />
+    <Compile Include="Events\ElementUsageHighlightEvent.cs" />
+    <Compile Include="Events\HighlightByCategoryEvent.cs" />
+    <Compile Include="Events\HighlightEvent.cs" />
+    <Compile Include="Events\ToggleDeprecatedThingEvent.cs" />
+    <Compile Include="Events\TaskbarNotificationEvent.cs" />
+    <Compile Include="FolderRowViewModel.cs" />
+    <Compile Include="Mvvm\Behaviours\ContextMenuBehavior.cs" />
+    <Compile Include="Mvvm\Behaviours\ExtendedDiagramOrgChartBehavior.cs" />
+    <Compile Include="Mvvm\Behaviours\FilterStringService.cs" />
+    <Compile Include="Mvvm\Behaviours\IExtendedDiagramOrgChartBehavior.cs" />
+    <Compile Include="Mvvm\Behaviours\TreeListNodesExpander.cs" />
+    <Compile Include="Mvvm\Behaviours\TreeCellEditBehavior.cs" />
+    <Compile Include="Mvvm\Behaviours\CellEditBehavior.cs" />
+    <Compile Include="Mvvm\Behaviours\TreeCellShowingEditorBehavior.cs" />
+    <Compile Include="Mvvm\MenuItems\EngineeringModelMenuGroupViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonButtonEngineeringModelSetupDependentViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonMenuItemEngineeringModelSetupDependentViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\SessionEngineeringModelSetupMenuGroupViewModel.cs" />
+    <Compile Include="Mvvm\ModellingThingBrowserViewModelBase.cs" />
+    <Compile Include="Mvvm\CDPVersionQuerier.cs" />
+    <Compile Include="Mvvm\DiagramItemViewModel.cs" />
+    <Compile Include="Mvvm\IBrowserViewModelBase.cs" />
+    <Compile Include="Mvvm\IRowViewModelBase.cs" />
+    <Compile Include="Mvvm\MenuItems\SessionMenuGroupViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\IterationMenuGroupViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\MenuGroupViewModelBase.cs" />
+    <Compile Include="Mvvm\MenuItems\MenuItemKind.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonButtonIterationDependentViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonButtonOptionDependentViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonMenuItemEngineeringModelDependentViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonMenuItemOptionDependentViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonMenuItemSessionDependentViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonMenuItemViewModelBase.cs" />
+    <Compile Include="Mvvm\RowStatusKind.cs" />
+    <Compile Include="Mvvm\FloatingDialogViewModelBase.cs" />
+    <Compile Include="Attributes\IDescribeMetaData.cs" />
+    <Compile Include="Navigation\Interfaces\IFloatingDialogViewModel.cs" />
+    <Compile Include="Navigation\Interfaces\IOpenSaveFileDialogService.cs" />
+    <Compile Include="Navigation\OpenSaveFileDialogService.cs" />
+    <Compile Include="Services\GridUpdateService.cs" />
+    <Compile Include="Services\IconCacheService\IconCacheService.cs" />
+    <Compile Include="Services\IconCacheService\IIconCacheService.cs" />
+    <Compile Include="Services\RuleVerification\BuiltInRule.cs" />
+    <Compile Include="Services\RuleVerification\BuiltInRuleMetaDataExportAttribute.cs" />
+    <Compile Include="Services\RuleVerification\IBuiltInRule.cs" />
+    <Compile Include="Services\RuleVerification\IBuiltInRuleMetaData.cs" />
+    <Compile Include="Services\RuleVerification\IRuleVerificationService.cs" />
+    <Compile Include="Services\RuleVerification\RuleVerificationService.cs" />
+    <Compile Include="SpecialTerms\ISpecialTermsService.cs" />
+    <Compile Include="SpecialTerms\SpecialTermsService.cs" />
+    <Compile Include="SpellingChecker\SpellDictionaryService.cs" />
+    <Compile Include="SpellingChecker\ISpellDictionaryService.cs" />
+    <Compile Include="Log\CDP4SimpleConfigurator.cs" />
+    <Compile Include="Log\MemoryEventTarget.cs" />
+    <Compile Include="Mvvm\BrowserViewModelBase.cs" />
+    <Compile Include="Mvvm\DialogViewModelBase.cs" />
+    <Compile Include="Mvvm\IDialogViewModelBase.cs" />
+    <Compile Include="Mvvm\IViewModelBase.cs" />
+    <Compile Include="Mvvm\MenuItems\ContextMenuItemViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonButtonSessionDependentViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonMenuItemIterationDependentViewModel.cs" />
+    <Compile Include="Mvvm\Behaviours\ExtendedDialogResultCloser.cs" />
+    <Compile Include="Mvvm\Behaviours\DialogCloser.cs" />
+    <Compile Include="Mvvm\RowViewModelBase.cs" />
+    <Compile Include="Navigation\BaseDialogResult.cs" />
+    <Compile Include="Navigation\DialogViewModelBase.cs" />
+    <Compile Include="Navigation\Interfaces\IPanelView.cs" />
+    <Compile Include="Navigation\Interfaces\IPanelViewModel.cs" />
+    <Compile Include="Attributes\DialogViewExportAttribute.cs" />
+    <Compile Include="Attributes\DialogViewModelExportAttribute.cs" />
+    <Compile Include="Navigation\Interfaces\IDialogView.cs" />
+    <Compile Include="Navigation\Interfaces\IDialogViewModel.cs" />
+    <Compile Include="Mvvm\ViewModelBase.cs" />
+    <Compile Include="Navigation\DialogNavigationService.cs" />
+    <Compile Include="Navigation\Events\NavigationPanelEvent.cs" />
+    <Compile Include="Navigation\Interfaces\IDialogResult.cs" />
+    <Compile Include="Navigation\Interfaces\IDialogNavigationService.cs" />
+    <Compile Include="Navigation\Interfaces\IPanelNavigationService.cs" />
+    <Compile Include="Navigation\Interfaces\IThingDialogNavigationService.cs" />
+    <Compile Include="Navigation\Interfaces\IThingDialogView.cs" />
+    <Compile Include="Navigation\Interfaces\IThingDialogViewModel.cs" />
+    <Compile Include="Navigation\ThingDialogKind.cs" />
+    <Compile Include="Navigation\PanelNavigationService.cs" />
+    <Compile Include="Navigation\ThingDialogNavigationService.cs" />
+    <Compile Include="OfficeRibbon\IFluentRibbonCallback.cs" />
+    <Compile Include="OfficeRibbon\IFluentRibbonManager.cs" />
+    <Compile Include="OfficeRibbon\FluentRibbonManager.cs" />
+    <Compile Include="OfficeRibbon\RibbonPart.cs" />
+    <Compile Include="Plugins\PluginLoader.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegionNames.cs" />
+    <Compile Include="Ribbon\ExtendedRibbonPage.cs" />
+    <Compile Include="Ribbon\ExtendedRibbonPageGroup.cs" />
+    <Compile Include="Services\ValidationService.cs" />
+    <Compile Include="SpellingChecker\CultureInfoChangedEventArgs.cs" />
+    <Compile Include="StaticPanelViewModel.cs" />
+    <Compile Include="Mvvm\Types\ReactiveListExtension.cs" />
+    <Compile Include="Attributes\DescribeExportAttribute.cs" />
+    <Compile Include="Utilities\CultureInfoUtility.cs" />
+    <Compile Include="Utilities\UriConfig.cs" />
+    <Compile Include="Utilities\IconUtilities.cs" />
+    <Compile Include="Utilities\AppliedTheme.cs" />
+    <Compile Include="Utilities\UriConfigFileHandler.cs" />
+    <Compile Include="ViewModels\ConfirmationDialogViewModel.cs" />
+    <Compile Include="ViewModels\IValueSetRow.cs" />
+    <Compile Include="ViewModels\MessageHelper.cs" />
+    <Compile Include="ViewModels\GenericConfirmationDialogViewModel.cs" />
+    <Compile Include="ViewModels\InformationDialogViewModel.cs" />
+    <Compile Include="Views\BrowserHeader.xaml.cs">
+      <DependentUpon>BrowserHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CommonThingControl.xaml.cs">
+      <DependentUpon>CommonThingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ConfirmationDialog.xaml.cs">
+      <DependentUpon>ConfirmationDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InformationDialog.xaml.cs">
+      <DependentUpon>InformationDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SessionHeader.xaml.cs">
+      <DependentUpon>SessionHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GenericConfirmationDialog.xaml.cs">
+      <DependentUpon>GenericConfirmationDialog.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\Dictionaries\en_GB.aff" />
+    <EmbeddedResource Include="Resources\Dictionaries\en_GB.dic" />
+    <EmbeddedResource Include="Resources\RibbonXml\customui14.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\cdplogo3d_16x16.png" />
+    <Resource Include="Resources\Images\cdplogo3d_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\cdplogo3d_48x48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Log\Error_16x16.png" />
+    <Resource Include="Resources\Images\Log\Info_16x16.png" />
+    <Resource Include="Resources\Images\Log\Warning_16x16.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Images\Thing\naturallanguage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Thing\requirement.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Thing\measurementunit_16x16.png" />
+    <Resource Include="Resources\Images\Thing\measurementunit_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Thing\requirementContainer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Log\ExclamationRed_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Thing\Organization_16x16.png" />
+    <Resource Include="Resources\Images\Thing\Organization_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Info_128x128.png" />
+    <Resource Include="Resources\Images\Thing\lock.png" />
+    <Resource Include="Resources\Images\Thing\parameterComponent_32x32.png" />
+    <Resource Include="Resources\Images\Thing\grayscaleIterationSetup_16x16.png" />
+    <Resource Include="Resources\Images\Thing\grayscaleIterationSetup_32x32.png" />
+    <Resource Include="Resources\Images\Thing\Book.png" />
+    <Resource Include="Resources\Images\Log\ExclamationRed_32x32.png" />
+    <Resource Include="Resources\Images\Warning_128x128.png" />
+    <Resource Include="Resources\Images\Thing\grayscalePerson_16x16.png" />
+    <Resource Include="Resources\Images\Thing\grayscalePerson_32x32.png" />
+    <Resource Include="Resources\Images\Thing\grayscaleParticipant_16x16.png" />
+    <Resource Include="Resources\Images\Thing\grayscaleParticipant_32x32.png" />
+    <Resource Include="Resources\Images\trashcan_128x128.png" />
+    <Resource Include="Resources\Images\Thing\PossibleFiniteState_48x48.png" />
+    <Resource Include="Resources\Images\export_32x32.png" />
+    <Resource Include="Resources\Images\import_32x32.png" />
+    <Resource Include="Resources\Images\whiteball.jpg" />
+    <Resource Include="Resources\Images\orangeball.jpg" />
+    <Resource Include="Resources\Images\blueball.gif" />
+    <Resource Include="Resources\Images\Apply_16x16.png" />
+    <Resource Include="Resources\Images\Cancel_16x16.png" />
+    <Resource Include="Resources\Images\Thing\ActualFiniteState_48x48.png" />
+    <Content Include="Resources\Images\animatedcdplogo.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\Images\Help_128x128.png" />
+    <Resource Include="Resources\Images\cdplogo3d_48x48p10.png" />
+    <Content Include="Resources\Images\IconLicence.txt" />
+    <Resource Include="Resources\Images\Thing\siteRdl_16x16.png" />
+    <Resource Include="Resources\Images\Thing\siteRdl_32x32.png" />
+    <Resource Include="Resources\Images\Thing\parametertype_16x16.png" />
+    <Resource Include="Resources\Images\Thing\parametertype_32x32.png" />
+    <Resource Include="Resources\Images\Thing\domainofexpertise_16x16.png" />
+    <Resource Include="Resources\Images\Thing\domainofexpertise_32x32.png" />
+    <Resource Include="Resources\Images\Thing\category_16x16.png" />
+    <Resource Include="Resources\Images\Thing\category_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Views\BrowserHeader.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\CommonThingControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ConfirmationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\LoadingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InformationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SessionHeader.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GenericConfirmationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

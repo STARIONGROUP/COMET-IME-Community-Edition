@@ -1,0 +1,146 @@
+﻿<dx:DXWindow x:Class="CDP4CommonView.Views.AnnotationFloatingDialog"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+            xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+            xmlns:views="clr-namespace:CDP4CommonView.Views"
+            Title="{Binding ShortName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+            dx:ThemeManager.Theme="Seven"
+            Height="Auto"
+            MaxHeight="1080"
+            Width="525"
+            EnableTransparency="True">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+            <DataTemplate x:Key="DiscussionItemTemplate">
+                <dxlc:LayoutGroup Orientation="Horizontal"
+                                  View="GroupBox"
+                                  GroupBoxDisplayMode="Light">
+                    <dxlc:LayoutGroup.Resources>
+                        
+                    </dxlc:LayoutGroup.Resources>
+                    <dxlc:LayoutGroup Orientation="Vertical" 
+                                      Width="100" 
+                                      Height="100"
+                                      View="Group"
+                                      Margin="5">
+                        <dxlc:LayoutItem>
+                            <Image Width="48"
+                                   Height="48"
+                                   Source="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Top"/>
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem Label="{Binding ParticipantFullName, Mode=OneWay}"
+                                         FontSize="8"
+                                         HorizontalAlignment="Left"/>
+                        <dxlc:LayoutItem Label="Posted on: "
+                                         FontSize="8"
+                                         HorizontalAlignment="Left">
+                            <Label Content="{Binding CreatedOn, Mode=OneWay}"
+                                   FontSize="8"/>
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem Label="Edit: "
+                                         Visibility="{Binding IsModifiedAtVisible, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                         FontSize="8"
+                                         HorizontalAlignment="Left">
+                            <Label Content="{Binding ModifiedOn, Mode=OneWay}"
+                                   FontSize="8"/>
+                        </dxlc:LayoutItem>
+                    </dxlc:LayoutGroup>
+
+                    <dxlc:LayoutItem VerticalAlignment="Stretch">
+                        <views:InlineEditContentUserControl VerticalAlignment="Stretch"
+                                                            HorizontalAlignment="Stretch"
+                                                            InlineMode="True"
+                                                            StartInPreviewMode="True"
+                                                            BorderThickness="3"
+                                                            EventPublisher="{Binding EventPublisher, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ContentText="{Binding Content, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            SaveCommand="{Binding SaveCommand}"
+                                                            CancelCommand="{Binding CancelCommand}">
+                        </views:InlineEditContentUserControl>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+            </DataTemplate>
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+
+    <dxlc:LayoutControl>
+        <dxlc:LayoutGroup Orientation="Vertical"
+                          ScrollBars="Auto"
+                          View="Group"
+                          Background="White">
+            <dxlc:LayoutGroup Orientation="Vertical"
+                              View="GroupBox"
+                              GroupBoxDisplayMode="Light">
+                <dxlc:LayoutItem Label="Title: "
+                                 LabelPosition="Left">
+                    <dxlc:LayoutItem Label="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Description: "
+                                 LabelPosition="Left">
+                    <dxlc:LayoutItem Label="{Binding Content, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Primary Annotated Object: "
+                                 LabelPosition="Left">
+                    <dxlc:LayoutItem Label="{Binding PrimaryAnnotatedThingName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+
+            <dxlc:LayoutGroup Orientation="Vertical"
+                              View="GroupBox"
+                              GroupBoxDisplayMode="Light"
+                              Header="Discussions"
+                              ScrollBars="Auto"
+                              Width="Auto"
+                              MinHeight="50"
+                              Height="Auto"
+                              VerticalAlignment="Stretch">
+                <dxlc:LayoutItem>
+                    <ItemsControl x:Name="ItemsControl" 
+                                  HorizontalAlignment="Stretch" 
+                                  ItemsSource="{Binding DiscussionRows, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                  ItemTemplate="{StaticResource DiscussionItemTemplate}">
+                    </ItemsControl>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+
+            <dxlc:LayoutGroup Orientation="Horizontal" 
+                              Height="Auto" 
+                              Width="Auto"
+                              Margin="0,3,0,0"
+                              View="Group"
+                              VerticalAlignment="Bottom">
+                <dxlc:LayoutItem>
+                    <views:InlineEditContentUserControl Height="100"
+                                                        InlineMode="False"
+                                                        StartInPreviewMode="False"
+                                                        ContentText="{Binding NewDiscussionItemText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        IsReadOnly="{Binding IsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                    </views:InlineEditContentUserControl>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem HorizontalAlignment="Right">
+                    <Button Content="Send" 
+                            FontWeight="Bold"
+                            Height="100"
+                            Width="60"
+                            Command="{Binding PostDiscussionItemCommand}"/>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+
+            <dxlc:LayoutItem VerticalAlignment="Bottom">
+                <TextBox IsReadOnly="True"
+                         Text="{Binding Path=ErrorMessage,
+                                        Mode=OneWay}"
+                         Visibility="{Binding Path=HasError,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={StaticResource BooleanToVisibilityConverter}}" />
+            </dxlc:LayoutItem>
+
+        </dxlc:LayoutGroup>
+
+    </dxlc:LayoutControl>
+</dx:DXWindow>
+ 

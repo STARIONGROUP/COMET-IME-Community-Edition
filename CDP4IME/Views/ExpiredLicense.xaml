@@ -1,0 +1,108 @@
+﻿<UserControl x:Class="CDP4IME.Views.ExpiredLicense"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:views="clr-namespace:CDP4IME.Views"
+             mc:Ignorable="d"
+             x:Name="ExpiredLicenseWindow"
+             dx:ThemeManager.ThemeName="Seven">
+    <UserControl.Resources>
+        <views:TextDataProvider x:Key="TextData" Uri="../../Resources/license.rtf"/>
+    </UserControl.Resources>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="UserControl.Unloaded">
+            <BeginStoryboard>
+                <Storyboard x:Name="Board">
+                    <DoubleAnimation Duration="0:0:10"
+                                     From="1.0"
+                                     Storyboard.TargetName="ExpiredLicenseWindow"
+                                     Storyboard.TargetProperty="Opacity"
+                                     To="0" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </UserControl.Triggers>
+    
+    <Grid>
+        <Grid x:Name="ExpiredLicenseGrid"
+                      Width="500"
+                      Height="500"
+                      Margin="0"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Top">
+            <Grid x:Name="Back">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="342*"/>
+                    <ColumnDefinition Width="107*"/>
+                </Grid.ColumnDefinitions>
+                <Border Background="Black"
+                                CornerRadius="3"
+                                Opacity="0.15" Grid.ColumnSpan="2" Margin="0,0,-0.4,0.4" />
+                <Border Margin="1,1,0.6,1.4"
+                                Background="White"
+                                CornerRadius="2" Grid.ColumnSpan="2" />
+            </Grid>
+            
+            <Grid x:Name="Content_Area" Margin="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="29*"/>
+                    <ColumnDefinition Width="280*"/>
+                    <ColumnDefinition Width="18*"/>
+                    <ColumnDefinition Width="149*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Image Name="logo"
+                       Source="../Resources/logobar.png"
+                       Stretch="None" 
+                       Grid.ColumnSpan="4" 
+                       Margin="0,0,0,0" />
+                <TextBlock Name="Version"
+                            Grid.Row="1"
+                           Margin="0,10,0,0"
+                            Foreground="#FF2D2D2D"
+                            TextWrapping="Wrap" 
+                           Grid.ColumnSpan="4" />
+
+                <TextBlock Grid.Row="2"
+                           Margin="0,10,0,0"
+                           Foreground="#FF2D2D2D"
+                           TextWrapping="Wrap" 
+                           Grid.ColumnSpan="4"> More information on <Hyperlink NavigateUri="http://www.rheagroup.com" RequestNavigate="Hyperlink_OnRequestNavigate">www.rheagroup.com</Hyperlink></TextBlock>
+                <Border Grid.Row="3" BorderThickness="1" BorderBrush="LightGray" Grid.ColumnSpan="4" Margin="0,0,0,40.2" Grid.RowSpan="2" Height="250">
+                    <ScrollViewer  HorizontalScrollBarVisibility="Disabled" Background="WhiteSmoke">
+                        <TextBlock Name="LicenceInfo" Text="{Binding Source={StaticResource TextData}, Mode=OneWay}" TextWrapping="Wrap"/>
+                    </ScrollViewer>
+                </Border>
+                <Button Width="75"
+                        Grid.Row="4"
+                        Grid.Column="3"
+                        Height="25"
+                        HorizontalAlignment="Right"
+                        Click="Ok_OnClick"
+                        Content="Ok" />
+                <DockPanel x:Name="Footer"
+                                   Grid.Row="4"
+                                   Margin="12,20.6,12,3.2" Grid.ColumnSpan="4">
+                    <TextBlock x:Name="Footer_Text"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       Foreground="#FF2D2D2D"
+                                       Opacity="0.5"
+                                       TextWrapping="Wrap" >
+                                Copyright RHEA S.A © 2016. Visit us @ 
+                                <Hyperlink NavigateUri="http://www.rheagroup.com" RequestNavigate="Hyperlink_OnRequestNavigate">www.rheagroup.com</Hyperlink>
+                    </TextBlock>
+                </DockPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

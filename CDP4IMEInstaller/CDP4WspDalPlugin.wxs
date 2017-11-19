@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <ComponentGroup Id="WSPDAL_CG" Directory="WSPDAL">
+      
+      <Component Id="comp_CDP4WspDal" Guid="{201BF432-2731-49F4-8C28-086B5779DBB5}" Location="local">
+        <File Id="fil_CDP4WspDal"  Vital="yes" Source="$(var.CDP4WspDal.TargetDir)CDP4WspDal.dll" KeyPath="yes"></File>
+      </Component>
+
+    </ComponentGroup>
+  </Fragment>
+</Wix>

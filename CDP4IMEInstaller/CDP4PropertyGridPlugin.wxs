@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <ComponentGroup Id="PROPERTYGRID_CG" Directory="PROPERTYGRID">
+      <Component Id="comp_CDP4PropertyGrid" Guid="{527C1073-3EFD-495F-A2F5-2AAD7BFDDC8D}" Location="local">
+        <File Id="fil_CDP4PropertyGrid"  Vital="yes" Source="$(var.CDP4PropertyGrid.TargetPath)" KeyPath="yes"></File>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

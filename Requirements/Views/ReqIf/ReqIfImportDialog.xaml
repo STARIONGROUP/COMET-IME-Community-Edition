@@ -1,0 +1,99 @@
+﻿<dx:DXWindow
+    x:Class="CDP4Requirements.Views.ReqIfImportDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+    xmlns:dxdove="http://schemas.devexpress.com/winfx/2008/xaml/docking/visualelements"
+    Title="Import Requirement Data from ReqIF file..." 
+    dx:ThemeManager.ThemeName="Seven"
+    navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+    Height="350" 
+    Width="525">
+
+    <Grid>
+        <dxlc:LayoutControl Background="White" Orientation="Vertical">
+            <dxlc:LayoutGroup Orientation="Vertical" View="GroupBox">
+                
+                <dxlc:LayoutItem LabelVerticalAlignment="Top"
+                                 LabelPosition="Top"
+                                 Label="Select the iteration of the engineering model in which the requirement data shall be created:">
+                    <dxg:GridControl AllowLiveDataShaping="False"
+                                     ItemsSource="{Binding Iterations}"
+                                     SelectedItem="{Binding SelectedIteration,
+                                                            Mode=TwoWay,
+                                                            UpdateSourceTrigger=PropertyChanged}"
+                                     SelectionMode="Row"
+                                     Height="160">
+                        <dxg:GridControl.View>
+                            <dxg:TableView Name="View"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           AllowColumnMoving="True"
+                                           AllowEditing="False"
+                                           AllowGrouping="True"
+                                           AutoWidth="true"
+                                           IsDetailButtonVisibleBinding="{x:Null}"
+                                           ShowGroupPanel="False">
+                                <dxg:TableView.FocusedRow>
+                                    <dynamic:ExpandoObject />
+                                </dxg:TableView.FocusedRow>
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                                <dxg:GridControl.Columns>
+                                    <dxg:GridColumn FieldName="Model" Header="Model" />
+                                    <dxg:GridColumn FieldName="IterationNumber" Header="Iteration" />
+                                    <dxg:GridColumn FieldName="DataSourceUri" Header="Data-source" />
+                                </dxg:GridControl.Columns>  
+                    </dxg:GridControl>
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutItem AddColonToLabel="True" 
+                                 LabelPosition="Top"
+                                 Label="Path">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="55" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0"
+                                 MinWidth="150"
+                                 IsEnabled="False"
+                                 Text="{Binding Path,
+                                                UpdateSourceTrigger=PropertyChanged,
+                                                Mode=TwoWay}" />
+                        <Button Grid.Column="1"
+                                Margin="5,0,0,0"
+                                Command="{Binding BrowseCommand}"
+                                Content="..." />
+                    </Grid>
+
+                </dxlc:LayoutItem>
+
+            </dxlc:LayoutGroup>
+            
+            <dxlc:LayoutGroup Orientation="Horizontal" Margin="3,3,0,0">
+                <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=OkCommand}"
+                    Content="Import" />
+                <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=CancelCommand}"
+                    Content="Cancel" />
+
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+        <views:LoadingControl Grid.Row="0" Grid.Column="0" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</dx:DXWindow>

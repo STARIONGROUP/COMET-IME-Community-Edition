@@ -1,0 +1,26 @@
+﻿<ribbon:ExtendedRibbonPage x:Class="BasicRdl.Views.BasicRdlRibbon"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
+                           xmlns:views="clr-namespace:BasicRdl.Views"
+                           Name="BasicRdlRibbonPage"
+                           Caption="Reference Data"
+                           IsInDefaultPageCategory="True"
+                           mc:Ignorable="d"
+                           MergeOrder="2000">
+
+    <views:SiteRdlSelectionRibbon/>
+    <views:MeasurementScalesRibbon/>
+    <views:MeasurementUnitsRibbon/>
+    <views:UnitPrefixRibbon/>
+    <views:CategoryRibbon/>
+    <views:ParameterTypeRibbon/>
+    <views:RulesRibbon/>
+    <views:ConstantBrowserRibbon/>
+    <views:GlossaryBrowserRibbon/>
+    <views:FileTypeBrowserRibbon/>
+    <views:ReferenceSourceRibbon/>
+    
+</ribbon:ExtendedRibbonPage>
