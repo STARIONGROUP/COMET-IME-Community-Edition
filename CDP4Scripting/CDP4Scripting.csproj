@@ -49,15 +49,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CDP4Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.1.0.0-rc6\lib\net452\CDP4Common.dll</HintPath>
+      <HintPath>..\packages\CDP4Common-CE.1.0.0-rc7\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4Dal, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.1.0.0-rc6\lib\net452\CDP4Dal.dll</HintPath>
+      <HintPath>..\packages\CDP4Dal-CE.1.0.0-rc7\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.1.0.0-rc6\lib\net452\CDP4JsonSerializer.dll</HintPath>
+      <HintPath>..\packages\CDP4JsonSerializer-CE.1.0.0-rc7\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v15.2, Version=15.2.15.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
