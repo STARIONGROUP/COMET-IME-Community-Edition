@@ -102,6 +102,7 @@
     <Content Include="ThirdPartyLicense\Rx-PlatformServices.txt" />
     <Content Include="ThirdPartyLicense\Rx-XAML.txt" />
     <Content Include="ThirdPartyLicense\Splat.txt" />
+    <Content Include="ThirdPartyLicense\System.Xml.XmlSerializer.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BasicRdl\BasicRdl.csproj">

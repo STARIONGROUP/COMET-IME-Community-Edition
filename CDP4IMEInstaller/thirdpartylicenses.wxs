@@ -119,6 +119,10 @@
         <File Id="fil_license_Splat" Vital="yes" Source="ThirdPartyLicense\Splat.txt" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="comp_license_System_Xml_XmlSerializer" Guid="{0C741452-C104-4353-B257-F98E3CE844B2}" Location="local">
+        <File Id="fil_license_System_Xml_XmlSerializer" Vital="yes" Source="ThirdPartyLicense\System.Xml.XmlSerializer.txt" KeyPath="yes"></File>
+      </Component>
+      
     </ComponentGroup>
 	</Fragment>
 </Wix>
