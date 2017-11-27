@@ -25,14 +25,6 @@ namespace CDP4IME
         /// A NLog logger
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// The expire date for this app beta version. 
-        /// </summary>
-        /// <remarks>
-        /// If set to DateTime.MaxValue the license will never expire
-        /// </remarks>
-        public static readonly DateTime ExpireDate = DateTime.MaxValue;
         
         /// <summary>
         /// Called when the applications starts. Makes a distinction between debug and release mode
@@ -46,14 +38,7 @@ namespace CDP4IME
             ThemeManager.ApplicationThemeName = Theme.SevenName;
             AppliedTheme.ThemeName = Theme.SevenName;
             base.OnStartup(e);
-
-            // check if the license is expired or not
-            if (this.IsLicenseExpired())
-            {
-                DXSplashScreen.Show<Views.ExpiredLicense>();
-                return;
-            }
-
+            
             DXSplashScreen.Show<Views.SplashScreenView>();
             DXSplashScreen.SetState("Starting CDP4");
 
@@ -71,18 +56,7 @@ namespace CDP4IME
 
             DXSplashScreen.Close();
         }
-
-        /// <summary>
-        /// Checks whether the license is expired
-        /// </summary>
-        /// <returns>
-        /// returns true if the license is expired, false otherwise
-        /// </returns>
-        private bool IsLicenseExpired()
-        {
-            return DateTime.Today > ExpireDate;
-        }
-
+        
         /// <summary>
         /// Run the application in debug mode. Unhandled Exceptions are not caught.
         /// The application will crash

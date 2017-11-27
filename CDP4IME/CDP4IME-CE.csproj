@@ -309,7 +309,6 @@
     <Compile Include="CDP4IMEBootstrapper.cs" />
     <Compile Include="CDP4PluginLoader.cs" />
     <Compile Include="DynamicDirectoryModuleCatalog.cs" />
-    <Compile Include="ViewModels\ExpiredLicenseViewModel.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\DataSourceExportViewModel.cs" />
     <Compile Include="ViewModels\LogDetailsViewModel.cs" />
@@ -318,9 +317,6 @@
     <Compile Include="ViewModels\PluginRowViewModel.cs" />
     <Compile Include="ViewModels\SessionViewModel.cs" />
     <Compile Include="ShellViewModel.cs" />
-    <Compile Include="Views\ExpiredLicense.xaml.cs">
-      <DependentUpon>ExpiredLicense.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\DataSourceExport.xaml.cs">
       <DependentUpon>DataSourceExport.xaml</DependentUpon>
     </Compile>
@@ -352,10 +348,6 @@
       <DependentUpon>Shell.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\ExpiredLicense.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\DataSourceExport.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
