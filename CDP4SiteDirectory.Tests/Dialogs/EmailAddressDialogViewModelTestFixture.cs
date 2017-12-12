@@ -8,7 +8,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 {
     using System;
     using CDP4Common.MetaInfo;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;

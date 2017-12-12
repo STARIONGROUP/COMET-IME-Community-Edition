@@ -10,13 +10,12 @@ namespace CDP4CommonView.Tests
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.MetaInfo;
-    using CDP4Common.Operations;
+    using CDP4Common.MetaInfo;    
     using CDP4Common.SiteDirectoryData;
-
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
+    using CDP4Dal.Operations;
     using Microsoft.Practices.ServiceLocation;
     using Moq;
     using ReactiveUI;

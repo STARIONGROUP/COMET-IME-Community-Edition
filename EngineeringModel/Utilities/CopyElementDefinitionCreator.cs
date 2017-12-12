@@ -9,7 +9,7 @@ namespace CDP4EngineeringModel.Utilities
     using System;
     using System.Collections.Generic;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Dal;
 
     /// <summary>

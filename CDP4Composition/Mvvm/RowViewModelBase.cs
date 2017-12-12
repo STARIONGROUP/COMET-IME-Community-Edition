@@ -13,7 +13,6 @@ namespace CDP4Composition.Mvvm
     using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
     using CDP4Common.Poco;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -23,6 +22,7 @@ namespace CDP4Composition.Mvvm
     using Services;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using Events;
     using Navigation.Interfaces;

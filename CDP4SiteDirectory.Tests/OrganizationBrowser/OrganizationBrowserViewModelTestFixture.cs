@@ -12,7 +12,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
     using System.Reactive.Concurrency;
     using System.Reflection;
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;

@@ -13,7 +13,7 @@ namespace CDP4Requirements.ViewModels
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;

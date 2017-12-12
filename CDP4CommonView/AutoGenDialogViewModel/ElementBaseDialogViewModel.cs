@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementBaseDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+//   Copyright (c) 2015-2017 RHEA S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -19,11 +19,12 @@ namespace CDP4CommonView
     using CDP4Common.ReportingData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Operations;
+    
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
+	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
 

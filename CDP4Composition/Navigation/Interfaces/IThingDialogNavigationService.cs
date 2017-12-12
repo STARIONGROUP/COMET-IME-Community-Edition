@@ -8,8 +8,8 @@ namespace CDP4Composition.Navigation.Interfaces
 {
     using System.Collections.Generic;
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
     using CDP4Dal;
+    using CDP4Dal.Operations;
 
     /// <summary>
     /// The Interface for Dialog Navigation classes.

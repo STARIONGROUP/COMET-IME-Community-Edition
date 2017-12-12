@@ -11,9 +11,9 @@ namespace CDP4Composition.Mvvm
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
     using CDP4Dal;
     using CDP4Dal.Exceptions;
+    using CDP4Dal.Operations;
     using Navigation;
     using Navigation.Interfaces;
     using ReactiveUI;

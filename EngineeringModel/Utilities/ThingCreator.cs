@@ -10,7 +10,7 @@ namespace CDP4EngineeringModel.Utilities
     using System.ComponentModel.Composition;
     using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Services;
     using CDP4Dal;

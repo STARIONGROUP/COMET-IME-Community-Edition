@@ -13,7 +13,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     using CDP4CommonView;

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="CitationDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="CitationDialogViewModel.cs" company="RHEA S.A.">
+//   Copyright (c) 2015 RHEA S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ namespace CDP4CommonView.ViewModels
     using System.Linq;
     using System.Collections.Generic;
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;

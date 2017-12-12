@@ -11,12 +11,10 @@ namespace CDP4Composition.Mvvm
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
+    using CDP4Common.EngineeringModelData;    
     using CDP4Common.Poco;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
-
     using CDP4Composition.Converters;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
@@ -24,6 +22,7 @@ namespace CDP4Composition.Mvvm
     using CDP4Composition.ViewModels;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using NLog;
     using ReactiveUI;

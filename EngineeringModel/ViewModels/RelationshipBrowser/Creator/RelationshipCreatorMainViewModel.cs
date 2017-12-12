@@ -10,7 +10,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Reactive.Linq;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Dal;
     using NLog;
     using ReactiveUI;

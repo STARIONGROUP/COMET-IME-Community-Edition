@@ -12,7 +12,7 @@ namespace CDP4Requirements.ViewModels
     using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;

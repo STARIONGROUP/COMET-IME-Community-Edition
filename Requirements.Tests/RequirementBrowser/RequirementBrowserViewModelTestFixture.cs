@@ -22,7 +22,7 @@ namespace CDP4Requirements.Tests.Panels
     using NUnit.Framework;
     using System;
     using System.Linq;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using ReactiveUI;
 
     [TestFixture]

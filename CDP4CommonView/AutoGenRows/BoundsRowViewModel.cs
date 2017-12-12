@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="BoundsRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="BoundsRowViewModel.cs" company="RHEA S.A.">
 //   Copyright (c) 2015-2017 RHEA System S.A.
 // </copyright>
 // <summary>

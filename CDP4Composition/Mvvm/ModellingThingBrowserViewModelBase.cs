@@ -11,14 +11,13 @@ namespace CDP4Composition.Mvvm
     using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
     using CDP4Common.Poco;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
-
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
+    using CDP4Dal.Operations;
 
     using NLog;
     using ReactiveUI;

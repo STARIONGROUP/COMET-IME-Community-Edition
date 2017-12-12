@@ -9,15 +9,13 @@ namespace CDP4Composition.Services
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
-
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
     using CDP4Common.SiteDirectoryData;
-
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using NLog;
 
     /// <summary>

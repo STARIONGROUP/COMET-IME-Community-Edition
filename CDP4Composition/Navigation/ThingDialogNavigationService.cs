@@ -15,17 +15,13 @@ namespace CDP4Composition.Navigation
     using System.Windows;
     using System.Windows.Interop;
     using System.Windows.Media;
-
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
-
     using CDP4Composition.Attributes;
     using CDP4Composition.Converters;
     using CDP4Composition.Navigation.Interfaces;
-
     using CDP4Dal;
+    using CDP4Dal.Operations;
     using DevExpress.Xpf.Core;
-
     using NLog;
 
     /// <summary>

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="AnnotationFloatingDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="AnnotationFloatingDialogViewModel.cs" company="RHEA S.A.">
+//   Copyright (c) 2015 RHEA S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ namespace CDP4CommonView.ViewModels
     using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;

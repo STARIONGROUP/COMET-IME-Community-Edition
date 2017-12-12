@@ -10,10 +10,10 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
     using System;
     using System.Collections.Generic;
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
     using CDP4Dal;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using DevExpress.Xpf.Grid;
     using DevExpress.Xpf.Grid.TreeList;

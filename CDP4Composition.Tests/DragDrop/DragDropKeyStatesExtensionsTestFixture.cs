@@ -4,11 +4,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Windows;
-
 namespace CDP4Composition.Tests.DragDrop
 {
-    using CDP4Common.Operations;
+    using System.Windows;
+    using CDP4Dal.Operations;
     using CDP4Composition.DragDrop;
     using NUnit.Framework;
 

@@ -18,11 +18,11 @@ namespace CDP4Composition.Mvvm
     using System.Windows;
     using CDP4Common;
     using CDP4Common.CommonData;    
-    using CDP4Common.Operations;
     using CDP4Composition.Converters;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
+    using CDP4Dal.Operations;
     using CDP4JsonSerializer;
     using DevExpress.Xpf.SpellChecker;
     using DevExpress.XtraSpellChecker;

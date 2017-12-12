@@ -12,7 +12,7 @@ namespace BasicRdl.Tests.ViewModels
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4CommonView;
     using CDP4Composition.Navigation;

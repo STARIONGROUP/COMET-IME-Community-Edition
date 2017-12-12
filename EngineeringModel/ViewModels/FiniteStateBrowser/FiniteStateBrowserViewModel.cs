@@ -12,7 +12,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Reactive.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;

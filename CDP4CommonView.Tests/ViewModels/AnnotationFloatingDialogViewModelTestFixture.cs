@@ -12,12 +12,12 @@ namespace CDP4CommonView.Tests.ViewModels
     using System.Reflection;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     using CDP4CommonView.ViewModels;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using Moq;
     using NUnit.Framework;

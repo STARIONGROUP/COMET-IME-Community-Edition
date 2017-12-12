@@ -22,7 +22,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
     using NUnit.Framework;
     using System;
     using System.Linq;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4CommonView.EventAggregator;
     using ReactiveUI;
 

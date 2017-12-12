@@ -10,13 +10,13 @@ namespace CDP4Composition.Tests.Navigation
     using System.Collections.Generic;
     using System.Windows;
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
     using CDP4Dal;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using DevExpress.Xpf.SpellChecker;
     using Moq;

@@ -10,7 +10,7 @@ namespace CDP4IME.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using CDP4Dal.Composition;

@@ -11,7 +11,7 @@ namespace CDP4EngineeringModel.Utilities
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;    
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4CommonView.ViewModels;
     using CDP4Composition.Navigation;
     using CDP4Dal;

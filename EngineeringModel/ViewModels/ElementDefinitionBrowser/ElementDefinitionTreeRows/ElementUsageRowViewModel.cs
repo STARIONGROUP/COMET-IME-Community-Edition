@@ -15,7 +15,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;

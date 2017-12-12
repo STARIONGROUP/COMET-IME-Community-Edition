@@ -11,7 +11,7 @@ namespace BasicRdl.ViewModels
     using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;

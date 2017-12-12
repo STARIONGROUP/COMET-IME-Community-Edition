@@ -7,7 +7,7 @@
 namespace CDP4Composition.DragDrop
 {
     using System.Windows;
-    using CDP4Common.Operations;
+    using CDP4Dal.Operations;
 
     /// <summary>
     /// The <see cref="DragDropKeyStatesExtensions"/> class specifies Extension methods for the <see cref="DragDropKeyStates"/>
