@@ -66,11 +66,6 @@ namespace CDP4ShellDialogs.ViewModels
         /// Backing field for the <see cref="Password"/> property.
         /// </summary>
         private string password;
-
-        /// <summary>
-        /// Backing field for the <see cref="ArchivePassword"/> property.
-        /// </summary>
-        private string archivePassword;
         
         /// <summary>
         /// Backing field for the <see cref="ShowBrowseButton"/> property.
@@ -254,22 +249,6 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets the ArchivePassword
-        /// </summary>
-        public string ArchivePassword
-        {
-            get
-            {
-                return this.archivePassword;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.archivePassword, value);
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether to show the browse source button
         /// </summary>
         public bool ShowBrowseButton
@@ -353,7 +332,7 @@ namespace CDP4ShellDialogs.ViewModels
             }
             else
             {                
-                var credentials = new Credentials(this.UserName, this.Password, providedUri, this.ArchivePassword);
+                var credentials = new Credentials(this.UserName, this.Password, providedUri);
                 var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
 

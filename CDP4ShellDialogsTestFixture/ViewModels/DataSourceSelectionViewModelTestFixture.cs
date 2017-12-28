@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceSelectionViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2017 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -93,7 +93,6 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             viewmodel.UserName = "John";
             viewmodel.Password = "Dow";
-            viewmodel.ArchivePassword = "Doe";
             viewmodel.Uri = "http://www.rheagroup.com";
 
             Assert.IsTrue(viewmodel.OkCommand.CanExecute(null));
@@ -114,16 +113,15 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             Assert.IsNullOrEmpty(viewmodel.ErrorMessage);
 
             Assert.IsNotEmpty(viewmodel.AvailableDataSourceKinds);
-           
+
             viewmodel.UserName = "John";
             viewmodel.Password = "Dow";
-            viewmodel.ArchivePassword = "Doe";
-            
+
             var daltype0 = viewmodel.AvailableDataSourceKinds[0];
             var daltype1 = viewmodel.AvailableDataSourceKinds[1];
             viewmodel.SelectedDataSourceKind = null;
 
-            UriConfig cl1 = new UriConfig() { Alias = "BadAlias", Uri = "KKK",  DalType = daltype0.DalType.ToString() };
+            UriConfig cl1 = new UriConfig() { Alias = "BadAlias", Uri = "KKK", DalType = daltype0.DalType.ToString() };
             UriRowViewModel row1 = new UriRowViewModel() { UriConfig = cl1 };
 
             UriConfig cl2 = new UriConfig() { Uri = "http://www.rheagroup.com", DalType = daltype0.DalType.ToString() };
@@ -136,7 +134,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             viewmodel.AllDefinedUris.Add(row1);
             viewmodel.AllDefinedUris.Add(row2);
             viewmodel.AllDefinedUris.Add(row3);
-            
+
             viewmodel.SelectedDataSourceKind = daltype0;
             viewmodel.SelectedUri = viewmodel.AvailableUris.Last();
             Assert.IsTrue(viewmodel.OkCommand.CanExecute(null));
@@ -165,7 +163,6 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             viewmodel.UserName = "John";
             viewmodel.Password = "Dow";
-            viewmodel.ArchivePassword = "Doe";
             viewmodel.Uri = "http://www.rheagroup.com";
 
             viewmodel.OkCommand.Execute(null);

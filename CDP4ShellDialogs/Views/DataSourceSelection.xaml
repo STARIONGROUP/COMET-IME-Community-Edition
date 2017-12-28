@@ -45,8 +45,7 @@
                 <dxlc:LayoutItemLabel Grid.Row="0"
                                       Grid.Column="0"
                                       Margin="5"
-                                      Content="Data Source :" />
-                
+                                      Content="Data Source:" />
 
                 <ComboBox Grid.Row="0"
                           Grid.Column="1"
@@ -62,7 +61,7 @@
                 <dxlc:LayoutItemLabel Grid.Row="1"
                                       Grid.Column="0"
                                       Margin="5"
-                                      Content="URI :" />
+                                      Content="URI:" />
                 <StackPanel Grid.Row="1"
                             Grid.Column="1"
                             Orientation="Horizontal">
@@ -101,7 +100,7 @@
                 <dxlc:LayoutItemLabel Grid.Row="2"
                                       Grid.Column="0"
                                       Margin="5"
-                                      Content="Proxy URI :" />
+                                      Content="Proxy URI:" />
                 <TextBox Grid.Row="2"
                          Grid.Column="1"
                          MinWidth="215"
@@ -115,32 +114,19 @@
                 <dxlc:LayoutItemLabel Grid.Row="3"
                                       Grid.Column="0"
                                       Margin="5"
-                                      Content="Archive Password :" />
-                <dxe:PasswordBoxEdit Grid.Row="3"
-                                     Grid.Column="1"
-                                     MinWidth="150"
-                                     Margin="2"
-                                     IsEnabled="{Binding ShowBrowseButton}"
-                                     Text="{Binding ArchivePassword,
-                                                    UpdateSourceTrigger=PropertyChanged,
-                                                    Mode=TwoWay}" />
-
-                <dxlc:LayoutItemLabel Grid.Row="4"
-                                      Grid.Column="0"
-                                      Margin="5"
-                                      Content="User Name : " />
-                <TextBox Grid.Row="4"
+                                      Content="User Name: " />
+                <TextBox Grid.Row="3"
                          Grid.Column="1"
                          MinWidth="150"
                          Margin="2"
                          Text="{Binding UserName,
                                         UpdateSourceTrigger=PropertyChanged,
                                         Mode=TwoWay}" />
-                <dxlc:LayoutItemLabel Grid.Row="5"
+                <dxlc:LayoutItemLabel Grid.Row="4"
                                       Grid.Column="0"
                                       Margin="5"
-                                      Content="Password : " />
-                <Grid Grid.Row="5" Grid.Column="1">
+                                      Content="Password: " />
+                <Grid Grid.Row="4" Grid.Column="1">
                     <dxe:PasswordBoxEdit Name="PasswordBoxEdit"
                                          MinWidth="150"
                                          Margin="2"
@@ -157,13 +143,13 @@
                 </Grid>
 
                 <CheckBox Name="ShowPasswordBox"
-                          Grid.Row="6"
+                          Grid.Row="5"
                           Grid.Column="1"
                           Margin="2"
                           Content="Show Password" />
-                
+
                 <views:LoadingControl Grid.Row="0"
-                                      Grid.RowSpan="6"
+                                      Grid.RowSpan="5"
                                       Grid.Column="0"
                                       Grid.ColumnSpan="2"
                                       Visibility="{Binding IsBusy,

@@ -56,15 +56,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="CDP4Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.1.0.0-rc8\lib\net452\CDP4Common.dll</HintPath>
+      <HintPath>..\packages\CDP4Common-CE.1.0.0-rc9\lib\net452\CDP4Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CDP4Dal, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.1.0.0-rc8\lib\net452\CDP4Dal.dll</HintPath>
+      <HintPath>..\packages\CDP4Dal-CE.1.0.0-rc9\lib\net452\CDP4Dal.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.1.0.0-rc8\lib\net452\CDP4JsonSerializer.dll</HintPath>
+      <HintPath>..\packages\CDP4JsonSerializer-CE.1.0.0-rc9\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.Prism.Composition, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -173,7 +173,6 @@
     <Compile Include="ViewModels\ErrorBrowserViewModelTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
