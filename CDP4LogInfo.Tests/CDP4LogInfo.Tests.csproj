@@ -55,16 +55,16 @@
       <HintPath>..\packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.1.0.0-rc9\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.1.0.1-rc02\lib\net452\CDP4Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.1.0.0-rc9\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.1.0.1-rc02\lib\net452\CDP4Dal.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.1.0.0-rc9\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.1.0.1-rc02\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CsvHelper, Version=6.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
