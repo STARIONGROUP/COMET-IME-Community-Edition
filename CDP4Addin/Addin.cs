@@ -95,7 +95,7 @@ namespace CDP4Addin
         /// </remarks>
         public Addin()
         {
-            logger.Debug("starting addin");
+            logger.Debug("starting CDP4-CE addin");
 
             this.RedirectAssemblies();
             this.SetupIdtExtensibility2Events();
@@ -104,7 +104,7 @@ namespace CDP4Addin
             // Set the Theme of the application
             DevExpress.Xpf.Core.ThemeManager.ApplicationThemeName = DevExpress.Xpf.Core.Theme.SevenName;
 
-            logger.Debug("addin started");
+            logger.Debug("CDP4-CE addin started");
         }
 
         /// <summary>
