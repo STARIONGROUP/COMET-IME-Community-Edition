@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Addin.Tests
+namespace CDP4AddinCE.Tests
 {
     using CDP4Composition;
 

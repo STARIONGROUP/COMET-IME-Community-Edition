@@ -3,7 +3,8 @@
 //   Copyright (c) 2015 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-namespace CDP4Addin
+
+namespace CDP4AddinCE
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace CDP4Addin
     using System.Runtime.InteropServices;
     using System.Windows;
 
-    using CDP4Addin.Utils;
+    using CDP4AddinCE.Utils;
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
@@ -43,7 +44,7 @@ namespace CDP4Addin
     [COMAddin("CDP4-CE Office Add-in", "The CDP4-CE Office Add-in provides CDP4 application integration with Microsoft Office Suite", 3)]
     [Guid("FD48B640-1D3F-4922-854B-C69028CA469E"), ProgId("CDP4CE.Addin")]
     [RegistryLocation(RegistrySaveLocation.CurrentUser)]
-    public class Addin : COMAddin 
+    public class Addin : COMAddin
     {
         /// <summary>
         /// The NLog logger
@@ -425,7 +426,7 @@ namespace CDP4Addin
 
                         var dockPosition = navigationPanelEvent.RegionName.ToDockPosition();
                         logger.Trace("Create new Task Pane with title {0}", title);
-                        var taskPane = this.TaskPaneFactory.CreateCTP("CDP4Addin.TaskPaneWpfHostControl", title);
+                        var taskPane = this.TaskPaneFactory.CreateCTP("CDP4AddinCE.TaskPaneWpfHostControl", title);
                         taskPane.DockPosition = dockPosition;
                         taskPane.Width = 300;
                         taskPane.Visible = true;

@@ -4,9 +4,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Addin.Tests.Utils
+namespace CDP4AddinCE.Tests.Utils
 {
-    using CDP4Addin.Utils;
+    using CDP4AddinCE.Utils;
     using Moq;
 
     using NetOffice.OfficeApi.Enums;

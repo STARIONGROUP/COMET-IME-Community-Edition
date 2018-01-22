@@ -11,11 +11,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CDP4Addin")]
-[assembly: AssemblyDescription("CDP4 Office Plugin")]
+[assembly: AssemblyTitle("CDP4AddinCE")]
+[assembly: AssemblyDescription("CDP4-CE Office Plugin")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RHEA System S.A.")]
-[assembly: AssemblyProduct("CDP4Addin")]
+[assembly: AssemblyProduct("CDP4AddinCE")]
 [assembly: AssemblyCopyright("Copyright © RHEA System S.A.")]
 [assembly: AssemblyTrademark("CDP")]
 [assembly: AssemblyCulture("")]

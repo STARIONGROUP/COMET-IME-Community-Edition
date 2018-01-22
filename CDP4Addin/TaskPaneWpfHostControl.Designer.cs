@@ -1,4 +1,4 @@
-﻿namespace CDP4Addin
+﻿namespace CDP4AddinCE
 {
     partial class TaskPaneWpfHostControl
     {

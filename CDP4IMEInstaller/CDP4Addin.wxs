@@ -41,7 +41,7 @@
       </Component>
       
       <Component Id="_A6C2914281B1" Guid="{FCED4287-9FDE-4603-8D6E-A6C2914281B1}">
-        <File Id="_FCED4287" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\CDP4Addin.tlb" KeyPath="yes" />
+        <File Id="_FCED4287" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\CDP4AddinCE.tlb" KeyPath="yes" />
       </Component>
 
       <Component Id="_7E040B395541" Guid="{DE3065F5-E1C0-42EA-B699-7E040B395541}">
@@ -54,15 +54,15 @@
         <!-- register addin with EXCEL-->
 
         <RegistryKey Key="Software\Microsoft\Office\Excel\Addins\CDP4CE.Addin" Root="HKLM" Action="createAndRemoveOnUninstall" ForceDeleteOnUninstall="yes">
-          <RegistryValue Type="string" Name="FriendlyName" Value="CDP4 Office Add-in"></RegistryValue>
-          <RegistryValue Type="string" Name="Description" Value="The CDP4 Office Add-in provides CDP4 application integration with Microsoft Office Suite"></RegistryValue>
+          <RegistryValue Type="string" Name="FriendlyName" Value="CDP4-CE Office Add-in"></RegistryValue>
+          <RegistryValue Type="string" Name="Description" Value="The CDP4-CE Office Add-in provides CDP4 application integration with Microsoft Office Suite"></RegistryValue>
           <RegistryValue Type="integer" Name="LoadBehavior" Value="3"></RegistryValue>
         </RegistryKey>
 
         <!-- register CDP4Addin.Addin Class-->
 
         <RegistryKey Key="SOFTWARE\Classes\CDP4CE.Addin" Root="HKLM" Action="createAndRemoveOnUninstall" ForceDeleteOnUninstall="yes">
-          <RegistryValue Type="string" Value="CDP4Addin.Addin"></RegistryValue>
+          <RegistryValue Type="string" Value="CDP4AddinCE.Addin"></RegistryValue>
           <RegistryKey Key="CLSID">
             <RegistryValue Type="string" Value="{0CAE241F-E861-4CBF-9636-72555CC33D8E}"></RegistryValue>
           </RegistryKey>
@@ -78,15 +78,15 @@
 
           <RegistryKey Key="InprocServer32">
             <RegistryKey Key="0.0.0.2">
-              <RegistryValue Type="string" Name="Assembly" Value="CDP4Addin, Version=0.0.0.2, Culture=neutral, PublicKeyToken=null"></RegistryValue>
-              <RegistryValue Type="string" Name="Class" Value="CDP4Addin.Addin"></RegistryValue>
+              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=0.0.0.2, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+              <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.Addin"></RegistryValue>
               <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
               <RegistryValue Type="string" Name="CodeBase" Value="file:///[#_17CAA5BE]"></RegistryValue>
             </RegistryKey>
 
             <RegistryValue Type="string" Value="mscoree.dll"></RegistryValue>
-            <RegistryValue Type="string" Name="Assembly" Value="CDP4Addin, Version=0.0.0.2, Culture=neutral, PublicKeyToken=null"></RegistryValue>
-            <RegistryValue Type="string" Name="Class" Value="CDP4Addin.Addin"></RegistryValue>
+            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=0.0.0.2, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.Addin"></RegistryValue>
             <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
             <RegistryValue Type="string" Name="ThreadingModel" Value="Both"></RegistryValue>
             <RegistryValue Type="string" Name="CodeBase" Value="file:///[#_17CAA5BE]"></RegistryValue>
@@ -99,8 +99,8 @@
 
         <!-- register TaskPaneWpfHostControl Class -->
 
-        <RegistryKey Key="SOFTWARE\Classes\CDP4Addin.TaskPaneWpfHostControl" Root="HKLM" Action="createAndRemoveOnUninstall" ForceDeleteOnUninstall="yes">
-          <RegistryValue Type="string" Value="CDP4Addin.TaskPaneWpfHostControl"></RegistryValue>
+        <RegistryKey Key="SOFTWARE\Classes\CDP4AddinCE.TaskPaneWpfHostControl" Root="HKLM" Action="createAndRemoveOnUninstall" ForceDeleteOnUninstall="yes">
+          <RegistryValue Type="string" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
           <RegistryKey Key="CLSID">
             <RegistryValue Type="string" Value="{76CD03FA-0532-45A4-A222-5A14669D805C}"></RegistryValue>
           </RegistryKey>
@@ -116,22 +116,22 @@
 
           <RegistryKey Key="InprocServer32">
             <RegistryKey Key="0.0.0.2">
-              <RegistryValue Type="string" Name="Assembly" Value="CDP4Addin, Version=0.0.0.2, Culture=neutral, PublicKeyToken=null"></RegistryValue>
-              <RegistryValue Type="string" Name="Class" Value="CDP4Addin.TaskPaneWpfHostControl"></RegistryValue>
+              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=0.0.0.2, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+              <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
               <RegistryValue Type="string" Name="CodeBase" Value="[#_17CAA5BE]"></RegistryValue>
               <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
             </RegistryKey>
 
             <RegistryValue Type="string" Value="mscoree.dll"></RegistryValue>
-            <RegistryValue Type="string" Name="Assembly" Value="CDP4Addin, Version=0.0.0.2, Culture=neutral, PublicKeyToken=null"></RegistryValue>
-            <RegistryValue Type="string" Name="Class" Value="CDP4Addin.TaskPaneWpfHostControl"></RegistryValue>
+            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=0.0.0.2, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
             <RegistryValue Type="string" Name="CodeBase" Value="[#_17CAA5BE]"></RegistryValue>
             <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
             <RegistryValue Type="string" Name="ThreadingModel" Value="Both"></RegistryValue>
           </RegistryKey>
 
           <RegistryKey Key="ProgId">
-            <RegistryValue Type="string" Value="CDP4Addin.TaskPaneWpfHostControl"></RegistryValue>
+            <RegistryValue Type="string" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
           </RegistryKey>
         </RegistryKey>
 

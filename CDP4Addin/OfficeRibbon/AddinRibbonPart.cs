@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Addin
+namespace CDP4AddinCE
 {
     using System;
     using System.Reflection;

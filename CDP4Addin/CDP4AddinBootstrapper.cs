@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Addin
+namespace CDP4AddinCE
 {
     using System;
     using System.ComponentModel.Composition;
@@ -15,10 +15,7 @@ namespace CDP4Addin
     using System.Windows;
 
     using CDP4Composition;
-
     using Microsoft.Practices.Prism.MefExtensions;
-    using Microsoft.Practices.ServiceLocation;
-
     using NLog;
 
     /// <summary>

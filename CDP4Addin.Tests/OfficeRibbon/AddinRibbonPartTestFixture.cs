@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Addin.Tests.OfficeRibbon
+namespace CDP4AddinCE.Tests.OfficeRibbon
 {
     using System;
     using System.Collections.Generic;

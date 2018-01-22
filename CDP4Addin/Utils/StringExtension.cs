@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Addin.Utils
+namespace CDP4AddinCE.Utils
 {
     using CDP4Composition;
     using NetOffice.OfficeApi.Enums;

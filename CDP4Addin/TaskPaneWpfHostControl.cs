@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Addin
+namespace CDP4AddinCE
 {
     using System.Runtime.InteropServices;
     using System.Windows;
@@ -16,7 +16,7 @@ namespace CDP4Addin
     /// the WPF controls of the CDP4 plugins
     /// </summary>
     [Guid("76CD03FA-0532-45A4-A222-5A14669D805C")]
-    [ProgId("CDP4Addin.TaskPaneWpfHostControl")]
+    [ProgId("CDP4AddinCE.TaskPaneWpfHostControl")]
     [ComVisible(true)]
     public partial class TaskPaneWpfHostControl : UserControl
     {
