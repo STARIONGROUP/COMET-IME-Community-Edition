@@ -212,6 +212,7 @@
     <Compile Include="ArrayAssemblers\OptionSheet\OptionSheetRowAssemblerTestFixture.cs" />
     <Compile Include="ArrayAssemblers\ParameterSheet\HeaderArrayAssemblerTestFixture.cs" />
     <Compile Include="ArrayAssemblers\ParameterSheet\ParameterArrayAssemblerTestFixture.cs" />
+    <Compile Include="Assemblers\OptionSheet\OptionSheetRowAssemblerTestFixture.cs" />
     <Compile Include="Generator\OptionSheetRowAssemblerTestFixture.cs" />
     <Compile Include="Generator\ParameterSheetUtilitiesTestFixture.cs" />
     <Compile Include="Generator\ParameterSheetRowAssemblerTestFixture.cs" />
