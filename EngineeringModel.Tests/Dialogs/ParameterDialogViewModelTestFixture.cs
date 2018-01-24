@@ -214,11 +214,31 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
+        public void Verify_that_when_parameterType_is_not_QuantityKind_the_scale_must_be_null()
+        {
+            var textParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri);
+            this.parameter.ParameterType = textParameterType;
+            this.parameter.Scale = null;
+            
+            var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
+                ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
+
+            Assert.IsTrue(vm.OkCommand.CanExecute(null));
+
+            vm.SelectedScale = this.integerScale;
+
+            Assert.IsFalse(vm.OkCommand.CanExecute(null));
+        }
+
+        [Test]
         public void VerifyUpdateOkCanExecute()
         {
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
     ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
+            
+            Assert.IsFalse(vm.OkCommand.CanExecute(null));
 
+            vm.SelectedScale = this.integerScale;
             Assert.IsTrue(vm.OkCommand.CanExecute(null));
             var owner = vm.SelectedOwner;
 
@@ -230,6 +250,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [Test]
         public void VerifyUpdateOkExecute()
         {
+            this.parameter.Scale = this.integerScale;
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
     ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
 

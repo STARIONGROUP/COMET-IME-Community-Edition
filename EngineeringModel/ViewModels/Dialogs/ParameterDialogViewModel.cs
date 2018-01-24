@@ -20,14 +20,13 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using ReactiveUI;
-
+    
     /// <summary>
     /// The dialog-view model to create, edit or inspect a <see cref="Parameter"/>
     /// </summary>
     [ThingDialogViewModelExport(ClassKind.Parameter)]
     public class ParameterDialogViewModel : CDP4CommonView.ParameterDialogViewModel, IThingDialogViewModel
     {
-        #region Fields
         /// <summary>
         /// Backing field for <see cref="SelectedValueSet"/>
         /// </summary>
@@ -47,9 +46,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="IsValueSetEditable"/>
         /// </summary>
         private bool isValueSetEditable;
-        #endregion
 
-        #region Constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterDialogViewModel"/> class.
         /// </summary>
@@ -91,6 +88,7 @@ namespace CDP4EngineeringModel.ViewModels
             : base(parameter, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
             this.WhenAnyValue(vm => vm.SelectedOwner).Subscribe(_ => this.UpdateOkCanExecute());
+            this.WhenAnyValue(vm => vm.SelectedScale).Subscribe(_ => this.UpdateOkCanExecute());
             this.WhenAnyValue(vm => vm.IsOptionDependent).Subscribe(_ => this.IsValueSetEditable = this.IsOptionDependent == this.Thing.IsOptionDependent && this.SelectedStateDependence == this.Thing.StateDependence);
             this.WhenAnyValue(vm => vm.SelectedStateDependence).Subscribe(_ => this.IsValueSetEditable = this.IsOptionDependent == this.Thing.IsOptionDependent && this.SelectedStateDependence == this.Thing.StateDependence);
             this.WhenAnyValue(vm => vm.SelectedScale).Where(x => x != null).Subscribe(_ => this.CheckValueValidation());
@@ -98,10 +96,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.IsNameVisible = this.Thing.ParameterType is CompoundParameterType || this.Thing.IsOptionDependent || this.Thing.StateDependence != null;
         }
-        #endregion
-
-        #region Public Properties and Commands
-
+        
         /// <summary>
         /// Gets a value indicating whether is owner visible.
         /// </summary>
@@ -177,18 +172,16 @@ namespace CDP4EngineeringModel.ViewModels
             get { return true; }
         }
         
-        #endregion
-
-        #region base override
+        
         /// <summary>
         /// Initialize the dialog
         /// </summary>
         protected override void Initialize()
-         {
-             base.Initialize();
-             this.ValueSet = new ReactiveList<Dialogs.ParameterRowViewModel>();
-             this.PossibleGroups = new ReactiveList<GroupSelectionViewModel>();
-         }
+        {
+            base.Initialize();
+            this.ValueSet = new ReactiveList<Dialogs.ParameterRowViewModel>();
+            this.PossibleGroups = new ReactiveList<GroupSelectionViewModel>();
+        }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -202,183 +195,210 @@ namespace CDP4EngineeringModel.ViewModels
             this.InspectStateDependenceCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedStateDependence));
         }
 
-         /// <summary>
-         /// Update the properties
-         /// </summary>
-         protected override void UpdateProperties()
-         {
-             base.UpdateProperties();
-             this.IsOptionDependent = this.Thing.IsOptionDependent;
-             this.IsStateDependent = this.Thing.StateDependence != null;
-             this.SelectedParameterType = this.Thing.ParameterType;
-             this.PopulatePossibleParameterType();
-             this.SelectedScale = this.Thing.Scale;
-             this.PopulatePossibleScale();
-             this.SelectedStateDependence = this.Thing.StateDependence;
-             this.PopulatePossibleStateDependence();
-             this.PopulatePossibleGroup();
-             this.PopulateValueSet();
+        /// <summary>
+        /// Update the properties
+        /// </summary>
+        protected override void UpdateProperties()
+        {
+            base.UpdateProperties();
+            this.IsOptionDependent = this.Thing.IsOptionDependent;
+            this.IsStateDependent = this.Thing.StateDependence != null;
+            this.SelectedParameterType = this.Thing.ParameterType;
+            this.PopulatePossibleParameterType();            
+            this.SelectedScale = this.Thing.Scale;
+            this.PopulatePossibleScale();
+            this.SelectedStateDependence = this.Thing.StateDependence;
+            this.PopulatePossibleStateDependence();
+            this.PopulatePossibleGroup();
+            this.PopulateValueSet();
+        }
+
+        /// <summary>
+        /// Updates the <see cref="OkCanExecute"/> property using validation rules
+        /// </summary>
+        protected override void UpdateOkCanExecute()
+        {
+            base.UpdateOkCanExecute();
+            
+            this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null && this.IsSelectedScaleValid();
+        }
+
+        /// <summary>
+        /// verifies whether the selected scale is valid
+        /// </summary>
+        /// <returns>
+        /// true of valid, false if not
+        /// </returns>
+        /// <remarks>
+        /// When the SelectedParameterType is a QuantityKind then the SelectedScale may not be null.
+        /// If the SelectedParameterType is not a QuantityKind, then the SelectedScale must be null.
+        /// </remarks>
+        private bool IsSelectedScaleValid()
+        {
+            var quantityKind = this.SelectedParameterType as QuantityKind;
+
+            if (quantityKind != null && this.SelectedScale == null)
+            {
+                return false;
+            }
+
+            if (quantityKind == null && this.SelectedScale != null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Populates the <see cref="PossibleRequestedBy"/> property
+        /// </summary>
+        protected override void PopulatePossibleRequestedBy()
+        {
+            base.PopulatePossibleRequestedBy();
+
+            var model = this.Thing.TopContainer as EngineeringModel;
+            if (model == null)
+            {
+                return;
+            }
+
+            this.PossibleRequestedBy.AddRange(model.EngineeringModelSetup.ActiveDomain.Except(new[] { this.SelectedOwner }));
+        }
+
+        /// <summary>
+        /// Populates the <see cref="PossibleParameterType"/> property
+        /// </summary>
+        protected override void PopulatePossibleParameterType()
+        {
+            base.PopulatePossibleParameterType();
+            var model = this.Thing.TopContainer as EngineeringModel;
+            if (model == null)
+            {
+                return;
+            }
+
+            var modelRdl = model.EngineeringModelSetup.RequiredRdl.Single();
+            var parametertypes = modelRdl.ParameterType.ToList();
+            if (modelRdl.RequiredRdl != null)
+            {
+                parametertypes.AddRange(modelRdl.RequiredRdl.ParameterType.Except(parametertypes));
+            }
+
+            this.PossibleParameterType.AddRange(parametertypes.OrderBy(p => p.ShortName));
+
+            if (this.SelectedParameterType == null)
+            {
+                this.SelectedParameterType = this.PossibleParameterType.FirstOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// Populates the <see cref="PossibleScale"/> property
+        /// </summary>
+        protected override void PopulatePossibleScale()
+        {
+            base.PopulatePossibleScale();
+            var quantityKind = this.SelectedParameterType as QuantityKind;
+            if (quantityKind == null)
+            {
+                return;
+            }
+
+            var model = this.Thing.TopContainer as EngineeringModel;
+            if (model == null)
+            {
+                return;
+            }
+
+            this.PossibleScale.AddRange(quantityKind.AllPossibleScale.OrderBy(p => p.ShortName));
+        }
+        
+        /// <summary>
+        /// Populates the <see cref="PossibleStateDependence"/> property
+        /// </summary>
+        protected override void PopulatePossibleStateDependence()
+        {
+            base.PopulatePossibleStateDependence();
+            var iteration = this.Thing.Container.Container as Iteration;
+            if (iteration == null)
+            {
+                return;
+            }
+
+            this.PossibleStateDependence.AddRange(iteration.ActualFiniteStateList);
          }
 
-         /// <summary>
-         /// Updates the <see cref="OkCanExecute"/> property using validation rules
-         /// </summary>
-         protected override void UpdateOkCanExecute()
-         {
-             base.UpdateOkCanExecute();
-             this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null;
-         }
-
-         /// <summary>
-         /// Populates the <see cref="PossibleRequestedBy"/> property
-         /// </summary>
-         protected override void PopulatePossibleRequestedBy()
-         {
-             base.PopulatePossibleRequestedBy();
-
-             var model = this.Thing.TopContainer as EngineeringModel;
-             if (model == null)
-             {
-                 return;
-             }
-
-             this.PossibleRequestedBy.AddRange(model.EngineeringModelSetup.ActiveDomain.Except(new[] { this.SelectedOwner }));
-         }
-
-         /// <summary>
-         /// Populates the <see cref="PossibleParameterType"/> property
-         /// </summary>
-         protected override void PopulatePossibleParameterType()
-         {
-             base.PopulatePossibleParameterType();
-             var model = this.Thing.TopContainer as EngineeringModel;
-             if (model == null)
-             {
-                 return;
-             }
-
-             var modelRdl = model.EngineeringModelSetup.RequiredRdl.Single();
-             var parametertypes = modelRdl.ParameterType.ToList();
-             if (modelRdl.RequiredRdl != null)
-             {
-                 parametertypes.AddRange(modelRdl.RequiredRdl.ParameterType.Except(parametertypes));
-             }
-
-             this.PossibleParameterType.AddRange(parametertypes.OrderBy(p => p.ShortName));
-
-             if (this.SelectedParameterType == null)
-             {
-                 this.SelectedParameterType = this.PossibleParameterType.FirstOrDefault();
-             }
-         }
-
-         /// <summary>
-         /// Populates the <see cref="PossibleScale"/> property
-         /// </summary>
-         protected override void PopulatePossibleScale()
-         {
-             base.PopulatePossibleScale();
-             var quantityKind = this.SelectedParameterType as QuantityKind;
-             if (quantityKind == null)
-             {
-                 return;
-             }
-
-             var model = this.Thing.TopContainer as EngineeringModel;
-             if (model == null)
-             {
-                 return;
-             }
-
-             this.PossibleScale.AddRange(quantityKind.PossibleScale.OrderBy(p => p.ShortName));
-         }
-
-         /// <summary>
-         /// Populates the <see cref="PossibleStateDependence"/> property
-         /// </summary>
-         protected override void PopulatePossibleStateDependence()
-         {
-             base.PopulatePossibleStateDependence();
-             var iteration = this.Thing.Container.Container as Iteration;
-             if (iteration == null)
-             {
-                 return;
-             }
-
-             this.PossibleStateDependence.AddRange(iteration.ActualFiniteStateList);
-         }
-
-         /// <summary>
-         /// Populates the <see cref="PossibleGroup"/> property
-         /// </summary>
-         protected override void PopulatePossibleGroup()
-         {
+        /// <summary>
+        /// Populates the <see cref="PossibleGroup"/> property
+        /// </summary>
+        protected override void PopulatePossibleGroup()
+        {
             this.PossibleGroups.Clear();
 
             var elementDefinition = this.Thing.Container as ElementDefinition;
-             if (elementDefinition == null)
-             {
-                 return;
-             }
+            if (elementDefinition == null)
+            {
+                return;
+            }
 
-             this.PossibleGroups.AddRange(elementDefinition.ParameterGroup.Select(x => new GroupSelectionViewModel(x)));
-             this.SelectedGroupSelection = this.PossibleGroups.SingleOrDefault(x => x.Thing == this.Thing.Group);
-         }
+            this.PossibleGroups.AddRange(elementDefinition.ParameterGroup.Select(x => new GroupSelectionViewModel(x)));
+            this.SelectedGroupSelection = this.PossibleGroups.SingleOrDefault(x => x.Thing == this.Thing.Group);
+        }
 
-         /// <summary>
-         /// Populates the <see cref="PossibleOwner"/> property
-         /// </summary>
-         protected override void PopulatePossibleOwner()
-         {
-             base.PopulatePossibleOwner();
-             var model = this.Thing.TopContainer as EngineeringModel;
-             if (model == null)
-             {
-                 return;
-             }
+        /// <summary>
+        /// Populates the <see cref="PossibleOwner"/> property
+        /// </summary>
+        protected override void PopulatePossibleOwner()
+        {
+            base.PopulatePossibleOwner();
+            var model = this.Thing.TopContainer as EngineeringModel;
+            if (model == null)
+            {
+                return;
+            }
 
-             this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain);
-             if (this.SelectedOwner == null)
-             {
-                 Tuple<DomainOfExpertise, Participant> tuple;
-                 this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
-                 this.SelectedOwner = tuple.Item1;
-             }
-         }
+            this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain);
+            if (this.SelectedOwner == null)
+            {
+                Tuple<DomainOfExpertise, Participant> tuple;
+                this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+                this.SelectedOwner = tuple.Item1;
+            }
+        }
 
-         /// <summary>
-         /// Update the transaction with the Thing represented by this Dialog
-         /// </summary>
-         protected override void UpdateTransaction()
-         {
-             base.UpdateTransaction();
+        /// <summary>
+        /// Update the transaction with the Thing represented by this Dialog
+        /// </summary>
+        protected override void UpdateTransaction()
+        {
+            base.UpdateTransaction();
 
-             this.Thing.Group = this.SelectedGroup;
-             this.Thing.StateDependence = this.SelectedStateDependence;
-             this.Thing.Scale = this.SelectedScale;
-             this.Thing.ParameterType = this.SelectedParameterType;
-             this.Thing.IsOptionDependent = this.IsOptionDependent;
+            this.Thing.Group = this.SelectedGroup;
+            this.Thing.StateDependence = this.SelectedStateDependence;
+            this.Thing.Scale = this.SelectedScale;
+            this.Thing.ParameterType = this.SelectedParameterType;
+            this.Thing.IsOptionDependent = this.IsOptionDependent;
 
-             if (!this.IsValueSetEditable)
-             {
-                 // no operation shall be done on the value sets
-                 return;
-             }
+            if (!this.IsValueSetEditable)
+            {
+                // no operation shall be done on the value sets
+                return;
+            }
 
-             for (int i = 0; i < this.Thing.ValueSet.Count; i++)
-             {
-                 this.Thing.ValueSet[i] = this.Thing.ValueSet[i].Clone(false);
-             }
+            for (int i = 0; i < this.Thing.ValueSet.Count; i++)
+            {
+                this.Thing.ValueSet[i] = this.Thing.ValueSet[i].Clone(false);
+            }
 
-             this.ValueSet.First().UpdateParameterValueSet(this.Thing);
+            this.ValueSet.First().UpdateParameterValueSet(this.Thing);
 
-             foreach (var parameterValueSet in this.Thing.ValueSet)
-             {
+            foreach (var parameterValueSet in this.Thing.ValueSet)
+            {
                  this.transaction.CreateOrUpdate(parameterValueSet);
-             }
-         }
-        #endregion
-
+            }
+        }
+        
         /// <summary>
         /// Populates the <see cref="ValueSet"/> property with the content of the actual thing and the content of the transaction
         /// </summary>
