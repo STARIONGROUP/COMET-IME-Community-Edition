@@ -191,7 +191,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             var currentActiveDomain = this.Thing.ActiveDomain;
             this.PossibleActiveDomain.Clear();
-            this.PossibleActiveDomain.AddRange(sitedir.Domain);
+            this.PossibleActiveDomain.AddRange(sitedir.Domain.OrderBy(x => x.Name));
 
             this.ActiveDomain = new ReactiveList<DomainOfExpertise>(currentActiveDomain);
         }
