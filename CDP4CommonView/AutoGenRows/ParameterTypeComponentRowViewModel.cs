@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterTypeComponentRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="ParameterTypeComponentRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -159,7 +159,17 @@ namespace CDP4CommonView
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.ShortName = this.Thing.ShortName;
+			if (this.Thing.ParameterType != null)
+			{
+				this.ParameterTypeShortName = this.Thing.ParameterType.ShortName;
+				this.ParameterTypeName = this.Thing.ParameterType.Name;
+			}			
             this.ParameterType = this.Thing.ParameterType;
+			if (this.Thing.Scale != null)
+			{
+				this.ScaleShortName = this.Thing.Scale.ShortName;
+				this.ScaleName = this.Thing.Scale.Name;
+			}			
             this.Scale = this.Thing.Scale;
         }
     }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="ParameterRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -132,6 +132,11 @@ namespace CDP4CommonView
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.AllowDifferentOwnerOfOverride = this.Thing.AllowDifferentOwnerOfOverride;
             this.ExpectsOverride = this.Thing.ExpectsOverride;
+			if (this.Thing.RequestedBy != null)
+			{
+				this.RequestedByShortName = this.Thing.RequestedBy.ShortName;
+				this.RequestedByName = this.Thing.RequestedBy.Name;
+			}			
             this.RequestedBy = this.Thing.RequestedBy;
         }
     }

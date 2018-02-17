@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParticipantRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="ParticipantRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -174,7 +174,17 @@ namespace CDP4CommonView
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.IsActive = this.Thing.IsActive;
             this.Person = this.Thing.Person;
+			if (this.Thing.Role != null)
+			{
+				this.RoleShortName = this.Thing.Role.ShortName;
+				this.RoleName = this.Thing.Role.Name;
+			}			
             this.Role = this.Thing.Role;
+			if (this.Thing.SelectedDomain != null)
+			{
+				this.SelectedDomainShortName = this.Thing.SelectedDomain.ShortName;
+				this.SelectedDomainName = this.Thing.SelectedDomain.Name;
+			}			
             this.SelectedDomain = this.Thing.SelectedDomain;
         }
     }

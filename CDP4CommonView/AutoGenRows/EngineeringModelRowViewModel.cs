@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="EngineeringModelRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="EngineeringModelRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -102,6 +102,11 @@ namespace CDP4CommonView
         private void UpdateProperties()
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
+			if (this.Thing.EngineeringModelSetup != null)
+			{
+				this.EngineeringModelSetupShortName = this.Thing.EngineeringModelSetup.ShortName;
+				this.EngineeringModelSetupName = this.Thing.EngineeringModelSetup.Name;
+			}			
             this.EngineeringModelSetup = this.Thing.EngineeringModelSetup;
         }
     }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="PersonRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="PersonRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -307,7 +307,17 @@ namespace CDP4CommonView
             this.Name = this.Thing.Name;
             this.IsDeprecated = this.Thing.IsDeprecated;
             this.Organization = this.Thing.Organization;
+			if (this.Thing.DefaultDomain != null)
+			{
+				this.DefaultDomainShortName = this.Thing.DefaultDomain.ShortName;
+				this.DefaultDomainName = this.Thing.DefaultDomain.Name;
+			}			
             this.DefaultDomain = this.Thing.DefaultDomain;
+			if (this.Thing.Role != null)
+			{
+				this.RoleShortName = this.Thing.Role.ShortName;
+				this.RoleName = this.Thing.Role.Name;
+			}			
             this.Role = this.Thing.Role;
             this.DefaultEmailAddress = this.Thing.DefaultEmailAddress;
             this.DefaultTelephoneNumber = this.Thing.DefaultTelephoneNumber;

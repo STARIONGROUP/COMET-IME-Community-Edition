@@ -110,7 +110,7 @@
                             </dxg:GridColumn.DisplayTemplate>
                         </dxg:GridColumn>
 
-                        <dxg:GridColumn FieldName="Unit.ShortName" Header="Measurement Unit"/>
+                        <dxg:GridColumn FieldName="UnitShortName" Header="Measurement Unit"/>
                         <dxg:GridColumn FieldName="Exponent" Header="Exponent" />
 
                     </dxg:GridControl.Columns>

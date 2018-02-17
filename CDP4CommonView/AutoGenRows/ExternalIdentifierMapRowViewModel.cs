@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ExternalIdentifierMapRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="ExternalIdentifierMapRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -204,7 +204,17 @@ namespace CDP4CommonView
             this.ExternalToolName = this.Thing.ExternalToolName;
             this.ExternalToolVersion = this.Thing.ExternalToolVersion;
             this.Name = this.Thing.Name;
+			if (this.Thing.ExternalFormat != null)
+			{
+				this.ExternalFormatShortName = this.Thing.ExternalFormat.ShortName;
+				this.ExternalFormatName = this.Thing.ExternalFormat.Name;
+			}			
             this.ExternalFormat = this.Thing.ExternalFormat;
+			if (this.Thing.Owner != null)
+			{
+				this.OwnerShortName = this.Thing.Owner.ShortName;
+				this.OwnerName = this.Thing.Owner.Name;
+			}			
             this.Owner = this.Thing.Owner;
         }
     }

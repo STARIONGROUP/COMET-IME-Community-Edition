@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="MeasurementScaleRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="MeasurementScaleRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -222,6 +222,11 @@ namespace CDP4CommonView
             this.PositiveValueConnotation = this.Thing.PositiveValueConnotation;
             this.NegativeValueConnotation = this.Thing.NegativeValueConnotation;
             this.IsDeprecated = this.Thing.IsDeprecated;
+			if (this.Thing.Unit != null)
+			{
+				this.UnitShortName = this.Thing.Unit.ShortName;
+				this.UnitName = this.Thing.Unit.Name;
+			}			
             this.Unit = this.Thing.Unit;
         }
     }

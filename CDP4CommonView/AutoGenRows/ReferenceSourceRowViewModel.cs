@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ReferenceSourceRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="ReferenceSourceRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -213,6 +213,11 @@ namespace CDP4CommonView
             this.Language = this.Thing.Language;
             this.IsDeprecated = this.Thing.IsDeprecated;
             this.Publisher = this.Thing.Publisher;
+			if (this.Thing.PublishedIn != null)
+			{
+				this.PublishedInShortName = this.Thing.PublishedIn.ShortName;
+				this.PublishedInName = this.Thing.PublishedIn.Name;
+			}			
             this.PublishedIn = this.Thing.PublishedIn;
         }
     }

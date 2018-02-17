@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="IterationRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="IterationRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -177,7 +177,17 @@ namespace CDP4CommonView
                 this.SourceIterationIid = this.Thing.SourceIterationIid.Value;
             }
             this.IterationSetup = this.Thing.IterationSetup;
+			if (this.Thing.TopElement != null)
+			{
+				this.TopElementShortName = this.Thing.TopElement.ShortName;
+				this.TopElementName = this.Thing.TopElement.Name;
+			}			
             this.TopElement = this.Thing.TopElement;
+			if (this.Thing.DefaultOption != null)
+			{
+				this.DefaultOptionShortName = this.Thing.DefaultOption.ShortName;
+				this.DefaultOptionName = this.Thing.DefaultOption.Name;
+			}			
             this.DefaultOption = this.Thing.DefaultOption;
         }
     }

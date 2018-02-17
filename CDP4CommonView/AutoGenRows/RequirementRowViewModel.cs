@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RequirementRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="RequirementRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -117,6 +117,11 @@ namespace CDP4CommonView
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.IsDeprecated = this.Thing.IsDeprecated;
+			if (this.Thing.Group != null)
+			{
+				this.GroupShortName = this.Thing.Group.ShortName;
+				this.GroupName = this.Thing.Group.Name;
+			}			
             this.Group = this.Thing.Group;
         }
     }

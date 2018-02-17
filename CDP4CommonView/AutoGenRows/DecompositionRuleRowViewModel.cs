@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DecompositionRuleRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="DecompositionRuleRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -135,6 +135,11 @@ namespace CDP4CommonView
             {
                 this.MaxContained = this.Thing.MaxContained.Value;
             }
+			if (this.Thing.ContainingCategory != null)
+			{
+				this.ContainingCategoryShortName = this.Thing.ContainingCategory.ShortName;
+				this.ContainingCategoryName = this.Thing.ContainingCategory.Name;
+			}			
             this.ContainingCategory = this.Thing.ContainingCategory;
         }
     }

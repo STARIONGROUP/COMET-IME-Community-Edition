@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="SiteDirectoryRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="SiteDirectoryRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -189,7 +189,17 @@ namespace CDP4CommonView
             this.CreatedOn = this.Thing.CreatedOn;
             this.Name = this.Thing.Name;
             this.ShortName = this.Thing.ShortName;
+			if (this.Thing.DefaultParticipantRole != null)
+			{
+				this.DefaultParticipantRoleShortName = this.Thing.DefaultParticipantRole.ShortName;
+				this.DefaultParticipantRoleName = this.Thing.DefaultParticipantRole.Name;
+			}			
             this.DefaultParticipantRole = this.Thing.DefaultParticipantRole;
+			if (this.Thing.DefaultPersonRole != null)
+			{
+				this.DefaultPersonRoleShortName = this.Thing.DefaultPersonRole.ShortName;
+				this.DefaultPersonRoleName = this.Thing.DefaultPersonRole.Name;
+			}			
             this.DefaultPersonRole = this.Thing.DefaultPersonRole;
         }
     }

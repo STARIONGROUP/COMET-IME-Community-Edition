@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="StakeHolderValueMapSettingsRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="StakeHolderValueMapSettingsRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -186,8 +186,23 @@ namespace CDP4CommonView
         private void UpdateProperties()
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
+			if (this.Thing.GoalToValueGroupRelationship != null)
+			{
+				this.GoalToValueGroupRelationshipShortName = this.Thing.GoalToValueGroupRelationship.ShortName;
+				this.GoalToValueGroupRelationshipName = this.Thing.GoalToValueGroupRelationship.Name;
+			}			
             this.GoalToValueGroupRelationship = this.Thing.GoalToValueGroupRelationship;
+			if (this.Thing.ValueGroupToStakeholderValueRelationship != null)
+			{
+				this.ValueGroupToStakeholderValueRelationshipShortName = this.Thing.ValueGroupToStakeholderValueRelationship.ShortName;
+				this.ValueGroupToStakeholderValueRelationshipName = this.Thing.ValueGroupToStakeholderValueRelationship.Name;
+			}			
             this.ValueGroupToStakeholderValueRelationship = this.Thing.ValueGroupToStakeholderValueRelationship;
+			if (this.Thing.StakeholderValueToRequirementRelationship != null)
+			{
+				this.StakeholderValueToRequirementRelationshipShortName = this.Thing.StakeholderValueToRequirementRelationship.ShortName;
+				this.StakeholderValueToRequirementRelationshipName = this.Thing.StakeholderValueToRequirementRelationship.Name;
+			}			
             this.StakeholderValueToRequirementRelationship = this.Thing.StakeholderValueToRequirementRelationship;
         }
     }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="FileStoreRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="FileStoreRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -132,6 +132,11 @@ namespace CDP4CommonView
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.Name = this.Thing.Name;
             this.CreatedOn = this.Thing.CreatedOn;
+			if (this.Thing.Owner != null)
+			{
+				this.OwnerShortName = this.Thing.Owner.ShortName;
+				this.OwnerName = this.Thing.Owner.Name;
+			}			
             this.Owner = this.Thing.Owner;
         }
     }

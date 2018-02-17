@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterBaseRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -229,10 +229,25 @@ namespace CDP4CommonView
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.IsOptionDependent = this.Thing.IsOptionDependent;
+			if (this.Thing.ParameterType != null)
+			{
+				this.ParameterTypeShortName = this.Thing.ParameterType.ShortName;
+				this.ParameterTypeName = this.Thing.ParameterType.Name;
+			}			
             this.ParameterType = this.Thing.ParameterType;
+			if (this.Thing.Scale != null)
+			{
+				this.ScaleShortName = this.Thing.Scale.ShortName;
+				this.ScaleName = this.Thing.Scale.Name;
+			}			
             this.Scale = this.Thing.Scale;
             this.StateDependence = this.Thing.StateDependence;
             this.Group = this.Thing.Group;
+			if (this.Thing.Owner != null)
+			{
+				this.OwnerShortName = this.Thing.Owner.ShortName;
+				this.OwnerName = this.Thing.Owner.Name;
+			}			
             this.Owner = this.Thing.Owner;
         }
     }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ReferencerRuleRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="ReferencerRuleRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -132,6 +132,11 @@ namespace CDP4CommonView
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.MinReferenced = this.Thing.MinReferenced;
             this.MaxReferenced = this.Thing.MaxReferenced;
+			if (this.Thing.ReferencingCategory != null)
+			{
+				this.ReferencingCategoryShortName = this.Thing.ReferencingCategory.ShortName;
+				this.ReferencingCategoryName = this.Thing.ReferencingCategory.Name;
+			}			
             this.ReferencingCategory = this.Thing.ReferencingCategory;
         }
     }

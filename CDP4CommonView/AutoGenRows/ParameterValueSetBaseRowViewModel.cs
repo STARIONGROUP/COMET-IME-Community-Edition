@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterValueSetBaseRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="ParameterValueSetBaseRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -132,6 +132,11 @@ namespace CDP4CommonView
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.ValueSwitch = this.Thing.ValueSwitch;
             this.ActualState = this.Thing.ActualState;
+			if (this.Thing.ActualOption != null)
+			{
+				this.ActualOptionShortName = this.Thing.ActualOption.ShortName;
+				this.ActualOptionName = this.Thing.ActualOption.Name;
+			}			
             this.ActualOption = this.Thing.ActualOption;
         }
     }

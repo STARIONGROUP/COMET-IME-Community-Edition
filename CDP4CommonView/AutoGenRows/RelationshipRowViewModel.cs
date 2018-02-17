@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RelationshipRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="RelationshipRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -102,6 +102,11 @@ namespace CDP4CommonView
         private void UpdateProperties()
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
+			if (this.Thing.Owner != null)
+			{
+				this.OwnerShortName = this.Thing.Owner.ShortName;
+				this.OwnerName = this.Thing.Owner.Name;
+			}			
             this.Owner = this.Thing.Owner;
         }
     }

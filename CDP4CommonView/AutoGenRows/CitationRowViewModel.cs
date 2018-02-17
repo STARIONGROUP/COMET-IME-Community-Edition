@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="CitationRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="CitationRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -162,6 +162,11 @@ namespace CDP4CommonView
             this.IsAdaptation = this.Thing.IsAdaptation;
             this.Remark = this.Thing.Remark;
             this.ShortName = this.Thing.ShortName;
+			if (this.Thing.Source != null)
+			{
+				this.SourceShortName = this.Thing.Source.ShortName;
+				this.SourceName = this.Thing.Source.Name;
+			}			
             this.Source = this.Thing.Source;
         }
     }

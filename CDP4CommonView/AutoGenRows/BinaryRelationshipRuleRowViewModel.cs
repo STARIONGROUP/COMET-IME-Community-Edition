@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="BinaryRelationshipRuleRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="BinaryRelationshipRuleRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -216,8 +216,23 @@ namespace CDP4CommonView
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.ForwardRelationshipName = this.Thing.ForwardRelationshipName;
             this.InverseRelationshipName = this.Thing.InverseRelationshipName;
+			if (this.Thing.RelationshipCategory != null)
+			{
+				this.RelationshipCategoryShortName = this.Thing.RelationshipCategory.ShortName;
+				this.RelationshipCategoryName = this.Thing.RelationshipCategory.Name;
+			}			
             this.RelationshipCategory = this.Thing.RelationshipCategory;
+			if (this.Thing.SourceCategory != null)
+			{
+				this.SourceCategoryShortName = this.Thing.SourceCategory.ShortName;
+				this.SourceCategoryName = this.Thing.SourceCategory.Name;
+			}			
             this.SourceCategory = this.Thing.SourceCategory;
+			if (this.Thing.TargetCategory != null)
+			{
+				this.TargetCategoryShortName = this.Thing.TargetCategory.ShortName;
+				this.TargetCategoryName = this.Thing.TargetCategory.Name;
+			}			
             this.TargetCategory = this.Thing.TargetCategory;
         }
     }

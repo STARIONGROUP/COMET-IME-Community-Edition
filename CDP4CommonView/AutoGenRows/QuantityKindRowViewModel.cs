@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="QuantityKindRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="QuantityKindRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -132,6 +132,11 @@ namespace CDP4CommonView
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.QuantityDimensionSymbol = this.Thing.QuantityDimensionSymbol;
             this.QuantityDimensionExpression = this.Thing.QuantityDimensionExpression;
+			if (this.Thing.DefaultScale != null)
+			{
+				this.DefaultScaleShortName = this.Thing.DefaultScale.ShortName;
+				this.DefaultScaleName = this.Thing.DefaultScale.Name;
+			}			
             this.DefaultScale = this.Thing.DefaultScale;
         }
     }

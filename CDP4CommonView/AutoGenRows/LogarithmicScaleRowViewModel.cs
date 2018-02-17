@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="LogarithmicScaleRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="LogarithmicScaleRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -147,6 +147,11 @@ namespace CDP4CommonView
             this.LogarithmBase = this.Thing.LogarithmBase;
             this.Factor = this.Thing.Factor;
             this.Exponent = this.Thing.Exponent;
+			if (this.Thing.ReferenceQuantityKind != null)
+			{
+				this.ReferenceQuantityKindShortName = this.Thing.ReferenceQuantityKind.ShortName;
+				this.ReferenceQuantityKindName = this.Thing.ReferenceQuantityKind.Name;
+			}			
             this.ReferenceQuantityKind = this.Thing.ReferenceQuantityKind;
         }
     }

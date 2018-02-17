@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="QuantityKindFactorRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="QuantityKindFactorRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -117,6 +117,11 @@ namespace CDP4CommonView
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.Exponent = this.Thing.Exponent;
+			if (this.Thing.QuantityKind != null)
+			{
+				this.QuantityKindShortName = this.Thing.QuantityKind.ShortName;
+				this.QuantityKindName = this.Thing.QuantityKind.Name;
+			}			
             this.QuantityKind = this.Thing.QuantityKind;
         }
     }

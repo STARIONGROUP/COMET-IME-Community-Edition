@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="MappingToReferenceScaleRowViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="MappingToReferenceScaleRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -144,7 +144,17 @@ namespace CDP4CommonView
         private void UpdateProperties()
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
+			if (this.Thing.ReferenceScaleValue != null)
+			{
+				this.ReferenceScaleValueShortName = this.Thing.ReferenceScaleValue.ShortName;
+				this.ReferenceScaleValueName = this.Thing.ReferenceScaleValue.Name;
+			}			
             this.ReferenceScaleValue = this.Thing.ReferenceScaleValue;
+			if (this.Thing.DependentScaleValue != null)
+			{
+				this.DependentScaleValueShortName = this.Thing.DependentScaleValue.ShortName;
+				this.DependentScaleValueName = this.Thing.DependentScaleValue.Name;
+			}			
             this.DependentScaleValue = this.Thing.DependentScaleValue;
         }
     }
