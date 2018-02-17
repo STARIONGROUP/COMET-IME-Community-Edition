@@ -105,7 +105,7 @@
                             </dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn FieldName="QuantityKind.Name" Header="Quantity Kind"/>
+                            <dxg:GridColumn Binding="{Binding Path=QuantityKind.Name}" Header="Quantity Kind"/>
                             <dxg:GridColumn FieldName="Exponent" Header="Exponent" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>

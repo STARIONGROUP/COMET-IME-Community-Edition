@@ -25,8 +25,8 @@
             <dxg:GridControl.Columns>
                 <dxg:GridColumn FieldName="Name" ReadOnly="True"/>
                 <dxg:GridColumn FieldName="NumberSet" Header="Number set" ReadOnly="True" />
-                <dxg:GridColumn FieldName="Unit.ShortName" Header="Unit" ReadOnly="True"/>
-                <dxg:GridColumn FieldName="Container.ShortName" Header="RDL" ReadOnly="True"/>
+                <dxg:GridColumn Binding="{Binding Path=Unit.ShortName}" Header="Unit" ReadOnly="True"/>
+                <dxg:GridColumn Binding="{Binding Path=Container.ShortName}" Header="RDL" ReadOnly="True"/>
             </dxg:GridControl.Columns>
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="ScalesView" 

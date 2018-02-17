@@ -34,9 +34,9 @@
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
-                <dxg:GridColumn FieldName="Owner.ShortName" Header="Owner"/>
-                <dxg:GridColumn FieldName="Scale.ShortName" Header="Scale"/>
-                <dxg:GridColumn FieldName="ParameterType.ShortName" Header="Parameter type" />
+                <dxg:GridColumn Binding="{Binding Path=Owner.ShortName}" Header="Owner"/>
+                <dxg:GridColumn Binding="{Binding Path=Scale.ShortName}" Header="Scale"/>
+                <dxg:GridColumn Binding="{Binding Path=ParameterType.ShortName}" Header="Parameter type" />
             </dxg:GridControl.Columns>
         </dxg:GridControl>
     </dxlc:LayoutItem>

@@ -62,10 +62,10 @@
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
-                <dxg:GridColumn FieldName="ReferenceScaleValue.ShortName" Header="Reference"/>
-                <dxg:GridColumn FieldName="ReferenceScaleValue.Value" Header="Reference value"/>
-                <dxg:GridColumn FieldName="DependentScaleValue.ShortName" Header="Dependent"/>
-                <dxg:GridColumn FieldName="DependentScaleValue.Value" Header="Dependent value"/>
+                <dxg:GridColumn Binding="{Binding Path=ReferenceScaleValue.ShortName}" Header="Reference"/>
+                <dxg:GridColumn Binding="{Binding Path=ReferenceScaleValue.Value}" Header="Reference value"/>
+                <dxg:GridColumn Binding="{Binding Path=DependentScaleValue.ShortName}" Header="Dependent"/>
+                <dxg:GridColumn Binding="{Binding Path=DependentScaleValue.Value}" Header="Dependent value"/>
             </dxg:GridControl.Columns>
         </dxg:GridControl>
     </dxlc:LayoutItem>

@@ -85,7 +85,7 @@
                             <dxg:GridColumn FieldName="ShortName" Header="Short name" ReadOnly="True" />
                             <dxg:GridColumn FieldName="Name" ReadOnly="True"/>
                             <dxg:GridColumn FieldName="Symbol" ReadOnly="True"/>
-                            <dxg:GridColumn FieldName="Container.ShortName" Header="RDL" ReadOnly="True"/>
+                            <dxg:GridColumn Binding="{Binding Path=Container.ShortName}"  Header="RDL" ReadOnly="True"/>
                         </dxg:GridControl.Columns>
                         <dxg:GridControl.View>
                             <dxg:SelectionView x:Name="ParameterTypesView"

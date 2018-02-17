@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ThingDialogNavigationService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -196,12 +196,22 @@ namespace CDP4Composition.Navigation
                 this.SetOwner(view);
 
                 var iview = (IThingDialogView)view;
-                var res = iview.ShowDialog();
 
-                // clean subscription to MessageBus
-                var disposableViewModel = (IDisposable)viewModel;
-                iview.DataContext = null;
-                disposableViewModel.Dispose();
+                try
+                {
+                    var res = iview.ShowDialog();
+                    iview.DataContext = null;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                }
+                finally
+                {
+                    // clean subscription to MessageBus
+                    var disposableViewModel = (IDisposable)viewModel;
+                    disposableViewModel.Dispose();
+                }
 
                 // TODO: implement processing of result to update status bar with results of dialog (success, failure, cancelled, like in CDP3)
                 return viewModel.DialogResult;
@@ -209,7 +219,7 @@ namespace CDP4Composition.Navigation
             else
             {
                 return false;
-            }            
+            }
         }
 
         [DllImport("user32.dll")]
