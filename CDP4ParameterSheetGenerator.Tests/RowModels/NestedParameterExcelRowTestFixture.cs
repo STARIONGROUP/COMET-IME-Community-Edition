@@ -30,6 +30,10 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
         private SimpleQuantityKind length;
 
+        private TextParameterType text;
+
+        private RatioScale meter;
+
         private DomainOfExpertise systemEngineering;
 
         private DomainOfExpertise powerEngineering;
@@ -51,23 +55,35 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             this.uri = new Uri("http://www.rheagroup.com");
 
+            this.text = new TextParameterType(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ShortName = "txt",
+                Name = "Text"
+            };
+
             this.length = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri)
-                                          {
-                                              ShortName = "l",
-                                              Name = "Length"
-                                          };
+            {
+                ShortName = "l",
+                Name = "Length"
+            };
+
+            this.meter = new RatioScale(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ShortName = "m",
+                Name = "meter"
+            };
 
             this.systemEngineering = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri)
-                                         {
-                                             ShortName = "SYS",
-                                             Name = "System Engineering"
-                                         };
+            {
+                ShortName = "SYS",
+                Name = "System Engineering"
+            };
 
             this.powerEngineering = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri)
-                                        {
-                                            ShortName = "PWR",
-                                            Name = "Power Engineering"
-                                        };
+            {
+                ShortName = "PWR",
+                Name = "Power Engineering"
+            };
 
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
 
@@ -75,25 +91,25 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             this.iteration.Option.Add(this.option);
 
             this.satellite = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri)
-                                {
-                                    ShortName = "SAT",
-                                    Name = "Satellite",
-                                    Owner = this.systemEngineering
-                                };
+            {
+                ShortName = "SAT",
+                Name = "Satellite",
+                Owner = this.systemEngineering
+            };
 
             this.battery = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri)
-                              {
-                                  ShortName = "BAT",
-                                  Name = "Battery",
-                                  Owner = this.powerEngineering
-                              };
+            {
+                ShortName = "BAT",
+                Name = "Battery",
+                Owner = this.powerEngineering
+            };
 
             this.batteryUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
-                                   {
-                                       ShortName = "batt",
-                                       ElementDefinition = this.battery,
-                                       Owner = this.powerEngineering
-                                   };
+            {
+                ShortName = "batt",
+                ElementDefinition = this.battery,
+                Owner = this.powerEngineering
+            };
 
             this.satellite.ContainedElement.Add(this.batteryUsage);
 
@@ -111,18 +127,19 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
         public void VerifyThatNestedParameterExcelRowPropertiesAreSetForParameter()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
-                                {
-                                    ParameterType = this.length,
-                                    Owner = this.systemEngineering
-                                };
+            {
+                ParameterType = this.length,
+                Owner = this.systemEngineering,
+                Scale = this.meter
+            };
 
             var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
-                            {
-                                Manual = new ValueArray<string>(new List<string> { "A" }),
-                                Computed = new ValueArray<string>(new List<string> { "B" }),
-                                Formula = new ValueArray<string>(new List<string> { "C" }),
-                                ValueSwitch = ParameterSwitchKind.MANUAL
-                            };
+            {
+                Manual = new ValueArray<string>(new List<string> { "A" }),
+                Computed = new ValueArray<string>(new List<string> { "B" }),
+                Formula = new ValueArray<string>(new List<string> { "C" }),
+                ValueSwitch = ParameterSwitchKind.MANUAL
+            };
             parameter.ValueSet.Add(parameterValueSet);
             this.satellite.Parameter.Add(parameter);
 
@@ -138,8 +155,111 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             Assert.AreEqual("SAT\\l\\option1\\", excelRow.ModelCode);
             Assert.AreEqual("Length", excelRow.Name);
             Assert.AreEqual("SYS", excelRow.Owner);
-            Assert.AreEqual("l", excelRow.ParameterTypeShortName);
+            Assert.AreEqual("l [m]", excelRow.ParameterTypeShortName);
             Assert.AreEqual("NP", excelRow.Type);
+        }
+
+        [Test]
+        public void VerifyThatNestedParameterExcelRowPropertiesAreSetForParameterWithTextParameterType()
+        {
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.text,
+                Owner = this.systemEngineering
+            };
+
+            var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Manual = new ValueArray<string>(new List<string> { "A" }),
+                Computed = new ValueArray<string>(new List<string> { "B" }),
+                Formula = new ValueArray<string>(new List<string> { "C" }),
+                ValueSwitch = ParameterSwitchKind.MANUAL
+            };
+            parameter.ValueSet.Add(parameterValueSet);
+            this.satellite.Parameter.Add(parameter);
+
+            var nestedElementTreeGenerator = new NestedElementTreeGenerator();
+            var nestedElements = nestedElementTreeGenerator.Generate(this.option, this.systemEngineering);
+
+            var rootnode = nestedElements.Single(ne => ne.ShortName == "SAT");
+            var nestedparameter = rootnode.NestedParameter.Single();
+
+            var excelRow = new NestedParameterExcelRow(nestedparameter);
+
+            Assert.AreEqual("A", excelRow.ActualValue);
+            Assert.AreEqual("SAT\\txt\\option1\\", excelRow.ModelCode);
+            Assert.AreEqual("Text", excelRow.Name);
+            Assert.AreEqual("SYS", excelRow.Owner);
+            Assert.AreEqual("txt", excelRow.ParameterTypeShortName);
+            Assert.AreEqual("NP", excelRow.Type);
+        }
+
+        [Test]
+        public void VerifyThatNestedParameterExcelRowPropertiesAreSetForCompoundParameter()
+        {
+            var compoundParameterType = new CompoundParameterType(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Name = "coordinate",
+                ShortName = "coord"
+            };
+
+            var component_1 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.length,
+                Scale = this.meter,
+                ShortName = "x"
+            };
+
+            compoundParameterType.Component.Add(component_1);
+
+            var component_2 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.text,
+                ShortName = "txt"
+            };
+            compoundParameterType.Component.Add(component_2);
+
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = compoundParameterType,
+                Owner = this.systemEngineering
+            };
+
+            var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Manual = new ValueArray<string>(new List<string> { "A", "A1" }),
+                Computed = new ValueArray<string>(new List<string> { "B", "B1" }),
+                Formula = new ValueArray<string>(new List<string> { "C", "C1" }),
+                ValueSwitch = ParameterSwitchKind.MANUAL
+            };
+            parameter.ValueSet.Add(parameterValueSet);
+            this.satellite.Parameter.Add(parameter);
+
+            var nestedElementTreeGenerator = new NestedElementTreeGenerator();
+            var nestedElements = nestedElementTreeGenerator.Generate(this.option, this.systemEngineering);
+
+            var rootnode = nestedElements.Single(ne => ne.ShortName == "SAT");
+            var nestedparameter_1 = rootnode.NestedParameter.Single(x => x.Component == component_1);
+
+            var excelRow_1 = new NestedParameterExcelRow(nestedparameter_1);
+
+            Assert.AreEqual("A", excelRow_1.ActualValue);
+            Assert.AreEqual("SAT\\coord.x\\option1\\", excelRow_1.ModelCode);
+            Assert.AreEqual("coordinate", excelRow_1.Name);
+            Assert.AreEqual("SYS", excelRow_1.Owner);
+            Assert.AreEqual("coord.x [m]", excelRow_1.ParameterTypeShortName);
+            Assert.AreEqual("NP", excelRow_1.Type);
+
+            var nestedparameter_2 = rootnode.NestedParameter.Single(x => x.Component == component_2);
+
+            var excelRow_2 = new NestedParameterExcelRow(nestedparameter_2);
+
+            Assert.AreEqual("A1", excelRow_2.ActualValue);
+            Assert.AreEqual("SAT\\coord.txt\\option1\\", excelRow_2.ModelCode);
+            Assert.AreEqual("coordinate", excelRow_2.Name);
+            Assert.AreEqual("SYS", excelRow_2.Owner);
+            Assert.AreEqual("coord.txt", excelRow_2.ParameterTypeShortName);
+            Assert.AreEqual("NP", excelRow_2.Type);
         }
 
         [Test]
@@ -148,6 +268,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
             {
                 ParameterType = this.length,
+                Scale = this.meter,
                 Owner = this.systemEngineering
             };
 
@@ -171,7 +292,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             };
             parameterSubscription.ValueSet.Add(parameterSubscriptionValueSet);
             parameter.ParameterSubscription.Add(parameterSubscription);
-            
+
             var nestedElementTreeGenerator = new NestedElementTreeGenerator();
             var nestedElements = nestedElementTreeGenerator.Generate(this.option, this.powerEngineering);
 
@@ -184,7 +305,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             Assert.AreEqual("SAT\\l\\option1\\", excelRow.ModelCode);
             Assert.AreEqual("Length", excelRow.Name);
             Assert.AreEqual("PWR [SYS]", excelRow.Owner);
-            Assert.AreEqual("l", excelRow.ParameterTypeShortName);
+            Assert.AreEqual("l [m]", excelRow.ParameterTypeShortName);
             Assert.AreEqual("NPS", excelRow.Type);
         }
 
@@ -194,6 +315,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
             {
                 ParameterType = this.length,
+                Scale = this.meter,
                 Owner = this.powerEngineering
             };
 
@@ -240,7 +362,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             Assert.AreEqual("SAT.batt\\l\\option1\\", excelRow.ModelCode);
             Assert.AreEqual("Length", excelRow.Name);
             Assert.AreEqual("PWR", excelRow.Owner);
-            Assert.AreEqual("l", excelRow.ParameterTypeShortName);
+            Assert.AreEqual("l [m]", excelRow.ParameterTypeShortName);
             Assert.AreEqual("NP", excelRow.Type);
         }
     }

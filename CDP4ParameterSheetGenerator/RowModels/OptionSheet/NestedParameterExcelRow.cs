@@ -8,6 +8,8 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
 {
     using CDP4Common;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Exceptions;
+    using CDP4Common.SiteDirectoryData;
     using CDP4ParameterSheetGenerator.RowModels;
 
     /// <summary>
@@ -35,13 +37,44 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         {
             this.Id = this.Thing.Iid.ToString();
             this.Name = this.Thing.AssociatedParameter.ParameterType.Name;
-            this.ShortName = this.Thing.AssociatedParameter.ParameterType.ShortName;
+            this.ShortName = this.QueryParameterTypeShortname(false);
             this.ActualValue = this.Thing.ActualValue;
             this.Type = this.QueryRowType(this.Thing.AssociatedParameter);
             this.Owner = this.QueryOwner(this.Thing);
             this.ModelCode = this.Thing.Path;
             this.ParameterType = this.Thing.AssociatedParameter.ParameterType;
-            this.ParameterTypeShortName = this.Thing.AssociatedParameter.ParameterType.ShortName;
+            this.ParameterTypeShortName = this.QueryParameterTypeShortname(true);
+        }
+
+        /// <summary>
+        /// Queroes the shortname of the <see cref="ParameterType"/> of the assiacted <see cref="Parameter"/>
+        /// that is represented by the current <see cref="NestedParameter"/>.
+        /// </summary>
+        /// <returns>
+        /// the shortname of the parametertype, or concatenation of the shortname of the parametertype and component
+        /// in case the referenced parametertype is a compound parametertype.
+        /// </returns>
+        private string QueryParameterTypeShortname(bool inlcudeScale)
+        {
+            var compoundParameterType = this.Thing.AssociatedParameter.ParameterType as CompoundParameterType;
+            if (compoundParameterType == null)
+            {
+                if (inlcudeScale && this.Thing.AssociatedParameter.Scale != null)
+                {
+                    return $"{this.Thing.AssociatedParameter.ParameterType.ShortName} [{this.Thing.AssociatedParameter.Scale.ShortName}]";
+                }
+
+                return this.Thing.AssociatedParameter.ParameterType.ShortName;
+            }
+            else
+            {
+                if (inlcudeScale && this.Thing.Component.Scale != null)
+                {
+                    return $"{this.Thing.AssociatedParameter.ParameterType.ShortName}.{this.Thing.Component.ShortName} [{this.Thing.Component.Scale.ShortName}]";
+                }
+
+                return $"{this.Thing.AssociatedParameter.ParameterType.ShortName}.{this.Thing.Component.ShortName}";
+            }
         }
 
         /// <summary>

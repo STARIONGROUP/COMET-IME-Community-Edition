@@ -1,11 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="OptionSheetGenerator.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ParameterSheetGenerator.OptionSheet
 {
+    using System;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
@@ -59,11 +60,11 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
 
                 var optionSheet = ParameterSheetUtilities.RetrieveOptionSheet(workbook, option);
                 ParameterSheetUtilities.ApplyLocking(optionSheet, false);
-                
+
                 var headerEndRow = this.PopulateAndWriteHeaderArray(optionSheet, option);
                 var startrow = headerEndRow + 2;
                 this.PopulateAndWriteParameterArray(optionSheet, option, startrow);
-                
+
                 this.ApplySheetSettings(optionSheet);
 
                 ParameterSheetUtilities.ApplyLocking(optionSheet, true);
@@ -141,7 +142,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             var endrow = startRow + numberOfRows - 1;
 
             var nestedElementRange = optionSheet.Range(optionSheet.Cells[startRow, 1], optionSheet.Cells[endrow, numberOfColumns]);
-            
+
             nestedElementRange.NumberFormat = formatArray;
             nestedElementRange.Value = contentArray;
             nestedElementRange.Locked = lockArray;
@@ -152,9 +153,38 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             formattedrange.Font.Bold = true;
             formattedrange.Font.Underline = true;
             formattedrange.Font.Size = 11;
-            
+
+            this.ApplyCellNames(optionSheet, startRow, endrow);
+
             optionSheet.Cells[startRow + 1, 1].Select();
             this.excelApplication.ActiveWindow.FreezePanes = true;
+        }
+
+        /// <summary>
+        /// apply cell names to the actual value column
+        /// </summary>
+        /// <param name="beginRow">
+        /// The row at which the range begins
+        /// </param>
+        /// <param name="endRow">
+        /// The row at which the range ends
+        /// </param>
+        private void ApplyCellNames(Worksheet optionSheet, int beginRow, int endRow)
+        {
+            try
+            {
+                var range =
+                    optionSheet.Range(
+                        optionSheet.Cells[endRow, OptionSheetConstants.ModelCodeColumn],
+                        optionSheet.Cells[beginRow + 2, OptionSheetConstants.ActualValueColumn]
+                        );
+
+                range.CreateNames(top: false, left: true, bottom: false, right: false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Could not apply cell names");
+            }
         }
 
         /// <summary>
@@ -174,12 +204,12 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             optionSheet.Cells.EntireColumn.AutoFit();
 
             optionSheet.Rows.RowHeight = 12.75;
-            
+
             optionSheet.Columns[OptionSheetConstants.IdColumn].EntireColumn.OutlineLevel = 2;
             optionSheet.Columns[OptionSheetConstants.ModelCodeColumn].EntireColumn.OutlineLevel = 2;
             optionSheet.Outline.ShowLevels(8, 1);
 
-            this.excelApplication.ActiveWindow.DisplayGridlines = false;    
+            this.excelApplication.ActiveWindow.DisplayGridlines = false;
         }
     }
 }

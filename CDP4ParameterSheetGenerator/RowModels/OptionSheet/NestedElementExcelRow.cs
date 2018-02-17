@@ -16,7 +16,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
     /// The purpose of the <see cref="NestedElementExcelRow"/> is to represent <see cref="NestedElement"/>s in the 
     /// <see cref="Option"/> Sheet
     /// </summary>
-    public class NestedElementExcelRow : ExcelRowBase<NestedElement>  
+    public class NestedElementExcelRow : ExcelRowBase<NestedElement>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NestedElementExcelRow"/> class.
@@ -47,7 +47,15 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             this.ShortName = this.Thing.ShortName;
             this.Type = OptionSheetConstants.NE;
             this.Owner = this.Thing.Owner.ShortName;
-            this.ModelCode = this.Thing.ShortName;
+
+            var optionShortName = "-";
+            var containerOption = this.Thing.Container as Option;
+            if (containerOption != null)
+            {
+                optionShortName = containerOption.ShortName;
+            }
+
+            this.ModelCode = $"{this.Thing.ShortName}\\{optionShortName}";
 
             var elementUsage = this.Thing.ElementUsage.LastOrDefault();
             if (elementUsage != null)
@@ -78,7 +86,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
                     }
 
                     var nestedParameterExcelRow = new NestedParameterExcelRow(nestedParameter);
-                    this.ContainedRows.Add(nestedParameterExcelRow);                    
+                    this.ContainedRows.Add(nestedParameterExcelRow);
                 }
             }
         }
