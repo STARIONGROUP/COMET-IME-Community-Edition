@@ -8,6 +8,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
 {
     using CDP4Common;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Exceptions;
 
     using CDP4Requirements.Utils;
     using CDP4Requirements.ViewModels.RequirementsSpecificationEditor;

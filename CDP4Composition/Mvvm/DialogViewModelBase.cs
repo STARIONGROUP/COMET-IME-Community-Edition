@@ -17,7 +17,8 @@ namespace CDP4Composition.Mvvm
     using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common;
-    using CDP4Common.CommonData;    
+    using CDP4Common.CommonData;
+    using CDP4Common.Exceptions;
     using CDP4Composition.Converters;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;

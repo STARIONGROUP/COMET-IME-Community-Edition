@@ -12,6 +12,7 @@ namespace CDP4Composition.Services
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Exceptions;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Events;

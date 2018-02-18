@@ -158,11 +158,22 @@ namespace CDP4Composition.Navigation
         /// </returns>
         public bool? Navigate(Thing thing, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
         {
-            Utils.AssertNotNull(thing);
-            Utils.AssertNotNull(session);
+            if (thing == null)
+            {
+                throw new ArgumentNullException(nameof(thing), "The Thing may not be null");
+            }
+            
+            if (thing == null)
+            {
+                throw new ArgumentNullException(nameof(session), "The ISession may not be null");
+            }
+            
             if (dialogKind != ThingDialogKind.Inspect)
             {
-                Utils.AssertNotNull(transaction);
+                if (transaction == null)
+                {
+                    throw new ArgumentNullException(nameof(transaction), "The IThingTransaction may not be null when the dialogkind is not of type inspection");
+                }
             }
 
             // set up special terms service

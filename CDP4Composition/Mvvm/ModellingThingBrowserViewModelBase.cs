@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ModellingThingBrowserViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ namespace CDP4Composition.Mvvm
     using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Poco;
+    using CDP4Common;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;

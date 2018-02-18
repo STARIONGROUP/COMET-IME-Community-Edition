@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CategoryBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ namespace BasicRdl.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using CDP4Common.CommonData;
-    using CDP4Common.Poco;
+    using CDP4Common;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Events;

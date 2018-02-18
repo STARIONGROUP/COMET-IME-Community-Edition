@@ -9,6 +9,7 @@ namespace CDP4Requirements.Utils
     using CDP4Common;
     using System;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Exceptions;
 
     public static class BreadCrumbComputer
     {

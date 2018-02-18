@@ -9,6 +9,7 @@ namespace CDP4Errors.ViewModels
     using System;
     using CDP4Common;
     using CDP4Common.CommonData;
+    using CDP4Common.Exceptions;
     using CDP4Composition.Mvvm;
     using CDP4Dal;
     using NLog;

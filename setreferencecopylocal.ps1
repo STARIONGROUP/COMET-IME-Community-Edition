@@ -10,8 +10,8 @@ dir -Recurse *.csproj | `
             $references = $xml.Project.ItemGroup | Where-Object { $_.Reference -ne $null }
 
             foreach($reference in $references.ChildNodes)
-            { 
-                if (($reference.Include -like '*CDP4Common*') -or ($reference.Include -like '*CDP4JsonSerializer*') -or ($reference.Include -like '*CDP4Dal*'))
+            {
+                if (($reference.Include -like '*CDP4Common*') -or ($reference.Include -like '*CDP4JsonSerializer*') -or ($reference.Include -like '*CDP4Dal*') -or ($reference.Include -like '*Microsoft.Practices.ServiceLocation*') -or ($reference.Include -like '*NLog*'))
                 {
                     if($reference.Private -eq $null)
                     {

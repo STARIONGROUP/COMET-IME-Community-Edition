@@ -187,7 +187,10 @@ namespace CDP4Composition.Navigation
         /// </remarks>
         public void Open(IPanelViewModel viewModel, bool useRegionManager)
         {
-            Utils.AssertNotNull(viewModel);
+            if (viewModel == null)
+            {
+                throw new ArgumentNullException(nameof(viewModel), "The IPanelViewModel may not be null");
+            }
             
             if (useRegionManager)
             {
