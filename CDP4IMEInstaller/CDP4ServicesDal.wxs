@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
   <Fragment>
     <ComponentGroup Id="CDP4SERVICESDAL_CG" Directory="CDP4SERVICESDAL">
       
-      <Component Id="comp_CDP4ServicesDal" Guid="{88A209B6-1C42-4007-9106-8E49D4963F97}" Location="local">
+      <Component Id="comp_CDP4ServicesDal" Guid="{88A209B6-1C42-4007-9106-8E49D4963F97}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)CDP4ServicesDal.dll" KeyPath="yes"></File>
       </Component>
 

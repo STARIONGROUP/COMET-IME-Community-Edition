@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
   <Fragment>
     <ComponentGroup Id="PRODUCTTREE_CG" Directory="PRODUCTTREE">
-      <Component Id="comp_ProductTree" Guid="{CC2CF0B6-28B8-455F-B155-FF19898E6BB5}" Location="local">
+      <Component Id="comp_ProductTree" Guid="{CC2CF0B6-28B8-455F-B155-FF19898E6BB5}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_ProductTree"  Vital="yes" Source="$(var.ProductTree.TargetPath)" KeyPath="yes"></File>
       </Component>
     </ComponentGroup>

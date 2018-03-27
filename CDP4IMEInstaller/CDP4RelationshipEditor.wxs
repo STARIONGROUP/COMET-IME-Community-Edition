@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
   <Fragment>
     <ComponentGroup Id="RELATIONSHIPEDITOR_CG" Directory="RELATIONSHIPEDITOR">
-      <Component Id="comp_RELATIONSHIPEDITOR" Guid="{513166CE-2407-4201-B02E-78201A247741}" Location="local">
+      <Component Id="comp_RELATIONSHIPEDITOR" Guid="{513166CE-2407-4201-B02E-78201A247741}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_RELATIONSHIPEDITOR"  Vital="yes" Source="$(var.CDP4RelationshipEditor.TargetPath)" KeyPath="yes"></File>
       </Component>
     </ComponentGroup>

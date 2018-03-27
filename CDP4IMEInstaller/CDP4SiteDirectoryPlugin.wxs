@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
   <Fragment>
     <ComponentGroup Id="SITEDIRECTORY_CG" Directory="SITEDIRECTORY">
-      <Component Id="comp_SiteDirectory" Guid="{AD413BF5-39B6-47F2-A61D-D3C7F7A673BA}" Location="local">
+      <Component Id="comp_SiteDirectory" Guid="{AD413BF5-39B6-47F2-A61D-D3C7F7A673BA}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_SiteDirectory"  Vital="yes" Source="$(var.CDP4SiteDirectory.TargetPath)" KeyPath="yes"></File>
       </Component>
     </ComponentGroup>

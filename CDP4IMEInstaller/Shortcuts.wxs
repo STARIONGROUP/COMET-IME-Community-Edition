@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
   <Fragment>
     <DirectoryRef Id="ApplicationProgramsFolder" >
       <Component Id="ShortcutCDP4CE" Guid="{E241E4F4-CFD0-4EAA-A838-6150670FF906}">

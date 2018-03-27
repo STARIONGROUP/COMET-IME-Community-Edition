@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?if $(sys.BUILDARCH)="x86"?>
+    <?define Win64 = "no" ?>
+    <?define ProgramFilesPlatformSpecific="ProgramFilesFolder"?>
+  <?elseif $(sys.BUILDARCH)="x64"?>
+    <?define Win64 = "yes" ?>
+  <?define ProgramFilesPlatformSpecific="ProgramFiles64Folder"?>
+  <?else?>
+    <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
+  <?endif?>
+</Include>

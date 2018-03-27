@@ -1,13 +1,16 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
   <Fragment>
     <ComponentGroup Id="LOGINFO_CG" Directory="LOGINFO">
       
-      <Component Id="comp_CDP4LogInfo" Guid="{911797F3-5BAD-49A7-A426-6D99B2BAF812}" Location="local">
+      <Component Id="comp_CDP4LogInfo" Guid="{911797F3-5BAD-49A7-A426-6D99B2BAF812}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_CDP4LogInfo"  Vital="yes" Source="$(var.CDP4LogInfo.TargetPath)" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_csvhelper" Guid="{873A7341-472F-4FA5-AC53-FA7EC8C2F102}" Location="local">
+      <Component Id="comp_csvhelper" Guid="{873A7341-472F-4FA5-AC53-FA7EC8C2F102}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_csvhelper" Vital="yes" Source="$(var.CDP4LogInfo.TargetDir)CsvHelper.dll" KeyPath="yes" />
       </Component>
       

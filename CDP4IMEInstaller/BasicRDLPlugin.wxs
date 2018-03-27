@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
 	<Fragment>
     <ComponentGroup Id="BASICRDL_CG" Directory="BASICRDL">
-      <Component Id="comp_BasicRdl" Guid="{DE37D6B6-D60F-4B4C-B8A5-537A9FCBDF02}" Location="local">
+      <Component Id="comp_BasicRdl" Guid="{DE37D6B6-D60F-4B4C-B8A5-537A9FCBDF02}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_BasicRdl"  Vital="yes" Source="$(var.BasicRdl.TargetPath)" KeyPath="yes"></File>
        </Component>
     </ComponentGroup>

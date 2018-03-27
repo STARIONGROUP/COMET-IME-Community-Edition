@@ -1,52 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
 	<Fragment>
     <ComponentGroup Id="SCRIPTING_CG" Directory="SCRIPTING">
 
-      <Component Id="comp_CDP4Scripting" Guid="{8ECE3F28-18D0-4CF1-AE8E-FDB2C16C0687}" Location="local">
+      <Component Id="comp_CDP4Scripting" Guid="{8ECE3F28-18D0-4CF1-AE8E-FDB2C16C0687}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_CDP4Scripting"  Vital="yes" Source="$(var.CDP4Scripting.TargetPath)" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_avalonedit" Guid="{93A09AF1-FF5D-4413-A039-610711F2216D}" Location="local">
+      <Component Id="comp_avalonedit" Guid="{93A09AF1-FF5D-4413-A039-610711F2216D}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_avalonedit" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)ICSharpCode.AvalonEdit.dll" KeyPath="yes" />
       </Component>
 
       <!-- scripting -->
-      <Component Id="comp_MicrosoftDynamic" Guid="{C7C64703-240D-4C83-9D14-119276A9E4D5}" Location="local">
+      <Component Id="comp_MicrosoftDynamic" Guid="{C7C64703-240D-4C83-9D14-119276A9E4D5}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MicrosoftDynamic"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Dynamic.dll" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_MicrosoftScripting" Guid="{66438239-9085-45F6-B56C-069F5C396496}" Location="local">
+      <Component Id="comp_MicrosoftScripting" Guid="{66438239-9085-45F6-B56C-069F5C396496}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MicrosoftScripting"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Scripting.dll" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_MicrosoftScriptingAspNet" Guid="{AC98885C-1A52-4BDB-9CD6-2224EA9E91D5}" Location="local">
+      <Component Id="comp_MicrosoftScriptingAspNet" Guid="{AC98885C-1A52-4BDB-9CD6-2224EA9E91D5}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MicrosoftScriptingAspNet"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Scripting.AspNet.dll" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_MicrosoftScriptingMetadata" Guid="{F8FEBC24-58F4-406F-B1E8-2DA0A0D9EF5A}" Location="local">
+      <Component Id="comp_MicrosoftScriptingMetadata" Guid="{F8FEBC24-58F4-406F-B1E8-2DA0A0D9EF5A}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MicrosoftScriptingMetadata"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Scripting.Metadata.dll" KeyPath="yes"></File>
       </Component>
       
       <!-- Iron Python -->
-      <Component Id="comp_IronPython" Guid="{3E0A049E-C4E4-4D07-BCEA-A504D8744861}" Location="local">
+      <Component Id="comp_IronPython" Guid="{3E0A049E-C4E4-4D07-BCEA-A504D8744861}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_IronPython" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)IronPython.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="comp_IronPythonModules" Guid="{E9DA1DB9-1AAF-46CA-85D3-69742B17255B}" Location="local">
+      <Component Id="comp_IronPythonModules" Guid="{E9DA1DB9-1AAF-46CA-85D3-69742B17255B}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_IronPythonModules" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)IronPython.Modules.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="comp_IronPythonSQLite" Guid="{F6BEA623-FF42-48DC-9881-CD3A4781CA09}" Location="local">
+      <Component Id="comp_IronPythonSQLite" Guid="{F6BEA623-FF42-48DC-9881-CD3A4781CA09}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_IronPythonSQLite" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)IronPython.SQLite.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="comp_IronPythonWpf" Guid="{D9C6D9D4-10F9-49A2-AA43-835C9AF7023A}" Location="local">
+      <Component Id="comp_IronPythonWpf" Guid="{D9C6D9D4-10F9-49A2-AA43-835C9AF7023A}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_IronPythonWpf" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)IronPython.Wpf.dll" KeyPath="yes" />
       </Component>
 
       <!-- Lua / Moonsharp -->
-      <Component Id="comp_MoonSharpInterpreter" Guid="{120B0CF9-17E7-47AA-9B1D-1AC213DFAEE3}" Location="local">
+      <Component Id="comp_MoonSharpInterpreter" Guid="{120B0CF9-17E7-47AA-9B1D-1AC213DFAEE3}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MoonSharpInterpreter" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)MoonSharp.Interpreter.dll" KeyPath="yes" />
       </Component>
       

@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
   <Fragment>
     <ComponentGroup Id="REQUIREMENTS_CG" Directory="REQUIREMENTS">
       
-      <Component Id="comp_Requirements" Guid="{31447E07-695F-4C0A-9268-86BC298726E4}" Location="local">
+      <Component Id="comp_Requirements" Guid="{31447E07-695F-4C0A-9268-86BC298726E4}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_Requirements"  Vital="yes" Source="$(var.Requirements.TargetPath)" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_reqif" Guid="{A628AC1E-6361-4294-93DB-068A674EBF40}" Location="local">
+      <Component Id="comp_reqif" Guid="{A628AC1E-6361-4294-93DB-068A674EBF40}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_reqif" Vital="yes" Source="$(var.Requirements.TargetDir)ReqIFSharp.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="comp_dotliquid" Guid="{EF1A4166-32FC-4408-B106-ED198FB3A08A}" Location="local">
+      <Component Id="comp_dotliquid" Guid="{EF1A4166-32FC-4408-B106-ED198FB3A08A}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_DotLiquid" Vital="yes" Source="$(var.Requirements.TargetDir)DotLiquid.dll" KeyPath="yes" />
       </Component>
       

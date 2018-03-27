@@ -6,7 +6,6 @@
     <ProductVersion>3.9</ProductVersion>
     <ProjectGuid>2ee90906-5978-4c5a-a9be-1d8feb5adce9</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>CDP4IMEInstaller</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -16,20 +15,28 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <InstallerPlatform>x86</InstallerPlatform>
+    <OutputName>CDP4IMEInstaller.x86</OutputName>
     <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <InstallerPlatform>x86</InstallerPlatform>
+    <OutputName>CDP4IMEInstaller.x86</OutputName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DefineConstants>Debug</DefineConstants>
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <OutputName>CDP4IMEInstaller.x64</OutputName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <OutputName>CDP4IMEInstaller.x64</OutputName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CDP4IME.wxs" />
@@ -103,6 +110,7 @@
     <Content Include="ThirdPartyLicense\Rx-XAML.txt" />
     <Content Include="ThirdPartyLicense\Splat.txt" />
     <Content Include="ThirdPartyLicense\System.Xml.XmlSerializer.txt" />
+    <Content Include="variables.wxi" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BasicRdl\BasicRdl.csproj">
