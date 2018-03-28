@@ -82,6 +82,7 @@
     <Content Include="license.rtf" />
     <Content Include="ThirdPartyLicense\AvalonEdit.txt" />
     <Content Include="ThirdPartyLicense\CastleCore.txt" />
+    <Content Include="ThirdPartyLicense\CDP4Satsearch.txt" />
     <Content Include="ThirdPartyLicense\CommonServiceLocator.txt" />
     <Content Include="ThirdPartyLicense\CsvHelper.txt" />
     <Content Include="ThirdPartyLicense\dotliquid.txt" />

@@ -1,0 +1,5 @@
+name: CDP4Satsearch
+version: 1.0.7.0
+project url: http://www.rheagroup.com
+
+Copyright (c) 2018, RHEA System S.A.
