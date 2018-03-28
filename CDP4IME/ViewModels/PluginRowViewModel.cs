@@ -1,10 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
-// <summary>
-//   Defines the PluginRowViewModel type.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4IME.ViewModels

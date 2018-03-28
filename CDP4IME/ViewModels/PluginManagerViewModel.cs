@@ -1,11 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginManagerViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
-// <summary>
-//   The purpose of the  is to allow a user to select an  implementation
-//   and provide Credentials to login to a data source.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4IME.ViewModels
