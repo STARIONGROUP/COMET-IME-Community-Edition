@@ -16,27 +16,27 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <InstallerPlatform>x86</InstallerPlatform>
-    <OutputName>CDP4IMEInstaller.x86</OutputName>
+    <OutputName>CDP4IME-CE.x86</OutputName  >
     <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <InstallerPlatform>x86</InstallerPlatform>
-    <OutputName>CDP4IMEInstaller.x86</OutputName>
+    <OutputName>CDP4IME-CE.x86</OutputName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DefineConstants>Debug</DefineConstants>
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <InstallerPlatform>x64</InstallerPlatform>
-    <OutputName>CDP4IMEInstaller.x64</OutputName>
+    <OutputName>CDP4IME-CE.x64</OutputName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <InstallerPlatform>x64</InstallerPlatform>
-    <OutputName>CDP4IMEInstaller.x64</OutputName>
+    <OutputName>CDP4IME-CE.x64</OutputName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CDP4IME.wxs" />
