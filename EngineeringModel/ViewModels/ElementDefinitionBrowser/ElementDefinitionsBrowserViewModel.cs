@@ -1,11 +1,11 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
-{ 
+{
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -28,10 +28,11 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+    using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
     using NLog;
     using ReactiveUI;
-    
+
     /// <summary>
     /// Represent the view-model of the browser that displays all the <see cref="ElementDefinition"/>s in one <see cref="Iteration"/>
     /// </summary>
@@ -83,7 +84,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="DomainOfExpertise"/>
         /// </summary>
         private string domainOfExpertise;
-        
+
         #endregion
 
         #region Constructors
@@ -103,7 +104,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.ElementDefinitionRowViewModels = new ReactiveList<IRowViewModelBase<Thing>>();
             this.UpdateElementDefinition();
-            
+
             this.AddSubscriptions();
             this.UpdateProperties();
         }
@@ -234,24 +235,43 @@ namespace CDP4EngineeringModel.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            logger.Trace("drag over {0}", dropInfo.TargetItem);
-            var droptarget = dropInfo.TargetItem as IDropTarget;
-            if (droptarget != null)
+            try
             {
-                droptarget.DragOver(dropInfo);
-                return;
-            }
-            
-            var elementDefinition = dropInfo.Payload as ElementDefinition;
-            if (elementDefinition != null)
-            {
-                dropInfo.Effects = (elementDefinition.TopContainer == this.Thing.TopContainer)
-                    ? DragDropEffects.None
-                    : DragDropEffects.Copy;
-                return;
-            }
+                logger.Trace("drag over {0}", dropInfo.TargetItem);
+                var droptarget = dropInfo.TargetItem as IDropTarget;
+                if (droptarget != null)
+                {
+                    droptarget.DragOver(dropInfo);
+                    return;
+                }
 
-            dropInfo.Effects = DragDropEffects.None;
+                var elementDefinition = dropInfo.Payload as ElementDefinition;
+                if (elementDefinition != null)
+                {
+                    if (elementDefinition.Iid == Guid.Empty)
+                    {
+                        logger.Debug("Copying an Element Definition that has been created as template - iid is the empty guid");
+
+                        dropInfo.Effects = DragDropEffects.Move;
+                        return;
+                    }
+                    else
+                    {
+                        dropInfo.Effects = (elementDefinition.TopContainer == this.Thing.TopContainer)
+                            ? DragDropEffects.None
+                            : DragDropEffects.Copy;
+                        return;
+                    }
+                }
+
+                dropInfo.Effects = DragDropEffects.None;
+            }
+            catch (Exception ex)
+            {
+                dropInfo.Effects = DragDropEffects.None;
+                logger.Error(ex, "drag-over caused an error");
+                throw;
+            }
         }
 
         /// <summary>
@@ -286,22 +306,46 @@ namespace CDP4EngineeringModel.ViewModels
             var elementDefinition = dropInfo.Payload as ElementDefinition;
             if (elementDefinition != null)
             {
-                // copy the payload to this iteration
-                try
+                if (elementDefinition.Iid == Guid.Empty)
                 {
-                    this.IsBusy = true;
+                    logger.Debug("Copying an Element Definition that has been created as template - iid is the empty guid");
 
-                    var copyCreator = new CopyCreator(this.Session, this.DialogNavigationService);
-                    await copyCreator.Copy(elementDefinition, this.Thing, dropInfo.KeyStates);
+                    dropInfo.Effects = DragDropEffects.Copy;
+
+                    try
+                    {
+                        this.IsBusy = true;
+                        await ElementDef1initionService.CreateElementDefinitionFromTemplate(this.Session, this.Thing, elementDefinition); //this.CreateElementDefinitionFromTemplate(elementDefinition);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e.Message);
+                        this.Feedback = e.Message;
+                    }
+                    finally
+                    {
+                        this.IsBusy = false;
+                    }
                 }
-                catch (Exception e)
+                else
                 {
-                    logger.Error(e.Message);
-                    this.Feedback = e.Message;
-                }
-                finally
-                {
-                    this.IsBusy = false;
+                    // copy the payload to this iteration
+                    try
+                    {
+                        this.IsBusy = true;
+
+                        var copyCreator = new CopyCreator(this.Session, this.DialogNavigationService);
+                        await copyCreator.Copy(elementDefinition, this.Thing, dropInfo.KeyStates);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e.Message);
+                        this.Feedback = e.Message;
+                    }
+                    finally
+                    {
+                        this.IsBusy = false;
+                    }
                 }
             }
         }
@@ -351,9 +395,9 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 return;
             }
-            
+
             Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing,out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
 
             var parameter = parameterRow.Thing as Parameter;
             if (parameter != null)
@@ -437,7 +481,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
                 return;
             }
-            
+
             var parameterRow = this.SelectedThing as ParameterRowViewModel;
             if (parameterRow != null)
             {
@@ -512,6 +556,61 @@ namespace CDP4EngineeringModel.ViewModels
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Creates an new <see cref="ElementDefinition"/> on the connected data-source and updates and valuesests of created contained parameters
+        /// </summary>
+        /// <param name="elementDefinition"></param>
+        /// <returns></returns>
+        private async Task CreateElementDefinitionFromTemplate(ElementDefinition elementDefinition)
+        {
+            var owner = this.QueryCurrentDomainOfExpertise();
+            if (owner == null)
+            {
+                return;
+            }
+
+            elementDefinition.Owner = owner;
+            foreach (var parameter in elementDefinition.Parameter)
+            {
+                parameter.Owner = owner;
+            }
+
+            var clonedParameters = new List<Parameter>();
+            foreach (var parameter in elementDefinition.Parameter)
+            {
+                clonedParameters.Add(parameter.Clone(true));
+
+                parameter.ValueSet.Clear();
+            }
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
+            var iterationClone = this.Thing.Clone(false);
+
+            var createTransaction = new ThingTransaction(transactionContext);
+            createTransaction.CreateDeep(elementDefinition, iterationClone);
+            var createOperationContainer = createTransaction.FinalizeTransaction();
+            await Session.Write(createOperationContainer);
+
+            var updateTransaction = new ThingTransaction(transactionContext);
+            var createdElementDefinition = this.Thing.Element.SingleOrDefault(x => x.Iid == elementDefinition.Iid);
+            foreach (var parameter in createdElementDefinition.Parameter)
+            {
+                var clonedParameter = clonedParameters.SingleOrDefault(x => x.ParameterType.Iid == parameter.ParameterType.Iid);
+                if (clonedParameter != null)
+                {
+                    var parameterValueSet = parameter.ValueSet[0];
+                    var clonedParameterValuesSet = parameterValueSet.Clone(false);
+                    clonedParameterValuesSet.Manual = clonedParameter.ValueSet[0].Manual;
+
+                    updateTransaction.CreateOrUpdate(clonedParameterValuesSet);
+                }
+            }
+
+            var updateOperationContainer = updateTransaction.FinalizeTransaction();
+            await Session.Write(updateOperationContainer);
+        }
+
         /// <summary>
         /// Update the rows to display
         /// </summary>
@@ -538,12 +637,12 @@ namespace CDP4EngineeringModel.ViewModels
                 // clear the top elements
                 if (topElementDefinitionOld != null)
                 {
-                    ((ElementDefinitionRowViewModel) topElementDefinitionOld).IsTopElement = false;
+                    ((ElementDefinitionRowViewModel)topElementDefinitionOld).IsTopElement = false;
                 }
 
                 return;
             }
-            
+
             var topElementDefinitionNew = this.ElementDefinitionRowViewModels.First(vm => vm.Thing.Iid == this.Thing.TopElement.Iid) as ElementDefinitionRowViewModel;
 
             if (topElementDefinitionNew != null)
@@ -676,7 +775,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             var transactionContext = TransactionContextResolver.ResolveContext(elementUsage);
             var transaction = new ThingTransaction(transactionContext);
-            
+
             transaction.Create(parameterOverride);
 
             var elementUsageClone = elementUsage.Clone(false);
@@ -737,19 +836,27 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateProperties()
         {
             this.CurrentModel = this.CurrentEngineeringModelSetup.Name;
-            this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;           
+            this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
 
+            var currentDomainOfExpertise = this.QueryCurrentDomainOfExpertise();
+            this.DomainOfExpertise = currentDomainOfExpertise == null ? "None" : $"{currentDomainOfExpertise.Name} [{currentDomainOfExpertise.ShortName}]";
+        }
+
+        /// <summary>
+        /// Queries the current <see cref="DomainOfExpertise"/> from the session for the current <see cref="Iteration"/>
+        /// </summary>
+        /// <returns>
+        /// The <see cref="DomainOfExpertise"/> if selected, null otherwise.
+        /// </returns>
+        private DomainOfExpertise QueryCurrentDomainOfExpertise()
+        {
             var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
             if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
             {
-                this.DomainOfExpertise = "None";
+                return null;
             }
-            else
-            {
-                this.DomainOfExpertise = (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null)
-                                        ? "None"
-                                        : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
-            }
+
+            return (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null) ? null : iterationDomainPair.Value.Item1;
         }
 
         /// <summary>
