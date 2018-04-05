@@ -248,7 +248,10 @@ namespace CDP4Requirements.ReqIFDal
                     requirement.Group = group;
                 }
 
-                var container = reqContainer.GetContainerOfType<RequirementsSpecification>();
+                RequirementsSpecification container = null;
+                var specification = reqContainer as RequirementsSpecification;
+                container = specification ?? reqContainer.GetContainerOfType<RequirementsSpecification>();
+                
                 if (container == null)
                 {
                     throw new InvalidOperationException("The RequirementsSpecication container is null.");
