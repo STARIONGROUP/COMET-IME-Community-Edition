@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;    
     using CDP4Common.EngineeringModelData;
@@ -235,8 +236,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [Test]
         public void VerifyThatOnDragDragEffectIsNoneWhenParticipantSelectedDomainISNull()
         {
-
-
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.SetupProperty(d => d.Effects);
             dropinfo.Object.Effects = DragDropEffects.All;
@@ -256,7 +255,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         }
 
         [Test]
-        public void VerifyThatDropWorks()
+        public async Task VerifyThatDropWorks()
         {
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
@@ -268,15 +267,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
 
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
-            viewmodel.Drop(dropinfo.Object);
+            await viewmodel.Drop(dropinfo.Object);
             droptarget.Verify(x => x.Drop(dropinfo.Object));
         }
 
         [Test]
-        public void VerifyThatOnDropDragEffectsIsNoneWhenParticipantSelectedDomainIsNull()
+        public async Task VerifyThatOnDropDragEffectsIsNoneWhenParticipantSelectedDomainIsNull()
         {
-
-
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.SetupProperty(d => d.Effects);
             dropinfo.Object.Effects = DragDropEffects.All;
@@ -290,13 +287,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             });
 
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
-            viewmodel.Drop(dropinfo.Object);
+            await viewmodel.Drop(dropinfo.Object);
 
             Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
         }
 
         [Test]
-        public void VerifyThatDropExceptionFeedbackIsSet()
+        public async Task VerifyThatDropExceptionFeedbackIsSet()
         {
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
@@ -313,7 +310,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
             Assert.IsNullOrEmpty(viewmodel.Feedback);
-            viewmodel.Drop(dropinfo.Object);
+            await viewmodel.Drop(dropinfo.Object);
 
             Assert.IsNotNullOrEmpty(viewmodel.Feedback);
         }

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class RuleVerificationListBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget
     {
-        #region Fields
         /// <summary>
         /// The logger for the current class
         /// </summary>
@@ -73,9 +72,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private const string PanelCaption = "Rule verification lists";
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="RuleVerificationListBrowserViewModel"/> class.
         /// </summary>
@@ -114,10 +110,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -207,9 +199,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public ReactiveList<RuleVerificationListRowViewModel> RuleVerificationListRowViewModels { get; private set; }
 
-        #endregion Properties
-
-        #region BrowserBase
         /// <summary>
         /// Initializes the browser
         /// </summary>
@@ -303,11 +292,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Execute the Rule Verification List", "", this.VerifyRuleVerificationList, MenuItemKind.None, ClassKind.NotThing));
             }
         }
-
-        #endregion BrowserBase
-
-        #region private methods
-
+        
         /// <summary>
         /// Executes the <see cref="VerifyRuleVerificationList"/> <see cref="ReactiveCommand"/>
         /// </summary>
@@ -393,10 +378,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
         }
 
-        #endregion private methods
-
-        #region drag-n-drop
-
         /// <summary>
         /// Updates the current drag state.
         /// </summary>
@@ -412,8 +393,8 @@ namespace CDP4EngineeringModel.ViewModels
         {
             logger.Trace("drag over {0}", dropInfo.TargetItem);
 
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+            Tuple<DomainOfExpertise, Participant> tuple;            
+            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
 
             if (tuple.Item1 == null)
             {
@@ -437,7 +418,7 @@ namespace CDP4EngineeringModel.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(),out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
 
             if (tuple.Item1 == null)
             {
@@ -464,7 +445,5 @@ namespace CDP4EngineeringModel.ViewModels
                 }
             }
         }
-
-        #endregion drag-n-drop
     }
 }
