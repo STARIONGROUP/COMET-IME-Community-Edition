@@ -367,7 +367,7 @@ namespace CDP4RelationshipEditor.ViewModels
         {
              // send off the relationship
             Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
             var multiRelationship = new MultiRelationship(Guid.NewGuid(), null, null) { Owner = tuple.Item1};
 
             if (rule != null)
@@ -418,7 +418,7 @@ namespace CDP4RelationshipEditor.ViewModels
         {
             // send off the relationship
             Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
 
             var binaryRelationship = new BinaryRelationship(Guid.NewGuid(), null, null) { Owner = tuple.Item1};
 
