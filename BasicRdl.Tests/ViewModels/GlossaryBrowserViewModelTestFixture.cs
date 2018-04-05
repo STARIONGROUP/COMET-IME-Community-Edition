@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GlossaryBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,6 +10,7 @@ namespace BasicRDL.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using BasicRdl.ViewModels;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -229,13 +230,13 @@ namespace BasicRDL.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatDropWorks()
+        public async Task VerifyThatDropWorks()
         {
             var dropinfo = new Mock<IDropInfo>();
             var droptarget = new Mock<IDropTarget>();
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
 
-            this.glossaryBrowser.Drop(dropinfo.Object);
+            await this.glossaryBrowser.Drop(dropinfo.Object);
             droptarget.Verify(x => x.Drop(dropinfo.Object));
         }
 

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GlossaryBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,6 @@ namespace BasicRdl.ViewModels
     /// </summary>
     public class GlossaryBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget
     {
-        #region Fields
         /// <summary>
         /// The NLog logger
         /// </summary>
@@ -48,9 +47,6 @@ namespace BasicRdl.ViewModels
         /// Backing field for <see cref="CanCreateGlossary"/>
         /// </summary>
         private bool canCreateGlossary;
-        #endregion Fields
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GlossaryBrowserViewModel"/> class.
@@ -68,10 +64,6 @@ namespace BasicRdl.ViewModels
 
             this.AddSubscriptions();
         }
-
-        #endregion Constructors
-
-        #region Public properties
 
         /// <summary>
         /// Gets the <see cref="GlossaryRowViewModel"/> that are contained by this view-model
@@ -105,10 +97,6 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="Glossary"/> Creation <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> CreateGlossaryCommand { get; private set; }
-
-        #endregion Public properties
-
-        #region Private Methods
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.
@@ -190,9 +178,7 @@ namespace BasicRdl.ViewModels
                 }
             }
         }
-        #endregion
 
-        #region BrowserBase
         /// <summary>
         /// Loads the <see cref="Glossary"/>s from the cache when the browser is instantiated.
         /// </summary>
@@ -212,13 +198,14 @@ namespace BasicRdl.ViewModels
         }
 
         /// <summary>
-        /// Initialize the commands
+        /// Initialize the <see cref="ReactiveCommand"/>s
         /// </summary>
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-            this.CreateTermCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateTerm));
-            this.CreateTermCommand.Subscribe(_ => this.ExecuteCreateCommand<Term>(this.SelectedThing.Thing.GetContainerOfType<Glossary>()));
+
+            this.CreateTermCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateTerm));           
+            this.CreateTermCommand.Subscribe(_ => this.ExecuteCreateCommand<Term>(this.SelectedThing.Thing as Glossary ?? this.SelectedThing.Thing.GetContainerOfType<Glossary>()));
 
             this.CreateGlossaryCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateGlossary));
             this.CreateGlossaryCommand.Subscribe(_ => this.ExecuteCreateCommand<Glossary>());
@@ -246,7 +233,7 @@ namespace BasicRdl.ViewModels
                 return;
             }
 
-            this.CanCreateTerm = this.PermissionService.CanWrite(ClassKind.Term, this.SelectedThing.Thing.GetContainerOfType<Glossary>());
+            this.CanCreateTerm = this.PermissionService.CanWrite(ClassKind.Term, this.SelectedThing.Thing as Glossary ?? this.SelectedThing.Thing.GetContainerOfType<Glossary>());
         }
 
         /// <summary>
@@ -279,10 +266,6 @@ namespace BasicRdl.ViewModels
                 glossary.Dispose();
             }
         }
-
-        #endregion
-
-        #region IDragSource, IDropTarget
 
         /// <summary>
         /// Updates the current drag state.
@@ -331,7 +314,5 @@ namespace BasicRdl.ViewModels
                 }
             }
         }
-
-        #endregion
     }
 }
