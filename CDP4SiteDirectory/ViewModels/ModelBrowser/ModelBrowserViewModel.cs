@@ -247,8 +247,8 @@ namespace CDP4SiteDirectory.ViewModels
             var folderRow = this.SelectedThing as FolderRowViewModel;
             if (folderRow == null)
             {
-                var modelSetup = this.SelectedThing.Thing.GetContainerOfType<EngineeringModelSetup>();
-
+                var modelSetup = this.SelectedThing.Thing as EngineeringModelSetup ?? this.SelectedThing.Thing.GetContainerOfType<EngineeringModelSetup>();
+                
                 this.CanCreateIterationSetup = (modelSetup != null) 
                                             && modelSetup.StudyPhase != StudyPhaseKind.PREPARATION_PHASE 
                                             && this.PermissionService.CanWrite(ClassKind.IterationSetup, modelSetup);
@@ -324,7 +324,7 @@ namespace CDP4SiteDirectory.ViewModels
 
             if (this.SelectedThing != null)
             {
-                return this.SelectedThing.Thing.GetContainerOfType<EngineeringModelSetup>();
+                return this.SelectedThing.Thing as EngineeringModelSetup ?? this.SelectedThing.Thing.GetContainerOfType<EngineeringModelSetup>();
             }
 
             return null;
