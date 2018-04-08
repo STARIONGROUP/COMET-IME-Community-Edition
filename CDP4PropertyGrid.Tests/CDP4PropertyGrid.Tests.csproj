@@ -55,16 +55,16 @@
       <HintPath>..\packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4Common, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.1.0.7-rc1\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.1.1.0-rc1\lib\net452\CDP4Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.1.0.7-rc1\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.1.1.0-rc1\lib\net452\CDP4Dal.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.1.0.7-rc1\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.1.1.0-rc1\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.Prism.Mvvm, Version=1.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -87,12 +87,12 @@
       <HintPath>..\packages\Moq.4.8.1\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.5.0\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.5.2\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework">
