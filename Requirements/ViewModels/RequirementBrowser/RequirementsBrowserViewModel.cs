@@ -390,7 +390,8 @@ namespace CDP4Requirements.ViewModels
         {
             var req = new Requirement();
             var reqGroup = this.SelectedThing.Thing as RequirementsGroup;
-            var reqSpecification = this.SelectedThing.Thing.GetContainerOfType<RequirementsSpecification>();
+
+            var reqSpecification = this.SelectedThing.Thing as RequirementsSpecification ?? this.SelectedThing.Thing.GetContainerOfType<RequirementsSpecification>();
             if (reqGroup != null)
             {
                 req.Group = reqGroup;
