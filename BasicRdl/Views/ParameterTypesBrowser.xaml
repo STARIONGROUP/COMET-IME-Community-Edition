@@ -110,6 +110,7 @@
 
                 <dxg:GridColumn FieldName="Name" Header="Name" />
                 <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
+                <dxg:GridColumn FieldName="Symbol" Header="Symbol" />
                 <dxg:GridColumn FieldName="Type" Header="Type" />
                 <dxg:GridColumn FieldName="DefaultScale" Header="Default scale" />
                 <dxg:GridColumn FieldName="ContainerRdl" Header="Container RDL" />
