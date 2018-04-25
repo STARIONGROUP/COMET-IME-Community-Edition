@@ -2,6 +2,7 @@
   <group id="CDP4EngineeringModel" label="Engineering Model">
     <button id="CDP4_SelectModelToOpen" label="Open" screentip="Select an Engineering Model to open" imageMso="ServerConnection" onAction="OnAction" getEnabled="GetEnabled" />
     <button id="CDP4_SelectModelToClose" label="Close" screentip="Select an Engineering Model to close" imageMso="FileDropSqlDatabase" onAction="OnAction" getEnabled="GetEnabled" />
-  <dynamicMenu id="ShowElementDefinitionsBrowser_" size="normal" label="Definition Browser" screentip="Show or Hide the Elements Definitions Browser of an Iteration"  imageMso="ServerConnection" getEnabled="GetEnabled" getContent="GetContent"/>
+    <dynamicMenu id="ShowElementDefinitionsBrowser_" size="normal" label="Definition Browser" screentip="Show or Hide the Elements Definitions Browser of an Iteration"  imageMso="ServerConnection" getEnabled="GetEnabled" getContent="GetContent"/>
+    <dynamicMenu id="ShowOptionBrowser_" size="normal" label="Option Browser" screentip="Show or Hide the Option Browser of an Iteration" imageMso="SlideMasterVerticalContentPlaceholderInsert" getEnabled="GetEnabled" getContent="GetContent"/>
   </group>
 </ribbonxml>

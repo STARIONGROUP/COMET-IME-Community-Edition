@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelRibbonPart.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -42,6 +42,11 @@ namespace CDP4EngineeringModel
         private readonly List<ElementDefinitionsBrowserViewModel> openElementDefinitionBrowser;
 
         /// <summary>
+        /// The list of open <see cref="OptionBrowserViewModel"/>
+        /// </summary>
+        private readonly List<OptionBrowserViewModel> openOptionBrowser;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EngineeringModelRibbonPart"/> class.
         /// </summary>
         /// <param name="order">
@@ -58,6 +63,7 @@ namespace CDP4EngineeringModel
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService)
         {
             this.openElementDefinitionBrowser = new List<ElementDefinitionsBrowserViewModel>();
+            this.openOptionBrowser = new List<OptionBrowserViewModel>();
             this.Iterations = new List<Iteration>();
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
@@ -110,6 +116,11 @@ namespace CDP4EngineeringModel
             {
                 this.ShowOrCloseElementDefinitionsBrowser(ribbonControlTag);
             }
+
+            if (ribbonControlId.Contains("ShowOptionBrowser_"))
+            {
+                this.ShowOrCloseOptionBrowser(ribbonControlTag);
+            }
         }
 
         /// <summary>
@@ -144,6 +155,11 @@ namespace CDP4EngineeringModel
             }
 
             if (ribbonControlId.Contains("ShowElementDefinitionsBrowser_"))
+            {
+                return this.Iterations.Any();
+            }
+
+            if (ribbonControlId.Contains("ShowOptionBrowser_"))
             {
                 return this.Iterations.Any();
             }
@@ -187,6 +203,32 @@ namespace CDP4EngineeringModel
                     var menuContent =
                         string.Format(
                             "<button id=\"ShowElementDefinitionsBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
+                            iteration.Iid, label);
+                    sb.Append(menuContent);
+                }
+
+                sb.Append(@"</menu>");
+                menuxml = sb.ToString();
+            }
+
+            if (ribbonControlId == "ShowOptionBrowser_")
+            {
+                var sb = new StringBuilder();
+                sb.Append(@"<menu xmlns=""http://schemas.microsoft.com/office/2006/01/customui"">");
+
+                foreach (var iteration in this.Iterations)
+                {
+                    var engineeringModel = (EngineeringModel)iteration.Container;
+
+                    Tuple<DomainOfExpertise, Participant> tuple;
+                    this.Session.OpenIterations.TryGetValue(iteration, out tuple);
+
+                    var label = string.Format("{0} - {1} : [{2}]", engineeringModel.EngineeringModelSetup.ShortName,
+                        iteration.IterationSetup.IterationNumber, tuple.Item1 == null ? String.Empty : tuple.Item1.ShortName);
+
+                    var menuContent =
+                        string.Format(
+                            "<button id=\"ShowOptionBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
                             iteration.Iid, label);
                     sb.Append(menuContent);
                 }
@@ -372,6 +414,42 @@ namespace CDP4EngineeringModel
             browser = new ElementDefinitionsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
 
             this.openElementDefinitionBrowser.Add(browser);
+            this.PanelNavigationService.Open(browser, false);
+        }
+
+        /// <summary>
+        /// Show or close the <see cref="OptionBrowserViewModel"/>
+        /// </summary>
+        /// <param name="iterationId">
+        /// the unique id of the <see cref="Iteration"/> that is being represented by the <see cref="OptionBrowserViewModel"/>
+        /// </param>
+        private void ShowOrCloseOptionBrowser(string iterationId)
+        {
+            var uniqueId = Guid.Parse(iterationId);
+            var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+            if (iteration == null)
+            {
+                return;
+            }
+
+            // close the brower if it exists
+            var browser = this.openOptionBrowser.SingleOrDefault(x => x.Thing == iteration);
+            if (browser != null)
+            {
+                this.PanelNavigationService.Close(browser, false);
+                this.openOptionBrowser.Remove(browser);
+                return;
+            }
+
+            var model = (EngineeringModel)iteration.Container;
+            if (model == null)
+            {
+                throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
+            }
+
+            browser = new OptionBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+
+            this.openOptionBrowser.Add(browser);
             this.PanelNavigationService.Open(browser, false);
         }
     }
