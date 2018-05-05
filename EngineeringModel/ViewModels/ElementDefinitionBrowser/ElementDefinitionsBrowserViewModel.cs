@@ -14,7 +14,6 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Helpers;
     using CDP4Dal.Operations;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
@@ -38,8 +37,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ElementDefinitionsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget
     {
-        #region Fields
-
         /// <summary>
         /// The logger for the current class
         /// </summary>
@@ -85,9 +82,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private string domainOfExpertise;
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionsBrowserViewModel"/> class
         /// </summary>
@@ -108,9 +102,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-        #endregion
-
-        #region public properties
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -218,9 +209,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         /// <remarks>This was made into a list of generic row to use the ReactiveList extension</remarks>
         public ReactiveList<IRowViewModelBase<Thing>> ElementDefinitionRowViewModels { get; private set; }
-        #endregion
-
-        #region IDragSource, IDropTarget
 
         /// <summary>
         /// Updates the current drag state.
@@ -349,9 +337,7 @@ namespace CDP4EngineeringModel.ViewModels
                 }
             }
         }
-        #endregion
 
-        #region Overriden Methods
         /// <summary>
         /// Initializes the create <see cref="ReactiveCommand"/> that allow a user to create the different kinds of <see cref="ParameterType"/>s
         /// </summary>
@@ -553,9 +539,6 @@ namespace CDP4EngineeringModel.ViewModels
             var vm = new AnnotationFloatingDialogViewModel(annotation, this.Session);
             this.DialogNavigationService.NavigateFloating(vm);
         }
-        #endregion
-
-        #region Private Methods
 
         /// <summary>
         /// Creates an new <see cref="ElementDefinition"/> on the connected data-source and updates and valuesests of created contained parameters
@@ -864,16 +847,28 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void ExecuteCreateParameterGroup()
         {
+            ElementDefinition containerElementDefinition = null;
+
             var group = new ParameterGroup();
-            var containingGroup = this.SelectedThing.Thing as ParameterGroup;
-            var elementDef = this.SelectedThing.Thing.GetContainerOfType<ElementDefinition>();
-            if (containingGroup != null)
+
+            var containingParameterGroup = this.SelectedThing.Thing as ParameterGroup;
+            if (containingParameterGroup != null)
             {
-                group.ContainingGroup = containingGroup;
+                containerElementDefinition = containingParameterGroup.GetContainerOfType<ElementDefinition>();
+                group.ContainingGroup = containingParameterGroup;
+            }
+            else
+            {
+                containerElementDefinition = this.SelectedThing.Thing as ElementDefinition;
             }
 
-            this.ExecuteCreateCommand(group, elementDef);
+            if (containerElementDefinition == null)
+            {
+                logger.Debug("The container ElementDefinition could not be set. Something is wrong");
+                return;
+            }
+
+            this.ExecuteCreateCommand(group, containerElementDefinition);
         }
-        #endregion
     }
 }
