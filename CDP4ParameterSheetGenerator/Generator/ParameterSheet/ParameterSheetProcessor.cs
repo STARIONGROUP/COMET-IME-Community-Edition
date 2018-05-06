@@ -116,7 +116,10 @@ namespace CDP4ParameterSheetGenerator.Generator
             var temporaryProcessedValueSets = new Dictionary<Guid, ProcessedValueSet>();
             
             var numberFormatInfo = this.QuerayNumberFormatInfo(application);
-            
+
+            var rowType = string.Empty;
+            var rowIid = string.Empty;
+
             try
             {
                 ParameterSheetUtilities.ApplyLocking(this.parameterSheet, false);
@@ -134,8 +137,6 @@ namespace CDP4ParameterSheetGenerator.Generator
 
                 for (var i = 1; i < parameterContentRows; i++)
                 {
-                    var rowType = string.Empty;
-
                     try
                     {
                         rowType = (string)this.parameterContent[i, ParameterSheetConstants.TypeColumn];
@@ -150,8 +151,8 @@ namespace CDP4ParameterSheetGenerator.Generator
                             || rowType == ParameterSheetConstants.POVS || rowType == ParameterSheetConstants.POVSCT
                             || rowType == ParameterSheetConstants.PSVS || rowType == ParameterSheetConstants.PSVSCT))
                     {
-                        var rowIid = Convert.ToString(this.parameterContent[i, ParameterSheetConstants.IdColumn]);
-
+                        rowIid = Convert.ToString(this.parameterContent[i, ParameterSheetConstants.IdColumn]);
+                        
                         var computedValue = this.QueryComputedValue(i);
                         var formulaValue = this.QueryFormulaValue(i);
                         var manualValue = this.QueryManualValue(i);
@@ -204,7 +205,15 @@ namespace CDP4ParameterSheetGenerator.Generator
             }
             catch (Exception ex)
             {
-                this.errorMessage = ex.Message;
+                if (rowType != string.Empty && rowIid != string.Empty)
+                {
+                    this.errorMessage = $"{rowType}:{rowIid} - {ex.Message}";
+                }
+                else
+                {
+                    this.errorMessage = ex.Message;
+                }
+
                 logger.Error(ex);
             }
             finally

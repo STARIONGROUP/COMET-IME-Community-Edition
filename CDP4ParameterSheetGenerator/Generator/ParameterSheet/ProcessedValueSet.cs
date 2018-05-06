@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProcessedValueSet.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,6 +12,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Validation;
+    using NLog;
 
     /// <summary>
     /// The purpose of the <see cref="ProcessedValueSet"/> is to perform the comparison of the data coming from the Parameter Sheet
@@ -22,6 +23,11 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
     /// </summary>
     public class ProcessedValueSet
     {
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessedValueSet"/> class.
         /// </summary>
@@ -65,9 +71,6 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
         /// </param>
         /// <param name="referenceValue">
         /// The reference value that is read from the Parameter sheet
-        /// </param>
-        /// <param name="actualValue">
-        /// The actual value that is read from the Parameter sheet
         /// </param>
         /// <param name="formulaValue">
         /// The formula value that is read from the Parameter sheet
@@ -121,9 +124,6 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
         /// <param name="referenceValue">
         /// The reference value that is read from the Parameter sheet
         /// </param>
-        /// <param name="actualValue">
-        /// The actual value that is read from the Parameter sheet
-        /// </param>
         /// <param name="formulaValue">
         /// The formula value that is read from the Parameter sheet
         /// </param>
@@ -140,18 +140,73 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             var stringManualValue = manualValue.ToValueSetString(parameterType);
             var stringComputedValue = computedValue.ToValueSetString(parameterType);
             var stringReferenceValue = referenceValue.ToValueSetString(parameterType);
-            
-            var isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
-            var isFormualValueDirty = original.Formula[componentIndex] != formulaValue;
-            var isComputedValueDirty = original.Computed[componentIndex] != stringComputedValue;
-            var isReferenceValueDirty = original.Reference[componentIndex] != stringReferenceValue;
-            var isSwitchKindDirty = original.ValueSwitch != switchKind;
 
+            bool isManualValueDirty;
+            try
+            {
+                isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                isManualValueDirty = true;
+                logger.Debug("The ParameterValueSet.Manual ValueArray has an incorrect number of slots {0}", original.Iid);
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+
+            bool isFormualValueDirty;          
+            try
+            {
+                isFormualValueDirty = original.Formula[componentIndex] != formulaValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                isFormualValueDirty = true;
+                logger.Debug("The ParameterValueSet.Formula ValueArray has an incorrect number of slots {0}", original.Iid);
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+
+            bool isComputedValueDirty;
+            try
+            {
+                isComputedValueDirty = original.Computed[componentIndex] != stringComputedValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                isComputedValueDirty = true;
+                logger.Debug("The ParameterValueSet.Computed ValueArray has an incorrect number of slots {0}", original.Iid);
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+
+            bool isReferenceValueDirty;
+            try
+            {
+                isReferenceValueDirty = original.Reference[componentIndex] != stringReferenceValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                isReferenceValueDirty = true;
+                logger.Debug("The ParameterValueSet.Reference ValueArray has an incorrect number of slots {0}", original.Iid);
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+
+            var isSwitchKindDirty = original.ValueSwitch != switchKind;
+            
             if (isManualValueDirty || isFormualValueDirty || isComputedValueDirty || isReferenceValueDirty || isSwitchKindDirty)
             {
                 valueSetValues = new ValueSetValues(componentIndex, parameterType, switchKind, stringManualValue, stringComputedValue, stringReferenceValue, formulaValue);
                 return true;
-                
             }
 
             valueSetValues = null;
@@ -182,9 +237,6 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
         /// <param name="referenceValue">
         /// The reference value that is read from the Parameter sheet
         /// </param>
-        /// <param name="actualValue">
-        /// The actual value that is read from the Parameter sheet
-        /// </param>
         /// <param name="formulaValue">
         /// The formula value that is read from the Parameter sheet
         /// </param>
@@ -201,11 +253,67 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             var stringManualValue = manualValue.ToValueSetString(parameterType);
             var stringComputedValue = computedValue.ToValueSetString(parameterType);
             var stringReferenceValue = referenceValue.ToValueSetString(parameterType);
+
+            bool isManualValueDirty;
+            try
+            {
+                isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                isManualValueDirty = true;
+                logger.Debug("The ParameterOverrideValueSet.Manual ValueArray has an incorrect number of slots {0}", original.Iid);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
             
-            var isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
-            var isFormualValueDirty = original.Formula[componentIndex] != formulaValue;
-            var isComputedValueDirty = original.Computed[componentIndex] != stringComputedValue;
-            var isReferenceValueDirty = original.Reference[componentIndex] != stringReferenceValue;
+            bool isFormualValueDirty;
+            try
+            {
+                isFormualValueDirty = original.Formula[componentIndex] != formulaValue;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                isFormualValueDirty = true;
+                logger.Debug("The ParameterOverrideValueSet.Formula ValueArray has an incorrect number of slots {0}", original.Iid);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            
+            bool isComputedValueDirty;            
+            try
+            {
+                isComputedValueDirty = original.Computed[componentIndex] != stringComputedValue;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                isComputedValueDirty = true;
+                logger.Debug("The ParameterOverrideValueSet.Computed ValueArray has an incorrect number of slots {0}", original.Iid);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            bool isReferenceValueDirty;            
+            try
+            {
+                isReferenceValueDirty = original.Reference[componentIndex] != stringReferenceValue;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                isReferenceValueDirty = true;
+                logger.Debug("The ParameterOverrideValueSet.Reference ValueArray has an incorrect number of slots {0}", original.Iid);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
             var isSwitchKindDirty = original.ValueSwitch != switchKind;
 
             if (isManualValueDirty || isFormualValueDirty || isComputedValueDirty || isReferenceValueDirty || isSwitchKindDirty)
@@ -247,7 +355,22 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             // here we use CultureInfo.InvariantCulture, these are values that are not shown to the user
             // but serve the purpose to update the data-source.
             var stringManualValue = manualValue.ToValueSetString(parameterType);
-            var isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
+
+            bool isManualValueDirty;
+            try
+            {
+                isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                isManualValueDirty = true;
+                logger.Debug("The ParameterSubscriptionValueSet.Manual ValueArray has an incorrect number of slots {0}", original.Iid);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
             var isSwitchKindDirty = original.ValueSwitch != switchKind;
 
             if (isManualValueDirty || isSwitchKindDirty)
@@ -301,12 +424,24 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
 
             var originalvalueset = this.OriginalThing as IValueSet;
             var clonedValueset = this.ClonedThing as IValueSet;
-
-            if (originalvalueset.Manual[componentIndex] != clonedValueset.Manual[componentIndex])
+            
+            try
             {
+                if (originalvalueset.Manual[componentIndex] != clonedValueset.Manual[componentIndex])
+                {
+                    return true;
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                logger.Debug("The IValueSet.Manual ValueArray has an incorrect number of slots");
                 return true;
             }
-
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
             return false;
         }
 
@@ -334,11 +469,23 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             var originalvalueset = this.OriginalThing as IValueSet;
             var clonedValueset = this.ClonedThing as IValueSet;
 
-            if (originalvalueset.Computed[componentIndex] != clonedValueset.Computed[componentIndex])
+            try
             {
+                if (originalvalueset.Computed[componentIndex] != clonedValueset.Computed[componentIndex])
+                {
+                    return true;
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                logger.Debug("The IValueSet.Computed ValueArray has an incorrect number of slots");
                 return true;
             }
-
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
             return false;
         }
 
@@ -366,11 +513,23 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             var originalvalueset = this.OriginalThing as IValueSet;
             var clonedValueset = this.ClonedThing as IValueSet;
 
-            if (originalvalueset.Reference[componentIndex] != clonedValueset.Reference[componentIndex])
+            try
             {
+                if (originalvalueset.Reference[componentIndex] != clonedValueset.Reference[componentIndex])
+                {
+                    return true;
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                logger.Debug("The IValueSet.Reference ValueArray has an incorrect number of slots");
                 return true;
             }
-
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
             return false;
         }
 
@@ -398,11 +557,23 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             var originalvalueset = this.OriginalThing as IValueSet;
             var clonedValueset = this.ClonedThing as IValueSet;
 
-            if (originalvalueset.Formula[componentIndex] != clonedValueset.Formula[componentIndex])
+            try
             {
+                if (originalvalueset.Formula[componentIndex] != clonedValueset.Formula[componentIndex])
+                {
+                    return true;
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                logger.Debug("The IValueSet.Formula ValueArray has an incorrect number of slots");
                 return true;
             }
-
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
             return false;
         }
 
@@ -421,7 +592,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
 
             var originalvalueset = this.OriginalThing as IValueSet;
             var clonedValueset = this.ClonedThing as IValueSet;
-
+            
             if (originalvalueset.ValueSwitch != clonedValueset.ValueSwitch)
             {
                 return true;
