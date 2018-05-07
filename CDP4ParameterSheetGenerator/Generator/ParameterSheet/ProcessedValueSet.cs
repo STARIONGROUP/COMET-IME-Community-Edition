@@ -670,10 +670,62 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
         /// </param>
         private void UpdateClone(ParameterValueSet clone, ValueSetValues valueSetValues)
         {
-            clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
-            clone.Formula[valueSetValues.ComponentIndex] = valueSetValues.FormulaValue;
-            clone.Computed[valueSetValues.ComponentIndex] = valueSetValues.ComputedValue;
-            clone.Reference[valueSetValues.ComponentIndex] = valueSetValues.ReferenceValue;            
+            try
+            {
+                clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                clone.ResetManual();
+                clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
+            try
+            {
+                clone.Formula[valueSetValues.ComponentIndex] = valueSetValues.FormulaValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                clone.ResetFormula();
+                clone.Formula[valueSetValues.ComponentIndex] = valueSetValues.FormulaValue;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+
+            try
+            {
+                clone.Computed[valueSetValues.ComponentIndex] = valueSetValues.ComputedValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                clone.ResetComputed();
+                clone.Computed[valueSetValues.ComponentIndex] = valueSetValues.ComputedValue;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+
+            try
+            {
+                clone.Reference[valueSetValues.ComponentIndex] = valueSetValues.ReferenceValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                clone.ResetReference();
+                clone.Reference[valueSetValues.ComponentIndex] = valueSetValues.ReferenceValue;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
             clone.ValueSwitch = valueSetValues.SwitchKind;
         }
 
@@ -688,10 +740,62 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
         /// </param>
         private void UpdateClone(ParameterOverrideValueSet clone, ValueSetValues valueSetValues)
         {
-            clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
-            clone.Computed[valueSetValues.ComponentIndex] = valueSetValues.ComputedValue;
-            clone.Formula[valueSetValues.ComponentIndex] = valueSetValues.FormulaValue;
-            clone.Reference[valueSetValues.ComponentIndex] = valueSetValues.ReferenceValue;
+            try
+            {
+                clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                clone.ResetManual();
+                clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
+            try
+            {
+                clone.Computed[valueSetValues.ComponentIndex] = valueSetValues.ComputedValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                clone.ResetComputed();
+                clone.Computed[valueSetValues.ComponentIndex] = valueSetValues.ComputedValue;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
+            try
+            {
+                clone.Formula[valueSetValues.ComponentIndex] = valueSetValues.FormulaValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                clone.ResetFormula();
+                clone.Formula[valueSetValues.ComponentIndex] = valueSetValues.FormulaValue;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
+            try
+            {
+                clone.Reference[valueSetValues.ComponentIndex] = valueSetValues.ReferenceValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                clone.ResetReference();
+                clone.Reference[valueSetValues.ComponentIndex] = valueSetValues.ReferenceValue;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+
             clone.ValueSwitch = valueSetValues.SwitchKind;
         }
 
@@ -706,7 +810,20 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
         /// </param>
         private void UpdateClone(ParameterSubscriptionValueSet clone, ValueSetValues valueSetValues)
         {
-            clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
+            try
+            {
+                clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                clone.ResetManual();
+                clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            
             clone.ValueSwitch = valueSetValues.SwitchKind;
         }
     }
