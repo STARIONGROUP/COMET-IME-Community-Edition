@@ -59,12 +59,12 @@
       <HintPath>..\packages\CDP4Dal-CE.1.2.0\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.1.2.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.1.2.1\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4ServicesDal, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4ServicesDal-CE.1.2.0\lib\net452\CDP4ServicesDal.dll</HintPath>
+    <Reference Include="CDP4ServicesDal, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4ServicesDal-CE.1.2.1\lib\net452\CDP4ServicesDal.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
