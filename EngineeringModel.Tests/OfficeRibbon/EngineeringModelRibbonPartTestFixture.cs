@@ -23,7 +23,6 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
     using CDP4Dal.Permission;
     using Moq;
     using NUnit.Framework;
-
     using ReactiveUI;
 
     /// <summary>
@@ -99,7 +98,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
-            this.amountOfRibbonControls = 5;
+            this.amountOfRibbonControls = 7;
             this.order = 1;
 
             // Setup negative dialog result - selection of iterationsetup
@@ -209,6 +208,8 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowElementDefinitionsBrowser_"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowOptionBrowser_"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("ShowFiniteStateBrowser_"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("ShowPublicationBrowser_"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(openSessionEvent);
@@ -217,6 +218,8 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowElementDefinitionsBrowser_"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowOptionBrowser_"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("ShowFiniteStateBrowser_"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("ShowPublicationBrowser_"));
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
             Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
@@ -225,6 +228,8 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("ShowElementDefinitionsBrowser_"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("ShowOptionBrowser_"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("ShowFiniteStateBrowser_"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("ShowPublicationBrowser_"));
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
@@ -233,6 +238,8 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowElementDefinitionsBrowser_"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowOptionBrowser_"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("ShowFiniteStateBrowser_"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("ShowPublicationBrowser_"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
             CDPMessageBus.Current.SendMessage(closeSessionEvent);
@@ -241,6 +248,8 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowElementDefinitionsBrowser_"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowOptionBrowser_"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("ShowFiniteStateBrowser_"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("ShowPublicationBrowser_"));
         }
 
         [Test]
@@ -262,6 +271,84 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
 
             var content = this.ribbonPart.GetContent("ShowElementDefinitionsBrowser_");
             await this.ribbonPart.OnAction("ShowElementDefinitionsBrowser_" + this.iteration.Iid, this.iteration.Iid.ToString());
+
+            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
+            Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
+        }
+
+        [Test]
+        public async Task VerifyThatOnActionShowOptionsWorks()
+        {
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null);
+
+            var fluentRibbonManager = new FluentRibbonManager();
+            fluentRibbonManager.IsActive = true;
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
+
+            var content = this.ribbonPart.GetContent("ShowOptionBrowser_");
+            await this.ribbonPart.OnAction("ShowOptionBrowser_" + this.iteration.Iid, this.iteration.Iid.ToString());
+
+            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
+            Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
+        }
+
+        [Test]
+        public async Task VerifyThatOnActionShowShowFiniteStatesWorks()
+        {
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null);
+
+            var fluentRibbonManager = new FluentRibbonManager();
+            fluentRibbonManager.IsActive = true;
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
+
+            var content = this.ribbonPart.GetContent("ShowFiniteStateBrowser_");
+            await this.ribbonPart.OnAction("ShowFiniteStateBrowser_" + this.iteration.Iid, this.iteration.Iid.ToString());
+
+            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
+            Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
+        }
+
+        [Test]
+        public async Task VerifyThatOnActionShowShowPublicationsWorks()
+        {
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null);
+
+            var fluentRibbonManager = new FluentRibbonManager();
+            fluentRibbonManager.IsActive = true;
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
+
+            var content = this.ribbonPart.GetContent("ShowPublicationBrowser_");
+            await this.ribbonPart.OnAction("ShowPublicationBrowser_" + this.iteration.Iid, this.iteration.Iid.ToString());
 
             this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
 

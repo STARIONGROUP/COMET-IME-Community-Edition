@@ -4,5 +4,7 @@
     <button id="CDP4_SelectModelToClose" label="Close" screentip="Select an Engineering Model to close" imageMso="FileDropSqlDatabase" onAction="OnAction" getEnabled="GetEnabled" />
     <dynamicMenu id="ShowElementDefinitionsBrowser_" size="normal" label="Definition Browser" screentip="Show or Hide the Elements Definitions Browser of an Iteration"  imageMso="ServerConnection" getEnabled="GetEnabled" getContent="GetContent"/>
     <dynamicMenu id="ShowOptionBrowser_" size="normal" label="Option Browser" screentip="Show or Hide the Option Browser of an Iteration" imageMso="SlideMasterVerticalContentPlaceholderInsert" getEnabled="GetEnabled" getContent="GetContent"/>
+    <dynamicMenu id="ShowFiniteStateBrowser_" size="normal" label="Finite State Browser" screentip="Show or Hide the Finite State Browser of an Iteration" imageMso="StartTimer" getEnabled="GetEnabled" getContent="GetContent"/>
+    <dynamicMenu id="ShowPublicationBrowser_" size="normal" label="Publication Browser" screentip="Show or Hide the Publication Browser of an Iteration" imageMso="FileManageMenu" getEnabled="GetEnabled" getContent="GetContent"/>
   </group>
 </ribbonxml>

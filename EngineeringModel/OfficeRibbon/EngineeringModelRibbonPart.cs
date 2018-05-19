@@ -47,6 +47,16 @@ namespace CDP4EngineeringModel
         private readonly List<OptionBrowserViewModel> openOptionBrowser;
 
         /// <summary>
+        /// The list of open <see cref="FiniteStateBrowserViewModel"/>
+        /// </summary>
+        private readonly List<FiniteStateBrowserViewModel> finiteStateBrowserViewModel;
+
+        /// <summary>
+        /// The list of open <see cref="PublicationBrowserViewModel"/>
+        /// </summary>
+        private readonly List<PublicationBrowserViewModel> publicationBrowserViewModel;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EngineeringModelRibbonPart"/> class.
         /// </summary>
         /// <param name="order">
@@ -64,6 +74,8 @@ namespace CDP4EngineeringModel
         {
             this.openElementDefinitionBrowser = new List<ElementDefinitionsBrowserViewModel>();
             this.openOptionBrowser = new List<OptionBrowserViewModel>();
+            this.finiteStateBrowserViewModel = new List<FiniteStateBrowserViewModel>();
+            this.publicationBrowserViewModel = new List<PublicationBrowserViewModel>();
             this.Iterations = new List<Iteration>();
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
@@ -121,6 +133,16 @@ namespace CDP4EngineeringModel
             {
                 this.ShowOrCloseOptionBrowser(ribbonControlTag);
             }
+
+            if (ribbonControlId.Contains("ShowFiniteStateBrowser_"))
+            {
+                this.ShowOrCloseFiniteStateBrowser(ribbonControlTag);
+            }
+
+            if (ribbonControlId.Contains("ShowPublicationBrowser_"))
+            {
+                this.ShowOrClosePublicationBrowser(ribbonControlTag);
+            }
         }
 
         /// <summary>
@@ -160,6 +182,16 @@ namespace CDP4EngineeringModel
             }
 
             if (ribbonControlId.Contains("ShowOptionBrowser_"))
+            {
+                return this.Iterations.Any();
+            }
+
+            if (ribbonControlId.Contains("ShowFiniteStateBrowser_"))
+            {
+                return this.Iterations.Any();
+            }
+
+            if (ribbonControlId.Contains("ShowPublicationBrowser_"))
             {
                 return this.Iterations.Any();
             }
@@ -229,6 +261,58 @@ namespace CDP4EngineeringModel
                     var menuContent =
                         string.Format(
                             "<button id=\"ShowOptionBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
+                            iteration.Iid, label);
+                    sb.Append(menuContent);
+                }
+
+                sb.Append(@"</menu>");
+                menuxml = sb.ToString();
+            }
+
+            if (ribbonControlId == "ShowFiniteStateBrowser_")
+            {
+                var sb = new StringBuilder();
+                sb.Append(@"<menu xmlns=""http://schemas.microsoft.com/office/2006/01/customui"">");
+
+                foreach (var iteration in this.Iterations)
+                {
+                    var engineeringModel = (EngineeringModel)iteration.Container;
+
+                    Tuple<DomainOfExpertise, Participant> tuple;
+                    this.Session.OpenIterations.TryGetValue(iteration, out tuple);
+
+                    var label = string.Format("{0} - {1} : [{2}]", engineeringModel.EngineeringModelSetup.ShortName,
+                        iteration.IterationSetup.IterationNumber, tuple.Item1 == null ? String.Empty : tuple.Item1.ShortName);
+
+                    var menuContent =
+                        string.Format(
+                            "<button id=\"ShowFiniteStateBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
+                            iteration.Iid, label);
+                    sb.Append(menuContent);
+                }
+
+                sb.Append(@"</menu>");
+                menuxml = sb.ToString();
+            }
+
+            if (ribbonControlId == "ShowPublicationBrowser_")
+            {
+                var sb = new StringBuilder();
+                sb.Append(@"<menu xmlns=""http://schemas.microsoft.com/office/2006/01/customui"">");
+
+                foreach (var iteration in this.Iterations)
+                {
+                    var engineeringModel = (EngineeringModel)iteration.Container;
+
+                    Tuple<DomainOfExpertise, Participant> tuple;
+                    this.Session.OpenIterations.TryGetValue(iteration, out tuple);
+
+                    var label = string.Format("{0} - {1} : [{2}]", engineeringModel.EngineeringModelSetup.ShortName,
+                        iteration.IterationSetup.IterationNumber, tuple.Item1 == null ? String.Empty : tuple.Item1.ShortName);
+
+                    var menuContent =
+                        string.Format(
+                            "<button id=\"ShowPublicationBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
                             iteration.Iid, label);
                     sb.Append(menuContent);
                 }
@@ -450,6 +534,78 @@ namespace CDP4EngineeringModel
             browser = new OptionBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
 
             this.openOptionBrowser.Add(browser);
+            this.PanelNavigationService.Open(browser, false);
+        }
+
+        /// <summary>
+        /// Show or close the <see cref="FiniteStateBrowserViewModel"/>
+        /// </summary>
+        /// <param name="iterationId">
+        /// the unique id of the <see cref="Iteration"/> that is being represented by the <see cref="FiniteStateBrowserViewModel"/>
+        /// </param>
+        private void ShowOrCloseFiniteStateBrowser(string iterationId)
+        {
+            var uniqueId = Guid.Parse(iterationId);
+            var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+            if (iteration == null)
+            {
+                return;
+            }
+
+            // close the brower if it exists
+            var browser = this.finiteStateBrowserViewModel.SingleOrDefault(x => x.Thing == iteration);
+            if (browser != null)
+            {
+                this.PanelNavigationService.Close(browser, false);
+                this.finiteStateBrowserViewModel.Remove(browser);
+                return;
+            }
+
+            var model = (EngineeringModel)iteration.Container;
+            if (model == null)
+            {
+                throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
+            }
+
+            browser = new FiniteStateBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+
+            this.finiteStateBrowserViewModel.Add(browser);
+            this.PanelNavigationService.Open(browser, false);
+        }
+
+        /// <summary>
+        /// Show or close the <see cref="PublicationBrowserViewModel"/>
+        /// </summary>
+        /// <param name="iterationId">
+        /// the unique id of the <see cref="Iteration"/> that is being represented by the <see cref="PublicationBrowserViewModel"/>
+        /// </param>
+        private void ShowOrClosePublicationBrowser(string iterationId)
+        {
+            var uniqueId = Guid.Parse(iterationId);
+            var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+            if (iteration == null)
+            {
+                return;
+            }
+
+            // close the brower if it exists
+            var browser = this.publicationBrowserViewModel.SingleOrDefault(x => x.Thing == iteration);
+            if (browser != null)
+            {
+                this.PanelNavigationService.Close(browser, false);
+                this.publicationBrowserViewModel.Remove(browser);
+                return;
+            }
+
+            var model = (EngineeringModel)iteration.Container;
+            if (model == null)
+            {
+                throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
+            }
+
+            browser = new PublicationBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+
+            this.publicationBrowserViewModel.Add(browser);
             this.PanelNavigationService.Open(browser, false);
         }
     }
