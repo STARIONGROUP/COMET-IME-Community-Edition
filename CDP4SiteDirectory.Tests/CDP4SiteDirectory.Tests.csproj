@@ -164,6 +164,7 @@
     <Compile Include="Dialogs\PersonDialogViewModelTestFixture.cs" />
     <Compile Include="Dialogs\ParticipantRoleDialogViewModelTestFixture.cs" />
     <Compile Include="Dialogs\PersonRoleDialogViewModelTestFixture.cs" />
+    <Compile Include="Dialogs\Row\IterationSetupListBoxItemTestFixture.cs" />
     <Compile Include="Dialogs\SiteReferenceDataLibraryDialogViewModelTestFixture.cs" />
     <Compile Include="Dialogs\EmailAddressDialogViewModelTestFixture.cs" />
     <Compile Include="Dialogs\TelephoneNumberDialogViewModelTestFixture.cs" />

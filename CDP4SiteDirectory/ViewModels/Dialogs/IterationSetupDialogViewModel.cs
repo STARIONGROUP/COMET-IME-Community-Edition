@@ -133,7 +133,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             this.PossibleSourceIterationSetupRow = new ReactiveList<IterationSetupListBoxItem>();
             var modelsetup = (EngineeringModelSetup)this.Container;
-            this.PossibleSourceIterationSetupRow.AddRange(modelsetup.IterationSetup.Where(x => !x.IsDeleted).Select(x => new IterationSetupListBoxItem(x)));
+            this.PossibleSourceIterationSetupRow.AddRange(modelsetup.IterationSetup.OrderBy(x => x.IterationNumber).Where(x => !x.IsDeleted).Select(x => new IterationSetupListBoxItem(x)));
             this.SelectedSourceIterationSetupRow = (this.Thing.SourceIterationSetup == null) ? null : this.PossibleSourceIterationSetupRow.SingleOrDefault(x => x.IterationSetup == this.Thing.SourceIterationSetup);
             if (this.dialogKind == ThingDialogKind.Create)
             {

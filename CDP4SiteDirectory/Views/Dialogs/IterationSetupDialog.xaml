@@ -67,8 +67,16 @@
                                       IsEnabled="{Binding IsNonEditableFieldReadOnly, Converter={StaticResource NotConverter}}"
                                       IsTextEditable="False"
                                       DisplayMember="IterationNumber">
+                        <dxe:ComboBoxEdit.ItemContainerStyle>
+                            <Style>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True" Binding="{Binding IsActive}">
+                                        <Setter Property="TextBlock.FontWeight" Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </dxe:ComboBoxEdit.ItemContainerStyle>
                     </dxe:ComboBoxEdit>
-                    
                 </lc:LayoutItem>
 
                 <lc:LayoutItem Label="Frozen on: ">

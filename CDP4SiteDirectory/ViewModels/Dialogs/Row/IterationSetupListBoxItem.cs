@@ -17,6 +17,7 @@ namespace CDP4SiteDirectory.ViewModels
         public IterationSetupListBoxItem(IterationSetup iterationSetup)
         {
             this.IterationSetup = iterationSetup;
+
         }
 
         /// <summary>
@@ -30,6 +31,14 @@ namespace CDP4SiteDirectory.ViewModels
         public int IterationNumber
         {
             get { return this.IterationSetup.IterationNumber; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="IterationSetup"/> is frozen or not
+        /// </summary>
+        public bool IsActive
+        {
+            get { return this.IterationSetup.FrozenOn == null; }
         }
     }
 }
