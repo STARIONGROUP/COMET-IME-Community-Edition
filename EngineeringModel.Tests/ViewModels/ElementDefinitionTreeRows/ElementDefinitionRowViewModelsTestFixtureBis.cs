@@ -640,6 +640,22 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
+        public void Verify_that_dragover_sets_move_for_template_ElementDefenition()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+
+            var payloadElementDefenition = new ElementDefinition(Guid.Empty, null, null);
+            
+            var dropInfo = new Mock<IDropInfo>();
+            dropInfo.Setup(x => x.Payload).Returns(payloadElementDefenition);
+
+            row.DragOver(dropInfo.Object);
+
+            dropInfo.VerifySet(x => x.Effects = DragDropEffects.Move);
+        }
+
+        [Test]
         public void VerifyThatDragOverWorksWithElementDefinition2()
         {
             var row = new ElementDefinitionRowViewModel(this.elementDefinitionForUsage1, this.activeDomain, this.session.Object, null);

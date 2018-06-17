@@ -16,10 +16,10 @@ namespace CDP4EngineeringModel.Services
     using CDP4Dal.Operations;
 
     /// <summary>
-    /// The purpose of the <see cref="ElementDef1initionService"/> class is to create
+    /// The purpose of the <see cref="ElementDefinitionService"/> class is to create
     /// an ElementDefinition in a data-source based on an ElementDefinition template.
     /// </summary>
-    public static class ElementDef1initionService
+    public static class ElementDefinitionService
     {
         /// <summary>
         /// Creates an new <see cref="ElementDefinition"/> on the connected data-source and updates and valuesests of created contained parameters

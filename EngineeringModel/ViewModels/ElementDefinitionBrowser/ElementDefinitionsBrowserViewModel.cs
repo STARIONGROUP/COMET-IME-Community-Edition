@@ -303,7 +303,7 @@ namespace CDP4EngineeringModel.ViewModels
                     try
                     {
                         this.IsBusy = true;
-                        await ElementDef1initionService.CreateElementDefinitionFromTemplate(this.Session, this.Thing, elementDefinition); //this.CreateElementDefinitionFromTemplate(elementDefinition);
+                        await ElementDefinitionService.CreateElementDefinitionFromTemplate(this.Session, this.Thing, elementDefinition);
                     }
                     catch (Exception e)
                     {

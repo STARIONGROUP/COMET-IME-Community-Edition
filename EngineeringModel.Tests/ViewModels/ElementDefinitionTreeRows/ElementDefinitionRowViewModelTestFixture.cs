@@ -184,7 +184,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
             row.ThingCreator = this.thingCreator.Object;
 
-            var payload = new ElementDefinition();
+            var payload = new ElementDefinition(Guid.NewGuid(), null, null);
             this.iteration.Element.Add(payload);
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(payload);
@@ -207,7 +207,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
             row.ThingCreator = new TestThingCreatorThatThrowsExceptions();
 
-            var payload = new ElementDefinition();
+            var payload = new ElementDefinition(Guid.NewGuid(), null, null);
             this.iteration.Element.Add(payload);
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(payload);

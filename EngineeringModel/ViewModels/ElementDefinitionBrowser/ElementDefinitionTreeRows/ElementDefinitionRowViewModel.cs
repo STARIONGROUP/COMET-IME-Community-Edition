@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -18,6 +18,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4EngineeringModel.Services;
     using ReactiveUI;
     using Utilities;
 
@@ -26,14 +27,11 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ElementDefinitionRowViewModel : ElementBaseRowViewModel<ElementDefinition>, IDropTarget
     {
-        #region Fields
         /// <summary>
         /// The backing field for <see cref="IsTopElement"/>
         /// </summary>
         private bool isTopElement;
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionRowViewModel"/> class
         /// </summary>
@@ -46,9 +44,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateProperties();
         }
-        #endregion
 
-        #region public Properties
         /// <summary>
         /// Gets or sets the value indicating whether this is a top element or not.
         /// </summary>
@@ -62,9 +58,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
         public IThingCreator ThingCreator { get; set; }
-        #endregion
-
-        #region IDragSource/IDropTarget Public
+        
         /// <summary>
         /// Queries whether a drag can be started
         /// </summary>
@@ -179,9 +173,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
         }
 
-        #endregion
-
-        #region Overriden Methods
         /// <summary>
         /// Update the tooltip
         /// </summary>
@@ -199,10 +190,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Private Row Update Methods
-
+        
         /// <summary>
         /// Update this row and its children
         /// </summary>
@@ -287,10 +275,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContainedRows.SortedInsert(row, ChildRowComparer);
             }
         }
-        #endregion
-
-        #region Public Methods
-
+        
         /// <summary>
         /// Update the children rows of the current row
         /// </summary>
@@ -298,11 +283,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateProperties();
         }
-
-        #endregion
-
-        #region IDropTarget Dragged Over Private methods
-
+        
         /// <summary>
         /// Set the <see cref="IDropInfo.Effects"/> when the payload is an <see cref="ElementDefinition"/>
         /// </summary>
@@ -314,6 +295,14 @@ namespace CDP4EngineeringModel.ViewModels
             if (!this.PermissionService.CanWrite(ClassKind.ElementDefinition, iteration))
             {
                 dropinfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            if (elementDefinition.Iid == Guid.Empty)
+            {
+                logger.Debug("Copying an Element Definition that has been created as template - iid is the empty guid");
+
+                dropinfo.Effects = DragDropEffects.Move;
                 return;
             }
 
@@ -406,10 +395,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             dropinfo.Effects = DragDropEffects.Move;
         }
-
-        #endregion
-
-        #region Drop Methods
+        
         /// <summary>
         /// Handle the drop of a <see cref="Tuple{ParameterType, MeasurementScale}"/>
         /// </summary>
@@ -445,6 +431,16 @@ namespace CDP4EngineeringModel.ViewModels
         {
             try
             {
+                if (elementDefinition.Iid == Guid.Empty)
+                {
+                    logger.Debug("Copying an Element Definition that has been created as template - iid is the empty guid");
+                    dropInfo.Effects = DragDropEffects.Copy;
+
+                    var iteration = (Iteration)this.Thing.Container;
+                    await ElementDefinitionService.CreateElementDefinitionFromTemplate(this.Session, iteration, elementDefinition);
+                    return;
+                }
+                
                 if (elementDefinition.TopContainer == this.Thing.TopContainer)
                 {
                     await this.ThingCreator.CreateElementUsage(this.Thing, elementDefinition, this.currentDomain, this.Session);
@@ -458,6 +454,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
             catch (Exception ex)
             {
+                logger.Error(ex.Message);
                 this.ErrorMsg = ex.Message;
             }
         }
@@ -491,6 +488,5 @@ namespace CDP4EngineeringModel.ViewModels
                 await this.DalWrite(clone);
             }
         }
-        #endregion
     }
 }
