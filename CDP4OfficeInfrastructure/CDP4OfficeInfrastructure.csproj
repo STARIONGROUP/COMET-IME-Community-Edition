@@ -51,16 +51,16 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.1.2.0\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.1.3.0\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.1.2.0\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.1.3.0\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.1.2.1\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.1.3.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ExcelApi, Version=1.7.3.0, Culture=neutral, PublicKeyToken=26cf6d85ba68fa54, processorArchitecture=MSIL">
