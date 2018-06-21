@@ -254,6 +254,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                     this.rowMarker = "R";
                     this.columnMarker = "C";
                     break;
+                case 7: // russian
+                    this.conditionalFunction = "ЕСЛИ";
+                    this.rowMarker = "R";
+                    this.columnMarker = "C";
+                    break;
                 case 31: // dutch
                     this.conditionalFunction = "ALS";
                     this.rowMarker = "R";
