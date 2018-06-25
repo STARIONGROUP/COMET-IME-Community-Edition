@@ -57,6 +57,11 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
 
             this.ModelCode = $"{this.Thing.ShortName}\\{optionShortName}";
 
+            if (this.Thing.IsRootElement)
+            {
+                this.Categories = this.Thing.RootElement.GetAllCategoryShortNames();
+            }
+
             var elementUsage = this.Thing.ElementUsage.LastOrDefault();
             if (elementUsage != null)
             {
