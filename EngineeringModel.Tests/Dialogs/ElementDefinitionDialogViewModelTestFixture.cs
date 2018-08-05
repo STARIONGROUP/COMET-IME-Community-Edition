@@ -4,6 +4,8 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
     using System;
@@ -54,8 +56,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();            
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
-
+            
             this.domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "system", ShortName = "SYS" };
+
+            var participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
+            participant.Domain.Add(domainOfExpertise);
 
             var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
             engineeringModelSetup.ActiveDomain.Add(this.domainOfExpertise);
@@ -72,7 +77,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.engineeringModel.Iteration.Add(iteration);
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
             iteration.Element.Add(this.elementDefinition);
-
+            
             this.cache.TryAdd(new Tuple<Guid, Guid?>(iteration.Iid, null), new Lazy<Thing>(() => iteration));
             this.iterationClone = iteration.Clone(false);
 
@@ -82,6 +87,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+
+            var openIterations = new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>();
+            openIterations.Add(iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, participant));
+
+            this.session.Setup(x => x.OpenIterations).Returns(openIterations);
+
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 

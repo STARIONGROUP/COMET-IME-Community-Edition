@@ -91,8 +91,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.Initialize();
             this.PopulatePossibleCategories();
         }
-
-
+        
         /// <summary>
         /// Update the properties
         /// </summary>
@@ -103,6 +102,11 @@ namespace CDP4EngineeringModel.ViewModels
             if (((Iteration)this.Container).TopElement != null)
             {
                 this.IsTopElement = ((Iteration)this.Container).TopElement.Iid == this.Thing.Iid; 
+            }
+
+            if (this.SelectedOwner == null)
+            {
+                this.SelectedOwner = this.QueryCurrentDomainOfExpertise(this.Session, (Iteration)this.Container);
             }
         }
 
@@ -117,7 +121,7 @@ namespace CDP4EngineeringModel.ViewModels
             var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
             this.PossibleOwner.AddRange(domains);
         }
-
+        
         /// <summary>
         /// Update the transaction with the Thing represented by this Dialog
         /// </summary>
@@ -163,6 +167,23 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.UpdateOkCanExecute();
             this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null;
+        }
+
+        /// <summary>
+        /// Queries the current <see cref="DomainOfExpertise"/> from the session for the current <see cref="Iteration"/>
+        /// </summary>
+        /// <returns>
+        /// The <see cref="DomainOfExpertise"/> if selected, null otherwise.
+        /// </returns>
+        private DomainOfExpertise QueryCurrentDomainOfExpertise(ISession session, Iteration iteration)
+        {
+            var iterationDomainPair = session.OpenIterations.SingleOrDefault(x => x.Key.Iid == iteration.Iid);
+            if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
+            {
+                return null;
+            }
+
+            return (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null) ? null : iterationDomainPair.Value.Item1;
         }
     }
 }
