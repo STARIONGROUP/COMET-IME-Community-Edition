@@ -113,19 +113,24 @@ namespace CDP4Composition.DragDrop
                         if (this.dragInfo.Effects != DragDropEffects.None && this.dragInfo.Payload != null)
                         {
                             var data = new DataObject(DataFormat.Name, this.dragInfo.Payload);
-                            try
+                            
+                            this.dragInProgress = true;
+                            Dispatcher.BeginInvoke(new Action(() =>
                             {
-                                this.dragInProgress = true;
-                                System.Windows.DragDrop.DoDragDrop(this.AssociatedObject, data, this.dragInfo.Effects);
+                                try
+                                {
+                                    System.Windows.DragDrop.DoDragDrop(this.AssociatedObject, data, this.dragInfo.Effects);
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.Error(ex, "MouseMove caused an error");
+                                }
+                                finally
+                                {
+                                    this.dragInProgress = false;
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                logger.Error(ex, "MouseMove caused an error");
-                            }
-                            finally
-                            {
-                                this.dragInProgress = false;
-                            }
+                            ));
                         }
                     }
                 }
