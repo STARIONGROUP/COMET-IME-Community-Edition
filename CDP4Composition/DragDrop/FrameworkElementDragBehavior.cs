@@ -10,12 +10,18 @@ namespace CDP4Composition.DragDrop
     using System.Windows;
     using System.Windows.Input;
     using System.Windows.Interactivity;
-    
+    using NLog;
+
     /// <summary>
     /// The drag behavior for any <see cref="FrameworkElement"/>
     /// </summary>
     public class FrameworkElementDragBehavior : Behavior<FrameworkElement>
     {
+        /// <summary>
+        /// A NLog logger
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The name of the data format used for drag-n-drop operations
         /// </summary>
@@ -111,6 +117,10 @@ namespace CDP4Composition.DragDrop
                             {
                                 this.dragInProgress = true;
                                 System.Windows.DragDrop.DoDragDrop(this.AssociatedObject, data, this.dragInfo.Effects);
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.Error(ex, "MouseMove caused an error");
                             }
                             finally
                             {
