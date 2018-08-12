@@ -24,7 +24,9 @@ namespace CDP4LogInfo.Tests.ViewModelTests
 
     [TestFixture]
     public class LogInfoControlsViewModelTestFixture
-    {       
+    {
+        private Mock<IDialogNavigationService> dialogNavigationService;
+
         private Mock<IPanelNavigationService> navigationService;
 
         private Mock<IServiceLocator> servicelocator;
@@ -36,6 +38,7 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.navigationService = new Mock<IPanelNavigationService>();
             this.servicelocator = new Mock<IServiceLocator>();
             this.panelView = new Mock<IPanelView>();
@@ -56,7 +59,7 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         [Test]
         public void VerifyThatCommandWorks()
         {
-            var vm = new LogInfoControlsViewModel();
+            var vm = new LogInfoControlsViewModel(this.dialogNavigationService.Object);
 
             vm.IsChecked = true;
             vm.OpenClosePanelCommand.Execute(null);

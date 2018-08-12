@@ -1,0 +1,47 @@
+﻿<dx:DXWindow x:Class="CDP4LogInfo.Views.Dialogs.LogItemDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"             
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             mc:Ignorable="d" 
+             Width="450"
+             Height="285"
+             navigation:DialogCloser.DialogResult="{Binding DialogResult}"
+             dx:ThemeManager.ThemeName="Seven">
+    <dxlc:LayoutControl Margin="5"
+                        Orientation="Vertical"
+                        ScrollBars="None">
+        <dxlc:LayoutGroup Header="Log Item" Orientation="Vertical"
+                          dxlc:LayoutControl.AllowHorizontalSizing="True">
+
+            <dxlc:LayoutItem Label="Log Level:">
+                <dxe:TextEdit Name="LogLevel" 
+                              Text="{Binding Path=LogLevel, Mode=OneWay}"
+                              IsReadOnly="True"/>
+            </dxlc:LayoutItem>
+
+            <dxlc:LayoutItem Label="Message:" LabelVerticalAlignment="Top">
+                <dxe:TextEdit Name="Message" 
+                              Text="{Binding Path=Message, Mode=OneWay}"
+                              TextWrapping="Wrap"
+                              IsReadOnly="True" MinHeight="100"/>
+            </dxlc:LayoutItem>
+
+            <dxlc:LayoutItem Label="Time:">
+                <dxe:TextEdit Name="TimeStamp" 
+                              Text="{Binding Path=TimeStamp, Mode=OneWay}"
+                              IsReadOnly="True"/>
+            </dxlc:LayoutItem>
+
+            <dxlc:LayoutItem Label="Logger:">
+                <dxe:TextEdit Name="Logger" 
+                              Text="{Binding Path=Logger, Mode=OneWay}"
+                              IsReadOnly="True"/>
+            </dxlc:LayoutItem>
+        </dxlc:LayoutGroup>
+    </dxlc:LayoutControl>
+</dx:DXWindow>

@@ -7,6 +7,7 @@
 namespace CDP4LogInfo.Views
 {
     using System.ComponentModel.Composition;
+    using CDP4Composition.Navigation;
     using CDP4Composition.Ribbon;
     using CDP4LogInfo.ViewModels;
     using Microsoft.Practices.Prism.Mvvm;
@@ -20,10 +21,11 @@ namespace CDP4LogInfo.Views
         /// <summary>
         /// Initializes a new instance of the <see cref="LogInfoControls"/> class
         /// </summary>
-        public LogInfoControls()
+        [ImportingConstructor]
+        public LogInfoControls(IDialogNavigationService dialogNavigationService)
         {
             this.InitializeComponent();
-            this.DataContext = new LogInfoControlsViewModel();
+            this.DataContext = new LogInfoControlsViewModel(dialogNavigationService);
         }
     }
 }

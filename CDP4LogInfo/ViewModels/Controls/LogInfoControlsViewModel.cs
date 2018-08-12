@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="LogInfoControlsViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -8,7 +8,6 @@ namespace CDP4LogInfo.ViewModels
 {
     using System;
     using System.Reactive.Linq;
-
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
@@ -30,9 +29,9 @@ namespace CDP4LogInfo.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="LogInfoControlsViewModel"/> class
         /// </summary>
-        public LogInfoControlsViewModel()
+        public LogInfoControlsViewModel(IDialogNavigationService dialogNavigationService)
         {
-            this.LogInfoPanel = new LogInfoPanelViewModel();
+            this.LogInfoPanel = new LogInfoPanelViewModel(dialogNavigationService);
 
             this.OpenClosePanelCommand = ReactiveCommand.Create();
             this.OpenClosePanelCommand.Subscribe(_ => this.ExecuteOpenClosePanel());

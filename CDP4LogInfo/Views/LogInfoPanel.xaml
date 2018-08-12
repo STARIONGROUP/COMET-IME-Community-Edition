@@ -8,6 +8,7 @@
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:views="clr-namespace:CDP4LogInfo.Views"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              d:DesignHeight="300"
              d:DesignWidth="415"
              mc:Ignorable="d">
@@ -87,6 +88,9 @@
 
         <dxg:GridControl Grid.Row="1"
                          ItemsSource="{Binding Path=Data}"
+                         SelectedItem="{Binding SelectedItem,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
                          SelectionMode="Row">
             <dxg:GridControl.View>
                 <dxg:TableView HorizontalAlignment="Stretch"
@@ -121,6 +125,13 @@
                 <dxg:GridColumn FieldName="TimeStamp" />
                 <dxg:GridColumn FieldName="Logger" />
             </dxg:GridControl.Columns>
+            <dxmvvm:Interaction.Behaviors>
+                <dxmvvm:EventToCommand PassEventArgsToCommand="True" Command="{Binding ShowDetailsDialogCommand}" EventName="MouseDoubleClick">
+                    <dxmvvm:EventToCommand.EventArgsConverter>
+                        <dx:EventArgsToDataRowConverter />
+                    </dxmvvm:EventToCommand.EventArgsConverter>
+                </dxmvvm:EventToCommand>
+            </dxmvvm:Interaction.Behaviors>
         </dxg:GridControl>
     </Grid>
 </UserControl>

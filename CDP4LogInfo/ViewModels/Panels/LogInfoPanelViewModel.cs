@@ -18,6 +18,7 @@ namespace CDP4LogInfo.ViewModels
     using CDP4LogInfo.ViewModels.Panels.LogInfoRows;
     using CDP4LogInfo.Views;
     using CDP4Composition.Navigation;
+    using CDP4LogInfo.ViewModels.Dialogs;
     using Microsoft.Practices.ServiceLocation;
     using NLog;
     using ReactiveUI;
@@ -31,7 +32,8 @@ namespace CDP4LogInfo.ViewModels
     /// </remarks>
     public class LogInfoPanelViewModel : ReactiveObject, IPanelViewModel
     {
-        #region Fields
+        private readonly IDialogNavigationService dialogNavigationService;
+
         /// <summary>
         /// Backing field for the <see cref="Data"/> property
         /// </summary>
@@ -76,14 +78,19 @@ namespace CDP4LogInfo.ViewModels
         /// Backing field for the <see cref="IsTraceLogelSelected"/>
         /// </summary>
         private bool isTraceLogelSelected;
-        #endregion
 
-        #region Constructor
+        /// <summary>
+        /// Backing field for the <see cref="SelectedItem"/>
+        /// </summary>
+        private LogInfoRowViewModel selectedItem;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="LogInfoPanelViewModel"/> class
         /// </summary>
-        public LogInfoPanelViewModel()
+        public LogInfoPanelViewModel(IDialogNavigationService dialogNavigationService)
         {
+            this.dialogNavigationService = dialogNavigationService;
+
             this.Identifier = Guid.NewGuid();
             this.LogEventInfo = new ReactiveList<LogInfoRowViewModel>();
             this.data = new ListCollectionView(this.LogEventInfo);
@@ -110,6 +117,9 @@ namespace CDP4LogInfo.ViewModels
             this.ExportCommand = ReactiveCommand.Create(canExport);
             this.ExportCommand.Subscribe(_ => this.ExecuteExportCommand());
 
+            this.ShowDetailsDialogCommand = ReactiveCommand.Create();
+            this.ShowDetailsDialogCommand.Subscribe(_ => this.ExecuteShowDetailsDialogCommand());
+
             Observable.Merge(
                 this.WhenAnyValue(vm => vm.IsFatalLogelSelected),
                 this.WhenAnyValue(vm => vm.IsErrorLogelSelected),
@@ -119,9 +129,7 @@ namespace CDP4LogInfo.ViewModels
                 this.WhenAnyValue(vm => vm.IsTraceLogelSelected))
                 .Subscribe(_ => { this.data.Filter = this.LogLevelFilter; });
         }
-        #endregion
-
-        #region Properties
+        
         /// <summary>
         /// Gets a list of possible <see cref="LogLevel"/>
         /// </summary>
@@ -285,6 +293,22 @@ namespace CDP4LogInfo.ViewModels
         public ReactiveList<LogInfoRowViewModel> LogEventInfo { get; private set; }
 
         /// <summary>
+        /// Gets or sets the the selected <see cref="LogInfoRowViewModel"/>
+        /// </summary>
+        public LogInfoRowViewModel SelectedItem
+        {
+            get
+            {
+                return this.selectedItem;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.selectedItem, value);
+            }
+        }
+
+        /// <summary>
         /// Gets a <see cref="ICollectionView"/> that wraps the <see cref="LogEventInfo"/> to enable filtering.
         /// </summary>
         /// <remarks>
@@ -307,8 +331,12 @@ namespace CDP4LogInfo.ViewModels
         /// Gets the command to Export the log
         /// </summary>
         public ReactiveCommand<object> ExportCommand { get; private set; }
-        #endregion
 
+        /// <summary>
+        /// Gets the command to show the details of the selected Log item
+        /// </summary>
+        public ReactiveCommand<object> ShowDetailsDialogCommand { get; private set; }
+        
         /// <summary>
         /// Initializes the <see cref="PossibleLoglevels"/> collection
         /// </summary>
@@ -379,6 +407,20 @@ namespace CDP4LogInfo.ViewModels
                     csv.NextRecord();
                 }
             }
+        }
+
+        /// <summary>
+        /// Executes the <see cref="ShowDetailsDialogCommand"/> and pops the logitem details
+        /// </summary>
+        private void ExecuteShowDetailsDialogCommand()
+        {
+            if (this.SelectedItem == null)
+            {
+                return;
+            }
+
+            var dialogViewModel = new LogItemDialogViewModel(this.SelectedItem.LogEventInfo);            
+            this.dialogNavigationService.NavigateModal(dialogViewModel);
         }
 
         /// <summary>

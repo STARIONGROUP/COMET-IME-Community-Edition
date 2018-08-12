@@ -4,24 +4,38 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4LogInfo.ViewModels.Panels.LogInfoRows
+namespace CDP4LogInfo.ViewModels.Dialogs
 {
+    using System;
     using System.Globalization;
-    using CDP4LogInfo.Views;
+    using CDP4Composition.Attributes;
+    using CDP4Composition.Navigation;
     using NLog;
     using ReactiveUI;
 
     /// <summary>
-    /// Represents a row for a <see cref="LogEventInfo"/> in the <see cref="LogInfoPanel"/>
-    /// Display Level: Warning, Error, Info
+    /// A dialog view-model that reprents a Log item
     /// </summary>
-    public class LogInfoRowViewModel : ReactiveObject
+    [DialogViewModelExport("LogItem", "The details of a Log Item")]
+    public class LogItemDialogViewModel : DialogViewModelBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="LogInfoRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="LogItemDialogViewModel"/> class.
         /// </summary>
-        /// <param name="logEventInfo">The <see cref="LogEventInfo"/></param>
-        public LogInfoRowViewModel(LogEventInfo logEventInfo)
+        /// <remarks>
+        /// Used by MEF.
+        /// </remarks>
+        public LogItemDialogViewModel()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogItemDialogViewModel"/> class.
+        /// </summary>
+        /// <param name="logEventInfo">
+        /// The subject <see cref="LogEventInfo"/>
+        /// </param>
+        public LogItemDialogViewModel(LogEventInfo logEventInfo)
         {
             this.LogEventInfo = logEventInfo;
         }
@@ -36,7 +50,7 @@ namespace CDP4LogInfo.ViewModels.Panels.LogInfoRows
         /// </summary>
         public LogLevel LogLevel
         {
-            get { return this.LogEventInfo.Level; }
+            get { return this.LogEventInfo.Level ; }
         }
 
         /// <summary>
@@ -62,5 +76,10 @@ namespace CDP4LogInfo.ViewModels.Panels.LogInfoRows
         {
             get { return this.LogEventInfo.LoggerName; }
         }
+
+        /// <summary>
+        /// Gets the Close Command
+        /// </summary>
+        public ReactiveCommand<object> CloseCommand { get; private set; }
     }
 }
