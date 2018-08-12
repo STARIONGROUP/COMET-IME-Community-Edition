@@ -117,7 +117,7 @@ namespace CDP4EngineeringModel.ViewModels
                 // The OCDT WSP may return a broken model where the actualState.PossibleState is empty.
                 if (actualState.PossibleState.Count == 0)
                 {
-                    logger.Error("The PossibleState property of the ActualState with iid {0} is empty (The multiplicity is 1..*). The data-source has returned a broken model.");
+                    logger.Error("The PossibleState property of the ActualState with iid {0} is empty (The multiplicity is 1..*). The data-source has returned a broken model.", actualState.Iid);
                     break;
                 }
 

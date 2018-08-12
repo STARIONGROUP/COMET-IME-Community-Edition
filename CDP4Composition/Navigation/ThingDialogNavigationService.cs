@@ -160,19 +160,19 @@ namespace CDP4Composition.Navigation
         {
             if (thing == null)
             {
-                throw new ArgumentNullException(nameof(thing), "The Thing may not be null");
+                throw new ArgumentNullException(nameof(thing), $"The {nameof(thing)} may not be null");
             }
             
-            if (thing == null)
+            if (session == null)
             {
-                throw new ArgumentNullException(nameof(session), "The ISession may not be null");
+                throw new ArgumentNullException(nameof(session), $"The {nameof(session)} may not be null");
             }
             
             if (dialogKind != ThingDialogKind.Inspect)
             {
                 if (transaction == null)
                 {
-                    throw new ArgumentNullException(nameof(transaction), "The IThingTransaction may not be null when the dialogkind is not of type inspection");
+                    throw new ArgumentNullException(nameof(transaction), $"The {nameof(transaction)} may not be null when the dialogkind is not of type inspection");
                 }
             }
 
@@ -251,7 +251,7 @@ namespace CDP4Composition.Navigation
             var viewTypeFound = this.viewDictionary.TryGetValue(classKind, out returnedViewType);
             if (!viewTypeFound)
             {
-                throw new Exception(string.Format("An IThingDialogView for {0} has not been registered with the Application", classKind));
+                throw new Exception($"An IThingDialogView for {classKind} has not been registered with the Application");
             }
 
             return returnedViewType;
@@ -273,7 +273,7 @@ namespace CDP4Composition.Navigation
 
             if (!viewModelTypeFound)
             {
-                throw new Exception(string.Format("A IThingDialogViewModel for {0} has not been registered with the Application", classKind));
+                throw new Exception($"A IThingDialogViewModel for {classKind} has not been registered with the Application");
             }
 
             return returnedViewModelType;
@@ -358,7 +358,7 @@ namespace CDP4Composition.Navigation
                 }
 
                 var typename = new CamelCaseToSpaceConverter().Convert(thing.ClassKind, null, null, null);
-                window.Title = string.Format("{0} {1}", titlePrefix, typename);
+                window.Title = $"{titlePrefix} {typename}";
             }
         }
     }

@@ -75,6 +75,32 @@ namespace CDP4Composition.Tests.Navigation
             Assert.IsTrue(result.Value);
         }
 
+        [Test, RequiresSTA]
+        public void Verify_that_when_on_Navigate_Thing_is_null_an_ArgumentNullException_is_thrown()
+        {
+            var navigationService = new ThingDialogNavigationService(this.lazyviews, this.lazyviewmodels, this.spellDictionaryService, this.specialTermService);
+
+            Assert.Throws<ArgumentNullException>(() => navigationService.Navigate(null, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, null));
+        }
+
+        [Test, RequiresSTA]
+        public void Verify_that_when_on_Navigate_Session_is_null_an_ArgumentNullException_is_thrown()
+        {
+            var navigationService = new ThingDialogNavigationService(this.lazyviews, this.lazyviewmodels, this.spellDictionaryService, this.specialTermService);
+            
+            Assert.Throws<ArgumentNullException>(() => navigationService.Navigate(this.simpleUnit, this.transaction, null, true, ThingDialogKind.Create, null, null));
+        }
+
+        [Test, RequiresSTA]
+        public void Verify_that_when_on_Navigate_Transaction_is_null_for_Create_or_Update_an_ArgumentNullException_is_thrown()
+        {
+            var navigationService = new ThingDialogNavigationService(this.lazyviews, this.lazyviewmodels, this.spellDictionaryService, this.specialTermService);
+
+            Assert.Throws<ArgumentNullException>(() => navigationService.Navigate(this.simpleUnit, null, this.session.Object, true, ThingDialogKind.Create, null, null));
+            Assert.Throws<ArgumentNullException>(() => navigationService.Navigate(this.simpleUnit, null, this.session.Object, true, ThingDialogKind.Update, null, null));
+            Assert.DoesNotThrow(() => navigationService.Navigate(this.simpleUnit, null, this.session.Object, true, ThingDialogKind.Inspect, null, null));
+        }
+
         /// <summary>
         /// implementation of <see cref="IThingDialogView"/> for testing purposes
         /// </summary>
