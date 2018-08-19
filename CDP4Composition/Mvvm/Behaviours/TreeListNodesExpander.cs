@@ -1,14 +1,16 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="TreeListNodesExpander.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Mvvm
 {
+    using System;
     using System.Windows;
     using DevExpress.Xpf.Grid;
     using DevExpress.Xpf.Grid.TreeList;
+    using NLog;
 
     /// <summary>
     /// The purpose of the <see cref="TreeListNodesExpander"/> is enable model binding to
@@ -16,6 +18,11 @@ namespace CDP4Composition.Mvvm
     /// </summary>
     public static class TreeListNodesExpander
     {
+        /// <summary>
+        /// The current logger
+        /// </summary>
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="SetIsExpanded"/> method.
         /// </summary>
@@ -38,22 +45,33 @@ namespace CDP4Composition.Mvvm
         /// </param>
         private static void OnIsExpandedChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var rowControl = sender as RowControl;
-            if (rowControl != null)
+            bool expand = false;
+            
+            try
             {
-                var treeListRowData = rowControl.DataContext as TreeListRowData;
-                if (treeListRowData != null && treeListRowData.Node != null)
+                var rowControl = sender as RowControl;
+                if (rowControl != null)
                 {
-                    var expand = (bool)e.NewValue;
-                    if (expand)
+                    var treeListRowData = rowControl.DataContext as TreeListRowData;
+                    if (treeListRowData != null && treeListRowData.Node != null)
                     {
-                        treeListRowData.Node.ExpandAll();
-                    }
-                    else
-                    {
-                        treeListRowData.Node.CollapseAll();
+                        expand = (bool)e.NewValue;
+                        if (expand)
+                        {
+                            treeListRowData.Node.ExpandAll();
+                        }
+                        else
+                        {
+                            treeListRowData.Node.CollapseAll();
+                        }
                     }
                 }
+            }
+            catch (Exception exception)
+            {
+                var action = expand ? "expanding" : "collapsing";
+
+                Logger.Error(exception, $"A problem occurend when {action} a row");
             }
         }
 
@@ -68,7 +86,16 @@ namespace CDP4Composition.Mvvm
         /// </param>
         public static void SetIsExpanded(DependencyObject target, bool value)
         {
-            target.SetValue(IsExpandedProperty, value);
+            try
+            {
+                target.SetValue(IsExpandedProperty, value);
+            }
+            catch (Exception exception)
+            {
+                var action = value ? "expanding" : "collapsing";
+
+                Logger.Error(exception, $"A problem occurend when {action} a row");
+            }
         }        
     }
 }
