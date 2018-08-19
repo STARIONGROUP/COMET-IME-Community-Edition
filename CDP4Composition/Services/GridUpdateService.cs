@@ -9,12 +9,18 @@ namespace CDP4Composition.Services
     using System;
     using System.Windows;
     using DevExpress.Xpf.Grid;
+    using NLog;
 
     /// <summary>
     /// The service used to lock the update of a grid view when update in the view-model are occuring
     /// </summary>
     public class GridUpdateService
     {
+        /// <summary>
+        /// The current logger
+        /// </summary>
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The <see cref="DependencyProperty"/> used to lock the update in a grid
         /// </summary>
@@ -27,7 +33,14 @@ namespace CDP4Composition.Services
         /// <param name="value">The <see cref="Boolean"/> value</param>
         public static void SetUpdateStarted(UIElement element, bool? value)
         {
-            element.SetValue(UpdateStartedProperty, value);
+            try
+            {
+                element.SetValue(UpdateStartedProperty, value);
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception, $"A problem occurend when SetUpdateStarted was called");
+            }            
         }
 
         /// <summary>
@@ -53,25 +66,32 @@ namespace CDP4Composition.Services
                 throw new InvalidOperationException("The Service can only be used on GridDataControlBase view elements such as GridControl or TreeListControl.");
             }
 
-            if ((bool?)e.NewValue == true)
+            try
             {
-                grid.BeginDataUpdate();
-            }
-            else if ((bool?)e.NewValue == false)
-            {
-                var treeListControl = grid as TreeListControl;
-                if (treeListControl != null)
+                if ((bool?)e.NewValue == true)
                 {
-                    treeListControl.EndDataUpdate(); 
+                    grid.BeginDataUpdate();
                 }
-                else
+                else if ((bool?)e.NewValue == false)
                 {
-                    var gridControl = grid as GridControl;
-                    if (gridControl != null && gridControl.DataController.IsUpdateLocked)
+                    var treeListControl = grid as TreeListControl;
+                    if (treeListControl != null)
                     {
-                        grid.EndDataUpdate();
+                        treeListControl.EndDataUpdate(); 
+                    }
+                    else
+                    {
+                        var gridControl = grid as GridControl;
+                        if (gridControl != null && gridControl.DataController.IsUpdateLocked)
+                        {
+                            grid.EndDataUpdate();
+                        }
                     }
                 }
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception, $"A problem occurend when UpdateStartedPropertyChanged was called");
             }
         }
     }
