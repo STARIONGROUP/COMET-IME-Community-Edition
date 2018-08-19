@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// <typeparam name="T">An <see cref="ElementBase"/> type</typeparam>
     public abstract class ElementBaseRowViewModel<T> : CDP4CommonView.ElementBaseRowViewModel<T>, IElementBaseRowViewModel where T : ElementBase
     {
-        #region Field
         /// <summary>
         /// The <see cref="IComparer{T}"/>
         /// </summary>
@@ -64,10 +63,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// The active <see cref="DomainOfExpertise"/>
         /// </summary>
         protected DomainOfExpertise currentDomain;
-        #endregion
-
-        #region Constructor
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementBaseRowViewModel{T}"/> class
         /// </summary>
@@ -89,10 +85,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateOwnerProperties();
             this.WhenAnyValue(vm => vm.Owner).Subscribe(_ => this.UpdateOwnerProperties());
         }
-
-        #endregion
-
-        #region Public properties
+        
         /// <summary>
         /// Gets or sets the <see cref="HasExcludes"/>. Null if <see cref="ElementUsage"/> is in no options.
         /// </summary>
@@ -126,11 +119,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return false; }
         }
-
-        #endregion
-
-        #region Public Methods
-
+        
         /// <summary>
         /// Update properties of the Owner
         /// </summary>
@@ -149,28 +138,35 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="parameterBase">The <see cref="ParameterBase"/></param>
         public void UpdateParameterBasePosition(ParameterBase parameterBase)
         {
-            var oldContainer = this.parameterBaseContainerMap[parameterBase];
-            var newContainer = parameterBase.Group;
-            var associatedRow = this.parameterBaseCache[parameterBase];
+            try
+            {
+                var oldContainer = this.parameterBaseContainerMap[parameterBase];
+                var newContainer = parameterBase.Group;
+                var associatedRow = this.parameterBaseCache[parameterBase];
 
-            if (newContainer != null && oldContainer == null)
-            {
-                this.ContainedRows.Remove(associatedRow);
-                this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
-                this.parameterBaseContainerMap[parameterBase] = newContainer;
+                if (newContainer != null && oldContainer == null)
+                {
+                    this.ContainedRows.Remove(associatedRow);
+                    this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    this.parameterBaseContainerMap[parameterBase] = newContainer;
+                }
+                else if (newContainer == null && oldContainer != null)
+                {
+                    this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                    this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
+                    this.parameterBaseContainerMap[parameterBase] = null;
+                }
+                else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
+                {
+                    this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                    this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    this.parameterBaseContainerMap[parameterBase] = newContainer;
+                }
             }
-            else if (newContainer == null && oldContainer != null)
+            catch (Exception exception)
             {
-                this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
-                this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
-                this.parameterBaseContainerMap[parameterBase] = null;
-            }
-            else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
-            {
-                this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
-                this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
-                this.parameterBaseContainerMap[parameterBase] = newContainer;
-            }
+                logger.Error(exception, "A problem occured when executing the UpdateParameterBasePosition method.");
+            }            
         }
 
         /// <summary>
@@ -179,32 +175,37 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="parameterGroup">The <see cref="ParameterGroup"/></param>
         public void UpdateParameterGroupPosition(ParameterGroup parameterGroup)
         {
-            var oldContainer = this.parameterGroupContainment[parameterGroup];
-            var newContainer = parameterGroup.ContainingGroup;
-            var associatedRow = this.parameterGroupCache[parameterGroup];
+            try
+            {
+                var oldContainer = this.parameterGroupContainment[parameterGroup];
+                var newContainer = parameterGroup.ContainingGroup;
+                var associatedRow = this.parameterGroupCache[parameterGroup];
 
-            if (newContainer != null && oldContainer == null)
-            {
-                this.ContainedRows.Remove(associatedRow);
-                this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
-                this.parameterGroupContainment[parameterGroup] = newContainer;
+                if (newContainer != null && oldContainer == null)
+                {
+                    this.ContainedRows.Remove(associatedRow);
+                    this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    this.parameterGroupContainment[parameterGroup] = newContainer;
+                }
+                else if (newContainer == null && oldContainer != null)
+                {
+                    this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                    this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
+                    this.parameterGroupContainment[parameterGroup] = null;
+                }
+                else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
+                {
+                    this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                    this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    this.parameterGroupContainment[parameterGroup] = newContainer;
+                }
             }
-            else if (newContainer == null && oldContainer != null)
+            catch (Exception exception)
             {
-                this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
-                this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
-                this.parameterGroupContainment[parameterGroup] = null;
-            }
-            else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
-            {
-                this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
-                this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
-                this.parameterGroupContainment[parameterGroup] = newContainer;
+                logger.Error(exception, "A problem occured when executing the UpdateParameterGroupPosition method.");
             }
         }
-        #endregion
-
-        #region row base
+        
         /// <summary>
         /// Initializes the subscription for this row
         /// </summary>
@@ -253,8 +254,7 @@ namespace CDP4EngineeringModel.ViewModels
                 listener.Dispose();
             }
         }
-        #endregion
-
+        
         /// <summary>
         /// Populates the Parameter group rows
         /// </summary>
@@ -263,55 +263,62 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         protected void PopulateParameterGroups(ElementDefinition elementDefinition)
         {
-            var definedGroups = elementDefinition.ParameterGroup;
-
-            // remove deleted groups
-            var oldgroup = this.parameterGroupCache.Keys.Except(definedGroups).ToList();
-            foreach (var group in oldgroup)
+            try
             {
-                if (group.ContainingGroup == null)
+                var definedGroups = elementDefinition.ParameterGroup;
+
+                // remove deleted groups
+                var oldgroup = this.parameterGroupCache.Keys.Except(definedGroups).ToList();
+                foreach (var group in oldgroup)
                 {
-                    this.ContainedRows.Remove(this.parameterGroupCache[group]);
-                }
-                else
-                {
-                    this.parameterGroupCache[group.ContainingGroup].ContainedRows.Remove(this.parameterGroupCache[group]);
+                    if (group.ContainingGroup == null)
+                    {
+                        this.ContainedRows.Remove(this.parameterGroupCache[group]);
+                    }
+                    else
+                    {
+                        this.parameterGroupCache[group.ContainingGroup].ContainedRows.Remove(this.parameterGroupCache[group]);
+                    }
+
+                    this.parameterGroupCache[group].Dispose();
+                    this.parameterGroupCache.Remove(group);
+                    this.parameterGroupContainment.Remove(group);
                 }
 
-                this.parameterGroupCache[group].Dispose();
-                this.parameterGroupCache.Remove(group);
-                this.parameterGroupContainment.Remove(group);
+                var updatedGroups = this.parameterGroupCache.Keys.Intersect(definedGroups).ToList();
+
+                // create new group rows
+                var newgroup = definedGroups.Except(this.parameterGroupCache.Keys).ToList();
+                foreach (var group in newgroup)
+                {
+                    var row = new ParameterGroupRowViewModel(group, this.currentDomain, this.Session, this);
+                    this.parameterGroupCache.Add(group, row);
+                    this.parameterGroupContainment.Add(group, group.ContainingGroup);
+                }
+
+                // add the new group in the right position in the tree
+                foreach (var group in newgroup)
+                {
+                    if (group.ContainingGroup == null)
+                    {
+                        this.ContainedRows.SortedInsert(this.parameterGroupCache[group], ChildRowComparer);
+                    }
+                    else
+                    {
+                        var container = this.parameterGroupCache[group.ContainingGroup];
+                        container.ContainedRows.SortedInsert(this.parameterGroupCache[group], ParameterGroupRowViewModel.ChildRowComparer);
+                    }
+                }
+
+                // Check if ContainingGroup for existing group might have been updated
+                foreach (var group in updatedGroups)
+                {
+                    this.UpdateParameterGroupPosition(group);
+                }
             }
-
-            var updatedGroups = this.parameterGroupCache.Keys.Intersect(definedGroups).ToList();
-
-            // create new group rows
-            var newgroup = definedGroups.Except(this.parameterGroupCache.Keys).ToList();
-            foreach (var group in newgroup)
+            catch (Exception exception)
             {
-                var row = new ParameterGroupRowViewModel(group, this.currentDomain, this.Session, this);
-                this.parameterGroupCache.Add(group, row);
-                this.parameterGroupContainment.Add(group, group.ContainingGroup);
-            }
-
-            // add the new group in the right position in the tree
-            foreach (var group in newgroup)
-            {
-                if (group.ContainingGroup == null)
-                {
-                    this.ContainedRows.SortedInsert(this.parameterGroupCache[group], ChildRowComparer);
-                }
-                else
-                {
-                    var container = this.parameterGroupCache[group.ContainingGroup];
-                    container.ContainedRows.SortedInsert(this.parameterGroupCache[group], ParameterGroupRowViewModel.ChildRowComparer);
-                }
-            }
-
-            // Check if ContainingGroup for existing group might have been updated
-            foreach (var group in updatedGroups)
-            {
-                this.UpdateParameterGroupPosition(group);
+                logger.Error(exception, "A problem occured when executing the PopulateParameterGroups method.");
             }
         }
 
@@ -326,30 +333,37 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="deletedParameterBase">The <see cref="ParameterBase"/>s to remove</param>
         protected void RemoveParameterBase(IEnumerable<ParameterBase> deletedParameterBase)
         {
-            foreach (var parameter in deletedParameterBase)
+            try
             {
-                IRowViewModelBase<ParameterBase> row;
-                if (!this.parameterBaseCache.TryGetValue(parameter, out row))
+                foreach (var parameter in deletedParameterBase)
                 {
-                    continue;
-                }
+                    IRowViewModelBase<ParameterBase> row;
+                    if (!this.parameterBaseCache.TryGetValue(parameter, out row))
+                    {
+                        continue;
+                    }
 
-                // remove the row from its container node
-                var group = this.parameterBaseContainerMap[parameter];
-                if (group == null)
-                {
-                    this.ContainedRows.Remove(row);
-                }
-                else
-                {
-                    this.parameterGroupCache[group].ContainedRows.Remove(row);
-                }
+                    // remove the row from its container node
+                    var group = this.parameterBaseContainerMap[parameter];
+                    if (group == null)
+                    {
+                        this.ContainedRows.Remove(row);
+                    }
+                    else
+                    {
+                        this.parameterGroupCache[group].ContainedRows.Remove(row);
+                    }
 
-                row.Dispose();
-                this.parameterBaseCache.Remove(parameter);
-                this.parameterBaseContainerMap.Remove(parameter);
+                    row.Dispose();
+                    this.parameterBaseCache.Remove(parameter);
+                    this.parameterBaseContainerMap.Remove(parameter);
 
-                this.RemoveParameterBaseListener(parameter);
+                    this.RemoveParameterBaseListener(parameter);
+                }
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "A problem occured when executing the RemoveParameterBase method.");
             }
         }
 
@@ -410,7 +424,11 @@ namespace CDP4EngineeringModel.ViewModels
                 }
                 else
                 {
-                    this.parameterGroupCache[group].ContainedRows.SortedInsert(row, ParameterGroupRowViewModel.ChildRowComparer);
+                    ParameterGroupRowViewModel parameterGroupRowViewModel;
+                    if (this.parameterGroupCache.TryGetValue(group, out parameterGroupRowViewModel))
+                    {
+                        parameterGroupRowViewModel.ContainedRows.SortedInsert(row, ParameterGroupRowViewModel.ChildRowComparer);
+                    }
                 }
             }
         }
@@ -495,27 +513,26 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="parameter">The <see cref="Parameter"/></param>
         private void RemoveParameterOrOverrideListener(Parameter parameter)
         {
-            if (!this.ParameterBaseListener.ContainsKey(parameter))
+            IDisposable disposable;
+            if (this.ParameterBaseListener.TryGetValue(parameter, out disposable))
             {
-                return;
-            }
-
-            var elementDef = this.Thing as ElementDefinition;
-            if (elementDef == null)
-            {
-                var usage = this.Thing as ElementUsage;
-                if (usage == null)
+                var elementDef = this.Thing as ElementDefinition;
+                if (elementDef == null)
                 {
-                    return;
+                    var usage = this.Thing as ElementUsage;
+                    if (usage == null)
+                    {
+                        return;
+                    }
+
+                    elementDef = usage.ElementDefinition;
                 }
 
-                elementDef = usage.ElementDefinition;
-            }
-
-            if (!elementDef.Parameter.Contains(parameter))
-            {
-                this.ParameterBaseListener[parameter].Dispose();
-                this.ParameterBaseListener.Remove(parameter);
+                if (!elementDef.Parameter.Contains(parameter))
+                {
+                    disposable.Dispose();
+                    this.ParameterBaseListener.Remove(parameter);   
+                }
             }
         }
 
@@ -525,13 +542,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="parameterSubscription">The <see cref="ParameterSubscription"/></param>
         private void RemoveParameterSubscriptionListener(ParameterSubscription parameterSubscription)
         {
-            if (!this.ParameterBaseListener.ContainsKey(parameterSubscription))
+            IDisposable disposable;
+            if(this.ParameterBaseListener.TryGetValue(parameterSubscription, out disposable))
             {
-                return;
+                disposable.Dispose();
+                this.ParameterBaseListener.Remove(parameterSubscription);
             }
-
-            this.ParameterBaseListener[parameterSubscription].Dispose();
-            this.ParameterBaseListener.Remove(parameterSubscription);
         }
 
         /// <summary>
@@ -540,22 +556,21 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="parameterOverride">The <see cref="ParameterOverride"/></param>
         private void RemoveParameterOrOverrideListener(ParameterOverride parameterOverride)
         {
-            if (!this.ParameterBaseListener.ContainsKey(parameterOverride))
+            IDisposable disposable;
+            if (this.ParameterBaseListener.TryGetValue(parameterOverride, out disposable))
             {
-                return;
-            }
+                var usage = this.Thing as ElementUsage;
+                if (usage == null)
+                {
+                    return;
+                }
 
-            var usage = this.Thing as ElementUsage;
-            if (usage == null)
-            {
-                return;
-            }
-
-            if (!usage.ParameterOverride.Contains(parameterOverride))
-            {
-                this.ParameterBaseListener[parameterOverride].Dispose();
-                this.ParameterBaseListener.Remove(parameterOverride);
-            }
+                if (!usage.ParameterOverride.Contains(parameterOverride))
+                {
+                    disposable.Dispose();
+                    this.ParameterBaseListener.Remove(parameterOverride);
+                }
+            }    
         }
 
         /// <summary>
@@ -587,7 +602,7 @@ namespace CDP4EngineeringModel.ViewModels
             await this.DalWrite(clone, true);
             if (!this.HasError)
             {
-                this.ShowConfirmation("Success", string.Format("The Element {0} was updated successfully", this.Thing.Name), NotificationKind.INFO);
+                this.ShowConfirmation("Success", $"The Element {this.Thing.Name} was updated successfully", NotificationKind.INFO);
             }
         }
     }
