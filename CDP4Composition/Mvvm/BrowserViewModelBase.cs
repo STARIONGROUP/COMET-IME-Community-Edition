@@ -33,7 +33,6 @@ namespace CDP4Composition.Mvvm
     /// <typeparam name="T">The <see cref="Thing"/> the browser is associated to</typeparam>
     public abstract class BrowserViewModelBase<T> : ViewModelBase<T>, IBrowserViewModelBase<T> where T : Thing
     {
-        #region fields
         /// <summary>
         /// The <see cref="CamelCaseToSpaceConverter"/> converter.
         /// </summary>
@@ -104,9 +103,6 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         private string tooltip;
         
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModelBase{T}"/> class.
         /// Used by MEF.
@@ -168,9 +164,6 @@ namespace CDP4Composition.Mvvm
                 this.Disposables.Add(personSubscription);
             }
         }
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets a value indicating whether the browser is dirty
@@ -380,8 +373,6 @@ namespace CDP4Composition.Mvvm
             get { return this.tooltip; }
             protected set { this.RaiseAndSetIfChanged(ref this.tooltip, value); }
         }
-
-        #endregion
 
         /// <summary>
         /// Execute the generic <see cref="CreateCommand"/>
@@ -638,10 +629,10 @@ namespace CDP4Composition.Mvvm
                 var operationContainer = transaction.FinalizeTransaction();
                 await this.Session.Write(operationContainer);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                logger.Error("The inline update operation failed: {0}", ex);
-                this.Feedback = ex.Message;
+                logger.Error(exception, "The inline update operation failed");
+                this.Feedback = exception.Message;
             }
         }
 

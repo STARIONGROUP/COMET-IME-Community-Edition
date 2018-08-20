@@ -693,7 +693,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Executes the <see cref="CreateSubscriptionCommand"/>
         /// </summary>
-        private void ExecuteCreateSubscriptionCommand()
+        private async Task ExecuteCreateSubscriptionCommand()
         {
             if (this.SelectedThing == null)
             {
@@ -722,13 +722,13 @@ namespace CDP4EngineeringModel.ViewModels
             transaction.CreateOrUpdate(clone);
             clone.ParameterSubscription.Add(subscription);
 
-            this.DalWrite(transaction);
+            await this.DalWrite(transaction);
         }
 
         /// <summary>
         /// Execute the <see cref="CreateCommand"/>
         /// </summary>
-        private void ExecuteCreateParameterOverride()
+        private async Task ExecuteCreateParameterOverride()
         {
             if (this.SelectedThing == null)
             {
@@ -764,15 +764,14 @@ namespace CDP4EngineeringModel.ViewModels
             var elementUsageClone = elementUsage.Clone(false);
             transaction.CreateOrUpdate(elementUsageClone);
             elementUsageClone.ParameterOverride.Add(parameterOverride);
-
-            // TODO: add await statement?
-            this.DalWrite(transaction);
+            
+            await this.DalWrite(transaction);
         }
 
         /// <summary>
         /// Execute the <see cref="CopyElementDefinitionCommand"/>
         /// </summary>
-        private void ExecuteCopyElementDefinition()
+        private async Task ExecuteCopyElementDefinition()
         {
             var elementDef = this.SelectedThing.Thing as ElementDefinition;
             var copyUsage = true;
@@ -785,8 +784,15 @@ namespace CDP4EngineeringModel.ViewModels
                 copyUsage = result.Result.HasValue && result.Result.Value;
             }
 
-            var copyCreator = new CopyElementDefinitionCreator(this.Session);
-            copyCreator.Copy((ElementDefinition)this.SelectedThing.Thing, copyUsage);
+            try
+            {
+                var copyCreator = new CopyElementDefinitionCreator(this.Session);
+                await copyCreator.Copy((ElementDefinition)this.SelectedThing.Thing, copyUsage);
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "An error occured when creating a copy of an Element Definition");
+            }
         }
 
         /// <summary>

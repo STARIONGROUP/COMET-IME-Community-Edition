@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ namespace CDP4ProductTree.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Windows.Input;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
@@ -28,7 +28,6 @@ namespace CDP4ProductTree.ViewModels
     /// </summary>
     public class ProductTreeViewModel : BrowserViewModelBase<Option>, IPanelViewModel
     {
-        #region Fields
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
         /// </summary>
@@ -93,10 +92,7 @@ namespace CDP4ProductTree.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Product tree";
-
-        #endregion
-
-        #region Constructor
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductTreeViewModel"/> class
         /// </summary>
@@ -136,9 +132,6 @@ namespace CDP4ProductTree.ViewModels
 
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
@@ -254,7 +247,6 @@ namespace CDP4ProductTree.ViewModels
         /// This has to be a list in order to display the tree
         /// </remarks>
         public ReactiveList<ElementDefinitionRowViewModel> TopElement { get; private set; }
-        #endregion
 
         /// <summary>
         /// Initialize the <see cref="ICommand"/>
@@ -467,7 +459,7 @@ namespace CDP4ProductTree.ViewModels
         /// <summary>
         /// Executes the <see cref="CreateSubscriptionCommand"/>
         /// </summary>
-        private void ExecuteCreateSubscriptionCommand()
+        private async Task ExecuteCreateSubscriptionCommand()
         {
             if (this.SelectedThing == null)
             {
@@ -495,15 +487,14 @@ namespace CDP4ProductTree.ViewModels
             transaction.Create(subscription);
             transaction.CreateOrUpdate(clone);
             clone.ParameterSubscription.Add(subscription);
-
-            //TODO: maybe make use of await?
-            this.DalWrite(transaction);
+            
+            await this.DalWrite(transaction);
         }
 
         /// <summary>
         /// Execute the <see cref="CreateCommand"/>
         /// </summary>
-        private void ExecuteCreateParameterOverride()
+        private async Task ExecuteCreateParameterOverride()
         {
             if (this.SelectedThing == null)
             {
@@ -540,9 +531,8 @@ namespace CDP4ProductTree.ViewModels
             var clone = elementUsage.Clone(false);
             transaction.CreateOrUpdate(clone);
             clone.ParameterOverride.Add(parameterOverride);
-
-            //TODO: maybe make use of await?
-            this.DalWrite(transaction);
+            
+            await this.DalWrite(transaction);
         }
 
         /// <summary>

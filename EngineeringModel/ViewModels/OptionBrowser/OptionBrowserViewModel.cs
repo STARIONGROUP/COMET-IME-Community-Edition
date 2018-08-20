@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="OptionBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,6 +10,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
@@ -27,7 +28,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class OptionBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
-        #region Fields
         /// <summary>
         /// The row associated to the default <see cref="Option"/>
         /// </summary>
@@ -62,10 +62,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Options";
-
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionBrowserViewModel"/> class
         /// </summary>
@@ -85,10 +82,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Properties
-
+        
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
@@ -151,8 +145,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the rows representing <see cref="Option"/>s
         /// </summary>
         public ReactiveList<OptionRowViewModel> Options { get; private set; }
-        #endregion
-
+        
         /// <summary>
         /// Initializes the browser
         /// </summary>
@@ -234,8 +227,6 @@ namespace CDP4EngineeringModel.ViewModels
                 iteration.Dispose();
             }
         }
-
-        #region Private methods
         
         /// <summary>
         /// Update the <see cref="Options"/> List
@@ -338,7 +329,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Executes the <see cref="SetDefaultCommand"/>
         /// </summary>
-        private void ExecuteSetDefaultCommand()
+        private async Task ExecuteSetDefaultCommand()
         {
             if (this.SelectedThing == null)
             {
@@ -357,8 +348,7 @@ namespace CDP4EngineeringModel.ViewModels
             clone.DefaultOption = option;
 
             transaction.CreateOrUpdate(clone);
-            this.DalWrite(transaction);
+            await this.DalWrite(transaction);
         }
-        #endregion
     }
 }

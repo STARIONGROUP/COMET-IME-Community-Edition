@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CopyElementDefinitionCreator.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ namespace CDP4EngineeringModel.Utilities
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Dal;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The class responsible for copying Element Definition
@@ -51,7 +52,7 @@ namespace CDP4EngineeringModel.Utilities
         /// </summary>
         /// <param name="elementDefinition">The <see cref="ElementDefinition"/> to copy</param>
         /// <param name="targetIteration">The target container</param>
-        public async void Copy(ElementDefinition elementDefinition, bool areUsagesCopied)
+        public async Task Copy(ElementDefinition elementDefinition, bool areUsagesCopied)
         {
             var iterationClone = (Iteration)elementDefinition.Container.Clone(false);
             var transactionContext = TransactionContextResolver.ResolveContext(iterationClone);

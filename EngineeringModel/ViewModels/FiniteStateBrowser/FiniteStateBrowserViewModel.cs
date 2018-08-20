@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FiniteStateBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -21,13 +21,13 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The view-model for the <see cref="FiniteStateBrowser"/> view
     /// </summary>
     public class FiniteStateBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
-        #region Fields
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -77,10 +77,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="DomainOfExpertise"/>
         /// </summary>
         private string domainOfExpertise;
-        
-        #endregion
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="FiniteStateBrowserViewModel"/> class
         /// </summary>
@@ -110,9 +107,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -209,9 +203,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to create a <see cref="PossibleFiniteState"/> 
         /// </summary>
         public ReactiveCommand<object> CreatePossibleStateCommand { get; private set; } 
-        #endregion
-
-        #region BrowserBase
+        
         /// <summary>
         /// Initializes the browser
         /// </summary>
@@ -325,9 +317,6 @@ namespace CDP4EngineeringModel.ViewModels
                 folderRowViewModel.Dispose();
             }
         }
-        #endregion
-
-        #region Private Methods
         
         /// <summary>
         /// Update the <see cref="PossibleFiniteStateList"/>
@@ -386,7 +375,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Execute the <see cref="SetDefaultCommand"/> command
         /// </summary>
-        private void ExecuteSetDefaultCommand()
+        private async Task ExecuteSetDefaultCommand()
         {
             var possibleStateRow = this.SelectedThing as PossibleFiniteStateRowViewModel;
             if (possibleStateRow == null)
@@ -402,7 +391,7 @@ namespace CDP4EngineeringModel.ViewModels
             clone.DefaultState = possibleStateRow.Thing.Clone(false);
 
             transaction.CreateOrUpdate(clone);
-            this.DalWrite(transaction);
+            await this.DalWrite(transaction);
         }
 
         /// <summary>
@@ -449,6 +438,5 @@ namespace CDP4EngineeringModel.ViewModels
                                         : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
             }
         }
-        #endregion
     }
 }
