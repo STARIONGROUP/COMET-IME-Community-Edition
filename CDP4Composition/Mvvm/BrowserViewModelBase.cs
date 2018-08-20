@@ -797,9 +797,10 @@ namespace CDP4Composition.Mvvm
                 this.ContextMenu.Add(new ContextMenuItemViewModel(deprecableThing.IsDeprecated? "Un-Deprecate" : "Deprecate" , "", this.DeprecateCommand, MenuItemKind.Deprecate));
             }
 
-            this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
-                     new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
-                     new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+            // Disabled - reported on GitHub at https://github.com/RHEAGROUP/CDP4-IME-Community-Edition/issues/48
+            //this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
+            //        new ContextMenuItemViewModel("Collapse Rows","", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
+            //         new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
         }
 
         /// <summary>
