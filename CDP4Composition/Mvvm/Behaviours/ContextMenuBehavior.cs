@@ -1,17 +1,19 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ContextMenuBehavior.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition
 {
+    using System;
     using System.Windows;
     using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Composition.Mvvm;
     using DevExpress.Mvvm.UI.Interactivity;
     using DevExpress.Xpf.Grid;
+    using NLog;
 
     /// <summary>
     /// This behavior creates the context menu when the user right mouse clicks on a row in a <see cref="IBrowserViewModelBase"/>.
@@ -19,6 +21,11 @@ namespace CDP4Composition
     /// </summary>
     public class ContextMenuBehavior : Behavior<FrameworkElement>
     {
+        /// <summary>
+        /// The current logger
+        /// </summary>
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The on attached event handler
         /// </summary>
@@ -48,20 +55,27 @@ namespace CDP4Composition
         /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
         private void PopulateContextMenu(object sender, MouseButtonEventArgs e)
         {
-            var control = sender as GridDataControlBase;
-            if (control == null)
+            try
             {
-                return;
-            }
+                var control = sender as GridDataControlBase;
+                if (control == null)
+                {
+                    return;
+                }
 
-            var browser = control.DataContext as IBrowserViewModelBase<Thing>;
-            if (browser == null)
+                var browser = control.DataContext as IBrowserViewModelBase<Thing>;
+                if (browser == null)
+                {
+                    return;
+                }
+
+                browser.ComputePermission();
+                browser.PopulateContextMenu();
+            }
+            catch (Exception exception)
             {
-                return;
+                Logger.Error(exception, "A problem occurend when populating the ContextMenu");
             }
-
-            browser.ComputePermission();
-            browser.PopulateContextMenu();
         }
     }
 }

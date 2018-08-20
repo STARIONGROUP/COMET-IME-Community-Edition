@@ -1,21 +1,28 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CellEditBehavior.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition
 {
+    using System;
     using CDP4Common.CommonData;
     using CDP4Composition.Mvvm;
     using DevExpress.Mvvm.UI.Interactivity;
     using DevExpress.Xpf.Grid;
+    using NLog;
 
     /// <summary>
     /// The cell edit helper.
     /// </summary>
     public class CellEditBehavior : Behavior<GridViewBase>
     {
+        /// <summary>
+        /// The current logger
+        /// </summary>
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The on attached event handler
         /// </summary>
@@ -48,17 +55,24 @@ namespace CDP4Composition
         /// </param>
         private void ValidateCell(object sender, GridCellValidationEventArgs e)
         {
-            var row = e.Row as IRowViewModelBase<Thing>;
-            if (row == null)
+            try
             {
-                return;
-            }
+                var row = e.Row as IRowViewModelBase<Thing>;
+                if (row == null)
+                {
+                    return;
+                }
 
-            var error = row.ValidateProperty(e.Column.FieldName, e.Value);
-            if (error != null)
+                var error = row.ValidateProperty(e.Column.FieldName, e.Value);
+                if (error != null)
+                {
+                    e.IsValid = false;
+                    e.ErrorContent = error;
+                }
+            }
+            catch (Exception exception)
             {
-                e.IsValid = false;
-                e.ErrorContent = error;
+                Logger.Error(exception, "A problem occurend when executing ValidateCell");
             }
         }
 
@@ -73,13 +87,20 @@ namespace CDP4Composition
         /// </param>
         private void SaveCellValue(object sender, CellValueChangedEventArgs e)
         {
-            var row = e.Row as IRowViewModelBase<Thing>;
-            if (row == null)
+            try
             {
-                return;
-            }
+                var row = e.Row as IRowViewModelBase<Thing>;
+                if (row == null)
+                {
+                    return;
+                }
 
-            row.CreateCloneAndWrite(e.Value, e.Column.FieldName);
+                row.CreateCloneAndWrite(e.Value, e.Column.FieldName);
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception, "A problem occurend when executing SaveCellValue");
+            }            
         }
     }
 }

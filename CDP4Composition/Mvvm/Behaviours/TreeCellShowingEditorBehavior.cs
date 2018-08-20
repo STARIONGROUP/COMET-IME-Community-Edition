@@ -6,11 +6,13 @@
 
 namespace CDP4Composition
 {
+    using System;
     using CDP4Common.CommonData;
     using CDP4Composition.Mvvm;
     using DevExpress.Mvvm.UI.Interactivity;
     using DevExpress.Xpf.Grid;
     using DevExpress.Xpf.Grid.TreeList;
+    using NLog;
 
     /// <summary>
     /// The purpose of the <see cref="TreeCellShowingEditorBehavior"/> is to determine whether or not the 
@@ -23,6 +25,11 @@ namespace CDP4Composition
     /// </remarks>
     public class TreeCellShowingEditorBehavior : Behavior<TreeListView>
     {
+        /// <summary>
+        /// The current logger
+        /// </summary>
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The event handler that is raised when the <see cref="Behavior"/> is attached
         /// </summary>
@@ -54,14 +61,21 @@ namespace CDP4Composition
         /// </param>
         private void EnableOrDisableShowingEditor(object sender, TreeListShowingEditorEventArgs e)
         {
-            var row = e.Node.Content as IRowViewModelBase<Thing>;
-            if (row == null)
+            try
             {
-                e.Cancel = true;
-                return;
-            }
+                var row = e.Node.Content as IRowViewModelBase<Thing>;
+                if (row == null)
+                {
+                    e.Cancel = true;
+                    return;
+                }
 
-            e.Cancel = !row.IsEditable(e.Column.FieldName);
+                e.Cancel = !row.IsEditable(e.Column.FieldName);
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception, "A problem occurend when executing EnableOrDisableShowingEditor");
+            }
         }
     }
 }

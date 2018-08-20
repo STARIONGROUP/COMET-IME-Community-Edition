@@ -22,19 +22,18 @@ namespace CDP4Composition.Mvvm
         /// <param name="list">The <see cref="ReactiveList{T}"/></param>
         /// <param name="row">The <see cref="IRowViewModelBase{Thing}"/> to add</param>
         /// <param name="comparer">The <see cref="IComparer{T}"/> used to perform the sorting</param>
-        public static void SortedInsert(this ReactiveList<IRowViewModelBase<Thing>> list, IRowViewModelBase<Thing> row,
-            IComparer<IRowViewModelBase<Thing>> comparer)
+        public static void SortedInsert(this ReactiveList<IRowViewModelBase<Thing>> list, IRowViewModelBase<Thing> row, IComparer<IRowViewModelBase<Thing>> comparer)
         {
             if (row == null)
             {
-                throw new ArgumentNullException("row");
+                throw new ArgumentNullException(nameof(row), $"The {nameof(row)} may not be null");
             }
 
             if (comparer == null)
             {
-                throw new ArgumentNullException("comparer");
+                throw new ArgumentNullException(nameof(comparer), $"The {nameof(comparer)} may not be null");
             }
-
+            
             // item is found using the comparer : returns the index of the item found
             // item not found : returns a negative number that is the bitwise complement 
             // of the index of the next element that is larger or count if none

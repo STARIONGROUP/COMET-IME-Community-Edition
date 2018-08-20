@@ -596,13 +596,20 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="category">The <see cref="Category"/></param>
         protected async Task Drop(IDropInfo dropInfo, Category category)
         {
-            var clone = this.Thing.Clone(false);
-            clone.Category.Add(category);
-
-            await this.DalWrite(clone, true);
-            if (!this.HasError)
+            try
             {
-                this.ShowConfirmation("Success", $"The Element {this.Thing.Name} was updated successfully", NotificationKind.INFO);
+                var clone = this.Thing.Clone(false);
+                clone.Category.Add(category);
+
+                await this.DalWrite(clone, true);
+                if (!this.HasError)
+                {
+                    this.ShowConfirmation("Success", $"The Element {this.Thing.Name} was updated successfully", NotificationKind.INFO);
+                }
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "An error occured when dropping a Category");
             }
         }
     }
