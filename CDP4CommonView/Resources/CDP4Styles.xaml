@@ -36,9 +36,6 @@
                 <Setter Property="FontStyle" Value="Italic"/>
                 <Setter Property="Foreground" Value="DarkRed"/>
             </DataTrigger>
-            <DataTrigger Binding="{Binding Row.IsExpanded}" Value="True">
-                <Setter Property="mvvm:TreeListNodesExpander.IsExpanded" Value="True"/>            
-            </DataTrigger>    
         </Style.Triggers>
     </Style>
     

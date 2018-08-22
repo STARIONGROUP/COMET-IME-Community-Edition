@@ -126,6 +126,7 @@
                                   AllowEditing="False"
                                   AutoWidth="False"
                                   ExpandCollapseNodesOnNavigation="True"
+                                  ExpandStateFieldName="IsExpanded"
                                   HorizontalScrollbarVisibility="Auto"
                                   NavigationStyle="Cell"
                                   ShowHorizontalLines="False"
@@ -146,9 +147,6 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
                                     <Setter Property="Background" Value="Yellow"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Row.IsExpanded}" Value="True">
-                                    <Setter Property="mvvm:TreeListNodesExpander.IsExpanded" Value="True"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

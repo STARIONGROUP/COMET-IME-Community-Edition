@@ -193,6 +193,32 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// Expands the current row and all contained rows along the containment hierarchy
+        /// </summary>
+        public void ExpandAllRows()
+        {
+            this.IsExpanded = true;
+
+            foreach (var row in ContainedRows)
+            {
+                row.ExpandAllRows();
+            }
+        }
+
+        /// <summary>
+        /// Collapases the current row and all contained rows along the containment hierarchy
+        /// </summary>
+        public void CollapseAllRows()
+        {
+            this.IsExpanded = false;
+
+            foreach (var row in ContainedRows)
+            {
+                row.CollapseAllRows();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the error message
         /// </summary>
         public string ErrorMsg

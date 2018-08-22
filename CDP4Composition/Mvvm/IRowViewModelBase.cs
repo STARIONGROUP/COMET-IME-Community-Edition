@@ -93,5 +93,15 @@ namespace CDP4Composition.Mvvm
         /// Sets a value indicating that the row is expanded
         /// </summary>
         bool IsExpanded { get; set; }
+
+        /// <summary>
+        /// Expands the current row and all contained rows along the containment hierarchy
+        /// </summary>
+        void ExpandAllRows();
+
+        /// <summary>
+        /// Collapases the current row and all contained rows along the containment hierarchy
+        /// </summary>
+        void CollapseAllRows();
     }
 }

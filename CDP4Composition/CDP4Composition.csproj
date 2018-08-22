@@ -233,7 +233,6 @@
     <Compile Include="Mvvm\Behaviours\ExtendedDiagramOrgChartBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\FilterStringService.cs" />
     <Compile Include="Mvvm\Behaviours\IExtendedDiagramOrgChartBehavior.cs" />
-    <Compile Include="Mvvm\Behaviours\TreeListNodesExpander.cs" />
     <Compile Include="Mvvm\Behaviours\TreeCellEditBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\CellEditBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\TreeCellShowingEditorBehavior.cs" />
