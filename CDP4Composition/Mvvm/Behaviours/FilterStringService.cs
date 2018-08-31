@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="FilterStringService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015 RHEA-2018 System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -10,18 +10,12 @@ namespace CDP4Composition
     using System.Windows;
     using DevExpress.Mvvm.UI.Interactivity;
     using DevExpress.Xpf.Grid;
-    using NLog;
-
+    
     /// <summary>
     /// This behavior Shows or hides the deprecated rows in all browsers
     /// </summary>
     public class FilterStringService : Behavior<FrameworkElement>
     {
-        /// <summary>
-        /// The current logger
-        /// </summary>
-        private static Logger Logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// The string to filter rows of things that are deprecated.
         /// </summary>
@@ -81,16 +75,8 @@ namespace CDP4Composition
         /// </param>
         public void AddGridControl(GridControl gridControl)
         {
-            if (gridControl == null)
-            {
-                return;
-            }
-            
-            if (this.OpenGridControls.ContainsKey(gridControl.Name))
-            {
-                gridControl.FilterString = DeprecatedFilterString;
-                this.OpenGridControls[gridControl.Name] = gridControl;
-            }          
+            gridControl.FilterString = DeprecatedFilterString;
+            this.OpenGridControls[gridControl.Name] = gridControl;
         }
 
         /// <summary>
@@ -101,16 +87,8 @@ namespace CDP4Composition
         /// </param>
         public void AddTreeListControl(TreeListControl treeListControl)
         {
-            if (treeListControl == null)
-            {
-                return;
-            }
-
-            if (this.OpenTreeListControls.ContainsKey(treeListControl.Name))
-            {
-                treeListControl.FilterString = DeprecatedFilterString;
-                this.OpenTreeListControls[treeListControl.Name] = treeListControl;
-            }
+            treeListControl.FilterString = DeprecatedFilterString;
+            this.OpenTreeListControls[treeListControl.Name] = treeListControl;
         }
     }
 }
