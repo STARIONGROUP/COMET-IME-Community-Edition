@@ -579,7 +579,7 @@ namespace CDP4AddinCE
         /// </param>
         private void InitializeApplication(object application)
         {
-            var comObject = Core.Default.CreateObjectFromComProxy(null, application);
+            var comObject = Core.Default.CreateObjectFromComProxy(null, application, false);
 
             var excel = comObject as NetOffice.ExcelApi.Application;
             if (excel != null)
