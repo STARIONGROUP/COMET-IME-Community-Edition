@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Addin.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ namespace CDP4AddinCE
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Drawing;
-    using System.Globalization;    
+    using System.Globalization;
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Runtime.InteropServices;
@@ -26,16 +26,12 @@ namespace CDP4AddinCE
     using CDP4OfficeInfrastructure;
     using DevExpress.Xpf.Core;
     using Microsoft.Practices.ServiceLocation;
-    using NetOffice;
-    using NetOffice.ExcelApi;
+
     using NetOffice.ExcelApi.Tools;
     using NetOffice.Tools;
-    using NetOffice.WordApi.Enums;
     using NLog;
-    using ReactiveUI;
-    using Excel = NetOffice.ExcelApi;
+    using ReactiveUI;  
     using MessageBox = System.Windows.Forms.MessageBox;
-    using Office = NetOffice.OfficeApi;
 
     /// <summary>
     /// The <see cref="Addin"/> provides CDP4 integration with the Office Suite. It self-registers in the registry and
@@ -65,17 +61,12 @@ namespace CDP4AddinCE
         /// Excel application instance
         /// </summary>
         private NetOffice.ExcelApi.Application excelApplication;
-
-        /// <summary>
-        /// Word application instance
-        /// </summary>
-        private NetOffice.WordApi.Application wordApplication;
-
+        
         /// <summary>
         /// The list of current loaded custom task panes
         /// </summary>
         private Dictionary<Guid, IdentifiableCustomTaskPane> customTaskPanes = new Dictionary<Guid, IdentifiableCustomTaskPane>();
-        
+
         /// <summary>
         /// A wrapper class that provides access to the different office application instances
         /// </summary>
@@ -107,12 +98,7 @@ namespace CDP4AddinCE
 
             logger.Debug("CDP4-CE addin started");
         }
-
-        /// <summary>
-        /// Gets the Ribbon instance
-        /// </summary>
-        internal Office.IRibbonUI RibbonUi { get; set; }
-
+        
         /// <summary>
         /// Error handler for the Registration methods
         /// </summary>
@@ -145,27 +131,14 @@ namespace CDP4AddinCE
             return ribbonXml;
         }
 
-        /// <summary>
-        /// Executes the "OnLoadRibbonUi" call-back that is invoked from the <see cref="Office.IRibbonUI"/>
-        /// </summary>
-        /// <param name="ribbonUi">
-        /// The ribbon control that invokes the callback
-        /// </param>
-        /// <remarks>
-        /// defined in RibbonUI XML to get an instance for ribbon GUI.
-        /// </remarks>
-        public void OnLoadRibbonUi(Office.IRibbonUI ribbonUi)
-        {
-            this.RibbonUi = ribbonUi;
-        }
-
+        
         /// <summary>
         /// Executes the OnAction callback that is invoked from the <see cref="Office.IRibbonControl"/>
         /// </summary>
         /// <param name="control">
         /// The ribbon control that invokes the callback
         /// </param>
-        public async void OnAction(Office.IRibbonControl control)
+        public async void OnAction(NetOffice.OfficeApi.IRibbonControl control)
         {
             logger.Trace("{0} OnAction", control.Id);
             try
@@ -176,8 +149,8 @@ namespace CDP4AddinCE
             {
                 logger.Log(LogLevel.Error, ex);
             }
-            
-            this.RibbonUi.Invalidate();
+
+            this.RibbonUI.Invalidate();
         }
 
         /// <summary>
@@ -189,7 +162,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// ribbon XML containing the controls 
         /// </returns>
-        public string GetContent(Office.IRibbonControl control)
+        public string GetContent(NetOffice.OfficeApi.IRibbonControl control)
         {
             logger.Trace("{0} GetContent", control.Id);
             try
@@ -214,7 +187,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// a string with the content of the label
         /// </returns>
-        public string GetLabel(Office.IRibbonControl control)
+        public string GetLabel(NetOffice.OfficeApi.IRibbonControl control)
         {
             logger.Trace("{0} GetLabel", control.Id);
             return this.FluentRibbonManager.GetLabel(control.Id, control.Tag);
@@ -229,7 +202,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// true if enabled, false if not enabled
         /// </returns>
-        public bool GetEnabled(Office.IRibbonControl control)
+        public bool GetEnabled(NetOffice.OfficeApi.IRibbonControl control)
         {
             logger.Trace("{0} GetEnabled", control.Id);
             return this.FluentRibbonManager.GetEnabled(control.Id, control.Tag);
@@ -244,7 +217,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// true if pressed, false if not pressed
         /// </returns>
-        public bool GetPressed(Office.IRibbonControl control)
+        public bool GetPressed(NetOffice.OfficeApi.IRibbonControl control)
         {
             logger.Trace("{0} GetPressed", control.Id);
             return this.FluentRibbonManager.GetPressed(control.Id, control.Tag);
@@ -259,7 +232,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// returns true if visible, false if not
         /// </returns>
-        public bool GetVisible(Office.IRibbonControl control)
+        public bool GetVisible(NetOffice.OfficeApi.IRibbonControl control)
         {
             logger.Trace("{0} GetVisible", control.Id);
             return this.FluentRibbonManager.GetVisible(control.Id, control.Tag);
@@ -274,7 +247,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// an image if found, null otherwise
         /// </returns>
-        public Image GetImage(Office.IRibbonControl control)
+        public Image GetImage(NetOffice.OfficeApi.IRibbonControl control)
         {
             logger.Trace("{0} GetImage", control.Id);
             return this.FluentRibbonManager.GetImage(control.Id, control.Tag);
@@ -505,9 +478,9 @@ namespace CDP4AddinCE
             }
             finally
             {
-                if (this.RibbonUi != null)
+                if (this.RibbonUI != null)
                 {
-                    this.RibbonUi.Invalidate();
+                    this.RibbonUI.Invalidate();
                 }
             }
         }
@@ -562,7 +535,7 @@ namespace CDP4AddinCE
                 foreach (var error in compositionException.Errors)
                 {
                     logger.Fatal(error.Exception, string.Format("CompositionException Error: {0} {1}", error.Element.DisplayName, error.Description));
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -579,9 +552,7 @@ namespace CDP4AddinCE
         /// </param>
         private void InitializeApplication(object application)
         {
-            var comObject = Core.Default.CreateObjectFromComProxy(null, application, false);
-
-            var excel = comObject as NetOffice.ExcelApi.Application;
+            var excel = application as NetOffice.ExcelApi.Application;
             if (excel != null)
             {
                 // set the excel application object
@@ -599,23 +570,6 @@ namespace CDP4AddinCE
                 logger.Debug("The current addin is loaded for Excel");
                 return;
             }
-
-            var word = comObject as NetOffice.WordApi.Application;
-            if (word != null)
-            {
-                // set the word application object
-                this.wordApplication = word;
-                this.wordApplication.DisplayAlerts = WdAlertLevel.wdAlertsAll;
-                this.wordApplication.ScreenUpdating = true;
-
-                // set the word instance to the office application wrapper
-                this.officeApplicationWrapper.Word = word;
-
-                //// create event handlers
-
-                logger.Debug("The current addin is loaded for Word");
-                return;
-            }
         }
 
         /// <summary>
@@ -628,19 +582,10 @@ namespace CDP4AddinCE
                 // unregister events
                 this.excelApplication.WorkbookActivateEvent -= this.OnWorkbookActivateEvent;
                 this.excelApplication.WorkbookDeactivateEvent -= this.OnWorkbookDeactivateEvent;
-                
+
                 // set excel instance to null
                 this.officeApplicationWrapper.Excel = null;
                 this.excelApplication = null;
-            }
-
-            if (this.wordApplication != null)
-            {
-                //// unregister events
-
-                // set excel instance to null
-                this.officeApplicationWrapper.Word = null;
-                this.wordApplication = null;
             }
         }
 
@@ -650,12 +595,12 @@ namespace CDP4AddinCE
         /// <param name="workbook">
         /// The workbook that was activated
         /// </param>
-        private void OnWorkbookActivateEvent(Excel.Workbook workbook)
+        private void OnWorkbookActivateEvent(NetOffice.ExcelApi.Workbook workbook)
         {
             logger.Debug("Workbook {0} activated", workbook.Name);
-            if (this.RibbonUi != null)
+            if (this.RibbonUI != null)
             {
-                this.RibbonUi.Invalidate();
+                this.RibbonUI.Invalidate();
             }
         }
 
@@ -665,13 +610,13 @@ namespace CDP4AddinCE
         /// <param name="workbook">
         /// The workbook that was deactivated
         /// </param>
-        private void OnWorkbookDeactivateEvent(Excel.Workbook workbook)
+        private void OnWorkbookDeactivateEvent(NetOffice.ExcelApi.Workbook workbook)
         {
             logger.Debug("Workbook {0} deactivated", workbook.Name);
-            if (this.RibbonUi != null)
+            if (this.RibbonUI != null)
             {
-                this.RibbonUi.Invalidate();
-            }            
+                this.RibbonUI.Invalidate();
+            }
         }
 
         /// <summary>

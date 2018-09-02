@@ -7,11 +7,8 @@
 namespace CDP4AddinCE.Tests
 {
     using CDP4Composition;
-
     using Moq;
-
     using NetOffice.OfficeApi;
-
     using NUnit.Framework;
 
     /// <summary>
@@ -21,14 +18,11 @@ namespace CDP4AddinCE.Tests
     public class AddinTestFixture
     {
         private Mock<IRibbonControl> ribbonControl;
-
-        private Mock<IRibbonUI> ribbonUI;
-
+        
         private string ribbonId;
 
         private string ribbbonTag;
-
-
+        
         private Mock<IFluentRibbonManager> fluentRibbonManager;
 
         private Addin addin;
@@ -36,7 +30,7 @@ namespace CDP4AddinCE.Tests
         [SetUp]
         public void SetUp()
         {
-            this.ribbonUI = new Mock<IRibbonUI>();
+           
             
             this.ribbonId = "ribbonId";
             this.ribbbonTag = "ribbonTag";
@@ -48,7 +42,6 @@ namespace CDP4AddinCE.Tests
             this.fluentRibbonManager = new Mock<IFluentRibbonManager>();
 
             this.addin = new Addin();
-            this.addin.RibbonUi = this.ribbonUI.Object;
             this.addin.FluentRibbonManager = this.fluentRibbonManager.Object;
 
             //TODO: this.addin.GetCustomUI()

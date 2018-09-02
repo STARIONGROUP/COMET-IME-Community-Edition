@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FluentRibbonManager.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,12 +13,10 @@ namespace CDP4Composition
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Resources;
     using System.Text;
     using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.Schema;
-
     using NLog;
 
     /// <summary>
@@ -81,7 +79,7 @@ namespace CDP4Composition
         {
             var sb = new StringBuilder();
             sb.Append("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
-            sb.Append("<customUI xmlns=\"http://schemas.microsoft.com/office/2006/01/customui\" onLoad=\"OnLoadRibbonUi\" >");
+            sb.Append("<customUI xmlns=\"http://schemas.microsoft.com/office/2006/01/customui\" onLoad=\"CustomUI_OnLoad\" >");
             sb.Append("<ribbon>");
             sb.Append("<tabs>");
             sb.Append("<tab id=\"CDP4-CE\" label=\"CDP4-CE\">");
