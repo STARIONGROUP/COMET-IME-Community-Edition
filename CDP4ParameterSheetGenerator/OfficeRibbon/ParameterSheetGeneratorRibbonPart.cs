@@ -235,12 +235,11 @@ namespace CDP4ParameterSheetGenerator
                 foreach (var iteration in this.Iterations)
                 {
                     var engineeringModel = (EngineeringModel)iteration.Container;
-                    
-                    Tuple<DomainOfExpertise, Participant> tuple;
-                    this.Session.OpenIterations.TryGetValue(iteration,out tuple);
 
-                    var domainShortName = tuple.Item1 == null ? string.Empty : tuple.Item1.ShortName;
-                    var label = string.Format("{0} - {1} : [{2}]", engineeringModel.EngineeringModelSetup.ShortName, iteration.IterationSetup.IterationNumber, domainShortName);
+                    var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
+                    
+                    var domainShortName = selectedDomainOfExpertise == null ? string.Empty : selectedDomainOfExpertise.ShortName;
+                    var label = $"{engineeringModel.EngineeringModelSetup.ShortName} - {iteration.IterationSetup.IterationNumber} : [{domainShortName}]";
 
                     var menuContent = string.Format("<button id=\"Rebuild_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />", iteration.Iid, label);
                     sb.Append(menuContent);
@@ -440,14 +439,13 @@ namespace CDP4ParameterSheetGenerator
 
                 var engineeringModel = iteration.Container as EngineeringModel;
                 var activeParticipant = engineeringModel.EngineeringModelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
-
+                
                 var workbook = this.QueryIterationWorkbook(this.officeApplicationWrapper.Excel, iteration);
                 if (workbook == null)
                 {
-                    Tuple<DomainOfExpertise, Participant> tuple;
-                    this.Session.OpenIterations.TryGetValue(iteration, out tuple);
+                    var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
 
-                    var workbookSelectionViewModel = new WorkbookSelectionViewModel(application, engineeringModel.EngineeringModelSetup, iteration.IterationSetup, tuple.Item1);
+                    var workbookSelectionViewModel = new WorkbookSelectionViewModel(application, engineeringModel.EngineeringModelSetup, iteration.IterationSetup, selectedDomainOfExpertise);
                     this.DialogNavigationService.NavigateModal(workbookSelectionViewModel);
 
                     var dialogResult = workbookSelectionViewModel.DialogResult;

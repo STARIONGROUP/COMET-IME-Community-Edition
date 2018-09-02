@@ -580,9 +580,10 @@ namespace CDP4ParameterSheetGenerator
         private void WriteSessionInfoToWorkbook(ISession session, Iteration iteration, Participant participant)
         {
             var engineeringModel = (EngineeringModel)iteration.Container;
-            Tuple<DomainOfExpertise, Participant> tuple;
-            session.OpenIterations.TryGetValue(iteration, out tuple);
-            var workbookSession = new WorkbookSession(participant.Person, engineeringModel.EngineeringModelSetup, iteration.IterationSetup, tuple.Item1);
+
+            var selectedDomainOfExpertise = session.QuerySelectedDomainOfExpertise(iteration);
+
+            var workbookSession = new WorkbookSession(participant.Person, engineeringModel.EngineeringModelSetup, iteration.IterationSetup, selectedDomainOfExpertise);
             var workbookSessionDal = new WorkbookSessionDal(this.workbook);
             workbookSessionDal.Write(workbookSession);
         }

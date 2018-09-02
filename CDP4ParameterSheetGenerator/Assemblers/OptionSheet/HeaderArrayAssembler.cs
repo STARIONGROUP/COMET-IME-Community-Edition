@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="HeaderArrayAssembler.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         {
             if (option == null)
             {
-                throw new ArgumentNullException("option", "the option may not be null");
+                throw new ArgumentNullException(nameof(option), "the option may not be null");
             }
 
             this.option = option;
@@ -90,12 +90,12 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             this.HeaderArray[1, 1] = this.Iteration.IterationSetup.IterationNumber;
             this.HeaderArray[2, 1] = this.option.Name;
             this.HeaderArray[3, 1] = this.EngineeringModel.EngineeringModelSetup.StudyPhase.ToString();
+            
+            var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Iteration);
 
-            Tuple<DomainOfExpertise, Participant> domainOfExpertiseParticipantTuple;
-            this.Session.OpenIterations.TryGetValue(this.Iteration, out domainOfExpertiseParticipantTuple);
-            this.HeaderArray[4, 1] = domainOfExpertiseParticipantTuple.Item1 == null ? "-" : domainOfExpertiseParticipantTuple.Item1.Name;
+            this.HeaderArray[4, 1] = selectedDomainOfExpertise == null ? "-" : selectedDomainOfExpertise.Name;
 
-            this.HeaderArray[5, 1] = string.Format("{0} {1}", this.Participant.Person.GivenName, this.Participant.Person.Surname);
+            this.HeaderArray[5, 1] = $"{this.Participant.Person.GivenName} {this.Participant.Person.Surname}";
             this.HeaderArray[6, 1] = DateTime.Now;
         }
     }

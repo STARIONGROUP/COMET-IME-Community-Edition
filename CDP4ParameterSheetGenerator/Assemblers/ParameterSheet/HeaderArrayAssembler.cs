@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="HeaderArrayAssembler.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -73,12 +73,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
             this.HeaderArray[0, 2] = this.EngineeringModel.EngineeringModelSetup.Name;
             this.HeaderArray[1, 2] = this.Iteration.IterationSetup.IterationNumber;
             this.HeaderArray[2, 2] = this.EngineeringModel.EngineeringModelSetup.StudyPhase.ToString();
+            
+            var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Iteration);
 
-            Tuple<DomainOfExpertise, Participant> domainOfExpertiseParticipantTuple;
-            this.Session.OpenIterations.TryGetValue(this.Iteration, out domainOfExpertiseParticipantTuple);
-
-            this.HeaderArray[3, 2] = domainOfExpertiseParticipantTuple.Item1 == null ? "-" : domainOfExpertiseParticipantTuple.Item1.Name;
-            this.HeaderArray[4, 2] = string.Format("{0} {1}", this.Participant.Person.GivenName, this.Participant.Person.Surname);
+            this.HeaderArray[3, 2] = selectedDomainOfExpertise == null ? "-" : selectedDomainOfExpertise.Name;
+            this.HeaderArray[4, 2] = $"{this.Participant.Person.GivenName} {this.Participant.Person.Surname}";
             this.HeaderArray[5, 2] = DateTime.Now;
         }
     }

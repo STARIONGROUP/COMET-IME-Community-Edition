@@ -314,11 +314,10 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// </param>
         private void PopulateSheetArrays(IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
         {
-            Tuple<DomainOfExpertise, Participant> domainOfExpertiseParticipantTuple;
-            this.session.OpenIterations.TryGetValue(this.iteration, out domainOfExpertiseParticipantTuple);
-
+            var selectedDomainOfExpertise = this.session.QuerySelectedDomainOfExpertise(this.iteration);
+            
             // Instantiate the different rows
-            var assembler = new ParameterSheetRowAssembler(this.iteration, domainOfExpertiseParticipantTuple.Item1);
+            var assembler = new ParameterSheetRowAssembler(this.iteration, selectedDomainOfExpertise);
             assembler.Assemble(processedValueSets);
             this.excelRows = assembler.ExcelRows;
 
