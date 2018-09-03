@@ -1,5 +1,5 @@
 ﻿name: Newtonsoft.Json
-version: 10.0.3
+version: 11.0.2
 project url: http://www.newtonsoft.com/json
 license url: https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md
 

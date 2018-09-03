@@ -1,5 +1,5 @@
 ﻿name: NetOffice
-version: 1.7.3
+version: 1.7.4.3
 project url: http://netoffice.codeplex.com/
 license url: http://netoffice.codeplex.com/license
 

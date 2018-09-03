@@ -1,5 +1,5 @@
 ﻿name: DynamicLanguageRuntime
-version: 1.1.2
+version: 1.2.1
 project url: http://dlr.codeplex.com/
 license url: http://dlr.codeplex.com/license
 
