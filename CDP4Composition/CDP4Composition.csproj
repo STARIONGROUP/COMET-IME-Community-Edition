@@ -198,6 +198,7 @@
     <Compile Include="Converters\EnumerationValueDefinitionConverter.cs" />
     <Compile Include="Converters\IncludeOptionListToObjectListConverter.cs" />
     <Compile Include="Converters\GenericListToObjectListConverter.cs" />
+    <Compile Include="Converters\NamedShortNamedThingToStringConverter.cs" />
     <Compile Include="Converters\NotConverter.cs" />
     <Compile Include="Converters\GenericObjectListConverter.cs" />
     <Compile Include="Converters\ReactiveClassKindToObjectListConverter.cs" />

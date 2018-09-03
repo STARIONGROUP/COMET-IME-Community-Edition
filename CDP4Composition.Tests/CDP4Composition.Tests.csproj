@@ -190,6 +190,7 @@
     <Compile Include="Converters\CamelCaseToSpaceConverterTestFixture.cs" />
     <Compile Include="Converters\CdpVersionToVisibilityConverterTestFixture.cs" />
     <Compile Include="Converters\EnumerationValueDefinitionConverterTestFixture.cs" />
+    <Compile Include="Converters\NamedShortNamedThingToStringConverterTestFixture.cs" />
     <Compile Include="Converters\NotConverterTestFixture.cs" />
     <Compile Include="Converters\ReactiveListCategoryConverterTestFixture.cs" />
     <Compile Include="Converters\ThingToIconUriConverterTestFixture.cs" />

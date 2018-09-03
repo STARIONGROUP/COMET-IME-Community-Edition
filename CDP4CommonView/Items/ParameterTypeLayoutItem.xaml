@@ -6,9 +6,11 @@
                  xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                  xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
                  Label="Parameter Type:"
                  mc:Ignorable="d">
     <dxlc:LayoutItem.Resources>
+        <converters:NamedShortNamedThingToStringConverter x:Key="NamedShortNamedThingToStringConverter" />
     </dxlc:LayoutItem.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -16,14 +18,22 @@
             <ColumnDefinition Width="35" />
         </Grid.ColumnDefinitions>
         <dxe:ComboBoxEdit Name="SelectedParameterType"
-                          DisplayMember="ShortName"
+                          ApplyItemTemplateToSelectedItem="True"
                           EditValue="{Binding Path=SelectedParameterType,
                                               Mode=TwoWay,
                                               UpdateSourceTrigger=PropertyChanged}"
                           IsReadOnly="{Binding IsReadOnly}"
                           IsTextEditable="False"
                           ItemsSource="{Binding Path=PossibleParameterType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                          ShowCustomItems="False" />
+                          SelectedItem=""
+                          ShowCustomItems="False">
+            <dxe:ComboBoxEdit.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource NamedShortNamedThingToStringConverter}}" />
+                </DataTemplate>
+            </dxe:ComboBoxEdit.ItemTemplate>
+        </dxe:ComboBoxEdit> 
+        
         <Button Grid.Column="1"
                 Width="25"
                 Height="25"

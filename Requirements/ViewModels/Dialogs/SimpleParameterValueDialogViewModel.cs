@@ -1,12 +1,11 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="SimpleParameterValueDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
-    using CDP4Composition.Services;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -16,7 +15,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    using CDP4CommonView;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -34,7 +32,6 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private Dialogs.SimpleParameterValueRowViewModel selectedValue;
 
-        #region constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleParameterValueDialogViewModel"/> class.
         /// </summary>
@@ -80,7 +77,6 @@ namespace CDP4Requirements.ViewModels
             this.WhenAnyValue(vm => vm.SelectedParameterType).Subscribe(_ => this.PopulateValues());
             this.Values.CountChanged.Subscribe(_ => this.UpdateOkCanExecute());
         }
-        #endregion
 
         /// <summary>
         /// Gets or sets the selected value row.
