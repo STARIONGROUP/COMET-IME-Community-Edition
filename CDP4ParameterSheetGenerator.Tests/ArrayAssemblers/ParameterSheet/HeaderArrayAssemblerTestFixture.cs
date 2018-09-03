@@ -8,14 +8,11 @@ namespace CDP4ParameterSheetGenerator.Tests.ArrayAssemblers.ParameterSheet
 {
     using System;
     using System.Collections.Generic;
-
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using NUnit.Framework;
     using CDP4Dal;
-
     using CDP4ParameterSheetGenerator.ParameterSheet;
-
     using Moq;
 
     /// <summary>
@@ -67,6 +64,8 @@ namespace CDP4ParameterSheetGenerator.Tests.ArrayAssemblers.ParameterSheet
             {
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)}
             });
+
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(domain);
         }
 
         [Test]        

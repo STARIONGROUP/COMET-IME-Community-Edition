@@ -23,10 +23,6 @@
         <File Id="fil_MicrosoftScripting"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Scripting.dll" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_MicrosoftScriptingAspNet" Guid="{AC98885C-1A52-4BDB-9CD6-2224EA9E91D5}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_MicrosoftScriptingAspNet"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Scripting.AspNet.dll" KeyPath="yes"></File>
-      </Component>
-
       <Component Id="comp_MicrosoftScriptingMetadata" Guid="{F8FEBC24-58F4-406F-B1E8-2DA0A0D9EF5A}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MicrosoftScriptingMetadata"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Scripting.Metadata.dll" KeyPath="yes"></File>
       </Component>

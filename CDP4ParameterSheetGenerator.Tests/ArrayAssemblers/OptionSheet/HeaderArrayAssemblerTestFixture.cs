@@ -81,6 +81,8 @@ namespace CDP4ParameterSheetGenerator.Tests.ArrayAssemblers.OptionSheet
             {
                 { this.iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, null) }
             });
+
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(domainOfExpertise);
         }
 
         [TearDown]
