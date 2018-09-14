@@ -187,6 +187,7 @@
                 <dxg:TreeListView x:Name="View"
                                   AllowEditing="False"
                                   AutoWidth="False"
+                                  ExpandStateFieldName="IsExpanded"
                                   HorizontalScrollbarVisibility="Auto"
                                   NavigationStyle="Cell"
                                   ShowHorizontalLines="False"
