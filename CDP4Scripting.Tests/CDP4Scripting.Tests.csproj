@@ -56,8 +56,8 @@
       <HintPath>..\packages\CDP4Common-CE.1.5.1\lib\net452\CDP4Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.1.5.1\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=1.5.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.1.5.2\lib\net452\CDP4Dal.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL">
