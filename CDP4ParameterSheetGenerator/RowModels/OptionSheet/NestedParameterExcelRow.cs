@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="NestedParameterExcelRow.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -38,16 +38,19 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             this.Id = this.Thing.Iid.ToString();
             this.Name = this.Thing.AssociatedParameter.ParameterType.Name;
             this.ShortName = this.QueryParameterTypeShortname(false);
-            this.ActualValue = this.Thing.ActualValue;
+            
+            var index = this.Thing.Component == null ? 0 : this.Thing.Component.Index;
+            this.ActualValue = $"={this.Thing.AssociatedParameter.ModelCode(index)}";
+            
             this.Type = this.QueryRowType(this.Thing.AssociatedParameter);
             this.Owner = this.QueryOwner(this.Thing);
             this.ModelCode = this.Thing.Path;
             this.ParameterType = this.Thing.AssociatedParameter.ParameterType;
             this.ParameterTypeShortName = this.QueryParameterTypeShortname(true);
         }
-
+        
         /// <summary>
-        /// Queroes the shortname of the <see cref="ParameterType"/> of the assiacted <see cref="Parameter"/>
+        /// Queries the shortname of the <see cref="ParameterType"/> of the associated <see cref="Parameter"/>
         /// that is represented by the current <see cref="NestedParameter"/>.
         /// </summary>
         /// <returns>
@@ -93,7 +96,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             if (parameterSubscription != null)
             {
                 var parameter = (ParameterOrOverrideBase)parameterSubscription.Container;
-                owner = string.Format("{0} [{1}]", nestedParameter.Owner.ShortName, parameter.Owner.ShortName);
+                owner = $"{nestedParameter.Owner.ShortName} [{parameter.Owner.ShortName}]";
             }
             else
             {
@@ -130,7 +133,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
                 return OptionSheetConstants.NPS;
             }
 
-            throw new NestedElementTreeException(string.Format("The {0} type in the NestedElement Tree is not supported.", associatedParameter.GetType()));
+            throw new NestedElementTreeException($"The {associatedParameter.GetType()} type in the NestedElement Tree is not supported.");
         }
     }
 }
