@@ -151,7 +151,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var excelRow = new NestedParameterExcelRow(nestedparameter);
 
-            Assert.AreEqual("A", excelRow.ActualValue);
+            Assert.AreEqual("=SAT.l", excelRow.ActualValue);
             Assert.AreEqual("SAT\\l\\option1\\", excelRow.ModelCode);
             Assert.AreEqual("Length", excelRow.Name);
             Assert.AreEqual("SYS", excelRow.Owner);
@@ -186,7 +186,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var excelRow = new NestedParameterExcelRow(nestedparameter);
 
-            Assert.AreEqual("A", excelRow.ActualValue);
+            Assert.AreEqual("=SAT.txt", excelRow.ActualValue);
             Assert.AreEqual("SAT\\txt\\option1\\", excelRow.ModelCode);
             Assert.AreEqual("Text", excelRow.Name);
             Assert.AreEqual("SYS", excelRow.Owner);
@@ -243,7 +243,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var excelRow_1 = new NestedParameterExcelRow(nestedparameter_1);
 
-            Assert.AreEqual("A", excelRow_1.ActualValue);
+            Assert.AreEqual("=SAT.coord.x", excelRow_1.ActualValue);
             Assert.AreEqual("SAT\\coord.x\\option1\\", excelRow_1.ModelCode);
             Assert.AreEqual("coordinate", excelRow_1.Name);
             Assert.AreEqual("SYS", excelRow_1.Owner);
@@ -254,7 +254,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var excelRow_2 = new NestedParameterExcelRow(nestedparameter_2);
 
-            Assert.AreEqual("A1", excelRow_2.ActualValue);
+            Assert.AreEqual("=SAT.coord.txt", excelRow_2.ActualValue);
             Assert.AreEqual("SAT\\coord.txt\\option1\\", excelRow_2.ModelCode);
             Assert.AreEqual("coordinate", excelRow_2.Name);
             Assert.AreEqual("SYS", excelRow_2.Owner);
@@ -301,7 +301,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var excelRow = new NestedParameterExcelRow(nestedparameter);
 
-            Assert.AreEqual("AA", excelRow.ActualValue);
+            Assert.AreEqual("=SAT.l", excelRow.ActualValue);
             Assert.AreEqual("SAT\\l\\option1\\", excelRow.ModelCode);
             Assert.AreEqual("Length", excelRow.Name);
             Assert.AreEqual("PWR [SYS]", excelRow.Owner);
@@ -358,7 +358,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var excelRow = new NestedParameterExcelRow(nestedparameter);
 
-            Assert.AreEqual("A", excelRow.ActualValue);
+            Assert.AreEqual("=BAT.l", excelRow.ActualValue);
             Assert.AreEqual("SAT.batt\\l\\option1\\", excelRow.ModelCode);
             Assert.AreEqual("Length", excelRow.Name);
             Assert.AreEqual("PWR", excelRow.Owner);
