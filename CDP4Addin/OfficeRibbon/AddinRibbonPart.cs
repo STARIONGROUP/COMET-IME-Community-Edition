@@ -70,7 +70,7 @@ namespace CDP4AddinCE
                     var result = dialogService.NavigateModal(dataSelection) as DataSourceSelectionResult;
                     break;
                 case "CDP4_Close":
-                    this.session.Close();
+                    await this.session.Close();
                     break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);

@@ -276,9 +276,9 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Executes the <see cref="Close"/> Command and closes the <see cref="Session"/>
         /// </summary>
-        private void ExecuteClose()
+        private async void ExecuteClose()
         {
-            this.Session.Close();
+            await this.Session.Close();
             this.IsClosed = true;
         }
 
