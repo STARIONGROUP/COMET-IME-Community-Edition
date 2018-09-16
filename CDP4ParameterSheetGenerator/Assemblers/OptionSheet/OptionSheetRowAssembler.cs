@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="OptionSheetRowAssembler.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -60,17 +60,17 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         {
             if (iteration == null)
             {
-                throw new ArgumentNullException("iteration", "The iteration may not be null");
+                throw new ArgumentNullException(nameof(iteration), "The iteration may not be null");
             }
 
             if (option == null)
             {
-                throw new ArgumentNullException("option", "The option may not be null");
+                throw new ArgumentNullException(nameof(option), "The option may not be null");
             }
 
             if (owner == null)
             {
-                throw new ArgumentNullException("owner", "The owning DomainOfExpertise may not be null");
+                throw new ArgumentNullException(nameof(owner), "The owning DomainOfExpertise may not be null");
             }
 
             this.iteration = iteration;

@@ -201,12 +201,12 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
 
                 ParameterSheetUtilities.ApplyLocking(this.parameterSheet, true);
 
-                this.excelApplication.StatusBar = string.Format("CDP4: Parameter Sheet rebuilt in {0} [ms]", sw.ElapsedMilliseconds);
+                this.excelApplication.StatusBar = $"CDP4: Parameter Sheet rebuilt in {sw.ElapsedMilliseconds} [ms]";
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
-                this.excelApplication.StatusBar = string.Format("CDP4: The following error occured while rebuilding the sheet: {0}", ex.Message);
+                this.excelApplication.StatusBar = $"CDP4: The following error occured while rebuilding the sheet: {ex.Message}";
             }
             finally
             {

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="WorkbookOperator.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -78,12 +78,12 @@ namespace CDP4ParameterSheetGenerator
         {
             if (application == null)
             {
-                throw new ArgumentNullException("application", "the Excel application may not be null");
+                throw new ArgumentNullException(nameof(application), "the Excel application may not be null");
             }
 
             if (workbook == null)
             {
-                throw new ArgumentNullException("workbook", "the workbook may not be null");
+                throw new ArgumentNullException(nameof(workbook), "the workbook may not be null");
             }
 
             workbook.Activate();
@@ -190,11 +190,11 @@ namespace CDP4ParameterSheetGenerator
             sw.Start();
 
             this.application.Cursor = XlMousePointer.xlWait;
-            this.application.StatusBar = string.Format("CDP4: refreshing data from the data source {0}", session.DataSourceUri);
+            this.application.StatusBar = $"CDP4: refreshing data from the data source {session.DataSourceUri}";
             
             await session.Refresh();
             
-            this.application.StatusBar = string.Format("CD4: data refreshed in {0} [ms]", sw.ElapsedMilliseconds);
+            this.application.StatusBar = $"CD4: data refreshed in {sw.ElapsedMilliseconds} [ms]";
             this.application.Cursor = XlMousePointer.xlDefault;
         }
 

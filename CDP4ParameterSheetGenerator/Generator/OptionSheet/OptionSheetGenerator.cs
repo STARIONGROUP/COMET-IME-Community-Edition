@@ -120,9 +120,13 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         /// </param>
         private void PopulateAndWriteParameterArray(Worksheet optionSheet, Option option, int startRow)
         {
-            var owner = this.participant.SelectedDomain;  
-            Logger.Debug("Option Sheet Generator Owner: {0}:{1}:{2}", owner.ShortName, owner.Name, owner.Iid);
+            var owner = this.session.QuerySelectedDomainOfExpertise(this.iteration);
 
+            if (owner != null)
+            {
+                Logger.Debug("Option Sheet Generator Owner: {0}:{1}:{2}", owner.ShortName, owner.Name, owner.Iid);
+            }
+            
             // We use a clone of the option. NestedElements are added to the option
             // when created using the OptionSheetRowAssembler, these should not be 
             // added to the option object in the cache.
