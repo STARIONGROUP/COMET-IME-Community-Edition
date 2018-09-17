@@ -127,12 +127,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
                 Logger.Debug("Option Sheet Generator Owner: {0}:{1}:{2}", owner.ShortName, owner.Name, owner.Iid);
             }
             
-            // We use a clone of the option. NestedElements are added to the option
-            // when created using the OptionSheetRowAssembler, these should not be 
-            // added to the option object in the cache.
-            var optionClone = option.Clone(false);
-
-            var assembler = new OptionSheetRowAssembler(this.iteration, optionClone, owner);
+            var assembler = new OptionSheetRowAssembler(this.iteration, option, owner);
             assembler.Assemble();
             var excelRows = assembler.ExcelRows;
 

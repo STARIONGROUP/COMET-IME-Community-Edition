@@ -37,11 +37,8 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         {
             this.Id = this.Thing.Iid.ToString();
             this.Name = this.Thing.AssociatedParameter.ParameterType.Name;
-            this.ShortName = this.QueryParameterTypeShortname(false);
-            
-            var index = this.Thing.Component == null ? 0 : this.Thing.Component.Index;
-            this.ActualValue = $"={this.Thing.AssociatedParameter.ModelCode(index)}";
-            
+            this.ShortName = this.QueryParameterTypeShortname(false);            
+            this.ActualValue = this.Thing.ActualValue;
             this.Type = this.QueryRowType(this.Thing.AssociatedParameter);
             this.Owner = this.QueryOwner(this.Thing);
             this.ModelCode = this.Thing.Path;

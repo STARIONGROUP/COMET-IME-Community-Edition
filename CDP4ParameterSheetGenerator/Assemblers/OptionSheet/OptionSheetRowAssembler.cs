@@ -104,7 +104,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             else
             {
                 var nestedElementTreeGenerator = new NestedElementTreeGenerator();
-                nestedElements = nestedElementTreeGenerator.Generate(this.option, this.owner);
+                nestedElements = nestedElementTreeGenerator.Generate(this.option, this.owner, false);
             }
             
             // Order the nestedElements by shortname. The Shortname of an NestedElement 
