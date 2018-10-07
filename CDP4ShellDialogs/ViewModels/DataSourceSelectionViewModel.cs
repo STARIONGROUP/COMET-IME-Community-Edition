@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceSelectionViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -43,9 +43,19 @@ namespace CDP4ShellDialogs.ViewModels
         private string uri;
 
         /// <summary>
+        /// Backing field for the <see cref="IsProxyEnabled"/> property.
+        /// </summary>
+        private bool isProxyEnabled;
+
+        /// <summary>
         /// Backing field for the <see cref="ProxyUri"/> property.
         /// </summary>
         private string proxyUri;
+
+        /// <summary>
+        /// Backing field for the <see cref="ProxyPort"/> property.
+        /// </summary>
+        private string proxyPort;
 
         /// <summary>
         /// Backing field for the <see cref="SelectedUri"/> property.
@@ -106,13 +116,18 @@ namespace CDP4ShellDialogs.ViewModels
             this.openSessions = openSessions;
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
             this.AvailableDataSourceKinds.ChangeTrackingEnabled = true;
-
+            
             var canOk = this.WhenAnyValue(
                 vm => vm.UserName,
                 vm => vm.Password,
                 vm => vm.SelectedDataSourceKind,
                 vm => vm.Uri,
-                (username, password, datasource, uri) => datasource != null && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource));
+                vm => vm.IsProxyEnabled,
+                vm => vm.ProxyUri,
+                vm => vm.ProxyPort,
+                (username, password, datasource, uri, isproxyenabled, proxyuri, proxyport) =>
+                    datasource != null && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && 
+                    !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource) && this.isValidProxyUri(isproxyenabled, proxyuri) && this.isValidProxyPort(isproxyenabled, proxyport));
 
             this.OkCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteOk(), RxApp.MainThreadScheduler);
             this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
@@ -171,6 +186,21 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether a connection shall be made via a proxy server.
+        /// </summary>
+        public bool IsProxyEnabled
+        {
+            get
+            {
+                return this.isProxyEnabled;
+            }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.isProxyEnabled, value);
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the ProxyUri value
         /// </summary>
         public string ProxyUri
@@ -185,6 +215,20 @@ namespace CDP4ShellDialogs.ViewModels
             }
         }
 
+        /// <summary>
+        /// Gets or sets the ProxyPort value
+        /// </summary>
+        public string ProxyPort
+        {
+            get
+            {
+                return this.proxyPort;
+            }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.proxyPort, value);
+            }
+        }
 
         /// <summary>
         /// Gets or sets the uri value that is hand edited by the user
@@ -328,11 +372,17 @@ namespace CDP4ShellDialogs.ViewModels
 
             if (this.IsSessionOpen(this.Uri, this.UserName))
             {
-                this.ErrorMessage = string.Format("A session with the username {0} already exists", this.UserName);
+                this.ErrorMessage = $"A session with the username {this.UserName} already exists";
             }
             else
-            {                
-                var credentials = new Credentials(this.UserName, this.Password, providedUri);
+            {
+                Uri proxyUri = null;
+                if (this.isProxyEnabled)
+                {
+                    proxyUri = new Uri($"http://{this.ProxyUri}:{this.ProxyPort}");
+                }
+                
+                var credentials = new Credentials(this.UserName, this.Password, providedUri, proxyUri);
                 var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
 
@@ -512,9 +562,68 @@ namespace CDP4ShellDialogs.ViewModels
         /// </returns>
         private bool IsValidUri(string uriToCheck, INameMetaData dataSourceKind)
         {
-            var dal = this.dals.Single(x => x.Metadata.Name == dataSourceKind.Name);
+            var dal = this.dals.Single(x => x.Metadata.Name == dataSourceKind.Name);   
             var result = dal.Value.IsValidUri(uriToCheck);
             return result;
+        }
+
+        /// <summary>
+        /// Assertion to compute whether the specified proxy uri is a valid Uri
+        /// </summary>
+        /// <param name="uriToCheck">
+        /// the provided uriToCheck
+        /// </param>
+        /// <param name="dataSourceKind">
+        /// the selected data source kind
+        /// </param>
+        /// <returns>
+        /// true when the uriToCheck is valid, false if it is invalid
+        /// </returns>
+        internal bool isValidProxyUri(bool isProxyEnabled, string proxyAddressToCheck)
+        {
+            if (!isProxyEnabled)
+            {
+                return true;
+            }
+
+            if (proxyAddressToCheck.IsValidIp())
+            {
+                return true;
+            }
+
+            if (proxyAddressToCheck.IsValidHostName())
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Assertion to compute whether the specified port is a valid port
+        /// </summary>
+        /// <param name="uriToCheck">
+        /// the provided uriToCheck
+        /// </param>
+        /// <param name="dataSourceKind">
+        /// the selected data source kind
+        /// </param>
+        /// <returns>
+        /// true when the uriToCheck is valid, false if it is invalid
+        /// </returns>
+        internal bool isValidProxyPort(bool isProxyEnabled, string proxyPortToCheck)
+        {
+            if (!isProxyEnabled)
+            {
+                return true;
+            }
+
+            if (proxyPortToCheck.IsValidPort())
+            {
+                return true;
+            }
+            
+            return false;
         }
 
         /// <summary>

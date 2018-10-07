@@ -171,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="ViewModels\DataSourceSelectionViewModel.cs" />
     <Compile Include="ViewModels\DialogResult\DataSourceSelectionResult.cs" />
     <Compile Include="ViewModels\UriManagerViewModel.cs" />
