@@ -1,0 +1,304 @@
+﻿<dx:DXWindow x:Class="CDP4Budget.Views.BudgetConfig"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+             xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
+             xmlns:services="clr-namespace:CDP4Budget.Services"
+             xmlns:viewModels="clr-namespace:CDP4Budget.ViewModels"
+             xmlns:converters1="clr-namespace:CDP4Budget.Converters"
+             Title="Budget Definition"
+             Height="600"
+             d:DesignWidth="571"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             mc:Ignorable="d">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <Image x:Key="CrossImage" x:Shared="False"  Source="{dx:DXImage Image=Delete_16x16.png}"></Image>
+            <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
+            <converters1:ReactiveListElementDefinitionConverter x:Key="ReactiveListElementDefinitionConverter"/>
+
+            <DataTemplate x:Key="GenericBudgetParameterConfigDataTemplate">
+                <lc:LayoutGroup Header="Parameters: " 
+                                View="GroupBox" 
+                                HorizontalAlignment="Stretch" 
+                                GroupBoxDisplayMode="Normal"
+                                Orientation="Vertical"
+                                Padding="5">
+                    <lc:LayoutItem Label="Parameter:" LabelPosition="Top">
+                        <dxe:ComboBoxEdit ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dx:DXWindow}}, Path=DataContext.PossibleParameterTypes, Mode=OneWay}"
+                                          EditValue="{Binding GenericConfig.SelectedParameterType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="False">
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+
+                    <lc:LayoutItem Label="Margin (%):" LabelPosition="Top">
+                        <dxe:ComboBoxEdit ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dx:DXWindow}}, Path=DataContext.PossibleParameterTypes, Mode=OneWay}"
+                                          EditValue="{Binding GenericConfig.SelectedMarginParameterType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="False">
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+                </lc:LayoutGroup>
+            </DataTemplate>
+
+            <DataTemplate x:Key="ExtraMassContributionTemplate">
+                <lc:LayoutItem>
+                    <lc:LayoutGroup View="Group"
+                                Orientation="Horizontal"
+                                GroupBoxDisplayMode="Light">
+                        <lc:LayoutItem Label="Categories:" LabelPosition="Top">
+                            <dxe:ComboBoxEdit ItemsSource="{Binding PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          EditValue="{Binding SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ReactiveCategoryToObjectListConverter}}"
+                                          AllowNullInput="False"
+                                          DisplayMember="Name">
+                                <dxe:ComboBoxEdit.StyleSettings>
+                                    <dxe:CheckedComboBoxStyleSettings />
+                                </dxe:ComboBoxEdit.StyleSettings>
+                            </dxe:ComboBoxEdit>
+                        </lc:LayoutItem>
+                        <lc:LayoutItem Label="Parameter:" LabelPosition="Top">
+                            <dxe:ComboBoxEdit ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dx:DXWindow}}, Path=DataContext.PossibleParameterTypes, Mode=OneWay}"
+                                          EditValue="{Binding SelectedParameter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="False">
+                            </dxe:ComboBoxEdit>
+                        </lc:LayoutItem>
+
+                        <lc:LayoutItem Label="Margin:" LabelPosition="Top">
+                            <dxe:ComboBoxEdit ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dx:DXWindow}}, Path=DataContext.PossibleParameterTypes, Mode=OneWay}"
+                                              EditValue="{Binding SelectedMarginParameter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              DisplayMember="Name"
+                                              AllowNullInput="False">
+                            </dxe:ComboBoxEdit>
+                        </lc:LayoutItem>
+
+                        <lc:LayoutItem Width="20" LabelPosition="Top" Label=" ">
+                            <Button BorderThickness="0"  
+                                Height="18"
+                                Width="18"
+                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                Command="{Binding RemoveExtraMassContributionCommand}"
+                                Content="{StaticResource CrossImage}">
+                            </Button>
+                        </lc:LayoutItem>
+                    </lc:LayoutGroup>
+                </lc:LayoutItem>
+            </DataTemplate>
+
+            <DataTemplate x:Key="MassBudgetParameterConfigDataTemplate">
+                <lc:LayoutGroup View="Group"
+                                Orientation="Vertical">
+                    <lc:LayoutGroup Header="Parameters: " 
+                                    View="GroupBox" 
+                                    HorizontalAlignment="Stretch" 
+                                    GroupBoxDisplayMode="Normal"
+                                    Orientation="Horizontal"
+                                    Padding="5">
+                        <lc:LayoutItem Label="Dry-Mass Parameter:" LabelPosition="Top">
+                            <dxe:ComboBoxEdit ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dx:DXWindow}}, Path=DataContext.PossibleParameterTypes, Mode=OneWay}"
+                                            EditValue="{Binding DryMassConfig.SelectedParameterType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            DisplayMember="Name"
+                                            AllowNullInput="False">
+                            </dxe:ComboBoxEdit>
+                        </lc:LayoutItem>
+
+                        <lc:LayoutItem Label="Margin (%):" LabelPosition="Top">
+                            <dxe:ComboBoxEdit ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dx:DXWindow}}, Path=DataContext.PossibleParameterTypes, Mode=OneWay}"
+                                            EditValue="{Binding DryMassConfig.SelectedMarginParameterType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            DisplayMember="Name"
+                                            AllowNullInput="False">
+                            </dxe:ComboBoxEdit>
+                        </lc:LayoutItem>
+                    </lc:LayoutGroup>
+
+                    <lc:LayoutGroup Header="Extra Mass Contribution: " 
+                                    View="GroupBox" 
+                                    HorizontalAlignment="Stretch" 
+                                    GroupBoxDisplayMode="Normal"
+                                    Orientation="Vertical"
+                                    Padding="5">
+                        <lc:LayoutItem>
+                            <dxb:ToolBarControl Height="30" UseWholeRow="False" ShowDragWidget="False">
+                                <dxb:BarButtonItem Command="{Binding AddExtraMassContributionCommand}"
+                                                   Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                                   Hint="Add an extra mass contribution" />
+                            </dxb:ToolBarControl>
+                        </lc:LayoutItem>
+
+                        <lc:LayoutGroup View="Group" 
+                                        GroupBoxDisplayMode="Light"
+                                        Orientation="Vertical"
+                                        IsCollapsible="True">
+                            <dxmvvm:Interaction.Behaviors>
+                                <behaviours:ItemsSourceHelper ItemTemplate="{StaticResource ExtraMassContributionTemplate}" ItemsSource="{Binding ExtraMassContributions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </dxmvvm:Interaction.Behaviors>
+                        </lc:LayoutGroup>
+                    </lc:LayoutGroup>
+                </lc:LayoutGroup>
+            </DataTemplate>
+
+            <viewModels:BudgetParameterConfigDataTemplateSelector x:Key="ParameterConfigDataTemplateSelector"
+                                                                  GenericBudgetDataTemplate="{StaticResource ResourceKey=GenericBudgetParameterConfigDataTemplate}"
+                                                                  MassBudgetDataTemplate="{StaticResource ResourceKey=MassBudgetParameterConfigDataTemplate}">
+            </viewModels:BudgetParameterConfigDataTemplateSelector>
+
+            <DataTemplate x:Key="SubSystemDataTemplate">
+                <lc:LayoutGroup View="Group"
+                                GroupBoxDisplayMode="Light">
+                    <lc:LayoutItem Label="Categories:" LabelPosition="Top">
+                        <dxe:ComboBoxEdit ItemsSource="{Binding SubSystemDefinitions.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          EditValue="{Binding SubSystemDefinitions.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ReactiveCategoryToObjectListConverter}}"
+                                          AllowNullInput="False"
+                                          DisplayMember="Name">
+                            <dxe:ComboBoxEdit.StyleSettings>
+                                <dxe:CheckedComboBoxStyleSettings />
+                            </dxe:ComboBoxEdit.StyleSettings>
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+
+                    <lc:LayoutItem Label="Element Categories:" LabelPosition="Top">
+                        <dxe:ComboBoxEdit ItemsSource="{Binding SubSystemElementDefinition.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          EditValue="{Binding SubSystemElementDefinition.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ReactiveCategoryToObjectListConverter}}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="False">
+                            <dxe:ComboBoxEdit.StyleSettings>
+                                <dxe:CheckedComboBoxStyleSettings />
+                            </dxe:ComboBoxEdit.StyleSettings>
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+
+                    <lc:LayoutItem Width="20" LabelPosition="Top" Label=" ">
+                        <Button BorderThickness="0"  
+                                Height="18"
+                                Width="18"
+                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                Command="{Binding RemoveSubSystemDefinitionCommand}"
+                                Content="{StaticResource CrossImage}">
+                        </Button>
+                    </lc:LayoutItem>
+                </lc:LayoutGroup>
+            </DataTemplate>
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+    <lc:LayoutControl Margin="5"
+                      Orientation="Vertical"
+                      ScrollBars="Auto">
+        <lc:LayoutGroup Margin="-10,-7,-10,-5"
+                        Orientation="Vertical"
+                        View="Group"
+                        lc:LayoutControl.AllowHorizontalSizing="True">
+            <lc:LayoutGroup Header="Basic" Orientation="Vertical" HorizontalAlignment="Stretch">
+                <lc:LayoutItem Label="Budget Kind: " Padding="5">
+                    <dxe:ComboBoxEdit EditValue="{Binding SelectedBudgetKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      AllowNullInput="False"
+                                      ToolTip="Select the budget kind to compute">
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type services:BudgetKind}"/>
+                        </dxmvvm:Interaction.Behaviors>
+                    </dxe:ComboBoxEdit>
+                </lc:LayoutItem>
+
+                <lc:LayoutItem Label="Root Elements: " Padding="5">
+                    <dxe:ComboBoxEdit ItemsSource="{Binding PossibleElementDefinitions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                      EditValue="{Binding SelectedElements, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ReactiveListElementDefinitionConverter}}"
+                                      DisplayMember="Name"
+                                      AllowNullInput="False"
+                                      ToolTip="Select the root elements to compute the budget for"
+                                      AutoComplete="True">
+                        <dxe:ComboBoxEdit.StyleSettings>
+                            <dxe:CheckedComboBoxStyleSettings />
+                        </dxe:ComboBoxEdit.StyleSettings>
+                    </dxe:ComboBoxEdit>
+                </lc:LayoutItem>
+
+                <lc:LayoutGroup Header="Sub-Systems: " 
+                                View="GroupBox" 
+                                HorizontalAlignment="Stretch" 
+                                GroupBoxDisplayMode="Normal"
+                                Orientation="Vertical"
+                                Padding="5"
+                                IsCollapsible="True">
+                    <lc:LayoutItem>
+                        <dxb:ToolBarControl Height="30">
+                            <dxb:BarButtonItem Command="{Binding AddSubSystemDefinitionCommand}"
+                                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                               Hint="Define a new sub-system" />
+                        </dxb:ToolBarControl>
+                    </lc:LayoutItem>
+                    <lc:LayoutItem>
+                        <lc:LayoutGroup View="GroupBox" 
+                                        GroupBoxDisplayMode="Light"
+                                        Orientation="Vertical">
+                            <dxmvvm:Interaction.Behaviors>
+                                <behaviours:ItemsSourceHelper ItemTemplate="{StaticResource SubSystemDataTemplate}" ItemsSource="{Binding SubSystemDefinitions}" />
+                            </dxmvvm:Interaction.Behaviors>
+                        </lc:LayoutGroup>
+                    </lc:LayoutItem>
+
+                </lc:LayoutGroup>
+
+                <lc:LayoutItem>
+                    <ContentControl Content="{Binding BudgetParameterConfig}" ContentTemplateSelector="{StaticResource ResourceKey=ParameterConfigDataTemplateSelector}"></ContentControl>
+                </lc:LayoutItem>
+
+                <lc:LayoutGroup View="GroupBox"
+                                GroupBoxDisplayMode="Normal"
+                                IsCollapsible="True"
+                                Orientation="Vertical"
+                                Header="System Level Definition">
+                    <lc:LayoutItem Label="System Level To Use: "
+                                   Padding="5">
+                        <dxe:ComboBoxEdit ItemsSource="{Binding PossibleSystemLevelParameterTypes, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          EditValue="{Binding SystemLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="True"
+                                          ToolTip="The parameter to use that represents the system level to use. If undefined, the computer uses the equipment level.">
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+
+                    <lc:LayoutItem Label="SubSystem: "
+                                   Padding="5">
+                        <dxe:ComboBoxEdit ItemsSource="{Binding PossibleSystemLevelEnum, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          EditValue="{Binding SelectedSubSystemEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="True"
+                                          ToolTip="Select the enumeration that correspond to the sub-system level">
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+
+                    <lc:LayoutItem Label="Equipment: "
+                                   Padding="5">
+                        <dxe:ComboBoxEdit ItemsSource="{Binding PossibleSystemLevelEnum, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          EditValue="{Binding SelectedEquipmentEnum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="True"
+                                          ToolTip="Select the enumeration that correspond to the equipment level">
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+
+                </lc:LayoutGroup>
+
+                <lc:LayoutItem Label="Number of Element: "
+                               Padding="5">
+                    <dxe:ComboBoxEdit ItemsSource="{Binding PossibleParameterTypes, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                      EditValue="{Binding NumberOfElement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMember="Name"
+                                      AllowNullInput="True">
+                    </dxe:ComboBoxEdit>
+                </lc:LayoutItem>
+
+            </lc:LayoutGroup>
+        </lc:LayoutGroup>
+        <items:UserValidationButtonsLayoutGroup />
+    </lc:LayoutControl>
+</dx:DXWindow>

@@ -12,6 +12,8 @@
                     xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                     xmlns:viewModels="clr-namespace:CDP4IME.ViewModels"
                     xmlns:tb="http://www.hardcodet.net/taskbar"
+                    xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+                    xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
                     Title="{Binding Path=Title}"
                     Width="774.254"
                     Height="441.045"
@@ -320,6 +322,10 @@
                 </dxb:BarStaticItem>
             </dxr:RibbonStatusBarControl.RightItems>
         </dxr:RibbonStatusBarControl>
+        <views:LoadingControl Name="IsBusyNotification"
+                              Grid.Row="1"
+                              Grid.Column="0"
+                              Visibility="{Binding IsBusy, Converter={dxc:BooleanToVisibilityConverter}}"/>
         <tb:TaskbarIcon Grid.Row="3"
                         Name="CdpTaskBarIcon"
                         IconSource="cdplogo_48x48.ico">

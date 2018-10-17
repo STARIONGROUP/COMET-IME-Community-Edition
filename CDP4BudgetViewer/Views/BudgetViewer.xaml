@@ -1,0 +1,401 @@
+<UserControl x:Class="CDP4Budget.Views.BudgetViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
+             xmlns:viewModels="clr-namespace:CDP4Budget.ViewModels"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxci="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
+             xmlns:converters="clr-namespace:CDP4Budget.Converters"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             dx:ThemeManager.ThemeName="{Binding ThemeName}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:ListCountToTabVisibilityConverter x:Key="ListCountToTabVisibilityConverter"/>
+
+            <DataTemplate x:Key="ExtraMassContributionTemplate">
+                <dxlc:LayoutGroup View="Group"
+                                  Orientation="Horizontal"
+                                  GroupBoxDisplayMode="Light">
+                    <dxlc:LayoutItem Label="{Binding ContributionName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                     LabelPosition="Left">
+                        <TextBox IsReadOnly="True"
+                                 Text="{Binding ContributionTotal, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="100"
+                                 HorizontalAlignment="Right"/>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+            </DataTemplate>
+
+            <DataTemplate x:Key="ElementMassBudgetTemplate">
+                <dxlc:LayoutGroup Orientation="Vertical"
+                                  View="GroupBox"
+                                  GroupBoxDisplayMode="Normal"
+                                  Header="{Binding ElementName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                  IsCollapsible="True">
+                    <dxlc:LayoutItem Label="All values are expressed in: ">
+                        <TextBlock Text="{Binding Scale, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+                    </dxlc:LayoutItem>
+
+                    <dxlc:LayoutGroup Header="SubSystem Summary"
+                                      View="GroupBox"
+                                      GroupBoxDisplayMode="Normal"
+                                      IsCollapsible="True"
+                                      IsCollapsed="True">
+                        <dxg:GridControl Name="BudgetGridControl"
+                                         AllowLiveDataShaping="False"
+                                         AutoExpandAllGroups="True"
+                                         MinHeight="200"
+                                         MaxHeight="1080"
+                                         ItemsSource="{Binding SubSystemSummary, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                         services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <dxg:GridControl.View>
+                                <dxg:TableView Name="View"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch"
+                                               AllowColumnMoving="True"
+                                               AllowEditing="False"
+                                               AllowGrouping="True"
+                                               AutoWidth="true"
+                                               ShowFilterPanelMode="Never"
+                                               IsDetailButtonVisibleBinding="{x:Null}"
+                                               ShowGroupPanel="False"
+                                               ShowSearchPanelMode="Default"
+                                               EnableImmediatePosting="True"
+                                               ScrollingMode="Smart">
+                                    <dxg:TableView.FocusedRow>
+                                        <dynamic:ExpandoObject />
+                                    </dxg:TableView.FocusedRow>
+                                </dxg:TableView>
+                            </dxg:GridControl.View>
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn Fixed="Left"
+                                                FixedWidth="True"
+                                                AllowEditing="True"
+                                                Binding="{Binding SelectedSystemLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                Header="SystemLevel">
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:ComboBoxEdit AllowNullInput="False"
+                                                              x:Name="PART_Editor">
+                                                <dxmvvm:Interaction.Behaviors>
+                                                    <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type viewModels:SystemLevelKind}"/>
+                                                </dxmvvm:Interaction.Behaviors>
+                                            </dxe:ComboBoxEdit>
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn Binding="{Binding SubSystemName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Sub-System Name" />
+
+                                <dxg:GridColumn Binding="{Binding DryMass, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Dry Mass" />
+                                <dxg:GridColumn Binding="{Binding DryMassMarginRatio, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Dry Mass Margin (%)" />
+                                <dxg:GridColumn Binding="{Binding DryMassMarginValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Dry Mass Margin" />
+
+                                <dxg:GridColumn Binding="{Binding DryMassTotal, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Dry Mass (+ Margin)" />
+                                <dxg:GridColumn Binding="{Binding DryMassTotalRatio, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="% of Total Mass" />
+                            </dxg:GridControl.Columns>
+                        </dxg:GridControl>
+                    </dxlc:LayoutGroup>
+
+                    <dxlc:LayoutGroup Orientation="Vertical"
+                                      View="GroupBox"
+                                      GroupBoxDisplayMode="Normal"
+                                      Header="Dry Mass Summary: "
+                                      IsCollapsible="True"
+                                      IsCollapsed="True">
+                        <dxlc:LayoutItem Label="System Margin (%): ">
+                            <dxe:TextEdit EditValue="{Binding SystemMargin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Width="100"
+                                          Mask="d"
+                                          HorizontalAlignment="Right">
+                            </dxe:TextEdit>
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem Label="Total Dry Mass: ">
+                            <TextBox IsReadOnly="True" 
+                                     Text="{Binding DryTotal, Mode=OneWay}"
+                                     Width="100"
+                                     HorizontalAlignment="Right"></TextBox>
+                        </dxlc:LayoutItem>
+
+                        <dxlc:LayoutItem Label="Total Dry Mass (Margin included): ">
+                            <TextBox IsReadOnly="True" 
+                                     Text="{Binding DryTotalWithSystemMargin, Mode=OneWay}"
+                                     Width="100"
+                                     HorizontalAlignment="Right">
+                            </TextBox>
+                        </dxlc:LayoutItem>
+                    </dxlc:LayoutGroup>
+
+                    <dxlc:LayoutGroup Orientation="Vertical"
+                                      View="GroupBox"
+                                      GroupBoxDisplayMode="Normal"
+                                      Header="Extra Mass Contribution: "
+                                      IsCollapsible="True"
+                                      IsCollapsed="True">
+                        <dxlc:LayoutItem>
+                            <dxg:GridControl ItemsSource="{Binding ExtraMassContributions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                             MinHeight="100"
+                                             MaxHeight="300">
+                                <dxg:GridControl.View>
+                                    <dxg:TableView HorizontalAlignment="Stretch"
+                                                   VerticalAlignment="Stretch"
+                                                   AllowColumnMoving="True"
+                                                   AllowEditing="False"
+                                                   AllowGrouping="True"
+                                                   AutoWidth="true"
+                                                   ShowFilterPanelMode="Never"
+                                                   IsDetailButtonVisibleBinding="{x:Null}"
+                                                   ShowGroupPanel="False"
+                                                   ShowSearchPanelMode="Default"
+                                                   EnableImmediatePosting="True"
+                                                   ScrollingMode="Smart">
+                                        <dxg:TableView.FocusedRow>
+                                            <dynamic:ExpandoObject />
+                                        </dxg:TableView.FocusedRow>
+                                    </dxg:TableView>
+                                </dxg:GridControl.View>
+                                <dxg:GridControl.Columns>
+                                    <dxg:GridColumn Binding="{Binding ContributionName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Contribution Name" />
+                                    <dxg:GridColumn Binding="{Binding ContributionTotal, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Contribution Mass" />
+                                    <dxg:GridColumn Binding="{Binding ContributionMarginRatio, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Margin (%)" />
+                                    <dxg:GridColumn Binding="{Binding ContributionMargin, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Total Margin" />
+                                    <dxg:GridColumn Binding="{Binding ContributionTotalWithMargin, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Total Wet Mass" />
+                                </dxg:GridControl.Columns>
+                            </dxg:GridControl>
+                        </dxlc:LayoutItem>
+                    </dxlc:LayoutGroup>
+
+                    <dxlc:LayoutGroup Orientation="Vertical"
+                                      View="GroupBox"
+                                      GroupBoxDisplayMode="Light">
+                        <dxlc:LayoutItem Label="Total: ">
+                            <TextBox IsReadOnly="True" 
+                                     Text="{Binding WetTotal, Mode=OneWay}"
+                                     Width="100"
+                                     HorizontalAlignment="Right">
+                            </TextBox>
+                        </dxlc:LayoutItem>
+                    </dxlc:LayoutGroup>
+                </dxlc:LayoutGroup>
+            </DataTemplate>
+
+            <DataTemplate x:Key="ElementCostBudgetTemplate">
+                <dxlc:LayoutGroup Orientation="Vertical"
+                                  View="GroupBox"
+                                  GroupBoxDisplayMode="Normal"
+                                  Header="{Binding ElementName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                  IsCollapsible="True">
+                    <dxlc:LayoutItem Label="All values are expressed in: ">
+                        <TextBlock Text="{Binding Scale, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+                    </dxlc:LayoutItem>
+
+                    <dxlc:LayoutGroup Header="SubSystem Summary"
+                                      View="GroupBox"
+                                      GroupBoxDisplayMode="Normal"
+                                      IsCollapsible="True"
+                                      IsCollapsed="True">
+                        <dxg:GridControl Name="BudgetGridControl"
+                                         AllowLiveDataShaping="False"
+                                         AutoExpandAllGroups="True"
+                                         MinHeight="200"
+                                         MaxHeight="1080"
+                                         ItemsSource="{Binding SubSystemSummary, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                         services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <dxg:GridControl.View>
+                                <dxg:TableView Name="View"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch"
+                                               AllowColumnMoving="True"
+                                               AllowEditing="False"
+                                               AllowGrouping="True"
+                                               AutoWidth="true"
+                                               ShowFilterPanelMode="Never"
+                                               IsDetailButtonVisibleBinding="{x:Null}"
+                                               ShowGroupPanel="False"
+                                               ShowSearchPanelMode="Default"
+                                               EnableImmediatePosting="True"
+                                               ScrollingMode="Smart">
+                                    <dxg:TableView.FocusedRow>
+                                        <dynamic:ExpandoObject />
+                                    </dxg:TableView.FocusedRow>
+                                </dxg:TableView>
+                            </dxg:GridControl.View>
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn Fixed="Left"
+                                                FixedWidth="True"
+                                                AllowEditing="True"
+                                                Binding="{Binding SelectedSystemLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                Header="SystemLevel">
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:ComboBoxEdit AllowNullInput="False"
+                                                              x:Name="PART_Editor">
+                                                <dxmvvm:Interaction.Behaviors>
+                                                    <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type viewModels:SystemLevelKind}"/>
+                                                </dxmvvm:Interaction.Behaviors>
+                                            </dxe:ComboBoxEdit>
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn Binding="{Binding SubSystemName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="Sub-System Name" />
+
+                                <dxg:GridColumn Binding="{Binding Cost, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="SS Cost" />
+                                <dxg:GridColumn Binding="{Binding CostMarginRatio, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="SS Cost Margin (%)" />
+                                <dxg:GridColumn Binding="{Binding CostMarginValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="SS Cost Margin" />
+
+                                <dxg:GridColumn Binding="{Binding CostTotal, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="SS Cost (+ Margin)" />
+                                <dxg:GridColumn Binding="{Binding CostTotalRatio, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Header="% of Total Cost" />
+                            </dxg:GridControl.Columns>
+                        </dxg:GridControl>
+                    </dxlc:LayoutGroup>
+
+                    <dxlc:LayoutGroup Orientation="Vertical"
+                                      View="GroupBox"
+                                      GroupBoxDisplayMode="Normal"
+                                      Header="Cost Summary: "
+                                      IsCollapsible="True"
+                                      IsCollapsed="False">
+                        <dxlc:LayoutItem Label="System Margin (%): ">
+                            <dxe:TextEdit EditValue="{Binding SystemMargin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Width="100"
+                                          Mask="d"
+                                          HorizontalAlignment="Right">
+                            </dxe:TextEdit>
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem Label="Total Cost: ">
+                            <TextBox IsReadOnly="True" 
+                                     Text="{Binding Total, Mode=OneWay}"
+                                     Width="100"
+                                     HorizontalAlignment="Right"></TextBox>
+                        </dxlc:LayoutItem>
+
+                        <dxlc:LayoutItem Label="Total Cost (Margin included): ">
+                            <TextBox IsReadOnly="True" 
+                                     Text="{Binding TotalWithSystemMargin, Mode=OneWay}"
+                                     Width="100"
+                                     HorizontalAlignment="Right">
+                            </TextBox>
+                        </dxlc:LayoutItem>
+                    </dxlc:LayoutGroup>
+                </dxlc:LayoutGroup>
+            </DataTemplate>
+
+            <viewModels:BudgetViewerDataTemplateSelector x:Key="BudgetTemplateSelector"
+                                                         MassBudgetDataTemplate="{StaticResource ResourceKey=ElementMassBudgetTemplate}"
+                                                         CostBudgetDataTemplate="{StaticResource ResourceKey=ElementCostBudgetTemplate}">
+            </viewModels:BudgetViewerDataTemplateSelector>
+
+            <DataTemplate x:Key="OptionDataTemplate">
+                <dxlc:LayoutGroup View="Group"
+                                    Header="{Binding GroupTitle}"
+                                    Orientation="Vertical"
+                                    GroupBoxDisplayMode="Normal"
+                                    Margin="5">
+                    <dxmvvm:Interaction.Behaviors>
+                        <behaviours:ItemsSourceHelper ItemTemplateSelector="{StaticResource BudgetTemplateSelector}" ItemsSource="{Binding BudgetSummary}" />
+                    </dxmvvm:Interaction.Behaviors>
+                </dxlc:LayoutGroup>
+            </DataTemplate>
+
+            <DataTemplate x:Key="DefaultColumnTemplate">
+                <ContentControl>
+                    <dxg:GridColumn Header="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).Header, RelativeSource={RelativeSource Self}}"
+                                    FieldName="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}"/>
+                </ContentControl>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <dx:LoadingDecorator IsSplashScreenShown="{Binding IsBusy}"
+                         OwnerLock="LoadingContent"
+                         BorderEffect="Default"
+                         BorderEffectColor="Blue">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <dxb:ToolBarControl Height="30">
+                <dxb:BarButtonItem Command="{Binding OpenConfigCommand}"
+                               Glyph="{dx:DXImage Image=Properties_16x16.png}"
+                               Hint="Configure the budget to display" />
+
+                <dxb:BarButtonItem Command="{Binding SaveConfigCommand}"
+                                   Glyph="{dx:DXImage Image=SavePageSetup_16x16.png}"
+                                   Hint="Save Current Budget Configuration" />
+
+                <dxb:BarButtonItem Command="{Binding LoadConfigCommand}"
+                                   Glyph="{dx:DXImage Image=LoadPageSetup_16x16.png}"
+                                   Hint="Load Existing Budget Configuration" />
+
+                <dxb:BarButtonItem Command="{Binding RefreshBudgetCommand}"
+                                   Glyph="{dx:DXImage Image=Refresh2_16x16.png}"
+                                   Hint="Refresh the budget" />
+            </dxb:ToolBarControl>
+
+            <views:BrowserHeader Grid.Row="1" />
+
+            <dxlc:LayoutControl Grid.Row="2"
+                                Margin="5"
+                                Orientation="Vertical"
+                                ScrollBars="Auto">
+                <dxlc:LayoutGroup View="Tabs"
+                                  Visibility="{Binding BudgetViewModels.Count, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ListCountToTabVisibilityConverter}}">
+                    <dxlc:LayoutGroup View="Tabs"
+                                      Header="Summary">
+                        <dxlc:LayoutGroup.Resources>
+                            <Style TargetType="dx:DXTabControl">
+                                <Setter Property="View">
+                                    <Setter.Value>
+                                        <dx:TabControlScrollView ScrollButtonsShowMode="Never" HeaderOrientation="Horizontal" HeaderLocation="Left" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </dxlc:LayoutGroup.Resources>
+                        <dxmvvm:Interaction.Behaviors>
+                            <behaviours:TabItemsSourceHelper ItemTemplate="{StaticResource OptionDataTemplate}" ItemsSource="{Binding BudgetViewModels}" Header="GroupTitle"/>
+                        </dxmvvm:Interaction.Behaviors>
+                    </dxlc:LayoutGroup>
+                    <dxlc:LayoutGroup View="Group"
+                                      Header="Option Overview">
+                        <dxg:GridControl ItemsSource="{Binding OptionOverviewViewModel.Records, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                         ColumnsSource="{Binding OptionOverviewViewModel.Columns, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                         ColumnGeneratorTemplate="{StaticResource DefaultColumnTemplate}">
+                            <dxg:GridControl.View>
+                                <dxg:TableView HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch"
+                                               AllowEditing="False"
+                                               AutoWidth="true"
+                                               ShowFilterPanelMode="Never"
+                                               IsDetailButtonVisibleBinding="{x:Null}"
+                                               ShowGroupPanel="False"
+                                               ShowSearchPanelMode="Default"
+                                               ScrollingMode="Smart">
+                                </dxg:TableView>
+                            </dxg:GridControl.View>
+                        </dxg:GridControl>
+                    </dxlc:LayoutGroup>
+                </dxlc:LayoutGroup>
+            </dxlc:LayoutControl>
+        </Grid>
+    </dx:LoadingDecorator>
+</UserControl>

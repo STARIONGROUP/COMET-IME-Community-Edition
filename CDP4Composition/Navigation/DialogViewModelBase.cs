@@ -6,6 +6,8 @@
 
 namespace CDP4Composition.Navigation
 {
+    using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Reactive.Linq;
     using Interfaces;
@@ -50,6 +52,11 @@ namespace CDP4Composition.Navigation
         /// Backing field for the <see cref="ErrorMessage"/> property.
         /// </summary>
         private string errorMessage;
+
+        /// <summary>
+        /// Gets the list of <see cref="IDisposable"/>
+        /// </summary>
+        protected readonly List<IDisposable> Subscriptions = new List<IDisposable>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DialogViewModelBase"/> class.
@@ -147,6 +154,17 @@ namespace CDP4Composition.Navigation
         public bool HasError
         {
             get { return this.hasError.Value; }
+        }
+
+        /// <summary>
+        /// Dispose of this <see cref="DialogViewModelBase"/>
+        /// </summary>
+        public virtual void Dispose()
+        {
+            foreach (var subscription in this.Subscriptions)
+            {
+                subscription?.Dispose();
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ namespace CDP4IME.ViewModels
     using System.Windows.Input;
     using System.Windows.Threading;
     using CDP4Composition;
+    using CDP4Composition.Events;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using Microsoft.Practices.ServiceLocation;
@@ -296,7 +297,7 @@ namespace CDP4IME.ViewModels
             catch (Exception e)
             {
                 this.ErrorMsg = e.Message;
-            }            
+            }
         }
 
         /// <summary>
@@ -306,6 +307,7 @@ namespace CDP4IME.ViewModels
         {
             try
             {
+                CDPMessageBus.Current.SendMessage(new IsBusyEvent(true, "Reloading..."));
                 this.errorMsg = null;
                 await this.Session.Reload();
                 this.LastUpdateDateTime = DateTime.Now;
@@ -313,6 +315,10 @@ namespace CDP4IME.ViewModels
             catch (Exception e)
             {
                 this.ErrorMsg = e.Message;
+            }
+            finally
+            {
+                CDPMessageBus.Current.SendMessage(new IsBusyEvent(false));
             }
         }
         

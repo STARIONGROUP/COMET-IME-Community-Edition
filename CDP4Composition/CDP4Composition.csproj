@@ -226,6 +226,7 @@
     <Compile Include="Events\CancelHighlightEvent.cs" />
     <Compile Include="Events\ElementUsageHighlightEvent.cs" />
     <Compile Include="Events\HighlightByCategoryEvent.cs" />
+    <Compile Include="Events\IsBusyEvent.cs" />
     <Compile Include="Events\HighlightEvent.cs" />
     <Compile Include="Events\ToggleDeprecatedThingEvent.cs" />
     <Compile Include="Events\TaskbarNotificationEvent.cs" />
@@ -234,6 +235,9 @@
     <Compile Include="Mvvm\Behaviours\ExtendedDiagramOrgChartBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\FilterStringService.cs" />
     <Compile Include="Mvvm\Behaviours\IExtendedDiagramOrgChartBehavior.cs" />
+    <Compile Include="Mvvm\Behaviours\ItemsSourceHelper.cs" />
+    <Compile Include="Mvvm\Behaviours\LayoutControlItemsSourceHelper.cs" />
+    <Compile Include="Mvvm\Behaviours\TabItemsSourceHelper.cs" />
     <Compile Include="Mvvm\Behaviours\TreeCellEditBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\CellEditBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\TreeCellShowingEditorBehavior.cs" />

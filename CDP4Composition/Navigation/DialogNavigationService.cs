@@ -117,8 +117,9 @@ namespace CDP4Composition.Navigation
             IDialogViewModel viewModel;
 
             viewModel = Activator.CreateInstance(returned.Value.GetType()) as IDialogViewModel;
-
-            return this.NavigateModal(viewModel);
+            var result = this.NavigateModal(viewModel);
+            viewModel?.Dispose();
+            return result;
         }
 
         /// <summary>

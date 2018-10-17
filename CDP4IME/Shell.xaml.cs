@@ -51,6 +51,9 @@ namespace CDP4IME
             {
                 this.subscription.Dispose();
             }
+
+            var vm = this.DataContext as ShellViewModel;
+            vm?.Dispose();
         }
 
         /// <summary>

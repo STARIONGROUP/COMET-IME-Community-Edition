@@ -5,7 +5,7 @@
 // ------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Navigation.Interfaces
-{    
+{
     using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>

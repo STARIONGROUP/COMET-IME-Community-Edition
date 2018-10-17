@@ -81,7 +81,7 @@ namespace BasicRdl
         public void Initialize()
         {
             this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(SiteRdlSelectionRibbon));
-            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(BasicRdlRibbon));            
+            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(BasicRdlRibbon));
             this.RegisterRibbonParts();
         }
 

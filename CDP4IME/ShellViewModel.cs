@@ -11,6 +11,7 @@ namespace CDP4IME
     using System.Linq;
     using System.Reactive.Linq;
     using System.Reflection;
+    using CDP4Composition.Events;
     using CDP4Composition.Log;
     using CDP4Composition.Navigation;
     using CDP4Dal;
@@ -22,7 +23,7 @@ namespace CDP4IME
     /// <summary>
     /// The View Model of the <see cref="Shell"/>
     /// </summary>
-    public class ShellViewModel : ReactiveObject
+    public class ShellViewModel : ReactiveObject, IDisposable
     {
         /// <summary>
         /// The NLog logger
@@ -63,6 +64,21 @@ namespace CDP4IME
         /// Backing field for the <see cref="SelectedSession"/> property
         /// </summary>
         private SessionViewModel selectedSession;
+
+        /// <summary>
+        /// Backing field for <see cref="IsBusy"/> property
+        /// </summary>
+        private bool isBusy;
+
+        /// <summary>
+        /// Backing field for <see cref="LoadingMessage"/>
+        /// </summary>
+        private string loadingMessage;
+
+        /// <summary>
+        /// The subscription for the IsBusy status
+        /// </summary>
+        private IDisposable subscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellViewModel"/> class.
@@ -120,7 +136,14 @@ namespace CDP4IME
 
             this.OpenAboutCommand = ReactiveCommand.Create();
             this.OpenAboutCommand.Subscribe(_ => this.ExecuteOpenAboutRequest());
-            
+
+            this.subscription = CDPMessageBus.Current.Listen<IsBusyEvent>()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => {
+                    this.IsBusy = x.IsBusy;
+                    this.LoadingMessage = x.Message;
+                });
+
             logger.Info("Welcome in the CDP4 Application");
         }
 
@@ -178,6 +201,24 @@ namespace CDP4IME
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the application is busy
+        /// </summary>
+        public bool IsBusy
+        {
+            get { return this.isBusy; }
+            set { this.RaiseAndSetIfChanged(ref this.isBusy, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the loading message
+        /// </summary>
+        public string LoadingMessage
+        {
+            get { return this.loadingMessage; }
+            set { this.RaiseAndSetIfChanged(ref this.loadingMessage, value); }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether a session is selected or not
         /// </summary>
         public bool IsSessionSelected
@@ -214,6 +255,14 @@ namespace CDP4IME
             set
             {
                 this.RaiseAndSetIfChanged(ref this.title, value);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (this.subscription != null)
+            {
+                this.subscription.Dispose();
             }
         }
 
