@@ -12,12 +12,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CDP4Budget.Tests")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("CDP4Budget Unit Tests")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("RHEA System S.A.")]
 [assembly: AssemblyProduct("CDP4Budget.Tests")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2018")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © RHEA System S.A.")]
+[assembly: AssemblyTrademark("CDP")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
