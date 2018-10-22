@@ -123,10 +123,9 @@
                 <cdp4Composition:ContextMenuBehavior />
             </dxmvvm:Interaction.Behaviors>
             <dxg:TreeListControl.Columns>
-                <dxg:TreeListColumn FieldName="Name" Header="First Name" />
-                <dxg:TreeListColumn FieldName="SurName" Header="Last Name" />
-                <dxg:TreeListColumn FieldName="OrganizationValue" Header="Organization" />
-                <dxg:TreeListColumn FieldName="Description" />
+                <dxg:TreeListColumn FieldName="GivenName" Header="First Name" />
+                <dxg:TreeListColumn FieldName="Surname" Header="Last Name" />
+                <dxg:TreeListColumn FieldName="Organization.ShortName" Header="Organization" />
             </dxg:TreeListControl.Columns>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView x:Name="View"
