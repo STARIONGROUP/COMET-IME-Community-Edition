@@ -62,15 +62,22 @@ namespace CDP4AddinCE
         /// </param>        
         public override async Task OnAction(string ribbonControlId, string ribbonControlTag = "")
         {
+            IDialogNavigationService dialogService;
+
             switch (ribbonControlId)
             {
                 case "CDP4_Open":
-                    var dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
                     var dataSelection = new DataSourceSelectionViewModel();
-                    var result = dialogService.NavigateModal(dataSelection) as DataSourceSelectionResult;
+                    var dataSelectionResult = dialogService.NavigateModal(dataSelection) as DataSourceSelectionResult;
                     break;
                 case "CDP4_Close":
                     await this.session.Close();
+                    break;
+                case "CDP4_ProxySettings":
+                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+                    var proxyServerViewModel = new ProxyServerViewModel();
+                    var proxyServerViewModelResult = dialogService.NavigateModal(proxyServerViewModel) as DataSourceSelectionResult;
                     break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
@@ -98,6 +105,8 @@ namespace CDP4AddinCE
                     return this.session == null;
                 case "CDP4_Close":
                     return this.session != null;
+                case "CDP4_ProxySettings":
+                    return this.session == null;
                 default:
                     return false;
             }

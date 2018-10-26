@@ -112,6 +112,12 @@ namespace CDP4IME.Tests
         }
 
         [Test]
+        public void Verify_that_OpenProxyConfigurationCommand_can_be_executed()
+        {
+            Assert.DoesNotThrow(() => this.viewModel.OpenProxyConfigurationCommand.Execute(null));
+        }
+
+        [Test]
         public void VerifyThatOpenDataSourceCommandExecutesAndIfCancelledNoSessionLoaded()
         {
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>())).Returns(null as DataSourceSelectionResult);

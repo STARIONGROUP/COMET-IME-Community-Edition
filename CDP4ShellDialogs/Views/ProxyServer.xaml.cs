@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UriManager.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="ProxyServer.xaml.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,17 +11,20 @@ namespace CDP4ShellDialogs.Views
     using DevExpress.Xpf.Core;
 
     /// <summary>
-    /// The Dialog to to manage the existing Uris
+    /// Interaction logic for ProxyServer configuration
     /// </summary>
-    [DialogViewExport("UriManager", "The Dialog to to manage the existing Uris")]
-    public partial class UriManager : DXWindow, IDialogView
+    [DialogViewExport("DataSourceSelection", "The Dialog to configure a Web-Proxy server")]
+    public partial class ProxyServer : DXWindow, IDialogView
     {
-        public UriManager()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyServer"/> class.
+        /// </summary>
+        public ProxyServer()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UriManager"/> class.
+        /// Initializes a new instance of the <see cref="ProxyServer"/> class.
         /// </summary>
         /// <param name="initializeComponent">
         /// a value indicating whether the contained Components shall be loaded
@@ -29,7 +32,7 @@ namespace CDP4ShellDialogs.Views
         /// <remarks>
         /// This constructor is called by the navigation service
         /// </remarks>
-        public UriManager(bool initializeComponent)
+        public ProxyServer(bool initializeComponent)
         {
             if (initializeComponent)
             {

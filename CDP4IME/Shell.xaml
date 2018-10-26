@@ -120,6 +120,15 @@
                             </dxb:BarSplitButtonItem.PopupControl>
                         </dxb:BarSplitButtonItem>
 
+                        <dxb:BarButtonItem Name="bProxyServerConfiguration"
+                                           Command="{Binding OpenProxyConfigurationCommand}"
+                                           Content="Proxy"
+                                           Description="Show the Proxy Server Configuration."
+                                           Glyph="{dxc:DXImage Image=ManageDatasource_16x16.png}"
+                                           Hint="Configure a Proxy Server."
+                                           LargeGlyph="{dxc:DXImage Image=ManageDatasource_32x32.png}"
+                                           RibbonStyle="Large" />
+
                         <dxb:BarItemLinkSeparator />
 
                         <dxb:BarSplitButtonItem Name="sbSave"

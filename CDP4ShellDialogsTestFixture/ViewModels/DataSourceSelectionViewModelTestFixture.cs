@@ -169,5 +169,24 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             Assert.AreEqual("A session with the username John already exists", viewmodel.ErrorMessage);
         }
+
+        [Test]
+        public void Verify_that_when_proxy_is_enabled_proxy_address_and_port_are_set()
+        {
+            var vm = new DataSourceSelectionViewModel();
+            Assert.IsFalse(vm.IsProxyEnabled);
+            Assert.AreEqual(string.Empty, vm.ProxyUri);
+            Assert.AreEqual(string.Empty, vm.ProxyPort);
+
+            vm.IsProxyEnabled = true;
+
+            Assert.AreNotEqual(string.Empty, vm.ProxyUri);
+            Assert.AreNotEqual(string.Empty, vm.ProxyPort);
+
+            vm.IsProxyEnabled = false;
+
+            Assert.AreEqual(string.Empty, vm.ProxyUri);
+            Assert.AreEqual(string.Empty, vm.ProxyPort);
+        }
     }
 }

@@ -119,6 +119,9 @@ namespace CDP4IME
             this.SaveSessionCommand = ReactiveCommand.Create();
             this.SaveSessionCommand.Subscribe(_ => this.ExecuteSaveSessionCommand());
 
+            this.OpenProxyConfigurationCommand = ReactiveCommand.Create();
+            this.OpenProxyConfigurationCommand.Subscribe(_ => this.ExecuteOpenProxyConfigurationCommand());
+
             this.OpenUriManagerCommand = ReactiveCommand.Create();
             this.OpenUriManagerCommand.Subscribe(_ => this.ExecuteOpenUriManagerRequest());
 
@@ -165,6 +168,11 @@ namespace CDP4IME
         /// Gets the <see cref="ReactiveCommand"/> to save a session to a file
         /// </summary>
         public ReactiveCommand<object> SaveSessionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to open the web-proxy configuration
+        /// </summary>
+        public ReactiveCommand<object> OpenProxyConfigurationCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to manage the configured uris
@@ -267,7 +275,7 @@ namespace CDP4IME
         }
 
         /// <summary>
-        /// ExecuteRaises the <see cref="OpenDataSourceCommand"/> 
+        /// Executes the <see cref="OpenDataSourceCommand"/> 
         /// </summary>
         private void ExecuteOpenDataSourceRequest()
         {
@@ -290,6 +298,15 @@ namespace CDP4IME
         {
             var sessionExport = new DataSourceExportViewModel(this.Sessions.Select(x => x.Session), new OpenSaveFileDialogService());
             this.dialogNavigationService.NavigateModal(sessionExport);
+        }
+
+        /// <summary>
+        /// Executes the <see cref="OpenProxyConfigurationCommand"/> to load and save the web-proxy configuration
+        /// </summary>
+        private void ExecuteOpenProxyConfigurationCommand()
+        {
+            var proxyServerViewModel = new ProxyServerViewModel();
+            this.dialogNavigationService.NavigateModal(proxyServerViewModel);
         }
 
         /// <summary>

@@ -2,9 +2,6 @@
 // <copyright file="UriRowViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015 RHEA System S.A.
 // </copyright>
-// <summary>
-//   Defines the UriRowViewModel type.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ShellDialogs.ViewModels
@@ -19,7 +16,6 @@ namespace CDP4ShellDialogs.ViewModels
     /// </summary>
     public class UriRowViewModel : ReactiveObject
     {
-
         /// <summary>
         /// The backing field for the <see cref="Alias"/> property
         /// </summary>
@@ -29,18 +25,12 @@ namespace CDP4ShellDialogs.ViewModels
         /// The backing field for the <see cref="Uri"/> property
         /// </summary>
         private string uri;
-
-        /// <summary>
-        /// The backing field for the <see cref="ProxyUri"/> property
-        /// </summary>
-        private string proxyUri;
-
+        
         /// <summary>
         /// The backing field for the <see cref="DalType"/> property
         /// </summary>
         private DalType dalType;
-
-
+        
         /// <summary>
         /// Gets or sets the <see cref="UriConfig"/> of the Row
         /// </summary>        
@@ -48,21 +38,19 @@ namespace CDP4ShellDialogs.ViewModels
         {
             get
             {
-                var uc = new UriConfig
+                var uriConfig = new UriConfig
                 {
                     Alias = this.alias,
                     Uri = this.uri,
-                    ProxyUri = this.proxyUri,
                     DalType = this.dalType.ToString()
                 };
-                return uc;
+                return uriConfig;
             }
 
             set
             {
                 this.Alias = value.Alias;
                 this.Uri = value.Uri;
-                this.ProxyUri = value.ProxyUri;
                 this.DalType = (DalType) Enum.Parse(typeof(DalType), value.DalType, true);
             }
         }
@@ -109,26 +97,9 @@ namespace CDP4ShellDialogs.ViewModels
                 this.RaiseAndSetIfChanged(ref this.uri, value);
             }
         }
-
+        
         /// <summary>
-        /// Gets or sets the value of the proxy uri
-        /// </summary>
-        public string ProxyUri
-        {
-            get
-            {
-                return this.proxyUri;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.proxyUri, value);
-            }
-        }
-
-
-        /// <summary>
-        /// Gets or sets the daltype of the uri
+        /// Gets or sets the <see cref="DalType"/> of the uri
         /// </summary>
         public DalType DalType
         {
@@ -142,6 +113,5 @@ namespace CDP4ShellDialogs.ViewModels
                 this.RaiseAndSetIfChanged(ref this.dalType, value);
             }
         }
-
     }
 }

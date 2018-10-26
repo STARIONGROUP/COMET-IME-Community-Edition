@@ -52,7 +52,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             // Write row the same as the testing one
             List<UriConfig> rows = new List<UriConfig>();
-            rows.Add(new UriConfig() { Alias="Alias0", Uri="Uri0", ProxyUri="Proxy0", DalType="Web" });
+            rows.Add(new UriConfig() { Alias="Alias0", Uri="Uri0", DalType="Web" });
             configurator.Write(rows);
 
             // Ensure the generated file is the same as the testing one
@@ -74,7 +74,6 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             Assert.IsTrue(configViewModel.UriRowList[0].Alias.Equals("Alias0"));
             Assert.IsTrue(configViewModel.UriRowList[0].Uri.Equals("Uri0"));
-            Assert.IsTrue(configViewModel.UriRowList[0].ProxyUri.Equals("Proxy0"));
             Assert.IsTrue(configViewModel.UriRowList[0].DalType == CDP4Dal.Composition.DalType.Web);
 
             // Close viewmodel
@@ -94,13 +93,12 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             int initialSize = configViewModel.UriRowList.Count;
 
             // Create a new UriRowViewModel from a UriConfig
-            var cl1 = new UriConfig() { Alias = "Alias1", Uri = "Uri1", ProxyUri = "Proxy1", DalType = "Web" };
+            var cl1 = new UriConfig() { Alias = "Alias1", Uri = "Uri1", DalType = "Web" };
             var row1 = new UriRowViewModel() { UriConfig = cl1 };
             configViewModel.UriRowList.Add(row1);            
             Assert.IsNotNull(configViewModel.UriRowList);
             Assert.IsTrue(configViewModel.UriRowList[initialSize].Alias.Equals("Alias1"));
             Assert.IsTrue(configViewModel.UriRowList[initialSize].Uri.Equals("Uri1"));
-            Assert.IsTrue(configViewModel.UriRowList[initialSize].ProxyUri.Equals("Proxy1"));
             Assert.IsTrue(configViewModel.UriRowList[initialSize].DalType == CDP4Dal.Composition.DalType.Web);
 
             // Create a new UriRowViewModel 
@@ -110,15 +108,12 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             // Test get Name
             Assert.IsTrue(row2.Name.Equals("Uri2"));
             row2.Alias = "Alias2";
-            row2.ProxyUri = "Proxy2";
             Assert.IsTrue(row2.Name.Equals("Alias2"));
-            Assert.IsTrue(row2.ProxyUri.Equals("Proxy2"));
 
             // Test get UriConfig from a UriRowViewModel
             var cl2 = row2.UriConfig;
             Assert.IsTrue(cl2.Alias.Equals("Alias2"));
             Assert.IsTrue(cl2.Uri.Equals("Uri2"));
-            Assert.IsTrue(cl2.ProxyUri.Equals("Proxy2"));
             Assert.IsTrue(cl2.DalType.Equals("File"));
 
             // Test there are 2 existing DalTypes

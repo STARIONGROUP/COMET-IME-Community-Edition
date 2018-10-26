@@ -20,6 +20,7 @@ namespace CDP4ShellDialogs.ViewModels
     using Microsoft.Practices.ServiceLocation;
     using ReactiveUI;
     using CDP4Composition.Utilities;
+    using CDP4ShellDialogs.Proxy;
 
     /// <summary>
     /// The purpose of the <see cref="DataSourceSelectionViewModel"/> is to allow a user to select an <see cref="IDal"/> implementation
@@ -116,6 +117,8 @@ namespace CDP4ShellDialogs.ViewModels
             this.openSessions = openSessions;
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
             this.AvailableDataSourceKinds.ChangeTrackingEnabled = true;
+
+            this.WhenAnyValue(vm => vm.IsProxyEnabled).Subscribe(_ => this.UpdateProxyAddressProperty());
             
             var canOk = this.WhenAnyValue(
                 vm => vm.UserName,
@@ -123,11 +126,9 @@ namespace CDP4ShellDialogs.ViewModels
                 vm => vm.SelectedDataSourceKind,
                 vm => vm.Uri,
                 vm => vm.IsProxyEnabled,
-                vm => vm.ProxyUri,
-                vm => vm.ProxyPort,
-                (username, password, datasource, uri, isproxyenabled, proxyuri, proxyport) =>
+                (username, password, datasource, uri, isproxyenabled) =>
                     datasource != null && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && 
-                    !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource) && this.isValidProxyUri(isproxyenabled, proxyuri) && this.isValidProxyPort(isproxyenabled, proxyport));
+                    !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource));
 
             this.OkCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteOk(), RxApp.MainThreadScheduler);
             this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
@@ -229,7 +230,7 @@ namespace CDP4ShellDialogs.ViewModels
                 this.RaiseAndSetIfChanged(ref this.proxyPort, value);
             }
         }
-
+        
         /// <summary>
         /// Gets or sets the uri value that is hand edited by the user
         /// </summary>
@@ -380,8 +381,9 @@ namespace CDP4ShellDialogs.ViewModels
                 
                 if (this.isProxyEnabled)
                 {
-                    var proxyUri = new Uri($"http://{this.ProxyUri}:{this.ProxyPort}");
-                    proxySettings = new ProxySettings(proxyUri);
+                    var proxyServerConfiguration = ProxyServerConfigurationManager.Read();
+                    var proxyUri = new Uri($"http://{proxyServerConfiguration.Address}:{proxyServerConfiguration.Port}");
+                    proxySettings = new ProxySettings(proxyUri, proxyServerConfiguration.UserName, proxyServerConfiguration.Password);
                 }
                 
                 var credentials = new Credentials(this.UserName, this.Password, providedUri, proxySettings);
@@ -485,12 +487,10 @@ namespace CDP4ShellDialogs.ViewModels
             if (this.selectedUri != null)
             {
                 this.Uri = this.selectedUri.Uri;
-                this.ProxyUri = this.selectedUri.ProxyUri;
             }
             else
             {
                 this.Uri = this.selectedUriText;
-                this.ProxyUri = String.Empty;
             }
         }
 
@@ -546,8 +546,30 @@ namespace CDP4ShellDialogs.ViewModels
             this.Password = string.Empty;
             this.Uri = string.Empty;
 #endif
-
+            this.IsProxyEnabled = false;
+            this.ProxyUri = string.Empty;
+            this.ProxyPort = string.Empty;
+            
             this.SelectedDataSourceKind = this.AvailableDataSourceKinds.FirstOrDefault(v => v.DalType == DalType.Web);            
+        }
+
+        /// <summary>
+        /// updates the proxy server address and port
+        /// </summary>
+        private void UpdateProxyAddressProperty()
+        {
+            if (this.IsProxyEnabled)
+            {
+                var proxyServerConfiguration = ProxyServerConfigurationManager.Read();
+
+                this.ProxyUri = proxyServerConfiguration.Address;
+                this.ProxyPort = proxyServerConfiguration.Port;
+            }
+            else
+            {
+                this.ProxyUri = string.Empty;
+                this.ProxyPort = string.Empty;
+            }
         }
 
         /// <summary>
@@ -568,66 +590,7 @@ namespace CDP4ShellDialogs.ViewModels
             var result = dal.Value.IsValidUri(uriToCheck);
             return result;
         }
-
-        /// <summary>
-        /// Assertion to compute whether the specified proxy uri is a valid Uri
-        /// </summary>
-        /// <param name="uriToCheck">
-        /// the provided uriToCheck
-        /// </param>
-        /// <param name="dataSourceKind">
-        /// the selected data source kind
-        /// </param>
-        /// <returns>
-        /// true when the uriToCheck is valid, false if it is invalid
-        /// </returns>
-        internal bool isValidProxyUri(bool isProxyEnabled, string proxyAddressToCheck)
-        {
-            if (!isProxyEnabled)
-            {
-                return true;
-            }
-
-            if (proxyAddressToCheck.IsValidIp())
-            {
-                return true;
-            }
-
-            if (proxyAddressToCheck.IsValidHostName())
-            {
-                return true;
-            }
-            
-            return false;
-        }
-
-        /// <summary>
-        /// Assertion to compute whether the specified port is a valid port
-        /// </summary>
-        /// <param name="uriToCheck">
-        /// the provided uriToCheck
-        /// </param>
-        /// <param name="dataSourceKind">
-        /// the selected data source kind
-        /// </param>
-        /// <returns>
-        /// true when the uriToCheck is valid, false if it is invalid
-        /// </returns>
-        internal bool isValidProxyPort(bool isProxyEnabled, string proxyPortToCheck)
-        {
-            if (!isProxyEnabled)
-            {
-                return true;
-            }
-
-            if (proxyPortToCheck.IsValidPort())
-            {
-                return true;
-            }
-            
-            return false;
-        }
-
+        
         /// <summary>
         /// Queries the open openSessions to check if a session with the same uri and user name has already been opened
         /// </summary>

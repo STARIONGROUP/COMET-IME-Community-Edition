@@ -9,6 +9,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
     using System;
     using System.Collections.Generic;
     using System.IO.Packaging;
+    using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -58,7 +59,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.serviceLocator = new Mock<IServiceLocator>();
 
-            this.amountOfRibbonControls = 3;
+            this.amountOfRibbonControls = 4;
             this.order = 1;
 
             this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, null);
@@ -107,31 +108,41 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
         {
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Close"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_ProxySettings"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(openSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Close"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_ProxySettings"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
             CDPMessageBus.Current.SendMessage(closeSessionEvent);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Close"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_ProxySettings"));
         }
 
         [Test]
-        public void VerifyThatOnActionPerformsExpectedResult()
+        public async Task VerifyThatOnActionPerformsExpectedResult()
         {
-            this.ribbonPart.OnAction("CDP4_Open");
+            await this.ribbonPart.OnAction("CDP4_Open");
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(openSessionEvent);
 
-            this.ribbonPart.OnAction("CDP4_Close");
+            await this.ribbonPart.OnAction("CDP4_Close");
             this.session.Verify(x => x.Close());
+        }
+
+        [Test]
+        public void Verify_that_when_proxyserver_on_action_dialogisnavigated()
+        {
+            this.ribbonPart.OnAction("CDP4_ProxySettings");
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
         }
     }
 }

@@ -42,7 +42,6 @@
                     <dxg:GridControl.Columns>
                         <dxg:GridColumn FieldName="Alias" />
                         <dxg:GridColumn Width="300" FieldName="Uri" />
-                         <dxg:GridColumn FieldName="ProxyUri" />
                          <dxg:GridColumn FieldName="DalType" >
                             <dxg:GridColumn.EditSettings>
                                 <dxe:ComboBoxEditSettings ItemsSource="{Binding DalTypesList}" />
