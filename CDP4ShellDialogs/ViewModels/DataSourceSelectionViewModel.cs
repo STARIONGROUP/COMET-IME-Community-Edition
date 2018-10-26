@@ -376,13 +376,15 @@ namespace CDP4ShellDialogs.ViewModels
             }
             else
             {
-                Uri proxyUri = null;
+                ProxySettings proxySettings = null;
+                
                 if (this.isProxyEnabled)
                 {
-                    proxyUri = new Uri($"http://{this.ProxyUri}:{this.ProxyPort}");
+                    var proxyUri = new Uri($"http://{this.ProxyUri}:{this.ProxyPort}");
+                    proxySettings = new ProxySettings(proxyUri);
                 }
                 
-                var credentials = new Credentials(this.UserName, this.Password, providedUri, proxyUri);
+                var credentials = new Credentials(this.UserName, this.Password, providedUri, proxySettings);
                 var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
 

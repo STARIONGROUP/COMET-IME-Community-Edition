@@ -55,16 +55,16 @@
       <HintPath>..\packages\Castle.Core.4.3.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4Common, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.1.7.3\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=1.7.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.1.7.4\lib\net452\CDP4Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.1.7.3\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.2.0.0\lib\net452\CDP4Dal.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.1.7.3\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=1.7.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.1.7.4\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.Mvvm.v15.2, Version=15.2.17.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
@@ -99,7 +99,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.5.9\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.5.10\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework">
