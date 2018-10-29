@@ -80,27 +80,12 @@
                             <dxg:TreeListControl  ItemsSource="{Binding ScriptVariables}">
                                 <dxg:TreeListControl.View>
                                     <dxg:TreeListView AllowEditing="False"
-                                                      ShowIndicator="False"/>
+                                                      ShowIndicator="False"
+                                                      AutoWidth="True"/>
                                 </dxg:TreeListControl.View>
                                 <dxg:TreeListControl.Columns>
-                                    <dxg:TreeListColumn FieldName="Name" Fixed="Left">
-                                        <dxg:TreeListColumn.DisplayTemplate>
-                                            <ControlTemplate>
-                                                <TextBlock Margin="5,0,0,0"
-                                                           VerticalAlignment="Center"
-                                                           Text="{Binding Path=Data.Key}" />
-                                            </ControlTemplate>
-                                        </dxg:TreeListColumn.DisplayTemplate>
-                                    </dxg:TreeListColumn>
-                                    <dxg:TreeListColumn FieldName="Value" Fixed="Right">
-                                        <dxg:TreeListColumn.DisplayTemplate>
-                                            <ControlTemplate>
-                                                <TextBlock Margin="5,0,0,0"
-                                                           VerticalAlignment="Center"
-                                                           Text="{Binding Path=Data.Value}" />
-                                            </ControlTemplate>
-                                        </dxg:TreeListColumn.DisplayTemplate>
-                                    </dxg:TreeListColumn>
+                                    <dxg:TreeListColumn Binding="{Binding Path=Data.Key}" Header="Name" Fixed="Left"/>
+                                    <dxg:TreeListColumn Binding="{Binding Path=Data.Value}" Header="Value" Fixed="Right"/>
                                 </dxg:TreeListControl.Columns>
                             </dxg:TreeListControl>
                         </dxdo:LayoutPanel>
