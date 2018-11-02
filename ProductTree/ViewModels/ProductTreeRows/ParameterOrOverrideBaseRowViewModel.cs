@@ -11,6 +11,7 @@ namespace CDP4ProductTree.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using CDP4Common.CommonData;
+    using CDP4Common.Comparers;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
@@ -428,6 +429,7 @@ namespace CDP4ProductTree.ViewModels
                 this.actualFiniteStateListener.Add(listener);
             }
 
+            this.Thing.StateDependence.ActualState.Sort(new ActualFiniteStateComparer());
             foreach (var state in this.Thing.StateDependence.ActualState.Where(x => x.Kind == ActualFiniteStateKind.MANDATORY))
             {
                 this.UpdateActualStateRow(actualOption, state);

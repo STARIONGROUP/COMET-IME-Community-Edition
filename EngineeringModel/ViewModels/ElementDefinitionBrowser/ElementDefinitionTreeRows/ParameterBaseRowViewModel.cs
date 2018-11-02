@@ -11,6 +11,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using CDP4Common.CommonData;
+    using CDP4Common.Comparers;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
@@ -18,7 +19,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.ViewModels;
     using CDP4Dal;
     using CDP4Dal.Events;
-
+    using CDP4Dal.Permission;
     using DevExpress.XtraPrinting.Native;
 
     using ReactiveUI;
@@ -415,53 +416,12 @@ namespace CDP4EngineeringModel.ViewModels
                 this.actualFiniteStateListener.Add(listener);
             }
 
-            var actualFiniteStates = this.GetOrderedActualFiniteStates().Where(x => x.Kind == ActualFiniteStateKind.MANDATORY);
+            this.StateDependence.ActualState.Sort(new ActualFiniteStateComparer());
+            var actualFiniteStates = this.StateDependence.ActualState.Where(x => x.Kind == ActualFiniteStateKind.MANDATORY);
             foreach (var state in actualFiniteStates)
             {
                 this.UpdateActualStateRow(row, actualOption, state);
             }
-        }
-
-        /// <summary>
-        /// Returns the list of ordered actual finite states
-        /// </summary>
-        /// <remarks>
-        /// The order is derived from the order of the <see cref="PossibleFiniteStateList"/>s within the <see cref="ActualFiniteState"/>s 
-        /// and the position of each <see cref="PossibleFiniteState"/> inside its container <see cref="PossibleFiniteStateList"/>
-        /// </remarks>
-        private IEnumerable<ActualFiniteState> GetOrderedActualFiniteStates()
-        {
-            var actualFiniteStateDictionary = new SortedDictionary<int, ActualFiniteState>();
-            var possibleFiniteStateListsSize = this.Thing.StateDependence.PossibleFiniteStateList.SortedItems.Values.Select(x => x.PossibleState.Count).ToList();
-
-            foreach (var actualState in this.Thing.StateDependence.ActualState)
-            {
-                // The OCDT WSP may return a broken model where the actualState.PossibleState is empty.
-                if (actualState.PossibleState.Count == 0)
-                {
-                    logger.Error("The PossibleState property of the ActualState with iid {0} is empty (The multiplicity is 1..*). The data-source has returned a broken model.");
-                    break;
-                }
-                
-                var orderKey = 0;
-                foreach (var possibleState in actualState.PossibleState)
-                {
-                    var power = 1;
-                    var containerPossibleFiniteStateList = (PossibleFiniteStateList)possibleState.Container;
-                    var position = containerPossibleFiniteStateList.PossibleState.IndexOf(possibleState);
-
-                    for (var i = this.Thing.StateDependence.PossibleFiniteStateList.IndexOf(containerPossibleFiniteStateList) + 1; i < possibleFiniteStateListsSize.Count; i++)
-                    {
-                        power = power * possibleFiniteStateListsSize[i];
-                    }
-
-                    orderKey += power * position;
-                }
-
-                actualFiniteStateDictionary.Add(orderKey, actualState);
-            }
-
-            return actualFiniteStateDictionary.Values;
         }
 
         /// <summary>

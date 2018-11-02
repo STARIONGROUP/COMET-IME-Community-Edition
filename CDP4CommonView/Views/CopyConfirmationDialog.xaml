@@ -23,7 +23,7 @@
         <dxlc:LayoutGroup>
             <dxlc:LayoutItemLabel VerticalAlignment="Top" 
                               HorizontalAlignment="Center"
-                              Content="{Binding CopyPermissionMessage}"
+                              Content="{Binding CopyPermissionMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                               FontSize="16"/>
         </dxlc:LayoutGroup>
         
@@ -90,7 +90,7 @@
                           MinHeight="50"
                           MaxHeight="300">
             <dxlc:LayoutItem>
-                <TextBox Text="{Binding CopyPermissionDetails}"
+                <TextBox Text="{Binding CopyPermissionDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                          VerticalScrollBarVisibility="Visible"
                          HorizontalScrollBarVisibility="Visible"/>
             </dxlc:LayoutItem>
