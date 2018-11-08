@@ -11,7 +11,7 @@ namespace CDP4ProductTree.ViewModels
     /// <summary>
     /// The interface for rows that contains rows representing a <see cref="ParameterGroup"/> or <see cref="ParameterBase"/>
     /// </summary>
-    public interface IParameterRowContainer
+    public interface IParameterRowContainer : IModelCodeRowViewModel
     {
         /// <summary>
         /// Update the row containment associated to a <see cref="ParameterBase"/>

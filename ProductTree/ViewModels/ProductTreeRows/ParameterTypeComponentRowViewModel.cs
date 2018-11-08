@@ -18,7 +18,7 @@ namespace CDP4ProductTree.ViewModels
     /// <summary>
     /// Represents a <see cref="ParameterTypeComponent"/>
     /// </summary>
-    public class ParameterTypeComponentRowViewModel : CDP4CommonView.ParameterTypeComponentRowViewModel
+    public class ParameterTypeComponentRowViewModel : CDP4CommonView.ParameterTypeComponentRowViewModel, IModelCodeRowViewModel
     {
         /// <summary>
         /// Backing field for <see cref="Name"/>
@@ -46,6 +46,11 @@ namespace CDP4ProductTree.ViewModels
         private string ownerShortName;
 
         /// <summary>
+        /// Backing field for <see cref="ModelCode"/>
+        /// </summary>
+        private string modelCode;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeComponentRowViewModel"/> class
         /// </summary>
         /// <param name="component">The <see cref="ParameterTypeComponent"/> represented</param>
@@ -62,6 +67,15 @@ namespace CDP4ProductTree.ViewModels
             {
                 this.OwnerShortName = parameterOrOverrideBaseRowViewModel.OwnerShortName;
             }
+        }
+
+        /// <summary>
+        /// Gets the model-code
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
         }
 
         /// <summary>
@@ -125,6 +139,8 @@ namespace CDP4ProductTree.ViewModels
             var actualValue = index.HasValue && valueSet.Published.Count() > index 
                 ? valueSet.ActualValue[index.Value] 
                 : valueSet.ActualValue.FirstOrDefault();
+
+            this.ModelCode = index.HasValue ? valueSet.ModelCode(index.Value) : valueSet.ModelCode();
 
             this.Switch = valueSet.ValueSwitch;
             if (this.Value == null || actualValue == null)

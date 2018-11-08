@@ -22,7 +22,7 @@ namespace CDP4ProductTree.ViewModels
     /// <summary>
     /// The row-view-model that represents a <see cref="ParameterOrOverrideBase"/>
     /// </summary>
-    public abstract class ParameterOrOverrideBaseRowViewModel : CDP4CommonView.ParameterOrOverrideBaseRowViewModel<ParameterOrOverrideBase>
+    public abstract class ParameterOrOverrideBaseRowViewModel : CDP4CommonView.ParameterOrOverrideBaseRowViewModel<ParameterOrOverrideBase>, IModelCodeRowViewModel
     {
         #region Fields
         /// <summary>
@@ -54,6 +54,11 @@ namespace CDP4ProductTree.ViewModels
         /// The state listeners
         /// </summary>
         private readonly List<IDisposable> actualFiniteStateListener;
+
+        /// <summary>
+        /// Backing field for <see cref="ModelCode"/>
+        /// </summary>
+        private string modelCode;
         #endregion
 
         #region Constructors
@@ -101,6 +106,15 @@ namespace CDP4ProductTree.ViewModels
         {
             get { return this.usage; }
             set { this.RaiseAndSetIfChanged(ref this.usage, value); }
+        }
+
+        /// <summary>
+        /// Gets the model-code
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
         }
         #endregion
 
@@ -158,6 +172,7 @@ namespace CDP4ProductTree.ViewModels
             this.Value = null;
             this.IsPublishable = false;
             this.UpdateOwnerNameAndShortName();
+            this.ModelCode = this.Thing.ModelCode();
 
             if (this.StateDependence != this.Thing.StateDependence)
             {

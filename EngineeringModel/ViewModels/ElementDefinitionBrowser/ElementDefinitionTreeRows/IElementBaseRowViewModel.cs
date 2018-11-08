@@ -11,7 +11,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// The interface for rows that contains rows representing a <see cref="ParameterGroup"/> or <see cref="ParameterBase"/>
     /// </summary>
-    public interface IElementBaseRowViewModel
+    public interface IElementBaseRowViewModel : IModelCodeRowViewModel
     {
         /// <summary>
         /// Update the row containment associated to a <see cref="ParameterBase"/>

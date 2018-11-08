@@ -313,6 +313,7 @@
                 <dxg:TreeListColumn FieldName="OwnerShortName" Header="Owner"/>
                 <dxg:TreeListColumn FieldName="Switch" />
                 <dxg:TreeListColumn FieldName="Description" />
+                <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
                 <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
             </dxg:TreeListControl.Columns>
             <dxg:TreeListControl.InputBindings>

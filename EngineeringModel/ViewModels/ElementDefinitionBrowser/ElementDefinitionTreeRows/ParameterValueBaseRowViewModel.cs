@@ -23,7 +23,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// The base row view-model that displays the value-set of a <see cref="ParameterBase"/> 
     /// when its type is not a <see cref="ScalarParameterType"/> and it is not option and state dependent
     /// </summary>
-    public abstract class ParameterValueBaseRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IValueSetRow
+    public abstract class ParameterValueBaseRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IValueSetRow, IModelCodeRowViewModel
     {
         #region Fields
         /// <summary>
@@ -65,6 +65,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// A value indicating whether this <see cref="ParameterBase"/> is editable in the current context
         /// </summary>
         private readonly bool isParameterBaseReadOnlyInDataContext;
+
+        /// <summary>
+        /// Backing field for <see cref="ModelCode"/>
+        /// </summary>
+        private string modelCode;
         #endregion
 
         #region Constructors
@@ -107,6 +112,15 @@ namespace CDP4EngineeringModel.ViewModels
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Gets the model-code
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            protected set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="ParameterBase"/> is publishable
@@ -339,6 +353,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.Manual = valueSet.Manual.Count() > this.ValueIndex ? valueSet.Manual[this.ValueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
             this.Reference = valueSet.Reference.Count() > this.ValueIndex ? valueSet.Reference[this.ValueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
             this.Value = valueSet.ActualValue.Count() > this.ValueIndex ? valueSet.ActualValue[this.ValueIndex] : "-";
+            this.ModelCode = valueSet.ModelCode(this.ValueIndex);
         }
 
         /// <summary>
@@ -381,6 +396,8 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.Error = "No ValueSet found for this component";
             }
+
+            this.ModelCode = valueSet.ModelCode(this.ValueIndex);
         }
 
         /// <summary>

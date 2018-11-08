@@ -10,6 +10,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.Comparers;
     using CDP4Common.EngineeringModelData;
@@ -28,7 +29,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// The Base row-class for <see cref="ParameterBase"/>
     /// </summary>
     /// <typeparam name="T">A <see cref="ParameterBase"/> type</typeparam>
-    public abstract class ParameterBaseRowViewModel<T> : CDP4CommonView.ParameterBaseRowViewModel<T>, IValueSetRow where T : ParameterBase
+    public abstract class ParameterBaseRowViewModel<T> : CDP4CommonView.ParameterBaseRowViewModel<T>, IValueSetRow, IModelCodeRowViewModel where T : ParameterBase
     {
         #region Fields
         /// <summary>
@@ -55,6 +56,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// A value indicating whether this <see cref="ParameterBase"/> is editable in the current context
         /// </summary>
         private readonly bool isParameterBaseReadOnlyInDataContext;
+
+        /// <summary>
+        /// Backing field for <see cref="ModelCode"/>
+        /// </summary>
+        private string modelCode;
         #endregion
 
         #region Constructors
@@ -94,6 +100,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets or sets the owner listener
         /// </summary>
         protected KeyValuePair<DomainOfExpertise, IDisposable> OwnerListener { get; set; }
+
+        /// <summary>
+        /// Gets the model-code
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="ParameterType"/> of this <see cref="Parameter"/> is a <see cref="EnumerationParameterType"/>
@@ -271,6 +286,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </remarks>
         private void UpdateProperties()
         {
+            this.ModelCode = this.Thing.ModelCode();
             this.Name = this.Thing.ParameterType.Name;
 
             this.ClearValues();

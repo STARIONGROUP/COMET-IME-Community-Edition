@@ -12,6 +12,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -63,6 +64,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// The active <see cref="DomainOfExpertise"/>
         /// </summary>
         protected DomainOfExpertise currentDomain;
+
+        /// <summary>
+        /// Backing field for <see cref="ModelCode"/>
+        /// </summary>
+        private string modelCode;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementBaseRowViewModel{T}"/> class
@@ -84,6 +90,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateTooltip();
             this.UpdateOwnerProperties();
             this.WhenAnyValue(vm => vm.Owner).Subscribe(_ => this.UpdateOwnerProperties());
+            this.ModelCode = ((IModelCode)this.Thing).ModelCode();
         }
         
         /// <summary>
@@ -130,6 +137,15 @@ namespace CDP4EngineeringModel.ViewModels
                 this.OwnerName = this.Owner.Name;
                 this.OwnerShortName = this.Owner.ShortName;
             }
+        }
+
+        /// <summary>
+        /// Gets the mode-code
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
         }
 
         /// <summary>
@@ -228,6 +244,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateTooltip();
+            this.ModelCode = ((IModelCode)this.Thing).ModelCode();
         }
 
         /// <summary>

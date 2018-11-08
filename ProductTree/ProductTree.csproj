@@ -195,6 +195,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\ProductTreeRibbonViewModel.cs" />
     <Compile Include="ViewModels\ProductTreeRows\ActualFiniteStateRowViewModel.cs" />
+    <Compile Include="ViewModels\ProductTreeRows\IModelCodeRowViewModel.cs" />
     <Compile Include="ViewModels\ProductTreeRows\IParameterRowContainer.cs" />
     <Compile Include="ViewModels\ProductTreeRows\ParameterOrOverrideBaseRowViewModel.cs" />
     <Compile Include="ViewModels\ProductTreeRows\ParameterOverrideRowViewModel.cs" />

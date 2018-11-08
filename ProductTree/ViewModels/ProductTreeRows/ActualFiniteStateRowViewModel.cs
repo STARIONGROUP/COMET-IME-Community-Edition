@@ -21,7 +21,7 @@ namespace CDP4ProductTree.ViewModels
     /// <remarks>
     /// This row shall be used when a <see cref="Parameter"/> is state dependent
     /// </remarks>
-    public class ActualFiniteStateRowViewModel : CDP4CommonView.ActualFiniteStateRowViewModel
+    public class ActualFiniteStateRowViewModel : CDP4CommonView.ActualFiniteStateRowViewModel, IModelCodeRowViewModel
     {
         /// <summary>
         /// backing field for <see cref="Value"/> property.
@@ -44,6 +44,11 @@ namespace CDP4ProductTree.ViewModels
         private string ownerShortName;
 
         /// <summary>
+        /// Backing field for <see cref="ModelCode"/>
+        /// </summary>
+        private string modelCode;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ActualFiniteStateRowViewModel"/> class
         /// </summary>
         /// <param name="actualFiniteState">The <see cref="ActualFiniteState"/> represented</param>
@@ -60,7 +65,16 @@ namespace CDP4ProductTree.ViewModels
                 this.OwnerShortName = parameterOrOverrideBaseRowViewModel.OwnerShortName;
             }
         }
-        
+
+        /// <summary>
+        /// Gets the model-code
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether the current represented <see cref="ParameterValueSetBase"/> is publishable
         /// </summary>
@@ -126,6 +140,7 @@ namespace CDP4ProductTree.ViewModels
             }
 
             this.Switch = valueSet.ValueSwitch;
+            this.ModelCode = valueSet.ModelCode();
         }
     }
 }

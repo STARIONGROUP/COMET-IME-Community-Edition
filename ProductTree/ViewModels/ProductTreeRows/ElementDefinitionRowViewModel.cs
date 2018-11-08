@@ -59,6 +59,11 @@ namespace CDP4ProductTree.ViewModels
         /// The selected <see cref="Option"/> for the browser this row is contained in
         /// </summary>
         public readonly Option Option;
+
+        /// <summary>
+        /// Backing field for <see cref="ModelCode"/>
+        /// </summary>
+        private string modelCode;
         #endregion
 
         #region Constructors
@@ -81,6 +86,15 @@ namespace CDP4ProductTree.ViewModels
             this.UpdateTooltip();
         }
         #endregion
+
+        /// <summary>
+        /// Gets the model-code
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
 
         #region IParameterRowContainer public methods
 
@@ -208,6 +222,7 @@ namespace CDP4ProductTree.ViewModels
             this.PopulateElementUsages();
             this.PopulateParameterGroups();
             this.PopulateParameter();
+            this.ModelCode = this.Thing.ModelCode();
         }
 
         /// <summary>

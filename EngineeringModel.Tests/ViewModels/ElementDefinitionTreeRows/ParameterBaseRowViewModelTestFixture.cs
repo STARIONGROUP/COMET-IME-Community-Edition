@@ -213,6 +213,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.elementDefinition.Parameter.Add(this.parameter1);
             this.elementDefinition.Parameter.Add(this.parameterCompound);
+            this.elementDefinition.Parameter.Add(this.parameter5ForSubscription);
 
             this.person = new Person(Guid.NewGuid(), null, null) { GivenName = "test", Surname = "test" };
             this.participant = new Participant(Guid.NewGuid(), null, null) { Person = this.person, SelectedDomain = this.activeDomain };

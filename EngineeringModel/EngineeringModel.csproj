@@ -261,6 +261,7 @@
     <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ElementDefinitionRowViewModel.cs" />
     <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ElementUsageRowViewModel.cs" />
     <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\IElementBaseRowViewModel.cs" />
+    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\IModelCodeRowViewModel.cs" />
     <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterBaseRowViewModel.cs" />
     <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterComponentValueRowViewModel.cs" />
     <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterGroupRowViewModel.cs" />

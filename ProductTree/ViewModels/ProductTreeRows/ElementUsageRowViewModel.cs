@@ -58,7 +58,12 @@ namespace CDP4ProductTree.ViewModels
         /// <summary>
         /// A parameter group - parameter group container mapping
         /// </summary>
-        private Dictionary<ParameterGroup, ParameterGroup> parameterGroupContainment; 
+        private Dictionary<ParameterGroup, ParameterGroup> parameterGroupContainment;
+
+        /// <summary>
+        /// Backing field for <see cref="ModelCode"/>
+        /// </summary>
+        private string modelCode;
         #endregion
 
         #region Constructors
@@ -91,6 +96,15 @@ namespace CDP4ProductTree.ViewModels
             this.UpdateTooltip();
         }
         #endregion
+
+        /// <summary>
+        /// Gets the model-code
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
 
         #region IParameterRowContainer public methods
 
@@ -233,6 +247,7 @@ namespace CDP4ProductTree.ViewModels
         {
             this.Name = this.Thing.Name + " : " + this.ElementDefinition.Name;
             this.ShortName = this.Thing.ShortName + " : " + this.ElementDefinition.ShortName;
+            this.ModelCode = this.Thing.ModelCode();
 
             this.UpdateOwnerNameAndShortName();
 

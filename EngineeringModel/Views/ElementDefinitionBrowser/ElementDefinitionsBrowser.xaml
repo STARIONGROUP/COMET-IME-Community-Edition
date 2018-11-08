@@ -388,6 +388,7 @@
                                         CellTemplateSelector="{StaticResource ReferenceValueCellTemplateSelector}"
                                         FieldName="Reference" />
                     <dxg:TreeListColumn FieldName="Formula" />
+                    <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
                     <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
                 </dxg:TreeListControl.Columns>
                 <dxg:TreeListControl.InputBindings>
