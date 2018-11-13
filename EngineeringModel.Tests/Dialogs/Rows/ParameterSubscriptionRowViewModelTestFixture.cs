@@ -300,10 +300,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var o2s1Set = this.subscription.ValueSet.Single(x => x.ActualOption == this.option2 && x.ActualState == this.actualState1);
             var o2s2Set = this.subscription.ValueSet.Single(x => x.ActualOption == this.option2 && x.ActualState == this.actualState2);
 
-            row.UpdateValueSets(o1s1Set);
-            row.UpdateValueSets(o1s2Set);
-            row.UpdateValueSets(o2s1Set);
-            row.UpdateValueSets(o2s2Set);
+            row.UpdateValueSets(this.subscription);
 
             Assert.AreEqual(o1s1Set.ValueSwitch, o1s1c1Row.Switch);
             Assert.AreEqual(o1s2Set.ValueSwitch, o1s2c1Row.Switch);
@@ -374,8 +371,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var o1Set = this.subscription.ValueSet.Single(x => x.ActualOption == this.option1);
             var o2Set = this.subscription.ValueSet.Single(x => x.ActualOption == this.option2);
 
-            row.UpdateValueSets(o1Set);
-            row.UpdateValueSets(o2Set);
+            row.UpdateValueSets(this.subscription);
 
             Assert.AreEqual(o1Set.ValueSwitch, o1c1Row.Switch);
             Assert.AreEqual(o2Set.ValueSwitch, o2c2Row.Switch);
@@ -443,8 +439,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var s1Set = this.subscription.ValueSet.Single(x => x.ActualState == this.actualState1);
             var s2Set = this.subscription.ValueSet.Single(x => x.ActualState == this.actualState2);
 
-            row.UpdateValueSets(s1Set);
-            row.UpdateValueSets(s2Set);
+            row.UpdateValueSets(this.subscription);
 
             Assert.AreEqual(s1Set.ValueSwitch, s1c1Row.Switch);
             Assert.AreEqual(s2Set.ValueSwitch, s2c2Row.Switch);

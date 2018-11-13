@@ -96,7 +96,12 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.IsNameVisible = this.Thing.ParameterType is CompoundParameterType || this.Thing.IsOptionDependent || this.Thing.StateDependence != null;
         }
-        
+
+        /// <summary>
+        /// Gets a value indicating if the scale shall be made visible
+        /// </summary>
+        public bool IsScaleVisible => this.Thing.ParameterType is CompoundParameterType;
+
         /// <summary>
         /// Gets a value indicating whether is owner visible.
         /// </summary>

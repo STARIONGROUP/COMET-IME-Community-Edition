@@ -146,6 +146,25 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         }
 
         /// <summary>
+        /// Check that the values of this row are valid
+        /// </summary>
+        /// <param name="scale">The <see cref="MeasurementScale"/></param>
+        public override void CheckValues(MeasurementScale scale)
+        {
+            if (this.ContainedRows.Count == 0)
+            {
+                this.RaisePropertyChanged(ManualPropertyName);
+                this.RaisePropertyChanged(ReferencePropertyName);
+                return;
+            }
+
+            foreach (IDialogValueSetRow row in this.ContainedRows)
+            {
+                row.CheckValues(scale);
+            }
+        }
+
+        /// <summary>
         /// Gets the error message for the property with the given name.
         /// </summary>
         /// <returns>

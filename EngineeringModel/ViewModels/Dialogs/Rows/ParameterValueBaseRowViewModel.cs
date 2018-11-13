@@ -227,7 +227,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// Check that the values of this row are valid
         /// </summary>
         /// <param name="scale">The <see cref="MeasurementScale"/></param>
-        public void CheckValues(MeasurementScale scale)
+        public virtual void CheckValues(MeasurementScale scale)
         {
             this.Scale = scale;
             if (this.ContainedRows.Count == 0)

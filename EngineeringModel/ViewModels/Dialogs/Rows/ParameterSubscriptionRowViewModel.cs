@@ -71,34 +71,37 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// Update the <see cref="ParameterSubscriptionValueSet"/> with the row values
         /// </summary>
         /// <param name="valueSet">The <see cref="ParameterSubscriptionValueSet"/> to update</param>
-        public void UpdateValueSets(ParameterSubscriptionValueSet valueSet)
+        public void UpdateValueSets(ParameterSubscription subscription)
         {
-            var actualOption = valueSet.ActualOption;
-            var actualState = valueSet.ActualState;
+            foreach (var valueSet in subscription.ValueSet)
+            {
+                var actualOption = valueSet.ActualOption;
+                var actualState = valueSet.ActualState;
 
-            if (actualOption != null)
-            {
-                var optionRow = this.ContainedRows.Cast<ParameterOptionRowViewModel>().Single(x => x.ActualOption == actualOption);
-                if (actualState != null)
+                if (actualOption != null)
                 {
-                    var actualStateRow = optionRow.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
-                    this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    var optionRow = this.ContainedRows.Cast<ParameterOptionRowViewModel>().Single(x => x.ActualOption == actualOption);
+                    if (actualState != null)
+                    {
+                        var actualStateRow = optionRow.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
+                        this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    }
+                    else
+                    {
+                        this.UpdateScalarOrCompoundValueSet(valueSet, optionRow);
+                    }
                 }
                 else
                 {
-                    this.UpdateScalarOrCompoundValueSet(valueSet, optionRow);
-                }
-            }
-            else
-            {
-                if (actualState != null)
-                {
-                    var actualStateRow = this.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
-                    this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
-                }
-                else
-                {
-                    this.UpdateScalarOrCompoundValueSet(valueSet);
+                    if (actualState != null)
+                    {
+                        var actualStateRow = this.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
+                        this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    }
+                    else
+                    {
+                        this.UpdateScalarOrCompoundValueSet(valueSet);
+                    }
                 }
             }
         }

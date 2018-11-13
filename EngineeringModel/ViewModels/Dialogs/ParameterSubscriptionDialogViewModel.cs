@@ -128,6 +128,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public ReactiveCommand<object> InspectSubcribedParameterCommand { get; protected set; }
 
+        /// <summary>
+        /// Gets a value indicating if the scale shall be made visible
+        /// </summary>
+        public bool IsScaleVisible => this.Thing.ParameterType is CompoundParameterType;
         #endregion
 
         #region Methods
@@ -185,7 +189,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.Thing.ValueSet[i] = this.Thing.ValueSet[i].Clone(false);
             }
 
-            this.ValueSet.First().UpdateValueSets(this.Thing.ValueSet.First());
+            this.ValueSet.First().UpdateValueSets(this.Thing);
 
             foreach (var parameterSubscriptionValueSet in this.Thing.ValueSet)
             {

@@ -84,7 +84,7 @@
                 <dxg:TreeListColumn AllowEditing="True" FieldName="Switch">
                     <dxg:TreeListColumn.CellTemplate>
                         <DataTemplate>
-                            <dxe:ComboBoxEdit Name="PART_Editor"                                              
+                            <dxe:ComboBoxEdit Name="PART_Editor"
                                               IsTextEditable="False"
                                               ShowBorder="True"
                                               ShowCustomItems="False">
@@ -98,6 +98,7 @@
                 <dxg:TreeListColumn FieldName="Computed" ReadOnly="True" />
                 <dxg:TreeListColumn AllowEditing="True" CellTemplateSelector="{StaticResource ManualValueCellTemplateSelector}" FieldName="Manual" />
                 <dxg:TreeListColumn AllowEditing="True" CellTemplateSelector="{StaticResource ReferenceValueCellTemplateSelector}" FieldName="Reference" />
+                <dxg:TreeListColumn AllowEditing="False" Visible="{Binding IsScaleVisible, Mode=OneWay}" FieldName="Scale.ShortName" Header="Scale" />
                 <dxg:TreeListColumn AllowEditing="False" FieldName="ParameterType.Name" Header="Parameter Type" />
             </dxg:TreeListControl.Columns>
         </dxg:TreeListControl>

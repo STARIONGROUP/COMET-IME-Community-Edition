@@ -87,7 +87,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         #endregion
 
         #region public properties
-        
+
         /// <summary>
         /// Gets a value indicating whether the <see cref="ParameterType"/> of this <see cref="Parameter"/> is a <see cref="EnumerationParameterType"/>
         /// </summary>
@@ -109,7 +109,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// Check that the values of this row are valid
         /// </summary>
         /// <param name="scale">The <see cref="MeasurementScale"/></param>
-        public void CheckValues(MeasurementScale scale)
+        public virtual void CheckValues(MeasurementScale scale)
         {
             this.Scale = scale;
             if (this.ContainedRows.Count == 0)

@@ -79,6 +79,11 @@ namespace CDP4EngineeringModel.ViewModels
 
         #region Properties
         /// <summary>
+        /// Gets a value indicating if the scale shall be made visible
+        /// </summary>
+        public bool IsScaleVisible => this.Thing.ParameterType is CompoundParameterType;
+
+        /// <summary>
         /// Gets a value indicating whether is owner visible.
         /// </summary>
         public bool IsOwnerVisible

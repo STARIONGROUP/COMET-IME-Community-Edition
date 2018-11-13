@@ -52,11 +52,6 @@ namespace CDP4EngineeringModel.ViewModels
         private bool isValueSetListenerInitialized;
 
         /// <summary>
-        /// Gets a value indicating whether this is a <see cref="ParameterSubscription"/>
-        /// </summary>
-        protected readonly bool IsParameterSubscription;
-
-        /// <summary>
         /// Backing field for <see cref="IsPublishable"/>
         /// </summary>
         private bool isPublishable;
