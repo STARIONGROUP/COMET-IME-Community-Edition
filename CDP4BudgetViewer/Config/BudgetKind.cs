@@ -12,18 +12,13 @@ namespace CDP4Budget.Services
     public enum BudgetKind
     {
         /// <summary>
-        /// Asserts that a cost budget shall be computed
+        /// Asserts that a generic budget shall be computed
         /// </summary>
-        Cost,
+        Generic,
 
         /// <summary>
         /// Asserts that a mass budget shall be calculated
         /// </summary>
         Mass,
-
-        /// <summary>
-        /// Asserts that a power budget shall be calculated
-        /// </summary>
-        //Power,
     }
 }

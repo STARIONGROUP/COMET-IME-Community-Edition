@@ -54,7 +54,7 @@ namespace CDP4Budget.ViewModels
         /// <param name="rootElement">The root <see cref="ElementDefinition"/></param>
         /// <param name="option">The current <see cref="Option"/></param>
         /// <param name="session">The <see cref="ISession"/></param>
-        public MassBudgetSummaryViewModel(BudgetConfig budgetConfig, ElementDefinition rootElement, Option option, ISession session) : base(budgetConfig, rootElement, option, session)
+        public MassBudgetSummaryViewModel(BudgetConfig budgetConfig, ElementDefinition rootElement, Option option, ISession session, Action refreshOptionOverview) : base(budgetConfig, rootElement, option, session, refreshOptionOverview)
         {
             this.WhenAnyValue(x => x.WetTotal).Subscribe(x => this.SummaryTotal = x);
             this.ExtraMassContributions = new ReactiveList<ExtraMassContributionRowViewModel>();

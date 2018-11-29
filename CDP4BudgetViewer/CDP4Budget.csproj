@@ -174,6 +174,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CDP4BudgetModule.cs" />
+    <Compile Include="ConfigFile\GenericParameterConfigDto.cs" />
     <Compile Include="ConfigFile\MassParameterConfigDto.cs" />
     <Compile Include="ConfigFile\ParameterConfigDto.cs" />
     <Compile Include="ConfigFile\ExtraContributionDto.cs" />
@@ -188,16 +189,16 @@
     <Compile Include="Exceptions\BudgetComputationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Config\PowerBudgetParameterConfig.cs" />
-    <Compile Include="Config\CostBudgetParameterConfig.cs" />
+    <Compile Include="Config\GenericBudgetParameterConfig.cs" />
     <Compile Include="Config\MassBudgetParameterConfig.cs" />
     <Compile Include="Config\BudgetParameterConfigBase.cs" />
     <Compile Include="Services\ExtraContribution.cs" />
     <Compile Include="Services\ISubSystemBudgetResult.cs" />
     <Compile Include="Services\ISubSystemGenericBudgetResult.cs" />
-    <Compile Include="Services\CostBudgetGenerator.cs" />
+    <Compile Include="Services\GenericBudgetGenerator.cs" />
     <Compile Include="Services\MassBudgetGenerator.cs" />
-    <Compile Include="Services\SubSystemCostBudgetResult.cs" />
     <Compile Include="Services\SubSystemGenericBudgetResult.cs" />
+    <Compile Include="Services\SubSystemGenericOfTBudgetResult.cs" />
     <Compile Include="Services\SubSystemMassBudgetResult.cs" />
     <Compile Include="Services\SubSystemBudgetResult.cs" />
     <Compile Include="Config\SubSystemDefinition.cs" />
@@ -207,8 +208,8 @@
     <Compile Include="Utils.cs" />
     <Compile Include="ViewModels\Config\BudgetConfigDialogResult.cs" />
     <Compile Include="ViewModels\Viewer\ColumnDefinition.cs" />
-    <Compile Include="ViewModels\Viewer\Cost\CostBudgetSummaryViewModel.cs" />
-    <Compile Include="ViewModels\Viewer\Cost\CostBudgetRowViewModel.cs" />
+    <Compile Include="ViewModels\Viewer\Generic\GenericBudgetSummaryViewModel.cs" />
+    <Compile Include="ViewModels\Viewer\Generic\GenericBudgetRowViewModel.cs" />
     <Compile Include="Views\BudgetParameterConfigDataTemplateSelector.cs" />
     <Compile Include="ViewModels\Config\ExtraMassContributionConfigurationViewModel.cs" />
     <Compile Include="ViewModels\SystemLevelKind.cs" />
@@ -218,7 +219,7 @@
     <Compile Include="Views\BudgetViewerDataTemplateSelector.cs" />
     <Compile Include="ViewModels\Config\BudgetParameterConfigViewModelBase.cs" />
     <Compile Include="ViewModels\Config\PowerBudgetParameterConfigViewModel.cs" />
-    <Compile Include="ViewModels\Config\CostBudgetParameterConfigViewModel.cs" />
+    <Compile Include="ViewModels\Config\GenericBudgetParameterConfigViewModel.cs" />
     <Compile Include="ViewModels\Config\MassBudgetParameterConfigViewModel.cs" />
     <Compile Include="ViewModels\Config\CategorySelectionViewModel.cs" />
     <Compile Include="ViewModels\Config\BudgetConfigViewModel.cs" />

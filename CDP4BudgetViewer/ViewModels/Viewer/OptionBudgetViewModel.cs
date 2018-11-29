@@ -6,6 +6,7 @@
 
 namespace CDP4Budget.ViewModels
 {
+    using System;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal;
     using Config;
@@ -19,7 +20,7 @@ namespace CDP4Budget.ViewModels
     public class OptionBudgetViewModel : ReactiveObject
     {
         public const string MASS_BUDGET_TITLE = "Mass Budget";
-        public const string COST_BUDGET_TITLE = "Cost Budget";
+        public const string GENERIC_BUDGET_TITLE = "Generic Budget";
         public const string POWER_BUDGET_TITLE = "Power Budget";
 
         /// <summary>
@@ -33,7 +34,7 @@ namespace CDP4Budget.ViewModels
         /// <param name="option">The option</param>
         /// <param name="budgetConfig">The current <see cref="BudgetConfig"/></param>
         /// <param name="session">The current <see cref="ISession"/></param>
-        public OptionBudgetViewModel(Option option, BudgetConfig budgetConfig, ISession session)
+        public OptionBudgetViewModel(Option option, BudgetConfig budgetConfig, ISession session, Action refreshOptionOverview)
         {
             this.BudgetSummary = new ReactiveList<BudgetSummaryViewModel>();
             this.Option = option;
@@ -42,12 +43,12 @@ namespace CDP4Budget.ViewModels
                 if (budgetConfig.BudgetParameterConfig is MassBudgetParameterConfig)
                 {
                     this.GroupTitle = $"{MASS_BUDGET_TITLE}: {option.Name}";
-                    this.BudgetSummary.Add(new MassBudgetSummaryViewModel(budgetConfig, budgetConfigElement, option, session));
+                    this.BudgetSummary.Add(new MassBudgetSummaryViewModel(budgetConfig, budgetConfigElement, option, session, refreshOptionOverview));
                 }
-                else if (budgetConfig.BudgetParameterConfig is CostBudgetParameterConfig)
+                else if (budgetConfig.BudgetParameterConfig is GenericBudgetParameterConfig)
                 {
-                    this.GroupTitle = $"{COST_BUDGET_TITLE}: {option.Name}";
-                    this.BudgetSummary.Add(new CostBudgetSummaryViewModel(budgetConfig, budgetConfigElement, option, session));
+                    this.GroupTitle = $"{GENERIC_BUDGET_TITLE}: {option.Name}";
+                    this.BudgetSummary.Add(new GenericBudgetSummaryViewModel(budgetConfig, budgetConfigElement, option, session, refreshOptionOverview));
                 }
                 else if (budgetConfig.BudgetParameterConfig is PowerBudgetParameterConfig)
                 {

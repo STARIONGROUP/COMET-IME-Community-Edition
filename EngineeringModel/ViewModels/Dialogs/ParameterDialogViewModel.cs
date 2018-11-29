@@ -363,7 +363,7 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain);
+            this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name));
             if (this.SelectedOwner == null)
             {
                 Tuple<DomainOfExpertise, Participant> tuple;

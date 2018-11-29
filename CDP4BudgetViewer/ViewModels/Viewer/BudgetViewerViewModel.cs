@@ -224,13 +224,8 @@ namespace CDP4Budget.ViewModels
 
             foreach (Option option in this.Thing.Option)
             {
-                var budgetViewModel = new OptionBudgetViewModel(option, this.BudgetConfig, this.Session);
+                var budgetViewModel = new OptionBudgetViewModel(option, this.BudgetConfig, this.Session, this.PopulateOptionOverview);
                 this.BudgetViewModels.Add(budgetViewModel);
-
-                foreach (var budgetSummaryViewModel in budgetViewModel.BudgetSummary)
-                {
-                    budgetSummaryViewModel.WhenAnyValue(x => x.SummaryTotal).Skip(1).Subscribe(_ => this.PopulateOptionOverview());
-                }
             }
 
             this.PopulateOptionOverview();
@@ -300,7 +295,7 @@ namespace CDP4Budget.ViewModels
 
             try
             {
-                BudgetConfigDto fileconfig;
+                BudgetConfigDto fileconfig; 
 
                 using (var filestream = new FileStream(filePath, FileMode.Open))
                 using (var sr = new StreamReader(filestream))

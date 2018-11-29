@@ -122,6 +122,16 @@ namespace CDP4Budget.Config
 
                 dto.ParameterConfig = parameterConfigDto;
             }
+
+            var genericConfig = this.BudgetParameterConfig as GenericBudgetParameterConfig;
+            if (genericConfig != null)
+            {
+                var parameterConfigDto = new GenericParameterConfigDto();
+                parameterConfigDto.ParameterType = genericConfig.GenericTuple.MainParameterType.Iid;
+                parameterConfigDto.MarginParameterType = genericConfig.GenericTuple.MarginParameterType?.Iid;
+
+                dto.ParameterConfig = parameterConfigDto;
+            }
             else
             {
                 throw new NotImplementedException("only mass budget has been implemented");

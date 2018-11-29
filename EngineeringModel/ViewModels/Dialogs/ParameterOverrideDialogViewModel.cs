@@ -26,6 +26,11 @@ namespace CDP4EngineeringModel.ViewModels
     [ThingDialogViewModelExport(ClassKind.ParameterOverride)]
     public class ParameterOverrideDialogViewModel : CDP4CommonView.ParameterOverrideDialogViewModel, IThingDialogViewModel
     {
+        /// <summary>
+        /// Backing field for <see cref="IsOwnerReadonly"/>
+        /// </summary>
+        private bool isOwnerReadonly;
+
         #region Constructors
 
         /// <summary>
@@ -97,6 +102,15 @@ namespace CDP4EngineeringModel.ViewModels
         public bool IsNameVisible { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether the owner is read-only
+        /// </summary>
+        public bool IsOwnerReadonly
+        {
+            get { return this.isOwnerReadonly; }
+            private set { this.RaiseAndSetIfChanged(ref this.isOwnerReadonly, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the list of <see cref="ParameterOverrideValueSet"/>
         /// </summary>
         public ReactiveList<Dialogs.ParameterOverrideRowViewModel> ValueSet { get; protected set; }
@@ -141,6 +155,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.Initialize();
             this.ValueSet = new ReactiveList<Dialogs.ParameterOverrideRowViewModel>();
+            this.IsOwnerReadonly = !this.Thing.Parameter.AllowDifferentOwnerOfOverride;
         }
 
          /// <summary>
@@ -192,7 +207,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.Thing.Parameter.AllowDifferentOwnerOfOverride)
             {
-                this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain);   
+                this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name));   
             }
             else
             {

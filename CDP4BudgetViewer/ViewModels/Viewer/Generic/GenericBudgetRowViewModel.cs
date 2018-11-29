@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CostBudgetRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="GenericBudgetRowViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ namespace CDP4Budget.ViewModels
     /// <summary>
     /// A view-model for sub-system cost representation
     /// </summary>
-    public sealed class CostBudgetRowViewModel : BudgetRowViewModelBase<SubSystemCostBudgetResult>
+    public sealed class GenericBudgetRowViewModel : BudgetRowViewModelBase<SubSystemGenericBudgetResult>
     {
         #region backing field
         /// <summary>
@@ -44,12 +44,12 @@ namespace CDP4Budget.ViewModels
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CostBudgetRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="GenericBudgetRowViewModel"/> class
         /// </summary>
         /// <param name="subsystemResult">The <see cref="SubSystemMassBudgetResult"/></param>
         /// <param name="subsystem">The <see cref="SubSystem"/></param>
         /// <param name="recomputeTotal">The action to recompute the total</param>
-        public CostBudgetRowViewModel(SubSystemCostBudgetResult subsystemResult, SubSystem subsystem, Action recomputeTotal) : base(subsystemResult, subsystem, recomputeTotal)
+        public GenericBudgetRowViewModel(SubSystemGenericBudgetResult subsystemResult, SubSystem subsystem, Action recomputeTotal) : base(subsystemResult, subsystem, recomputeTotal)
         {
         }
 

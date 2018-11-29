@@ -48,7 +48,7 @@
                                   GroupBoxDisplayMode="Normal"
                                   Header="{Binding ElementName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                   IsCollapsible="True">
-                    <dxlc:LayoutItem Label="All values are expressed in: ">
+                    <dxlc:LayoutItem Label="All values are expressed in (unless specified otherwise): ">
                         <TextBlock Text="{Binding Scale, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
                     </dxlc:LayoutItem>
 
@@ -267,7 +267,7 @@
                     <dxlc:LayoutGroup Orientation="Vertical"
                                       View="GroupBox"
                                       GroupBoxDisplayMode="Normal"
-                                      Header="Cost Summary: "
+                                      Header="Summary: "
                                       IsCollapsible="True"
                                       IsCollapsed="False">
                         <dxlc:LayoutItem Label="System Margin (%): ">
@@ -277,14 +277,14 @@
                                           HorizontalAlignment="Right">
                             </dxe:TextEdit>
                         </dxlc:LayoutItem>
-                        <dxlc:LayoutItem Label="Total Cost: ">
+                        <dxlc:LayoutItem Label="Total: ">
                             <TextBox IsReadOnly="True" 
                                      Text="{Binding Total, Mode=OneWay}"
                                      Width="100"
                                      HorizontalAlignment="Right"></TextBox>
                         </dxlc:LayoutItem>
 
-                        <dxlc:LayoutItem Label="Total Cost (Margin included): ">
+                        <dxlc:LayoutItem Label="Total (Margin included): ">
                             <TextBox IsReadOnly="True" 
                                      Text="{Binding TotalWithSystemMargin, Mode=OneWay}"
                                      Width="100"

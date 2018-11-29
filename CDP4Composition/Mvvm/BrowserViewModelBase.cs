@@ -441,7 +441,7 @@ namespace CDP4Composition.Mvvm
             var confirmation = new ConfirmationDialogViewModel(thing);
             var dialogResult = this.dialogNavigationService.NavigateModal(confirmation);
 
-            if (!dialogResult.Result.HasValue || !dialogResult.Result.Value)
+            if (dialogResult == null || !dialogResult.Result.HasValue || !dialogResult.Result.Value)
             {
                 return;
             }

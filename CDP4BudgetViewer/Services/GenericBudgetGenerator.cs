@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="CostBudgetGenerator.cs" company="RHEA System S.A.">
+// <copyright file="GenericBudgetGenerator.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ namespace CDP4Budget.Services
     /// <summary>
     /// The service responsible for generating the cost-budget
     /// </summary>
-    public class CostBudgetGenerator : BudgetGenerator
+    public class GenericBudgetGenerator : BudgetGenerator
     {
         /// <summary>
         /// Computes the sub-system budget results
@@ -38,7 +38,7 @@ namespace CDP4Budget.Services
             var ssResults = new List<ISubSystemBudgetResult>();
             foreach (var subSystem in subSystems)
             {
-                var ssResult = new SubSystemCostBudgetResult(subSystem, budgetConfig, option, currentDomain);
+                var ssResult = new SubSystemGenericBudgetResult(subSystem, budgetConfig, option, currentDomain);
                 ssResults.Add(ssResult);
             }
 

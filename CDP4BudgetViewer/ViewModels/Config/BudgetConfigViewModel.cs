@@ -276,14 +276,10 @@ namespace CDP4Budget.ViewModels
 
                     parameterConfig = new MassBudgetParameterConfig(drymassConfig, extraConf);
                     break;
-                case BudgetKind.Cost:
-                    var costBudgetVm = (CostBudgetParameterConfigViewModel)this.BudgetParameterConfig;
-                    parameterConfig = new CostBudgetParameterConfig(new BudgetParameterMarginPair(costBudgetVm.GenericConfig.SelectedParameterType, costBudgetVm.GenericConfig.SelectedMarginParameterType));
+                case BudgetKind.Generic:
+                    var costBudgetVm = (GenericBudgetParameterConfigViewModel)this.BudgetParameterConfig;
+                    parameterConfig = new GenericBudgetParameterConfig(new BudgetParameterMarginPair(costBudgetVm.GenericConfig.SelectedParameterType, costBudgetVm.GenericConfig.SelectedMarginParameterType));
                     break;
-                //case BudgetKind.Power:
-                //    var powerBudgetVm = (PowerBudgetParameterConfigViewModel)this.BudgetParameterConfig;
-                //    parameterConfig = new PowerBudgetParameterConfig(new BudgetParameterMarginPair(powerBudgetVm.GenericConfig.SelectedParameterType, powerBudgetVm.GenericConfig.SelectedMarginParameterType));
-                //    break;
                 default:
                     throw new NotImplementedException($"Case {this.SelectedBudgetKind} not implemented");
             }
@@ -334,9 +330,9 @@ namespace CDP4Budget.ViewModels
 
             this.usedCategories = new List<Category>(elementBases.SelectMany(x => x.Category).Distinct().OrderBy(x => x.Name));
 
-            var usedParameterTypes = iteration.Element.SelectMany(x => x.Parameter).Select(x => x.ParameterType).Distinct().OrderBy(x => x.Name);
+            var usedParameterTypes = iteration.Element.SelectMany(x => x.Parameter).Select(x => x.ParameterType).Distinct().OrderBy(x => x.Name).ToList();
             this.PossibleParameterTypes = new ReactiveList<QuantityKind>(usedParameterTypes.OfType<QuantityKind>());
-            this.PossibleSystemLevelParameterTypes = new ReactiveList<EnumerationParameterType>(this.PossibleParameterTypes.OfType<EnumerationParameterType>());
+            this.PossibleSystemLevelParameterTypes = new ReactiveList<EnumerationParameterType>(usedParameterTypes.OfType<EnumerationParameterType>());
             this.SubSystemDefinitions = new ReactiveList<SubSystemConfigViewModel>();
             this.PossibleElementDefinitions = new ReactiveList<ElementDefinition>(iteration.Element.OrderBy(x => x.Name));
         }
@@ -372,16 +368,17 @@ namespace CDP4Budget.ViewModels
                 this.BudgetParameterConfig = vm;
             }
 
-            //var powerBudgetConfig = configuration.BudgetParameterConfig as PowerBudgetParameterConfig;
-            //if (powerBudgetConfig != null)
-            //{
-            //    this.SelectedBudgetKind = BudgetKind.Power;
-            //}
-
-            var costBudgetConfig = configuration.BudgetParameterConfig as CostBudgetParameterConfig;
-            if (costBudgetConfig != null)
+            var genericBudgetConfig = configuration.BudgetParameterConfig as GenericBudgetParameterConfig;
+            if (genericBudgetConfig != null)
             {
-                this.SelectedBudgetKind = BudgetKind.Cost;
+                this.SelectedBudgetKind = BudgetKind.Generic;
+                var vm = new GenericBudgetParameterConfigViewModel(this.PossibleParameterTypes, this.UpdateCanOk);
+                vm.GenericConfig.SelectedParameterType = this.PossibleParameterTypes.FirstOrDefault(x => x.Iid == genericBudgetConfig.GenericTuple.MainParameterType.Iid);
+                vm.GenericConfig.SelectedMarginParameterType = genericBudgetConfig.GenericTuple.MarginParameterType != null
+                    ? this.PossibleParameterTypes.FirstOrDefault(x => x.Iid == genericBudgetConfig.GenericTuple.MarginParameterType.Iid)
+                    : null;
+
+                this.BudgetParameterConfig = vm;
             }
 
             foreach (var subSystemDefinition in configuration.SubSystemDefinition)
@@ -415,8 +412,8 @@ namespace CDP4Budget.ViewModels
                         case BudgetKind.Mass:
                             this.BudgetParameterConfig = new MassBudgetParameterConfigViewModel(this.PossibleParameterTypes, this.UpdateCanOk, this.usedCategories);
                             break;
-                        case BudgetKind.Cost:
-                            this.BudgetParameterConfig = new CostBudgetParameterConfigViewModel(this.PossibleParameterTypes, this.UpdateCanOk);
+                        case BudgetKind.Generic:
+                            this.BudgetParameterConfig = new GenericBudgetParameterConfigViewModel(this.PossibleParameterTypes, this.UpdateCanOk);
                             break;
                         //case BudgetKind.Power:
                         //    this.BudgetParameterConfig = new PowerBudgetParameterConfigViewModel(this.PossibleParameterTypes, this.UpdateCanOk);

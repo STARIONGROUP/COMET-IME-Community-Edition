@@ -144,6 +144,20 @@ namespace CDP4Budget.ConfigFile
                 parameterConfigBase = new MassBudgetParameterConfig(new BudgetParameterMarginPair(configPt, configMarginPt), extraConfigList);
             }
 
+            // resolve Parameter-Configuration
+            var genericConfig = this.ParameterConfig as GenericParameterConfigDto;
+            if (genericConfig != null)
+            {
+                var configPt = usedQuantityKinds.FirstOrDefault(x => x.Iid == genericConfig.ParameterType);
+
+                if (genericConfig.MarginParameterType.HasValue)
+                {
+                    configMarginPt = usedQuantityKinds.FirstOrDefault(x => x.Iid == genericConfig.MarginParameterType.Value);
+                }
+
+                parameterConfigBase = new GenericBudgetParameterConfig(new BudgetParameterMarginPair(configPt, configMarginPt));
+            }
+
             // resolve sub-systems
             var subSystemDef = new List<SubSystemDefinition>();
             foreach (var subSystemDefinitionDto in this.SubSystemDefinition)

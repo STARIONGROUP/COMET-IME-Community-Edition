@@ -30,7 +30,7 @@ namespace CDP4Budget.ViewModels
                 return this.MassBudgetDataTemplate;
             }
 
-            var costVm = item as CostBudgetSummaryViewModel;
+            var costVm = item as GenericBudgetSummaryViewModel;
             if (costVm != null)
             {
                 return this.CostBudgetDataTemplate;

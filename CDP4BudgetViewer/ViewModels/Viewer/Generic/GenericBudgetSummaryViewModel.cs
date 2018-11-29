@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CostBudgetSummaryViewModel.cs" company="RHEA System S.A.">
+// <copyright file="GenericBudgetSummaryViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -10,6 +10,7 @@ namespace CDP4Budget.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reactive.Linq;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
@@ -22,7 +23,7 @@ namespace CDP4Budget.ViewModels
     /// <summary>
     /// The view-model that is responsible for showing the computed total cost-budget for a <see cref="ParameterType"/>
     /// </summary>
-    public sealed class CostBudgetSummaryViewModel : BudgetSummaryViewModel
+    public sealed class GenericBudgetSummaryViewModel : BudgetSummaryViewModel
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -44,16 +45,17 @@ namespace CDP4Budget.ViewModels
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CostBudgetSummaryViewModel"/> class
+        /// Initializes a new instance of the <see cref="GenericBudgetSummaryViewModel"/> class
         /// </summary>
         /// <param name="budgetConfig">The <see cref="BudgetConfig"/></param>
         /// <param name="rootElement">The root <see cref="ElementDefinition"/></param>
         /// <param name="option">The current <see cref="Option"/></param>
         /// <param name="session">The <see cref="ISession"/></param>
-        public CostBudgetSummaryViewModel(BudgetConfig budgetConfig, ElementDefinition rootElement, Option option, ISession session) : base(budgetConfig, rootElement, option, session)
+        public GenericBudgetSummaryViewModel(BudgetConfig budgetConfig, ElementDefinition rootElement, Option option, ISession session, Action refreshOptionOverview) : base(budgetConfig, rootElement, option, session, refreshOptionOverview)
         {
             this.ComputeBudget();
             this.ComputeTotal();
+            this.WhenAnyValue(x => x.TotalWithSystemMargin).Subscribe(x => this.SummaryTotal = x);
         }
 
         /// <summary>
@@ -89,7 +91,7 @@ namespace CDP4Budget.ViewModels
         protected override void ComputeTotal()
         {
             this.Total = 0;
-            foreach (CostBudgetRowViewModel budgetRowViewModelBase in this.SubSystemSummary)
+            foreach (GenericBudgetRowViewModel budgetRowViewModelBase in this.SubSystemSummary)
             {
                 this.Total = this.Total + budgetRowViewModelBase.CostTotal;
 
@@ -107,7 +109,7 @@ namespace CDP4Budget.ViewModels
                 }
             }
 
-            foreach (CostBudgetRowViewModel budgetRowViewModelBase in this.SubSystemSummary)
+            foreach (GenericBudgetRowViewModel budgetRowViewModelBase in this.SubSystemSummary)
             {
                 budgetRowViewModelBase.SetTotalCostRatio(this.Total);
             }
@@ -120,14 +122,14 @@ namespace CDP4Budget.ViewModels
         {
             try
             {
-                var computer = new CostBudgetGenerator();
+                var computer = new GenericBudgetGenerator();
                 var iteration = (Iteration)this.CurrentOption.Container;
 
                 var results = computer.ComputeResult(this.BudgetConfig, this.RootElement, this.CurrentOption, this.Session.QuerySelectedDomainOfExpertise(iteration));
 
-                foreach (SubSystemCostBudgetResult subSystemBudgetResult in results)
+                foreach (SubSystemGenericBudgetResult subSystemBudgetResult in results)
                 {
-                    var row = new CostBudgetRowViewModel(subSystemBudgetResult, subSystemBudgetResult.SubSystem, this.ComputeTotal);
+                    var row = new GenericBudgetRowViewModel(subSystemBudgetResult, subSystemBudgetResult.SubSystem, this.ComputeTotal);
                     this.SubSystemSummary.Add(row);
                 }
 

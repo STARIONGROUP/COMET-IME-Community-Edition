@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="CostBudgetParameterConfigViewModel.cs" company="RHEA System S.A.">
+// <copyright file="GenericBudgetParameterConfigViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2018 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
@@ -15,14 +15,14 @@ namespace CDP4Budget.ViewModels
     /// <summary>
     /// The view-model used to setup configuration for the budget view
     /// </summary>
-    public class CostBudgetParameterConfigViewModel : BudgetParameterConfigViewModelBase
+    public class GenericBudgetParameterConfigViewModel : BudgetParameterConfigViewModelBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CostBudgetParameterConfigViewModel"/> class
+        /// Initializes a new instance of the <see cref="GenericBudgetParameterConfigViewModel"/> class
         /// </summary>
         /// <param name="possibleParameterTypes">The possible <see cref="QuantityKind"/></param>
         /// <param name="validateMainForm">The main form validator to call on any changes</param>
-        public CostBudgetParameterConfigViewModel(IReadOnlyList<QuantityKind> possibleParameterTypes, Action validateMainForm) : base(validateMainForm)
+        public GenericBudgetParameterConfigViewModel(IReadOnlyList<QuantityKind> possibleParameterTypes, Action validateMainForm) : base(validateMainForm)
         {
             this.GenericConfig = new ParameterConfigViewModel(possibleParameterTypes, validateMainForm);
         }
@@ -33,9 +33,9 @@ namespace CDP4Budget.ViewModels
         public ParameterConfigViewModel GenericConfig { get; }
 
         /// <summary>
-        /// Gets the <see cref="BudgetKind"/> associated to this <see cref="CostBudgetParameterConfigViewModel"/>
+        /// Gets the <see cref="BudgetKind"/> associated to this <see cref="GenericBudgetParameterConfigViewModel"/>
         /// </summary>
-        public override BudgetKind BudgetKind => BudgetKind.Cost;
+        public override BudgetKind BudgetKind => BudgetKind.Generic;
 
         /// <summary>
         /// Asserts whether the view-model is valid

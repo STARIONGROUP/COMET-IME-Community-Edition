@@ -108,6 +108,14 @@ namespace CDP4Budget.ConfigFile
 
                 dto.ParameterConfig = paramConfigDto;
             }
+            else if (paramConfig != null && paramConfig[PARAMETER_CONFIG_TYPE].ToObject<BudgetKind>() == BudgetKind.Generic)
+            {
+                var paramConfigDto = new GenericParameterConfigDto();
+                paramConfigDto.ParameterType = paramConfig[PARAMETER_CONFIG_PARAM_TYPE].ToObject<Guid>();
+                paramConfigDto.MarginParameterType = paramConfig[PARAMETER_CONFIG_MARGIN_PARAM_TYPE].ToObject<Guid?>();
+
+                dto.ParameterConfig = paramConfigDto;
+            }
 
             return dto;
         }

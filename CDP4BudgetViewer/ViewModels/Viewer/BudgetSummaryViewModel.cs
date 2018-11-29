@@ -41,7 +41,7 @@ namespace CDP4Budget.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="BudgetSummaryViewModel"/> class
         /// </summary>
-        protected BudgetSummaryViewModel(BudgetConfig budgetConfig, ElementDefinition element, Option option, ISession session)
+        protected BudgetSummaryViewModel(BudgetConfig budgetConfig, ElementDefinition element, Option option, ISession session, Action refreshOptionOverview)
         {
             this.BudgetConfig = budgetConfig;
             this.Disposable = new List<IDisposable>();
@@ -50,6 +50,7 @@ namespace CDP4Budget.ViewModels
             this.Session = session;
             this.RootElement = element;
             this.WhenAnyValue(x => x.SystemMargin).Skip(1).Subscribe(_ => this.ComputeTotal());
+            this.WhenAnyValue(x => x.SummaryTotal).Skip(1).Subscribe(_ => refreshOptionOverview());
             this.ElementName = this.RootElement.Name;
         }
 

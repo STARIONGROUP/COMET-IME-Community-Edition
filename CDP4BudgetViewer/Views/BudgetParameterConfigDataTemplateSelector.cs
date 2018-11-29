@@ -34,8 +34,7 @@ namespace CDP4Budget.ViewModels
             {
                 case BudgetKind.Mass:
                     return this.MassBudgetDataTemplate;
-                case BudgetKind.Cost:
-                //case BudgetKind.Power:
+                case BudgetKind.Generic:
                 default:
                     return this.GenericBudgetDataTemplate;
             }
