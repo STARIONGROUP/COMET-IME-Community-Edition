@@ -115,6 +115,11 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <dx:LoadingDecorator IsSplashScreenShown="{Binding IsBusy}"
+                         OwnerLock="LoadingContent"
+                         BorderEffect="Default"
+                         BorderEffectColor="Blue">
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -244,4 +249,6 @@
             </dxg:TreeListControl>
         </Grid>
     </Grid>
+
+    </dx:LoadingDecorator>
 </UserControl>

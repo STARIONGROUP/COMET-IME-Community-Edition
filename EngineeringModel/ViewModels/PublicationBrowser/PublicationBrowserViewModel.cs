@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PublicationBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-208 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,8 +29,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class PublicationBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
-        #region Fields
-
         private static readonly PublicationChildRowComparer rowComparer = new PublicationChildRowComparer();
 
         /// <summary>
@@ -57,10 +55,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Publications";
-
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="PublicationBrowserViewModel"/> class
         /// </summary>
@@ -82,9 +77,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateProperties();
             this.ComputePermission();
         }
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Gets or sets the Create Command
         /// </summary>
@@ -138,9 +131,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the rows representing <see cref="Publication"/>s
         /// </summary>
         public ReactiveList<PublicationRowViewModel> Publications { get; private set; }
-        #endregion
-
-        #region Browser base
+        
         /// <summary>
         /// Gets the rows representing <see cref="DomainOfExpertise"/>s
         /// </summary>
@@ -431,6 +422,8 @@ namespace CDP4EngineeringModel.ViewModels
             
             publication.PublishedParameter = parametersOrOverrides;
 
+            this.IsBusy = true;
+
             var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
             var containerTransaction = new ThingTransaction(transactionContext, iteration);
             containerTransaction.CreateOrUpdate(publication);
@@ -450,6 +443,10 @@ namespace CDP4EngineeringModel.ViewModels
                 MessageBox.Show(string.Format("Publication failed: {0}", ex.Message), "Publication Failed",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            finally
+            {
+                this.IsBusy = false;
+            }
         }
         
         /// <summary>
@@ -464,8 +461,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateProperties();
         }
         
-        #endregion
-
         /// <summary>
         /// Update the properties of this view-model
         /// </summary>
