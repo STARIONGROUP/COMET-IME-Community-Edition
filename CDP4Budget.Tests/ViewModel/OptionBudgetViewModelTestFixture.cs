@@ -24,13 +24,13 @@ namespace CDP4Budget.Tests
         public void VerifyViewModelInitializedWell()
         {
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domainOfExpertise);
-            var vm = new OptionBudgetViewModel(this.option_A, this.MassBudgetConfig, this.session.Object);
+            var vm = new OptionBudgetViewModel(this.option_A, this.MassBudgetConfig, this.session.Object, () => { });
 
             var budgetVm = (MassBudgetSummaryViewModel)vm.BudgetSummary.Single();
             Assert.AreEqual(18750f, budgetVm.DryTotal);
             Assert.AreEqual(19150f, budgetVm.WetTotal);
 
-            var vmB = new OptionBudgetViewModel(this.option_B, this.MassBudgetConfig, this.session.Object);
+            var vmB = new OptionBudgetViewModel(this.option_B, this.MassBudgetConfig, this.session.Object, () => { });
 
             var budgetVmb = (MassBudgetSummaryViewModel)vmB.BudgetSummary.Single();
             Assert.AreEqual(25000f, budgetVmb.DryTotal);
