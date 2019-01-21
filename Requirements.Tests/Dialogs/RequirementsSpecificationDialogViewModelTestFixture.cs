@@ -100,7 +100,7 @@ namespace CDP4Requirements.Tests
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
-
+            this.modelSetup.ActiveDomain.Add(this.domain);
             this.viewmodel = new RequirementsSpecificationDialogViewModel(this.resSpec, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, clone);
         }
 

@@ -278,7 +278,10 @@ namespace CDP4Requirements.ViewModels
         protected override void PopulatePossibleOwner()
         {
             base.PopulatePossibleOwner();
-            this.PossibleOwner.AddRange(this.Session.RetrieveSiteDirectory().Domain);
+
+            var engineeringModel = (EngineeringModel)this.Container.Container;
+            var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
+            this.PossibleOwner.AddRange(domains);
         }
 
         /// <summary>
@@ -318,6 +321,7 @@ namespace CDP4Requirements.ViewModels
                 row.Index = this.Thing.ParametricConstraint.IndexOf(thing);
             }
         }
+
 
         /// <summary>
         /// Populate the language code following the definitions
