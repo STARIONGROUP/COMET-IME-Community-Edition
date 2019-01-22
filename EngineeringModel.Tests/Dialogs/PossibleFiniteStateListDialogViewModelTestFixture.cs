@@ -12,6 +12,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -40,7 +41,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private Category cat;
         private DomainOfExpertise owner;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Uri uri = new Uri("http://test.com");
 
         [SetUp]
@@ -50,7 +51,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri) { RequiredRdl = this.srdl };
@@ -67,7 +68,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.srdl.DefinedCategory.Add(this.cat);
             this.modelsetup.ActiveDomain.Add(this.owner);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
 
             var dal = new Mock<IDal>();

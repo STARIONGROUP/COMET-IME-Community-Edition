@@ -10,18 +10,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     using System.Collections.Concurrent;
     using System.Globalization;
     using System.Reflection;
-
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-
+    using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.Events;
-
     using CDP4EngineeringModel.ViewModels;
-
     using Moq;
-
     using NUnit.Framework;
 
     /// <summary>
@@ -34,7 +30,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
 
         private Mock<ISession> session;
         private Uri uri = new Uri("http://www.rheagroup.com");
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
         private Person person;
         private Participant participant;

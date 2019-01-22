@@ -402,8 +402,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinitionForUsage1.ParameterGroup.Add(group1);
             this.elementDefinitionForUsage1.ParameterGroup.Add(group2);
 
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group1.Iid, this.iteration.Iid), new Lazy<Thing>(() => group1));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group2.Iid, this.iteration.Iid), new Lazy<Thing>(() => group2));
+            this.assembler.Cache.TryAdd(new CacheKey(group1.Iid, this.iteration.Iid), new Lazy<Thing>(() => group1));
+            this.assembler.Cache.TryAdd(new CacheKey(group2.Iid, this.iteration.Iid), new Lazy<Thing>(() => group2));
 
             group2.ContainingGroup = group1;
 
@@ -430,8 +430,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinitionForUsage1.ParameterGroup.Add(group1);
             this.elementDefinitionForUsage1.ParameterGroup.Add(group2);
 
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group1.Iid, this.iteration.Iid), new Lazy<Thing>(() => group1));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group2.Iid, this.iteration.Iid), new Lazy<Thing>(() => group2));
+            this.assembler.Cache.TryAdd(new CacheKey(group1.Iid, this.iteration.Iid), new Lazy<Thing>(() => group1));
+            this.assembler.Cache.TryAdd(new CacheKey(group2.Iid, this.iteration.Iid), new Lazy<Thing>(() => group2));
 
             this.cptParameter.Group = group1;
             group2.ContainingGroup = group1;
@@ -455,8 +455,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             var group1 = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var group2 = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group1.Iid, this.iteration.Iid), new Lazy<Thing>(() => group1));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group2.Iid, this.iteration.Iid), new Lazy<Thing>(() => group2));
+            this.assembler.Cache.TryAdd(new CacheKey(group1.Iid, this.iteration.Iid), new Lazy<Thing>(() => group1));
+            this.assembler.Cache.TryAdd(new CacheKey(group2.Iid, this.iteration.Iid), new Lazy<Thing>(() => group2));
 
             this.elementDefinitionForUsage1.ParameterGroup.Add(group1);
             this.elementDefinitionForUsage1.ParameterGroup.Add(group2);
@@ -483,8 +483,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             var group1 = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var group2 = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group1.Iid, this.iteration.Iid), new Lazy<Thing>(() => group1));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group2.Iid, this.iteration.Iid), new Lazy<Thing>(() => group2));
+            this.assembler.Cache.TryAdd(new CacheKey(group1.Iid, this.iteration.Iid), new Lazy<Thing>(() => group1));
+            this.assembler.Cache.TryAdd(new CacheKey(group2.Iid, this.iteration.Iid), new Lazy<Thing>(() => group2));
 
             this.elementDefinitionForUsage1.ParameterGroup.Add(group1);
             this.elementDefinitionForUsage1.ParameterGroup.Add(group2);

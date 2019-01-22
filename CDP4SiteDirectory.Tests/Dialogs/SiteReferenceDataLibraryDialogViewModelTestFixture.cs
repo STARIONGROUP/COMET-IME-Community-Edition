@@ -10,6 +10,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Collections.Concurrent;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -30,7 +31,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         private SiteDirectory sitedir;
         private SiteReferenceDataLibrary siteRdl;
         private SiteReferenceDataLibrary siteRdl2;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         
         [SetUp]
         public void Setup()
@@ -38,7 +39,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             this.session = new Mock<ISession>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, null);
             this.siteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, null);
@@ -47,9 +48,9 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             this.sitedir.SiteReferenceDataLibrary.Add(this.siteRdl);
             this.sitedir.SiteReferenceDataLibrary.Add(this.siteRdl2);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.sitedir.Iid, null), new Lazy<Thing>(() => this.sitedir));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteRdl.Iid, null), new Lazy<Thing>(() => this.siteRdl));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteRdl2.Iid, null), new Lazy<Thing>(() => this.siteRdl2));
+            this.cache.TryAdd(new CacheKey(this.sitedir.Iid, null), new Lazy<Thing>(() => this.sitedir));
+            this.cache.TryAdd(new CacheKey(this.siteRdl.Iid, null), new Lazy<Thing>(() => this.siteRdl));
+            this.cache.TryAdd(new CacheKey(this.siteRdl2.Iid, null), new Lazy<Thing>(() => this.siteRdl2));
 
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));

@@ -14,6 +14,7 @@ namespace CDP4EngineeringModel.Tests
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.ViewModels;
@@ -80,15 +81,15 @@ namespace CDP4EngineeringModel.Tests
             this.assembler = new Assembler(this.uri);
 
             var lazysiteDirectory = new Lazy<Thing>(() => this.siteDirectory);
-            this.assembler.Cache.GetOrAdd(new Tuple<Guid, Guid?>(lazysiteDirectory.Value.Iid, null), lazysiteDirectory);
+            this.assembler.Cache.GetOrAdd(new CacheKey(lazysiteDirectory.Value.Iid, null), lazysiteDirectory);
 
             var iteration11 = new Iteration(Guid.NewGuid(), null, this.uri) { IterationSetup = this.iterationSetup11 };
             var lazyiteration = new Lazy<Thing>(() => iteration11);
-            this.assembler.Cache.GetOrAdd(new Tuple<Guid, Guid?>(lazyiteration.Value.Iid, null), lazyiteration);
+            this.assembler.Cache.GetOrAdd(new CacheKey(lazyiteration.Value.Iid, null), lazyiteration);
 
             this.iterationSetup11.IterationIid = iteration11.Iid;
             var lazyiterationSetup11 = new Lazy<Thing>(() => this.iterationSetup11);
-            this.assembler.Cache.GetOrAdd(new Tuple<Guid, Guid?>(lazyiterationSetup11.Value.Iid, null), lazyiterationSetup11);
+            this.assembler.Cache.GetOrAdd(new CacheKey(lazyiterationSetup11.Value.Iid, null), lazyiterationSetup11);
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
@@ -159,7 +160,7 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatOnlyOpenIterationsAreAvailable()
         {
             var lazyiterationSetup21 = new Lazy<Thing>(() => this.iterationSetup21);
-            this.assembler.Cache.GetOrAdd(new Tuple<Guid, Guid?>(lazyiterationSetup21.Value.Iid, null), lazyiterationSetup21);
+            this.assembler.Cache.GetOrAdd(new CacheKey(lazyiterationSetup21.Value.Iid, null), lazyiterationSetup21);
             var iteration21 = new Iteration(this.iterationSetup21.IterationIid, this.assembler.Cache, this.uri);
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { iteration21, null } });

@@ -6,17 +6,14 @@
 
 namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
 {
-
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reactive.Concurrency;
-    using System.Text;
-    using System.Threading.Tasks;
     using BasicRdl.ViewModels;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -31,7 +28,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
     public class ParameterTypeComponentRowViewModelTestFixture
     {
         private CompoundParameterType compoundPt;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private ParameterTypeComponent parameterType;
@@ -49,7 +46,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.permissionService = new Mock<IPermissionService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.session = new Mock<ISession>();
             var person = new Person(Guid.NewGuid(), null, null) { Container = this.siteDir };
@@ -77,7 +74,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
             this.srdl.Scale.Add(this.scale);
             this.qt.PossibleScale.Add(this.scale);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.srdl.Iid, null), new Lazy<Thing>(() => this.srdl));
+            this.cache.TryAdd(new CacheKey(this.srdl.Iid, null), new Lazy<Thing>(() => this.srdl));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);

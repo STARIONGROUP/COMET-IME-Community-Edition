@@ -9,20 +9,15 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
     using System;
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
-    using System.Security.Policy;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
-
+    using CDP4Common.Types;
     using CDP4Composition.Navigation.Interfaces;
-
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-
     using CDP4SiteDirectory.ViewModels;
-
     using Moq;
-
     using NUnit.Framework;
     using ReactiveUI;
 
@@ -30,7 +25,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
     public class TeamCompositionCardViewModelTestFixture
     {
         private Uri url;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<ISession> session;
@@ -50,7 +45,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.url = new Uri("http://www.rheagroup.com");
             
             this.session = new Mock<ISession>();

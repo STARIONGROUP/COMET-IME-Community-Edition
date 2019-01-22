@@ -12,6 +12,7 @@ namespace CDP4BuiltInRules.Tests.ViewModels
     using CDP4BuiltInRules.ViewModels;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Dal;
@@ -35,14 +36,14 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
         private Assembler assembler;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.uri = new Uri("http://www.rheagroup.com");
             this.assembler = new Assembler(this.uri);
             this.session = new Mock<ISession>();

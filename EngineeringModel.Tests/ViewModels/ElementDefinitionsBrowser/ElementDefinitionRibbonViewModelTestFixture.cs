@@ -14,17 +14,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
     using System.Reflection;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
-    using CDP4Dal.Events;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.ViewModels;
-
     using Microsoft.Practices.ServiceLocation;
-
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
@@ -52,7 +49,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
         private EngineeringModel model;
         private Iteration iteration;
         private DomainOfExpertise domain;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void SetUp()
@@ -103,7 +100,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
         }
 
         public void TearDown()

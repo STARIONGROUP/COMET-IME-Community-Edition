@@ -10,6 +10,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Collections.Concurrent;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -35,7 +36,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         private Person person;
         private DomainOfExpertise domain;
         private ParticipantRole role;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private EngineeringModelSetup clone;
 
         [SetUp]
@@ -45,7 +46,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.model = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
@@ -62,8 +63,8 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             this.model.ActiveDomain.Add(this.domain);
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.sitedir.Iid, null), new Lazy<Thing>(() => this.sitedir));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.model.Iid, null), new Lazy<Thing>(() => this.model));
+            this.cache.TryAdd(new CacheKey(this.sitedir.Iid, null), new Lazy<Thing>(() => this.sitedir));
+            this.cache.TryAdd(new CacheKey(this.model.Iid, null), new Lazy<Thing>(() => this.model));
 
             this.clone = this.model.Clone(false);
 

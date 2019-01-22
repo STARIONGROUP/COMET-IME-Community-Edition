@@ -59,7 +59,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private SiteReferenceDataLibrary srdl;
         private ModelReferenceDataLibrary mrdl;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
@@ -119,7 +119,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.FromResult("some result"));
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant)} });
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
         }
 
         [TearDown]

@@ -12,6 +12,7 @@ namespace CDP4EngineeringModel.Tests.RibbonControls
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -76,7 +77,7 @@ namespace CDP4EngineeringModel.Tests.RibbonControls
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(new BaseDialogResult(true));
 
             this.assembler = new Assembler(this.uri);
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.assembler.Cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);

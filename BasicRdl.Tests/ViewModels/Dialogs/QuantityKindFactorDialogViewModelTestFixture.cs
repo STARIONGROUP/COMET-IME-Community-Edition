@@ -13,6 +13,7 @@ namespace BasicRdl.Tests.ViewModels
     using BasicRdl.ViewModels.Dialogs;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -35,13 +36,13 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IThingDialogNavigationService> navigation;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.navigation = new Mock<IThingDialogNavigationService>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -64,7 +65,7 @@ namespace BasicRdl.Tests.ViewModels
             var chainOfContainers = new[] { rdl };
 
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(testDerivedQuantityKind.Iid, null), new Lazy<Thing>(() => testDerivedQuantityKind));
+            this.cache.TryAdd(new CacheKey(testDerivedQuantityKind.Iid, null), new Lazy<Thing>(() => testDerivedQuantityKind));
             var clone = testDerivedQuantityKind.Clone(false);
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);

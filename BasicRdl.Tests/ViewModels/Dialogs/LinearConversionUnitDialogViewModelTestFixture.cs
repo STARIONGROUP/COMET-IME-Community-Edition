@@ -14,6 +14,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
     using BasicRdl.ViewModels;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -42,7 +43,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
         private SiteReferenceDataLibrary genericSiteReferenceDataLibrary;
         private SiteReferenceDataLibrary siteRdl;
         private SiteDirectory sitedirclone;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
@@ -52,7 +53,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
             this.uri = new Uri("http://www.rheagroup.com");
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.dialogService = new Mock<IThingDialogNavigationService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -68,7 +69,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
             this.genericSiteReferenceDataLibrary.Unit.Add(gram);
             var metre = new SimpleUnit(Guid.NewGuid(), this.cache, this.uri) { Name = "metre", ShortName = "m" };
             this.genericSiteReferenceDataLibrary.Unit.Add(metre);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
             this.sitedirclone = this.siteDir.Clone(false);
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);

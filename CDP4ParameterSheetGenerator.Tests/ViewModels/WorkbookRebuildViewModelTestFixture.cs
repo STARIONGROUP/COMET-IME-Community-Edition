@@ -25,7 +25,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ViewModels
     [TestFixture]
     public class WorkbookRebuildViewModelTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Uri uri;
         
         private Dictionary<Guid, ProcessedValueSet> processedValueSets;
@@ -37,7 +37,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ViewModels
         [SetUp]
         public void SetUp()
         {
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.uri = new Uri("http://www.rheagroup.com");
 
             this.textParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri);

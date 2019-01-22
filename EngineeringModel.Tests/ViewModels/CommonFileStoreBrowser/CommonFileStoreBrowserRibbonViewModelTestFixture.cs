@@ -14,6 +14,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -51,7 +52,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
         private EngineeringModel model;
         private Iteration iteration;
         private DomainOfExpertise domain;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void SetUp()
@@ -99,7 +100,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
         }
 
         [TearDown]

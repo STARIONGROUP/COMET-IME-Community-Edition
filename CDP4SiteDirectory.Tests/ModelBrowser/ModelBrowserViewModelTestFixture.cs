@@ -10,6 +10,7 @@ namespace CDP4SiteDirectory.Tests
     using System.Linq;
     using System.Reflection;
     using CDP4Common.CommonData;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
@@ -446,7 +447,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatCreateModelSetupCommandWorks()
         {
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDirectory.Iid, null),
+            this.assembler.Cache.TryAdd(new CacheKey(this.siteDirectory.Iid, null),
                 new Lazy<Thing>(() => this.siteDirectory));
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);

@@ -10,20 +10,16 @@ namespace CDP4Composition.Tests.RuleVerification
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
-
+    using System.Reactive.Concurrency;    
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-
+    using CDP4Common.Types;
     using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
-
     using Moq;
     using NUnit.Framework;
-
     using ReactiveUI;
 
     /// <summary>
@@ -34,7 +30,7 @@ namespace CDP4Composition.Tests.RuleVerification
     {
         private Mock<ISession> session;
         private Uri uri;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private List<Lazy<IBuiltInRule, IBuiltInRuleMetaData>> builtInRules;
         private string builtInRuleName;
         private TestBuiltInRule testBuiltInRule;
@@ -55,7 +51,7 @@ namespace CDP4Composition.Tests.RuleVerification
 
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://www.rheagroup.com");
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.CreateCategories();
 
@@ -91,16 +87,16 @@ namespace CDP4Composition.Tests.RuleVerification
             this.equipmentCategory.SuperCategory.Add(this.productCategory);
 
             var lazyProductCategory = new Lazy<Thing>(() => this.productCategory);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.productCategory.Iid, null), lazyProductCategory);
+            this.cache.TryAdd(new CacheKey(this.productCategory.Iid, null), lazyProductCategory);
 
             var lazyEquipmentCategory = new Lazy<Thing>(() => this.equipmentCategory);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.equipmentCategory.Iid, null), lazyEquipmentCategory);
+            this.cache.TryAdd(new CacheKey(this.equipmentCategory.Iid, null), lazyEquipmentCategory);
 
             var lazyBatteryCategory = new Lazy<Thing>(() => this.batteryCategory);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.batteryCategory.Iid, null), lazyBatteryCategory);
+            this.cache.TryAdd(new CacheKey(this.batteryCategory.Iid, null), lazyBatteryCategory);
 
             var lazyLithiumBatteryCategory = new Lazy<Thing>(() => this.lithiumBatteryCategory);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.lithiumBatteryCategory.Iid, null), lazyLithiumBatteryCategory);
+            this.cache.TryAdd(new CacheKey(this.lithiumBatteryCategory.Iid, null), lazyLithiumBatteryCategory);
         }
 
         [Test]

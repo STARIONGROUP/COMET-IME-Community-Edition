@@ -15,6 +15,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4CommonView;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
@@ -107,7 +108,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var session = modelrow.Session;
 
                 Lazy<Thing> cachedIteration;
-                if (session.Assembler.Cache.TryGetValue(new Tuple<Guid, Guid?>(iteration.Thing.Iid, null),
+                if (session.Assembler.Cache.TryGetValue(new CacheKey(iteration.Thing.Iid, null),
                     out cachedIteration))
                 {
                     var modelSetup = (EngineeringModelSetup) modelrow.Thing.Container;

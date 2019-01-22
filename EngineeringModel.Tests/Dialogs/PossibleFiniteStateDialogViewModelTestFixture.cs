@@ -12,6 +12,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -31,7 +32,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private PossibleFiniteStateList statelist;
         private DomainOfExpertise owner;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Uri uri = new Uri("http://test.com");
         private EngineeringModel model;
         private Iteration iteration;
@@ -43,7 +44,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.owner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
@@ -56,7 +57,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.model.Iteration.Add(this.iteration);
             this.iteration.PossibleFiniteStateList.Add(this.statelist);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.statelist.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.statelist));
+            this.cache.TryAdd(new CacheKey(this.statelist.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.statelist));
 
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));

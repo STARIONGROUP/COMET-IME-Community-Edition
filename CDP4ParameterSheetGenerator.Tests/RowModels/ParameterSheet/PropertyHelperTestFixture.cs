@@ -11,6 +11,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels.ParameterSheet
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4ParameterSheetGenerator.RowModels;
     using NUnit.Framework;
 
@@ -20,7 +21,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels.ParameterSheet
     [TestFixture]
     public class PropertyHelperTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Uri uri;
         private SimpleQuantityKind length;
         private DomainOfExpertise systemEngineering;
@@ -38,7 +39,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels.ParameterSheet
         [SetUp]
         public void SetUp()
         {
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.uri = new Uri("http://www.rheagroup.com");
 

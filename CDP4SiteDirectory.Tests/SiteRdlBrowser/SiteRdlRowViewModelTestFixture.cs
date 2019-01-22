@@ -10,12 +10,10 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
     using System.Reflection;
-
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
-
+    using CDP4Common.Types;
     using CDP4Composition.Navigation.Interfaces;
-
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
@@ -35,7 +33,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
     public class SiteRdlRowViewModelTestFixture
     {
         private Assembler assembler;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory siteDir;
         private SiteReferenceDataLibrary rdl1;
         private SiteReferenceDataLibrary rdl2;

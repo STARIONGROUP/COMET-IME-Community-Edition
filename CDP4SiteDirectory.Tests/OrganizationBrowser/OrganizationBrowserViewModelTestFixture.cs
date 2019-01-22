@@ -12,6 +12,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
     using System.Reactive.Concurrency;
     using System.Reflection;
     using CDP4Common.CommonData;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -39,7 +40,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         private Mock<IThingDialogNavigationService> dialogNavigation;
         private Mock<IPermissionService> permissionService;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
@@ -48,7 +49,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
 
             this.uri = new Uri("http://test.com");
             this.session = new Mock<ISession>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri) { Name = "SiteDir" };
             this.orga1 = new Organization(Guid.NewGuid(), this.cache, this.uri) { Name = "1", ShortName = "1" };
@@ -63,7 +64,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
 
             this.navigation = new Mock<IPanelNavigationService>();
             this.dialogNavigation = new Mock<IThingDialogNavigationService>();
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
 

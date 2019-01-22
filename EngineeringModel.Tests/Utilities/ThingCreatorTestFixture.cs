@@ -10,9 +10,9 @@ namespace CDP4EngineeringModel.Tests.Utilities
     using System.Collections.Concurrent;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition.Services;
     using CDP4Dal;    
     using CDP4EngineeringModel.Utilities;
     using Moq;
@@ -27,13 +27,13 @@ namespace CDP4EngineeringModel.Tests.Utilities
         private Mock<ISession> session;
         private Mock<ISession> sessionThatThrowsException;
         private ThingCreator thingCreator;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void SetUp()
         {
             this.session = new Mock<ISession>();            
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.sessionThatThrowsException = new Mock<ISession>();
             this.sessionThatThrowsException.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws<Exception>();
 
@@ -68,7 +68,7 @@ namespace CDP4EngineeringModel.Tests.Utilities
             var parameterType = new BooleanParameterType(Guid.NewGuid(), this.cache, null);
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, null);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(elementDefinition.Iid, iteration.Iid), new Lazy<Thing>(() => elementDefinition));
+            this.cache.TryAdd(new CacheKey(elementDefinition.Iid, iteration.Iid), new Lazy<Thing>(() => elementDefinition));
             Assert.Throws<Exception>(async () => await this.thingCreator.CreateParameter(elementDefinition, null, parameterType, null, domainOfExpertise, this.sessionThatThrowsException.Object));
         }
 
@@ -85,7 +85,7 @@ namespace CDP4EngineeringModel.Tests.Utilities
             var parameterType = new BooleanParameterType();
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, null);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(elementDefinition.Iid, iteration.Iid), new Lazy<Thing>(() => elementDefinition));
+            this.cache.TryAdd(new CacheKey(elementDefinition.Iid, iteration.Iid), new Lazy<Thing>(() => elementDefinition));
             await this.thingCreator.CreateParameter(elementDefinition, null, parameterType, null, domainOfExpertise, this.session.Object);
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));

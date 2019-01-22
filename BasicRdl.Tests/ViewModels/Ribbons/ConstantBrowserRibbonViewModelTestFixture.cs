@@ -12,6 +12,7 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -39,7 +40,7 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
 
         private SiteDirectory sitedir;
         private Person person;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void SetUp()

@@ -140,7 +140,7 @@ namespace CDP4Scripting.Tests.Helpers
 
             // Inclusion of the engineering model in the cache 
             var testThing = new Lazy<Thing>(() => this.engineerModel);
-            testThing.Value.Cache.TryAdd(new Tuple<Guid, Guid?>(testThing.Value.Iid, null), testThing);
+            testThing.Value.Cache.TryAdd(new CacheKey(testThing.Value.Iid, null), testThing);
         }
 
         #region CDP4Commands

@@ -11,6 +11,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -28,21 +29,21 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         private Person person;
         private SiteDirectory siteDir;
         private Mock<ISession> session;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory clone;
 
         [SetUp]
         public void Setup()
         {
             this.uri = new Uri("http://www.rheagroup.com");
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.session = new Mock<ISession>();
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri) { ShortName = "personRole", Password = "123" };
             this.siteDir.Person.Add(this.person);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.person.Iid, null), new Lazy<Thing>(() => this.person));
+            this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.cache.TryAdd(new CacheKey(this.person.Iid, null), new Lazy<Thing>(() => this.person));
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.clone = this.siteDir.Clone(false);

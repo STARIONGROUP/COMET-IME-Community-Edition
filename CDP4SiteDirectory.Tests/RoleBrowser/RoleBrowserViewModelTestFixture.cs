@@ -12,6 +12,7 @@ namespace CDP4SiteDirectory.Tests
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -27,7 +28,7 @@ namespace CDP4SiteDirectory.Tests
     [TestFixture]
     public class RoleBrowserViewModelTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<IPanelNavigationService> navigation;
         private Mock<IPermissionService> permissionService; 
         private Mock<ISession> session;
@@ -41,7 +42,7 @@ namespace CDP4SiteDirectory.Tests
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.navigation = new Mock<IPanelNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
 

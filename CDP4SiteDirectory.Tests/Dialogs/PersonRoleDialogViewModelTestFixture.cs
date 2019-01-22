@@ -11,6 +11,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -32,14 +33,14 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         private ThingTransaction transaction;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory clone;
         private Mock<IServiceLocator> serviceLocator;
 
         [SetUp]
         public void Setup()
         {
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             var uri = new Uri("http://www.rheagroup.com");
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -56,7 +57,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.personRole = new PersonRole { Name = "Person role", ShortName = "personRole", IDalUri = uri };
             this.siteDir.PersonRole.Add(this.personRole);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
             this.clone = this.siteDir.Clone(false);
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);

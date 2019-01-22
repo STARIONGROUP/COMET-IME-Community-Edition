@@ -12,7 +12,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition.Navigation;
+    using CDP4Common.Types;
     using CDP4Dal;
     using CDP4SiteDirectory.ViewModels;
     using Moq;
@@ -25,7 +25,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     [TestFixture]
     public class EngineeringModelSetupSelectionDialogViewModelTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Uri uri;
         private Mock<ISession> session;
             
@@ -34,7 +34,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.uri = new Uri("http://www.rheagroup.com");
             var assembler = new Assembler(this.uri);
 

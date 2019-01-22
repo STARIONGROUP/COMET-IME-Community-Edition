@@ -9,7 +9,6 @@ namespace CDP4Budget.Tests
     using System.Linq;
     using NUnit.Framework;
     using ViewModels;
-    using Moq;
 
     [TestFixture]
     public class OptionBudgetViewModelTestFixture : BudgetTestFixtureBase

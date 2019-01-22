@@ -6,24 +6,16 @@
 
 namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Common.Types;
     using CDP4Dal;
-    using CDP4Dal.Events;
-    using CDP4Dal.Permission;
-    using CDP4Requirements.ViewModels;
     using CDP4Requirements.ViewModels.RequirementsSpecificationEditor;
-    using Moq;
-    using NUnit.Framework;
-    using System;
-    using System.Linq;
-    using CDP4Dal.Operations;
+    using NUnit.Framework;    
     using ReactiveUI;
 
     /// <summary>
@@ -32,7 +24,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
     [TestFixture]
     public class RequirementSpecificationContentComparerTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private Assembler assembler;
 

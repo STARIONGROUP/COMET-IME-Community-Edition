@@ -13,6 +13,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;    
+    using CDP4Common.Types;
 
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -31,7 +32,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     {
         private Mock<IThingDialogNavigationService> thingDialognavigationService;        
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<IPermissionService> permissionService;
         private Mock<ISession> session;
 
@@ -52,7 +53,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         public void SetUp()
         {
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);

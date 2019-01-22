@@ -11,6 +11,7 @@ namespace CDP4EngineeringModel.Tests
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -29,7 +30,7 @@ namespace CDP4EngineeringModel.Tests
         private Mock<ISession> session;
         private Mock<IThingDialogNavigationService> dialogNavigationService;
         private Mock<IPermissionService> permissionService; 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache; 
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache; 
         private SiteDirectory siteDir;
         private SiteReferenceDataLibrary srdl;
         private EngineeringModelSetup modelsetup;
@@ -57,7 +58,7 @@ namespace CDP4EngineeringModel.Tests
             this.dialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
@@ -97,7 +98,7 @@ namespace CDP4EngineeringModel.Tests
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
             this.siteDir.Domain.Add(this.domain);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             var assembler = new Assembler(this.uri);

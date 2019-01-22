@@ -13,6 +13,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
@@ -177,7 +178,7 @@ namespace CDP4EngineeringModel.ViewModels
             var updatePublishableParameterListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase))
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated 
-                                        && objectChange.ChangedThing.CacheId.Item2 == this.Thing.Iid 
+                                        && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid 
                                         && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing.Container as ParameterOrOverrideBase)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -187,7 +188,7 @@ namespace CDP4EngineeringModel.ViewModels
             var updateParameterListener =
                  CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
                  .Where(objectChange => objectChange.EventKind == EventKind.Updated 
-                                    && objectChange.ChangedThing.CacheId.Item2 == this.Thing.Iid
+                                    && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
                                     && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                  .Select(x => x.ChangedThing as ParameterOrOverrideBase)
                  .ObserveOn(RxApp.MainThreadScheduler)
@@ -197,7 +198,7 @@ namespace CDP4EngineeringModel.ViewModels
             var removeParameterListener =
                  CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
                  .Where(objectChange => objectChange.EventKind == EventKind.Removed 
-                                    && objectChange.ChangedThing.CacheId.Item2 == this.Thing.Iid 
+                                    && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid 
                                     && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                  .Select(x => x.ChangedThing as ParameterOrOverrideBase)
                  .ObserveOn(RxApp.MainThreadScheduler)
@@ -207,7 +208,7 @@ namespace CDP4EngineeringModel.ViewModels
             var addPublicationListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Publication))
                     .Where(objectChange => objectChange.EventKind == EventKind.Added 
-                                        && objectChange.ChangedThing.CacheId.Item2 == this.Thing.Iid 
+                                        && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid 
                                         && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Publication)
                     .ObserveOn(RxApp.MainThreadScheduler)

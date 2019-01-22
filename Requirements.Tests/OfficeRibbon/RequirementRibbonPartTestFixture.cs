@@ -8,12 +8,11 @@ namespace CDP4Requirements.Tests.OfficeRibbon
 {
     using System;
     using System.Collections.Generic;
-    using System.IO.Packaging;
     using System.Reactive.Concurrency;
-    using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -22,7 +21,6 @@ namespace CDP4Requirements.Tests.OfficeRibbon
     using CDP4Dal.Permission;
     using Moq;
     using NUnit.Framework;
-
     using ReactiveUI;
 
     /// <summary>
@@ -92,7 +90,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
             this.model.Iteration.Add(this.iteration);
 
             var siteDirectory = new Lazy<Thing>(() => this.sitedir);
-            this.assembler.Cache.GetOrAdd(new Tuple<Guid, Guid?>(siteDirectory.Value.Iid, null), siteDirectory);
+            this.assembler.Cache.GetOrAdd(new CacheKey(siteDirectory.Value.Iid, null), siteDirectory);
             this.session.Setup(x => x.DataSourceUri).Returns("test");
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);

@@ -9,17 +9,15 @@ namespace CDP4RelationshipEditor.Tests.ViewModels
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reflection;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
-    using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
     using CDP4RelationshipEditor.ViewModels;
@@ -52,7 +50,7 @@ namespace CDP4RelationshipEditor.Tests.ViewModels
         private EngineeringModel model;
         private Iteration iteration;
         private DomainOfExpertise domain;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void SetUp()
@@ -91,7 +89,7 @@ namespace CDP4RelationshipEditor.Tests.ViewModels
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
         }
 
         [TearDown]

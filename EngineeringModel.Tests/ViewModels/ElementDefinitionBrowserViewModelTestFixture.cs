@@ -6,7 +6,6 @@
 
 namespace CDP4EngineeringModel.Tests
 {
-    using CDP4Composition.Events;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -15,14 +14,16 @@ namespace CDP4EngineeringModel.Tests
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;    
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Events;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.ViewModels;
     using Moq;
@@ -120,8 +121,8 @@ namespace CDP4EngineeringModel.Tests
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
 
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(this.model.Iid, null), new Lazy<Thing>(() => this.model));
+            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.assembler.Cache.TryAdd(new CacheKey(this.model.Iid, null), new Lazy<Thing>(() => this.model));
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -449,9 +450,9 @@ namespace CDP4EngineeringModel.Tests
             model2.Iteration.Add(model2Iteration);
             model2Iteration.Element.Add(def);
 
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(model2.Iid, null), new Lazy<Thing>(() => model2));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(model2Iteration.Iid, null), new Lazy<Thing>(() => model2Iteration));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(def.Iid, model2Iteration.Iid), new Lazy<Thing>(() => def));
+            this.assembler.Cache.TryAdd(new CacheKey(model2.Iid, null), new Lazy<Thing>(() => model2));
+            this.assembler.Cache.TryAdd(new CacheKey(model2Iteration.Iid, null), new Lazy<Thing>(() => model2Iteration));
+            this.assembler.Cache.TryAdd(new CacheKey(def.Iid, model2Iteration.Iid), new Lazy<Thing>(() => def));
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null);
 
@@ -497,9 +498,9 @@ namespace CDP4EngineeringModel.Tests
             model2.Iteration.Add(model2Iteration);
             model2Iteration.Element.Add(def);
 
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(model2.Iid, null), new Lazy<Thing>(() => model2));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(model2Iteration.Iid, null), new Lazy<Thing>(() => model2Iteration));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(def.Iid, model2Iteration.Iid), new Lazy<Thing>(() => def));
+            this.assembler.Cache.TryAdd(new CacheKey(model2.Iid, null), new Lazy<Thing>(() => model2));
+            this.assembler.Cache.TryAdd(new CacheKey(model2Iteration.Iid, null), new Lazy<Thing>(() => model2Iteration));
+            this.assembler.Cache.TryAdd(new CacheKey(def.Iid, model2Iteration.Iid), new Lazy<Thing>(() => def));
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null);
 

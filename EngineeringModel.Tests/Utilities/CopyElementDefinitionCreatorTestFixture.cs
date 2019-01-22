@@ -11,9 +11,8 @@ namespace CDP4EngineeringModel.Tests.Utilities
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Composition.Services;
     using CDP4Dal;    
     using CDP4EngineeringModel.Utilities;
     using Moq;
@@ -28,7 +27,7 @@ namespace CDP4EngineeringModel.Tests.Utilities
         private Uri uri = new Uri("http://test.com");
         private Mock<ISession> session;
         private Assembler asembler;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private EngineeringModel model;
         private Iteration iteration;
@@ -100,21 +99,21 @@ namespace CDP4EngineeringModel.Tests.Utilities
             this.parameter1.ParameterSubscription.Add(this.sub1);
             this.parameterOverride.ParameterSubscription.Add(this.sub2);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.model.Iid, null), new Lazy<Thing>(() => this.model));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.elementDef1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.elementDef1));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.elementDef2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.elementDef2));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.usage.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.usage));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.parameter1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.parameter1));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.parameter2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.parameter2));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.valueSet1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.valueSet1));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.valueSet2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.valueSet2));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.parameterOverride.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.parameterOverride));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.overrideValueset.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.overrideValueset));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.sub1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.sub1));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.sub2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.sub2));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.subValueset1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.subValueset1));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.subValueset2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.subValueset2));
+            this.cache.TryAdd(new CacheKey(this.model.Iid, null), new Lazy<Thing>(() => this.model));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.elementDef1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.elementDef1));
+            this.cache.TryAdd(new CacheKey(this.elementDef2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.elementDef2));
+            this.cache.TryAdd(new CacheKey(this.usage.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.usage));
+            this.cache.TryAdd(new CacheKey(this.parameter1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.parameter1));
+            this.cache.TryAdd(new CacheKey(this.parameter2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.parameter2));
+            this.cache.TryAdd(new CacheKey(this.valueSet1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.valueSet1));
+            this.cache.TryAdd(new CacheKey(this.valueSet2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.valueSet2));
+            this.cache.TryAdd(new CacheKey(this.parameterOverride.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.parameterOverride));
+            this.cache.TryAdd(new CacheKey(this.overrideValueset.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.overrideValueset));
+            this.cache.TryAdd(new CacheKey(this.sub1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.sub1));
+            this.cache.TryAdd(new CacheKey(this.sub2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.sub2));
+            this.cache.TryAdd(new CacheKey(this.subValueset1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.subValueset1));
+            this.cache.TryAdd(new CacheKey(this.subValueset2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.subValueset2));
         }
 
         [Test]

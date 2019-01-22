@@ -13,6 +13,7 @@ namespace CDP4Budget.Tests
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;        
     using CDP4Dal;
     using Config;
     using Moq;
@@ -20,7 +21,7 @@ namespace CDP4Budget.Tests
     public abstract class BudgetTestFixtureBase
     {
         protected Uri uri;
-        protected ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        protected ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         protected Iteration iteration;
         protected ElementDefinition rootEd;
         protected ElementDefinition ssEd;
@@ -49,7 +50,7 @@ namespace CDP4Budget.Tests
         {
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://www.rheagroup.com");
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.InitializeRefData();
 

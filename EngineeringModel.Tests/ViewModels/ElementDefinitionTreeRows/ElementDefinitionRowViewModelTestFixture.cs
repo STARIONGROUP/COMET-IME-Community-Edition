@@ -15,6 +15,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -301,7 +302,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.ParameterGroup.Add(group);
             this.iteration.Element.Add(elementDefinition);
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group.Iid, this.iteration.Iid), new Lazy<Thing>(() => group));
+            this.assembler.Cache.TryAdd(new CacheKey(group.Iid, this.iteration.Iid), new Lazy<Thing>(() => group));
 
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
 

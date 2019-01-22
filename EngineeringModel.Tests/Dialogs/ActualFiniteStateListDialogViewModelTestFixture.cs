@@ -14,11 +14,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.MetaInfo;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.DAL;
-    using CDP4Dal.Permission;
     using CDP4EngineeringModel.ViewModels;
     using Moq;
     using NUnit.Framework;
@@ -48,7 +48,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private PossibleFiniteState state21;
         private PossibleFiniteState state22;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Uri uri = new Uri("http://www.rheagroup.com");
 
         [SetUp]
@@ -57,7 +57,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.session = new Mock<ISession>();            
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri) { RequiredRdl = this.srdl };
@@ -89,7 +89,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.iteration.PossibleFiniteStateList.Add(this.possibleList1);
             this.iteration.PossibleFiniteStateList.Add(this.possibleList2);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
 
             var dal = new Mock<IDal>();

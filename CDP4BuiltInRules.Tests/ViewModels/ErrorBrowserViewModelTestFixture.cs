@@ -14,6 +14,7 @@ namespace CDP4BuiltInRules.Tests
     using CDP4BuiltInRules.ViewModels;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Events;
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -83,7 +84,7 @@ namespace CDP4BuiltInRules.Tests
             pocoConstant.ValidatePoco();
 
             var testThing = new Lazy<Thing>(() => pocoConstant);
-            testThing.Value.Cache.TryAdd(new Tuple<Guid, Guid?>(testThing.Value.Iid, null), testThing);
+            testThing.Value.Cache.TryAdd(new CacheKey(testThing.Value.Iid, null), testThing);
 
             // Check that the cache is not empty anymore
             Assert.IsTrue(this.assembler.Cache.Skip(0).Any());
@@ -104,7 +105,7 @@ namespace CDP4BuiltInRules.Tests
             pocoConstant.ValidatePoco();
 
             var testThing = new Lazy<Thing>(() => pocoConstant);
-            testThing.Value.Cache.TryAdd(new Tuple<Guid, Guid?>(testThing.Value.Iid, null), testThing);
+            testThing.Value.Cache.TryAdd(new CacheKey(testThing.Value.Iid, null), testThing);
 
             Assert.IsFalse(this.highlightTrigger);
 
@@ -128,7 +129,7 @@ namespace CDP4BuiltInRules.Tests
             pocoConstant.ValidatePoco();
 
             var testThing = new Lazy<Thing>(() => pocoConstant);
-            testThing.Value.Cache.TryAdd(new Tuple<Guid, Guid?>(testThing.Value.Iid, null), testThing);
+            testThing.Value.Cache.TryAdd(new CacheKey(testThing.Value.Iid, null), testThing);
 
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.EndUpdate));
             Assert.IsNotEmpty(this.browser.Errors);
@@ -143,7 +144,7 @@ namespace CDP4BuiltInRules.Tests
             pocoConstant.ValidatePoco();
 
             var testThing = new Lazy<Thing>(() => pocoConstant);
-            testThing.Value.Cache.TryAdd(new Tuple<Guid, Guid?>(testThing.Value.Iid, null), testThing);
+            testThing.Value.Cache.TryAdd(new CacheKey(testThing.Value.Iid, null), testThing);
 
             Assert.IsFalse(this.highlightTrigger);
 
@@ -184,7 +185,7 @@ namespace CDP4BuiltInRules.Tests
             pocoConstant.ValidatePoco();
 
             var testThing = new Lazy<Thing>(() => pocoConstant);
-            testThing.Value.Cache.TryAdd(new Tuple<Guid, Guid?>(testThing.Value.Iid, null), testThing);
+            testThing.Value.Cache.TryAdd(new CacheKey(testThing.Value.Iid, null), testThing);
 
             // Check that the cache is not empty anymore
             Assert.IsTrue(this.assembler.Cache.Skip(0).Any());

@@ -24,7 +24,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
     [TestFixture]
     public class NestedParameterExcelRowTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private Uri uri;
 
@@ -51,7 +51,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
         [SetUp]
         public void SetUp()
         {
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.uri = new Uri("http://www.rheagroup.com");
 

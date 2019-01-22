@@ -11,6 +11,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using Microsoft.Practices.ServiceLocation;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -31,7 +32,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         private Mock<IPermissionService> permissionService;
         private Mock<ISession> session;
         private Person person;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<IServiceLocator> serviceLocator;
 
         [SetUp]
@@ -39,7 +40,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.uri = new Uri("http://www.rheagroup.com");
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();

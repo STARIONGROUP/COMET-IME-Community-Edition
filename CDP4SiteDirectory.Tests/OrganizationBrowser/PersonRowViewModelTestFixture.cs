@@ -10,24 +10,20 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
     using System.Reflection;
-
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
-
+    using CDP4Common.Types;
     using CDP4Dal;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using ReactiveUI;
     using CDP4Dal.Events;
-
+    using Moq;
+    using NUnit.Framework;
+    using ReactiveUI;
+    
     [TestFixture]
     public  class PersonRowViewModelTestFixture
     {
         private Uri uri;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<ISession> session;
         private PropertyInfo revInfo = typeof(Thing).GetProperty("RevisionNumber");
         private Person person;
@@ -39,7 +35,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://www.rheagroup.com");
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.personRole = new PersonRole(Guid.NewGuid(), this.cache, this.uri)
                                   {

@@ -12,21 +12,17 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
-
+    using CDP4Common.Types;
+    using CDP4Dal.Operations;    
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation.Interfaces;
-
     using CDP4Dal;
     using CDP4Dal.Permission;
-
     using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels;
-    using DevExpress.Mvvm.Native;
     using Moq;
     using NUnit.Framework;
-
     using ReactiveUI;
 
     /// <summary>
@@ -220,7 +216,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             var payload = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Parameter.Add(payload);
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(payload.Iid, this.iteration.Iid), new Lazy<Thing>(() => payload));
+            this.assembler.Cache.TryAdd(new CacheKey(payload.Iid, this.iteration.Iid), new Lazy<Thing>(() => payload));
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(payload);
             dropInfo.SetupProperty(x => x.Effects);
@@ -286,7 +282,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var row = new ParameterGroupRowViewModel(parameterGroup, domainOfExpertise, this.session.Object, null);
 
             var gr2 = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(gr2.Iid, this.iteration.Iid), new Lazy<Thing>(() => gr2));
+            this.assembler.Cache.TryAdd(new CacheKey(gr2.Iid, this.iteration.Iid), new Lazy<Thing>(() => gr2));
 
             elementDefinition.ParameterGroup.Add(gr2);
 

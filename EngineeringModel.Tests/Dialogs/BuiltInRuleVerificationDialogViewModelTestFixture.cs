@@ -14,6 +14,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -39,7 +40,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     {
         private Uri uri = new Uri("http://www.rheagroup.com");
         private Assembler assembler;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private IThingTransaction thingTransaction;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;

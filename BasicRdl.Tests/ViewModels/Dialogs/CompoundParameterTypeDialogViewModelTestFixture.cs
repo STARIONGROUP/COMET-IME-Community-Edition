@@ -14,6 +14,7 @@ namespace BasicRdl.Tests.ViewModels
     using BasicRdl.ViewModels;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -37,14 +38,14 @@ namespace BasicRdl.Tests.ViewModels
         private MeasurementScale scale;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService; 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.permissionService = new Mock<IPermissionService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.session = new Mock<ISession>();
             var person = new Person(Guid.NewGuid(), null, null) { Container = this.siteDir };
@@ -72,7 +73,7 @@ namespace BasicRdl.Tests.ViewModels
             this.srdl.Scale.Add(this.scale);
             this.qt.PossibleScale.Add(this.scale);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.srdl.Iid, null), new Lazy<Thing>(() => this.srdl));
+            this.cache.TryAdd(new CacheKey(this.srdl.Iid, null), new Lazy<Thing>(() => this.srdl));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);

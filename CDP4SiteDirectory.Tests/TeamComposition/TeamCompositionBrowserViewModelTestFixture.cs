@@ -13,6 +13,7 @@ namespace CDP4SiteDirectory.Tests
     using System.Reflection;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -45,13 +46,13 @@ namespace CDP4SiteDirectory.Tests
         private Participant participant;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -110,7 +111,7 @@ namespace CDP4SiteDirectory.Tests
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
         }
 
         [TearDown]

@@ -12,6 +12,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -32,7 +33,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
     [TestFixture]
     public class RequirementsSpecificationEditorViewModelTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private EngineeringModel model;
         private EngineeringModelSetup modelSetup;
@@ -156,9 +157,9 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             var requirementB = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "REQB", Owner = this.domain };
             var defA = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) {Content = "0"};
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(defA.Iid, this.iteration.Iid), new Lazy<Thing>(() => defA));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(requirementA.Iid, this.iteration.Iid), new Lazy<Thing>(() => requirementA));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(requirementB.Iid, this.iteration.Iid), new Lazy<Thing>(() => requirementB));
+            this.cache.TryAdd(new CacheKey(defA.Iid, this.iteration.Iid), new Lazy<Thing>(() => defA));
+            this.cache.TryAdd(new CacheKey(requirementA.Iid, this.iteration.Iid), new Lazy<Thing>(() => requirementA));
+            this.cache.TryAdd(new CacheKey(requirementB.Iid, this.iteration.Iid), new Lazy<Thing>(() => requirementB));
 
             requirementA.Definition.Add(defA);
 
@@ -188,9 +189,9 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             var requirementB = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "REQB", Owner = this.domain };
             var defA = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Content = "0" };
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(defA.Iid, this.iteration.Iid), new Lazy<Thing>(() => defA));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(requirementA.Iid, this.iteration.Iid), new Lazy<Thing>(() => requirementA));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(requirementB.Iid, this.iteration.Iid), new Lazy<Thing>(() => requirementB));
+            this.cache.TryAdd(new CacheKey(defA.Iid, this.iteration.Iid), new Lazy<Thing>(() => defA));
+            this.cache.TryAdd(new CacheKey(requirementA.Iid, this.iteration.Iid), new Lazy<Thing>(() => requirementA));
+            this.cache.TryAdd(new CacheKey(requirementB.Iid, this.iteration.Iid), new Lazy<Thing>(() => requirementB));
 
             requirementA.Definition.Add(defA);
 

@@ -17,8 +17,10 @@ namespace CDP4ProductTree.Tests.Converters
     using System.Windows;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4CommonView;
     using CDP4ProductTree.ViewModels;
+
     using ParameterRowViewModel = CDP4ProductTree.ViewModels.ParameterRowViewModel;
     using Thing = CDP4Common.CommonData.Thing;
 
@@ -29,7 +31,7 @@ namespace CDP4ProductTree.Tests.Converters
     internal class ProductTreeIconUriConverterTestFixture
     {
         private Mock<ISession> session;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private readonly Uri uri = new Uri("http://test.com");
         private Parameter parameter;
         private ParameterType parameterType;
@@ -50,7 +52,7 @@ namespace CDP4ProductTree.Tests.Converters
         {
             var ensurePackSchemeIsKnown = System.IO.Packaging.PackUriHelper.UriSchemePack;
             this.session = new Mock<ISession>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -81,7 +83,7 @@ namespace CDP4ProductTree.Tests.Converters
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.parameter.Iid, null), new Lazy<Thing>(() => this.parameter));
+            this.cache.TryAdd(new CacheKey(this.parameter.Iid, null), new Lazy<Thing>(() => this.parameter));
         }
 
         [Test]

@@ -12,6 +12,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -33,21 +34,21 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService; 
         private Mock<IThingDialogNavigationService> navigation;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory clone;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.session = new Mock<ISession>();
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, null);
             this.domain = new DomainOfExpertise();
 
             this.clone = this.siteDir.Clone(false);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             this.transaction = new ThingTransaction(transactionContext, this.clone);

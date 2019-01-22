@@ -12,6 +12,7 @@ namespace CDP4CommonView.Tests
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;    
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -84,7 +85,7 @@ namespace CDP4CommonView.Tests
         public void VerifyCreateNewDefinitionDialogViewModel()
         {
             var group = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(group.Iid, null), new Lazy<Thing>(() => group));
+            this.assembler.Cache.TryAdd(new CacheKey(group.Iid, null), new Lazy<Thing>(() => group));
 
             var clone = group.Clone(false);
             clone.Definition.Add(this.simpleDefinition);

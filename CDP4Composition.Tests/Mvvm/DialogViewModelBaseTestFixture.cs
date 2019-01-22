@@ -36,7 +36,7 @@ namespace CDP4Composition.Tests.Mvvm
         private Mock<IThingDialogNavigationService> navigation;
         private Mock<IPermissionService> permissionService;
         private Mock<IDal> dal;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory siteDir;
         private Person person;
         private ThingTransaction transaction;
@@ -50,7 +50,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             this.uri = new Uri("http://www.rheagroup.com");
             this.session = new Mock<ISession>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.permissionService = new Mock<IPermissionService>();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.navigation = new Mock<IThingDialogNavigationService>();
@@ -62,7 +62,7 @@ namespace CDP4Composition.Tests.Mvvm
 
             this.siteDir = new SiteDirectory(Guid.Parse(this.siteDirectoryId), this.cache, this.uri) { Name = "site directory" };
             this.person = new Person(Guid.Parse(this.personId), null, this.uri);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
 
             this.siteDir.Person.Add(this.person);
             this.clone = this.siteDir.Clone(false);

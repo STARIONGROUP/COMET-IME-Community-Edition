@@ -11,6 +11,7 @@ namespace CDP4BuiltInRules.Tests.Rules
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Types;
     using CDP4Dal;
     using Moq;
     using NUnit.Framework;
@@ -23,7 +24,7 @@ namespace CDP4BuiltInRules.Tests.Rules
     {
         private Mock<ISession> session;
         private Uri uri;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private EngineeringModel engineeringModel;
         private Iteration iteration;
@@ -35,7 +36,7 @@ namespace CDP4BuiltInRules.Tests.Rules
         {
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://www.rheagroup.com");
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);

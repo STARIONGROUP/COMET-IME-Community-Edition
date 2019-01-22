@@ -11,6 +11,7 @@ namespace BasicRdl.Tests.ViewModels.Rows
     using System.Windows;
     using BasicRdl.ViewModels;
     using CDP4Common.CommonData;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.DragDrop;
@@ -36,7 +37,7 @@ namespace BasicRdl.Tests.ViewModels.Rows
         private Term term1;
         private Term term2;
         private readonly Uri uri = new Uri("http://test.com");
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
         
         [SetUp]
         public void Setup()
@@ -65,13 +66,13 @@ namespace BasicRdl.Tests.ViewModels.Rows
             this.glossary1.Term.Add(this.term1);
             this.glossary2.Term.Add(this.term2);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.sitedir.Iid, null), new Lazy<Thing>(() => this.sitedir));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.srdl1.Iid, null), new Lazy<Thing>(() => this.srdl1));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.srdl2.Iid, null), new Lazy<Thing>(() => this.srdl2));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.glossary1.Iid, null), new Lazy<Thing>(() => this.glossary1));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.glossary2.Iid, null), new Lazy<Thing>(() => this.glossary2));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.term1.Iid, null), new Lazy<Thing>(() => this.term1));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.term2.Iid, null), new Lazy<Thing>(() => this.term2));
+            this.cache.TryAdd(new CacheKey(this.sitedir.Iid, null), new Lazy<Thing>(() => this.sitedir));
+            this.cache.TryAdd(new CacheKey(this.srdl1.Iid, null), new Lazy<Thing>(() => this.srdl1));
+            this.cache.TryAdd(new CacheKey(this.srdl2.Iid, null), new Lazy<Thing>(() => this.srdl2));
+            this.cache.TryAdd(new CacheKey(this.glossary1.Iid, null), new Lazy<Thing>(() => this.glossary1));
+            this.cache.TryAdd(new CacheKey(this.glossary2.Iid, null), new Lazy<Thing>(() => this.glossary2));
+            this.cache.TryAdd(new CacheKey(this.term1.Iid, null), new Lazy<Thing>(() => this.term1));
+            this.cache.TryAdd(new CacheKey(this.term2.Iid, null), new Lazy<Thing>(() => this.term2));
 
             this.permissionService.Setup(x => x.CanWrite(ClassKind.Term, It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);

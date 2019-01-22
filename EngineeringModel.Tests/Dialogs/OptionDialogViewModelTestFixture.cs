@@ -13,6 +13,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.MetaInfo;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -40,7 +41,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private SiteReferenceDataLibrary srdl;
         private Category cat1;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Iteration iterationClone;
 
         [SetUp]
@@ -49,7 +50,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.option = new Option();
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, null);
@@ -70,7 +71,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.model.Iteration.Add(this.iteration);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 
             this.iterationClone = this.iteration.Clone(false);
 

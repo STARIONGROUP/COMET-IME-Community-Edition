@@ -12,6 +12,7 @@ namespace CDP4CommonView.Tests
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -38,7 +39,7 @@ namespace CDP4CommonView.Tests
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IThingDialogNavigationService> navigation;
         private SiteDirectory siteDirectory;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteReferenceDataLibrary[] chainOfContainers;
 
         [SetUp]
@@ -63,7 +64,7 @@ namespace CDP4CommonView.Tests
             this.session.Setup(x => x.Dal).Returns(dal.Object);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, null) { Name = "testRDL", ShortName = "test" };
             var simpleQuantityKind = new SimpleQuantityKind();
             var testDerivedQuantityKind = new DerivedQuantityKind(Guid.NewGuid(), this.cache, null) { Name = "Test Derived QK", ShortName = "tdqk" };

@@ -30,7 +30,7 @@ namespace CDP4Requirements.Tests.Dialogs
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private ThingTransaction thingTransaction; 
         private SiteDirectory siteDir;
         private EngineeringModelSetup modelsetup;
@@ -53,7 +53,7 @@ namespace CDP4Requirements.Tests.Dialogs
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
@@ -89,7 +89,7 @@ namespace CDP4Requirements.Tests.Dialogs
             this.reqSpec.Requirement.Add(this.requirement);
             this.grp = new RequirementsGroup(Guid.NewGuid(), this.cache, this.uri);
             this.reqSpec.Group.Add(this.grp);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.reqSpec.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.reqSpec));
+            this.cache.TryAdd(new CacheKey(this.reqSpec.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.reqSpec));
 
             this.model.Iteration.Add(this.iteration);
             this.iteration.RequirementsSpecification.Add(this.reqSpec);

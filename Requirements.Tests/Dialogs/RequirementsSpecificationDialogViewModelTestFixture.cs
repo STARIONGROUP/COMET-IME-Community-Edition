@@ -13,6 +13,7 @@ namespace CDP4Requirements.Tests
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -46,14 +47,14 @@ namespace CDP4Requirements.Tests
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IPermissionService> permissionService;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.permissionService = new Mock<IPermissionService>();
             this.session = new Mock<ISession>();
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
@@ -89,7 +90,7 @@ namespace CDP4Requirements.Tests
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.ActivePerson).Returns(person);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             var clone = this.iteration.Clone(false);
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);

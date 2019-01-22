@@ -13,6 +13,7 @@ namespace CDP4ParameterSheetGenerator.Tests.Assemblers.OptionSheet
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4ParameterSheetGenerator.OptionSheet;
     using NUnit.Framework;
 
@@ -25,7 +26,7 @@ namespace CDP4ParameterSheetGenerator.Tests.Assemblers.OptionSheet
         private OptionSheetRowAssembler optionSheetRowAssembler;
 
         private Uri uri;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Iteration iteration;
         private DomainOfExpertise domainOfExpertise;
 
@@ -33,7 +34,7 @@ namespace CDP4ParameterSheetGenerator.Tests.Assemblers.OptionSheet
         public void SetUp()
         {
             this.uri = new Uri("http://www.rheagroup.com");
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri)
             {

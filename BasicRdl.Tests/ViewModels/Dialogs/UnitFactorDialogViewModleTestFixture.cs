@@ -13,6 +13,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
     using BasicRdl.ViewModels.Dialogs;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -38,14 +39,14 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
         private Mock<IThingDialogNavigationService> navigation;
         private ThingTransaction transaction;
         
-        private ConcurrentDictionary<Tuple<Guid ,Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private DerivedUnit clone;
     
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.navigation = new Mock<IThingDialogNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
             this.session = new Mock<ISession>();
@@ -60,7 +61,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
             this.siteDir.SiteReferenceDataLibrary.Add(this.siteRdl);
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.derivedUnit.Iid, null), new Lazy<Thing>(() => this.derivedUnit));
+            this.cache.TryAdd(new CacheKey(this.derivedUnit.Iid, null), new Lazy<Thing>(() => this.derivedUnit));
             this.clone = this.derivedUnit.Clone(false);
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);

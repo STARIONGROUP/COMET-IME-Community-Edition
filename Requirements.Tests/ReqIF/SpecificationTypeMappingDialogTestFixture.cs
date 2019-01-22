@@ -13,6 +13,7 @@ namespace CDP4Requirements.Tests.ReqIF
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -105,7 +106,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
 
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.reqIf = new ReqIF();
             this.reqIf.Lang = "en";
             var corecontent = new ReqIFContent();

@@ -12,6 +12,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -36,7 +37,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private ElementDefinition testED;
         private EngineeringModel testEM;
         private Iteration testIteration;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private Uri uri = new Uri("http://test.com");
 
@@ -48,7 +49,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.navigation = new Mock<IThingDialogNavigationService>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.navigation.Object);
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.session = new Mock<ISession>();
             this.testEM = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
@@ -58,7 +59,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.parameterGroup = new ParameterGroup() { Name = "1" };
             testIteration.Element.Add(this.testED);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.testED.Iid, testIteration.Iid), new Lazy<Thing>(() => this.testED));
+            this.cache.TryAdd(new CacheKey(this.testED.Iid, testIteration.Iid), new Lazy<Thing>(() => this.testED));
             var clone = this.testED.Clone(false);
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.testIteration);
@@ -125,7 +126,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             elementDefinition.ParameterGroup.Add(pg5);
             var pg6 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "6", ContainingGroup = pg5 };
             elementDefinition.ParameterGroup.Add(pg6);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(elementDefinition.Iid, this.testIteration.Iid), new Lazy<Thing>(() => elementDefinition));
+            this.cache.TryAdd(new CacheKey(elementDefinition.Iid, this.testIteration.Iid), new Lazy<Thing>(() => elementDefinition));
 
             var clone = elementDefinition.Clone(false);
 

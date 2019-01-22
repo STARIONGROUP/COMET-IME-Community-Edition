@@ -39,7 +39,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private EngineeringModel model;
         private SiteDirectory sitedir;
         private SiteReferenceDataLibrary srdl;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private ElementUsage elementUsageClone;
         private ParameterOverride parameterOverride;
 
@@ -50,7 +50,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             var testDomain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
             var subscription = new ParameterSubscription(Guid.NewGuid(), this.cache, this.uri);
@@ -106,7 +106,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.model.Iteration.Add(this.iteration);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(testPerson);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 
             this.elementUsageClone = elementUsage.Clone(false);
 

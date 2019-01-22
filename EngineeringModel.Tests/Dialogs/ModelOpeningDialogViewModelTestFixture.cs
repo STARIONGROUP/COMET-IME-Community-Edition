@@ -12,9 +12,9 @@ namespace CDP4EngineeringModel.Tests
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.DAL;
-
     using CDP4EngineeringModel.ViewModels;
     using Moq;
     using NUnit.Framework;
@@ -77,7 +77,7 @@ namespace CDP4EngineeringModel.Tests
             this.assembler = new Assembler(this.uri);
 
             var lazysiteDirectory = new Lazy<Thing>(() => this.siteDirectory);
-            this.assembler.Cache.GetOrAdd(new Tuple<Guid, Guid?>(lazysiteDirectory.Value.Iid, null) , lazysiteDirectory);
+            this.assembler.Cache.GetOrAdd(new CacheKey(lazysiteDirectory.Value.Iid, null) , lazysiteDirectory);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);

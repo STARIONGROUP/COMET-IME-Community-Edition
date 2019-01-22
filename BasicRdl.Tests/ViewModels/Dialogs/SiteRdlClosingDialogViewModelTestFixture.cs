@@ -12,6 +12,7 @@ namespace BasicRDL.Tests
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.Permission;
@@ -64,7 +65,7 @@ namespace BasicRDL.Tests
             this.mRdl = new ModelReferenceDataLibrary(Guid.NewGuid(), null, this.uri){RequiredRdl = this.siteRDL2};
 
             var lazysiteDirectory = new Lazy<Thing>(() => this.siteDirectory);
-            this.assembler.Cache.GetOrAdd(new Tuple<Guid, Guid?>(lazysiteDirectory.Value.Iid, null), lazysiteDirectory);
+            this.assembler.Cache.GetOrAdd(new CacheKey(lazysiteDirectory.Value.Iid, null), lazysiteDirectory);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(this.openReferenceDataLibraries);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);

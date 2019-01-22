@@ -8,9 +8,9 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 {
     using System;
     using System.Collections.Concurrent;
-
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -28,7 +28,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         private Mock<ISession> session;
         private Mock<IThingDialogNavigationService> navigation;
         private Mock<IPermissionService> permissionService;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory siteDirectory;
 
         [SetUp]
@@ -39,7 +39,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             this.permissionService = new Mock<IPermissionService>();
 
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, null);
 
             var dal = new Mock<IDal>();

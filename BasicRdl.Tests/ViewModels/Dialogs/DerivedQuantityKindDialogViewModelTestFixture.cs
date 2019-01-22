@@ -14,6 +14,7 @@ namespace BasicRdl.Tests.ViewModels
     using BasicRdl.ViewModels;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -36,14 +37,14 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IThingDialogNavigationService> navigation;
         private Mock<IPermissionService> permissionService;
         private SiteReferenceDataLibrary rdl;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.navigation = new Mock<IThingDialogNavigationService>();
 
             this.permissionService = new Mock<IPermissionService>();
@@ -65,7 +66,7 @@ namespace BasicRdl.Tests.ViewModels
             this.rdl.ParameterType.Add(new SimpleQuantityKind { Name = "testSQK", ShortName = "tSQK" });
             this.siteDir.SiteReferenceDataLibrary.Add(this.rdl);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.rdl.Iid, null), new Lazy<Thing>(() => this.rdl));
+            this.cache.TryAdd(new CacheKey(this.rdl.Iid, null), new Lazy<Thing>(() => this.rdl));
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             this.transaction = new ThingTransaction(transactionContext, null);

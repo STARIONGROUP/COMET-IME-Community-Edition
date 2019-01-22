@@ -8,20 +8,17 @@ namespace CDP4EngineeringModel.Tests
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
-    using CDP4Common.MetaInfo;
-    using CDP4Dal.Operations;
+    using CDP4Common.MetaInfo;    
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
     using CDP4EngineeringModel.ViewModels;
-    using Microsoft.Practices.ServiceLocation;
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
@@ -67,7 +64,7 @@ namespace CDP4EngineeringModel.Tests
         /// The unique ID of the source <see cref="EngineeringModelSetup"/>
         /// </summary>
         private EngineeringModelSetup sourceEngineeringModelSetup;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory siteDirClone;
 
         [SetUp]
@@ -75,7 +72,7 @@ namespace CDP4EngineeringModel.Tests
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.uri = new Uri("http://test.com");
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -91,7 +88,7 @@ namespace CDP4EngineeringModel.Tests
             this.sessionThatThrowsWriteException.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception(ExceptionMessage));
             this.sessionThatThrowsWriteException.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDirectory.Iid, null), new Lazy<Thing>(() => this.siteDirectory));
+            this.cache.TryAdd(new CacheKey(this.siteDirectory.Iid, null), new Lazy<Thing>(() => this.siteDirectory));
 
             this.siteDirClone = this.siteDirectory.Clone(false);
 
@@ -309,7 +306,7 @@ namespace CDP4EngineeringModel.Tests
             var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
             engineeringModelSetup.ActiveDomain.Add(domain1);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(engineeringModelSetup.Iid, null), new Lazy<Thing>(() => engineeringModelSetup));
+            this.cache.TryAdd(new CacheKey(engineeringModelSetup.Iid, null), new Lazy<Thing>(() => engineeringModelSetup));
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);

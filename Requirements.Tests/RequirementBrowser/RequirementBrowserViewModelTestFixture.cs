@@ -12,6 +12,7 @@ namespace CDP4Requirements.Tests.Panels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -28,7 +29,7 @@ namespace CDP4Requirements.Tests.Panels
     [TestFixture]
     public class RequirementBrowserViewModelTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private EngineeringModel model;
         private EngineeringModelSetup modelSetup;

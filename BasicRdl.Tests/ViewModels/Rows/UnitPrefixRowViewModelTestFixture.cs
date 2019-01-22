@@ -10,11 +10,10 @@ namespace BasicRDL.Tests.ViewModels
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
     using System.Reflection;
-
     using BasicRdl.ViewModels;
-
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Dal;
     using Moq;
     using NUnit.Framework;
@@ -29,7 +28,7 @@ namespace BasicRDL.Tests.ViewModels
     {
         private Assembler assembler;
         private Uri uri;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<ISession> session;
         private PropertyInfo revInfo = typeof(Thing).GetProperty("RevisionNumber");
         private SiteReferenceDataLibrary siteReferenceDataLibrary;
@@ -41,7 +40,7 @@ namespace BasicRDL.Tests.ViewModels
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://www.rheagroup.com");
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri)
             {

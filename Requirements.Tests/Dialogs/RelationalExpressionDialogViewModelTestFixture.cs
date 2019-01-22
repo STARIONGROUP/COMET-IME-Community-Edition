@@ -14,6 +14,7 @@ namespace CDP4Requirements.Tests.Dialogs
     using CDP4Common.MetaInfo;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -27,7 +28,7 @@ namespace CDP4Requirements.Tests.Dialogs
     {
         private Mock<ISession> session;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private ThingTransaction thingTransaction;
         private SiteDirectory siteDir;
         private EngineeringModelSetup modelsetup;
@@ -49,7 +50,7 @@ namespace CDP4Requirements.Tests.Dialogs
         {
             this.session = new Mock<ISession>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             var dal = new Mock<IDal>();
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
@@ -76,7 +77,7 @@ namespace CDP4Requirements.Tests.Dialogs
             this.reqSpec.Requirement.Add(this.requirement);
             this.grp = new RequirementsGroup(Guid.NewGuid(), this.cache, this.uri);
             this.reqSpec.Group.Add(this.grp);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.reqSpec.Iid, null), new Lazy<Thing>(() => this.reqSpec));
+            this.cache.TryAdd(new CacheKey(this.reqSpec.Iid, null), new Lazy<Thing>(() => this.reqSpec));
 
             this.model.Iteration.Add(this.iteration);
             this.iteration.RequirementsSpecification.Add(this.reqSpec);

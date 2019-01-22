@@ -12,6 +12,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
     using System.Reactive.Concurrency;
     using System.Reflection;
     using CDP4Common.CommonData;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -28,7 +29,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
     internal class SiteRdlBrowserViewModelTestFixture
     {
         private Assembler assembler;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory siteDir;
         private Uri uri;
         private Mock<ISession> session;
@@ -120,7 +121,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         [Test]
         public void VerifyThatCreateCommandWorks()
         {
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<SiteDirectory>())).Returns(true);
             var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, this.thingDialogNavigationService.Object, null, null);

@@ -15,6 +15,7 @@ namespace BasicRdl.Tests.ViewModels
     using CDP4Common.MetaInfo;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -33,13 +34,13 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPermissionService> permissionService;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -54,7 +55,7 @@ namespace BasicRdl.Tests.ViewModels
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDir.SiteReferenceDataLibrary));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.srdl.Iid, null), new Lazy<Thing>(() => this.srdl));
+            this.cache.TryAdd(new CacheKey(this.srdl.Iid, null), new Lazy<Thing>(() => this.srdl));
 
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));

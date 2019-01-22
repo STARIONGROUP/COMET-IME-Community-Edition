@@ -26,7 +26,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
     internal class ParameterOrOverrideBaseRowViewModelTestFixture
     {
         private Mock<ISession> session;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private Parameter parameter1;
         private ParameterType parameterType1;
@@ -50,7 +50,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         {
             var ensurePackSchemeIsKnown = System.IO.Packaging.PackUriHelper.UriSchemePack;
             this.session = new Mock<ISession>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain", ShortName = "dom" };
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -84,7 +84,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.parameter1.Iid, null), new Lazy<Thing>(() => this.parameter1));
+            this.cache.TryAdd(new CacheKey(this.parameter1.Iid, null), new Lazy<Thing>(() => this.parameter1));
             this.converter = new ProductTreeIconUriConverter();
         }
 

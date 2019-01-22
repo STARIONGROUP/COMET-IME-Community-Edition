@@ -11,6 +11,7 @@ namespace CDP4SiteDirectory.Tests
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Dal;
@@ -34,14 +35,14 @@ namespace CDP4SiteDirectory.Tests
         private Mock<IPanelNavigationService> navigationService;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.uri = new Uri("http://www.rheagroup.com");
             this.session = new Mock<ISession>();
             this.serviceLocator = new Mock<IServiceLocator>();

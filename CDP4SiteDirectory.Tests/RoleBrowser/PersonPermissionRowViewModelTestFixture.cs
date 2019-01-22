@@ -10,6 +10,7 @@ namespace CDP4SiteDirectory.Tests.RoleBrowser
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation.Interfaces;
@@ -28,7 +29,7 @@ namespace CDP4SiteDirectory.Tests.RoleBrowser
         private Mock<ISession> session;
         private SiteDirectory siteDir;
         private PersonRole personRole;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache; 
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache; 
         private readonly Uri uri = new Uri("http://test.com");
 
         [SetUp]
@@ -42,7 +43,7 @@ namespace CDP4SiteDirectory.Tests.RoleBrowser
             this.personRole = new PersonRole(Guid.NewGuid(), null, this.uri) { Name = "aa" };
             this.siteDir.PersonRole.Add(this.personRole);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString());
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
@@ -64,7 +65,7 @@ namespace CDP4SiteDirectory.Tests.RoleBrowser
             };
 
             this.personRole.PersonPermission.Add(permission);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(permission.Iid, null), new Lazy<Thing>(() => permission));
+            this.cache.TryAdd(new CacheKey(permission.Iid, null), new Lazy<Thing>(() => permission));
 
             var row = new PersonPermissionRowViewModel(permission, this.session.Object, null);
 

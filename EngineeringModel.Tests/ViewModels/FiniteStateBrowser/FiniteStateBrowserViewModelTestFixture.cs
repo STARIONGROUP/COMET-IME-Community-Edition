@@ -15,7 +15,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -45,7 +45,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         private EngineeringModel model;
         private Iteration iteration;
         private DomainOfExpertise domain;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
@@ -58,7 +58,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
@@ -82,7 +82,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
         }
 
         [TearDown]

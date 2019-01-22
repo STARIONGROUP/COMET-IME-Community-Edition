@@ -19,7 +19,7 @@ namespace CDP4Composition.Tests.Mvvm
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-    using Microsoft.Practices.ServiceLocation;
+    using CDP4Common.Types;
     using Moq;
     using NUnit.Framework;
     using System;
@@ -36,13 +36,13 @@ namespace CDP4Composition.Tests.Mvvm
         private Mock<IPermissionService> permissionService;
         private Mock<ISession> session;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.session = new Mock<ISession>();
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, null);
             this.person = new Person(Guid.NewGuid(), this.cache, null);
@@ -55,7 +55,7 @@ namespace CDP4Composition.Tests.Mvvm
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.permissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+            this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
         }
 
         [TearDown]

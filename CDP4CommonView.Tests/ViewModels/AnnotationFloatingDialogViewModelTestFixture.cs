@@ -14,6 +14,7 @@ namespace CDP4CommonView.Tests.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4CommonView.ViewModels;
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -85,8 +86,8 @@ namespace CDP4CommonView.Tests.ViewModels
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(() => null);
 
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(this.model.Iid, null), new Lazy<Thing>(() => this.model));
-            this.assembler.Cache.TryAdd(new Tuple<Guid, Guid?>(this.rid.Iid, null), new Lazy<Thing>(() => this.rid));
+            this.assembler.Cache.TryAdd(new CacheKey(this.model.Iid, null), new Lazy<Thing>(() => this.model));
+            this.assembler.Cache.TryAdd(new CacheKey(this.rid.Iid, null), new Lazy<Thing>(() => this.rid));
         }
 
         [TearDown]

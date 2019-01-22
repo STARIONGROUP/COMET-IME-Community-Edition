@@ -34,7 +34,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private Mock<IThingDialogNavigationService> thingDialognavigationService;
         private Mock<IThingCreator> thingCreator;
         private readonly Uri uri = new Uri("http://test.com");
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private ElementDefinition elementDefinition;
         private ElementDefinition elementDefinitionForUsage1;
@@ -99,7 +99,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.thingCreator = new Mock<IThingCreator>();
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);

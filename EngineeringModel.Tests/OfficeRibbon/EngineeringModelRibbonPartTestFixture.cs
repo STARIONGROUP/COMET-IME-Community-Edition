@@ -15,6 +15,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -91,7 +92,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             this.model.Iteration.Add(this.iteration);
 
             var siteDirectory = new Lazy<Thing>(() => this.sitedir);
-            this.assembler.Cache.GetOrAdd(new Tuple<Guid, Guid?>(siteDirectory.Value.Iid, null), siteDirectory);
+            this.assembler.Cache.GetOrAdd(new CacheKey(siteDirectory.Value.Iid, null), siteDirectory);
             this.session.Setup(x => x.DataSourceUri).Returns("test");
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);

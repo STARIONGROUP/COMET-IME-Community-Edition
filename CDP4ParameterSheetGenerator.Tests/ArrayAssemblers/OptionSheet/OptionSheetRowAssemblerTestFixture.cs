@@ -15,6 +15,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ArrayAssemblers.OptionSheet
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Dal;
     using CDP4ParameterSheetGenerator.OptionSheet;
     using Moq;
@@ -26,7 +27,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ArrayAssemblers.OptionSheet
     [TestFixture]
     public class OptionSheetRowAssemblerTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private Uri uri;
 
@@ -47,7 +48,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ArrayAssemblers.OptionSheet
         [SetUp]
         public void SetUp()
         {
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.uri = new Uri("http://www.rheagroup.com");
 

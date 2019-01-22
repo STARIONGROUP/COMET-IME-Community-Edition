@@ -26,7 +26,7 @@ namespace CDP4ParameterSheetGenerator.Tests.Generator
     {
         private Uri uri = new Uri("http://www.rheagroup.com");
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> concurentDictionary;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> concurentDictionary;
 
         private DomainOfExpertise SystemEngineering;
 
@@ -63,7 +63,7 @@ namespace CDP4ParameterSheetGenerator.Tests.Generator
         [SetUp]
         public void SetUp()
         {
-            this.concurentDictionary = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.concurentDictionary = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.iteration = new Iteration(Guid.NewGuid(), this.concurentDictionary, this.uri);
 

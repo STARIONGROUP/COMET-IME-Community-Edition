@@ -15,6 +15,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -34,7 +35,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     public class ElementDefinitionDialogViewModelTestFixture
     {
         private Uri uri = new Uri("http://www.rheagroup.com");
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private IThingTransaction thingTransaction;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
@@ -51,7 +52,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();            
             this.session = new Mock<ISession>();
@@ -78,7 +79,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
             iteration.Element.Add(this.elementDefinition);
             
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(iteration.Iid, null), new Lazy<Thing>(() => iteration));
+            this.cache.TryAdd(new CacheKey(iteration.Iid, null), new Lazy<Thing>(() => iteration));
             this.iterationClone = iteration.Clone(false);
 
             var transactionContext = TransactionContextResolver.ResolveContext(iteration);

@@ -14,6 +14,7 @@ namespace BasicRdl.Tests.ViewModels
     using CDP4Common.MetaInfo;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -37,13 +38,13 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IPermissionService> permissionService;
         private RatioScale testRatioScale;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.navigation = new Mock<IThingDialogNavigationService>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -69,7 +70,7 @@ namespace BasicRdl.Tests.ViewModels
             this.testRatioScale.ValueDefinition.Add(svd2);
 
             var clone = this.testRatioScale.Clone(false);
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(this.testRatioScale.Iid, null), new Lazy<Thing>(() => this.testRatioScale));
+            this.cache.TryAdd(new CacheKey(this.testRatioScale.Iid, null), new Lazy<Thing>(() => this.testRatioScale));
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             this.transaction = new ThingTransaction(transactionContext, clone);

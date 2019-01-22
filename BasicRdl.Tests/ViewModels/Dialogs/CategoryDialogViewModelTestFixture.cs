@@ -14,6 +14,7 @@ namespace BasicRdl.Tests.ViewModels
     using BasicRdl.ViewModels;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -38,7 +39,7 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<ISession> session;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IThingDialogNavigationService> navigation;
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<IPermissionService> permissionService;
 
         [SetUp]
@@ -47,7 +48,7 @@ namespace BasicRdl.Tests.ViewModels
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
             this.uri = new Uri("http://www.rheagroup.com");
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.navigation = new Mock<IThingDialogNavigationService>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -73,7 +74,7 @@ namespace BasicRdl.Tests.ViewModels
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDir.SiteReferenceDataLibrary));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(rdl.Iid, null), new Lazy<Thing>(() => rdl));
+            this.cache.TryAdd(new CacheKey(rdl.Iid, null), new Lazy<Thing>(() => rdl));
 
 
             var dal = new Mock<IDal>();
@@ -173,8 +174,8 @@ namespace BasicRdl.Tests.ViewModels
             vm.Container = container;
             Assert.AreEqual(9, vm.PossibleSuperCategories.Count);
 
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(mRdl.Iid, null), new Lazy<Thing>(() => mRdl));
-            this.cache.TryAdd(new Tuple<Guid, Guid?>(cat31.Iid, null), new Lazy<Thing>(() => cat31));
+            this.cache.TryAdd(new CacheKey(mRdl.Iid, null), new Lazy<Thing>(() => mRdl));
+            this.cache.TryAdd(new CacheKey(cat31.Iid, null), new Lazy<Thing>(() => cat31));
             var clonerdl = mRdl.Clone(false);
 
             var transactionContext = TransactionContextResolver.ResolveContext(sitedir);

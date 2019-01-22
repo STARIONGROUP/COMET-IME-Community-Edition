@@ -12,6 +12,7 @@ namespace CDP4ObjectBrowser.Tests
     using System.Linq;
     using System.Reactive.Concurrency;
     using CDP4Common.DTO;
+    using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Events;
@@ -66,7 +67,7 @@ namespace CDP4ObjectBrowser.Tests
 
         private SiteReferenceDataLibrary siteRdl;
 
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<CDP4Common.CommonData.Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<CDP4Common.CommonData.Thing>> cache;
 
         [SetUp]
         public async void SetUp()

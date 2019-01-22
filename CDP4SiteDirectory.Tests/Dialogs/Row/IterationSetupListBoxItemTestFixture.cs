@@ -8,21 +8,11 @@ namespace CDP4SiteDirectory.Tests.Dialogs.Row
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Linq;
-    using System.Reactive.Concurrency;
-    using CDP4Common.CommonData;
-    using CDP4Common.MetaInfo;
-    using CDP4Dal.Operations;
+    using CDP4Common.CommonData;    
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Permission;
+    using CDP4Common.Types;
     using CDP4SiteDirectory.ViewModels;
-    using Moq;
     using NUnit.Framework;
-    using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="IterationSetupListBoxItem"/> class.
@@ -30,7 +20,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs.Row
     [TestFixture]
     public class IterationSetupListBoxItemTestFixture
     {
-        private ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>> cache;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private IterationSetup iteration;
 
@@ -39,7 +29,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs.Row
         [SetUp]
         public void Setup()
         {
-            this.cache = new ConcurrentDictionary<Tuple<Guid, Guid?>, Lazy<Thing>>();
+            this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.iteration = new IterationSetup(Guid.NewGuid(), this.cache, null);
 
