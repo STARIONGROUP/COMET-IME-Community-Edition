@@ -104,7 +104,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Moq, Version=4.10.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\packages\Moq.4.10.0\lib\net45\Moq.dll</HintPath>
+      <HintPath>..\packages\Moq.4.10.1\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MSHTMLApi, Version=1.7.4.3, Culture=neutral, PublicKeyToken=9fe3ce00842d84e9, processorArchitecture=MSIL">
