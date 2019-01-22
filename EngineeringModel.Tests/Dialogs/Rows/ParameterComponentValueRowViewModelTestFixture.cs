@@ -8,18 +8,15 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Linq;
-    
+    using System.Linq;    
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;    
     using CDP4Common.Types;
-
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.Permission;
-    using CDP4EngineeringModel.ViewModels.Dialogs;
-    
+    using CDP4EngineeringModel.ViewModels.Dialogs;    
     using Moq;
     using NUnit.Framework;
     using System.Collections.Generic;
@@ -94,7 +91,6 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void VerifyThatIfParameterTypeOfParameterBaseIsNotCompoundArgumentExecptionIsThrown()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
@@ -102,13 +98,10 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             parameter.ParameterType = textParameterType;
 
-            var rowViewModel = new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null);
-
-            Assert.IsNotNull(rowViewModel);
+            Assert.Throws<InvalidOperationException>(() => new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null));
         }
 
-        [Test]
-        [ExpectedException(typeof(IndexOutOfRangeException))]
+        [Test]        
         public void VerifyThatIfComponentIndexIsLargerThatCompoundComponentCountExceptionIsThrown()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
@@ -121,13 +114,10 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             parameter.ParameterType = compoundParameterType;
 
-            var rowViewModel = new ParameterComponentValueRowViewModel(parameter, 2, this.session.Object, null, null, null);
-
-            Assert.IsNotNull(rowViewModel);
+            Assert.Throws<IndexOutOfRangeException>(() => new ParameterComponentValueRowViewModel(parameter, 2, this.session.Object, null, null, null));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatIfContainerRowIsNullArgumentNullExceptionIsThrown()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
@@ -136,9 +126,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             compoundParameterType.Component.Add(component1);
             parameter.ParameterType = compoundParameterType;
 
-            var rowViewModel = new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null);
-
-            Assert.IsNotNull(rowViewModel);
+            Assert.Throws<ArgumentNullException>(() => new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null));
         }
 
         [Test]
@@ -218,4 +206,3 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
     }
 }
-

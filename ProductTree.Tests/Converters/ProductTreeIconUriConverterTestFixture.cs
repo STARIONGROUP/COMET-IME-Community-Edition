@@ -4,12 +4,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4ProductTree.Tests.Converters
 {
     using CDP4Dal;
     using Moq;
     using System;
+    using System.Threading;
     using System.Windows.Media.Imaging;
     using NUnit.Framework;
     using System.Collections.Concurrent;
@@ -27,7 +27,7 @@ namespace CDP4ProductTree.Tests.Converters
     /// <summary>
     /// suite of tests for the <see cref="ProductTreeIconUriConverter"/>
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     internal class ProductTreeIconUriConverterTestFixture
     {
         private Mock<ISession> session;
@@ -132,10 +132,9 @@ namespace CDP4ProductTree.Tests.Converters
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void VerifyThatConvertBackThrowsException()
         {
-            this.converter.ConvertBack(null, null, null, null);
+            Assert.Throws<NotSupportedException>(() => this.converter.ConvertBack(null, null, null, null));
         }
     }
 }

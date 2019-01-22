@@ -4,15 +4,13 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-using CDP4LogInfo.ViewModels.Dialogs;
-using CDP4LogInfo.ViewModels.Panels.LogInfoRows;
-
 namespace CDP4LogInfo.Tests.ViewModelTests
 {
     using System.Linq;
     using System.Reactive.Concurrency;
     using CDP4Composition.Navigation;
     using CDP4LogInfo.ViewModels;
+    using CDP4LogInfo.ViewModels.Dialogs;
     using Moq;
     using NLog;
     using NLog.Config;
@@ -51,10 +49,9 @@ namespace CDP4LogInfo.Tests.ViewModelTests
             Assert.AreEqual(msg, row.Message);
             Assert.AreEqual(LogLevel.Warn, row.LogLevel);
             Assert.IsNotNull(row.TimeStamp);
-            Assert.IsNotNull(row.Logger);
-
-            Assert.IsNotNullOrEmpty(vm.Caption);
-            Assert.IsNotNullOrEmpty(vm.ToolTip);
+            Assert.IsNotNull(row.Logger);            
+            Assert.That(vm.Caption,  Is.Not.Null.Or.Empty);
+            Assert.That(vm.ToolTip,  Is.Not.Null.Or.Empty);
         }
 
         [Test]

@@ -10,6 +10,8 @@ namespace CDP4Scripting.Tests.Helpers
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows.Documents;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -27,7 +29,7 @@ namespace CDP4Scripting.Tests.Helpers
     /// <summary>
     /// Suite of tests for the <see cref="ScriptingProxy"/> class
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class ScriptingProxyTestFixture
     {
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -70,7 +72,7 @@ namespace CDP4Scripting.Tests.Helpers
         public IEnumerable<ParameterValueSet> ParameterValueSets { get; private set; }
 
         [SetUp]
-        public async void SetUp()
+        public async Task SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 

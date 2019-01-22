@@ -10,6 +10,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.Types;
@@ -86,7 +87,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
-        public async void VerifyThatOkCommandWorksWhenRoot()
+        public async Task VerifyThatOkCommandWorksWhenRoot()
         {
             var vm = new NaturalLanguageDialogViewModel(this.naturalLanguage, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
 
@@ -97,7 +98,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
-        public async void VerifyThatOkCommandCatchesException()
+        public async Task VerifyThatOkCommandCatchesException()
         {
             var vm = new NaturalLanguageDialogViewModel(this.naturalLanguage, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
 
@@ -109,7 +110,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
-        public async void VerifyThatOkCommandWorksWhenNotRoot()
+        public async Task VerifyThatOkCommandWorksWhenNotRoot()
         {
             var vm = new NaturalLanguageDialogViewModel(this.naturalLanguage, this.transaction, this.session.Object, false, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
 

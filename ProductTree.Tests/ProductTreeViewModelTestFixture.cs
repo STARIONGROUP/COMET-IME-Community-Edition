@@ -119,9 +119,9 @@ namespace ProductTree.Tests
         public void VerifyThatPropertiesAreSet()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
-
-            Assert.IsNotNullOrEmpty(vm.Caption);
-            Assert.IsNotNullOrEmpty(vm.ToolTip);
+            
+            Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
 
             Assert.AreEqual("model name", vm.CurrentModel);
             Assert.AreEqual("option name", vm.CurrentOption);

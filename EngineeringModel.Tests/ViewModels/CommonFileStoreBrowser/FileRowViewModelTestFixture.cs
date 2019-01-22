@@ -10,6 +10,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     using System.Collections.Concurrent;
     using System.Globalization;
     using System.Reflection;
+    using System.Threading;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -23,7 +24,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     /// <summary>
     /// Suite of tests for the <see cref="FileRowViewModel"/>
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class FileRowViewModelTestFixture
     {
         private PropertyInfo revisionNumberPropertyInfo = typeof(Thing).GetProperty("RevisionNumber");
@@ -106,5 +107,3 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
         }
     }
 }
-
-

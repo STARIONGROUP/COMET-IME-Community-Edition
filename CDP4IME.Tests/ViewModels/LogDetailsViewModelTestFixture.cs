@@ -7,7 +7,6 @@
 namespace CDP4IME.Tests.ViewModels
 {
     using System.Linq;
-
     using CDP4IME.ViewModels;
     using NLog;
     using NUnit.Framework;
@@ -20,9 +19,9 @@ namespace CDP4IME.Tests.ViewModels
         {
             var vm = new LogDetailsViewModel(new LogEventInfo(LogLevel.Info, "testlogger", "testMsg"));
             Assert.AreNotEqual(0, vm.DetailRows.Count);
-            Assert.IsNotNullOrEmpty(vm.DetailRows.First().Content);
-            Assert.IsNotNullOrEmpty(vm.DetailRows.First().Property);
-            Assert.IsNotNullOrEmpty(vm.DialogTitle);
+            Assert.That(vm.DetailRows.First().Content, Is.Not.Null.Or.Empty);
+            Assert.That(vm.DetailRows.First().Property, Is.Not.Null.Or.Empty);
+            Assert.That(vm.DialogTitle, Is.Not.Null.Or.Empty);
         }
     }
 }

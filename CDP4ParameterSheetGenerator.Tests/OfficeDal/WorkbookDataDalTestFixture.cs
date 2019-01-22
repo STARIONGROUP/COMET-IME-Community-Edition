@@ -37,8 +37,12 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeDal
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(new ServiceLocatorProvider(() => this.serviceLocator.Object));
             this.serviceLocator.Setup(x => x.GetInstance<IMetaDataProvider>()).Returns(new MetaDataProvider());
-            var fileinfo = new FileInfo("TestData\\test.xlsx");
-            var tempfile = fileinfo.CopyTo("TestData\\temporarytestfile.xlsx", true);
+
+            var sourcePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"TestData\test.xlsx");
+            var fileinfo = new FileInfo(sourcePath);
+
+            var targetPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"TestData\temporarytestfile.xlsx");
+            var tempfile = fileinfo.CopyTo(targetPath, true);
             this.testfilepath = tempfile.FullName;
 
             this.InstantiateThings();  
@@ -116,10 +120,9 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeDal
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatArgementNotNullExceptionIsThrown()
         {
-            var workbookDataDal = new WorkbookDataDal(null);
+            Assert.Throws<ArgumentNullException>(() => new WorkbookDataDal(null));
         }
 
         [Test]
@@ -185,10 +188,10 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeDal
                 var retrievedWbData = workbookDataDal.Read();
 
                 Assert.NotNull(retrievedWbData);
-
+                
                 Assert.IsNotEmpty(retrievedWbData.SitedirectoryData.Value);
 
-                var things = retrievedWbData.SiteDirectoryThings;
+                var things = retrievedWbData.IterationThings;
 
                 var iterationDto = things.SingleOrDefault(x => x.Iid == this.iteration.Iid);
                 Assert.IsNotNull(iterationDto);

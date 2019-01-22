@@ -77,11 +77,10 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void VerififyThatInvalidContainerThrowsException()
         {
             var simpleUnit = new SimpleUnit(Guid.NewGuid(), null, null);
-            var vm = new SimpleUnitDialogViewModel(simpleUnit,this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir);
+            Assert.Throws<ArgumentException>(() => new SimpleUnitDialogViewModel(simpleUnit,this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir));
         }
 
         [Test]

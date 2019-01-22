@@ -11,6 +11,7 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using BasicRdl.ViewModels;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
@@ -95,7 +96,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async void VerifyThatOkCommandWorks()
+        public async Task VerifyThatOkCommandWorks()
         {
             this.viewmodel.OkCommand.Execute(null);
 
@@ -105,7 +106,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async void VerifyThatExceptionAreCaught()
+        public async Task VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
@@ -120,10 +121,10 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyDialogValidation()
         {
             Assert.AreEqual(0, this.viewmodel.ValidationErrors.Count);
-            Assert.IsNotNullOrEmpty(this.viewmodel["Symbol"]);
+            Assert.That(this.viewmodel["Symbol"], Is.Not.Null.Or.Not.Empty);
 
             this.viewmodel.Symbol = "something";
-            Assert.IsNullOrEmpty(this.viewmodel["Symbol"]);
+            Assert.That(this.viewmodel["Symbol"], Is.Null.Or.Empty);
         }
 
         [Test]

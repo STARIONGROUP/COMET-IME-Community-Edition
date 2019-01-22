@@ -10,6 +10,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -30,7 +31,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         private Mock<ISession> session;
             
         [SetUp]
-        public async void SetUp()
+        public async Task SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 

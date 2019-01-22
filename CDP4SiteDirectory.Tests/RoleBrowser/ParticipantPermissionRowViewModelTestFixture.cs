@@ -71,8 +71,8 @@ namespace CDP4SiteDirectory.Tests.RoleBrowser
 
             Assert.AreEqual(row.ObjectClass, permission.ObjectClass);
             Assert.AreEqual(row.AccessRight, permission.AccessRight);
-
-            Assert.IsNotNullOrEmpty(row.Name);
+            
+            Assert.That(row.Name, Is.Not.Null.Or.Empty);
             Assert.IsNotNull(row.ShortName);
             Assert.IsFalse(row.IsReadOnly);
 

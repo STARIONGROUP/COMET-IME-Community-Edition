@@ -7,9 +7,9 @@
 namespace CDP4SiteDirectory.Tests.OfficeRibbon
 {
     using System;
-    using System.Collections.Generic;
     using System.IO.Packaging;
     using System.Reactive.Concurrency;
+    using System.Threading;
     using System.Windows;
     using CDP4SiteDirectory.ViewModels;
     using CDP4Common.CommonData;
@@ -28,7 +28,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
     /// <summary>
     /// Suite of tests for the <see cref="SiteDirectoryRibbonPart"/> class
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class SiteDirectoryRibbonPartTestFixture
     {
         private Uri uri;

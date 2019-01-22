@@ -17,11 +17,11 @@ namespace CDP4EngineeringModel.Tests.Utilities
         public void VerifyThatValidatorWorksForBooleanParameterType()
         {
             var boolPt = new BooleanParameterType();
-            Assert.IsNullOrEmpty(ParameterValueValidator.Validate(true, boolPt));
-            Assert.IsNullOrEmpty(ParameterValueValidator.Validate(false, boolPt));
-            Assert.IsNullOrEmpty(ParameterValueValidator.Validate(null, boolPt));
-
-            Assert.IsNotNullOrEmpty(ParameterValueValidator.Validate("hoho", boolPt));
+            
+            Assert.That(ParameterValueValidator.Validate(true, boolPt), Is.Null.Or.Empty);
+            Assert.That(ParameterValueValidator.Validate(false, boolPt), Is.Null.Or.Empty);
+            Assert.That(ParameterValueValidator.Validate(null, boolPt), Is.Null.Or.Empty);            
+            Assert.That(ParameterValueValidator.Validate("hoho", boolPt), Is.Not.Null.Or.Empty);
         }
     }
 }

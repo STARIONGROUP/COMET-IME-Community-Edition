@@ -11,6 +11,7 @@ namespace CDP4EngineeringModel.Tests
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -105,7 +106,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public async void VerifyThatModelClosingDialogReturnResult()
+        public async Task VerifyThatModelClosingDialogReturnResult()
         {
             var sessions = new List<ISession> { this.session.Object };
             var viewmodel = new ModelClosingDialogViewModel(sessions);

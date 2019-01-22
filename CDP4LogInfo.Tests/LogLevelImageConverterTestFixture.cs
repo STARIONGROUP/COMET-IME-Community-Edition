@@ -8,10 +8,11 @@ namespace CDP4LogInfo.Tests
 {
     using System;
     using System.IO.Packaging;
+    using System.Threading;
     using CDP4LogInfo.Views;
     using NUnit.Framework;
     
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class LogLevelImageConverterTestFixture
     {
         [Test]
@@ -32,11 +33,10 @@ namespace CDP4LogInfo.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(NotImplementedException))]
         public void VerifyThatConvertBackThrowsException()
         {
             var converter = new LogLevelImageConverter();
-            converter.ConvertBack(null, null, null, null);
+            Assert.Throws<NotImplementedException>(() =>  converter.ConvertBack(null, null, null, null));
         }
     }
 }

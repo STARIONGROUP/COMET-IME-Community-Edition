@@ -7,6 +7,7 @@
 namespace CDP4Scripting.Tests.ViewModels
 {
     using System.Reactive.Concurrency;
+    using System.Threading;
     using System.Windows.Documents;
     using CDP4Dal;
     using CDP4Scripting.Helpers;
@@ -20,7 +21,7 @@ namespace CDP4Scripting.Tests.ViewModels
     /// <summary>
     /// Suite of test for the <see cref="ScriptPanelViewModel"/> class.
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class ScriptPanelViewModelTestFixture
     {
         private Mock<ScriptPanelViewModel> scriptPanelViewModel;

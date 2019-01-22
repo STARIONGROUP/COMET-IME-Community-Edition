@@ -176,10 +176,9 @@ namespace CDP4Composition.Tests.Navigation
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void VerifyThatNavigationServiceThrowsException()
         {
-            this.NavigationService.Open(new ExceptionViewModel(), true);
+            Assert.Throws<ArgumentOutOfRangeException>(() => this.NavigationService.Open(new ExceptionViewModel(), true));
         }
 
         [Test]

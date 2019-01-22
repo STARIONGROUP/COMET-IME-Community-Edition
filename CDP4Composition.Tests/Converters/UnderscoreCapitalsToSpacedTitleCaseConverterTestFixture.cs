@@ -1,11 +1,12 @@
 ﻿namespace CDP4Composition.Tests.Converters
 {
     using System;
+    using System.Threading;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Converters;
     using NUnit.Framework;
 
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class UnderscoreCapitalsToSpacedTitleCaseConverterTestFixture
     {
         /// <summary>
@@ -38,10 +39,9 @@
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void VerifyThatConvertBackThrowsException()
         {
-            this.converter.ConvertBack(null, null, null, null);
+            Assert.Throws<NotSupportedException>(() => this.converter.ConvertBack(null, null, null, null));
         }
     }
 }

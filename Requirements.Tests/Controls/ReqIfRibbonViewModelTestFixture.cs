@@ -67,11 +67,10 @@ namespace CDP4Requirements.Tests.Controls
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void VerifyThatIterationEventAreCaughtFailed()
         {
             var vm = new ReqIfRibbonViewModel();
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            Assert.Throws<InvalidOperationException>(() => CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added));
         }
 
         [Test]

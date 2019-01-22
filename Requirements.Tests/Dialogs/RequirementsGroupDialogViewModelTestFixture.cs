@@ -29,7 +29,10 @@ namespace CDP4Requirements.Tests.Dialogs
 
         private EngineeringModel engineeringModel;
         private Iteration iteration;
+        private RequirementsSpecification requirementsSpecification;
+        private EngineeringModelSetup engineeringModelSetup;
         private IterationSetup iterationSetup;
+        private DomainOfExpertise domainOfExpertise;
 
         private RequirementsGroup reqGroup;
         private Uri uri;
@@ -46,10 +49,27 @@ namespace CDP4Requirements.Tests.Dialogs
 
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), null, this.uri);
             this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
+            this.requirementsSpecification = new RequirementsSpecification(Guid.NewGuid(), null, this.uri);
+            this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
             this.iteration.IterationSetup = this.iterationSetup;
 
+            var person = new Person(Guid.NewGuid(), null, this.uri);
+            this.domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) {Name = "test"};
+            person.DefaultDomain = this.domainOfExpertise;
+
+            this.engineeringModelSetup.ActiveDomain.Add(this.domainOfExpertise);
+            this.engineeringModelSetup.IterationSetup.Add(this.iterationSetup);
+
+            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
+            this.session.Setup(x => x.ActivePerson).Returns(person);
+            this.siteDir.Domain.Add(this.domainOfExpertise);
+            
             this.engineeringModel.Iteration.Add(this.iteration);
+            this.iteration.RequirementsSpecification.Add(this.requirementsSpecification);
+            this.requirementsSpecification.Group.Add(this.reqGroup);
+
+            this.engineeringModel.EngineeringModelSetup = this.engineeringModelSetup;
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.engineeringModel);
             this.thingTransaction = new ThingTransaction(transactionContext, null);
@@ -70,10 +90,6 @@ namespace CDP4Requirements.Tests.Dialogs
         [Test]
         public void VerifyThatPopulatePossibleOwnerWorks()
         {
-            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
-            this.session.Setup(x => x.ActivePerson).Returns(new Person(Guid.NewGuid(), null, this.uri));
-            this.siteDir.Domain.Add(new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "test" });
-
             var vm = new RequirementsGroupDialogViewModel(this.reqGroup, this.thingTransaction, this.session.Object,
                 true, ThingDialogKind.Create, null);
 

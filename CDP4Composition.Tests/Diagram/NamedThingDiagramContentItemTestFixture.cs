@@ -7,7 +7,7 @@
 namespace CDP4Composition.Tests.Diagram
 {
     using System;
-
+    using System.Threading;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -17,7 +17,7 @@ namespace CDP4Composition.Tests.Diagram
     /// <summary>
     /// Suite of tests for the <see cref="NamedThingDiagramContentItem"/> class
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class NamedThingDiagramContentItemTestFixture
     {
         private DomainOfExpertise domainOfExpertise;

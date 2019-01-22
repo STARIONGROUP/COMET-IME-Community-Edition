@@ -161,16 +161,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
 
             Assert.AreEqual(1, viewmodel.Publications.Count);
-            Assert.AreEqual(3, viewmodel.Publications[0].ContainedRows.Count);
-            Assert.IsNotNullOrEmpty(viewmodel.Caption);
-            Assert.IsNotNullOrEmpty(viewmodel.ToolTip);
-            Assert.IsNotNullOrEmpty(viewmodel.DataSource);
-            Assert.IsNotNullOrEmpty(viewmodel.DomainOfExpertise);
-            Assert.IsNotNullOrEmpty(viewmodel.CurrentModel);
+            Assert.AreEqual(3, viewmodel.Publications[0].ContainedRows.Count);            
+            Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.DataSource, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.DomainOfExpertise, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.CurrentModel, Is.Not.Null.Or.Empty);
 
             var publicationRowViewModel = viewmodel.Publications.Single();
-            Assert.IsNotNullOrEmpty(publicationRowViewModel.OwnerShortName);
-            Assert.IsNotNullOrEmpty(publicationRowViewModel.Name);
+            Assert.That(publicationRowViewModel.OwnerShortName, Is.Not.Null.Or.Empty);
+            Assert.That(publicationRowViewModel.Name, Is.Not.Null.Or.Empty);
         }
 
         [Test]
@@ -262,7 +262,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatCanPublish()
+        public async Task VerifyThatCanPublish()
         {
             var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
 
@@ -281,7 +281,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             ((PublicationParameterOrOverrideRowViewModel) viewmodel.Domains[0].ContainedRows[0]).ToBePublished = true;
 
             Assert.IsTrue(viewmodel.Domains.Any(x => x.ToBePublished));
-            Assert.DoesNotThrow(viewmodel.ExecutePublishCommand);
+            
+            Assert.DoesNotThrowAsync(async () => viewmodel.ExecutePublishCommand());
+
             Assert.IsFalse(viewmodel.Domains.Any(x => x.ToBePublished));
         }
 

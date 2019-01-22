@@ -159,8 +159,9 @@ namespace CDP4EngineeringModel.Tests
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
 
             this.viewModel = new EngineeringModelSetupDialogViewModel(engineeringModelSetup, transaction, this.session.Object, true, ThingDialogKind.Create, null, this.siteDirClone);
+            
+            Assert.That(this.viewModel["Name"], Is.Not.Null.Or.Empty);
 
-            Assert.IsNotNullOrEmpty(this.viewModel["Name"]);
             Assert.IsFalse(this.viewModel.OkCommand.CanExecute(null));
 
             var newShortName = "updatedshortname";
@@ -257,8 +258,8 @@ namespace CDP4EngineeringModel.Tests
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
             this.viewModel = new EngineeringModelSetupDialogViewModel(engineeringModelSetup, transaction, this.session.Object, true, ThingDialogKind.Create, null, this.siteDirClone);
-
-            Assert.IsNotNullOrEmpty(this.viewModel["Name"]);
+            
+            Assert.That(this.viewModel["Name"], Is.Not.Null.Or.Empty);
             Assert.IsFalse(this.viewModel.OkCommand.CanExecute(null));
 
             var newShortName = "EMShortname";

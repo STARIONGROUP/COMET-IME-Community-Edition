@@ -9,6 +9,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using System;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -177,7 +178,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
-        public async void VerifyThatParameterGetsCreatedWhenParameterTypeIsDropped()
+        public async Task VerifyThatParameterGetsCreatedWhenParameterTypeIsDropped()
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);

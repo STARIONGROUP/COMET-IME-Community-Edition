@@ -10,6 +10,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
     using System.Collections.Generic;
     using System.IO.Packaging;
     using System.Reactive.Concurrency;
+    using System.Threading;
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -32,7 +33,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
     /// <summary>
     /// Suite of tests for the <see cref="ParameterSheetGeneratorRibbonPart"/>
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class ParameterSheetGeneratorRibbonPartTestFixture
     {
         private Uri uri;

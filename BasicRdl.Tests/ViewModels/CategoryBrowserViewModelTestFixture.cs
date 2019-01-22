@@ -4,7 +4,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace BasicRdl.Tests.ViewModels
 {
     using System;
@@ -67,7 +66,9 @@ namespace BasicRdl.Tests.ViewModels
         {
             var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
             Assert.IsTrue(vm.Caption.Contains(this.siteDir.Name));
-            Assert.IsNotNullOrEmpty(vm.ToolTip);
+            
+            Assert.That(vm.ToolTip, Is.Not.Null.Or.Not.Empty);
+
             Assert.IsNotNull(vm.Session);
         }
 

@@ -106,9 +106,9 @@ namespace CDP4RelationshipEditor.Tests
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewmodel = new RelationshipEditorViewModel(this.iteration,this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
-            Assert.IsNotNullOrEmpty(viewmodel.Caption);
-            Assert.IsNotNullOrEmpty(viewmodel.ToolTip);
+            var viewmodel = new RelationshipEditorViewModel(this.iteration,this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);            
+            Assert.That(viewmodel.Caption,  Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.ToolTip,  Is.Not.Null.Or.Empty);
             Assert.IsNotNull(viewmodel.RelationshipRules);
         }
 

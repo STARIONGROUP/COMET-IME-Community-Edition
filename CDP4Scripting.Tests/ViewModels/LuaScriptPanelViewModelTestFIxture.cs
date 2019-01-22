@@ -7,8 +7,8 @@
 namespace CDP4Scripting.Tests.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Windows.Documents;
     using CDP4Dal;
     using CDP4Scripting.ViewModels;
@@ -20,7 +20,7 @@ namespace CDP4Scripting.Tests.ViewModels
     /// <summary>
     /// Suite of tests for the <see cref="LuaScriptPanelViewModel"/> class.
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class LuaScriptPanelViewModelTestFIxture
     {
         private Mock<IScriptingProxy> scriptingProxy;

@@ -152,17 +152,15 @@ namespace ProductTree.Tests.Comparers
         }
 
         [Test]
-        [ExpectedException(typeof (ArgumentNullException))]
         public void VerifyThatExceptionThrown()
         {
             var list = new ReactiveList<IRowViewModelBase<Thing>>();
             var comparer = new ElementDefinitionChildRowComparer();
 
-            list.SortedInsert(null, comparer);
+            Assert.Throws<ArgumentNullException>(() => list.SortedInsert(null, comparer));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatExceptionThrownNullComparer()
         {
             var list = new ReactiveList<IRowViewModelBase<Thing>>();
@@ -171,7 +169,7 @@ namespace ProductTree.Tests.Comparers
             usage1.Name = "def";
             var usageRow1 = new ElementUsageRowViewModel(usage1, this.option, this.session.Object, null);
 
-            list.SortedInsert(usageRow1, null);
+            Assert.Throws<ArgumentNullException>(() => list.SortedInsert(usageRow1, null));
         }
     }
 }

@@ -9,7 +9,6 @@ namespace ProductTree.Tests.Comparers
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -143,11 +142,10 @@ namespace ProductTree.Tests.Comparers
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatComparerSameAsElementDef()
         {
             var comparer = new ElementUsageChildRowComparer();
-            var test = comparer.Compare(null, null);
+            Assert.Throws<ArgumentNullException>(() => comparer.Compare(null, null));
         }
     }
 }

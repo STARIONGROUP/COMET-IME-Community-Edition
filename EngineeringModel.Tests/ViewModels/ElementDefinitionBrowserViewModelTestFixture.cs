@@ -170,8 +170,8 @@ namespace CDP4EngineeringModel.Tests
             Assert.IsNotNull(vm.DomainOfExpertise);
             Assert.AreEqual(0, vm.CurrentIteration);
 
-            var row = (ElementDefinitionRowViewModel) vm.ElementDefinitionRowViewModels.First();
-            Assert.IsNotNullOrEmpty(row.Name);
+            var row = (ElementDefinitionRowViewModel) vm.ElementDefinitionRowViewModels.First();            
+            Assert.That(row.Name, Is.Not.Null.Or.Empty);
             Assert.IsNotNull(row.Owner);
 
             this.elementDef.Name = "updated";
@@ -472,8 +472,8 @@ namespace CDP4EngineeringModel.Tests
             dropinfo.SetupProperty(x => x.Effects);
             dropinfo.Object.Effects = DragDropEffects.All;
 
-            vm.Drop(dropinfo.Object);
-            Assert.IsNullOrEmpty(vm.Feedback);
+            vm.Drop(dropinfo.Object);           
+            Assert.That(vm.Feedback, Is.Null.Or.Empty);
         }
 
         [Test]

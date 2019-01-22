@@ -9,6 +9,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System;
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
@@ -81,7 +82,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
-        public async void VerifyThatOkCommandWorks()
+        public async Task VerifyThatOkCommandWorks()
         {
             this.viewmodel.OkCommand.Execute(null);
 
@@ -91,7 +92,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
-        public async void VerifyThatExceptionAreCaught()
+        public async Task VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 

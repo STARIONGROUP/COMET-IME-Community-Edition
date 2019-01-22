@@ -85,9 +85,9 @@ namespace CDP4SiteDirectory.Tests
         public void VerifyThatPropertiesAreSet()
         {
             var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null);
-
-            Assert.IsNotNullOrEmpty(viewmodel.Caption);
-            Assert.IsNotNullOrEmpty(viewmodel.ToolTip);
+            
+            Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
 
             Assert.IsTrue(viewmodel.CreateParticipantRoleCommand.CanExecute(null));
             Assert.IsTrue(viewmodel.CreatePersonRoleCommand.CanExecute(null));

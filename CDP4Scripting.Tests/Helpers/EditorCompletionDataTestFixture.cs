@@ -6,13 +6,14 @@
 
 namespace CDP4Scripting.Tests.Helpers
 {
+    using System.Threading;
     using CDP4Scripting.Helpers;
     using NUnit.Framework;
 
     /// <summary>
     /// Suite of test for the <see cref="EditorCompletionData"/> class.
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class EditorCompletionDataTestFixture
     {
         [Test]

@@ -69,9 +69,9 @@ namespace CDP4SiteDirectory.Tests
         public void VerifyThatPropertiesAreSet()
         {
             var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null);
-
-            Assert.IsNotNullOrEmpty(viewmodel.ToolTip);
-            Assert.IsNotNullOrEmpty(viewmodel.Caption);
+            
+            Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
         }
 
         [Test]

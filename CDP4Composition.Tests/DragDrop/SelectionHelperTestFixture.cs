@@ -6,6 +6,7 @@
 
 namespace CDP4Composition.Tests.DragDrop
 {
+    using System.Threading;
     using System.Windows.Controls;
     using CDP4Composition.DragDrop;
     using DevExpress.Xpf.Grid;
@@ -14,7 +15,7 @@ namespace CDP4Composition.Tests.DragDrop
     /// <summary>
     /// Suite of tests for the <see cref="SelectionHelper"/>
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class SelectionHelperTestFixture
     {
         [Test]

@@ -103,7 +103,7 @@ namespace CDP4IME.Tests.ViewModels
         }
 
         [Test]
-        public async void VerifyThatRefreshUpdatesTheLastUpdateDatetimeAndSynchronizeData()
+        public async Task VerifyThatRefreshUpdatesTheLastUpdateDatetimeAndSynchronizeData()
         {
             var updatedSiteDir = new CDP4Common.DTO.SiteDirectory(this.dalOutputs.Single().Iid, 30);
 
@@ -127,7 +127,7 @@ namespace CDP4IME.Tests.ViewModels
         }
 
         [Test]
-        public async void VerifyThatReloadUpdatesTheLastUpdateDatetime()
+        public async Task VerifyThatReloadUpdatesTheLastUpdateDatetime()
         {
             var updatedSiteDir = new CDP4Common.DTO.SiteDirectory(this.dalOutputs.Single().Iid, 30);
 
@@ -170,7 +170,7 @@ namespace CDP4IME.Tests.ViewModels
         }
 
         [Test]
-        public async void VerifyThatErrorMsgIsReceivedUponReloadFailure()
+        public async Task VerifyThatErrorMsgIsReceivedUponReloadFailure()
         {
             this.mockedDal.Setup(x => x.Open(It.IsAny<Credentials>(), this.tokenSource.Token)).Returns(Task.Run(() => this.GetTestDtos()));
 
@@ -186,7 +186,7 @@ namespace CDP4IME.Tests.ViewModels
         }
 
         [Test]
-        public async void VerifyThatErrorMsgIsReceivedUponRefreshFailure()
+        public async Task VerifyThatErrorMsgIsReceivedUponRefreshFailure()
         {
             var openTaskCompletionSource = new TaskCompletionSource<IEnumerable<CDP4Common.DTO.Thing>>();
             openTaskCompletionSource.SetResult(this.GetTestDtos());

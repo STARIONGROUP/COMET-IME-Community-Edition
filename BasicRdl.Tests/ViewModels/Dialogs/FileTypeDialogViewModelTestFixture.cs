@@ -111,15 +111,15 @@ namespace BasicRdl.Tests.ViewModels
             var viewmodel = new FileTypeDialogViewModel(filetype, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object);
 
             var rule = viewmodel["Extension"];
-            Assert.IsNotNullOrEmpty(rule);
+            Assert.That(rule, Is.Not.Null.Or.Not.Empty);
 
             viewmodel.Extension = "Abc";
             rule = viewmodel["Extension"];
-            Assert.IsNotNullOrEmpty(rule);
+            Assert.That(rule, Is.Not.Null.Or.Not.Empty);
 
             viewmodel.Extension = "abc9 ";
             rule = viewmodel["Extension"];
-            Assert.IsNotNullOrEmpty(rule);
+            Assert.That(rule, Is.Not.Null.Or.Not.Empty);
 
             viewmodel.Extension = "abc9";
             rule = viewmodel["Extension"];
@@ -137,7 +137,7 @@ namespace BasicRdl.Tests.ViewModels
             var viewmodel = new FileTypeDialogViewModel(filetype, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object);
 
             var rule = viewmodel["Name"];
-            Assert.IsNotNullOrEmpty(rule);
+            Assert.That(rule, Is.Not.Null.Or.Not.Empty);
 
             viewmodel.Name = "application/a";
             rule = viewmodel["Name"];
@@ -177,7 +177,7 @@ namespace BasicRdl.Tests.ViewModels
 
             viewmodel.Name = "video/a-+dza   ";
             rule = viewmodel["Name"];
-            Assert.IsNotNullOrEmpty(rule);
+            Assert.That(rule, Is.Not.Null.Or.Not.Empty);
         }
     }
 }

@@ -93,15 +93,15 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
         
             Assert.AreEqual(1, viewmodel.Options.Count);
-            Assert.IsNotNullOrEmpty(viewmodel.Caption);
-            Assert.IsNotNullOrEmpty(viewmodel.ToolTip);
-            Assert.IsNotNullOrEmpty(viewmodel.DataSource);
-            Assert.IsNotNullOrEmpty(viewmodel.DomainOfExpertise);
-            Assert.IsNotNullOrEmpty(viewmodel.CurrentModel);
+            Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.DataSource, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.DomainOfExpertise, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.CurrentModel, Is.Not.Null.Or.Empty);
 
             var optionrow = viewmodel.Options.Single();
-            Assert.IsNotNullOrEmpty(optionrow.ShortName);
-            Assert.IsNotNullOrEmpty(optionrow.Name);
+            Assert.That(optionrow.ShortName, Is.Not.Null.Or.Empty);
+            Assert.That(optionrow.Name, Is.Not.Null.Or.Empty);
 
             viewmodel.SelectedThing = optionrow;
 

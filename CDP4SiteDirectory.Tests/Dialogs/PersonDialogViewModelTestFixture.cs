@@ -73,8 +73,9 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 
             // assert 2 errors messages are added when password update is activated
             vm.PwdEditIsChecked = true;
-            Assert.IsNotNullOrEmpty(vm["Password"]);
-            Assert.IsNotNullOrEmpty(vm["PasswordConfirmation"]);
+            
+            Assert.That(vm["Password"], Is.Not.Null.Or.Empty);
+            Assert.That(vm["PasswordConfirmation"], Is.Not.Null.Or.Empty);
 
             Assert.AreEqual(2, vm.ValidationErrors.Count);
 
@@ -82,8 +83,9 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             vm.Password = "123";
             vm.PasswordConfirmation = "123";
 
-            Assert.IsNullOrEmpty(vm["Password"]);
-            Assert.IsNullOrEmpty(vm["PasswordConfirmation"]);
+            Assert.That(vm["Password"], Is.Null.Or.Empty);
+            Assert.That(vm["PasswordConfirmation"], Is.Null.Or.Empty);
+            
             Assert.AreEqual(0, vm.ValidationErrors.Count);
 
             Assert.IsTrue(vm.OkCommand.CanExecute(null));

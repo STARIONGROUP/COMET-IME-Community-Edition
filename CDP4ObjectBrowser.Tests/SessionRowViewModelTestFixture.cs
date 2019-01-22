@@ -9,8 +9,8 @@ namespace CDP4ObjectBrowser.Tests
     using System;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using CDP4Common.DTO;
-
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4ObjectBrowser;
@@ -61,7 +61,7 @@ namespace CDP4ObjectBrowser.Tests
         private Guid engineeringMdodelGuid;
 
         [SetUp]
-        public async void SetUp()
+        public async Task SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 

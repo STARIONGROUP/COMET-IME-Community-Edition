@@ -52,9 +52,9 @@ namespace CDP4SiteDirectory.Tests.RoleBrowser
         public void VerifyThatPropertiesAreSet()
         {
             var row = new ParticipantRoleRowViewModel(this.participantRole, this.session.Object, null);
-
-            Assert.IsNotNullOrEmpty(row.ClassKind);
-            Assert.IsNotNullOrEmpty(row.Name);
+            
+            Assert.That(row.ClassKind, Is.Not.Null.Or.Empty);            
+            Assert.That(row.Name, Is.Not.Null.Or.Empty);
             Assert.IsNotEmpty(row.ContainedRows);
         }
     }

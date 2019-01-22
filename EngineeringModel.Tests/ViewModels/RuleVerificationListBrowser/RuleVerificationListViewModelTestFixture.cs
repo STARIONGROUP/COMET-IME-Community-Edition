@@ -26,9 +26,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.ViewModels;
-
     using Microsoft.Practices.ServiceLocation;
-
     using Moq;
     using NUnit.Framework;
 
@@ -104,8 +102,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
-
-
         }
 
         /// <summary>
@@ -309,10 +305,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
 
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
-            Assert.IsNullOrEmpty(viewmodel.Feedback);
+            
+            Assert.That(viewmodel.Feedback, Is.Null.Or.Empty);
             await viewmodel.Drop(dropinfo.Object);
-
-            Assert.IsNotNullOrEmpty(viewmodel.Feedback);
+            
+            Assert.That(viewmodel.Feedback, Is.Not.Null.Or.Empty);
         }
 
         [Test]

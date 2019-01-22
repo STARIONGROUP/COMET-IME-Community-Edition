@@ -32,7 +32,6 @@ namespace CDP4Requirements.ViewModels
     [ThingDialogViewModelExport(ClassKind.Requirement)]
     public class RequirementDialogViewModel : CDP4CommonView.RequirementDialogViewModel, IThingDialogViewModel
     {
-        #region private fields
         /// <summary>
         /// The Required Referance-Data-library for the current <see cref="Iteration"/>
         /// </summary>
@@ -57,9 +56,7 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="RequirementText"/>
         /// </summary>
         private string requirementText;
-        #endregion
-
-        #region Constructor
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementDialogViewModel"/> class.
         /// </summary>
@@ -101,9 +98,7 @@ namespace CDP4Requirements.ViewModels
 
             this.WhenAnyValue(vm => vm.RequirementText).Subscribe(_ => this.UpdateOkCanExecute());
         }
-        #endregion
-
-        #region Properties
+        
         /// <summary>
         /// Gets or sets the list of <see cref="SimpleParameterValue"/>
         /// </summary>
@@ -174,8 +169,7 @@ namespace CDP4Requirements.ViewModels
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a SimpleParameterValue
         /// </summary>
         public ReactiveCommand<object> InspectSimpleParameterValueCommand { get; protected set; }
-        #endregion
-
+        
         /// <summary>
         /// Initializes the properties of this <see cref="Requirement"/>
         /// </summary>
@@ -278,8 +272,9 @@ namespace CDP4Requirements.ViewModels
         protected override void PopulatePossibleOwner()
         {
             base.PopulatePossibleOwner();
+            
+            var engineeringModel = (EngineeringModel) this.Thing.TopContainer;
 
-            var engineeringModel = (EngineeringModel)this.Container.Container;
             var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
             this.PossibleOwner.AddRange(domains);
         }

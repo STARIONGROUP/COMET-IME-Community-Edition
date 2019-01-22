@@ -6,17 +6,17 @@
 
 namespace CDP4Composition.Tests.Mvvm.Behaviours
 {
+    using System;
+    using System.Threading;
     using System.Windows;
-
     using CDP4Composition.Navigation;
-
     using NUnit.Framework;
 
     /// <summary>
     /// Suite of tests for the <see cref="DialogCloser"/> class.
     /// </summary>
     [TestFixture]
-    [RequiresSTA]
+    [Apartment(ApartmentState.STA)]
     public class DialogCloserTestFixture
     {
         private Window window;
@@ -35,14 +35,13 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
         }
 
         [Test]
-        [ExpectedException]
         public void VerifyThatEventHandlerIsCalledWhenDialogResultIsSetToTrue()
         {
             // Setting the dialog result to anything but null throws an exception. 
             // What we are testing here is that the dialog result is set on the window
             // The fact that this happens demonstrates the event is handled
-
-            DialogCloser.SetDialogResult(this.window, true);
+            
+            Assert.Throws<InvalidOperationException>(() => DialogCloser.SetDialogResult(this.window, true));
         }
     }
 }

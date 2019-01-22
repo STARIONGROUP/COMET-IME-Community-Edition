@@ -91,11 +91,10 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void VerififyThatInvalidContainerThrowsException()
         {
             var prefixedUnit = new PrefixedUnit(Guid.NewGuid(), null, null);
-            var vm = new PrefixedUnitDialogViewModel(prefixedUnit, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir);
+            Assert.Throws<ArgumentException>(() =>  new PrefixedUnitDialogViewModel(prefixedUnit, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir));
         }
 
         [Test]
@@ -107,11 +106,12 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
             Assert.AreEqual(this.genericSiteReferenceDataLibrary.Iid, vm.Container.Iid);
             Assert.IsNotNull(vm.SelectedPrefix);
             Assert.IsNotNull(vm.SelectedReferenceUnit);
-            Assert.IsNotNullOrEmpty(vm.ShortName);
-            Assert.IsNotNullOrEmpty(vm.Name);
-            Assert.IsNullOrEmpty(vm["ShortName"]);
-            Assert.IsNullOrEmpty(vm["Name"]);
+            Assert.That(vm.ShortName, Is.Not.Null.Or.Not.Empty);
+            Assert.That(vm.Name, Is.Not.Null.Or.Not.Empty);
 
+            Assert.That(vm["ShortName"], Is.Empty.Or.Null);
+            Assert.That(vm["Name"], Is.Empty.Or.Null);
+            
             Assert.IsTrue(vm.OkCommand.CanExecute(null));
         }
 
@@ -147,11 +147,13 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
             Assert.AreEqual(this.genericSiteReferenceDataLibrary.Iid, vm.Container.Iid);
             Assert.IsNotNull(vm.SelectedPrefix);
             Assert.IsNotNull(vm.SelectedReferenceUnit);
-            Assert.IsNotNullOrEmpty(vm.ShortName);
-            Assert.IsNotNullOrEmpty(vm.Name);
-            Assert.IsNullOrEmpty(vm["ShortName"]);
-            Assert.IsNullOrEmpty(vm["Name"]);
+            
+            Assert.That(vm.ShortName, Is.Not.Null.Or.Not.Empty);
+            Assert.That(vm.Name, Is.Not.Null.Or.Not.Empty);
 
+            Assert.That(vm["ShortName"], Is.Null.Or.Empty);
+            Assert.That(vm["Name"], Is.Null.Or.Empty);
+            
             Assert.DoesNotThrow(() => vm.OkCommand.Execute(null));
         }
     }

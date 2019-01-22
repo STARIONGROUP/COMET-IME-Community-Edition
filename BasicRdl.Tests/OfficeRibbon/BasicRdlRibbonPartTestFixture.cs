@@ -7,9 +7,10 @@
 namespace BasicRdl.Tests
 {
     using System;
-    using System.Collections.Generic;
     using System.IO.Packaging;
     using System.Reactive.Concurrency;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
     using BasicRdl.ViewModels;
     using CDP4Common.CommonData;
@@ -24,12 +25,11 @@ namespace BasicRdl.Tests
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
-
-
+    
     /// <summary>
     /// TestFixture for the <see cref="BasicRdlRibbonPart"/>
     /// </summary>
-    [TestFixture, RequiresSTA]    
+    [TestFixture, Apartment(ApartmentState.STA)]    
     public class BasicRdlRibbonPartTestFixture
     {
         private Uri uri;
@@ -155,7 +155,7 @@ namespace BasicRdl.Tests
         }
 
         [Test]
-        public void VerifyThatOnActionInvokesTheNavigationServiceOpenAndCloseMethod()
+        public async Task VerifyThatOnActionInvokesTheNavigationServiceOpenAndCloseMethod()
         {
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -165,19 +165,19 @@ namespace BasicRdl.Tests
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(openSessionEvent);
 
-            this.ribbonPart.OnAction("ShowMeasurementUnits");
+            await this.ribbonPart.OnAction("ShowMeasurementUnits");
             this.panelNavigationService.Verify(x => x.Open(It.IsAny<MeasurementUnitsBrowserViewModel>(), false));
 
-            this.ribbonPart.OnAction("ShowMeasurementScales");
+            await this.ribbonPart.OnAction("ShowMeasurementScales");
             this.panelNavigationService.Verify(x => x.Open(It.IsAny<MeasurementScalesBrowserViewModel>(), false));
 
-            this.ribbonPart.OnAction("ShowParameterTypes");
+            await this.ribbonPart.OnAction("ShowParameterTypes");
             this.panelNavigationService.Verify(x => x.Open(It.IsAny<ParameterTypesBrowserViewModel>(), false));
 
-            this.ribbonPart.OnAction("ShowRules");
+            await this.ribbonPart.OnAction("ShowRules");
             this.panelNavigationService.Verify(x => x.Open(It.IsAny<RulesBrowserViewModel>(), false));
 
-            this.ribbonPart.OnAction("ShowCategories");
+            await this.ribbonPart.OnAction("ShowCategories");
             this.panelNavigationService.Verify(x => x.Open(It.IsAny<CategoryBrowserViewModel>(), false));
 
             // close viewmodels
@@ -192,9 +192,9 @@ namespace BasicRdl.Tests
         }
 
         [Test]
-        public void VerifyThatOnActionDoesNotInvokePanelNavigationWhenSessionIsNull()
+        public async Task VerifyThatOnActionDoesNotInvokePanelNavigationWhenSessionIsNull()
         {
-            this.ribbonPart.OnAction("ShowMeasurementUnits");
+            await this.ribbonPart.OnAction("ShowMeasurementUnits");
             this.panelNavigationService.Verify(x => x.Open(It.IsAny<MeasurementUnitsBrowserViewModel>(), false), Times.Never);
         }
 
@@ -253,7 +253,6 @@ namespace BasicRdl.Tests
 
             var unknownImage = this.ribbonPart.GetImage("unknownRibbonControlId");
             Assert.IsNull(unknownImage);
-            
         }
     }
 }

@@ -15,7 +15,6 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.Types;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
-    using CDP4Dal.Events;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.ViewModels.Dialogs;
     using Moq;
@@ -248,7 +247,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual("computed", row.Computed);
             Assert.AreEqual("ref", row.Reference);
             Assert.AreEqual("formula", row.Formula);
-            Assert.IsNullOrEmpty(row.ScaleName);
+            Assert.That(row.ScaleName, Is.Null.Or.Empty);
         }
 
         [Test]
@@ -279,8 +278,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual("manual", firstOption.Manual);
             Assert.AreEqual("computed", firstOption.Computed);
             Assert.AreEqual("formula", firstOption.Formula);
-            Assert.AreEqual("ref", firstOption.Reference);
-            Assert.IsNullOrEmpty(firstOption.ScaleName);
+            Assert.AreEqual("ref", firstOption.Reference);            
+            Assert.That(firstOption.ScaleName, Is.Null.Or.Empty);
         }
 
         [Test]
@@ -309,7 +308,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual("computed", firstState.Computed);
             Assert.AreEqual("formula", firstState.Formula);
             Assert.AreEqual("ref", firstState.Reference);
-            Assert.IsNullOrEmpty(firstState.ScaleName);
+            Assert.That(firstState.ScaleName, Is.Null.Or.Empty);
         }
 
         [Test]
@@ -333,7 +332,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual("computed1", c1.Computed);
             Assert.AreEqual("formula1", c1.Formula);
             Assert.AreEqual("ref1", c1.Reference);
-            Assert.IsNullOrEmpty(c1.ScaleName);
+            Assert.That(c1.ScaleName, Is.Null.Or.Empty);
         }
 
         [Test]
@@ -374,7 +373,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual("computed", stateRow.Computed);
             Assert.AreEqual("formula", stateRow.Formula);
             Assert.AreEqual("ref", stateRow.Reference);
-            Assert.IsNullOrEmpty(stateRow.ScaleName);
+            Assert.That(stateRow.ScaleName, Is.Null.Or.Empty);
         }
 
         [Test]
@@ -421,7 +420,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual("computed2", c2row.Computed);
             Assert.AreEqual("formula2", c2row.Formula);
             Assert.AreEqual("ref2", c2row.Reference);
-            Assert.IsNullOrEmpty(c2row.ScaleName);
+            Assert.That(c2row.ScaleName, Is.Null.Or.Empty);
         }
 
         [Test]
@@ -453,7 +452,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual("computed2", c2Row.Computed);
             Assert.AreEqual("formula2", c2Row.Formula);
             Assert.AreEqual("ref2", c2Row.Reference);
-            Assert.IsNullOrEmpty(c2Row.ScaleName);
+            Assert.That(c2Row.ScaleName, Is.Null.Or.Empty);
         }
 
         [Test]
@@ -476,7 +475,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual("[other]", row.OwnerName);
             Assert.AreEqual("formula", row.Formula);
             Assert.AreEqual("ref", row.Reference);
-            Assert.IsNullOrEmpty(row.ScaleName);
+            Assert.That(row.ScaleName, Is.Null.Or.Empty);
 
         }
 

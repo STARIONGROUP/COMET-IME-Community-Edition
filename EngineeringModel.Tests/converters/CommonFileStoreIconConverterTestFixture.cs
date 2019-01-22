@@ -7,9 +7,8 @@
 namespace CDP4EngineeringModel.Tests.converters
 {
     using System;
-
+    using System.Threading;
     using CDP4Common.EngineeringModelData;
-
     using CDP4Composition;
     using CDP4Composition.Services;
     using CDP4EngineeringModel.Converters;
@@ -20,7 +19,7 @@ namespace CDP4EngineeringModel.Tests.converters
     /// <summary>
     /// Suite of tests for the <see cref="CommonFileStoreIconConverter"/>
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class CommonFileStoreIconConverterTestFixture
     {
         private CommonFileStoreIconConverter commonFileStoreIconConverter;

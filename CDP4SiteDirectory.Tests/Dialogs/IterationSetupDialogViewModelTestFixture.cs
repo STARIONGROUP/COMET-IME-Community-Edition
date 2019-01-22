@@ -9,6 +9,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System;
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.Types;
@@ -87,7 +88,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
-        public async void VerifyThatOkCommandWorksWhenRoot()
+        public async Task VerifyThatOkCommandWorksWhenRoot()
         {
             var iterationSetup = new IterationSetup();
 

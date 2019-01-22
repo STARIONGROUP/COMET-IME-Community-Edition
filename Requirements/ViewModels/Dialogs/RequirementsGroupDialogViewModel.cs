@@ -70,7 +70,8 @@ namespace CDP4Requirements.ViewModels
         protected override void PopulatePossibleOwner()
         {
             base.PopulatePossibleOwner();
-            var engineeringModel = (EngineeringModel)this.Container.Container;
+            
+            var engineeringModel = (EngineeringModel)this.Thing.TopContainer;
             var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
             this.PossibleOwner.AddRange(domains);
             this.SelectedOwner = this.PossibleOwner.FirstOrDefault(x => this.Session.ActivePerson?.DefaultDomain != null && x.Iid == this.Session.ActivePerson.DefaultDomain.Iid) ?? this.PossibleOwner.First();

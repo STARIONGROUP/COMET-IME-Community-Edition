@@ -169,9 +169,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             var vm = new DomainFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
 
             Assert.IsEmpty(vm.ContainedRows);
-            Assert.IsNotNullOrEmpty(vm.Caption);
-            Assert.IsNotNullOrEmpty(vm.ToolTip);
-            Assert.IsNotNullOrEmpty(vm.DomainOfExpertise);
+            
+            Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
+            Assert.That(vm.DomainOfExpertise, Is.Not.Null.Or.Empty);
             Assert.AreEqual(this.engineeringModelSetup.Name, vm.CurrentModel);
             Assert.AreEqual(this.iterationSetup.IterationNumber, vm.CurrentIteration);
 

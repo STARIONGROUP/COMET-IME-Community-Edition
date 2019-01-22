@@ -8,6 +8,7 @@ namespace CDP4Composition.Tests.Mvvm
 {
     using System;
     using System.Windows;
+    using System.Threading;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
@@ -84,7 +85,7 @@ namespace CDP4Composition.Tests.Mvvm
             Assert.AreEqual("http://www.rheagroup.com:80/SiteDirectory/609d5d8f-f209-4905-967e-796970fefd84/person/f1cbaf64-afa6-4467-97e5-5d98803f2848", testdialog.ThingUri);
         }
 
-        [Test, RequiresSTA]
+        [Test, Apartment(ApartmentState.STA)]
         public void VerifThatCopyUriCommandWorks()
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, this.clone);
@@ -100,7 +101,7 @@ namespace CDP4Composition.Tests.Mvvm
             Assert.AreEqual("N/A", testdialog.ThingUri);
         }
 
-        [Test, RequiresSTA]
+        [Test, Apartment(ApartmentState.STA)]
         public void VerifThatJsonExportCommandsWork()
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, this.clone);
@@ -161,12 +162,14 @@ namespace CDP4Composition.Tests.Mvvm
 
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, this.clone);
 
-            testdialog.Name = "";
-            Assert.IsNotNullOrEmpty(testdialog["Name"]);
+            testdialog.Name = "";            
+            Assert.That(testdialog["Name"], Is.Not.Null.Or.Not.Empty);
+
             Assert.IsFalse(testdialog.OkCommand.CanExecute(null));
 
             testdialog.Name = "ara";
-            Assert.IsNullOrEmpty(testdialog["Name"]);
+            Assert.That(testdialog["Name"], Is.Null.Or.Empty);
+
             Assert.IsTrue(testdialog.OkCommand.CanExecute(null));
         }
 

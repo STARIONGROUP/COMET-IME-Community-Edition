@@ -46,10 +46,9 @@ namespace CDP4BuiltInRules.Tests.Rules
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatIfIterationIsNullExceptionIsThrown()
         {
-            this.rule.Verify(null);
+            Assert.Throws<ArgumentNullException>(() => this.rule.Verify(null));
         }
 
         [Test]

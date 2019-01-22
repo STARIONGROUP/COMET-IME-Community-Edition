@@ -91,11 +91,11 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void VerififyThatInvalidContainerThrowsException()
         {
             var linearConversionUnit = new LinearConversionUnit(Guid.NewGuid(), null, this.uri);
-            var vm = new LinearConversionUnitDialogViewModel(linearConversionUnit, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.sitedirclone);
+            
+            Assert.Throws<ArgumentException>(() => new LinearConversionUnitDialogViewModel(linearConversionUnit, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.sitedirclone));
         }
 
         [Test]

@@ -92,7 +92,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         
             Assert.AreEqual("requirement group 2", row.Name);
             Assert.AreEqual("rg2", row.ShortName);
-            Assert.IsNullOrEmpty(row.Definition);
+            Assert.That(row.Definition, Is.Null.Or.Empty);
         }
 
         [Test]

@@ -10,6 +10,7 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using BasicRdl.ViewModels.Dialogs;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
@@ -88,7 +89,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async void VerifyThatOkCommandWorks()
+        public async Task VerifyThatOkCommandWorks()
         {
             this.viewmodel.OkCommand.Execute(null);
 
@@ -98,7 +99,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async void VerifyThatExceptionAreCaught()
+        public async Task VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
@@ -113,7 +114,7 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyUpdateOkCanExecute()
         {
             Assert.IsFalse(this.viewmodel.OkCommand.CanExecute(null));
-            Assert.IsNullOrEmpty(this.viewmodel.Exponent);
+            Assert.That(this.viewmodel.Exponent, Is.Null.Or.Empty);
             Assert.IsNotEmpty(this.viewmodel.PossibleQuantityKind);
             Assert.IsNull(this.viewmodel.SelectedQuantityKind);
             this.viewmodel.Exponent = "2";

@@ -9,6 +9,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
     using System;
     using System.Collections.Generic;
     using System.IO.Packaging;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
@@ -28,7 +29,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
     /// <summary>
     /// suite of tests for the <see cref="AddinRibbonPart"/> class
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class AddinRibbonPartTestFixture
     {
         private Uri uri;
@@ -76,6 +77,12 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            CDPMessageBus.Current.ClearSubscriptions();
         }
 
         /// <summary>
@@ -140,9 +147,9 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
         }
 
         [Test]
-        public void Verify_that_when_proxyserver_on_action_dialogisnavigated()
+        public async Task Verify_that_when_proxyserver_on_action_dialogisnavigated()
         {
-            this.ribbonPart.OnAction("CDP4_ProxySettings");
+            await this.ribbonPart.OnAction("CDP4_ProxySettings");
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
         }
     }

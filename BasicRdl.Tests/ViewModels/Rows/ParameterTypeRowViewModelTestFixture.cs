@@ -86,7 +86,7 @@ namespace BasicRdl.Tests.ViewModels
             Assert.AreEqual(Name, parameterTypeRowViewModel.Name);
             Assert.AreEqual(Shortname, parameterTypeRowViewModel.ShortName);
             Assert.IsFalse(parameterTypeRowViewModel.IsBaseQuantityKind);
-            Assert.IsNullOrEmpty(parameterTypeRowViewModel.DefaultScale);
+            Assert.That(parameterTypeRowViewModel.DefaultScale, Is.Null.Or.Empty);
             Assert.AreEqual(textParamType.ClassKind.ToString(), parameterTypeRowViewModel.Type);
             Assert.AreEqual(rdl.ShortName, parameterTypeRowViewModel.ContainerRdl);
         }

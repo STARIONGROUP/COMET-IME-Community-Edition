@@ -87,7 +87,8 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             var viewmodel = new DataSourceSelectionViewModel();
 
             Assert.IsTrue(viewmodel.CancelCommand.CanExecute(null));
-            Assert.IsNullOrEmpty(viewmodel.ErrorMessage);
+
+            Assert.That(viewmodel.ErrorMessage, Is.Null.Or.Empty);
 
             Assert.IsNotEmpty(viewmodel.AvailableDataSourceKinds);
 
@@ -110,7 +111,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             var viewmodel = new DataSourceSelectionViewModel();
 
             Assert.IsTrue(viewmodel.CancelCommand.CanExecute(null));
-            Assert.IsNullOrEmpty(viewmodel.ErrorMessage);
+            Assert.That(viewmodel.ErrorMessage, Is.Null.Or.Empty);
 
             Assert.IsNotEmpty(viewmodel.AvailableDataSourceKinds);
 

@@ -13,8 +13,6 @@ namespace CDP4Composition
     using System.IO;
     using System.Linq;
     using System.Reflection;
-
-    using DevExpress.Xpf.SpellChecker;
     using DevExpress.XtraSpellChecker;
     using NLog;
 

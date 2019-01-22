@@ -93,11 +93,14 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void VerifyThatInvalidContainerThrowsException()
         {
             var constant = new Constant(Guid.NewGuid(), null, this.uri) { Container = this.siteRdl };
-            var vm = new ConstantDialogViewModel(constant, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir);
+
+            Assert.Throws<ArgumentException>(() =>
+
+                new ConstantDialogViewModel(constant, this.transaction, this.session.Object, true,
+                    ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir));
         }
 
         [Test]

@@ -94,10 +94,11 @@ namespace CDP4IME.Tests.ViewModels
 
             this.viewModel.PasswordRetype = "pass";
             this.viewModel.Password = "pass";
-            this.viewModel.Path = "C:\\test\\doubletest.zip";
+            this.viewModel.Path = @"C:\test\doubletest.zip";
 
             Assert.AreEqual(this.viewModel.Password, this.viewModel.PasswordRetype);
-            Assert.IsNullOrEmpty(this.viewModel.ErrorMessage);
+            Assert.That(this.viewModel.ErrorMessage, Is.Null.Or.Empty);
+
             Assert.IsNotNull(this.viewModel.SelectedDal);
             Assert.IsNotNull(this.viewModel.SelectedSession);
             Assert.IsTrue(this.viewModel.OkCommand.CanExecute(null));

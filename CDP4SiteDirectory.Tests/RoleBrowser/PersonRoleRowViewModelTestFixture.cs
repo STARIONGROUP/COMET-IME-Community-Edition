@@ -53,8 +53,8 @@ namespace CDP4SiteDirectory.Tests.RoleBrowser
         {
             var row = new PersonRoleRowViewModel(this.personRole, this.session.Object, null);
 
-            Assert.IsNotNullOrEmpty(row.ClassKind);
-            Assert.IsNotNullOrEmpty(row.Name);
+            Assert.That(row.ClassKind, Is.Not.Null.Or.Empty);
+            Assert.That(row.Name, Is.Not.Null.Or.Empty);
             Assert.IsNotEmpty(row.ContainedRows);
         }
     }

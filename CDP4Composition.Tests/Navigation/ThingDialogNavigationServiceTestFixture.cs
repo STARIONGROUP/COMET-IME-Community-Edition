@@ -8,6 +8,7 @@ namespace CDP4Composition.Tests.Navigation
 {
     using System;    
     using System.Collections.Generic;
+    using System.Threading;
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -17,7 +18,6 @@ namespace CDP4Composition.Tests.Navigation
     using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Operations;
-    using CDP4Dal.Permission;
     using DevExpress.Xpf.SpellChecker;
     using Moq;
     using NUnit.Framework;
@@ -66,8 +66,8 @@ namespace CDP4Composition.Tests.Navigation
 
             this.specialTermService = new SpecialTermsService();
         }
-
-        [Test, RequiresSTA]
+        
+        [Test,  Apartment(ApartmentState.STA)]
         public void VerifyThatTheNavigationServiceReturnsTrue()
         {
             var navigationService = new ThingDialogNavigationService(this.lazyviews, this.lazyviewmodels, this.spellDictionaryService, this.specialTermService);
@@ -75,7 +75,7 @@ namespace CDP4Composition.Tests.Navigation
             Assert.IsTrue(result.Value);
         }
 
-        [Test, RequiresSTA]
+        [Test, Apartment(ApartmentState.STA)]
         public void Verify_that_when_on_Navigate_Thing_is_null_an_ArgumentNullException_is_thrown()
         {
             var navigationService = new ThingDialogNavigationService(this.lazyviews, this.lazyviewmodels, this.spellDictionaryService, this.specialTermService);
@@ -83,7 +83,7 @@ namespace CDP4Composition.Tests.Navigation
             Assert.Throws<ArgumentNullException>(() => navigationService.Navigate(null, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, null));
         }
 
-        [Test, RequiresSTA]
+        [Test, Apartment(ApartmentState.STA)]
         public void Verify_that_when_on_Navigate_Session_is_null_an_ArgumentNullException_is_thrown()
         {
             var navigationService = new ThingDialogNavigationService(this.lazyviews, this.lazyviewmodels, this.spellDictionaryService, this.specialTermService);
@@ -91,7 +91,7 @@ namespace CDP4Composition.Tests.Navigation
             Assert.Throws<ArgumentNullException>(() => navigationService.Navigate(this.simpleUnit, this.transaction, null, true, ThingDialogKind.Create, null, null));
         }
 
-        [Test, RequiresSTA]
+        [Test, Apartment(ApartmentState.STA)]
         public void Verify_that_when_on_Navigate_Transaction_is_null_for_Create_or_Update_an_ArgumentNullException_is_thrown()
         {
             var navigationService = new ThingDialogNavigationService(this.lazyviews, this.lazyviewmodels, this.spellDictionaryService, this.specialTermService);

@@ -122,21 +122,20 @@ namespace CDP4Composition.Tests.RuleVerification
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatArgumentNotNullExceptionIsThrownWhenSessionIsNull()
         {
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri);
-
             var service = new RuleVerificationService(this.builtInRules);
-            service.Execute(null, ruleVerificationList);
+            
+            Assert.Throws<ArgumentNullException>(() => service.Execute(null, ruleVerificationList));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatArgumentNotNullExceptionIsThrownWhenRuleVerificationListIsNull()
         {
             var service = new RuleVerificationService(this.builtInRules);
-            service.Execute(this.session.Object, null);
+            
+            Assert.Throws<ArgumentNullException>(() => service.Execute(this.session.Object, null));
         }
 
         [Test]

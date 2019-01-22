@@ -8,6 +8,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.Types;
@@ -77,7 +78,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
-        public async void VerifyThatOkCommandWorks()
+        public async Task VerifyThatOkCommandWorks()
         {
             this.viewmodel.OkCommand.Execute(null);
 
@@ -87,7 +88,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
-        public async void VerifyThatExceptionAreCaught()
+        public async Task VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 

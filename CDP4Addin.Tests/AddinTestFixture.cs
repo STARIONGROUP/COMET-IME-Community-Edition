@@ -6,6 +6,7 @@
 
 namespace CDP4AddinCE.Tests
 {
+    using System.Threading;
     using CDP4Composition;
     using Moq;
     using NetOffice.OfficeApi;
@@ -14,7 +15,7 @@ namespace CDP4AddinCE.Tests
     /// <summary>
     /// suite of tests for the <see cref="AddinRibbonPart"/> class
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class AddinTestFixture
     {
         private Mock<IRibbonControl> ribbonControl;

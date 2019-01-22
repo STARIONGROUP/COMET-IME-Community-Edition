@@ -4,12 +4,12 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Composition.Tests.Mvvm.Behaviours
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Windows;
     using System.Windows.Input;    
     using CDP4Common.CommonData;
@@ -27,7 +27,7 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
     /// <summary>
     /// Suite of tests for the <see cref="ContextMenuBehavior"/> class.
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class ContextMenuBehaviorTestFixture
     {
         private ContextMenuBehavior contextMenuBehavior;

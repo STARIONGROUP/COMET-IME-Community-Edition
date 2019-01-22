@@ -11,6 +11,7 @@ namespace CDP4ObjectBrowser.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
     using CDP4Common.DTO;
     using CDP4Common.Types;
     using CDP4Dal;
@@ -70,7 +71,7 @@ namespace CDP4ObjectBrowser.Tests
         private ConcurrentDictionary<CacheKey, Lazy<CDP4Common.CommonData.Thing>> cache;
 
         [SetUp]
-        public async void SetUp()
+        public async Task SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 

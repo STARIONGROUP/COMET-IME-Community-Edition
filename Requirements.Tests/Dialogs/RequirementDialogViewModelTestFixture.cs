@@ -46,6 +46,7 @@ namespace CDP4Requirements.Tests.Dialogs
         private Category cat1;
         private Category cat2;
         private RequirementsSpecification clone;
+        private DomainOfExpertise domainOfExpertise;
 
         [SetUp]
         public void Setup()
@@ -101,9 +102,15 @@ namespace CDP4Requirements.Tests.Dialogs
             this.cat2 = new Category(Guid.NewGuid(), this.cache, this.uri);
             this.srdl.DefinedCategory.Add(this.cat2);
 
+            var person = new Person(Guid.NewGuid(), null, this.uri);
+            this.domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) {Name = "test"};
+            person.DefaultDomain = this.domainOfExpertise;
+
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
-            this.session.Setup(x => x.ActivePerson).Returns(new Person(Guid.NewGuid(), null, this.uri));
-            this.siteDir.Domain.Add(new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "test" });
+            this.session.Setup(x => x.ActivePerson).Returns(person);
+            this.siteDir.Domain.Add(this.domainOfExpertise);
+
+            this.modelsetup.ActiveDomain.Add(this.domainOfExpertise);
 
             this.clone = this.reqSpec.Clone(false);
 

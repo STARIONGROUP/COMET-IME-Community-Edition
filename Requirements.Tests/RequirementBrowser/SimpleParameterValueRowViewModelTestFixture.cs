@@ -61,8 +61,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var vm = new SimpleParameterValueRowViewModel(this.simpleParameterValue, this.session.Object, null);
 
             Assert.AreEqual(this.testParameterType.Name, vm.Name);
-            Assert.AreEqual(this.testParameterType.ShortName, vm.ShortName);
-            Assert.IsNotNullOrEmpty(vm.Definition);
+            Assert.AreEqual(this.testParameterType.ShortName, vm.ShortName);            
+            Assert.That(vm.Definition, Is.Not.Null.Or.Empty);
             Assert.AreEqual("1, 2", vm.Definition);
         }
     }

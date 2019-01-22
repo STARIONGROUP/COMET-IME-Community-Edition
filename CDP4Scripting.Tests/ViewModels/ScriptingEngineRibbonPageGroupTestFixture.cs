@@ -10,6 +10,7 @@ namespace CDP4Scripting.Tests.ViewModels
     using System.IO;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading;
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
@@ -21,12 +22,11 @@ namespace CDP4Scripting.Tests.ViewModels
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
-    using Views;
 
     /// <summary>
     /// Suite of tests for the <see cref="ScriptingEngineRibbonPageGroup"/>
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class ScriptingEngineRibbonPageGroupTestFixture
     {
         private ScriptingEngineRibbonPageGroupViewModel scriptingEngineRibbonPageGroupViewModel;

@@ -10,6 +10,7 @@ namespace CDP4BuiltInRules.Tests
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Threading;
     using System.Windows;
     using CDP4BuiltInRules.ViewModels;
     using CDP4Common.CommonData;
@@ -176,7 +177,7 @@ namespace CDP4BuiltInRules.Tests
             this.highlightTrigger = true;
         }
 
-        [Test, RequiresSTA]
+        [Test, Apartment(ApartmentState.STA)]
         public void VerifyThatCopyCommandExecutes()
         {
             var id = Guid.NewGuid();

@@ -69,7 +69,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var row = new RowTestClass(this.person, this.session.Object);
             row.ShortName = "a";
-            Assert.IsNullOrEmpty(row["ShortName"]);
+            Assert.That(row["ShortName"], Is.Null.Or.Empty);
         }
 
         [Test]
@@ -77,8 +77,9 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var row = new RowTestClass(this.person, this.session.Object);
             row.ShortName = "a";
-            Assert.IsNullOrEmpty(row.ValidateProperty("ShortName", "a"));
-            Assert.IsNotNullOrEmpty(row.ValidateProperty("ShortName", "---"));
+            Assert.That(row.ValidateProperty("ShortName", "a"), Is.Null.Or.Empty);
+            
+            Assert.That(row.ValidateProperty("ShortName", "---"), Is.Not.Null.Or.Not.Empty);
         }
 
         [Test]
@@ -106,11 +107,11 @@ namespace CDP4Composition.Tests.Mvvm
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void VerifyThatCreateCloneThrows()
         {
             var row = new RowTestClass(this.person, this.session.Object);
-            row.CreateCloneAndWrite("abc", "Exception");
+            
+            Assert.Throws<InvalidOperationException>(() => row.CreateCloneAndWrite("abc", "Exception"));
         }
 
         [Test]
@@ -123,7 +124,8 @@ namespace CDP4Composition.Tests.Mvvm
             row.CreateCloneAndWrite("abc", "ShortName");
 
             Assert.IsTrue(row.HasError);
-            Assert.IsNotNullOrEmpty(row.ErrorMsg);
+            Assert.That(row.ErrorMsg, Is.Not.Null.Or.Not.Empty);
+
             Assert.IsTrue(row.isUpdatePropertyCalled);
 
             row.Dispose();

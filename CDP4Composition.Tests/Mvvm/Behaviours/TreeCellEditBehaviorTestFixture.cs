@@ -9,6 +9,7 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
@@ -23,7 +24,7 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
     /// <summary>
     /// Suite of tests for the <see cref="TreeCellEditBehavior"/> class.
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class TreeCellEditBehaviorTestFixture
     {
         private TreeCellEditBehavior cellEditBehaviour;

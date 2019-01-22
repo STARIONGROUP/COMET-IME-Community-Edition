@@ -9,6 +9,7 @@ namespace CDP4Composition.Tests.Navigation
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Windows;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -20,7 +21,7 @@ namespace CDP4Composition.Tests.Navigation
     using ViewModels;
     using Views;
 
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class DialogNavigationServiceTestFixture
     {
         private IDialogView dialogView;

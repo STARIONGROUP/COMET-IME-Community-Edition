@@ -92,10 +92,10 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyDialogValidation()
         {
             Assert.AreEqual(0, this.viewmodel.ValidationErrors.Count);
-            Assert.IsNotNullOrEmpty(this.viewmodel["Symbol"]);
+            Assert.That(this.viewmodel["Symbol"], Is.Not.Null.Or.Not.Empty);
 
-            this.viewmodel.Symbol = "something";
-            Assert.IsNullOrEmpty(this.viewmodel["Symbol"]);
+            this.viewmodel.Symbol = "something";            
+            Assert.That(this.viewmodel["Symbol"], Is.Null.Or.Empty);
         }
 
         [Test]

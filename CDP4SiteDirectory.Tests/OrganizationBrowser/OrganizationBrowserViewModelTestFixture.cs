@@ -113,8 +113,8 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         {
             var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null);
 
-            Assert.IsNotNullOrEmpty(vm.Caption);
-            Assert.IsNotNullOrEmpty(vm.ToolTip);
+            Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
         }
 
         [Test]

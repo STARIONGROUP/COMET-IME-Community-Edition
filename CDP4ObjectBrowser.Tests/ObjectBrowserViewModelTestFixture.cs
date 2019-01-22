@@ -8,6 +8,8 @@ namespace CDP4ObjectBrowser.Tests
 {
     using System;
     using System.Reactive.Concurrency;
+    using System.Threading;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation.Interfaces;
@@ -21,7 +23,7 @@ namespace CDP4ObjectBrowser.Tests
     /// <summary>
     /// TestFixture for the <see cref="ObjectBrowserViewModel"/>
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class ObjectBrowserViewModelTestFixture
     {
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -32,7 +34,7 @@ namespace CDP4ObjectBrowser.Tests
         private SiteDirectory siteDirectory;
 
         [SetUp]
-        public async void SetUp()
+        public async Task SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 

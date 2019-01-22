@@ -9,6 +9,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Dal;
@@ -105,7 +106,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Execute the <see cref="CreateRelationshipCommand"/>
         /// </summary>
-        private async void ExecuteCreateRelationshipCommand()
+        private async Task ExecuteCreateRelationshipCommand()
         {
             var relationship = this.SelectedRelationshipCreator.CreateRelationshipObject();
             relationship.Owner = this.session.OpenIterations[this.iteration].Item1;

@@ -95,11 +95,10 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void VerifyThatInvalidContainerThrowsException()
         {
             var rule = new MultiRelationshipRule(Guid.NewGuid(), null, this.uri);
-            var vm = new MultiRelationshipRuleDialogViewModel(rule, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir);
+            Assert.Throws<ArgumentException>(() => new MultiRelationshipRuleDialogViewModel(rule, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir));
         }
 
         [Test]

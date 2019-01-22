@@ -135,11 +135,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                                                              this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
 
             Assert.AreEqual(2, viewmodel.RelationshipTypes.Count);
-            Assert.IsNotNullOrEmpty(viewmodel.Caption);
-            Assert.IsNotNullOrEmpty(viewmodel.ToolTip);
-            Assert.IsNotNullOrEmpty(viewmodel.DataSource);
-            Assert.IsNotNullOrEmpty(viewmodel.DomainOfExpertise);
-            Assert.IsNotNullOrEmpty(viewmodel.CurrentModel);
+            
+            Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.DataSource, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.DomainOfExpertise, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.CurrentModel, Is.Not.Null.Or.Empty);
         }
 
         [Test]

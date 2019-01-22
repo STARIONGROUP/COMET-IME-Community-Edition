@@ -10,6 +10,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -595,7 +596,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
-        public async void VerifyThatParameterGetsCreatedWhenParameterTypeIsDropped()
+        public async Task VerifyThatParameterGetsCreatedWhenParameterTypeIsDropped()
         {
             var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
             row.ThingCreator = this.thingCreator.Object;
@@ -609,7 +610,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             dropInfo.Setup(x => x.Payload).Returns(payload);
             dropInfo.SetupProperty(x => x.Effects);
 
-            row.Drop(dropInfo.Object);
+            await row.Drop(dropInfo.Object);
 
             this.thingCreator.Verify(x => x.CreateParameter(this.elementDefinition, null, simpleQuantityKind, ratioScale, this.activeDomain, this.session.Object));
         }

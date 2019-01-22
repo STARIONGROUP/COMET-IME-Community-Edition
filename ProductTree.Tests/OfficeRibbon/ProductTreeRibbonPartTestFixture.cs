@@ -10,6 +10,7 @@ namespace CDP4ProductTree.Tests.OfficeRibbon
     using System.Collections.Generic;
     using System.IO.Packaging;
     using System.Reactive.Concurrency;
+    using System.Threading;
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -23,13 +24,12 @@ namespace CDP4ProductTree.Tests.OfficeRibbon
     using CDP4Dal.Permission;
     using Moq;
     using NUnit.Framework;
-
     using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="ProductTreeRibbonPart"/> class
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class ProductTreeRibbonPartTestFixture
     {
 

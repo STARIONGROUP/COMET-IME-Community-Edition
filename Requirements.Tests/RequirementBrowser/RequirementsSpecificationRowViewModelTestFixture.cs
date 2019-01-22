@@ -107,7 +107,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             Assert.AreEqual("rs1", row.Name);
             Assert.AreEqual("1", row.ShortName);
             Assert.AreSame(this.domain, row.Owner);
-            Assert.IsNullOrEmpty(row.Definition);
+            Assert.That(row.Definition, Is.Null.Or.Empty);
         }
 
         [Test]

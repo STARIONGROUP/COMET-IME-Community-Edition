@@ -24,7 +24,7 @@ namespace ProductTree.Tests.ProductTreeRows
     using NUnit.Framework;
 
     [TestFixture]
-    internal class ElementDefinitionRowViewModelTestFixture
+    public class ElementDefinitionRowViewModelTestFixture
     {
         private Mock<IPermissionService> permissionService;
         private Mock<IPanelNavigationService> panelNavigationService;

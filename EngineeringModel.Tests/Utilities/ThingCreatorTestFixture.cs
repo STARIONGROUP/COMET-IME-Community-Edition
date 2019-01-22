@@ -8,6 +8,7 @@ namespace CDP4EngineeringModel.Tests.Utilities
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Types;
@@ -49,14 +50,14 @@ namespace CDP4EngineeringModel.Tests.Utilities
             var scale = new RatioScale(Guid.NewGuid(), this.cache, null);
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, null);
 
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateParameter(null, group, parameterType, scale, domainOfExpertise, this.session.Object));
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateParameter(elementDefinition, group, null, scale, domainOfExpertise, this.session.Object));
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateParameter(elementDefinition, group, parameterType, scale, null, this.session.Object));
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateParameter(elementDefinition, group, parameterType, scale, domainOfExpertise, null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateParameter(null, group, parameterType, scale, domainOfExpertise, this.session.Object));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateParameter(elementDefinition, group, null, scale, domainOfExpertise, this.session.Object));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateParameter(elementDefinition, group, parameterType, scale, null, this.session.Object));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateParameter(elementDefinition, group, parameterType, scale, domainOfExpertise, null));
         }
         
         [Test]
-        public async void VerifyThatCreateParameterWriteExceptionsAreThrown()
+        public async Task VerifyThatCreateParameterWriteExceptionsAreThrown()
         {
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
             var iteration = new Iteration(Guid.NewGuid(), this.cache, null);
@@ -69,11 +70,11 @@ namespace CDP4EngineeringModel.Tests.Utilities
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, null);
 
             this.cache.TryAdd(new CacheKey(elementDefinition.Iid, iteration.Iid), new Lazy<Thing>(() => elementDefinition));
-            Assert.Throws<Exception>(async () => await this.thingCreator.CreateParameter(elementDefinition, null, parameterType, null, domainOfExpertise, this.sessionThatThrowsException.Object));
+            Assert.ThrowsAsync<Exception>(async () => await this.thingCreator.CreateParameter(elementDefinition, null, parameterType, null, domainOfExpertise, this.sessionThatThrowsException.Object));
         }
 
         [Test]
-        public async void VerifyThatWriteIsExecuted()
+        public async Task VerifyThatWriteIsExecuted()
         {
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
             var iteration = new Iteration(Guid.NewGuid(), this.cache, null);
@@ -97,13 +98,13 @@ namespace CDP4EngineeringModel.Tests.Utilities
             var binaryRelationshipRule = new BinaryRelationshipRule(Guid.NewGuid(), this.cache, null);
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, null);
 
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateUserRuleVerification(null, null, null));
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateUserRuleVerification(ruleVerificationList, null, null));
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateUserRuleVerification(ruleVerificationList, binaryRelationshipRule, null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateUserRuleVerification(null, null, null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateUserRuleVerification(ruleVerificationList, null, null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateUserRuleVerification(ruleVerificationList, binaryRelationshipRule, null));
         }
         
         [Test]
-        public async void VerifyThatCreateUserRuleVerificationExecutesWrite()
+        public async Task VerifyThatCreateUserRuleVerificationExecutesWrite()
         {
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
             var iteration = new Iteration(Guid.NewGuid(), this.cache, null);
@@ -129,22 +130,22 @@ namespace CDP4EngineeringModel.Tests.Utilities
 
             var binaryRelationshipRule = new BinaryRelationshipRule(Guid.NewGuid(), this.cache, null);
 
-            Assert.Throws<Exception>(async() => await this.thingCreator.CreateUserRuleVerification(ruleVerificationList, binaryRelationshipRule, this.sessionThatThrowsException.Object));
+            Assert.ThrowsAsync<Exception>(async() => await this.thingCreator.CreateUserRuleVerification(ruleVerificationList, binaryRelationshipRule, this.sessionThatThrowsException.Object));
         }
 
         [Test]
-        public void VerifyThatArgumentNullExceptionsAreThrowForCreateBuiltInRuleVerificationWhenRuleNull()
+        public async Task VerifyThatArgumentNullExceptionsAreThrowForCreateBuiltInRuleVerificationWhenRuleNull()
         {
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, null);
             var binaryRelationshipRule = new BinaryRelationshipRule(Guid.NewGuid(), this.cache, null);
-
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateBuiltInRuleVerification(null, null, null));
-            Assert.Throws<ArgumentException>(async () => await this.thingCreator.CreateBuiltInRuleVerification(ruleVerificationList, null, null));
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateBuiltInRuleVerification(ruleVerificationList, "test", null));
+            
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateBuiltInRuleVerification(null, null, null));
+            Assert.ThrowsAsync<ArgumentException>(async () => await this.thingCreator.CreateBuiltInRuleVerification(ruleVerificationList, null, null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateBuiltInRuleVerification(ruleVerificationList, "test", null));
         }
         
         [Test]
-        public async void VerifyThatCreateBuiltInRuleVerificationExecutesWrite()
+        public async Task VerifyThatCreateBuiltInRuleVerificationExecutesWrite()
         {
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
             var iteration = new Iteration(Guid.NewGuid(), this.cache, null);
@@ -166,11 +167,11 @@ namespace CDP4EngineeringModel.Tests.Utilities
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, null);
             iteration.RuleVerificationList.Add(ruleVerificationList);
 
-            Assert.Throws<Exception>(async () => await this.thingCreator.CreateBuiltInRuleVerification(ruleVerificationList, "testrule", this.sessionThatThrowsException.Object));
+            Assert.ThrowsAsync<Exception>(async () => await this.thingCreator.CreateBuiltInRuleVerification(ruleVerificationList, "testrule", this.sessionThatThrowsException.Object));
         }
 
         [Test]
-        public async void VerifyThatCreateElementUsageExecutesWrite()
+        public async Task VerifyThatCreateElementUsageExecutesWrite()
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, null);
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
@@ -202,10 +203,10 @@ namespace CDP4EngineeringModel.Tests.Utilities
             iteration.Element.Add(elementDefinitionA);
             iteration.Element.Add(elementDefinitionB);
 
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateElementUsage(null, elementDefinitionB, domainOfExpertise, this.session.Object));
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateElementUsage(elementDefinitionA, null, domainOfExpertise, this.session.Object));
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateElementUsage(elementDefinitionA, elementDefinitionB, null, this.session.Object));
-            Assert.Throws<ArgumentNullException>(async () => await this.thingCreator.CreateElementUsage(elementDefinitionA, elementDefinitionB, domainOfExpertise, null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateElementUsage(null, elementDefinitionB, domainOfExpertise, this.session.Object));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateElementUsage(elementDefinitionA, null, domainOfExpertise, this.session.Object));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateElementUsage(elementDefinitionA, elementDefinitionB, null, this.session.Object));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.CreateElementUsage(elementDefinitionA, elementDefinitionB, domainOfExpertise, null));
         }
 
         [Test]
@@ -222,7 +223,7 @@ namespace CDP4EngineeringModel.Tests.Utilities
             iteration.Element.Add(elementDefinitionA);
             iteration.Element.Add(elementDefinitionB);
 
-            Assert.Throws<Exception>(async () => await this.thingCreator.CreateElementUsage(elementDefinitionA, elementDefinitionB, domainOfExpertise, this.sessionThatThrowsException.Object));
+            Assert.ThrowsAsync<Exception>(async () => await this.thingCreator.CreateElementUsage(elementDefinitionA, elementDefinitionB, domainOfExpertise, this.sessionThatThrowsException.Object));
         }
     }
 }

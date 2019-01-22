@@ -4,7 +4,6 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-
 namespace ProductTree.Tests.ProductTreeRows
 {
     using System;
@@ -112,8 +111,8 @@ namespace ProductTree.Tests.ProductTreeRows
             var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
 
             Assert.IsNotNull(vm.ElementDefinition);
-            Assert.IsNotNullOrEmpty(vm.Name);
-            Assert.IsNotNullOrEmpty(vm.ShortName);
+            Assert.That(vm.Name, Is.Not.Null.Or.Empty);
+            Assert.That(vm.ShortName, Is.Not.Null.Or.Empty);
             Assert.AreEqual("Element usage 1 : Element definition 1", vm.Name);
             Assert.AreEqual("EU1 : ED1", vm.ShortName);
             Assert.AreSame(this.elementDef2, vm.ElementDefinition);
@@ -122,11 +121,10 @@ namespace ProductTree.Tests.ProductTreeRows
         }
 
         [Test]
-        [ExpectedException(typeof (NullReferenceException))]
         public void VerifyThatNullElementDefThrows()
         {
             this.elementUsage.ElementDefinition = null;
-            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+            Assert.Throws<NullReferenceException>(() =>  new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null));
         }
 
         [Test]

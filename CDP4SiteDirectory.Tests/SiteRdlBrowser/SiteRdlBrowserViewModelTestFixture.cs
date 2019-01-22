@@ -83,8 +83,8 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         {
             var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
             Assert.AreEqual(3, viewModel.SiteRdls.Count);
-            Assert.IsNotNullOrEmpty(viewModel.Caption);
-            Assert.IsNotNullOrEmpty(viewModel.ToolTip);
+            Assert.That(viewModel.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(viewModel.ToolTip, Is.Not.Null.Or.Empty);
         }
 
         [Test]

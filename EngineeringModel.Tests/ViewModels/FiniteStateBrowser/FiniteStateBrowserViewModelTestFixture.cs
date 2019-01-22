@@ -94,11 +94,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
-            Assert.IsNotNullOrEmpty(viewmodel.Caption);
-            Assert.IsNotNullOrEmpty(viewmodel.ToolTip);
-            Assert.IsNotNullOrEmpty(viewmodel.CurrentModel);
-            Assert.IsNotNullOrEmpty(viewmodel.DomainOfExpertise);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);            
+            Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.CurrentModel, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.DomainOfExpertise, Is.Not.Null.Or.Empty);
             Assert.IsNotNull(viewmodel.CurrentIteration);
         }
 

@@ -156,8 +156,8 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         public void VerifyThatEmailCanExecuteIsFalseWhenNoEmailExists()
         {
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
-
-            Assert.IsNullOrEmpty(this.teamCompositionCardViewModel.EmailAddress); 
+            
+            Assert.That(this.teamCompositionCardViewModel.EmailAddress, Is.Null.Or.Empty);
 
             Assert.IsFalse(this.teamCompositionCardViewModel.OpenEmail.CanExecute(null));
         }

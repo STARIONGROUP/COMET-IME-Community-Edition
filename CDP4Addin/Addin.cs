@@ -150,7 +150,14 @@ namespace CDP4AddinCE
                 logger.Log(LogLevel.Error, ex);
             }
 
-            this.RibbonUI.Invalidate();
+            if (this.RibbonUI != null)
+            {
+                this.RibbonUI.Invalidate();
+            }
+            else
+            {
+                logger.Warn("The RibbonUI is null and cannot be invalidated");
+            }
         }
 
         /// <summary>

@@ -56,31 +56,27 @@ namespace CDP4Requirements.Tests.Controls
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatExceptionRaises1()
         {
-            var vm = new ReqIfExportDialogViewModel(null, new List<Iteration>(), this.fileDialogService.Object, this.serializer.Object);
+            Assert.Throws<ArgumentNullException>(() =>  new ReqIfExportDialogViewModel(null, new List<Iteration>(), this.fileDialogService.Object, this.serializer.Object));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatExceptionRaises2()
         {
-            var vm = new ReqIfExportDialogViewModel(new List<ISession>(), null, this.fileDialogService.Object, this.serializer.Object);
+            Assert.Throws<ArgumentNullException>(() => new ReqIfExportDialogViewModel(new List<ISession>(), null, this.fileDialogService.Object, this.serializer.Object));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatExceptionRaises3()
         {
-            var vm = new ReqIfExportDialogViewModel(new List<ISession>(), new List<Iteration>(), null, this.serializer.Object);
+            Assert.Throws<ArgumentNullException>(() => new ReqIfExportDialogViewModel(new List<ISession>(), new List<Iteration>(), null, this.serializer.Object));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatExceptionRaises4()
         {
-            var vm = new ReqIfExportDialogViewModel(new List<ISession>(), new List<Iteration>(), this.fileDialogService.Object, null);
+            Assert.Throws<ArgumentNullException>(() => new ReqIfExportDialogViewModel(new List<ISession>(), new List<Iteration>(), this.fileDialogService.Object, null));
         }
 
         [Test]
@@ -92,10 +88,10 @@ namespace CDP4Requirements.Tests.Controls
                 x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1))
                 .Returns("test");
 
-            vm.SelectedIteration = vm.Iterations.First();
-            Assert.IsNotNullOrEmpty(vm.SelectedIteration.IterationNumber);
-            Assert.IsNotNullOrEmpty(vm.SelectedIteration.Model);
-            Assert.IsNotNullOrEmpty(vm.SelectedIteration.DataSourceUri);
+            vm.SelectedIteration = vm.Iterations.First();            
+            Assert.That(vm.SelectedIteration.IterationNumber, Is.Not.Null.Or.Empty);            
+            Assert.That(vm.SelectedIteration.Model, Is.Not.Null.Or.Empty);            
+            Assert.That(vm.SelectedIteration.DataSourceUri, Is.Not.Null.Or.Empty);
             Assert.IsNotNull(vm.SelectedIteration.Iteration);
 
             Assert.IsFalse(vm.OkCommand.CanExecute(null));
@@ -103,7 +99,7 @@ namespace CDP4Requirements.Tests.Controls
             Assert.IsTrue(vm.BrowseCommand.CanExecute(null));
 
             vm.BrowseCommand.Execute(null);
-            Assert.IsNotNullOrEmpty(vm.Path);
+            Assert.That(vm.Path, Is.Not.Null.Or.Empty);
 
             Assert.IsTrue(vm.OkCommand.CanExecute(null));
             vm.OkCommand.Execute(null);

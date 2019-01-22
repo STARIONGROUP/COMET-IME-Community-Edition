@@ -95,7 +95,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void VerifyThatIfParameterTypeOfParameterBaseIsNotCompoundArgumentExecptionIsThrown()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
@@ -103,13 +102,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             parameter.ParameterType = textParameterType;
 
-            var rowViewModel = new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null, false);
-
-            Assert.IsNotNull(rowViewModel);
+            Assert.Throws<InvalidOperationException>(() => new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null, false));
         }
 
         [Test]
-        [ExpectedException(typeof(IndexOutOfRangeException))]
         public void VerifyThatIfComponentIndexIsLargerThatCompoundComponentCountExceptionIsThrown()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
@@ -122,13 +118,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             parameter.ParameterType = compoundParameterType;
 
-            var rowViewModel = new ParameterComponentValueRowViewModel(parameter, 2, this.session.Object, null, null, null, false);
-
-            Assert.IsNotNull(rowViewModel);
+            Assert.Throws<IndexOutOfRangeException>(() => new ParameterComponentValueRowViewModel(parameter, 2, this.session.Object, null, null, null, false));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatIfContainerRowIsNullArgumentNullExceptionIsThrown()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
@@ -137,9 +130,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             compoundParameterType.Component.Add(component1);
             parameter.ParameterType = compoundParameterType;
 
-            var rowViewModel = new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null, false);
-
-            Assert.IsNotNull(rowViewModel);
+            Assert.Throws<ArgumentNullException>(() => new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null, false));
         }
 
         [Test]
@@ -240,11 +231,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var parameterSubscriptionRowViewModel = new ParameterSubscriptionRowViewModel(parameterSubscription, this.session.Object, null, false);
 
             var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
-            Assert.IsNotNullOrEmpty(component1row.ValidateProperty("Manual", "123"));
-            Assert.IsNotNullOrEmpty(component1row.ValidateProperty("Reference", "123"));
-
-            Assert.IsNullOrEmpty(component1row.ValidateProperty("Manual", false));
-            Assert.IsNullOrEmpty(component1row.ValidateProperty("Reference", null));
+            
+            Assert.That(component1row.ValidateProperty("Manual", "123"), Is.Not.Null.Or.Empty);            
+            Assert.That(component1row.ValidateProperty("Reference", "123"), Is.Not.Null.Or.Empty);
+            
+            Assert.That(component1row.ValidateProperty("Manual", false), Is.Null.Or.Empty);
+            Assert.That(component1row.ValidateProperty("Reference", null), Is.Null.Or.Empty);
         }
 
         [Test]
@@ -305,4 +297,3 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
     }
 }
-

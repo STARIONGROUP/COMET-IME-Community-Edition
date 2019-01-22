@@ -7,15 +7,15 @@
 namespace CDP4Composition.Tests.IconCacheService
 {
     using System;
-    using System.Windows.Media.Imaging;
-
+    using System.Threading;
+    using System.Windows.Media.Imaging;    
     using CDP4Composition.Services;
     using NUnit.Framework;
 
     /// <summary>
     /// Suite of tests for the <see cref="IconCacheService"/> class
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class IconCachServiceIconCachServiceTestFixture
     {
         private IconCacheService iconCacheService;

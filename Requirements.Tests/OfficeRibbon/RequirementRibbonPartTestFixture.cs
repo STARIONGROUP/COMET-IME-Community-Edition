@@ -9,6 +9,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
     using System;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    using System.Threading;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -26,7 +27,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
     /// <summary>
     /// Suite of tests for the <see cref="RequirementRibbonPart"/> class
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class RequirementRibbonPartTestFixture
     {
 

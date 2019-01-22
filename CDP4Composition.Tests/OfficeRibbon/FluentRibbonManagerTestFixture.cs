@@ -64,8 +64,7 @@ namespace CDP4Composition.Tests
                     }
                 }
             }
-
-            Assert.IsNotNullOrEmpty(fluentXml);
+            Assert.That(fluentXml, Is.Not.Null.Or.Empty);
         }
 
         [Test]

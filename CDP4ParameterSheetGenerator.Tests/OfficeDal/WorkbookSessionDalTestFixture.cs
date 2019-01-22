@@ -8,8 +8,6 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeDal
 {
     using System;
     using System.IO;
-    using CDP4Common.CommonData;
-    using CDP4Common.DTO;
     using CDP4Common.MetaInfo;
     using CDP4OfficeInfrastructure.OfficeDal;
     using Microsoft.Practices.ServiceLocation;
@@ -35,8 +33,13 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeDal
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(new ServiceLocatorProvider(() => this.serviceLocator.Object));
             this.serviceLocator.Setup(x => x.GetInstance<IMetaDataProvider>()).Returns(new MetaDataProvider());
-            var fileinfo = new FileInfo("TestData\\test.xlsx");
-            var tempfile = fileinfo.CopyTo("TestData\\temporarytestfile.xlsx", true);
+
+            var sourcePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"TestData\test.xlsx");
+            var fileinfo = new FileInfo(sourcePath);
+
+            var targetPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"TestData\temporarytestfile.xlsx");
+            var tempfile = fileinfo.CopyTo(targetPath, true);
+            
             this.testfilepath = tempfile.FullName;
 
             var siteDirectory = new CDP4Common.SiteDirectoryData.SiteDirectory(Guid.NewGuid(), null, null);
@@ -75,10 +78,9 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeDal
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void VerifyThatArgementNotNullExceptionIsThrown()
         {
-            var workbookSessionDal = new WorkbookSessionDal(null);
+            Assert.Throws<ArgumentNullException>(() => new WorkbookSessionDal(null));
         }
 
         [Test]

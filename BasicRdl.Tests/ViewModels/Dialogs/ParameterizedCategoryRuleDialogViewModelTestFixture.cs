@@ -86,11 +86,10 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void VerifyThatInvalidContainerThrowsException()
         {
             var rule = new ParameterizedCategoryRule(Guid.NewGuid(), null, this.uri);
-            var vm = new ParameterizedCategoryRuleDialogViewModel(rule, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir);
+            Assert.Throws<ArgumentException>(() => new ParameterizedCategoryRuleDialogViewModel(rule, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.dialogService.Object, this.siteDir));
         }
 
         [Test]

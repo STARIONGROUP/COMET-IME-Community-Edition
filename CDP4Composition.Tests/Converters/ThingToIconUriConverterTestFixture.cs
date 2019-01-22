@@ -7,29 +7,23 @@
 namespace CDP4Composition.Tests.Converters
 {
     using System;
-    using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using System.Windows.Media.Imaging;
     using CDP4Common.CommonData;
-    using CDP4Common.Helpers;
-    using CDP4Common.MetaInfo;
     using CDP4Common;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
-    using CDP4Composition.Navigation;
     using CDP4Composition.Services;
-
     using Microsoft.Practices.ServiceLocation;
-
     using Moq;
-
     using NUnit.Framework;
 
     /// <summary>
     /// suite of tests for the <see cref="ThingToIconUriConverter"/>
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class ThingToIconUriConverterTestFixture
     {
         /// <summary>
@@ -195,10 +189,9 @@ namespace CDP4Composition.Tests.Converters
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void VerifyThatConvertBackThrowsException()
         {
-            this.converter.ConvertBack(null, null, null, null);
+            Assert.Throws<NotSupportedException>(() => this.converter.ConvertBack(null, null, null, null));
         }
 
         [Test]

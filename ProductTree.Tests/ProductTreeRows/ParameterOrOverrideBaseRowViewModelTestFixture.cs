@@ -4,6 +4,8 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
+using System.IO.Packaging;
+
 namespace CDP4ProductTree.Tests.ProductTreeRows
 {
     using System;
@@ -23,7 +25,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
     using NUnit.Framework;
 
     [TestFixture]
-    internal class ParameterOrOverrideBaseRowViewModelTestFixture
+    public class ParameterOrOverrideBaseRowViewModelTestFixture
     {
         private Mock<ISession> session;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
@@ -174,7 +176,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
 
             Assert.IsTrue(row.IsPublishable);
-            Assert.IsNullOrEmpty(row.Value);
+            Assert.That(row.Value, Is.Null.Or.Empty);
             Assert.IsNotNull(row.StateDependence);
             Assert.IsNull(row.MeasurementScale);
             Assert.AreEqual(1, row.ContainedRows.Count);
@@ -359,36 +361,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             Assert.IsTrue(s2c1.Value.Contains("s2value1"));
             Assert.IsTrue(s2c2.Value.Contains("s2value2"));
         }
-
-        [Test]
-        public void VerifyThatConvertProvidesTheExpectedIcon()
-        {
-            if (Application.Current == null)
-            {
-                new Application();   
-            }
-
-            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
-            row.Usage = ParameterUsageKind.Unused;
-            var unusedIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/orangeball.jpg";
-            var subscribedByOthersIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/blueball.gif";
-            var subscribedIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/whiteball.jpg";
-
-            var converterResult = (BitmapImage)this.converter.Convert(new object[] { row }, null, null, null);
-            Assert.AreEqual(unusedIcon, converterResult.UriSource.ToString());
-
-            row.Usage = ParameterUsageKind.SubscribedByOthers;
-            converterResult = (BitmapImage)this.converter.Convert(new object[] { row }, null, null, null);
-            Assert.AreEqual(subscribedByOthersIcon, converterResult.UriSource.ToString());
-
-            row.Usage = ParameterUsageKind.Subscribed;
-            converterResult = (BitmapImage)this.converter.Convert(new object[] { row }, null, null, null);
-            Assert.AreEqual(subscribedIcon, converterResult.UriSource.ToString());
-
-            converterResult = (BitmapImage)this.converter.Convert(new object[] { "something" }, null, null, null);
-            Assert.IsNull(converterResult);
-        }
-
+        
         [Test]
         public void VerifyThatParameterTypeUpdatesAreHandled()
         {

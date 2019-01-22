@@ -7,26 +7,22 @@
 namespace CDP4EngineeringModel.Tests.Converters
 {
     using System;
+    using System.Threading;
     using System.Windows.Media.Imaging;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition;
-    using CDP4Composition.Mvvm;
+    using CDP4Composition;    
     using CDP4Composition.Services;
-
     using CDP4EngineeringModel.Converters;
-
     using Microsoft.Practices.ServiceLocation;
-
     using Moq;
-
     using NUnit.Framework;
 
     /// <summary>
     /// suite of tests for the <see cref="ThingToIconUriConverter"/>
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class ElementDefinitionBrowserIconConverterTestFixture
     {
         /// <summary>

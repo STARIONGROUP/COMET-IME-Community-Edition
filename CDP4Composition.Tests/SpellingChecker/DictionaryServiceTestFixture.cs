@@ -26,10 +26,11 @@ namespace CDP4Composition.Tests.SpellingChecker
         public void SetUp()
         {
             var folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var directoryInfo = Directory.CreateDirectory(folderPath + "\\RHEA\\CDP4\\dictionaries\\en-US");
+            var directoryInfo = Directory.CreateDirectory(folderPath + @"\RHEA\CDP4\dictionaries\en-US");
             try
             {
-                File.Copy("SpellingChecker\\en_US.aff", directoryInfo.FullName + "\\en_US.aff");
+                var aff_file = Path.Combine(TestContext.CurrentContext.TestDirectory, @"SpellingChecker\en_US.aff");
+                File.Copy(aff_file, directoryInfo.FullName + @"\en_US.aff");
             }
             catch (IOException ex)
             {
@@ -38,7 +39,8 @@ namespace CDP4Composition.Tests.SpellingChecker
 
             try
             {
-                File.Copy("SpellingChecker\\en_US.dic", directoryInfo.FullName + "\\en_US.dic");
+                var dic_file = Path.Combine(TestContext.CurrentContext.TestDirectory, @"SpellingChecker\en_US.dic");
+                File.Copy(dic_file, directoryInfo.FullName + @"\en_US.dic");
             }
             catch (IOException ex)
             {

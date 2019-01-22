@@ -6,6 +6,7 @@
 
 namespace CDP4Scripting.Tests.Helpers
 {
+    using System.Threading;
     using CDP4Scripting.Helpers;
     using ICSharpCode.AvalonEdit;
     using NUnit.Framework;
@@ -13,7 +14,7 @@ namespace CDP4Scripting.Tests.Helpers
     /// <summary>
     /// Suite of tests for the <see cref="AvalonEditExtensions"/> class.
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class AvalonEditExtensionsTestFixture
     {
         private TextEditor textEditor;
