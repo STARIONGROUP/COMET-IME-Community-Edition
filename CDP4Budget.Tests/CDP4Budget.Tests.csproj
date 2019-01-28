@@ -37,12 +37,12 @@
       <HintPath>..\packages\Castle.Core.4.3.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4Common, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.2.0.0\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.2.1.0\lib\net452\CDP4Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.4.0.0\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.4.1.0\lib\net452\CDP4Dal.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Moq, Version=4.10.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">

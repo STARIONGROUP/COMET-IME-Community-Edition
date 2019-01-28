@@ -171,6 +171,14 @@ namespace CDP4ProductTree.ViewModels
 
         #region Row Base
         /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
+        }
+
+        /// <summary>
         /// Initializes the subscriptions
         /// </summary>
         protected override void InitializeSubscriptions()
@@ -245,6 +253,7 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
+            this.UpdateThingStatus();
             this.Name = this.Thing.Name + " : " + this.ElementDefinition.Name;
             this.ShortName = this.Thing.ShortName + " : " + this.ElementDefinition.ShortName;
             this.ModelCode = this.Thing.ModelCode();

@@ -120,6 +120,14 @@ namespace CDP4ProductTree.ViewModels
 
         #region Row-Base
         /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
+        }
+
+        /// <summary>
         /// Initializes the subscriptions
         /// </summary>
         protected override void InitializeSubscriptions()
@@ -169,6 +177,7 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         protected void UpdateProperties()
         {
+            this.ThingStatus = new ThingStatus(this.Thing);
             this.Value = null;
             this.IsPublishable = false;
             this.UpdateOwnerNameAndShortName();

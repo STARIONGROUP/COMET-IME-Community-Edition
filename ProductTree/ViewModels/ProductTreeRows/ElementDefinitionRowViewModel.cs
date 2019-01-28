@@ -167,6 +167,14 @@ namespace CDP4ProductTree.ViewModels
 
         #region Row-Base
         /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
+        }
+
+        /// <summary>
         /// The object changed event handler
         /// </summary>
         /// <param name="objectChange">The <see cref="ObjectChangedEvent"/></param>
@@ -218,6 +226,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
+            this.UpdateThingStatus();
+
             this.UpdateOwnerNameAndShortName();
             this.PopulateElementUsages();
             this.PopulateParameterGroups();

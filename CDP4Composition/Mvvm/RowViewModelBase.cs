@@ -14,6 +14,7 @@ namespace CDP4Composition.Mvvm
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     using CDP4Composition.DragDrop;
@@ -80,6 +81,11 @@ namespace CDP4Composition.Mvvm
         /// Backing field for <see cref="Tooltip"/>
         /// </summary>
         private string tooltip;
+
+        /// <summary>
+        /// Backing field for <see cref="ThingStatus"/>
+        /// </summary>
+        private ThingStatus thingStatus;
         #endregion
 
         #region Constructors
@@ -129,6 +135,15 @@ namespace CDP4Composition.Mvvm
         {
             get { return this.rowStatus; }
             set { this.RaiseAndSetIfChanged(ref this.rowStatus, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ThingStatus"/>
+        /// </summary>
+        public ThingStatus ThingStatus
+        {
+            get { return this.thingStatus; }
+            protected set { this.RaiseAndSetIfChanged(ref this.thingStatus, value); }
         }
 
         /// <summary>
@@ -369,6 +384,10 @@ namespace CDP4Composition.Mvvm
                 }
             }
 
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Relationship))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateThingStatus()));
+
             this.WhenAnyValue(vm => vm.ErrorMsg)
                 .Select(x => !string.IsNullOrEmpty(x))
                 .ToProperty(this, x => x.HasError, out this.hasError);
@@ -383,7 +402,14 @@ namespace CDP4Composition.Mvvm
         {
             this.ShouldBeDisplayed = true;
         }
-        
+
+        /// <summary>
+        /// Udate the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected virtual void UpdateThingStatus()
+        {
+        }
+
         /// <summary>
         /// Compute the rows to remove and to add from a <see cref="IEnumerable{TThing}"/> compared to the <see cref="ContainedRows"/> list
         /// </summary>

@@ -55,33 +55,38 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private Person person;
         private BooleanParameterType boolPt;
 
+        private Assembler assembler;
+
+
         [SetUp]
         public void SetUp()
         {
+            this.assembler = new Assembler(this.uri);
+
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.option1 = new Option(Guid.NewGuid(), null, this.uri){ Name = "option1"};
-            this.option2 = new Option(Guid.NewGuid(), null, this.uri) {Name = "option2"};
+            this.option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri){ Name = "option1"};
+            this.option2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "option2"};
 
-            this.stateList = new ActualFiniteStateList(Guid.NewGuid(), null, this.uri);
-            this.state1 = new PossibleFiniteState(Guid.NewGuid(), null, this.uri) { Name = "state1" };
-            this.state2 = new PossibleFiniteState(Guid.NewGuid(), null, this.uri) { Name = "state2" };
+            this.stateList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.state1 = new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "state1" };
+            this.state2 = new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "state2" };
 
-            this.posStateList = new PossibleFiniteStateList(Guid.NewGuid(), null, this.uri);
+            this.posStateList = new PossibleFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.posStateList.PossibleState.Add(this.state1);
             this.posStateList.PossibleState.Add(this.state2);
             this.posStateList.DefaultState = this.state1;
 
-            this.stateList.ActualState.Add(new ActualFiniteState(Guid.NewGuid(), null, this.uri)
+            this.stateList.ActualState.Add(new ActualFiniteState(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 PossibleState = new List<PossibleFiniteState> { this.state1 },
                 Kind = ActualFiniteStateKind.MANDATORY
             });
 
-            this.stateList.ActualState.Add(new ActualFiniteState(Guid.NewGuid(), null, this.uri)
+            this.stateList.ActualState.Add(new ActualFiniteState(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 PossibleState = new List<PossibleFiniteState> { this.state2 },
                 Kind = ActualFiniteStateKind.FORBIDDEN
@@ -89,63 +94,63 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.stateList.PossibleFiniteStateList.Add(this.posStateList);
 
-            this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) {Name = "active", ShortName = "active"};
-            this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "other", ShortName = "other" };
+            this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "active", ShortName = "active"};
+            this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "other", ShortName = "other" };
 
-            this.qqParamType = new SimpleQuantityKind(Guid.NewGuid(), null, this.uri)
+            this.qqParamType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "PTName",
                 ShortName = "PTShortName"
             };
 
-            this.boolPt = new BooleanParameterType(Guid.NewGuid(), null, this.uri);
+            this.boolPt = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             // Array parameter type with components
-            this.apType = new ArrayParameterType(Guid.NewGuid(), null, this.uri)
+            this.apType = new ArrayParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "APTName",
                 ShortName = "APTShortName"
             };
 
-            this.apType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
+            this.apType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Iid = Guid.NewGuid(),
                 ParameterType = this.qqParamType
             });
 
-            this.apType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
+            this.apType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Iid = Guid.NewGuid(),
                 ParameterType = this.qqParamType
             });
 
             // compound parameter type with components
-            this.cptType = new CompoundParameterType(Guid.NewGuid(), null, this.uri)
+            this.cptType = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "APTName",
                 ShortName = "APTShortName"
             };
 
-            this.cptType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
+            this.cptType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Iid = Guid.NewGuid(),
                 ParameterType = this.qqParamType,
                 ShortName = "c1"
             });
 
-            this.cptType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
+            this.cptType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Iid = Guid.NewGuid(),
                 ParameterType = this.qqParamType,
                 ShortName = "c2"
             });
 
-            this.elementDefinition = new ElementDefinition(Guid.NewGuid(), null, this.uri)
+            this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.activeDomain
             };
 
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.iteration.Element.Add(this.elementDefinition);
 
@@ -154,22 +159,22 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), null, null);
             this.iteration.Container = engineeringModel;
 
-            this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), null, this.uri)
+            this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.someotherDomain
             };
 
-            this.elementDefinitionForUsage2 = new ElementDefinition(Guid.NewGuid(), null, this.uri)
+            this.elementDefinitionForUsage2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.someotherDomain
             };
 
-            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), null, this.uri)
+            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.someotherDomain
             };
 
-            this.elementUsage2 = new ElementUsage(Guid.NewGuid(), null, this.uri)
+            this.elementUsage2 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.someotherDomain
             };
@@ -177,31 +182,31 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementUsage1.ElementDefinition = this.elementDefinitionForUsage1;
             this.elementUsage2.ElementDefinition = this.elementDefinitionForUsage2;
 
-            this.parameter1 = new Parameter(Guid.NewGuid(), null, this.uri)
+            this.parameter1 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ParameterType = this.qqParamType,
                 Owner = this.activeDomain
             };
 
-            this.parameter5ForSubscription = new Parameter(Guid.NewGuid(), null, this.uri)
+            this.parameter5ForSubscription = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ParameterType = this.qqParamType,
                 Owner = this.someotherDomain
             };
 
-            this.parameterCompound = new Parameter(Guid.NewGuid(), null, this.uri)
+            this.parameterCompound = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ParameterType = this.cptType,
                 Owner = this.someotherDomain
             };
 
-            this.parameterCompoundForSubscription = new Parameter(Guid.NewGuid(), null, this.uri)
+            this.parameterCompoundForSubscription = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ParameterType = this.cptType,
                 Owner = this.someotherDomain
             };
 
-            this.parameterSubscriptionCompound = new ParameterSubscription(Guid.NewGuid(), null, this.uri)
+            this.parameterSubscriptionCompound = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.activeDomain
             };
@@ -234,7 +239,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void VerifyThatNoOptionNoStateParameterIsSet()
         {
             // Test input
-            var valueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.SetScalarValueSet(valueSet);
 
@@ -256,8 +261,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void VerifyThatOptionPArameterIsSet()
         {
             // Test input
-            var valueSetOption1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
-            var valueSetOption2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSetOption1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var valueSetOption2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.SetScalarValueSet(valueSetOption1);
             valueSetOption1.ActualOption = this.option1;
@@ -287,8 +292,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatStateDependentPArameterAreSet()
         {
-            var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
-            var valueSetState2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var valueSetState2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.SetScalarValueSet(valueSetState1);
             this.SetScalarValueSet(valueSetState2);
@@ -316,7 +321,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatCompoundParameterAreSet()
         {
-            var valueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.SetCompoundValueSet(valueSet);
 
             this.parameterCompound.ValueSet.Add(valueSet);
@@ -340,8 +345,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatOptionAndStateDependentParameterIsSet()
         {
-            var valueSeto1s1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
-            var valueSeto2s1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSeto1s1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var valueSeto2s1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.SetScalarValueSet(valueSeto1s1);
             this.SetScalarValueSet(valueSeto2s1);
@@ -381,8 +386,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatOptionStateDependentCompoundParameterCanBeSet()
         {
-            var valueSeto1s1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
-            var valueSeto2s1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSeto1s1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var valueSeto2s1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.SetCompoundValueSet(valueSeto1s1);
             this.SetCompoundValueSet(valueSeto2s1);
@@ -428,7 +433,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatStateDependentCompoundParameterCanBeSet()
         {
-            var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.SetCompoundValueSet(valueSetState1);
 
@@ -460,13 +465,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatParameterSubscriptionHasRightOwnerValue()
         {
-            this.parameter5Subscription = new ParameterSubscription(Guid.NewGuid(), null, this.uri){Owner = this.activeDomain};
+            this.parameter5Subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri){Owner = this.activeDomain};
             this.parameter5ForSubscription.ParameterSubscription.Add(this.parameter5Subscription);
 
-            var valueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.SetScalarValueSet(valueSet);
 
-            var valueSetSub = new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSetSub = new ParameterSubscriptionValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             valueSetSub.SubscribedValueSet = valueSet;
 
             this.parameter5Subscription.ValueSet.Add(valueSetSub);
@@ -510,8 +515,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatStateDependentRowAreUpdated()
         {
-            var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
-            var valueSetState2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var valueSetState2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.SetScalarValueSet(valueSetState1);
             this.SetScalarValueSet(valueSetState2);

@@ -7,6 +7,7 @@
 namespace CDP4EngineeringModel.Tests.Comparers
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -47,6 +48,9 @@ namespace CDP4EngineeringModel.Tests.Comparers
         private ParameterType type;
         private ParameterValueSet valueSet;
 
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+
+
         [SetUp]
         public void Setup()
         {
@@ -55,27 +59,27 @@ namespace CDP4EngineeringModel.Tests.Comparers
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domain" };
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
 
-            this.siteDir = new SiteDirectory(Guid.NewGuid(), null, this.uri);
-            this.person = new Person(Guid.NewGuid(), null, this.uri);
-            this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri);
-            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
-            this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
-            this.participant = new Participant(Guid.NewGuid(), null, this.uri);
-            this.option = new Option(Guid.NewGuid(), null, this.uri);
-            this.elementDef = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Owner = this.domain };
-            this.type = new EnumerationParameterType(Guid.NewGuid(), null, this.uri) { Name = "a" };
-            this.valueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri)
+            this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
+            this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
+            this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
+            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
+            this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
+            this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
+            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.type = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "a" };
+            this.valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
                 Published = new ValueArray<string>(new List<string> { "1" }),
                 Manual = new ValueArray<string>(new List<string> { "1" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
 
-            this.elementDef2 = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Owner = this.domain };
-            this.elementUsage = new ElementUsage(Guid.NewGuid(), null, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain };
+            this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain };
 
             this.siteDir.Person.Add(this.person);
             this.siteDir.Model.Add(this.modelSetup);
@@ -109,7 +113,7 @@ namespace CDP4EngineeringModel.Tests.Comparers
             var list = new ReactiveList<IRowViewModelBase<Thing>>();
             var comparer = new ElementBaseChildRowComparer();
 
-            var parameter1 = new Parameter(Guid.NewGuid(), null, this.uri) { ParameterType = this.type, Owner = this.domain, Container = this.elementDef };
+            var parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.type, Owner = this.domain, Container = this.elementDef };
             parameter1.ValueSet.Add(this.valueSet);
 
             var parameterRow1 = new ParameterRowViewModel(parameter1, this.session.Object, null, false);
@@ -121,10 +125,10 @@ namespace CDP4EngineeringModel.Tests.Comparers
 
             var parameterRow2 = new ParameterRowViewModel(paraClone, this.session.Object, null, false) { Name = "b" };
 
-            var group1 = new ParameterGroup(Guid.NewGuid(), null, this.uri) { Name = "a" };
+            var group1 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "a" };
             var groupRow1 = new ParameterGroupRowViewModel(group1, this.domain, this.session.Object, null);
 
-            var group2 = new ParameterGroup(Guid.NewGuid(), null, this.uri) { Name = "b" };
+            var group2 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "b" };
             var groupRow2 = new ParameterGroupRowViewModel(group2, this.domain, this.session.Object, null);
 
             var usage1 = this.elementUsage.Clone(false);
@@ -161,18 +165,18 @@ namespace CDP4EngineeringModel.Tests.Comparers
         [Test]
         public void VerifyThatParametersAreInRightOrder()
         {
-            var parameter1 = new Parameter(Guid.NewGuid(), null, this.uri) { ParameterType = this.type, Owner = this.domain, Container = this.elementDef };
+            var parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.type, Owner = this.domain, Container = this.elementDef };
             parameter1.ValueSet.Add(this.valueSet);
 
             var cpt = new CompoundParameterType { Name = "B", ShortName = "B" };
-            var cpt1 = new ParameterTypeComponent(Guid.NewGuid(), null, this.uri) { ParameterType = this.type };
-            var cpt2 = new ParameterTypeComponent(Guid.NewGuid(), null, this.uri) { ParameterType = this.type };
-            var cpt3 = new ParameterTypeComponent(Guid.NewGuid(), null, this.uri) { ParameterType = this.type };
+            var cpt1 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.type };
+            var cpt2 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.type };
+            var cpt3 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.type };
 
             cpt.Component.Add(cpt1);
             cpt.Component.Add(cpt2);
             cpt.Component.Add(cpt3);
-            var parameter2 = new Parameter(Guid.NewGuid(), null, this.uri) { ParameterType = cpt, Owner = this.domain, Container = this.elementDef };
+            var parameter2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = cpt, Owner = this.domain, Container = this.elementDef };
             
             var values = new List<string> {"a", "b", "c"};
             var cptValueSet = new ParameterValueSet();
@@ -184,8 +188,8 @@ namespace CDP4EngineeringModel.Tests.Comparers
 
             parameter2.ValueSet.Add(cptValueSet);
             
-            var type3 = new BooleanParameterType(Guid.NewGuid(), null, this.uri) { Name = "abc", ShortName = "abc"};
-            var parameter3 = new Parameter(Guid.NewGuid(), null, this.uri) { ParameterType = type3, Owner = this.domain, Container = this.elementDef };
+            var type3 = new BooleanParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "abc", ShortName = "abc"};
+            var parameter3 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type3, Owner = this.domain, Container = this.elementDef };
             parameter3.ValueSet.Add(this.valueSet);
 
             this.elementDef.Parameter.Add(parameter1);

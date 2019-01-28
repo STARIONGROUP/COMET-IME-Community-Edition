@@ -49,14 +49,16 @@ namespace CDP4Composition
 
             var rowStatus = value.OfType<RowStatusKind>().SingleOrDefault();
             var thing = value.OfType<Thing>().SingleOrDefault();
+            var thingStatus = value.OfType<ThingStatus>().SingleOrDefault();
+
             Uri uri;
 
-            if (thing == null)
+            if (thing == null && thingStatus == null)
             {
                 return null;
             }
 
-            var classKind = thing.ClassKind;
+            var classKind = thing != null ? thing.ClassKind : thingStatus.Thing.ClassKind;
             switch (rowStatus)
             {
                 case RowStatusKind.Active:
@@ -70,14 +72,29 @@ namespace CDP4Composition
                     break;
             }
 
-            if (thing.ValidationErrors.Any())
+            if (thing != null)
+            {
+                if (thing.ValidationErrors.Any())
+                {
+                    return this.QueryIIconCacheService().QueryErrorOverlayBitmapSource(uri);
+                }
+                else
+                {
+                    return this.QueryIIconCacheService().QueryBitmapImage(uri);
+                }
+            }
+
+            if (thingStatus.HasError)
             {
                 return this.QueryIIconCacheService().QueryErrorOverlayBitmapSource(uri);
             }
-            else
+
+            if (thingStatus.HasRelationship)
             {
-                return this.QueryIIconCacheService().QueryBitmapImage(uri);
+                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.RelationshipOverlayUri, OverlayPositionKind.TopRight);
             }
+
+            return this.QueryIIconCacheService().QueryBitmapImage(uri);
         }
 
         /// <summary>

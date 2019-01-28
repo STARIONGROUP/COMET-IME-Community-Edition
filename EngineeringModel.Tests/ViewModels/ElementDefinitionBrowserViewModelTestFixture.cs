@@ -83,7 +83,7 @@ namespace CDP4EngineeringModel.Tests
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = this.person };
             this.participant.Domain.Add(this.domain);
 
-            var parameter = new Parameter(Guid.NewGuid(), null, null)
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Container = this.elementDef,
                 ParameterType = this.pt,
@@ -175,7 +175,7 @@ namespace CDP4EngineeringModel.Tests
             Assert.IsNotNull(row.Owner);
 
             this.elementDef.Name = "updated";
-            this.elementDef.Owner = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "test" };
+            this.elementDef.Owner = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test" };
             // workaround to modify a read-only field
             var type = this.elementDef.GetType();
             type.GetProperty("RevisionNumber").SetValue(this.elementDef, 50);
@@ -220,8 +220,8 @@ namespace CDP4EngineeringModel.Tests
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null);
 
-            var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null);
-            var ratioScale = new RatioScale(Guid.NewGuid(), null, null);
+            var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var ratioScale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
             simpleQuantityKind.DefaultScale = ratioScale;
             var payload = new Tuple<ParameterType, MeasurementScale>(simpleQuantityKind, ratioScale);
             var dropInfo = new Mock<IDropInfo>();
@@ -279,10 +279,10 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyCreateParameterOverride()
         {
             var browser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, this.panelNavigationService.Object, null);
-            var elementUsage = new ElementUsage(Guid.NewGuid(), null, null) { Owner = this.elementDef.Owner, ElementDefinition = this.elementDef, Container = this.elementDef };
+            var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.elementDef.Owner, ElementDefinition = this.elementDef, Container = this.elementDef };
             var usageRow = new ElementUsageRowViewModel(elementUsage, this.elementDef.Owner, this.session.Object, null);
             var qk = new SimpleQuantityKind();
-            var parameter = new Parameter(Guid.NewGuid(), null, null)
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Container = this.elementDef, 
                 ParameterType = qk,
@@ -302,8 +302,8 @@ namespace CDP4EngineeringModel.Tests
             browser.CreateOverrideCommand.Execute(null);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
 
-            var paramtType = new CompoundParameterType(Guid.NewGuid(), null, null);
-            paramtType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), null, null) { ParameterType = new BooleanParameterType(Guid.NewGuid(), null, null), Scale = null });
+            var paramtType = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            paramtType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri), Scale = null });
             parameter.ParameterType = paramtType;
 
             var elementDefRow = new ElementDefinitionRowViewModel(this.elementDef, this.elementDef.Owner, this.session.Object, null);
@@ -312,7 +312,7 @@ namespace CDP4EngineeringModel.Tests
             browser.ComputePermission();
             browser.CreateOverrideCommand.Execute(null);
 
-            var parameterOverride = new ParameterOverride(Guid.NewGuid(), null, null) {Parameter = parameter, Owner = this.elementDef.Owner };
+            var parameterOverride = new ParameterOverride(Guid.NewGuid(), this.assembler.Cache, this.uri) {Parameter = parameter, Owner = this.elementDef.Owner };
             parameterValueBaseRow = new ParameterComponentValueRowViewModel(parameterOverride, 0, this.session.Object, null, null, usageRow, false);
             browser.SelectedThing = parameterValueBaseRow;
             browser.CreateOverrideCommand.Execute(null);
@@ -321,7 +321,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatActiveDomainIsDisplayed()
         {
-            var domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domain" };
+            var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain" };
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {

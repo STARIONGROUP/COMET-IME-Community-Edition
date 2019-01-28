@@ -61,10 +61,13 @@ namespace CDP4EngineeringModel.Tests
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
+            this.siteDir.Domain.Add(this.domain);
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri){RequiredRdl = this.srdl};
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup.RequiredRdl.Add(this.mrdl);
+            this.modelsetup.ActiveDomain.Add(this.domain);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.siteDir.SiteReferenceDataLibrary.Add(this.srdl);
 
@@ -95,8 +98,7 @@ namespace CDP4EngineeringModel.Tests
             this.reqSpec.Requirement.Add(this.req1);
             this.reqSpec.Requirement.Add(this.req2);
 
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
-            this.siteDir.Domain.Add(this.domain);
+            
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 

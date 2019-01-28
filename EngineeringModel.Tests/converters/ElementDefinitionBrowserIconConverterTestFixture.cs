@@ -12,7 +12,8 @@ namespace CDP4EngineeringModel.Tests.Converters
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition;    
+    using CDP4Composition;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4EngineeringModel.Converters;
     using Microsoft.Practices.ServiceLocation;
@@ -87,7 +88,7 @@ namespace CDP4EngineeringModel.Tests.Converters
             var parameter = new Parameter();
             parameter.ParameterType = new BooleanParameterType();
             parameter.StateDependence = new ActualFiniteStateList();
-            var icon = (BitmapImage)this.converter.Convert(new object[] { parameter }, null, ClassKind.Option, null);
+            var icon = (BitmapImage)this.converter.Convert(new object[] { new ThingStatus(parameter) }, null, ClassKind.Option, null);
 
             // overlay
             Assert.AreEqual(generic.UriSource.ToString(), icon.UriSource.ToString());
@@ -101,7 +102,7 @@ namespace CDP4EngineeringModel.Tests.Converters
             var parameter = new Parameter();
             parameter.ParameterType = new ArrayParameterType();
             parameter.StateDependence = new ActualFiniteStateList();
-            var icon = (BitmapImage)this.converter.Convert(new object[] { parameter }, null, ClassKind.ActualFiniteState, null);
+            var icon = (BitmapImage)this.converter.Convert(new object[] { new ThingStatus(parameter) }, null, ClassKind.ActualFiniteState, null);
 
             Assert.AreEqual(generic.UriSource.ToString(), icon.UriSource.ToString());
         }

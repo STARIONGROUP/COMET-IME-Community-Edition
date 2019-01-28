@@ -85,5 +85,23 @@ namespace CDP4Composition.Services
 
             return bitmapSource;
         }
+
+        /// <summary>
+        /// Queries the <see cref="BitmapSource"/> with an icon overlayed from the cache if the cache contains it else the <see cref="BitmapSource"/>
+        /// is created, added to the cache and then returned.
+        /// </summary>
+        /// <param name="uri">
+        /// The uri of the <see cref="BitmapSource"/>
+        /// </param>
+        /// <param name="overlayUri">
+        /// The uri of the overlay <see cref="BitmapSource"/>
+        /// </param>
+        /// <returns>
+        /// An instance of <see cref="BitmapSource"/>
+        /// </returns>
+        public BitmapSource QueryOverlayBitmapSource(Uri uri, Uri overlayUri, OverlayPositionKind overlayPosition = OverlayPositionKind.TopLeft)
+        {
+            return IconUtilities.WithOverlay(uri, overlayUri, overlayPosition);
+        }
     }
 }

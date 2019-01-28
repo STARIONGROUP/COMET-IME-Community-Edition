@@ -259,6 +259,14 @@ namespace CDP4Requirements.ViewModels
         #endregion Drag, Drop
 
         /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
+        }
+
+        /// <summary>
         /// Initializes the subscriptions
         /// </summary>
         protected override void InitializeSubscriptions()
@@ -410,6 +418,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
+            this.UpdateThingStatus();
             this.SetDefinitionContent();
             this.UpdateParameterConstraintRows();
             this.UpdateValues();

@@ -47,6 +47,7 @@ namespace CDP4Requirements.Tests.Dialogs
         private Category cat2;
         private RequirementsSpecification clone;
         private DomainOfExpertise domainOfExpertise;
+        private DomainOfExpertise domain;
 
         [SetUp]
         public void Setup()
@@ -57,7 +58,11 @@ namespace CDP4Requirements.Tests.Dialogs
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
+            this.siteDir.Domain.Add(this.domain);
+
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.modelsetup.ActiveDomain.Add(this.domain);
             this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri) { RequiredRdl = this.srdl };

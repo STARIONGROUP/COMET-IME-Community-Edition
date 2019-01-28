@@ -169,7 +169,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
 
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.iteration.Element.Add(this.elementDefinition);
             this.iteration.Option.Add(this.option1);
@@ -185,12 +185,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
                 Owner = this.someotherDomain
             };
 
-            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), null, this.uri)
+            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.someotherDomain
             };
 
-            this.elementUsage2 = new ElementUsage(Guid.NewGuid(), null, this.uri)
+            this.elementUsage2 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.someotherDomain
             };

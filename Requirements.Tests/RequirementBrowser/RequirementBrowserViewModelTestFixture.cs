@@ -106,7 +106,7 @@ namespace CDP4Requirements.Tests.Panels
 
             Assert.AreEqual(1, vm.ReqSpecificationRows.Count);
 
-            var reqspec2 = new RequirementsSpecification(Guid.NewGuid(), null, this.uri);
+            var reqspec2 = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri);
             this.iteration.RequirementsSpecification.Add(reqspec2);
             revision.SetValue(this.iteration, 2);
 

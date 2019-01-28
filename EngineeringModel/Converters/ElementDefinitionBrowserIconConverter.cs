@@ -16,6 +16,7 @@ namespace CDP4EngineeringModel.Converters
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
+    using CDP4Composition.Mvvm;
 
     /// <summary>
     /// The element definition browser icon converter
@@ -35,7 +36,9 @@ namespace CDP4EngineeringModel.Converters
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
         {
             var genericConverter = new ThingToIconUriConverter();
-            var parameterBase = value.OfType<ParameterBase>().SingleOrDefault();
+            var thingStatus = value.SingleOrDefault() as ThingStatus;
+
+            var parameterBase = thingStatus?.Thing as ParameterBase;
 
             ClassKind valuesetRowType;
             if (parameterBase == null || parameter == null || !Enum.TryParse(parameter.ToString(), out valuesetRowType))

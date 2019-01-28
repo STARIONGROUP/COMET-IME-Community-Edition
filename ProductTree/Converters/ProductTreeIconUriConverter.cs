@@ -16,6 +16,7 @@ namespace CDP4ProductTree
     using CDP4Composition.Mvvm;
     using CDP4Common.Helpers;
     using CDP4Composition;
+    using CDP4Composition.Services;
     using CDP4ProductTree.ViewModels;
 
     /// <summary>
@@ -41,29 +42,30 @@ namespace CDP4ProductTree
                 return null;
             }
 
-            var parameterOrOverrideRowViewModel = value.First() as ParameterOrOverrideBaseRowViewModel;
-            if (parameterOrOverrideRowViewModel == null)
+            var thingStatus = value.FirstOrDefault() as ThingStatus;
+            var usage = value.OfType<ParameterUsageKind>().SingleOrDefault();
+            if (thingStatus == null)
             {
                 return null;
             }
 
-            return this.GetIconForParameterOverride(parameterOrOverrideRowViewModel);
+            return this.GetIconForParameterOverride(thingStatus, usage);
         }
 
 
         /// <summary>
         /// The get icon for parameter override.
         /// </summary>
-        /// <param name="parameterOrOverrideRow">
+        /// <param name="thingStatus">
         /// The parameter or override.
         /// </param>
         /// <returns>
         /// The <see cref="object"/>.
         /// </returns>
-        private object GetIconForParameterOverride(ParameterOrOverrideBaseRowViewModel parameterOrOverrideRow)
+        private object GetIconForParameterOverride(ThingStatus thingStatus, ParameterUsageKind usage)
         {
             Uri uri = null;
-            switch (parameterOrOverrideRow.Usage)
+            switch (usage)
             {
                 case ParameterUsageKind.Unused:
                     uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/orangeball.jpg");
@@ -81,7 +83,11 @@ namespace CDP4ProductTree
                 return null;
             }
 
-            return parameterOrOverrideRow.Thing.ValidationErrors.Any() ? IconUtilities.WithErrorOverlay(uri) : new BitmapImage(uri);
+            return thingStatus.HasError 
+                ? IconUtilities.WithErrorOverlay(uri) 
+                : thingStatus.HasRelationship 
+                    ? IconUtilities.WithOverlay(uri, IconUtilities.RelationshipOverlayUri, OverlayPositionKind.TopRight)
+                    : new BitmapImage(uri);
         }
 
         /// <summary>

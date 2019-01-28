@@ -61,7 +61,6 @@ namespace CDP4Requirements.ViewModels
         public RequirementsGroupDialogViewModel(RequirementsGroup requirementsGroup, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(requirementsGroup, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
-            this.SelectedOwner = this.Session.ActivePerson.DefaultDomain ?? this.PossibleOwner.First();
         }
 
         /// <summary>
@@ -70,8 +69,7 @@ namespace CDP4Requirements.ViewModels
         protected override void PopulatePossibleOwner()
         {
             base.PopulatePossibleOwner();
-            
-            var engineeringModel = (EngineeringModel)this.Thing.TopContainer;
+            var engineeringModel = (EngineeringModel)this.Container.TopContainer;
             var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
             this.PossibleOwner.AddRange(domains);
             this.SelectedOwner = this.PossibleOwner.FirstOrDefault(x => this.Session.ActivePerson?.DefaultDomain != null && x.Iid == this.Session.ActivePerson.DefaultDomain.Iid) ?? this.PossibleOwner.First();

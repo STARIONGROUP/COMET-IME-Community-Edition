@@ -67,27 +67,29 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [SetUp]
         public void Setup()
         {
+            this.assembler = new Assembler(this.uri);
+
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.stateList = new ActualFiniteStateList(Guid.NewGuid(), null, this.uri);
-            this.state1 = new PossibleFiniteState(Guid.NewGuid(), null, this.uri) { Name = "state1" };
-            this.state2 = new PossibleFiniteState(Guid.NewGuid(), null, this.uri) { Name = "state2" };
+            this.stateList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.state1 = new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "state1" };
+            this.state2 = new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "state2" };
 
-            this.posStateList = new PossibleFiniteStateList(Guid.NewGuid(), null, this.uri);
+            this.posStateList = new PossibleFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.posStateList.PossibleState.Add(this.state1);
             this.posStateList.PossibleState.Add(this.state2);
             this.posStateList.DefaultState = this.state1;
 
-            this.actualState1 = new ActualFiniteState(Guid.NewGuid(), null, this.uri)
+            this.actualState1 = new ActualFiniteState(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 PossibleState = new List<PossibleFiniteState> { this.state1 },
                 Kind = ActualFiniteStateKind.MANDATORY
             };
 
-            this.actualState2 = new ActualFiniteState(Guid.NewGuid(), null, this.uri)
+            this.actualState2 = new ActualFiniteState(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 PossibleState = new List<PossibleFiniteState> { this.state2 },
                 Kind = ActualFiniteStateKind.MANDATORY
@@ -98,51 +100,51 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.stateList.PossibleFiniteStateList.Add(this.posStateList);
 
-            this.option1 = new Option(Guid.NewGuid(), null, this.uri) { Name = "option1" };
-            this.option2 = new Option(Guid.NewGuid(), null, this.uri) { Name = "option2" };
+            this.option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "option1" };
+            this.option2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "option2" };
 
-            this.qqParamType = new SimpleQuantityKind(Guid.NewGuid(), null, this.uri)
+            this.qqParamType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "PTName",
                 ShortName = "PTShortName"
             };
 
-            this.enum1 = new EnumerationValueDefinition(Guid.NewGuid(), null, this.uri) { Name = "enum1" };
-            this.enum2 = new EnumerationValueDefinition(Guid.NewGuid(), null, this.uri) { Name = "enum2" };
-            this.enumPt = new EnumerationParameterType(Guid.NewGuid(), null, this.uri);
+            this.enum1 = new EnumerationValueDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "enum1" };
+            this.enum2 = new EnumerationValueDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "enum2" };
+            this.enumPt = new EnumerationParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.enumPt.ValueDefinition.Add(this.enum1);
             this.enumPt.ValueDefinition.Add(this.enum2);
 
-            this.cptType = new CompoundParameterType(Guid.NewGuid(), null, this.uri)
+            this.cptType = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "APTName",
                 ShortName = "APTShortName"
             };
 
-            this.cptType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
+            this.cptType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Iid = Guid.NewGuid(),
                 ParameterType = this.qqParamType,
                 ShortName = "c1"
             });
 
-            this.cptType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
+            this.cptType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Iid = Guid.NewGuid(),
                 ParameterType = this.enumPt,
                 ShortName = "c2"
             });
 
-            this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "active", ShortName = "active" };
-            this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "other", ShortName = "other" };
+            this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "active", ShortName = "active" };
+            this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "other", ShortName = "other" };
 
-            this.parameter = new Parameter(Guid.NewGuid(), null, this.uri)
+            this.parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.activeDomain,
                 ParameterType = this.qqParamType
             };
 
-            this.cptParameter = new Parameter(Guid.NewGuid(), null, this.uri)
+            this.cptParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.activeDomain,
                 ParameterType = this.cptType,
@@ -155,39 +157,38 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.First()));
             this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.Last()));
 
-            this.elementDefinition = new ElementDefinition(Guid.NewGuid(), null, this.uri)
+            this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.activeDomain
             };
-            this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), null, this.uri);
-            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), null, this.uri){ElementDefinition = this.elementDefinitionForUsage1};
+            this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri){ElementDefinition = this.elementDefinitionForUsage1};
 
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
 
             this.elementDefinitionForUsage1.Parameter.Add(this.parameter);
             this.elementDefinitionForUsage1.Parameter.Add(this.cptParameter);
 
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iteration.Element.Add(this.elementDefinition);
             this.iteration.Element.Add(this.elementDefinitionForUsage1);
 
             this.iteration.Option.Add(this.option1);
             this.iteration.Option.Add(this.option2);
 
-            this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri);
+            this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.model.Iteration.Add(this.iteration);
 
-            this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "test", Surname = "test" };
-            this.participant = new Participant(Guid.NewGuid(), null, this.uri) { Person = this.person, SelectedDomain = this.activeDomain };
+            this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "test", Surname = "test" };
+            this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = this.person, SelectedDomain = this.activeDomain };
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
+            this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelsetup.Participant.Add(this.participant);
             this.model.EngineeringModelSetup = this.modelsetup;
 
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
-            this.assembler = new Assembler(this.uri);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
         }
@@ -284,7 +285,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatUpdateValueSetUpdatesRow()
         {
-            var valueset = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueset = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.parameter.ValueSet.Add(valueset);
 
             var row = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
@@ -322,8 +323,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void VerifyThatValueSetInlineEditWorksSimpleOptionNoState()
         {
             this.parameter.IsOptionDependent = true;
-            var set1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri) { ActualOption = this.option1 };
-            var set2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri) { ActualOption = this.option2 };
+            var set1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { ActualOption = this.option1 };
+            var set2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { ActualOption = this.option2 };
 
             this.parameter.ValueSet.Add(set1);
             this.parameter.ValueSet.Add(set2);
@@ -343,8 +344,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.parameter.IsOptionDependent = false;
             this.parameter.StateDependence = this.stateList;
-            var set1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri) { ActualState = this.actualState1 };
-            var set2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri) { ActualState = this.actualState2 };
+            var set1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { ActualState = this.actualState1 };
+            var set2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { ActualState = this.actualState2 };
 
             this.parameter.ValueSet.Add(set1);
             this.parameter.ValueSet.Add(set2);
@@ -364,7 +365,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.parameter.IsOptionDependent = false;
             this.parameter.StateDependence = null;
-            var set1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var set1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.parameter.ValueSet.Add(set1);
 
@@ -520,7 +521,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         /// </returns>
         private ParameterValueSet GetNewParameterValueSet(Option option, ActualFiniteState state)
         {
-            return new ParameterValueSet(Guid.NewGuid(), null, this.uri)
+            return new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ActualOption = option,
                 ActualState = state,

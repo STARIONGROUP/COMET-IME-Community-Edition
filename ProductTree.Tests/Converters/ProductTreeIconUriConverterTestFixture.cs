@@ -119,15 +119,15 @@ namespace CDP4ProductTree.Tests.Converters
             var subscribedByOthersIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/blueball.gif";
             var subscribedIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/whiteball.jpg";
 
-            var converterResult = (BitmapImage)this.converter.Convert(new object[] { row }, null, null, null);
+            var converterResult = (BitmapImage)this.converter.Convert(new object[] { row.ThingStatus, row.Usage }, null, null, null);
             Assert.AreEqual(unusedIcon, converterResult.UriSource.ToString());
 
             row.Usage = ParameterUsageKind.SubscribedByOthers;
-            converterResult = (BitmapImage)this.converter.Convert(new object[] { row }, null, null, null);
+            converterResult = (BitmapImage)this.converter.Convert(new object[] { row.ThingStatus, row.Usage }, null, null, null);
             Assert.AreEqual(subscribedByOthersIcon, converterResult.UriSource.ToString());
 
             row.Usage = ParameterUsageKind.Subscribed;
-            converterResult = (BitmapImage)this.converter.Convert(new object[] { row }, null, null, null);
+            converterResult = (BitmapImage)this.converter.Convert(new object[] { row.ThingStatus, row.Usage }, null, null, null);
             Assert.AreEqual(subscribedIcon, converterResult.UriSource.ToString());
         }
 

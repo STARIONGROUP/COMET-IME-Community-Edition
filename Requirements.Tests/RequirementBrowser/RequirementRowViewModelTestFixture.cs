@@ -44,10 +44,13 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private RequirementsGroup grp2;
         private Requirement req;
         private Definition def;
+        private Assembler assembler;
 
         [SetUp]
         public void Setup()
         {
+            this.assembler = new Assembler(this.uri);
+
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -56,13 +59,13 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
 
-            this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri);
-            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri) { Name = "model" };
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
-            this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
-            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), null, this.uri) {Name = "rs1", ShortName = "1"};
+            this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "model" };
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "rs1", ShortName = "1"};
 
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "test" };
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test" };
             this.reqSpec.Owner = this.domain;
 
             this.iteration.RequirementsSpecification.Add(this.reqSpec);
@@ -70,16 +73,16 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.model.EngineeringModelSetup = this.modelSetup;
             this.model.Iteration.Add(this.iteration);
 
-            this.grp1 = new RequirementsGroup(Guid.NewGuid(), null, this.uri);
-            this.grp11 = new RequirementsGroup(Guid.NewGuid(), null, this.uri);
-            this.grp2 = new RequirementsGroup(Guid.NewGuid(), null, this.uri);
+            this.grp1 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.grp11 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.grp2 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.reqSpec.Group.Add(this.grp1);
             this.reqSpec.Group.Add(this.grp2);
             this.grp1.Group.Add(this.grp11);
 
-            this.req = new Requirement(Guid.NewGuid(), null, this.uri) { Name = "requirement1", ShortName = "r1", Owner = this.domain };
-            this.def = new Definition(Guid.NewGuid(), null, this.uri) {Content = "def"};
+            this.req = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "requirement1", ShortName = "r1", Owner = this.domain };
+            this.def = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) {Content = "def"};
             this.reqSpec.Requirement.Add(this.req);
             this.req.Definition.Add(this.def);
         }
@@ -189,7 +192,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
             
-            var category = new Category(Guid.NewGuid(), null, this.uri);
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             category.PermissibleClass.Add(ClassKind.Requirement);
 
             var dropinfo = new Mock<IDropInfo>();
@@ -207,7 +210,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
 
-            var category = new Category(Guid.NewGuid(), null, this.uri);
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.req.Category.Add(category);
 
             var dropinfo = new Mock<IDropInfo>();
@@ -224,7 +227,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         {
             var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
-            var category = new Category(Guid.NewGuid(), null, this.uri);
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(category);

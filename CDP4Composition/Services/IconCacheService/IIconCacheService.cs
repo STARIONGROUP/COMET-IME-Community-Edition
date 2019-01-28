@@ -38,5 +38,21 @@ namespace CDP4Composition.Services
         /// An instance of <see cref="BitmapSource"/>
         /// </returns>
         BitmapSource QueryErrorOverlayBitmapSource(Uri uri);
+
+        /// <summary>
+        /// Queries the <see cref="BitmapSource"/> with an icon overlayed from the cache if the cache contains it else the <see cref="BitmapSource"/>
+        /// is created, added to the cache and then returned.
+        /// </summary>
+        /// <param name="uri">
+        /// The uri of the <see cref="BitmapSource"/>
+        /// </param>
+        /// <param name="overlayUri">
+        /// The uri of the overlay <see cref="BitmapSource"/>
+        /// </param>
+        /// <param name="overlayPosition">The overlay position</param>
+        /// <returns>
+        /// An instance of <see cref="BitmapSource"/>
+        /// </returns>
+        BitmapSource QueryOverlayBitmapSource(Uri uri, Uri overlayUri, OverlayPositionKind overlayPosition);
     }
 }

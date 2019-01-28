@@ -51,16 +51,16 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.2.0.0\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.2.1.0\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.4.0.0\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.4.1.0\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.2.0.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.2.0.1\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v15.2, Version=15.2.17.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
@@ -267,12 +267,14 @@
     <Compile Include="Mvvm\RowStatusKind.cs" />
     <Compile Include="Mvvm\FloatingDialogViewModelBase.cs" />
     <Compile Include="Attributes\IDescribeMetaData.cs" />
+    <Compile Include="Mvvm\ThingStatus.cs" />
     <Compile Include="Navigation\Interfaces\IFloatingDialogViewModel.cs" />
     <Compile Include="Navigation\Interfaces\IOpenSaveFileDialogService.cs" />
     <Compile Include="Navigation\OpenSaveFileDialogService.cs" />
     <Compile Include="Services\GridUpdateService.cs" />
     <Compile Include="Services\IconCacheService\IconCacheService.cs" />
     <Compile Include="Services\IconCacheService\IIconCacheService.cs" />
+    <Compile Include="Services\IconCacheService\OverlayPositionKind.cs" />
     <Compile Include="Services\ImageService\IImageService.cs" />
     <Compile Include="Services\ImageService\ImageService.cs" />
     <Compile Include="Services\RuleVerification\BuiltInRule.cs" />
@@ -405,6 +407,10 @@
     <Resource Include="Resources\Images\Thing\Organization_32x32.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Images\Log\linkgreen_16x16.png" />
+    <Resource Include="Resources\Images\Log\linkgreen_32x32.png" />
+    <Resource Include="Resources\Images\Log\link_16x16.png" />
+    <Resource Include="Resources\Images\Log\link_32x32.png" />
     <Resource Include="Resources\Images\Info_128x128.png" />
     <Resource Include="Resources\Images\Thing\lock.png" />
     <Resource Include="Resources\Images\Thing\parameterComponent_32x32.png" />

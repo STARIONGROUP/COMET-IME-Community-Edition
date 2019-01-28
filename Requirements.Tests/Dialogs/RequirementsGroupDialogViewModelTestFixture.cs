@@ -34,7 +34,11 @@ namespace CDP4Requirements.Tests.Dialogs
         private IterationSetup iterationSetup;
         private DomainOfExpertise domainOfExpertise;
 
+        private RequirementsSpecification reqSpec;
         private RequirementsGroup reqGroup;
+        private DomainOfExpertise domain;
+        private EngineeringModelSetup modelsetup;
+
         private Uri uri;
 
         [SetUp]
@@ -45,9 +49,15 @@ namespace CDP4Requirements.Tests.Dialogs
             
             this.uri = new Uri("http://test.com");
             this.siteDir = new SiteDirectory(Guid.NewGuid(), null, this.uri);
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
+            this.siteDir.Domain.Add(this.domain);
+            this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
+            this.modelsetup.ActiveDomain.Add(this.domain);
+
+            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), null, this.uri);
             this.reqGroup = new RequirementsGroup(Guid.NewGuid(), null, this.uri);
 
-            this.engineeringModel = new EngineeringModel(Guid.NewGuid(), null, this.uri);
+            this.engineeringModel = new EngineeringModel(Guid.NewGuid(), null, this.uri) { EngineeringModelSetup =  this.modelsetup};
             this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
             this.requirementsSpecification = new RequirementsSpecification(Guid.NewGuid(), null, this.uri);
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
@@ -67,6 +77,7 @@ namespace CDP4Requirements.Tests.Dialogs
             
             this.engineeringModel.Iteration.Add(this.iteration);
             this.iteration.RequirementsSpecification.Add(this.requirementsSpecification);
+            this.iteration.RequirementsSpecification.Add(this.reqSpec);
             this.requirementsSpecification.Group.Add(this.reqGroup);
 
             this.engineeringModel.EngineeringModelSetup = this.engineeringModelSetup;
@@ -90,8 +101,11 @@ namespace CDP4Requirements.Tests.Dialogs
         [Test]
         public void VerifyThatPopulatePossibleOwnerWorks()
         {
+
+            var clone = this.reqSpec.Clone(true);
+            this.thingTransaction.CreateOrUpdate(clone);
             var vm = new RequirementsGroupDialogViewModel(this.reqGroup, this.thingTransaction, this.session.Object,
-                true, ThingDialogKind.Create, null);
+                true, ThingDialogKind.Create, null, clone);
 
             Assert.AreEqual(1, vm.PossibleOwner.Count);
         }

@@ -215,7 +215,7 @@ namespace ProductTree.Tests
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
 
-            var elementdef = new ElementDefinition(Guid.NewGuid(), null, this.uri);
+            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iteration.TopElement = elementdef;
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
@@ -230,12 +230,12 @@ namespace ProductTree.Tests
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
 
-            var elementdef = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Container = this.iteration };
-            var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "Not owned" };
-            var boolParamType = new BooleanParameterType(Guid.NewGuid(), null, this.uri);
-            var parameter = new Parameter(Guid.NewGuid(), null, this.uri) { Owner = anotherDomain, Container = elementdef, ParameterType = boolParamType };
+            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
+            var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Not owned" };
+            var boolParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = anotherDomain, Container = elementdef, ParameterType = boolParamType };
             var published = new ValueArray<string>(new List<string> { "published" });
-            var paramValueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri) { Published = published, Manual = published, Computed = published, ValueSwitch = ParameterSwitchKind.COMPUTED};
+            var paramValueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { Published = published, Manual = published, Computed = published, ValueSwitch = ParameterSwitchKind.COMPUTED};
             parameter.ValueSet.Add(paramValueSet);
             elementdef.Parameter.Add(parameter);
             this.iteration.TopElement = elementdef;
@@ -272,13 +272,13 @@ namespace ProductTree.Tests
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
 
-            var elementdef = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Container = this.iteration };
-            var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "Not owned" };
-            var boolParamType = new BooleanParameterType(Guid.NewGuid(), null, this.uri);
-            var parameter = new Parameter(Guid.NewGuid(), null, this.uri) { Owner = anotherDomain, Container = elementdef, ParameterType = boolParamType };
-            parameter.ParameterSubscription.Add(new ParameterSubscription(Guid.NewGuid(), null, this.uri) { Owner = this.domain });
+            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
+            var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Not owned" };
+            var boolParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = anotherDomain, Container = elementdef, ParameterType = boolParamType };
+            parameter.ParameterSubscription.Add(new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain });
             var published = new ValueArray<string>(new List<string> { "published" });
-            var paramValueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri) { Published = published, Manual = published, Computed = published, ValueSwitch = ParameterSwitchKind.COMPUTED };
+            var paramValueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { Published = published, Manual = published, Computed = published, ValueSwitch = ParameterSwitchKind.COMPUTED };
             parameter.ValueSet.Add(paramValueSet);
             elementdef.Parameter.Add(parameter);
             this.iteration.TopElement = elementdef;
@@ -328,17 +328,17 @@ namespace ProductTree.Tests
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
-            var elementdef = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Container = this.iteration };
-            var boolParamType = new BooleanParameterType(Guid.NewGuid(), null, this.uri);
-            var elementUsage = new ElementUsage(Guid.NewGuid(), null, this.uri)
+            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
+            var boolParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
                                    {
                                        Container = elementdef,
                                        ElementDefinition = elementdef
                                    };
-            var parameter = new Parameter(Guid.NewGuid(), null, this.uri) { Owner = this.domain, Container = elementUsage, ParameterType = boolParamType };
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain, Container = elementUsage, ParameterType = boolParamType };
             elementdef.Parameter.Add(parameter);
             var published = new ValueArray<string>(new List<string> { "published" });
-            var paramValueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri) { Published = published, Manual = published, Computed = published, ValueSwitch = ParameterSwitchKind.COMPUTED };
+            var paramValueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { Published = published, Manual = published, Computed = published, ValueSwitch = ParameterSwitchKind.COMPUTED };
             parameter.ValueSet.Add(paramValueSet);
 
             var usageRow = new ElementUsageRowViewModel(elementUsage, this.option, this.session.Object, null);

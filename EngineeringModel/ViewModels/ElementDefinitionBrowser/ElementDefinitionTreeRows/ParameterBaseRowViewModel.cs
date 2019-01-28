@@ -274,6 +274,14 @@ namespace CDP4EngineeringModel.ViewModels
             this.actualFiniteStateListener.Clear();
             this.valueSetListener.Clear();
         }
+
+        /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
+        }
         #endregion
 
         #region Private method
@@ -286,6 +294,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </remarks>
         private void UpdateProperties()
         {
+            this.UpdateThingStatus();
             this.ModelCode = this.Thing.ModelCode();
             this.Name = this.Thing.ParameterType.Name;
 

@@ -8,8 +8,10 @@
 namespace ProductTree.Tests.ProductTreeRows
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -45,6 +47,9 @@ namespace ProductTree.Tests.ProductTreeRows
         private DomainOfExpertise domain;
         private ElementUsage elementUsage;
 
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+
+
         [SetUp]
         public void Setup()
         {
@@ -52,20 +57,20 @@ namespace ProductTree.Tests.ProductTreeRows
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domain" , ShortName = "dom"};
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" , ShortName = "dom"};
 
-            this.siteDir = new SiteDirectory(Guid.NewGuid(), null, this.uri);
-            this.person = new Person(Guid.NewGuid(), null, this.uri);
-            this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri);
-            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
-            this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
-            this.participant = new Participant(Guid.NewGuid(), null, this.uri);
-            this.option = new Option(Guid.NewGuid(), null, this.uri);
-            this.elementDef = new ElementDefinition(Guid.NewGuid(), null, this.uri) {Owner = this.domain};
+            this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
+            this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
+            this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
+            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
+            this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
+            this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
+            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) {Owner = this.domain};
 
-            this.elementDef2 = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Owner = this.domain };
-            this.elementUsage = new ElementUsage(Guid.NewGuid(), null, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain};
+            this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain};
 
             this.siteDir.Person.Add(this.person);
             this.siteDir.Model.Add(this.modelSetup);
@@ -109,7 +114,7 @@ namespace ProductTree.Tests.ProductTreeRows
         {
             var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
 
-            var usage = new ElementUsage(Guid.NewGuid(), null, this.uri) { Owner = this.domain };
+            var usage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
             usage.ElementDefinition = this.elementDef2;
 
             var revisionProperty = typeof (ElementDefinition).GetProperty("RevisionNumber");
@@ -133,8 +138,8 @@ namespace ProductTree.Tests.ProductTreeRows
         {
             var revisionProperty = typeof (ElementDefinition).GetProperty("RevisionNumber");
 
-            var group1 = new ParameterGroup(Guid.NewGuid(), null, this.uri);
-            var group11 = new ParameterGroup(Guid.NewGuid(), null, this.uri) { ContainingGroup = group1 };
+            var group1 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri);
+            var group11 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { ContainingGroup = group1 };
 
             this.elementDef.ParameterGroup.Add(group1);
             this.elementDef.ParameterGroup.Add(group11);
@@ -164,7 +169,7 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreSame(group11, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Single().Thing);
 
             // add group2 and move group11 under group2
-            var group2 = new ParameterGroup(Guid.NewGuid(), null, this.uri);
+            var group2 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri);
             group11.ContainingGroup = group2;
             this.elementDef.ParameterGroup.Add(group2);
             revisionProperty.SetValue(group11, 30);
@@ -193,15 +198,15 @@ namespace ProductTree.Tests.ProductTreeRows
         {
             var revisionProperty = typeof(ElementDefinition).GetProperty("RevisionNumber");
 
-            var group1 = new ParameterGroup(Guid.NewGuid(), null, this.uri);
-            var group11 = new ParameterGroup(Guid.NewGuid(), null, this.uri) { ContainingGroup = group1 };
+            var group1 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri);
+            var group11 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { ContainingGroup = group1 };
 
             this.elementDef.ParameterGroup.Add(group1);
             this.elementDef.ParameterGroup.Add(group11);
 
-            var type1 = new EnumerationParameterType(Guid.NewGuid(), null, this.uri) {Name = "type1"};
-            var parameter1 = new Parameter(Guid.NewGuid(), null, this.uri) {ParameterType = type1, Owner = this.domain};
-            var valueset = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var type1 = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) {Name = "type1"};
+            var parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) {ParameterType = type1, Owner = this.domain};
+            var valueset = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
             valueset.Published = new ValueArray<string>(new List<string>{"1"});
             valueset.Manual = new ValueArray<string>(new List<string> { "1" });
             valueset.ValueSwitch = ParameterSwitchKind.MANUAL;

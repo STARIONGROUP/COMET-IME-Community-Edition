@@ -46,10 +46,14 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private RequirementsGroup grp2;
 
         private Requirement req;
+        private Assembler assembler;
+
 
         [SetUp]
         public void Setup()
         {
+            this.assembler = new Assembler(this.uri);
+
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -57,18 +61,18 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
-            var person = new Person(Guid.NewGuid(), null, this.uri);
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "test" };
-            var participant = new Participant(Guid.NewGuid(), null, this.uri) { Person = person, Domain = new List<DomainOfExpertise>{ this.domain } };
+            var person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test" };
+            var participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = person, Domain = new List<DomainOfExpertise>{ this.domain } };
             this.session.Setup(x => x.ActivePerson).Returns(person);
 
-            this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri);
-            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri) { Name = "model" };
+            this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "model" };
             this.modelSetup.Participant.Add(participant);
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
-            this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelSetup.IterationSetup.Add(this.iterationSetup);
-            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), null, this.uri) {Name = "rs1", ShortName = "1"};
+            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "rs1", ShortName = "1"};
             var tuple = new Tuple<DomainOfExpertise, Participant>(domain, participant);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, tuple } });
 
@@ -79,15 +83,15 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.model.EngineeringModelSetup = this.modelSetup;
             this.model.Iteration.Add(this.iteration);
 
-            this.grp1 = new RequirementsGroup(Guid.NewGuid(), null, this.uri);
-            this.grp11 = new RequirementsGroup(Guid.NewGuid(), null, this.uri);
-            this.grp2 = new RequirementsGroup(Guid.NewGuid(), null, this.uri);
+            this.grp1 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.grp11 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.grp2 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.reqSpec.Group.Add(this.grp1);
             this.reqSpec.Group.Add(this.grp2);
             this.grp1.Group.Add(this.grp11);
 
-            this.req = new Requirement(Guid.NewGuid(), null, this.uri);
+            this.req = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.reqSpec.Requirement.Add(this.req);
 
             this.requirementBrowserViewModel = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null);
@@ -121,7 +125,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var grp1Row = row.ContainedRows.Single(x => x.Thing.Iid == this.grp1.Iid);
             Assert.AreEqual(2, grp1Row.ContainedRows.Count);
 
-            var newgrp = new RequirementsGroup(Guid.NewGuid(), null, null);
+            var newgrp = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.grp1.Group.Add(newgrp);
 
             this.revision.SetValue(this.grp1, 2);
@@ -171,7 +175,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             Assert.IsFalse(grp11Row.ContainedRows.Any(x => x.Thing.Iid == this.req.Iid));
             Assert.IsTrue(row.ContainedRows.Any(x => x.Thing.Iid == this.req.Iid));
 
-            var newreq = new Requirement(Guid.NewGuid(), null, null);
+            var newreq = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.reqSpec.Requirement.Add(newreq);
             this.revision.SetValue(this.reqSpec, 5);
 
@@ -198,7 +202,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var grp1Row = row.ContainedRows.Single(x => x.Thing.Iid == this.grp1.Iid);
             Assert.AreEqual(2, grp1Row.ContainedRows.Count);
 
-            var newgrp = new RequirementsGroup(Guid.NewGuid(), null, null);
+            var newgrp = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.grp1.Group.Add(newgrp);
 
             this.revision.SetValue(this.grp1, 2);

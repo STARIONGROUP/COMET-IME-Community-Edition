@@ -174,6 +174,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
+            this.UpdateThingStatus();
             // update the group-row under which this row shall be displayed
             if (this.currentGroup != this.Thing.ContainingGroup)
             {
@@ -187,6 +188,14 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         #region Row-Base
+        /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
+        }
+
         /// <summary>
         /// The object changed event handler
         /// </summary>

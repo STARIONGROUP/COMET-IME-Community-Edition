@@ -53,10 +53,19 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
+        }
+
+        /// <summary>
         /// Update the properties of this row
         /// </summary>
         private void UpdateProperties()
         {
+            this.UpdateThingStatus();
             if (this.Thing.ContainingGroup != this.currentGroup)
             {
                 // update the position of this row in the parameter-group hierarchy

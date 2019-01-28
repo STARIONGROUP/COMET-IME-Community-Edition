@@ -390,7 +390,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var revision = typeof(ElementDefinition).GetProperty("RevisionNumber");
 
             // Test input
-            var valueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
             var manualSet = new ValueArray<string>(new List<string> { "manual" });
             var referenceSet = new ValueArray<string>(new List<string> { "ref" });
             var computedSet = new ValueArray<string>(new List<string> { "computed" });
@@ -463,7 +463,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var revision = typeof(ElementDefinition).GetProperty("RevisionNumber");
 
             // Test input
-            var valueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
             var manualSet = new ValueArray<string>(new List<string> { "manual" });
             var referenceSet = new ValueArray<string>(new List<string> { "ref" });
             var computedSet = new ValueArray<string>(new List<string> { "computed" });
@@ -475,8 +475,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.parameter5ForSubscription.ValueSet.Add(valueSet);
 
-            var subscription = new ParameterSubscription(Guid.NewGuid(), null, this.uri) {Owner = this.activeDomain};
-            subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri){SubscribedValueSet = valueSet});
+            var subscription = new ParameterSubscription(Guid.NewGuid(), this.cache, this.uri) {Owner = this.activeDomain};
+            subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), this.cache, this.uri){SubscribedValueSet = valueSet});
 
             this.parameter5ForSubscription.ParameterSubscription.Add(subscription);
 

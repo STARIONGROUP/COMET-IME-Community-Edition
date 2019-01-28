@@ -90,7 +90,7 @@
                     <views:InlineEditContentUserControl HorizontalAlignment="Stretch"
                                                         VerticalAlignment="Stretch" 
                                                         InlineMode="False"
-                                                        StartInPreviewMode="True"
+                                                        StartInPreviewMode="False"
                                                         BorderThickness="3"
                                                         IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
                                                         ContentText="{Binding RequirementText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">

@@ -7,8 +7,10 @@
 namespace ProductTree.Tests.Comparers
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -46,55 +48,57 @@ namespace ProductTree.Tests.Comparers
         private ParameterOverrideValueSet ovs1;
 
         private ParameterGroup gr;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+
 
         [SetUp]
         public void Setup()
         {
             this.session = new Mock<ISession>();
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domain" };
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
 
-            this.siteDir = new SiteDirectory(Guid.NewGuid(), null, this.uri);
-            this.person = new Person(Guid.NewGuid(), null, this.uri);
-            this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri);
-            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
-            this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
-            this.participant = new Participant(Guid.NewGuid(), null, this.uri);
-            this.option = new Option(Guid.NewGuid(), null, this.uri);
-            this.elementDef = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Owner = this.domain };
-            this.type1 = new EnumerationParameterType(Guid.NewGuid(), null, this.uri) { Name = "a" };
-            this.type2 = new EnumerationParameterType(Guid.NewGuid(), null, this.uri) { Name = "p" };
+            this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
+            this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
+            this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
+            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
+            this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
+            this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
+            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.type1 = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "a" };
+            this.type2 = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "p" };
 
-            this.vs1 = new ParameterValueSet(Guid.NewGuid(), null, this.uri)
+            this.vs1 = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
                 Published = new ValueArray<string>(new List<string> { "1" }),
                 Manual = new ValueArray<string>(new List<string> { "1" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
-            this.vs2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri)
+            this.vs2 = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
                 Published = new ValueArray<string>(new List<string> { "1" }),
                 Manual = new ValueArray<string>(new List<string> { "1" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
-            this.ovs1 = new ParameterOverrideValueSet(Guid.NewGuid(), null, this.uri)
+            this.ovs1 = new ParameterOverrideValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
                 Published = new ValueArray<string>(new List<string> { "1" }),
                 Manual = new ValueArray<string>(new List<string> { "1" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL,
                 ParameterValueSet =  this.vs1
             };
-            this.gr = new ParameterGroup(Guid.NewGuid(), null, this.uri) {Name = "gr"};
+            this.gr = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) {Name = "gr"};
 
-            this.p1 = new Parameter(Guid.NewGuid(), null, this.uri) {ParameterType = this.type1};
-            this.p2 = new Parameter(Guid.NewGuid(), null, this.uri) {ParameterType = this.type2};
-            this.po1 = new ParameterOverride(Guid.NewGuid(), null, this.uri) {Parameter = this.p1};
+            this.p1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) {ParameterType = this.type1};
+            this.p2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) {ParameterType = this.type2};
+            this.po1 = new ParameterOverride(Guid.NewGuid(), this.cache, this.uri) {Parameter = this.p1};
             this.p1.ValueSet.Add(this.vs1);
             this.p2.ValueSet.Add(this.vs2);
             this.po1.ValueSet.Add(this.ovs1);
 
-            this.elementDef2 = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Owner = this.domain };
-            this.elementUsage = new ElementUsage(Guid.NewGuid(), null, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain };
+            this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain };
 
             this.elementDef2.Parameter.Add(this.p1);
             this.elementDef2.Parameter.Add(this.p2);

@@ -75,6 +75,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://www.rheagroup.com");
+            this.assembler = new Assembler(this.uri);
 
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -84,12 +85,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             var sitedir = new SiteDirectory();
             var iterationsetup = new IterationSetup();
-            var engModel = new EngineeringModel(Guid.NewGuid(), null, null);
-            var modelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, null);
+            var engModel = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             modelSetup.IterationSetup.Add(iterationsetup);
 
-            var person = new Person(Guid.NewGuid(), null, null) { GivenName = "test", Surname = "test" };
-            var participant = new Participant(Guid.NewGuid(), null, null) { Person = person };
+            var person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "test", Surname = "test" };
+            var participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = person };
             modelSetup.Participant.Add(participant);
             engModel.EngineeringModelSetup = modelSetup;
             this.session.Setup(x => x.ActivePerson).Returns(person);
@@ -97,7 +98,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             engModel.Iteration.Add(this.iteration);
             sitedir.Model.Add(modelSetup);
 
-            this.assembler = new Assembler(this.uri);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, participant)}});
         }
@@ -111,14 +111,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatParameterGetsCreatedWhenParameterTypeIsDropped()
         {
-            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), null, null);
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
             row.ThingCreator = this.thingCreator.Object;
             
-            var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null);
-            var ratioScale = new RatioScale(Guid.NewGuid(), null, null);
+            var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var ratioScale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
             simpleQuantityKind.DefaultScale = ratioScale;
             var payload = new Tuple<ParameterType, MeasurementScale>(simpleQuantityKind, ratioScale);
             var dropInfo = new Mock<IDropInfo>();
@@ -133,14 +133,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatExceptionIsCaughtWhenParameterCouldNotBeCreatedOnDrop()
         {
-            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), null, null);
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
             row.ThingCreator = new TestThingCreatorThatThrowsExceptions();
             
-            var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null);
-            var ratioScale = new RatioScale(Guid.NewGuid(), null, null);
+            var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var ratioScale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
             simpleQuantityKind.DefaultScale = ratioScale;
             var payload = new Tuple<ParameterType, MeasurementScale>(simpleQuantityKind, ratioScale);
             var dropInfo = new Mock<IDropInfo>();
@@ -155,15 +155,15 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatDragElementDefinitionSetsCopyEffect()
         {
-            var iteration = new Iteration(Guid.NewGuid(), null, null);
-            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), null, null);
+            var iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
             iteration.Element.Add(elementDefinition);
 
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
 
-            var payload = new ElementDefinition(Guid.NewGuid(), null, null);
+            var payload = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(payload);
             dropInfo.SetupProperty(x => x.Effects);
@@ -178,14 +178,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            var domainOfExpertise = new DomainOfExpertise();
-            var elementDefinition = new ElementDefinition { Owner = domainOfExpertise };
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
             this.iteration.Element.Add(elementDefinition);
 
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
             row.ThingCreator = this.thingCreator.Object;
 
-            var payload = new ElementDefinition(Guid.NewGuid(), null, null);
+            var payload = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iteration.Element.Add(payload);
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(payload);
@@ -201,14 +201,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            var domainOfExpertise = new DomainOfExpertise();
-            var elementDefinition = new ElementDefinition { Owner = domainOfExpertise };
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
             this.iteration.Element.Add(elementDefinition);
 
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
             row.ThingCreator = new TestThingCreatorThatThrowsExceptions();
 
-            var payload = new ElementDefinition(Guid.NewGuid(), null, null);
+            var payload = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iteration.Element.Add(payload);
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(payload);
@@ -224,10 +224,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
-            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), null, null);
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
-            var category = new Category(Guid.NewGuid(), null, null);
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             category.PermissibleClass.Add(ClassKind.ElementDefinition);
 
             this.iteration.Element.Add(elementDefinition);
@@ -250,10 +250,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatDragCategoryWithoutElementDefinitionClassKindSetsNoneEffect()
         {
-            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), null, null);
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
-            var category = new Category(Guid.NewGuid(), null, null);
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             category.PermissibleClass.Add(ClassKind.Parameter);
 
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
@@ -270,10 +270,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VeriftyThatDragAlreadyCategorizedCategorySetsNoneEffect()
         {
-            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), null, null);
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
-            var category = new Category(Guid.NewGuid(), null, null);
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             category.PermissibleClass.Add(ClassKind.ElementDefinition);
             elementDefinition.Category.Add(category);
 
@@ -293,10 +293,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
-            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), null, null);
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
-            var category = new Category(Guid.NewGuid(), null, null);
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             category.PermissibleClass.Add(ClassKind.ElementDefinition);
             elementDefinition.Category.Add(category);
             var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);

@@ -105,6 +105,14 @@ namespace CDP4Requirements.ViewModels
 
         #region private method
         /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
+        }
+
+        /// <summary>
         /// Update the current <see cref="RequirementsContainer"/> with its current <see cref="RequirementsGroup"/>s
         /// </summary>
         protected void UpdateRequirementGroupRows()
@@ -205,6 +213,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         protected virtual void UpdateProperties()
         {
+            this.UpdateThingStatus();
             this.Definition = (this.Thing.Definition.FirstOrDefault() == null)
                 ? string.Empty
                 : this.Thing.Definition.First().Content;

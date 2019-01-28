@@ -15,6 +15,7 @@ namespace CDP4Common.Helpers
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using CDP4Common.CommonData;
+    using CDP4Composition.Services;
     using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Core.Native;
     using Point = System.Drawing.Point;
@@ -28,6 +29,11 @@ namespace CDP4Common.Helpers
         /// The <see cref="Uri"/> to the error image overlay.
         /// </summary>
         public static readonly Uri ErrorImageUri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/Log/ExclamationRed_16x16.png");
+
+        /// <summary>
+        /// The <see cref="Uri"/> to the relationship image overlay.
+        /// </summary>
+        public static readonly Uri RelationshipOverlayUri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/Log/linkgreen_16x16.png");
 
         public static ImageSource ToImageSource(this Icon icon)
         {
@@ -115,10 +121,13 @@ namespace CDP4Common.Helpers
         /// <param name="overlayUri">
         /// The uri of the overlay
         /// </param>
+        /// <param name="overlayPosition">
+        /// The overlay position
+        /// </param>
         /// <returns>
         /// The <see cref="BitmapSource"/>.
         /// </returns>
-        public static BitmapSource WithOverlay(Uri iconUri, Uri overlayUri)
+        public static BitmapSource WithOverlay(Uri iconUri, Uri overlayUri, OverlayPositionKind overlayPosition = OverlayPositionKind.TopLeft)
         {
             var source = new BitmapImage(iconUri);
             var overlay = new BitmapImage(overlayUri);
@@ -128,11 +137,14 @@ namespace CDP4Common.Helpers
 
             var img = new Bitmap(thingBitMapImage.Width, thingBitMapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
+            var xOverlay = overlayPosition == OverlayPositionKind.TopLeft || overlayPosition == OverlayPositionKind.BottomLeft ? 0 : (int) source.Width / 2;
+            var yOverlay = overlayPosition == OverlayPositionKind.TopLeft || overlayPosition == OverlayPositionKind.TopRight ? 0 : (int) source.Height / 2;
+
             using (var gr = Graphics.FromImage(img))
             {
                 gr.CompositingMode = CompositingMode.SourceOver;
                 gr.DrawImage(thingBitMapImage, new Point(0, 0));
-                gr.DrawImage(overlayBitMapImage, new Point(0, 0));
+                gr.DrawImage(overlayBitMapImage, new Point(xOverlay, yOverlay));
             }
 
             return Bitmap2BitmapSource(img);

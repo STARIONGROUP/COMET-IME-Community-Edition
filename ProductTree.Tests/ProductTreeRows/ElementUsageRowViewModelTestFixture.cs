@@ -7,8 +7,10 @@
 namespace ProductTree.Tests.ProductTreeRows
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -45,6 +47,7 @@ namespace ProductTree.Tests.ProductTreeRows
         private ParameterValueSet valueSet;
         private ParameterOverrideValueSet valueSetOverride;
 
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
         [SetUp]
         public void Setup()
@@ -54,27 +57,27 @@ namespace ProductTree.Tests.ProductTreeRows
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
 
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domain" , ShortName = "dom" };
-            this.siteDir = new SiteDirectory(Guid.NewGuid(), null, this.uri);
-            this.person = new Person(Guid.NewGuid(), null, this.uri);
-            this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri);
-            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
-            this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
-            this.participant = new Participant(Guid.NewGuid(), null, this.uri);
-            this.option = new Option(Guid.NewGuid(), null, this.uri);
-            this.elementDef = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Owner = this.domain};
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" , ShortName = "dom" };
+            this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
+            this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
+            this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
+            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
+            this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
+            this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
+            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain};
 
-            this.elementDef2 = new ElementDefinition(Guid.NewGuid(), null, this.uri) { Owner = this.domain, Name = "Element definition 1", ShortName = "ED1" };
-            this.elementUsage = new ElementUsage(Guid.NewGuid(), null, this.uri) 
+            this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, Name = "Element definition 1", ShortName = "ED1" };
+            this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
             { ElementDefinition = this.elementDef2, Owner = this.domain, Name = "Element usage 1" ,ShortName = "EU1"};
 
-            this.valueSet = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
+            this.valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
             this.valueSet.Published = new ValueArray<string>(new List<string> { "1" });
             this.valueSet.Manual = new ValueArray<string>(new List<string> { "1" });
             this.valueSet.ValueSwitch = ParameterSwitchKind.MANUAL;
 
-            this.valueSetOverride = new ParameterOverrideValueSet(Guid.NewGuid(), null, this.uri);
+            this.valueSetOverride = new ParameterOverrideValueSet(Guid.NewGuid(), this.cache, this.uri);
             this.valueSetOverride.Published = new ValueArray<string>(new List<string> { "1" });
             this.valueSetOverride.Manual = new ValueArray<string>(new List<string> { "1" });
             this.valueSetOverride.ValueSwitch = ParameterSwitchKind.MANUAL;
@@ -132,8 +135,8 @@ namespace ProductTree.Tests.ProductTreeRows
         {
             var revisionProperty = typeof(ElementUsage).GetProperty("RevisionNumber");
 
-            var group1 = new ParameterGroup(Guid.NewGuid(), null, this.uri);
-            var group11 = new ParameterGroup(Guid.NewGuid(), null, this.uri) { ContainingGroup = group1 };
+            var group1 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri);
+            var group11 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { ContainingGroup = group1 };
 
             this.elementDef.ParameterGroup.Add(group1);
             this.elementDef.ParameterGroup.Add(group11);
@@ -166,7 +169,7 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreSame(group11, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Single().Thing);
 
             // add group2 and move group11 under group2
-            var group2 = new ParameterGroup(Guid.NewGuid(), null, this.uri);
+            var group2 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri);
             group11.ContainingGroup = group2;
             this.elementDef.ParameterGroup.Add(group2);
             revisionProperty.SetValue(this.elementDef, 30);
@@ -197,8 +200,8 @@ namespace ProductTree.Tests.ProductTreeRows
             var revisionProperty = typeof(ElementUsage).GetProperty("RevisionNumber");
 
             // TEST DATA
-            var group1 = new ParameterGroup(Guid.NewGuid(), null, this.uri);
-            var group11 = new ParameterGroup(Guid.NewGuid(), null, this.uri) { ContainingGroup = group1 };
+            var group1 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri);
+            var group11 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { ContainingGroup = group1 };
 
             this.elementDef.ParameterGroup.Add(group1);
             this.elementDef.ParameterGroup.Add(group11);
@@ -206,16 +209,16 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementUsage.ElementDefinition = this.elementDef;
             this.elementDef.ContainedElement.Clear();
 
-            var type1 = new EnumerationParameterType(Guid.NewGuid(), null, this.uri) { Name = "type1" };
-            var parameter1 = new Parameter(Guid.NewGuid(), null, this.uri) { ParameterType = type1, Owner = this.domain};
+            var type1 = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "type1" };
+            var parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type1, Owner = this.domain};
             parameter1.ValueSet.Add(this.valueSet);
-            var parameter2 = new Parameter(Guid.NewGuid(), null, this.uri) { ParameterType = type1, Owner = this.domain};
+            var parameter2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type1, Owner = this.domain};
             parameter2.ValueSet.Add(this.valueSet);
 
             this.elementDef.Parameter.Add(parameter2);
             this.elementDef.Parameter.Add(parameter1);
 
-            var override1 = new ParameterOverride(Guid.NewGuid(), null, this.uri) {Parameter = parameter1, Owner = this.domain};
+            var override1 = new ParameterOverride(Guid.NewGuid(), this.cache, this.uri) {Parameter = parameter1, Owner = this.domain};
             override1.ValueSet.Add(this.valueSetOverride);
             this.elementUsage.ParameterOverride.Add(override1);
 
@@ -272,8 +275,8 @@ namespace ProductTree.Tests.ProductTreeRows
         [Test]
         public void VerifyThatOptionDependencyIsHandled()
         {
-            var newDef = new ElementDefinition(Guid.NewGuid(), null, this.uri);
-            var newUsage = new ElementUsage(Guid.NewGuid(), null, this.uri) {ElementDefinition = newDef};
+            var newDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
+            var newUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) {ElementDefinition = newDef};
 
             this.elementDef2.ContainedElement.Add(newUsage);
 

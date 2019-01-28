@@ -273,7 +273,7 @@ namespace CDP4Requirements.ViewModels
         {
             base.PopulatePossibleOwner();
             
-            var engineeringModel = (EngineeringModel) this.Thing.TopContainer;
+            var engineeringModel = (EngineeringModel)this.Container.TopContainer;
 
             var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
             this.PossibleOwner.AddRange(domains);

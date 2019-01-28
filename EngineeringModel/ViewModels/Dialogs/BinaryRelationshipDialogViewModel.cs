@@ -192,7 +192,10 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void PopulatePossibleOwner()
         {
             base.PopulatePossibleOwner();
-            this.PossibleOwner.AddRange(this.Session.RetrieveSiteDirectory().Domain);
+
+            var engineeringModel = (EngineeringModel)this.Container.TopContainer;
+            var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
+            this.PossibleOwner.AddRange(domains);
         }
 
         /// <summary>

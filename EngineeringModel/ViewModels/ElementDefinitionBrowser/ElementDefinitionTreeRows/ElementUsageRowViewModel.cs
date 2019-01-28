@@ -225,6 +225,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
+            this.UpdateThingStatus();
             this.PopulateParameters();
         }
 
@@ -281,6 +282,14 @@ namespace CDP4EngineeringModel.ViewModels
 
             var addedParameterOrOverride = definedParameterOrOverrides.Except(currentParameterOrOverride).ToList();
             this.AddParameterBase(addedParameterOrOverride);
+        }
+
+        /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
         }
 
         /// <summary>
