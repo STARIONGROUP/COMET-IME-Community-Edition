@@ -1,10 +1,10 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="IThingCreator.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.Utilities
+namespace CDP4Composition.Services
 {
     using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;

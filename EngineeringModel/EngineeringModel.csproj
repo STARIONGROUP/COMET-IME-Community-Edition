@@ -222,8 +222,6 @@
     <Compile Include="Services\ElementDefinitionService.cs" />
     <Compile Include="Utilities\CopyElementDefinitionCreator.cs" />
     <Compile Include="Utilities\CopyCreator.cs" />
-    <Compile Include="Utilities\IThingCreator.cs" />
-    <Compile Include="Utilities\ThingCreator.cs" />
     <Compile Include="ViewModels\Dialogs\ActualFiniteStateDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BinaryRelationshipDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BuiltInRuleVerificationDialogViewModel.cs" />

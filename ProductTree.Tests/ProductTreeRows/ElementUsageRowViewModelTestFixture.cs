@@ -10,14 +10,17 @@ namespace ProductTree.Tests.ProductTreeRows
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using CDP4ProductTree.ViewModels;
     using Moq;
@@ -42,6 +45,7 @@ namespace ProductTree.Tests.ProductTreeRows
         private Option option;
         private ElementDefinition elementDef;
         private ElementDefinition elementDef2;
+        private ElementDefinition elementDef3;
         private DomainOfExpertise domain;
         private ElementUsage elementUsage;
         private ParameterValueSet valueSet;
@@ -67,6 +71,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
             this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
             this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain};
+            this.elementDef3 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain};
 
             this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, Name = "Element definition 1", ShortName = "ED1" };
             this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
@@ -94,12 +99,15 @@ namespace ProductTree.Tests.ProductTreeRows
             this.iteration.Option.Add(this.option);
             this.iteration.TopElement = this.elementDef;
             this.iteration.Element.Add(this.elementDef);
+            this.iteration.Element.Add(this.elementDef3);
             this.iteration.Element.Add(this.elementDef2);
             this.elementDef.ContainedElement.Add(this.elementUsage);
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
         }
 
         [TearDown]
@@ -297,6 +305,52 @@ namespace ProductTree.Tests.ProductTreeRows
 
             CDPMessageBus.Current.SendObjectChangeEvent(newUsage, EventKind.Updated);
             Assert.IsTrue(vm.ContainedRows.Select(x => x.Thing).Contains(newUsage));
+        }
+
+        [Test]
+        public void VerifyThatDragOverWorks()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementDef3);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.Copy, dropinfo.Object.Effects);
+        }
+
+        [Test]
+        public void VerifyThatDragOverWorks2()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementDef2);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
+        }
+
+
+        [Test]
+        public void VerifyThatDropWorks()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementDef3);
+            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.Drop(dropinfo.Object).Wait();
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
     }
 }

@@ -277,12 +277,14 @@
     <Compile Include="Services\IconCacheService\OverlayPositionKind.cs" />
     <Compile Include="Services\ImageService\IImageService.cs" />
     <Compile Include="Services\ImageService\ImageService.cs" />
+    <Compile Include="Services\IThingCreator.cs" />
     <Compile Include="Services\RuleVerification\BuiltInRule.cs" />
     <Compile Include="Services\RuleVerification\BuiltInRuleMetaDataExportAttribute.cs" />
     <Compile Include="Services\RuleVerification\IBuiltInRule.cs" />
     <Compile Include="Services\RuleVerification\IBuiltInRuleMetaData.cs" />
     <Compile Include="Services\RuleVerification\IRuleVerificationService.cs" />
     <Compile Include="Services\RuleVerification\RuleVerificationService.cs" />
+    <Compile Include="Services\ThingCreator.cs" />
     <Compile Include="SpecialTerms\ISpecialTermsService.cs" />
     <Compile Include="SpecialTerms\SpecialTermsService.cs" />
     <Compile Include="SpellingChecker\SpellDictionaryService.cs" />

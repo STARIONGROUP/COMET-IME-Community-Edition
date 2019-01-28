@@ -11,14 +11,17 @@ namespace ProductTree.Tests.ProductTreeRows
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using CDP4ProductTree.ViewModels;
 
@@ -90,6 +93,8 @@ namespace ProductTree.Tests.ProductTreeRows
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
         }
 
         [TearDown]
@@ -239,6 +244,51 @@ namespace ProductTree.Tests.ProductTreeRows
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.elementUsage, EventKind.Updated);
             Assert.IsTrue(vm.ContainedRows.Select(x => x.Thing).Contains(this.elementUsage));
+        }
+
+        [Test]
+        public void VerifyThatDragOverWorks()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementDef2);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.Copy, dropinfo.Object.Effects);
+        }
+
+        [Test]
+        public void VerifyThatDragOverWorks2()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementDef);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
+        }
+
+        [Test]
+        public void VerifyThatDropWorks()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementDef2);
+            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.Drop(dropinfo.Object).Wait();
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
     }
 }

@@ -543,8 +543,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Creates an new <see cref="ElementDefinition"/> on the connected data-source and updates and valuesests of created contained parameters
         /// </summary>
-        /// <param name="elementDefinition"></param>
-        /// <returns></returns>
+        /// <param name="elementDefinition">The <see cref="ElementDefinition"/></param>
+        /// <returns>The async task</returns>
+        /// <remarks>
+        /// This may be used in other plugins somehow
+        /// </remarks>
         private async Task CreateElementDefinitionFromTemplate(ElementDefinition elementDefinition)
         {
             var owner = this.QueryCurrentDomainOfExpertise();

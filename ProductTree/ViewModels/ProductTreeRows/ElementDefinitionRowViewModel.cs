@@ -10,10 +10,15 @@ namespace CDP4ProductTree.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
     using CDP4CommonView.ViewModels;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using Comparers;
@@ -22,7 +27,7 @@ namespace CDP4ProductTree.ViewModels
     /// <summary>
     /// The row representation of a <see cref="ElementDefinition"/>
     /// </summary>
-    public class ElementDefinitionRowViewModel : CDP4CommonView.ElementDefinitionRowViewModel, IParameterRowContainer
+    public class ElementDefinitionRowViewModel : CDP4CommonView.ElementDefinitionRowViewModel, IParameterRowContainer, IDropTarget
     {
         #region Fields
         /// <summary>
@@ -96,6 +101,11 @@ namespace CDP4ProductTree.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
+        /// </summary>
+        public IThingCreator ThingCreator { get; set; }
+
         #region IParameterRowContainer public methods
 
         /// <summary>
@@ -164,6 +174,46 @@ namespace CDP4ProductTree.ViewModels
             }
         }
         #endregion
+
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            var elementDefinition = dropInfo.Payload as ElementDefinition;
+            if (elementDefinition != null)
+            {
+                this.DragOver(dropInfo, elementDefinition);
+                return;
+            }
+
+            dropInfo.Effects = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            var elementDefinition = dropInfo.Payload as ElementDefinition;
+            if (elementDefinition != null)
+            {
+                await this.Drop(dropInfo, elementDefinition);
+            }
+        }
+
 
         #region Row-Base
         /// <summary>
@@ -461,6 +511,59 @@ namespace CDP4ProductTree.ViewModels
             }
 
             this.AddElementUsage(elementUsage);
+        }
+
+        /// <summary>
+        /// Set the <see cref="IDropInfo.Effects"/> when the payload is an <see cref="ElementDefinition"/>
+        /// </summary>
+        /// <param name="dropinfo">The <see cref="IDropInfo"/></param>
+        /// <param name="elementDefinition">The <see cref="ElementDefinition"/> in the payload</param>
+        private void DragOver(IDropInfo dropinfo, ElementDefinition elementDefinition)
+        {
+            if (!this.PermissionService.CanWrite(ClassKind.ElementUsage, this.Thing.Container))
+            {
+                dropinfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            if (elementDefinition.TopContainer == this.Thing.TopContainer)
+            {
+                // prevent circular model
+                dropinfo.Effects = elementDefinition.HasUsageOf(this.Thing)
+                    ? DragDropEffects.None
+                    : DragDropEffects.Copy;
+
+                return;
+            }
+
+            dropinfo.Effects = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// Handle the drop of a <see cref="ElementDefinition"/>
+        /// </summary>
+        /// <param name="dropInfo">The <see cref="IDropInfo"/> containing the payload</param>
+        /// <param name="elementDefinition">The <see cref="ElementDefinition"/></param>
+        private async Task Drop(IDropInfo dropInfo, ElementDefinition elementDefinition)
+        {
+            if (this.ThingCreator == null)
+            {
+                this.ThingCreator = new ThingCreator();
+            }
+
+            try
+            {
+                var currentDomain = this.Session.QuerySelectedDomainOfExpertise(this.Thing.GetContainerOfType<Iteration>());
+                if (elementDefinition.TopContainer == this.Thing.TopContainer)
+                {
+                    await this.ThingCreator.CreateElementUsage(this.Thing, elementDefinition, currentDomain, this.Session);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                this.ErrorMsg = ex.Message;
+            }
         }
     }
 }

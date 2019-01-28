@@ -11,11 +11,13 @@ namespace CDP4ProductTree.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -26,7 +28,7 @@ namespace CDP4ProductTree.ViewModels
     /// <summary>
     /// The view model for the Product Tree
     /// </summary>
-    public class ProductTreeViewModel : BrowserViewModelBase<Option>, IPanelViewModel
+    public class ProductTreeViewModel : BrowserViewModelBase<Option>, IPanelViewModel, IDropTarget
     {
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -247,6 +249,66 @@ namespace CDP4ProductTree.ViewModels
         /// This has to be a list in order to display the tree
         /// </remarks>
         public ReactiveList<ElementDefinitionRowViewModel> TopElement { get; private set; }
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            try
+            {
+                logger.Trace("drag over {0}", dropInfo.TargetItem);
+                var droptarget = dropInfo.TargetItem as IDropTarget;
+                if (droptarget != null)
+                {
+                    droptarget.DragOver(dropInfo);
+                    return;
+                }
+
+                dropInfo.Effects = DragDropEffects.None;
+            }
+            catch (Exception ex)
+            {
+                dropInfo.Effects = DragDropEffects.None;
+                logger.Error(ex, "drag-over caused an error");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            var droptarget = dropInfo.TargetItem as IDropTarget;
+            if (droptarget != null)
+            {
+                try
+                {
+                    this.IsBusy = true;
+                    await droptarget.Drop(dropInfo);
+                }
+                catch (Exception ex)
+                {
+                    this.Feedback = ex.Message;
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            }
+        }
 
         /// <summary>
         /// Initialize the <see cref="ICommand"/>
