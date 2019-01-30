@@ -15,6 +15,7 @@ namespace BasicRdl
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using NLog;
@@ -66,8 +67,8 @@ namespace BasicRdl
         /// </param>
         /// <param name="thingDialogNavigationService">The instance of <see cref="IThingDialogNavigationService"/> that orchestrates navigation of <see cref="IThingDialogView"/></param>
         /// <param name="dialogNavigationService">The instance of <see cref="IDialogNavigationService"/> that orchestrates navigation to dialogs</param>
-        public BasicRdlRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService)
+        public BasicRdlRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);            
         }
@@ -123,11 +124,11 @@ namespace BasicRdl
                 var session = sessionChange.Session;
                 var siteDirectory = session.RetrieveSiteDirectory();
 
-                this.measurementUnitsBrowserViewModel = new MeasurementUnitsBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.measurementScalesBrowserViewModel = new MeasurementScalesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.rulesBrowserViewModel = new RulesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.categoryBrowserViewModel = new CategoryBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.parameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+                this.measurementUnitsBrowserViewModel = new MeasurementUnitsBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.measurementScalesBrowserViewModel = new MeasurementScalesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.rulesBrowserViewModel = new RulesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.categoryBrowserViewModel = new CategoryBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.parameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
                 this.Session = session;
             }

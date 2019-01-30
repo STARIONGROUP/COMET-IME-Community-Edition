@@ -6,11 +6,11 @@
 
 namespace CDP4EngineeringModel.ViewModels
 {
-
     using CDP4Common.EngineeringModelData;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
 
     /// <summary>
@@ -46,9 +46,9 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>
         /// An instance of <see cref="DomainFileStoreBrowserViewModel"/>
         /// </returns>
-        public static DomainFileStoreBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+        public static DomainFileStoreBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            return new DomainFileStoreBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService);
+            return new DomainFileStoreBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }
 }

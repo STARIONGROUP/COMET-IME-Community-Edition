@@ -11,6 +11,7 @@ namespace CDP4RelationshipEditor.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
 
     public class RelationshipEditorRibbonViewModel : RibbonButtonIterationDependentViewModel
@@ -31,9 +32,12 @@ namespace CDP4RelationshipEditor.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
         /// <returns>An instance of <see cref="RelationshipEditorViewModel"/></returns>
         public static RelationshipEditorViewModel InstantiatePanelViewModel(Iteration iteration, ISession session,
-            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             var model = iteration.Container as EngineeringModel;
             if (model == null)
@@ -47,7 +51,7 @@ namespace CDP4RelationshipEditor.ViewModels
                 throw new InvalidOperationException("The Participant in an engineering model cannot be null");
             }
 
-            return new RelationshipEditorViewModel(iteration, participant, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService);
+            return new RelationshipEditorViewModel(iteration, participant, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }
 }

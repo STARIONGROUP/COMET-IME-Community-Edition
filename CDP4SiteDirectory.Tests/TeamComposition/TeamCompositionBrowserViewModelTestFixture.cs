@@ -123,7 +123,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var vm = new TeamCompositionBrowserViewModel(this.engineeringModelSetup, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new TeamCompositionBrowserViewModel(this.engineeringModelSetup, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             Assert.AreEqual("Team composition, test model", vm.Caption);
             Assert.AreEqual(1, vm.Participants.Count);
 
@@ -134,7 +134,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatIfNewParticipantIsAddedItIsAddedToTheBrowser()
         {
-            var vm = new TeamCompositionBrowserViewModel(this.engineeringModelSetup, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new TeamCompositionBrowserViewModel(this.engineeringModelSetup, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             Assert.AreEqual(1, vm.Participants.Count);
 
             var anotherPerson = new Person(Guid.NewGuid(), this.cache, this.uri) { GivenName = "Jane", Surname = "Doe" };
@@ -160,7 +160,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatIfParticipantIsRemovedItIsRemovedFromTheBrowser()
         {
-            var vm = new TeamCompositionBrowserViewModel(this.engineeringModelSetup, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new TeamCompositionBrowserViewModel(this.engineeringModelSetup, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             Assert.AreEqual(1, vm.Participants.Count);
             this.engineeringModelSetup.Participant.Clear();
 

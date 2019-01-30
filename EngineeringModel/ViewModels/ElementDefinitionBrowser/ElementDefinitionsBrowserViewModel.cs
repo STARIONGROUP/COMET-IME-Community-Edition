@@ -24,6 +24,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
@@ -85,8 +86,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="thingDialogNavigationService">The thing Dialog Navigation Service</param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogService"/></param>
-        public ElementDefinitionsBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public ElementDefinitionsBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = "Element definitions";
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);

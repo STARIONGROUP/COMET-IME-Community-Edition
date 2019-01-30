@@ -4,6 +4,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+
+
 namespace CDP4EngineeringModel.Tests.Utilities
 {
     using System;
@@ -11,12 +13,11 @@ namespace CDP4EngineeringModel.Tests.Utilities
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Composition.Services;
-    using CDP4Dal;    
-    using CDP4EngineeringModel.Utilities;
+    using CDP4Dal;
+    using CDP4Dal.Operations;
     using Moq;
     using NUnit.Framework;
 

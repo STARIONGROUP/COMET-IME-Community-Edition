@@ -109,7 +109,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null);
+            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null, null);
             
             Assert.AreEqual("Requirements Specification Editor: URD", vm.Caption);
             Assert.AreEqual("model", vm.CurrentModel);
@@ -127,7 +127,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             this.requirementsSpecification.Requirement.Add(requirementB);
             this.requirementsSpecification.Requirement.Add(requirementA);
             
-            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null);
+            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null, null);
             Assert.AreEqual(3, vm.ContainedRows.Count);
 
             var requirementARow = (CDP4Requirements.ViewModels.RequirementsSpecificationEditor.RequirementRowViewModel)vm.ContainedRows.Single(row => row.Thing == requirementA);
@@ -166,7 +166,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             this.requirementsSpecification.Requirement.Add(requirementB);
             this.requirementsSpecification.Requirement.Add(requirementA);
 
-            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null);
+            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null, null);
             Assert.AreEqual(3, vm.ContainedRows.Count);
 
             var requirementARow = (CDP4Requirements.ViewModels.RequirementsSpecificationEditor.RequirementRowViewModel)vm.ContainedRows.Single(row => row.Thing == requirementA);
@@ -198,7 +198,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             this.requirementsSpecification.Requirement.Add(requirementB);
             this.requirementsSpecification.Requirement.Add(requirementA);
 
-            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, this.thingDialogNavigation.Object, this.panelNavigation.Object, this.dialogNavigation.Object);
+            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, this.thingDialogNavigation.Object, this.panelNavigation.Object, this.dialogNavigation.Object, null);
             Assert.AreEqual(3, vm.ContainedRows.Count);
 
             var requirementARow = (ViewModels.RequirementsSpecificationEditor.RequirementRowViewModel)vm.ContainedRows.Single(row => row.Thing == requirementA);
@@ -227,7 +227,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             this.requirementsSpecification.Group.Add(requirementsGroupB);
             this.requirementsSpecification.Group.Add(requirementsGroupA);
 
-            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null);
+            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null, null);
             Assert.AreEqual(3, vm.ContainedRows.Count);
 
             var requirementsGroupRowA = (CDP4Requirements.ViewModels.RequirementsSpecificationEditor.RequirementsGroupRowViewModel)vm.ContainedRows.Single(row => row.Thing == requirementsGroupA);
@@ -254,7 +254,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             this.requirementsSpecification.Group.Add(requirementsGroup);
             this.requirementsSpecification.Requirement.Add(requirement);
 
-            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null);
+            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null, null);
             Assert.AreEqual(3, vm.ContainedRows.Count);
 
             var specRow = vm.ContainedRows[0];
@@ -302,7 +302,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             requirementB_1.Group = requirementsGroupB;
             requirementB_2.Group = requirementsGroupB;
 
-            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null);
+            var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null, null);
             Assert.AreEqual(11, vm.ContainedRows.Count);
 
             var specRow = vm.ContainedRows[0];

@@ -15,9 +15,9 @@ namespace CDP4Composition
     using System.Text;
     using System.Threading.Tasks;
     using System.Xml.Linq;
-
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Composition.OfficeRibbon;
     using CDP4Dal.Permission;
     using NLog;
@@ -49,7 +49,10 @@ namespace CDP4Composition
         /// </param>
         /// <param name="thingDialogNavigationService">The instance of <see cref="IThingDialogNavigationService"/> used to navigate to dialogs</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        protected RibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        protected RibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             var ribbonXmlResource = this.GetRibbonXmlResourceName();
 
@@ -59,6 +62,7 @@ namespace CDP4Composition
             this.PanelNavigationService = panelNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.DialogNavigationService = dialogNavigationService;
+            this.PluginSettingsService = pluginSettingsService;
         }
 
         /// <summary>
@@ -94,6 +98,11 @@ namespace CDP4Composition
         /// Gets the <see cref="IDialogNavigationService"/> used to navigate to dialogs
         /// </summary>
         public IDialogNavigationService DialogNavigationService { get; private set; }
+
+        /// <summary>
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files
+        /// </summary>
+        public IPluginSettingsService PluginSettingsService { get; private set; }
 
         /// <summary>
         /// Gets the order in which the ribbon xml is to be ordered in the Office Fluent Ribbon 

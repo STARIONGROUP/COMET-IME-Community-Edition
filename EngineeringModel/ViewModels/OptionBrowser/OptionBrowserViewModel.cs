@@ -19,6 +19,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -57,7 +58,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Options";
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionBrowserViewModel"/> class
         /// </summary>
@@ -66,8 +67,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public OptionBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public OptionBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);

@@ -144,7 +144,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
                     this.session.Object,
                     this.thingDialogNavigationService.Object,
                     this.panelNavigationService.Object,
-                    null));
+                    null, null));
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
             });
 
-            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             Assert.AreEqual("Rule verification lists, iteration_0", viewmodel.Caption);
             Assert.AreEqual("model\nhttp://test.com/\n ", viewmodel.ToolTip);
             Assert.AreEqual("model", viewmodel.CurrentModel);
@@ -172,7 +172,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             };
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
-            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             CollectionAssert.IsNotEmpty(viewmodel.RuleVerificationListRowViewModels);
         }
@@ -180,7 +180,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [Test]
         public void VerifyThatRuleIsAddedToViewModel()
         {
-            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri)
             {
@@ -204,7 +204,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [Test]
         public void VerifyThatCreateCommandInvokesNavigationService()
         {
-            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.IsTrue(viewmodel.CreateCommand.CanExecute(null));
             viewmodel.CreateCommand.Execute(null);
@@ -224,7 +224,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             var droptarget = new Mock<IDropTarget>();
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
 
-            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             viewmodel.DragOver(dropinfo.Object);
             droptarget.Verify(x => x.DragOver(dropinfo.Object));
         }
@@ -244,7 +244,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null)}
             });
 
-            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             viewmodel.DragOver(dropinfo.Object);
 
             Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
@@ -262,7 +262,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             var droptarget = new Mock<IDropTarget>();
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
 
-            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             await viewmodel.Drop(dropinfo.Object);
             droptarget.Verify(x => x.Drop(dropinfo.Object));
         }
@@ -282,7 +282,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null)}
             });
 
-            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             await viewmodel.Drop(dropinfo.Object);
 
             Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
@@ -304,7 +304,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             droptarget.Setup(x => x.Drop(dropinfo.Object)).Throws<Exception>();
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
 
-            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             
             Assert.That(viewmodel.Feedback, Is.Null.Or.Empty);
             await viewmodel.Drop(dropinfo.Object);
@@ -320,7 +320,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
                 { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
             });
 
-            var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null);
+            var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -328,11 +328,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null) }
             });
 
-            vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null);
+            vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
-            vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null);
+            vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
@@ -350,7 +350,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             };
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
-            var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null);
+            var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
             
             vm.SelectedThing = null;
             Assert.IsFalse(vm.VerifyRuleVerificationList.CanExecute(null)); 
@@ -371,7 +371,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             };
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
-            var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null);
+            var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
             vm.SelectedThing = vm.RuleVerificationListRowViewModels.FirstOrDefault();
             vm.ComputePermission();
 

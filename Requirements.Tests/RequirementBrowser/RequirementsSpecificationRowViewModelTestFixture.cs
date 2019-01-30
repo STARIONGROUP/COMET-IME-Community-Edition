@@ -94,7 +94,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.req = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.reqSpec.Requirement.Add(this.req);
 
-            this.requirementBrowserViewModel = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            this.requirementBrowserViewModel = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
         }
 
         [TearDown]

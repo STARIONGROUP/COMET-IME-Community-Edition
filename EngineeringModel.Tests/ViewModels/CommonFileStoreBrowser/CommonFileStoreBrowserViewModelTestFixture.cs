@@ -166,7 +166,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatBrowserWorksWithNoStore()
         {
-            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
             Assert.IsEmpty(vm.ContainedRows);
             
@@ -183,7 +183,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatRowsAreCreatedAndAddedCorrectly()
         {
-            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             this.model.CommonFileStore.Add(this.store);
             this.rev.SetValue(this.iteration, 2);
 
@@ -253,7 +253,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.model.CommonFileStore.Add(this.store);
             
             this.fileDialogService.Setup(x => x.GetSaveFileDialog(string.Empty, string.Empty, string.Empty, string.Empty, 1)).Returns("test");
-            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
             Assert.AreEqual(1, vm.ContainedRows.Count);
 

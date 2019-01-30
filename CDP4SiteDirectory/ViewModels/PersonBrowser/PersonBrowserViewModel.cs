@@ -14,6 +14,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -24,7 +25,6 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class PersonBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
     {
-        #region Fields
         /// <summary>
         /// Backing field for <see cref="CanCreatePerson"/>
         /// </summary>
@@ -35,9 +35,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private const string PanelCaption = "Persons";
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonBrowserViewModel"/> class.
         /// </summary>
@@ -50,8 +47,11 @@ namespace CDP4SiteDirectory.ViewModels
         /// The <see cref="IPanelNavigationService"/> that allows to navigate to Panels
         /// </param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public PersonBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public PersonBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
@@ -59,10 +59,7 @@ namespace CDP4SiteDirectory.ViewModels
             this.PersonRowViewModels = new ReactiveList<PersonRowViewModel>();
             this.UpdatePersonRows();
         }
-        #endregion
-
-        #region Properties
-
+        
         /// <summary>
         /// Gets the <see cref="PersonRowViewModel"/> that are contained by the row-view-model
         /// </summary>
@@ -76,7 +73,6 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.canCreatePerson; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreatePerson, value); }
         }
-        #endregion
 
         /// <summary>
         /// Update the person rows

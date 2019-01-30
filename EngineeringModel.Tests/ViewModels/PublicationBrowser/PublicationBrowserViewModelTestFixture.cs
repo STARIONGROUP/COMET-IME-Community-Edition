@@ -158,7 +158,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatRowsAreCreated()
         {
-            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.AreEqual(1, viewmodel.Publications.Count);
             Assert.AreEqual(3, viewmodel.Publications[0].ContainedRows.Count);            
@@ -176,7 +176,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatPublicationRowsAreUpdated()
         {
-            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var newpublication = new Publication(Guid.NewGuid(), null, this.uri);
             this.iteration.Publication.Add(newpublication);
@@ -197,7 +197,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatDomainsAreAdded()
         {
-            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.AreEqual(2, viewmodel.Domains.Count);
 
@@ -216,7 +216,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatParameterRowsAreAddedAndRemoved()
         {
-            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             this.parameter1.ValueSet.First().Published = new ValueArray<string>(new List<string>() { "-" },
                 this.parameter1.ValueSet.First());
@@ -264,7 +264,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public async Task VerifyThatCanPublish()
         {
-            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             this.parameter1.ValueSet.First().Published = new ValueArray<string>(new List<string>() { "-" },
                 this.parameter1.ValueSet.First());
@@ -297,7 +297,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)}
             });
 
-            var vm = new PublicationBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            var vm = new PublicationBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -305,11 +305,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                 {this.iteration, null}
             });
 
-            vm = new PublicationBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            vm = new PublicationBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
-            vm = new PublicationBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            vm = new PublicationBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
     }

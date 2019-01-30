@@ -18,6 +18,7 @@ namespace CDP4EngineeringModel
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ViewModels;
@@ -69,8 +70,11 @@ namespace CDP4EngineeringModel
         /// An instance of <see cref="IDialogNavigationService"/> that orchestrates dialog navigation.
         /// </param>
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/> that handles navigation to dialogs</param>
-        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.openElementDefinitionBrowser = new List<ElementDefinitionsBrowserViewModel>();
             this.openOptionBrowser = new List<OptionBrowserViewModel>();
@@ -495,7 +499,7 @@ namespace CDP4EngineeringModel
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
             }
 
-            browser = new ElementDefinitionsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+            browser = new ElementDefinitionsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.openElementDefinitionBrowser.Add(browser);
             this.PanelNavigationService.Open(browser, false);
@@ -531,7 +535,7 @@ namespace CDP4EngineeringModel
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
             }
 
-            browser = new OptionBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+            browser = new OptionBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.openOptionBrowser.Add(browser);
             this.PanelNavigationService.Open(browser, false);
@@ -567,7 +571,7 @@ namespace CDP4EngineeringModel
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
             }
 
-            browser = new FiniteStateBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+            browser = new FiniteStateBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.finiteStateBrowserViewModel.Add(browser);
             this.PanelNavigationService.Open(browser, false);
@@ -603,7 +607,7 @@ namespace CDP4EngineeringModel
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
             }
 
-            browser = new PublicationBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+            browser = new PublicationBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.publicationBrowserViewModel.Add(browser);
             this.PanelNavigationService.Open(browser, false);

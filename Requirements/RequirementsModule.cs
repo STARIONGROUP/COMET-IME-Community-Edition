@@ -11,6 +11,7 @@ namespace CDP4Requirements
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Requirements.Views;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
@@ -75,6 +76,11 @@ namespace CDP4Requirements
         internal IDialogNavigationService DialogNavigationService { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </summary>
+        internal IPluginSettingsService PluginSettingsService { get; private set; }
+
+        /// <summary>
         /// Initialize the Module
         /// </summary>
         public void Initialize()
@@ -88,7 +94,7 @@ namespace CDP4Requirements
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var requirementRibbonPart = new RequirementRibbonPart(2000, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService);
+            var requirementRibbonPart = new RequirementRibbonPart(2000, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService);
             this.RibbonManager.RegisterRibbonPart(requirementRibbonPart);
         }
     }

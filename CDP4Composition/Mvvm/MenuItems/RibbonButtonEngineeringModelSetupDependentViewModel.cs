@@ -10,12 +10,12 @@ namespace CDP4Composition.Mvvm
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Events;
     using Navigation;
     using Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using ReactiveUI;
 
     /// <summary>
@@ -26,7 +26,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// The Function returning an instance of <see cref="IPanelViewModel"/>
         /// </summary>
-        protected readonly Func<EngineeringModelSetup, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> InstantiatePanelViewModelFunction;
+        protected readonly Func<EngineeringModelSetup, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> InstantiatePanelViewModelFunction;
 
         /// <summary>
         /// Backing field for <see cref="HasSessions"/>
@@ -39,7 +39,7 @@ namespace CDP4Composition.Mvvm
         /// <param name="instantiatePanelViewModelFunction">
         /// The instantiate Panel View Model Function.
         /// </param>
-        protected RibbonButtonEngineeringModelSetupDependentViewModel(Func<EngineeringModelSetup, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> instantiatePanelViewModelFunction)
+        protected RibbonButtonEngineeringModelSetupDependentViewModel(Func<EngineeringModelSetup, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModelFunction)
         {
             this.InstantiatePanelViewModelFunction = instantiatePanelViewModelFunction;
 

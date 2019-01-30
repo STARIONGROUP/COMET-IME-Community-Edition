@@ -17,7 +17,6 @@ namespace BasicRDL.Tests.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
@@ -66,7 +65,7 @@ namespace BasicRDL.Tests.ViewModels
             var filetype = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.srdl.FileType.Add(filetype);
 
-            this.browser = new FileTypeBrowserViewModel(this.session.Object, this.siteDirectory, null, this.panelNavigation.Object, null);
+            this.browser = new FileTypeBrowserViewModel(this.session.Object, this.siteDirectory, null, this.panelNavigation.Object, null, null);
         }
 
         [TearDown]
@@ -108,7 +107,7 @@ namespace BasicRDL.Tests.ViewModels
         public void VerifyThatRdlShortnameIsUpdated()
         {
             this.srdl.FileType.Clear();
-            var vm = new FileTypeBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null);
+            var vm = new FileTypeBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;

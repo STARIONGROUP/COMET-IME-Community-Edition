@@ -85,7 +85,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         [Test]
         public void VerifyThatEventAreCaught()
         {
-            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null);
+            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
 
             revision.SetValue(this.siteDir, 2);
             this.siteDir.Organization.Add(this.orga2);
@@ -111,7 +111,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         [Test]
         public void VerifyStringProperties()
         {
-            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null);
+            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
 
             Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
@@ -120,7 +120,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         [Test]
         public void VerifyThatUpdateOnOrganizationAreCaught()
         {
-            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null);
+            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
 
             this.orga1.Name = "rhea";
 
@@ -137,7 +137,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         [Test]
         public void VerifyThatReactiveCommandCanExecuteProperly()
         {
-            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null);
+            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
             Assert.IsTrue(vm.CreateCommand.CanExecute(null));
             Assert.IsFalse(vm.InspectCommand.CanExecute(null));
             Assert.IsFalse(vm.UpdateCommand.CanExecute(null));
@@ -155,7 +155,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         [Test]
         public void VerifyThatReactiveCommandsOpenDialogsOnExecute()
         {
-            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null);
+            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
             vm.CreateCommand.Execute(null);
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Organization>(), It.IsAny<ThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
 
@@ -176,7 +176,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         [Test]
         public void VerifyThatAnOrganizationCantBeAddedMoreThanOnce()
         {
-            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null);
+            var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
             var organization = new Organization(Guid.NewGuid(), null, this.uri) { Name = "1", ShortName = "1" };
             CDPMessageBus.Current.SendObjectChangeEvent(organization, EventKind.Added);
             CDPMessageBus.Current.SendObjectChangeEvent(organization, EventKind.Added);

@@ -71,7 +71,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             this.amountOfRibbonControls = 8;
             this.order = 1;
 
-            this.ribbonPart = new SiteDirectoryRibbonPart(this.order, this.panelNavigationService.Object, null, null);
+            this.ribbonPart = new SiteDirectoryRibbonPart(this.order, this.panelNavigationService.Object, null, null, null);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>())

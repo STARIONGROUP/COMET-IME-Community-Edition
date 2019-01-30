@@ -15,6 +15,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -24,8 +25,6 @@ namespace BasicRdl.ViewModels
     /// </summary>
     public class FileTypeBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
     {
-        #region Fields
-
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -36,10 +35,6 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private bool canWriteFileType;
 
-        #endregion Fields
-
-        #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FileTypeBrowserViewModel"/> class.
         /// </summary>
@@ -48,18 +43,17 @@ namespace BasicRdl.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public FileTypeBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public FileTypeBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
             this.AddSubscriptions();
         }
-
-        #endregion Constructors
-
-        #region Public properties
-
+        
         /// <summary>
         /// Gets or sets a value indicating if the current person can create, edit or delete a <see cref="FileType"/>
         /// </summary>
@@ -73,10 +67,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="FileTypes"/> rows that are contained by this view-model
         /// </summary>
         public ReactiveList<FileTypeRowViewModel> FileTypes { get; private set; }
-
-        #endregion Public properties
-
-        #region Private Methods
+        
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -161,9 +152,7 @@ namespace BasicRdl.ViewModels
                 }
             }
         }
-        #endregion
 
-        #region Browser Base
         /// <summary>
         /// Loads the <see cref="FileType"/>s from the cache when the browser is instantiated.
         /// </summary>
@@ -216,6 +205,5 @@ namespace BasicRdl.ViewModels
                 fileType.Dispose();
             }
         }
-        #endregion
     }
 }

@@ -17,6 +17,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.OptionBrowser
     using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.ViewModels;
@@ -38,6 +39,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.OptionBrowser
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IPluginSettingsService> pluginSettingsService;
+
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private Mock<IServiceLocator> serviceLocator;
         private Assembler assembler;
@@ -64,6 +67,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.OptionBrowser
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
+
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
 
@@ -71,6 +76,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.OptionBrowser
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.thingDialogNavigationService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(this.panelNavigationService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IDialogNavigationService>()).Returns(this.dialogNavigationService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IPluginSettingsService>()).Returns(this.pluginSettingsService.Object);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
@@ -125,7 +131,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.OptionBrowser
                 this.session.Object,
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
-                this.dialogNavigationService.Object);
+                this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object);
 
             Assert.IsInstanceOf<OptionBrowserViewModel>(viewmodel);
         }

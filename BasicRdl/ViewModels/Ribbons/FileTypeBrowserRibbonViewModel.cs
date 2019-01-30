@@ -11,9 +11,8 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
-    using CDP4Dal.Permission;
-    using BasicRdl.Views;
     using NLog;
 
     /// <summary>
@@ -43,10 +42,10 @@ namespace BasicRdl.ViewModels
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
         /// <returns>An instance of the <see cref="ConstantsBrowserViewModel"/> class</returns>
         public static IPanelViewModel InstantiatePanelViewModel(ISession session,
-            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             var stopWatch = Stopwatch.StartNew();
-            var viewModel = new FileTypeBrowserViewModel(session, session.RetrieveSiteDirectory(), thingDialogNavigationService, panelNavigationService, dialogNavigationService);
+            var viewModel = new FileTypeBrowserViewModel(session, session.RetrieveSiteDirectory(), thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
             stopWatch.Stop();
             Logger.Info("The FileTypeBrowserViewModel opened in {0} [ms]", stopWatch.Elapsed);
             return viewModel;

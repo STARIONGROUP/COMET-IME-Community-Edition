@@ -9,11 +9,10 @@ namespace CDP4Composition.Mvvm
     using System;
     using System.Reactive.Linq;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Composition;    
+    using CDP4Composition;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;
     using Navigation;
     using Navigation.Interfaces;
     using ReactiveUI;
@@ -31,7 +30,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// The Function returning an instance of a <see cref="IPanelViewModel"/>
         /// </summary>
-        private readonly Func<Iteration, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> InstantiatePanelViewModelFunction;
+        private readonly Func<Iteration, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> InstantiatePanelViewModelFunction;
 
         /// <summary>
         /// The backing field for <see cref="Description"/>
@@ -53,7 +52,7 @@ namespace CDP4Composition.Mvvm
         /// The session.
         /// </param>
         /// <param name="instantiatePanelViewModelFunction">The function that creates an instance of the <see cref="IPanelViewModel"/> for this menu-item</param>
-        public RibbonMenuItemIterationDependentViewModel(Iteration iteration, ISession session, Func<Iteration, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> instantiatePanelViewModelFunction)
+        public RibbonMenuItemIterationDependentViewModel(Iteration iteration, ISession session, Func<Iteration, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModelFunction)
             : base("Iteration " + iteration.IterationSetup.IterationNumber, session)
         {
             this.Iteration = iteration;
@@ -125,7 +124,7 @@ namespace CDP4Composition.Mvvm
         /// <returns>An instance of <see cref="IPanelViewModel"/></returns>
         protected override IPanelViewModel InstantiatePanelViewModel()
         {
-            return this.InstantiatePanelViewModelFunction(this.Iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationServive, this.DialogNavigationService);
+            return this.InstantiatePanelViewModelFunction(this.Iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationServive, this.DialogNavigationService, this.PluginSettingsService);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Requirements.Views;
 
@@ -36,7 +37,7 @@ namespace CDP4Requirements.ViewModels
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
         /// <returns>An instance of <see cref="RequirementsBrowserViewModel"/></returns>
-        public static RequirementsBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+        public static RequirementsBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             var model = iteration.Container as EngineeringModel;
             if (model == null)
@@ -44,7 +45,7 @@ namespace CDP4Requirements.ViewModels
                 throw new InvalidOperationException("The container of an Iteration cannot be anything else than an Engineering Model.");
             }
 
-            return new RequirementsBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService);
+            return new RequirementsBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }
 }

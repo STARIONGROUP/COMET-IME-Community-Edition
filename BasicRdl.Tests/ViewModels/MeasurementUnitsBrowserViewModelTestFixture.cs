@@ -69,7 +69,7 @@ namespace BasicRdl.Tests.ViewModels
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.measurementUnitsViewModel = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            this.measurementUnitsViewModel = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace BasicRdl.Tests.ViewModels
             this.siteDir.Model.Add(engineeringModelSetup);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDir.SiteReferenceDataLibrary) { modelReferenceDataLibrary }); 
 
-            var browser = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var browser = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.AreEqual(4, browser.MeasurementUnits.Count);
         }
 
@@ -139,7 +139,7 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyThatAnyUnitCannotBeCreatedWithNonPermissiveService()
         {
             this.session.Setup(x => x.PermissionService).Returns(this.nonpermissivePermissionService.Object);
-            var browser = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var browser = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.IsFalse(browser.CanCreateRdlElement);
 
             Assert.IsFalse(browser.CreateDerivedUnit.CanExecute(null));
@@ -151,7 +151,7 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyThatRdlShortnameIsUpdated()
         {
-            var vm = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var vm = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;

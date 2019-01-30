@@ -15,6 +15,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -24,8 +25,6 @@ namespace BasicRdl.ViewModels
     /// </summary>
     public class ParameterTypesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
     {
-        #region Fields
-
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -40,11 +39,7 @@ namespace BasicRdl.ViewModels
         /// Backing field for the <see cref="ParameterTypes"/> property
         /// </summary>
         private readonly ReactiveList<ParameterTypeRowViewModel> parameterTypes = new ReactiveList<ParameterTypeRowViewModel>();
-
-        #endregion Fields
-
-        #region Constructors
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypesBrowserViewModel"/> class.
         /// </summary>
@@ -53,8 +48,11 @@ namespace BasicRdl.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/> that is used to navigate to a dialog of a specific <see cref="Thing"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/> that is used to navigate to a panel</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/> that is used to navigate to a panel</param>
-        public ParameterTypesBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public ParameterTypesBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
@@ -63,11 +61,7 @@ namespace BasicRdl.ViewModels
 
             this.AddSubscriptions();
         }
-
-        #endregion Constructors
-
-        #region Public properties
-
+        
         /// <summary>
         /// Gets the <see cref="ParameterTypeRowViewModel"/> that are contained by this view-model
         /// </summary>
@@ -143,10 +137,6 @@ namespace BasicRdl.ViewModels
         /// </summary>
         public ReactiveCommand<object> CreateArrayParameterType { get; private set; }
         
-        #endregion Public properties
-
-        #region Methods
-
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -328,7 +318,5 @@ namespace BasicRdl.ViewModels
                 type.Dispose();
             }
         }
-
-        #endregion Methods
     }
 }

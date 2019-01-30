@@ -13,6 +13,7 @@ namespace CDP4SiteDirectory
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ViewModels;
@@ -77,8 +78,8 @@ namespace CDP4SiteDirectory
         /// </param>
         /// <param name="thingDialogNavigationService">The instance of <see cref="IThingDialogNavigationService"/> that orchestrates navigation of <see cref="IThingDialogView"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public SiteDirectoryRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService)
+        public SiteDirectoryRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);            
         }
@@ -134,13 +135,13 @@ namespace CDP4SiteDirectory
                 var session = sessionChange.Session;
                 var siteDirectory = session.RetrieveSiteDirectory();
 
-                this.domainOfExpertiseBrowserViewModel = new DomainOfExpertiseBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.modelBrowserViewModel = new ModelBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.naturalLanguageBrowserViewModel = new NaturalLanguageBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.organizationBrowserViewModel = new OrganizationBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.personBrowserViewModel = new PersonBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.roleBrowserViewModel = new RoleBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
-                this.siteRdlBrowserViewModel = new SiteRdlBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+                this.domainOfExpertiseBrowserViewModel = new DomainOfExpertiseBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService );
+                this.modelBrowserViewModel = new ModelBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.naturalLanguageBrowserViewModel = new NaturalLanguageBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.organizationBrowserViewModel = new OrganizationBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.personBrowserViewModel = new PersonBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.roleBrowserViewModel = new RoleBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.siteRdlBrowserViewModel = new SiteRdlBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
                 this.Session = session;
             }

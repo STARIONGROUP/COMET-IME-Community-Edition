@@ -15,6 +15,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -24,8 +25,6 @@ namespace BasicRdl.ViewModels
     /// </summary>
     public class ReferenceSourceBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
     {
-        #region Fields
-
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -35,9 +34,6 @@ namespace BasicRdl.ViewModels
         /// Backing field for <see cref="CanCreateRdlElement"/>
         /// </summary>
         private bool canCreateRdlElement;
-        #endregion Fields
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceSourceBrowserViewModel"/> class.
@@ -47,8 +43,11 @@ namespace BasicRdl.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public ReferenceSourceBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public ReferenceSourceBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
@@ -57,10 +56,6 @@ namespace BasicRdl.ViewModels
 
             this.AddSubscriptions();
         }
-
-        #endregion Constructors
-
-        #region Public properties
 
         /// <summary>
         /// Gets the <see cref="ReferenceSourceRowViewModel"/> that are contained by this view-model
@@ -75,9 +70,6 @@ namespace BasicRdl.ViewModels
             get { return this.canCreateRdlElement; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value); }
         }
-
-        #endregion Public properties
-        #region Methods
 
         /// <summary>
         /// Initializes the Commands that can be executed from this view model. The commands are initialized
@@ -227,6 +219,5 @@ namespace BasicRdl.ViewModels
                 }
             }
         }
-        #endregion Methods
     }
 }

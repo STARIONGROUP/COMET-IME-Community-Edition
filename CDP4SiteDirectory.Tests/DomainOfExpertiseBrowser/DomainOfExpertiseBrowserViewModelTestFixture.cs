@@ -79,7 +79,7 @@ namespace CDP4SiteDirectory.Tests
         {
             var domainCount = this.siteDir.Domain.Count;
 
-            var vm = new DomainOfExpertiseBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var vm = new DomainOfExpertiseBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.AreEqual(domainCount, vm.DomainOfExpertises.Count);
 
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
@@ -100,7 +100,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyStringProperties()
         {
-            var vm = new DomainOfExpertiseBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var vm = new DomainOfExpertiseBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);

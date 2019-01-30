@@ -75,7 +75,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatSelectedSessionAreDisplayedInPropertyGrid()
         {
-            var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null);
+            var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null, null);
 
             viewmodel.SelectedThing = viewmodel.Roles.First();
             this.navigation.Verify(x => x.Open(It.IsAny<Thing>(), this.session.Object));
@@ -84,7 +84,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null);
+            var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null, null);
             
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
@@ -102,7 +102,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatNewRolesAreAdded()
         {
-            var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null);
+            var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null, null);
             var newPersonRole = new PersonRole(Guid.NewGuid(), null, this.uri);
             var newParticipantRole = new ParticipantRole(Guid.NewGuid(), null, this.uri);
 

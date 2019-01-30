@@ -17,6 +17,7 @@ namespace CDP4ParameterSheetGenerator
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4OfficeInfrastructure;    
@@ -25,7 +26,6 @@ namespace CDP4ParameterSheetGenerator
     using NetOffice.ExcelApi;
     using NLog;
     using ReactiveUI;
-    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// The purpose of the <see cref="ParameterSheetGeneratorRibbonPart"/> class is to describe and provide a part of the Fluent Ribbon
@@ -63,11 +63,14 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="dialogNavigationService">
         /// The instance of <see cref="IDialogNavigationService"/> that orchestrates navigation to dialogs
         /// </param>
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
         /// <param name="officeApplicationWrapper">
         /// The instance of <see cref="IOfficeApplicationWrapper"/> that provides access to the loaded Office application.
-        /// </param>
-        public ParameterSheetGeneratorRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IOfficeApplicationWrapper officeApplicationWrapper)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService)
+        /// </param>        
+        public ParameterSheetGeneratorRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.ExcelQuery = new ExcelQuery();
             this.officeApplicationWrapper = officeApplicationWrapper;

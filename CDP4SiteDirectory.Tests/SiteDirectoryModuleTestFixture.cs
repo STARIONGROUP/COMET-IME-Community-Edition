@@ -40,7 +40,7 @@ namespace CDP4SiteDirectory.Tests
         {
             var ribbonManager = new FluentRibbonManager();
 
-            var module = new SiteDirectoryModule(this.regionManager.Object, ribbonManager, this.panelNavigationService.Object, null, null);
+            var module = new SiteDirectoryModule(this.regionManager.Object, ribbonManager, this.panelNavigationService.Object, null, null, null);
             Assert.AreEqual(this.regionManager.Object, module.RegionManager);
         }
     }

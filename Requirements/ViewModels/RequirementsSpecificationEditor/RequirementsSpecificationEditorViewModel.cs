@@ -19,10 +19,10 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Requirements.ViewModels.RequirementsSpecificationEditor;
-
     using ReactiveUI;
 
     /// <summary>
@@ -30,7 +30,6 @@ namespace CDP4Requirements.ViewModels
     /// </summary>
     public class RequirementsSpecificationEditorViewModel : BrowserViewModelBase<RequirementsSpecification>, IPanelViewModel
     {
-        #region Fields
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
         /// </summary>
@@ -66,8 +65,6 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         protected static readonly IComparer<IRowViewModelBase<Thing>> ContainedRowsComparer = new RequirementSpecificationContentComparer();
         
-        #endregion
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementsSpecificationEditorViewModel"/> class
         /// </summary>
@@ -76,8 +73,8 @@ namespace CDP4Requirements.ViewModels
         /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public RequirementsSpecificationEditorViewModel(RequirementsSpecification thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        public RequirementsSpecificationEditorViewModel(RequirementsSpecification thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}: {1}", PanelCaption, this.Thing.ShortName);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
@@ -97,9 +94,7 @@ namespace CDP4Requirements.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-
-        #region Properties
-
+        
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
@@ -131,8 +126,7 @@ namespace CDP4Requirements.ViewModels
         /// Gets or sets the Contained <see cref="IRowViewModelBase{T}"/>
         /// </summary>
         public ReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
-        #endregion
-
+        
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>

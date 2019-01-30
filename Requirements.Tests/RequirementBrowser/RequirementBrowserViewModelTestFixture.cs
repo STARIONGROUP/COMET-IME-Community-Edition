@@ -102,7 +102,7 @@ namespace CDP4Requirements.Tests.Panels
         public void VerifyThatRequirementSpecificationMayBeAddedOrRemoved()
         {
             var revision = typeof (Thing).GetProperty("RevisionNumber");
-            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null);
+            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
 
             Assert.AreEqual(1, vm.ReqSpecificationRows.Count);
 
@@ -123,7 +123,7 @@ namespace CDP4Requirements.Tests.Panels
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual(1, vm.ReqSpecificationRows.Count);
             Assert.AreEqual(this.participant, vm.ActiveParticipant);
             Assert.AreEqual("Requirements, iteration_0", vm.Caption);
@@ -140,7 +140,7 @@ namespace CDP4Requirements.Tests.Panels
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
             });
 
-            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("test []", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -148,7 +148,7 @@ namespace CDP4Requirements.Tests.Panels
                 {this.iteration, null}
             });
 
-            vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
@@ -160,7 +160,7 @@ namespace CDP4Requirements.Tests.Panels
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
             });
 
-            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null);
+            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
             var reqSpecRow = vm.ReqSpecificationRows.Single();
 
             vm.SelectedThing = reqSpecRow;

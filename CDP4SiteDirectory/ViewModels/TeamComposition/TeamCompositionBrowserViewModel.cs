@@ -14,6 +14,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -24,7 +25,6 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class TeamCompositionBrowserViewModel : BrowserViewModelBase<EngineeringModelSetup>, IPanelViewModel
     {
-        #region Fields
         /// <summary>
         /// Backing field for the <see cref="CurrentModel"/> property.
         /// </summary>
@@ -45,9 +45,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private const string PanelCaption = "Team composition";
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="TeamCompositionBrowserViewModel"/> class
         /// </summary>
@@ -67,15 +64,18 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="dialogNavigationService">
         /// The <see cref="IDialogNavigationService"/>
         /// </param>
-        public TeamCompositionBrowserViewModel(EngineeringModelSetup thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+
+        public TeamCompositionBrowserViewModel(EngineeringModelSetup thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
 
             this.participants.ChangeTrackingEnabled = true;
         }
-        #endregion
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser

@@ -4,6 +4,8 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
+using CDP4Composition.PluginSettingService;
+
 namespace CDP4Composition.Mvvm
 {
     using System;
@@ -39,19 +41,24 @@ namespace CDP4Composition.Mvvm
         private readonly CamelCaseToSpaceConverter camelCaseToSpaceConverter = new CamelCaseToSpaceConverter();
 
         /// <summary>
-        /// The <see cref="IThingDialogNavigationService"/> used to navigate to <see cref="IThingDialogViewModel"/>s
+        /// The <see cref="IThingDialogNavigationService"/> used to navigate to <see cref="IThingDialogViewModel"/>s of a specific <see cref="Thing"/>
         /// </summary>
         private readonly IThingDialogNavigationService thingDialogNavigationService;
 
         /// <summary>
-        /// The <see cref="IPanelNavigationService"/>
+        /// The <see cref="IPanelNavigationService"/> used to navigate to a Panel
         /// </summary>
         private readonly IPanelNavigationService panelNavigationService;
 
         /// <summary>
-        /// The <see cref="IDialogNavigationService"/>
+        /// The <see cref="IDialogNavigationService"/> used to navigate to a dialog view-model
         /// </summary>
         private readonly IDialogNavigationService dialogNavigationService;
+
+        /// <summary>
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files
+        /// </summary>
+        private readonly IPluginSettingsService pluginSettingsService;
 
         /// <summary>
         /// Backing field for <see cref="SelectedThing"/>
@@ -119,12 +126,25 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModelBase{T}"/> class
         /// </summary>
-        /// <param name="thing">The <see cref="Thing"/> that contains the data to browse</param>
-        /// <param name="session">The session</param>
-        /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
-        /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
-        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        protected BrowserViewModelBase(T thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+        /// <param name="thing">
+        /// The <see cref="Thing"/> that contains the data to browse.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> that manages the current view-model.
+        /// </param>
+        /// <param name="thingDialogNavigationService">
+        /// The <see cref="IThingDialogNavigationService"/> used to navigate to <see cref="IThingDialogViewModel"/>s of a specific <see cref="Thing"/>
+        /// </param>
+        /// <param name="panelNavigationService">
+        /// The <see cref="IPanelNavigationService"/> used to navigate to a Panel
+        /// </param>
+        /// <param name="dialogNavigationService">
+        /// The <see cref="IDialogNavigationService"/> used to navigate to a dialog view-model
+        /// </param>
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        protected BrowserViewModelBase(T thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(thing, session)
         {
             this.Identifier = Guid.NewGuid();
@@ -132,6 +152,7 @@ namespace CDP4Composition.Mvvm
             this.thingDialogNavigationService = thingDialogNavigationService;
             this.panelNavigationService = panelNavigationService;
             this.dialogNavigationService = dialogNavigationService;
+            this.pluginSettingsService = pluginSettingsService;
             
             var defaultThingClassKind = this.GetDefaultThingClassKind();
             this.SelectedThingClassKindString = this.camelCaseToSpaceConverter.Convert(defaultThingClassKind, null, null, null).ToString();
@@ -222,6 +243,14 @@ namespace CDP4Composition.Mvvm
         public IThingDialogNavigationService ThingDialogNavigationService
         {
             get { return this.thingDialogNavigationService; }
+        }
+
+        /// <summary>
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files
+        /// </summary>
+        public IPluginSettingsService PluginSettingsService
+        {
+            get { return this.pluginSettingsService; }
         }
 
         /// <summary>

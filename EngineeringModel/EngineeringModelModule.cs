@@ -11,6 +11,7 @@ namespace CDP4EngineeringModel
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.Views;
     using Microsoft.Practices.Prism.Modularity;
@@ -49,13 +50,14 @@ namespace CDP4EngineeringModel
         /// The (MEF injected) instance of <see cref="IThingDialogNavigationService"/>
         /// </param>
         [ImportingConstructor]
-        public EngineeringModelModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService)
+        public EngineeringModelModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             this.regionManager = regionManager;
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
             this.DialogNavigationService = dialogNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
+            this.PluginSettingsService = pluginSettingsService;
         }
 
         /// <summary>
@@ -77,6 +79,11 @@ namespace CDP4EngineeringModel
         /// Gets the <see cref="IThingDialogNavigationService"/> that handles navigation to dialogs
         /// </summary>
         internal IThingDialogNavigationService ThingDialogNavigationService { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </summary>
+        internal IPluginSettingsService PluginSettingsService { get; private set; }
 
         /// <summary>
         /// Initialize the <see cref="EngineeringModelModule"/> by registering the <see cref="Region"/>s and the <see cref="RibbonPart"/>s
@@ -108,7 +115,7 @@ namespace CDP4EngineeringModel
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new EngineeringModelRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService);
+            var rdlRibbonPart = new EngineeringModelRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }

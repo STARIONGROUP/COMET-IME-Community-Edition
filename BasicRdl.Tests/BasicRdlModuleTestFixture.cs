@@ -6,20 +6,12 @@
 
 namespace BasicRdl.Tests
 {
-    using System;
-    using System.Windows;
-
-    using BasicRdl.Views;
-
     using CDP4Composition;
     using CDP4Composition.Navigation;
-
-    using Microsoft.Practices.Prism.MefExtensions;
+    using CDP4Composition.PluginSettingService;
     using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
-
     using Moq;
-
     using NUnit.Framework;
 
     /// <summary>
@@ -31,6 +23,7 @@ namespace BasicRdl.Tests
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IRegionManager> regionManager;
         private Mock<IPanelNavigationService> panelNavigationService;
+        private Mock<IPluginSettingsService> pluginSettingsService;
 
         [SetUp]
         public void SetUp()
@@ -52,7 +45,7 @@ namespace BasicRdl.Tests
         {
             var ribbonManager = new FluentRibbonManager();
 
-            var module = new BasicRdlModule(this.regionManager.Object, ribbonManager, this.panelNavigationService.Object, null, null);
+            var module = new BasicRdlModule(this.regionManager.Object, ribbonManager, this.panelNavigationService.Object, null, null, null);
             //module.Initialize();
             Assert.AreEqual(this.regionManager.Object, module.RegionManager);            
         }

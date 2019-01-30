@@ -21,6 +21,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -89,7 +90,7 @@ namespace CDP4ProductTree.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Product tree";
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductTreeViewModel"/> class
         /// </summary>
@@ -98,8 +99,11 @@ namespace CDP4ProductTree.ViewModels
         /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public ProductTreeViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public ProductTreeViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);

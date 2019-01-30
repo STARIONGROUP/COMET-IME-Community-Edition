@@ -22,6 +22,7 @@ namespace CDP4Requirements
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using NLog;
@@ -59,8 +60,11 @@ namespace CDP4Requirements
         /// <param name="thingDialogNavigationService">
         /// The <see cref="IThingDialogNavigationService"/> that handles navigation to dialogs
         /// </param>
-        public RequirementRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public RequirementRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.openRequirementBrowser = new List<RequirementsBrowserViewModel>();
             this.Iterations = new List<Iteration>();
@@ -348,7 +352,7 @@ namespace CDP4Requirements
                 return;
             }
 
-            browser = new RequirementsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+            browser = new RequirementsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.openRequirementBrowser.Add(browser);
             this.PanelNavigationService.Open(browser, false);

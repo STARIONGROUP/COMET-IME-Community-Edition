@@ -94,7 +94,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);            
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.CurrentModel, Is.Not.Null.Or.Empty);
@@ -105,7 +105,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [Test]
         public void VerifyThatTreeIsBuiltCorrectly()
         {
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             Assert.IsNotEmpty(viewmodel.FiniteStateList);
 
             var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
@@ -153,7 +153,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)}
             });
 
-            var vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            var vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -161,11 +161,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
                 {this.iteration, null}
             });
 
-            vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
-            vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
@@ -191,7 +191,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             this.iteration.ActualFiniteStateList.Add(actualList);
 
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             
             // no row selected
             viewmodel.ComputePermission();
@@ -234,7 +234,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             this.iteration.ActualFiniteStateList.Add(actualList);
 
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
@@ -258,7 +258,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [Test]
         public void VerifyThatDisposeWorks()
         {
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             viewmodel.Dispose();
 
             Assert.IsNull(viewmodel.Thing);

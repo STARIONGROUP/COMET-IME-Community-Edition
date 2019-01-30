@@ -8,18 +8,15 @@ namespace CDP4Composition.Mvvm
 {
     using System;
     using System.Linq;
-    using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Operations;
-
-    using NLog;
     using ReactiveUI;
 
     /// <summary>
@@ -52,7 +49,6 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         private bool canCreateEngineeringModelDataNote;
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ModellingThingBrowserViewModelBase"/> class
         /// </summary>
@@ -61,11 +57,13 @@ namespace CDP4Composition.Mvvm
         /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        protected ModellingThingBrowserViewModelBase(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        protected ModellingThingBrowserViewModelBase(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
         }
-        #endregion
 
         /// <summary>
         /// The applied annotations menu group

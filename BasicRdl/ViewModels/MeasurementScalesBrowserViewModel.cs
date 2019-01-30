@@ -15,6 +15,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -24,8 +25,6 @@ namespace BasicRdl.ViewModels
     /// </summary>
     public class MeasurementScalesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
     {
-        #region Fields
-
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -40,9 +39,6 @@ namespace BasicRdl.ViewModels
         /// Backing field for the <see cref="MeasurementScales"/> property.
         /// </summary>
         private readonly ReactiveList<MeasurementScaleRowViewModel> measurementScales = new ReactiveList<MeasurementScaleRowViewModel>();
-        #endregion Fields
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeasurementScalesBrowserViewModel"/> class.
@@ -52,8 +48,11 @@ namespace BasicRdl.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/> that is used to navigate to a dialog of a specific <see cref="Thing"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/> that is used to navigate to a panel</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/> that is used to navigate to a dialog</param>
-        public MeasurementScalesBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public MeasurementScalesBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
@@ -62,11 +61,7 @@ namespace BasicRdl.ViewModels
 
             this.AddSubscriptions();
         }
-
-        #endregion Constructors
-
-        #region Public properties
-
+        
         /// <summary>
         /// Gets the <see cref="MeasurementScaleRowViewModel"/> that are contained by this view-model
         /// </summary>
@@ -111,11 +106,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CyclicRatioScale"/>
         /// </summary>
         public ReactiveCommand<object> CreateCyclicRatioScale { get; private set; } 
-
-        #endregion Public properties
-
-        #region Methods
-
+        
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -273,6 +264,5 @@ namespace BasicRdl.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Ordinal Scale", "", this.CreateOrdinalScale, MenuItemKind.Create, ClassKind.OrdinalScale));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Ratio Scale", "", this.CreateRatioScale, MenuItemKind.Create, ClassKind.RatioScale));
         }
-        #endregion
     }
 }

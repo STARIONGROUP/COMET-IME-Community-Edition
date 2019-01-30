@@ -84,7 +84,7 @@ namespace CDP4SiteDirectory.Tests.ViewModels
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewmodel = new NaturalLanguageBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var viewmodel = new NaturalLanguageBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.AreEqual(1, viewmodel.NaturalLanguageRowViewModels.Count);
             Assert.IsTrue(viewmodel.Caption.Contains(viewmodel.Thing.Name));
             Assert.IsTrue(viewmodel.ToolTip.Contains(viewmodel.Thing.IDalUri.ToString()));

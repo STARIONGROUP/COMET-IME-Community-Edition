@@ -132,7 +132,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         public void VerifyThatRelationsBrowserIsCreated()
         {
             var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object,
-                                                             this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+                                                             this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.AreEqual(2, viewmodel.RelationshipTypes.Count);
             
@@ -146,7 +146,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatBinaryRelationshipsAreAddedModifiedRemoved()
         {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             //Add relationship1 and relationship2
             var relationship = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = this.elementDefinition1, Target = this.elementDefinition2, Owner = this.domain };
@@ -189,7 +189,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatMultiRelationshipsAreAddedModifiedRemoved()
         {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             //Add relationship1 and relationship2 and relationship3
             var relationship = new MultiRelationship(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, ModifiedOn = DateTime.Now };
@@ -234,7 +234,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatCreateBinaryRelationshipWorks()
         {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             var creator = viewmodel.RelationshipCreator.BinaryRelationshipCreator;
 
             var dropinfo = new Mock<IDropInfo>();
@@ -263,7 +263,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatCreateMultiRelationshipWorks()
         {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             viewmodel.RelationshipCreator.SelectedRelationshipCreator = viewmodel.RelationshipCreator.MultiRelationshipCreator;
             var creator = viewmodel.RelationshipCreator.MultiRelationshipCreator;
 

@@ -10,6 +10,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
 
     /// <summary>
@@ -42,12 +43,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="dialogNavigationService">
         /// The dialog Navigation Service.
         /// </param>
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
         /// <returns>
         /// An instance of <see cref="CommonFileStoreBrowserViewModel"/>
         /// </returns>
-        public static CommonFileStoreBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+        public static CommonFileStoreBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            return new CommonFileStoreBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService);
+            return new CommonFileStoreBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }
 }

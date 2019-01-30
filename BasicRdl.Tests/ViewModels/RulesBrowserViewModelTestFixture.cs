@@ -71,7 +71,7 @@ namespace BasicRdl.Tests.ViewModels
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.RulesViewModel = new RulesBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            this.RulesViewModel = new RulesBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
         }
 
         /// <summary>
@@ -133,14 +133,14 @@ namespace BasicRdl.Tests.ViewModels
             this.siteDir.Model.Add(engineeringModelSetup);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDir.SiteReferenceDataLibrary) { modelReferenceDataLibrary });     
 
-            var browser = new RulesBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var browser = new RulesBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.AreEqual(4, browser.Rules.Count);
         }
 
         [Test]
         public void VerifyThatRdlShortnameIsUpdated()
         {
-            var vm = new RulesBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var vm = new RulesBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;

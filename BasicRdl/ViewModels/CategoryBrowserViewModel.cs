@@ -17,6 +17,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -40,8 +41,7 @@ namespace BasicRdl.ViewModels
         /// Backing field for <see cref="CanCreateRdlElement"/>
         /// </summary>
         private bool canCreateRdlElement;
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="CategoryBrowserViewModel"/> class
         /// </summary>
@@ -50,17 +50,17 @@ namespace BasicRdl.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IDialogNavigationService"/> that is used to navigate to a dialog of a specific <see cref="Thing"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/> that is used to navigate to a panel</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/> that is used to navigate to a dialog</param>
-        public CategoryBrowserViewModel(ISession session, SiteDirectory thing, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public CategoryBrowserViewModel(ISession session, SiteDirectory thing, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
 
             this.AddSubscriptions();            
         }
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets the rows representing <see cref="Category"/>
@@ -86,7 +86,6 @@ namespace BasicRdl.ViewModels
             get { return this.canCreateRdlElement; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value); }
         }
-        #endregion
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -155,7 +154,6 @@ namespace BasicRdl.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Highlight", "", this.HighlightCommand, MenuItemKind.Highlight));
         }
 
-        #region Private Methods
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -250,6 +248,5 @@ namespace BasicRdl.ViewModels
             // highlight the selected thing
             CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.SelectedThing.Thing as Category), this.SelectedThing.Thing);
         }
-        #endregion
     }
 }

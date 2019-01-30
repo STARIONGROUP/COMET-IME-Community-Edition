@@ -74,7 +74,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyPanelProperties()
         {
-            var browser = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null);
+            var browser = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
             Assert.AreEqual("Persons, site directory", browser.Caption);
             Assert.AreEqual("site directory\nhttp://www.rheagroup.com/\n ", browser.ToolTip);
             Assert.AreEqual(1, browser.PersonRowViewModels.Count);
@@ -84,7 +84,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatEventAreCaught()
         {
-            var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null);
+            var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
             var pers = new Person(Guid.NewGuid(), this.cache, this.uri) { ShortName = "new" };
             this.siteDir.Person.Add(pers);
 
@@ -103,7 +103,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatExecuteCreateWorks()
         {
-            var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null);
+            var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
             vm.CreateCommand.Execute(null);
 
             this.navigation.Verify(x => x.Navigate(It.IsAny<Person>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.navigation.Object, It.IsAny<Thing>(), null));
@@ -112,7 +112,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatEditCommandWorks()
         {
-            var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null);
+            var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
             vm.SelectedThing = vm.PersonRowViewModels.First();
 
             vm.UpdateCommand.Execute(null);

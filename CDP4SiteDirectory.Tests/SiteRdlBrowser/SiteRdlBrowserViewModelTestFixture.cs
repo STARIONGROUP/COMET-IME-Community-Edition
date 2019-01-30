@@ -81,7 +81,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         [Test]
         public void VerifyThatRowsArePopulated()
         {
-            var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.AreEqual(3, viewModel.SiteRdls.Count);
             Assert.That(viewModel.Caption, Is.Not.Null.Or.Empty);
             Assert.That(viewModel.ToolTip, Is.Not.Null.Or.Empty);
@@ -90,7 +90,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         [Test]
         public void VerifyThatEventAreCaught()
         {
-            var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             
             var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), null, this.uri) { Name = "rdl0", ShortName = "0", Container = this.siteDir};
             
@@ -112,7 +112,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         [Test]
         public void VerifyThatDiposeWorks()
         {
-            var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             viewModel.Dispose();
 
             Assert.IsNull(viewModel.Thing);
@@ -124,7 +124,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
             this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<SiteDirectory>())).Returns(true);
-            var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, this.thingDialogNavigationService.Object, null, null);
+            var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, this.thingDialogNavigationService.Object, null, null, null);
 
             viewModel.ComputePermission();
             Assert.IsTrue(viewModel.CanCreateSiteRdl);

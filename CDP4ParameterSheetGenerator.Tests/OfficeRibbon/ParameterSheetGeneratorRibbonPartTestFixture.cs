@@ -18,6 +18,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
@@ -54,6 +55,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPermissionService> permittingPermissionService;
+        private Mock<IPluginSettingsService> pluginSettingsService;
         
         private Mock<IOfficeApplicationWrapper> officeApplicationWrapper;        
         private Mock<IExcelQuery> excelQuery;
@@ -102,10 +104,12 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             this.permittingPermissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permittingPermissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
+
             this.amountOfRibbonControls = 10;
             this.order = 1;
 
-            this.ribbonPart = new ParameterSheetGeneratorRibbonPart(this.order, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.officeApplicationWrapper.Object);
+            this.ribbonPart = new ParameterSheetGeneratorRibbonPart(this.order, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingsService.Object, this.officeApplicationWrapper.Object);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>())

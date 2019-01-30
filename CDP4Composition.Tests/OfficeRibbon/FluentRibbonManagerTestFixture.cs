@@ -15,6 +15,7 @@ namespace CDP4Composition.Tests
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal.Permission;
     using Moq;
     using NUnit.Framework;
@@ -43,7 +44,7 @@ namespace CDP4Composition.Tests
 
             this.nonexsitingribbonpartid = "a non exsting control";
 
-            this.ribbonPart = new RibbonPartTest(1, this.panelNavigationService.Object, null, null);
+            this.ribbonPart = new RibbonPartTest(1, this.panelNavigationService.Object, null, null, null);
             this.fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);            
         }
 
@@ -289,8 +290,8 @@ namespace CDP4Composition.Tests
     /// </summary>
     internal class RibbonPartTest : RibbonPart
     {
-        internal RibbonPartTest(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService)
+        internal RibbonPartTest(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
         }
 

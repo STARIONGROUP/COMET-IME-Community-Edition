@@ -18,6 +18,7 @@ namespace CDP4ProductTree
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ViewModels;
@@ -54,8 +55,11 @@ namespace CDP4ProductTree
         /// An instance of <see cref="IDialogNavigationService"/> that orchestrates dialog navigation.
         /// </param>
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/> that handles navigation to dialogs</param>
-        public ProductTreeRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public ProductTreeRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.openProductTree = new List<ProductTreeViewModel>();
             this.Iterations = new List<Iteration>();
@@ -334,7 +338,7 @@ namespace CDP4ProductTree
                 return;
             }
 
-            browser = new ProductTreeViewModel(option, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService);
+            browser = new ProductTreeViewModel(option, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.openProductTree.Add(browser);
             this.PanelNavigationService.Open(browser, false);

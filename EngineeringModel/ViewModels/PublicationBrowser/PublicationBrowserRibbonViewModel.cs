@@ -10,6 +10,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
 
     /// <summary>
@@ -32,10 +33,13 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
         /// <returns>An instance of <see cref="PublicationBrowserViewModel"/></returns>
-        public static PublicationBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+        public static PublicationBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            return new PublicationBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService);
+            return new PublicationBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }
 }

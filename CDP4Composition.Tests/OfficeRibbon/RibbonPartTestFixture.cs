@@ -10,11 +10,11 @@ namespace CDP4Composition.Tests
     using System.Reflection;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal.Permission;
     using Moq;
     using NUnit.Framework;
     
-
     /// <summary>
     /// Suite of tests for the <see cref="RibbonPart"/> class
     /// </summary>
@@ -39,7 +39,7 @@ namespace CDP4Composition.Tests
         [Test]
         public void VerifyThatTheExpectedRibbonXmlIsReturned()
         {
-            var ribbonPart = new RibbonPartTesting(this.order, this.panelNavigationService.Object, null, null);
+            var ribbonPart = new RibbonPartTesting(this.order, this.panelNavigationService.Object, null, null, null);
             Assert.AreEqual(this.order, ribbonPart.Order);
             Assert.AreEqual(this.ribbonXml, ribbonPart.RibbonXml);
         }
@@ -47,7 +47,7 @@ namespace CDP4Composition.Tests
         [Test]
         public void VerifyThatDefaultValueIsReturnedForMethodsThatAreNotOverriden()
         {
-            var ribbonPart = new RibbonPartTesting(this.order, this.panelNavigationService.Object, null, null);
+            var ribbonPart = new RibbonPartTesting(this.order, this.panelNavigationService.Object, null, null, null);
 
             Assert.DoesNotThrow(() => ribbonPart.OnAction("testId"));
 
@@ -83,8 +83,8 @@ namespace CDP4Composition.Tests
 
     internal class RibbonPartTesting : RibbonPart
     {
-        internal RibbonPartTesting(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService)
+        internal RibbonPartTesting(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
         }
 

@@ -15,6 +15,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -34,7 +35,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private const string PanelCaption = "Organizations";
 
-        #region constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="OrganizationBrowserViewModel"/> class
         /// </summary>
@@ -43,8 +43,11 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/> that allows to navigate to <see cref="Thing"/> dialog view models</param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/> that allows to navigate to Panels</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public OrganizationBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public OrganizationBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
@@ -52,9 +55,6 @@ namespace CDP4SiteDirectory.ViewModels
             this.Organizations = new ReactiveList<OrganizationRowViewModel>();
             this.ComputeOrganizationRows();
         }
-        #endregion
-
-        #region public properties
 
         /// <summary>
         /// Gets the List of <see cref="OrganizationRowViewModel"/>
@@ -69,9 +69,7 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.canCreateOrganization; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateOrganization, value); }
         }
-        #endregion
 
-        #region Private Methods
         /// <summary>
         /// Update the Organization rows
         /// </summary>
@@ -163,9 +161,7 @@ namespace CDP4SiteDirectory.ViewModels
                 row.Dispose();
             }
         }
-        #endregion
 
-        #region Override Region
         /// <summary>
         /// Initialize the <see cref="ReactiveCommand"/>s of the current view-model
         /// </summary>
@@ -223,6 +219,5 @@ namespace CDP4SiteDirectory.ViewModels
                 organization.Dispose();
             }
         }
-        #endregion
     }
 }

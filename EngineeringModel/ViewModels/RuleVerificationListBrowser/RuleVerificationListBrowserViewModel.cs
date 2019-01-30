@@ -20,6 +20,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -88,8 +89,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="dialogNavigationService">
         /// The dialog navigation service.
         /// </param>
-        public RuleVerificationListBrowserViewModel(Iteration iteration, Participant participant, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        public RuleVerificationListBrowserViewModel(Iteration iteration, Participant participant, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             if (participant == null)
             {

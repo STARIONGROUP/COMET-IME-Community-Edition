@@ -12,6 +12,7 @@ namespace CDP4BuiltInRules.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using NLog;
     using ReactiveUI;
@@ -47,10 +48,10 @@ namespace CDP4BuiltInRules.ViewModels
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
         /// <returns>An instance of the <see cref="ErrorBrowserBrowserViewModel"/> class</returns>
-        public static IPanelViewModel InstantiatePanelViewModel(ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+        public static IPanelViewModel InstantiatePanelViewModel(ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             var stopWatch = Stopwatch.StartNew();
-            var viewModel = new ErrorBrowserViewModel(session, session.RetrieveSiteDirectory(), thingDialogNavigationService, panelNavigationService, dialogNavigationService);
+            var viewModel = new ErrorBrowserViewModel(session, session.RetrieveSiteDirectory(), thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
             stopWatch.Stop();
             Logger.Info("The ErrorBrowserViewModel opened in {0} [ms]", stopWatch.Elapsed);
             return viewModel;

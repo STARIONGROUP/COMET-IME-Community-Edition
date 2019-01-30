@@ -24,6 +24,7 @@ namespace CDP4RelationshipEditor.ViewModels
     using CDP4Composition.Mvvm.Behaviours;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using Controls;
@@ -89,8 +90,8 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </param>
         /// <param name="thingDialogNavigationService"></param>
         /// <param name="panelNavigationService">The panel navigation service.</param>
-        public RelationshipEditorViewModel(Iteration thing, Participant participant, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        public RelationshipEditorViewModel(Iteration thing, Participant participant, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);

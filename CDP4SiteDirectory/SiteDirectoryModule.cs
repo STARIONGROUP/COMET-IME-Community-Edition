@@ -11,6 +11,7 @@ namespace CDP4SiteDirectory
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal.Permission;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
@@ -48,6 +49,11 @@ namespace CDP4SiteDirectory
         internal IDialogNavigationService DialogNavigationService { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </summary>
+        internal IPluginSettingsService PluginSettingsService { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SiteDirectoryModule"/> class.
         /// </summary>
         /// <param name="regionManager">
@@ -63,13 +69,14 @@ namespace CDP4SiteDirectory
         /// <param name="thingDialogNavigationService">The MEF injected instance of <see cref="IThingDialogNavigationService"/></param>
         /// <param name="dialogNavigationService">The MEF injected instance of <see cref="IDialogNavigationService"/></param>
         [ImportingConstructor]
-        public SiteDirectoryModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService)
+        public SiteDirectoryModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             this.RegionManager = regionManager;
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.DialogNavigationService = dialogNavigationService;
+            this.PluginSettingsService = pluginSettingsService;
         }
 
         /// <summary>
@@ -98,7 +105,7 @@ namespace CDP4SiteDirectory
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new SiteDirectoryRibbonPart(30, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService);
+            var rdlRibbonPart = new SiteDirectoryRibbonPart(30, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, this.PluginSettingsService);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }

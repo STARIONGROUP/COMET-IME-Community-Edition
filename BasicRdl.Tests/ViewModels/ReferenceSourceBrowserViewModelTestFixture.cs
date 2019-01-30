@@ -15,6 +15,7 @@ namespace BasicRDL.Tests.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
@@ -32,6 +33,7 @@ namespace BasicRDL.Tests.ViewModels
         private Mock<IThingDialogNavigationService> dialogNavigation;
         private Mock<IPanelNavigationService> navigation;
         private Mock<IPermissionService> permissionService;
+        private Mock<IPluginSettingsService> pluginSettingsService;
         private Uri uri;
         private SiteDirectory siteDirectory;
         private ReferenceSourceBrowserViewModel browser;
@@ -52,6 +54,7 @@ namespace BasicRDL.Tests.ViewModels
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
 
             this.uri = new Uri("http://www.rheagroup.com");
             this.assembler = new Assembler(this.uri);
@@ -65,7 +68,7 @@ namespace BasicRDL.Tests.ViewModels
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
-            this.browser = new ReferenceSourceBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigation.Object, this.navigation.Object, null);
+            this.browser = new ReferenceSourceBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigation.Object, this.navigation.Object, null, this.pluginSettingsService.Object);
         }
 
         [TearDown]
@@ -145,14 +148,14 @@ namespace BasicRDL.Tests.ViewModels
             this.openRdlList = new List<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary) { modelReferenceDataLibrary };
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.openRdlList));
 
-            var browser = new ReferenceSourceBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null);
+            var browser = new ReferenceSourceBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
             Assert.AreEqual(4, browser.ReferenceSources.Count);
         }
 
         [Test]
         public void VerifyThatRdlShortnameIsUpdated()
         {
-            var vm = new ReferenceSourceBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null);
+            var vm = new ReferenceSourceBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;

@@ -66,7 +66,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         [Test]
         public void VerifyThatInstantiateWorks()
         {
-            var vm = SiteRdlBrowserRibbonViewModel.InstantiatePanelViewModel(this.session.Object, null, null, null);
+            var vm = SiteRdlBrowserRibbonViewModel.InstantiatePanelViewModel(this.session.Object, null, null, null, null);
             Assert.IsNotNull(vm);
         }
     }

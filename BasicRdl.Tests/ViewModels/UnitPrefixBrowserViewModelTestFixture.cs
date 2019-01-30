@@ -65,7 +65,7 @@ namespace BasicRDL.Tests.ViewModels
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
-            this.browser = new UnitPrefixBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigation.Object, this.navigation.Object, null);
+            this.browser = new UnitPrefixBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigation.Object, this.navigation.Object, null, null);
         }
 
         [TearDown]
@@ -145,14 +145,14 @@ namespace BasicRDL.Tests.ViewModels
             this.openRdlList = new List<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary) { modelReferenceDataLibrary };
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.openRdlList));
 
-            var browser = new UnitPrefixBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null);
+            var browser = new UnitPrefixBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
             Assert.AreEqual(4, browser.UnitPrefixes.Count);
         }
 
         [Test]
         public void VerifyThatRdlShortnameIsUpdated()
         {
-            var vm = new UnitPrefixBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null);
+            var vm = new UnitPrefixBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;

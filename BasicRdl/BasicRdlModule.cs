@@ -8,11 +8,11 @@ namespace BasicRdl
 {
     using System.ComponentModel.Composition;
     using BasicRdl.Views;
-
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
 
@@ -40,14 +40,18 @@ namespace BasicRdl
         /// <param name="dialogNavigationService">
         /// The MEF injected instance of <see cref="IDialogNavigationService"/>
         /// </param>
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
         [ImportingConstructor]
-        public BasicRdlModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService)
+        public BasicRdlModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             this.RegionManager = regionManager;
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.DialogNavigationService = dialogNavigationService;
+            this.PluginSettingsService = pluginSettingsService;
         }
 
         /// <summary>
@@ -76,6 +80,11 @@ namespace BasicRdl
         internal IDialogNavigationService DialogNavigationService { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </summary>
+        internal IPluginSettingsService PluginSettingsService { get; private set; }
+
+        /// <summary>
         /// Initialize the Module
         /// </summary>
         public void Initialize()
@@ -90,7 +99,7 @@ namespace BasicRdl
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new BasicRdlRibbonPart(20, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService);
+            var rdlRibbonPart = new BasicRdlRibbonPart(20, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, this.PluginSettingsService);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }

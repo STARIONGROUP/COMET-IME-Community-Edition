@@ -14,6 +14,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -23,8 +24,6 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class SiteRdlBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
     {
-        #region Fields
-
         /// <summary>
         /// Backing field for <see cref="CanCreateSiteRdl"/>
         /// </summary>
@@ -35,7 +34,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private const string PanelCaption = "Site RDLs";
 
-        #endregion
         /// <summary>
         /// Initializes a new instance of the <see cref="SiteRdlBrowserViewModel"/> class
         /// </summary>
@@ -48,8 +46,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// The <see cref="IPanelNavigationService"/> that allows to navigate to Panels
         /// </param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public SiteRdlBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+
+        public SiteRdlBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
@@ -57,8 +59,6 @@ namespace CDP4SiteDirectory.ViewModels
             this.SiteRdls = new ReactiveList<SiteRdlRowViewModel>();
             this.ComputeSiteRdlRows();
         }
-
-        #region properties
 
         /// <summary>
         /// Gets the List of <see cref="SiteRdlRowViewModel"/>
@@ -73,9 +73,7 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.canCreateSiteRdl; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateSiteRdl, value); }
         }
-        #endregion
 
-        #region browser base
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -129,8 +127,6 @@ namespace CDP4SiteDirectory.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.ComputeSiteRdlRows();
         }
-
-        #endregion
 
         /// <summary>
         /// Compute the <see cref="SiteReferenceDataLibrary"/> rows

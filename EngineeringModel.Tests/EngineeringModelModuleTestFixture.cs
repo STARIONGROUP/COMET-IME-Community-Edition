@@ -37,7 +37,7 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatServicesAreSetByConstructor()
         {
             var regionManager = new RegionManager();
-            var module = new EngineeringModelModule(regionManager, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object);
+            var module = new EngineeringModelModule(regionManager, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, null);
             
             Assert.AreEqual(this.fluentRibbonManager.Object, module.RibbonManager);
             Assert.AreEqual(this.panelNavigationService.Object, module.PanelNavigationService);

@@ -9,15 +9,10 @@ namespace CDP4ObjectBrowser
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
-    using System.Linq;
     using System.Reactive.Linq;
-    using CDP4Common.CommonData;
-    using CDP4Common.SiteDirectoryData;
-
     using CDP4Composition;
-    using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -43,7 +38,7 @@ namespace CDP4ObjectBrowser
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectBrowserViewModel"/> class.
         /// </summary>
-        public ObjectBrowserViewModel(ISession session, IThingDialogNavigationService thingDialogNavigationService)
+        public ObjectBrowserViewModel(ISession session, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             this.Identifier = Guid.NewGuid();
             this.session = session;

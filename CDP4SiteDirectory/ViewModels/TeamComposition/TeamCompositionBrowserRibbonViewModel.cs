@@ -9,6 +9,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Dal;
@@ -35,9 +36,9 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
         /// <returns>An instance of the <see cref="TeamCompositionBrowserViewModel"/> class</returns>
-        public static IPanelViewModel InstantiatePanelViewModel(EngineeringModelSetup engineeringModelSetup, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+        public static IPanelViewModel InstantiatePanelViewModel(EngineeringModelSetup engineeringModelSetup, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            return new TeamCompositionBrowserViewModel(engineeringModelSetup, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService);
+            return new TeamCompositionBrowserViewModel(engineeringModelSetup, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }
 }

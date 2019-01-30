@@ -14,6 +14,7 @@ namespace CDP4Composition.Mvvm
     using CDP4Dal.Events;
     using Navigation;
     using Navigation.Interfaces;
+    using PluginSettingService;
     using ReactiveUI;
 
     /// <summary>
@@ -29,7 +30,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// The Function returning an instance of a <see cref="IPanelViewModel"/>
         /// </summary>
-        private readonly Func<Option, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> InstantiatePanelViewModelFunction;
+        private readonly Func<Option, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> InstantiatePanelViewModelFunction;
 
         /// <summary>
         /// Backing field for <see cref="Description"/>
@@ -46,7 +47,7 @@ namespace CDP4Composition.Mvvm
         /// The session.
         /// </param>
         /// <param name="instantiatePanelViewModelFunction">The function that creates an instance of the <see cref="IPanelViewModel"/> for this menu-item</param>
-        public RibbonMenuItemOptionDependentViewModel(Option option, ISession session, Func<Option, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> instantiatePanelViewModelFunction)
+        public RibbonMenuItemOptionDependentViewModel(Option option, ISession session, Func<Option, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModelFunction)
             : base(option.Name, session)
         {
             this.Option = option;
@@ -109,7 +110,7 @@ namespace CDP4Composition.Mvvm
         /// <returns>An instance of <see cref="IPanelViewModel"/></returns>
         protected override IPanelViewModel InstantiatePanelViewModel()
         {
-            return this.InstantiatePanelViewModelFunction(this.Option, this.Session, this.ThingDialogNavigationService, this.PanelNavigationServive, this.DialogNavigationService);
+            return this.InstantiatePanelViewModelFunction(this.Option, this.Session, this.ThingDialogNavigationService, this.PanelNavigationServive, this.DialogNavigationService, this.PluginSettingsService);
         }
     }
 }

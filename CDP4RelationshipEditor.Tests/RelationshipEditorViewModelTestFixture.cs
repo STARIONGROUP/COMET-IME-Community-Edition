@@ -106,7 +106,7 @@ namespace CDP4RelationshipEditor.Tests
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewmodel = new RelationshipEditorViewModel(this.iteration,this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);            
+            var viewmodel = new RelationshipEditorViewModel(this.iteration,this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);         
             Assert.That(viewmodel.Caption,  Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.ToolTip,  Is.Not.Null.Or.Empty);
             Assert.IsNotNull(viewmodel.RelationshipRules);
@@ -115,7 +115,7 @@ namespace CDP4RelationshipEditor.Tests
         [Test]
         public void VerifyThatSubscriptionsWork()
         {
-            var viewmodel = new RelationshipEditorViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new RelationshipEditorViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.AreEqual(0, viewmodel.RelationshipRules.Count);
 
@@ -138,7 +138,7 @@ namespace CDP4RelationshipEditor.Tests
         [Test]
         public void VerifyDragOver()
         {
-            var vm = new RelationshipEditorViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var vm = new RelationshipEditorViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             
             this.dropinfo.Setup(x => x.Payload).Returns(this.domain);
             vm.DragOver(this.dropinfo.Object);

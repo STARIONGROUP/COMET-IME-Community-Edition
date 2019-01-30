@@ -68,7 +68,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
             
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
@@ -77,7 +77,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatSelectedModelSetupAreDisplayedInProperty()
         {
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
 
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             this.siteDirectory.Model.Add(model);
@@ -94,7 +94,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatSelectedIterationSetupAreDisplayedInProperty()
         {
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
 
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
 
@@ -118,7 +118,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatSelectedParticipantAreDisplayedInProperty()
         {
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
 
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
 
@@ -147,7 +147,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatRowsAreAddedAndRemoved()
         {
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
 
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
 
@@ -196,7 +196,7 @@ namespace CDP4SiteDirectory.Tests
         [Test]
         public void VerifyThatDisposeWorks()
         {
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
 
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
 
@@ -228,7 +228,7 @@ namespace CDP4SiteDirectory.Tests
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             model.StudyPhase = StudyPhaseKind.DESIGN_SESSION_PHASE;
 
@@ -301,7 +301,7 @@ namespace CDP4SiteDirectory.Tests
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             model.StudyPhase = StudyPhaseKind.DESIGN_SESSION_PHASE;
 
@@ -373,7 +373,7 @@ namespace CDP4SiteDirectory.Tests
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), this.thingDialogNavigationService.Object, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), this.thingDialogNavigationService.Object, this.navigationService.Object, null, null);
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             model.StudyPhase = StudyPhaseKind.DESIGN_SESSION_PHASE;
 
@@ -410,7 +410,7 @@ namespace CDP4SiteDirectory.Tests
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), this.thingDialogNavigationService.Object, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), this.thingDialogNavigationService.Object, this.navigationService.Object, null, null);
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             model.StudyPhase = StudyPhaseKind.DESIGN_SESSION_PHASE;
 
@@ -452,7 +452,7 @@ namespace CDP4SiteDirectory.Tests
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), this.thingDialogNavigationService.Object, this.navigationService.Object, null);
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), this.thingDialogNavigationService.Object, this.navigationService.Object, null, null);
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             model.StudyPhase = StudyPhaseKind.DESIGN_SESSION_PHASE;
 

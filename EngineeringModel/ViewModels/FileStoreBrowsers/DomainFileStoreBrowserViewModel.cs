@@ -18,6 +18,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using Microsoft.Practices.ServiceLocation;
@@ -28,8 +29,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class DomainFileStoreBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
-        #region Fields
-
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -69,10 +68,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// The <see cref="IOpenSaveFileDialogService"/>
         /// </summary>
         private readonly IOpenSaveFileDialogService fileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
-
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainFileStoreBrowserViewModel"/> class.
         /// </summary>
@@ -91,8 +87,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="dialogNavigationService">
         /// The <see cref="IDialogNavigationService"/>
         /// </param>
-        public DomainFileStoreBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        public DomainFileStoreBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
@@ -100,10 +96,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Properties
-
+        
         /// <summary>
         /// Gets or sets the Contained <see cref="IRowViewModelBase{T}"/>
         /// </summary>
@@ -176,10 +169,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to create a <see cref="DomainFileStore"/>
         /// </summary>
         public ReactiveCommand<object> CreateStoreCommand { get; private set; }
-        #endregion
-
-        #region BrowserBase
-
+        
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s
         /// </summary>
@@ -243,10 +233,7 @@ namespace CDP4EngineeringModel.ViewModels
                 row.Dispose();
             }
         }
-        #endregion
-
-        #region Private Methods
-
+        
         /// <summary>
         /// Update the <see cref="DomainFileStore"/>
         /// </summary>
@@ -350,6 +337,5 @@ namespace CDP4EngineeringModel.ViewModels
             var uploadedRow = new DomainFileStoreRowViewModel(((Iteration)this.Thing).DomainFileStore.FirstOrDefault(), this.Session, this.domainFileStoreRow);
             this.ContainedRows.Add(uploadedRow);
         }
-        #endregion
     }
 }

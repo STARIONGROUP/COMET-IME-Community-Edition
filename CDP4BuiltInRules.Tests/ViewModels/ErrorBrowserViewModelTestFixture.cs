@@ -60,7 +60,7 @@ namespace CDP4BuiltInRules.Tests
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
             
-            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
         }
 
         [TearDown]
@@ -90,7 +90,7 @@ namespace CDP4BuiltInRules.Tests
             // Check that the cache is not empty anymore
             Assert.IsTrue(this.assembler.Cache.Skip(0).Any());
 
-            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.AreEqual(4, this.browser.Errors.Count);
             Assert.IsTrue(this.browser.Errors.All(e => e.ContainerThingClassKind == ClassKind.Constant.ToString()));
             Assert.IsTrue(this.browser.Errors.All(e => !string.IsNullOrEmpty(e.Content)));
@@ -113,7 +113,7 @@ namespace CDP4BuiltInRules.Tests
             // Check that the cache is not empty anymore
             Assert.IsTrue(this.assembler.Cache.Skip(0).Any());
 
-            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             Assert.IsTrue(this.browser.RefreshCommand.CanExecute(null));
             Assert.DoesNotThrow(() => this.browser.RefreshCommand.Execute(null));
@@ -122,7 +122,7 @@ namespace CDP4BuiltInRules.Tests
         [Test]
         public void VerifyThatBrowserIsUpdatedAutomaticallyOnSessionUpdate()
         {
-            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.IsEmpty(this.browser.Errors);
 
             var pocoConstant = new Constant(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -152,7 +152,7 @@ namespace CDP4BuiltInRules.Tests
             // Check that the cache is not empty anymore
             Assert.IsTrue(this.assembler.Cache.Skip(0).Any());
 
-            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             Assert.IsFalse(this.browser.HighlightCommand.CanExecute(null));
 
@@ -191,7 +191,7 @@ namespace CDP4BuiltInRules.Tests
             // Check that the cache is not empty anymore
             Assert.IsTrue(this.assembler.Cache.Skip(0).Any());
 
-            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             Assert.IsFalse(this.browser.CopyErrorCommand.CanExecute(null));
 

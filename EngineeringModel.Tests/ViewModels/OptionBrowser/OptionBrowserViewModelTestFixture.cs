@@ -90,7 +90,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatRowsAreCreated()
         {
-            var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
         
             Assert.AreEqual(1, viewmodel.Options.Count);
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
@@ -112,7 +112,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatOptionRowsAreUpdated()
         {
-            var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var newoption = new Option(Guid.NewGuid(), null, this.uri);
             this.iteration.Option.Add(newoption);
@@ -136,7 +136,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var newoption = new Option(Guid.NewGuid(), null, this.uri);
             this.iteration.Option.Add(newoption);
 
-            var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.IsEmpty(viewmodel.Options.Where(x => x.IsDefaultOption));
 
@@ -163,7 +163,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var newoption = new Option(Guid.NewGuid(), null, this.uri);
             this.iteration.Option.Add(newoption);
 
-            var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var optionRow = viewmodel.Options.First();
             optionRow.IsDefaultOption = true;
@@ -190,7 +190,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                 {this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)}
             });
 
-            var vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            var vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -198,11 +198,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                 {this.iteration, null}
             });
 
-            vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
-            vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null);
+            vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
     }

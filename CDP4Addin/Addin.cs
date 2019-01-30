@@ -21,6 +21,7 @@ namespace CDP4AddinCE
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4OfficeInfrastructure;
@@ -636,9 +637,10 @@ namespace CDP4AddinCE
             this.FluentRibbonManager = ServiceLocator.Current.GetInstance<IFluentRibbonManager>();
             var thingDialogNavigationService = ServiceLocator.Current.GetInstance<IThingDialogNavigationService>();
             var dialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+            var pluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
 
             this.FluentRibbonManager.IsActive = true;
-            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService);
+            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService);
             this.FluentRibbonManager.RegisterRibbonPart(ribbonpart);
             this.fluentRibbonXml = this.FluentRibbonManager.GetFluentXml();
 

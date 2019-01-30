@@ -12,6 +12,7 @@ namespace CDP4ProductTree
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4ProductTree.Views;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
@@ -76,6 +77,11 @@ namespace CDP4ProductTree
         internal IThingDialogNavigationService ThingDialogNavigationService { get; private set; }
         
         /// <summary>
+        /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </summary>
+        internal IPluginSettingsService PluginSettingsService { get; private set; }
+
+        /// <summary>
         /// Initialize the Module
         /// </summary>
         public void Initialize()
@@ -97,7 +103,7 @@ namespace CDP4ProductTree
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new ProductTreeRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService);
+            var rdlRibbonPart = new ProductTreeRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }

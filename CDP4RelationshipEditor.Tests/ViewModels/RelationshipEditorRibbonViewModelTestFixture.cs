@@ -17,11 +17,10 @@ namespace CDP4RelationshipEditor.Tests.ViewModels
     using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Permission;
-
     using CDP4RelationshipEditor.ViewModels;
-
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
@@ -39,6 +38,8 @@ namespace CDP4RelationshipEditor.Tests.ViewModels
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IPluginSettingsService> pluginSettingsService;
+
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private Assembler assembler;
 
@@ -62,6 +63,8 @@ namespace CDP4RelationshipEditor.Tests.ViewModels
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
+
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
             
@@ -113,7 +116,8 @@ namespace CDP4RelationshipEditor.Tests.ViewModels
                 this.session.Object,
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
-                this.dialogNavigationService.Object);
+                this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object);
 
             Assert.IsInstanceOf<RelationshipEditorViewModel>(viewmodel);
         }
@@ -130,7 +134,8 @@ namespace CDP4RelationshipEditor.Tests.ViewModels
                     this.session.Object,
                     this.thingDialogNavigationService.Object,
                     this.panelNavigationService.Object,
-                    this.dialogNavigationService.Object));
+                    this.dialogNavigationService.Object,
+                    this.pluginSettingsService.Object));
         }
     }
 }

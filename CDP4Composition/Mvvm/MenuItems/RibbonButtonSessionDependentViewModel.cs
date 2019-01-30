@@ -11,6 +11,7 @@ namespace CDP4Composition.Mvvm
     using System.Reactive.Linq;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -23,7 +24,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// The Function returning an instance of <see cref="IPanelViewModel"/>
         /// </summary>
-        protected readonly Func<ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> InstantiatePanelViewModelFunction;
+        protected readonly Func<ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> InstantiatePanelViewModelFunction;
 
         /// <summary>
         /// Backing field for <see cref="HasSession"/>
@@ -33,7 +34,8 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Initializes a new instance of the <see cref="RibbonButtonSessionDependentViewModel"/> class
         /// </summary>
-        protected RibbonButtonSessionDependentViewModel(Func<ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> instantiatePanelViewModel)
+
+        protected RibbonButtonSessionDependentViewModel(Func<ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModel)
         {
             this.InstantiatePanelViewModelFunction = instantiatePanelViewModel;
             this.OpenSessions = new ReactiveList<RibbonMenuItemViewModelBase>();

@@ -64,7 +64,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             this.amountOfRibbonControls = 4;
             this.order = 1;
 
-            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, null);
+            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, null, null);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IDialogNavigationService>())

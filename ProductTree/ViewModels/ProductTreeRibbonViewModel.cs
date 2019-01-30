@@ -10,6 +10,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
 
     /// <summary>
@@ -33,10 +34,13 @@ namespace CDP4ProductTree.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The dialig navigation service</param>
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
         /// <returns>An instance of <see cref="ProductTreeViewModel"/></returns>
-        public static ProductTreeViewModel InstantiatePanelViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
+        public static ProductTreeViewModel InstantiatePanelViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            return new ProductTreeViewModel(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService);
+            return new ProductTreeViewModel(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }
 }

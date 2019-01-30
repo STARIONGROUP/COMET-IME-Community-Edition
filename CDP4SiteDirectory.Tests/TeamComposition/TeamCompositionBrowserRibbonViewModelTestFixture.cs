@@ -70,7 +70,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         public void VerifyThatInstantiateWorks()
         {
             var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, null);
-            var vm = TeamCompositionBrowserRibbonViewModel.InstantiatePanelViewModel(engineeringModelSetup, this.session.Object, null, null, null);
+            var vm = TeamCompositionBrowserRibbonViewModel.InstantiatePanelViewModel(engineeringModelSetup, this.session.Object, null, null, null, null);
             Assert.IsNotNull(vm);
         }
     }

@@ -64,7 +64,7 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyProperties()
         {
-            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.IsTrue(vm.Caption.Contains(this.siteDir.Name));
             
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Not.Empty);
@@ -75,7 +75,7 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyThatCategoryEventAreCaught()
         {
-            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;
@@ -92,7 +92,7 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyThatUpdatedCategoryEventAreCaught()
         {
-            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;
@@ -136,14 +136,14 @@ namespace BasicRdl.Tests.ViewModels
             this.siteDir.Model.Add(engineeringModelSetup);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDir.SiteReferenceDataLibrary) { modelReferenceDataLibrary }); 
 
-            var browser = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var browser = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.AreEqual(4, browser.Categories.Count);
         }
 
         [Test]
         public void VerifyThatRdlShortnameIsUpdated()
         {
-            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null);
+            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;

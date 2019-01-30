@@ -120,7 +120,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
@@ -138,7 +138,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatUpdateOptionEventWorks()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.AreEqual("option name", vm.CurrentOption);
 
@@ -153,7 +153,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatUpdateIterationSetupEventIsHandled()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.AreEqual(0, vm.CurrentIteration);
 
@@ -170,7 +170,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatUpdateDomainEventIsHandled()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var revisionNumber = typeof(DomainOfExpertise).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.domain, 50);
@@ -185,7 +185,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatUpdatePersonEventIsHandled()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var revisionNumber = typeof(Person).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.person, 50);
@@ -199,7 +199,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatTopElementIsRemovedUponIterationUpdateWithNoTop()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
@@ -212,7 +212,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatTopElementIsModifiedUponNewTopElement()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
@@ -227,7 +227,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyExecuteCreateSubscriptionCommand()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
@@ -275,7 +275,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyExecuteDeleteSubscriptionCommand()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
@@ -321,7 +321,7 @@ namespace ProductTree.Tests
                     {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
                 });
 
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
             Assert.AreEqual("domain [domainshortname]", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(
@@ -330,18 +330,18 @@ namespace ProductTree.Tests
                     {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null)}
                 });
 
-            vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null);
+            vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
-            vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null);
+            vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
         [Test]
         public void VerifyCreateParameterOverride()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
             var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) {Container = this.iteration};
@@ -390,7 +390,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyToggleNamesAndShortNames()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             Assert.IsFalse(vm.IsDisplayShortNamesOn);
             Assert.IsTrue(vm.ToggleUsageNamesCommand.CanExecute(null));
 
@@ -405,7 +405,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyContextMenuPopulation()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             Assert.AreEqual(0, vm.ContextMenu.Count);
             Assert.IsNull(vm.SelectedThing);
             vm.PopulateContextMenu();
@@ -420,7 +420,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatDragWorks()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, null, this.panelNavigationService.Object, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, null, this.panelNavigationService.Object, null, null);
             var draginfo = new Mock<IDragInfo>();
             var dragSource = new Mock<IDragSource>();
 
@@ -433,7 +433,7 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatDropsWorkDomain()
         {
-            var vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null);
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
             var dropinfo = new Mock<IDropInfo>();
             var droptarget = new Mock<IDropTarget>();
 

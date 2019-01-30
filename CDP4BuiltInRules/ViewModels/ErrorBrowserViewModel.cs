@@ -11,15 +11,14 @@ namespace CDP4BuiltInRules.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Windows;
-    using CDP4BuiltInRules.Views;
     using CDP4Common;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Events;
+    using CDP4Composition.PluginSettingService;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Errors.ViewModels;
@@ -30,17 +29,11 @@ namespace CDP4BuiltInRules.ViewModels
     /// </summary>
     public class ErrorBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
     {
-        #region Fields
-
         /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Errors";
-
-        #endregion
-
-        #region Constructors
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorBrowserViewModel"/> class.
         /// </summary>
@@ -49,19 +42,15 @@ namespace CDP4BuiltInRules.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public ErrorBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        public ErrorBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
             this.Errors = new List<ErrorRowViewModel>();
             this.PopulateErrors();
         }
-
-        #endregion Constructors
         
-        #region Properties
-
         /// <summary>
         /// Gets the list of <see cref="ErrorRowViewModel"/>.
         /// </summary>
@@ -76,10 +65,7 @@ namespace CDP4BuiltInRules.ViewModels
         /// Gets or sets the Copy Command
         /// </summary>
         public ReactiveCommand<object> CopyErrorCommand { get; protected set; }
-
-        #endregion
-
-        #region Browser base
+        
         /// <summary>
         /// Populate the context menu
         /// </summary>
@@ -146,10 +132,7 @@ namespace CDP4BuiltInRules.ViewModels
                 error.Dispose();
             }
         }
-        #endregion
-
-        #region private Methods
-
+        
         /// <summary>
         /// populates the <see cref="ErrorBrowser"/> with <see cref="ErrorRowViewModel"/>s.
         /// </summary>
@@ -194,7 +177,5 @@ namespace CDP4BuiltInRules.ViewModels
             // highlight the selected thing
             CDPMessageBus.Current.SendMessage(new HighlightEvent(this.SelectedThing.Thing), this.SelectedThing.Thing);
         }
-
-        #endregion
     }
 }

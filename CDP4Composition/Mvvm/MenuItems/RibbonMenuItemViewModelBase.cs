@@ -15,6 +15,7 @@ namespace CDP4Composition.Mvvm
     using Navigation;
     using Navigation.Events;
     using Navigation.Interfaces;
+    using PluginSettingService;
     using ReactiveUI;
     using ViewModels;
 
@@ -42,6 +43,11 @@ namespace CDP4Composition.Mvvm
         /// The <see cref="IDialogNavigationService"/>
         /// </summary>
         protected readonly IDialogNavigationService DialogNavigationService;
+
+        /// <summary>
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </summary>
+        protected readonly IPluginSettingsService PluginSettingsService;
 
         /// <summary>
         /// a value indicating whether the instance is disposed
@@ -84,6 +90,7 @@ namespace CDP4Composition.Mvvm
             this.PermissionService = this.Session.PermissionService;
             this.ThingDialogNavigationService = ServiceLocator.Current.GetInstance<IThingDialogNavigationService>();
             this.DialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+            this.PluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
 
             this.ShowOrClosePanelCommand = ReactiveCommand.Create();
             this.ShowOrClosePanelCommand.Subscribe(x => this.ExecuteShowOrHide());

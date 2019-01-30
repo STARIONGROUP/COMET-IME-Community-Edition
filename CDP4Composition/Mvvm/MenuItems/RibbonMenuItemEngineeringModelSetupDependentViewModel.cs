@@ -14,6 +14,7 @@ namespace CDP4Composition.Mvvm
     using CDP4Dal.Events;
     using Navigation;
     using Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using ReactiveUI;
 
     /// <summary>
@@ -29,7 +30,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// The Function returning an instance of a <see cref="IPanelViewModel"/>
         /// </summary>
-        private readonly Func<EngineeringModelSetup, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> InstantiatePanelViewModelFunction;
+        private readonly Func<EngineeringModelSetup, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> InstantiatePanelViewModelFunction;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RibbonMenuItemEngineeringModelSetupDependentViewModel"/> class
@@ -41,7 +42,7 @@ namespace CDP4Composition.Mvvm
         /// The session.
         /// </param>
         /// <param name="instantiatePanelViewModelFunction">The function that creates an instance of the <see cref="IPanelViewModel"/> for this menu-item</param>
-        public RibbonMenuItemEngineeringModelSetupDependentViewModel(EngineeringModelSetup engineeringModelSetup, ISession session, Func<EngineeringModelSetup, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPanelViewModel> instantiatePanelViewModelFunction)
+        public RibbonMenuItemEngineeringModelSetupDependentViewModel(EngineeringModelSetup engineeringModelSetup, ISession session, Func<EngineeringModelSetup, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModelFunction)
             : base(engineeringModelSetup.Name, session)
         {
             this.EngineeringModelSetup = engineeringModelSetup;
@@ -84,7 +85,7 @@ namespace CDP4Composition.Mvvm
         /// <returns>An instance of <see cref="IPanelViewModel"/></returns>
         protected override IPanelViewModel InstantiatePanelViewModel()
         {
-            return this.InstantiatePanelViewModelFunction(this.EngineeringModelSetup, this.Session, this.ThingDialogNavigationService, this.PanelNavigationServive, this.DialogNavigationService);
+            return this.InstantiatePanelViewModelFunction(this.EngineeringModelSetup, this.Session, this.ThingDialogNavigationService, this.PanelNavigationServive, this.DialogNavigationService, this.PluginSettingsService);
         }
     }
 }

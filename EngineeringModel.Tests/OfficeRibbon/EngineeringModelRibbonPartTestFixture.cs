@@ -128,7 +128,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public void VerifyThatTheOrderAndXmlAreLoaded()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
 
             Assert.AreEqual(this.order, this.ribbonPart.Order);
             Assert.AreEqual(this.amountOfRibbonControls, this.ribbonPart.ControlIdentifiers.Count);
@@ -137,7 +137,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public void VerifyThatIfFluentRibbonIsNotActiveTheSessionEventHasNoEffect()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = false;
@@ -151,7 +151,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public void VerifyThatIfFluentRibbonIsNullTheSessionEventHasNoEffect()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
 
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(sessionEvent);
@@ -161,7 +161,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public void VerifyThatRibbonPartHandlesSessionOpenAndCloseEvent()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -181,7 +181,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public async Task VerifyThatOnActionSelectModelToOpenWithNegativeResultDoesNotOpenModel()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -200,7 +200,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public void VerifyThatButtonsAreEnabledAsExpected()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -257,7 +257,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public async Task VerifyThatOnActionShowElementDefWorks()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -283,7 +283,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public async Task VerifyThatOnActionShowOptionsWorks()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -309,7 +309,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public async Task VerifyThatOnActionShowShowFiniteStatesWorks()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -335,7 +335,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public async Task VerifyThatOnActionShowShowPublicationsWorks()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -380,7 +380,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         [Test]
         public async Task VerifyThatOnActionSelectModelToCloseOpenDialog()
         {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null);
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;

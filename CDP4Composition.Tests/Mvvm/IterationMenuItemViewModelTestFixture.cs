@@ -13,6 +13,7 @@ namespace CDP4Composition.Tests.Mvvm
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Permission;
     using Microsoft.Practices.ServiceLocation;
@@ -112,16 +113,16 @@ namespace CDP4Composition.Tests.Mvvm
             Assert.IsFalse(menu.IsChecked);
         }
 
-        private static IPanelViewModel MockInstantiate(Iteration it, ISession ses, IThingDialogNavigationService thingDialogService, IPanelNavigationService panelService, IDialogNavigationService dialogNavigationService)
+        private static IPanelViewModel MockInstantiate(Iteration it, ISession ses, IThingDialogNavigationService thingDialogService, IPanelNavigationService panelService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             var model = it.Container as EngineeringModel;
-            return new PanelViewModel(it, model.GetActiveParticipant(ses.ActivePerson), ses, thingDialogService, panelService, dialogNavigationService);
+            return new PanelViewModel(it, model.GetActiveParticipant(ses.ActivePerson), ses, thingDialogService, panelService, dialogNavigationService, pluginSettingsService);
         }
 
         private class PanelViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
         {
-            public PanelViewModel(Iteration iteration, Participant participant, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService)
-                : base(iteration, session, dialogNav, panelNav, dialogNavigationService)
+            public PanelViewModel(Iteration iteration, Participant participant, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+                : base(iteration, session, dialogNav, panelNav, dialogNavigationService,pluginSettingsService)
             { }
 
             public string Caption { get; private set; }

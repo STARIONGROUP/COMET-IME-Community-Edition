@@ -278,6 +278,9 @@
     <Compile Include="Services\ImageService\IImageService.cs" />
     <Compile Include="Services\ImageService\ImageService.cs" />
     <Compile Include="Services\IThingCreator.cs" />
+    <Compile Include="Services\PluginSettingService\IPluginSettingsService.cs" />
+    <Compile Include="Services\PluginSettingService\PluginSettings.cs" />
+    <Compile Include="Services\PluginSettingService\PluginSettingsService.cs" />
     <Compile Include="Services\RuleVerification\BuiltInRule.cs" />
     <Compile Include="Services\RuleVerification\BuiltInRuleMetaDataExportAttribute.cs" />
     <Compile Include="Services\RuleVerification\IBuiltInRule.cs" />

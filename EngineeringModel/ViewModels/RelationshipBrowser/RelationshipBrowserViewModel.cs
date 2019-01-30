@@ -16,6 +16,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
@@ -26,8 +27,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class RelationshipBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
-        #region Fields
-
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
         /// </summary>
@@ -57,10 +56,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Relationships";
-
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipBrowserViewModel"/> class
         /// </summary>
@@ -70,8 +66,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public RelationshipBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        public RelationshipBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
@@ -81,11 +77,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateMultiRelationships();
             this.ComputeUserDependentPermission();
         }
-
-        #endregion
-
-        #region Properties and Commands
-
+        
         /// <summary>
         /// Gets the folder rows representing relationship types
         /// </summary>
@@ -130,11 +122,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="RelationshipCreatorMainViewModel"/>
         /// </summary>
         public RelationshipCreatorMainViewModel RelationshipCreator { get; private set; }
-
-        #endregion
-
-        #region Methods
-
+        
         /// <summary>
         /// Updates all the Binary relationships
         /// </summary>
@@ -237,11 +225,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.CanCreateRelationship = this.PermissionService.CanWrite(ClassKind.BinaryRelationship, this.Thing);
         }
-
-        #endregion
-
-        #region Override methods
-
+        
         /// <summary>
         /// Initializes the browser
         /// </summary>
@@ -319,7 +303,5 @@ namespace CDP4EngineeringModel.ViewModels
             this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRelationship));
             this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<BinaryRelationship>(this.Thing));
         }
-
-        #endregion
     }
 }

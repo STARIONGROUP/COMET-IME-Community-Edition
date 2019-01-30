@@ -230,6 +230,9 @@
     <Compile Include="Navigation\ThingDialogNavigationServiceTestFixture.cs" />
     <Compile Include="OfficeRibbon\FluentRibbonManagerTestFixture.cs" />
     <Compile Include="OfficeRibbon\RibbonPartTestFixture.cs" />
+    <Compile Include="PluginSettingService\PluginSettingsServiceTestFixture.cs" />
+    <Compile Include="PluginSettingService\TestModule.cs" />
+    <Compile Include="PluginSettingService\TestSettings.cs" />
     <Compile Include="RuleVerification\RuleVerificationServiceTestFixture.cs" />
     <Compile Include="SpellingChecker\DictionaryServiceTestFixture.cs" />
     <Compile Include="StaticPanelViewModelTestFixture.cs" />
@@ -242,6 +245,9 @@
     <EmbeddedResource Include="Resources\RibbonXml\customui14.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="PluginSettingService\expectedSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="SpellingChecker\en_US.aff">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

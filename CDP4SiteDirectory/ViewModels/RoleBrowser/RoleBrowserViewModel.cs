@@ -15,6 +15,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -24,7 +25,6 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class RoleBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
     {
-        #region Fields
         /// <summary>
         /// The <see cref="CDP4Common.SiteDirectoryData.PersonRole"/> folder row
         /// </summary>
@@ -50,10 +50,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private bool canCreateParticipantRole;
 
-        #endregion Fields
-
-        #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RoleBrowserViewModel"/> class.
         /// </summary>
@@ -62,17 +58,16 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/> that allows to navigate to <see cref="CDP4Common.CommonData.Thing"/> dialog view models</param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/> that allows to navigate to Panels</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public RoleBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public RoleBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
         }
-
-        #endregion Constructors
-
-        #region Public properties
-
+        
         /// <summary>
         /// Gets the <see cref="FolderRowViewModel"/> that are displayed by the TreeListControl
         /// </summary>
@@ -105,10 +100,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CDP4Common.SiteDirectoryData.ParticipantRole"/>
         /// </summary>
         public ReactiveCommand<object> CreateParticipantRoleCommand { get; private set; }
-
-        #endregion Public properties
-
-        #region Browser Base
+        
         /// <summary>
         /// Initialize the browser
         /// </summary>
@@ -191,7 +183,6 @@ namespace CDP4SiteDirectory.ViewModels
                 session.Dispose();
             }
         }
-        #endregion
 
         /// <summary>
         /// Populate the <see cref="PersonRole"/> rows

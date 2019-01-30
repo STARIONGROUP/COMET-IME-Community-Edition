@@ -17,6 +17,7 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Permission;
     using DevExpress.Xpf.Grid;
@@ -65,7 +66,7 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
                 siteDir,
                 null,
                 this.panelNavigation.Object,
-                null);
+                null, null);
             this.gridControl = new GridControl { DataContext = this.testBrowserViewModel };
             this.gridColumn = new GridColumn { FieldName = "Name" };
             this.gridControl.Columns.Add(this.gridColumn);
@@ -160,8 +161,9 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
                 SiteDirectory siteDir,
                 IThingDialogNavigationService thingDialogNavigationService,
                 IPanelNavigationService panelNavigationService,
-                IDialogNavigationService dialogNavigationService)
-                : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService)
+                IDialogNavigationService dialogNavigationService,
+                IPluginSettingsService pluginSettingsService)
+                : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
             {
                 this.FileTypes = new ReactiveList<FileTypeRowViewModel>();
 

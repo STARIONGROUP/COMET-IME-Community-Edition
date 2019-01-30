@@ -64,7 +64,7 @@ namespace BasicRDL.Tests.ViewModels
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.glossaryBrowser = new GlossaryBrowserViewModel(this.session.Object, this.siteDirectory, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null);
+            this.glossaryBrowser = new GlossaryBrowserViewModel(this.session.Object, this.siteDirectory, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace BasicRDL.Tests.ViewModels
             this.siteDirectory.Model.Add(engineeringModelSetup);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary) { modelReferenceDataLibrary });     
 
-            var browser = new GlossaryBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null);
+            var browser = new GlossaryBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
             Assert.AreEqual(4, browser.Glossaries.Count);
         }
 
@@ -243,7 +243,7 @@ namespace BasicRDL.Tests.ViewModels
         [Test]
         public void VerifyThatRdlShortnameIsUpdated()
         {
-            var vm = new GlossaryBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null);
+            var vm = new GlossaryBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;
