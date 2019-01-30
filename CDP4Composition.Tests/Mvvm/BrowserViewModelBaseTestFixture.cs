@@ -21,6 +21,8 @@ namespace CDP4Composition.Tests.Mvvm
     using Moq;
     using NUnit.Framework;
     using System;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Dal.Events;
     using ReactiveUI;
     
     [TestFixture]
@@ -146,6 +148,23 @@ namespace CDP4Composition.Tests.Mvvm
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
+
+        [Test]
+        public void VerifyDomainSwitchEventIsCaught()
+        {
+            var iteration = new Iteration(Guid.NewGuid(), null, null);
+            var browser = new IterationBrowserTestClass(iteration, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null);
+           
+
+            var option = new Option(Guid.NewGuid(), null, null);
+            iteration.Option.Add(option);
+
+            var optionbrowser = new OptionBrowserTestClass(option, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null);
+
+            CDPMessageBus.Current.SendMessage(new DomainChangedEvent(iteration, new DomainOfExpertise { Name = "changed", ShortName = "ch" }));
+            Assert.AreEqual("changed [ch]", browser.DomainOfExpertise);
+            Assert.AreEqual("changed [ch]", optionbrowser.DomainOfExpertise);
+        }
     }
 
     internal class BrowserTestClass : BrowserViewModelBase<SiteDirectory>
@@ -155,6 +174,26 @@ namespace CDP4Composition.Tests.Mvvm
         {
             this.CreateCommand = ReactiveCommand.Create();
             this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Person>(siteDir));
+        }
+    }
+
+    internal class IterationBrowserTestClass : BrowserViewModelBase<Iteration>
+    {
+        internal IterationBrowserTestClass(Iteration it, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService)
+            : base(it, session, dialogNav, panelNav, dialogNavigationService)
+        {
+            this.CreateCommand = ReactiveCommand.Create();
+            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Person>(it));
+        }
+    }
+
+    internal class OptionBrowserTestClass : BrowserViewModelBase<Option>
+    {
+        internal OptionBrowserTestClass(Option op, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService)
+            : base(op, session, dialogNav, panelNav, dialogNavigationService)
+        {
+            this.CreateCommand = ReactiveCommand.Create();
+            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Person>(op));
         }
     }
 

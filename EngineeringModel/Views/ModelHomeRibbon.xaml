@@ -22,6 +22,13 @@
                        Hint="Opens Engineering Model Iterations"
                        LargeGlyph="{dx:DXImage Image=LoadPageSetup_32x32.png}"
                        RibbonStyle="large" />
+    <dxb:BarButtonItem Name="bSwitchDomain"
+                       Command="{Binding OpenDomainSwitchDialogCommand}"
+                       Content="Switch Domain"
+                       Description="Switch domain of expertise"
+                       Hint="Switch domain of expertise"
+                       LargeGlyph="pack://application:,,,/CDP4Composition;component/Resources/Images/domain_switch.png"
+                       RibbonStyle="large" />
     <dxb:BarButtonItem Content="Close"
                        Command="{Binding CloseIterationsCommand}"
                         Glyph="{dx:DXImage Image=Close_16x16.png}"

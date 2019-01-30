@@ -46,11 +46,6 @@ namespace CDP4ProductTree.ViewModels
         private string currentOption;
 
         /// <summary>
-        /// Backing field for <see cref="DomainOfExpertise"/>
-        /// </summary>
-        private string domainOfExpertise;
-
-        /// <summary>
         /// Backing field for <see cref="IsDisplayShortNamesOn"/>
         /// </summary>
         private bool isDisplayShortNamesOn;
@@ -160,15 +155,6 @@ namespace CDP4ProductTree.ViewModels
         {
             get { return this.currentOption; }
             private set { this.RaiseAndSetIfChanged(ref this.currentOption, value); }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="DomainOfExpertise"/> of the active user
-        /// </summary>
-        public string DomainOfExpertise
-        {
-            get { return this.domainOfExpertise; }
-            private set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
         }
 
         /// <summary>

@@ -142,7 +142,7 @@ namespace CDP4Requirements.Tests.Dialogs
             var vm = new RequirementDialogViewModel(this.requirement, this.thingTransaction, this.session.Object,
                 true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
 
-            Assert.AreEqual(1, vm.PossibleOwner.Count);
+            Assert.AreEqual(2, vm.PossibleOwner.Count);
         }
 
         [Test]

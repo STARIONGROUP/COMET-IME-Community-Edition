@@ -440,6 +440,7 @@
     </Content>
     <Resource Include="Resources\Images\Help_128x128.png" />
     <Resource Include="Resources\Images\cdplogo3d_48x48p10.png" />
+    <Resource Include="Resources\Images\domain_switch.png" />
     <Content Include="Resources\Images\IconLicence.txt" />
     <Resource Include="Resources\Images\Thing\siteRdl_16x16.png" />
     <Resource Include="Resources\Images\Thing\siteRdl_32x32.png" />

@@ -39,11 +39,6 @@ namespace CDP4EngineeringModel.ViewModels
         private int currentIteration;
 
         /// <summary>
-        /// Backing field for <see cref="DomainOfExpertise"/>
-        /// </summary>
-        private string domainOfExpertise;
-
-        /// <summary>
         /// Row folder containing all te binary relationships
         /// </summary>
         private CDP4Composition.FolderRowViewModel binaryRelationshipsFolder;
@@ -120,15 +115,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return this.currentIteration; }
             private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
-        }
-
-        /// <summary>
-        /// Gets the current <see cref="DomainOfExpertise"/> name
-        /// </summary>
-        public string DomainOfExpertise
-        {
-            get { return this.domainOfExpertise; }
-            private set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
         }
 
         /// <summary>

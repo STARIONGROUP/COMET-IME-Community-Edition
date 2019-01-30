@@ -72,11 +72,6 @@ namespace CDP4Requirements.ViewModels
         private int currentIteration;
 
         /// <summary>
-        /// Backing field for <see cref="DomainOfExpertise"/>
-        /// </summary>
-        private string domainOfExpertise;
-
-        /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Requirements";
@@ -141,15 +136,6 @@ namespace CDP4Requirements.ViewModels
         {
             get { return this.currentIteration; }
             private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Participant.SelectedDomain"/>
-        /// </summary>
-        public string DomainOfExpertise
-        {
-            get { return this.domainOfExpertise; }
-            private set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
         }
 
         /// <summary>

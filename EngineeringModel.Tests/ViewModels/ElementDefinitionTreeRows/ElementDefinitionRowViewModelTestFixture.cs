@@ -19,6 +19,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.Utilities;

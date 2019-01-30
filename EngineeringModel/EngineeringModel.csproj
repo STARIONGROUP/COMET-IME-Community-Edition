@@ -228,6 +228,7 @@
     <Compile Include="ViewModels\Dialogs\ElementUsageDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ElementDefinitionDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ActualFiniteStateListDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\ModelIterationDomainSwitchDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ModelClosingDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ModelOpeningDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ParameterSubscriptionDialogViewModel.cs" />
@@ -399,6 +400,9 @@
     <Compile Include="Views\Items\ParameterValueSetLayoutItem.xaml.cs">
       <DependentUpon>ParameterValueSetLayoutItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ModelIterationDomainSwitchDialog.xaml.cs">
+      <DependentUpon>ModelIterationDomainSwitchDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ModelClosingDialog.xaml.cs">
       <DependentUpon>ModelClosingDialog.xaml</DependentUpon>
     </Compile>
@@ -540,6 +544,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Items\ParameterValueSetLayoutItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ModelIterationDomainSwitchDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -55,6 +55,9 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CloseIterationsCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.HasOpenIterations));
             this.CloseIterationsCommand.Subscribe(_ => this.ExecuteCloseIterationsCommand());
+
+            this.OpenDomainSwitchDialogCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.HasOpenIterations));
+            this.OpenDomainSwitchDialogCommand.Subscribe(_ => this.ExecuteOpenDomainSwitchDialogCommand());
         }
 
         #endregion
@@ -88,6 +91,11 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveCommand<object> OpenSelectIterationsCommand { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ICommand"/> to switch the domain for an iteration
+        /// </summary>
+        public ReactiveCommand<object> OpenDomainSwitchDialogCommand { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="ICommand"/> to select and close Site RDLs
         /// </summary>
         public ReactiveCommand<object> CloseIterationsCommand { get; private set; }
@@ -114,6 +122,16 @@ namespace CDP4EngineeringModel.ViewModels
             var dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             var modelSelectionViewModel = new ModelClosingDialogViewModel(this.OpenSessions);
             dialogService.NavigateModal(modelSelectionViewModel);
+        }
+
+        /// <summary>
+        /// The execute the <see cref="OpenDomainSwitchDialogCommand"/>
+        /// </summary>
+        private void ExecuteOpenDomainSwitchDialogCommand()
+        {
+            var dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+            var domainSwitchViewModel = new ModelIterationDomainSwitchDialogViewModel(this.OpenSessions);
+            dialogService.NavigateModal(domainSwitchViewModel);
         }
 
         /// <summary>

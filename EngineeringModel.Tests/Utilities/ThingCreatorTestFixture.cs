@@ -14,6 +14,7 @@ namespace CDP4EngineeringModel.Tests.Utilities
     using CDP4Common.Types;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Composition.Services;
     using CDP4Dal;    
     using CDP4EngineeringModel.Utilities;
     using Moq;

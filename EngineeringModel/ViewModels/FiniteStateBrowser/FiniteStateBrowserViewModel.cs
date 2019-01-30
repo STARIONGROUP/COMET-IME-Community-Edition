@@ -74,11 +74,6 @@ namespace CDP4EngineeringModel.ViewModels
         private int currentIteration;
 
         /// <summary>
-        /// Backing field for <see cref="DomainOfExpertise"/>
-        /// </summary>
-        private string domainOfExpertise;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="FiniteStateBrowserViewModel"/> class
         /// </summary>
         /// <param name="iteration">
@@ -132,15 +127,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return this.currentIteration; }
             private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
-        }
-
-        /// <summary>
-        /// Gets the current <see cref="DomainOfExpertise"/> name
-        /// </summary>
-        public string DomainOfExpertise
-        {
-            get { return this.domainOfExpertise; }
-            private set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
         }
 
         /// <summary>

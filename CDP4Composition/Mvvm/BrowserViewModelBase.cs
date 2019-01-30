@@ -102,7 +102,12 @@ namespace CDP4Composition.Mvvm
         /// Backing Field For ToolTip
         /// </summary>
         private string tooltip;
-        
+
+        /// <summary>
+        /// Backing field for <see cref="DomainOfExpertise"/>
+        /// </summary>
+        private string domainOfExpertise;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModelBase{T}"/> class.
         /// Used by MEF.
@@ -163,6 +168,15 @@ namespace CDP4Composition.Mvvm
                         });
                 this.Disposables.Add(personSubscription);
             }
+        }
+
+        /// <summary>
+        /// Gets the current <see cref="DomainOfExpertise"/> name
+        /// </summary>
+        public string DomainOfExpertise
+        {
+            get { return this.domainOfExpertise; }
+            protected set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
         }
 
         /// <summary>
@@ -768,6 +782,17 @@ namespace CDP4Composition.Mvvm
 
             this.CollpaseRowsCommand = ReactiveCommand.Create();
             this.CollpaseRowsCommand.Subscribe(_ => this.ExecuteCollapseRows());
+
+            var iteration = this.Thing as Iteration ?? this.Thing.GetContainerOfType<Iteration>();
+            if (iteration != null)
+            {
+                var domainSwitchSubscription = CDPMessageBus.Current.Listen<DomainChangedEvent>()
+                    .Where(x => x.Iteration.Iid == iteration.Iid)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => this.DomainOfExpertise = x.SelectedDomain == null ? "None" : $"{x.SelectedDomain.Name} [{x.SelectedDomain.ShortName}]");
+                this.Disposables.Add(domainSwitchSubscription);
+            }
+
         }
         
         /// <summary>
