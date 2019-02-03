@@ -46,6 +46,10 @@
         <File Id="fil_System_Reactive_PlatformServices" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Reactive.PlatformServices.dll" KeyPath="yes" />
       </Component>
 
+      <Component Id="comp_System_ValueTuple" Guid="{D1C5CC93-8E1F-491B-A6D7-BC80F14B238C}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_System_ValueTuple" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.ValueTuple.dll" KeyPath="yes" />
+      </Component>
+
       <Component Id="comp_System_Reactive_Windows_Threading" Guid="{EAC298A2-DFE1-4481-BE63-2250A767D399}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_System_Reactive_Windows_Threading" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Reactive.Windows.Threading.dll" KeyPath="yes" />
       </Component>
@@ -53,7 +57,6 @@
       <Component Id="comp_System_Windows_Interactivity" Guid="{D4434DAD-D0BF-46FF-BEAD-250FAD669AC6}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_System_Windows_Interactivity" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Windows.Interactivity.dll" KeyPath="yes" />
       </Component>
-      
     </ComponentGroup>
   </Fragment>
 </Wix>
