@@ -27,7 +27,6 @@ namespace CDP4Composition.Mvvm
     using CDP4JsonSerializer;
     using DevExpress.Xpf.SpellChecker;
     using DevExpress.XtraSpellChecker;
-    using NLog;
     using ReactiveUI;
     using Services;
     
@@ -39,7 +38,6 @@ namespace CDP4Composition.Mvvm
     /// </typeparam>
     public abstract class DialogViewModelBase<T> : ViewModelBase<T>, IDialogViewModelBase<T> where T : Thing
     {
-        #region Fields
         /// <summary>
         /// The relative location of the loading animation image.
         /// </summary>
@@ -106,11 +104,11 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         private ISpellDictionaryService dictionaryService;
         
-        private Cdp4JsonSerializer serializer;
-        #endregion
-
-        #region Constructors
-
+        /// <summary>
+        /// The <see cref="Cdp4JsonSerializer"/> that is used to serialize an <see cref="Thing"/> to the clipboard
+        /// </summary>
+        private readonly Cdp4JsonSerializer serializer;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="DialogViewModelBase{T}"/> class
         /// </summary>
@@ -187,10 +185,6 @@ namespace CDP4Composition.Mvvm
         protected DialogViewModelBase()
         {
         }
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that represents an "confirmation" of the dialog
@@ -393,11 +387,7 @@ namespace CDP4Composition.Mvvm
         /// Gets the <see cref="Uri"/> of the <see cref="Thing"/> with respect to it's data-source
         /// </summary>
         public string ThingUri { get; private set; }
-
-        #endregion
-
-        #region methods
-
+        
         /// <summary>
         /// Updates the property indicating whether it is possible to close the current dialog by clicking the OK button
         /// </summary>
@@ -723,6 +713,5 @@ namespace CDP4Composition.Mvvm
             this.ChainOfContainer.Remove(lastitem);
             this.ChainOfContainer.Add(this.Container);
         }
-        #endregion
     }
 }
