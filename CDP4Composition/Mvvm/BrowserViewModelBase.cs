@@ -818,10 +818,9 @@ namespace CDP4Composition.Mvvm
                 var domainSwitchSubscription = CDPMessageBus.Current.Listen<DomainChangedEvent>()
                     .Where(x => x.Iteration.Iid == iteration.Iid)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(x => this.DomainOfExpertise = x.SelectedDomain == null ? "None" : $"{x.SelectedDomain.Name} [{x.SelectedDomain.ShortName}]");
+                    .Subscribe(x => this.UpdateDomain(x));
                 this.Disposables.Add(domainSwitchSubscription);
             }
-
         }
         
         /// <summary>
@@ -859,13 +858,12 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Populate the create <see cref="ContextMenuItemViewModel"/> from the current <see cref="ContextMenu"/>
+        /// Handles the <see cref="DomainChangedEvent"/>
         /// </summary>
-        private void PopulateCreateContextMenu()
+        /// <param name="domainChangeEvent">The <see cref="DomainChangedEvent"/></param>
+        protected virtual void UpdateDomain(DomainChangedEvent domainChangeEvent)
         {
-            this.CreateContextMenu.Clear();
-            this.CreateContextMenu.AddRange(this.ContextMenu.Where(x => x.MenuItemKind == MenuItemKind.Create));
-            this.IsAddButtonEnabled = this.CreateContextMenu.Any();
+            this.DomainOfExpertise = domainChangeEvent.SelectedDomain == null ? "None" : $"{domainChangeEvent.SelectedDomain.Name} [{domainChangeEvent.SelectedDomain.ShortName}]";
         }
 
         /// <summary>
@@ -899,6 +897,16 @@ namespace CDP4Composition.Mvvm
             {
                 dragSource.StartDrag(dragInfo);
             }
+        }
+
+        /// <summary>
+        /// Populate the create <see cref="ContextMenuItemViewModel"/> from the current <see cref="ContextMenu"/>
+        /// </summary>
+        private void PopulateCreateContextMenu()
+        {
+            this.CreateContextMenu.Clear();
+            this.CreateContextMenu.AddRange(this.ContextMenu.Where(x => x.MenuItemKind == MenuItemKind.Create));
+            this.IsAddButtonEnabled = this.CreateContextMenu.Any();
         }
     }
 }

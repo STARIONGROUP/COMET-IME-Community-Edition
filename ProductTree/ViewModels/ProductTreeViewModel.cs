@@ -329,6 +329,17 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
+        /// Handles the <see cref="DomainChangedEvent"/>
+        /// </summary>
+        /// <param name="domainChangeEvent">The <see cref="DomainChangedEvent"/></param>
+        protected override void UpdateDomain(DomainChangedEvent domainChangeEvent)
+        {
+            base.UpdateDomain(domainChangeEvent);
+            this.TopElement.Clear();
+            this.SetTopElement(this.Thing.Container as Iteration);
+        }
+
+        /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
         /// </summary>

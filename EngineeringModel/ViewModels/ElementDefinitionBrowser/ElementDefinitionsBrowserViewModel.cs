@@ -481,6 +481,18 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Handles the <see cref="DomainChangedEvent"/>
+        /// </summary>
+        /// <param name="domainChangeEvent">The <see cref="DomainChangedEvent"/></param>
+        protected override void UpdateDomain(DomainChangedEvent domainChangeEvent)
+        {
+            base.UpdateDomain(domainChangeEvent);
+            this.ElementDefinitionRowViewModels.Clear();
+            this.UpdateElementDefinition();
+
+        }
+
+        /// <summary>
         /// The <see cref="ObjectChangedEvent"/> event-handler.
         /// </summary>
         /// <param name="objectChange">The <see cref="ObjectChangedEvent"/></param>
