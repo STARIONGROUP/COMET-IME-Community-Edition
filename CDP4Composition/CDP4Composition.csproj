@@ -412,6 +412,9 @@
     <Resource Include="Resources\Images\Thing\Organization_32x32.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Images\to-left-arrow_16x16.png" />
+    <Resource Include="Resources\Images\to-up-arrow_16x16.png" />
+    <Resource Include="Resources\Images\up-and-left-arrow_16x16.png" />
     <Resource Include="Resources\Images\Log\linkgreen_16x16.png" />
     <Resource Include="Resources\Images\Log\linkgreen_32x32.png" />
     <Resource Include="Resources\Images\Log\link_16x16.png" />

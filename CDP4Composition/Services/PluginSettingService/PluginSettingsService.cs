@@ -10,6 +10,7 @@ namespace CDP4Composition.PluginSettingService
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using Microsoft.Practices.Prism.Modularity;
     using Newtonsoft.Json;
@@ -27,7 +28,12 @@ namespace CDP4Composition.PluginSettingService
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public static string ConfigurationDirectoryFolder = @"RHEA\CDP4\";
+        public const string ConfigurationDirectoryFolder = @"RHEA\CDP4\";
+
+        /// <summary>
+        /// The setting file extension
+        /// </summary>
+        public const string SETTING_FILE_EXTENSION = ".settings.json";
 
         /// <summary>
         /// a dictionary used to cache the names of assemblies
@@ -35,11 +41,29 @@ namespace CDP4Composition.PluginSettingService
         private readonly Dictionary<IModule, string> assemblyNamesCache;
 
         /// <summary>
+        /// A dictionary used to store the user plugin-setting of the application
+        /// </summary>
+        private readonly Dictionary<IModule, PluginSettings> applicationUserPluginSettings;
+
+        /// <summary>
         /// Initializes a new instance of <see cref="PluginSettingsService"/>
         /// </summary>
         public PluginSettingsService()
         {
             this.assemblyNamesCache = new Dictionary<IModule, string>();
+            this.applicationUserPluginSettings = new Dictionary<IModule, PluginSettings>();
+        }
+
+        /// <summary>
+        /// Reads the <see cref="T"/>
+        /// </summary>
+        /// <typeparam name="T">A type of <see cref="PluginSettings"/></typeparam>
+        /// <returns>
+        /// An instance of <see cref="PluginSettings"/>
+        /// </returns>
+        public T Read<T>() where T : PluginSettings
+        {
+            return this.applicationUserPluginSettings.Values.OfType<T>().SingleOrDefault();
         }
 
         /// <summary>
@@ -58,15 +82,22 @@ namespace CDP4Composition.PluginSettingService
                 throw new ArgumentNullException(nameof(module), "The module may not be null");
             }
 
+            PluginSettings result;
+            if (this.applicationUserPluginSettings.TryGetValue(module, out result))
+            {
+                return result as T;
+            }
+
             var assemblyName = this.QueryAssemblyName(module);
 
             var path = Path.Combine(ApplicationConfigurationDirectory, assemblyName);
 
-            using (var file = File.OpenText(path))
+            using (var file = File.OpenText($"{path}{SETTING_FILE_EXTENSION}"))
             {
                 var serializer = new JsonSerializer();
-                var result = (T)serializer.Deserialize(file, typeof(T));
-                return result;
+                result = (T)serializer.Deserialize(file, typeof(T));
+                this.applicationUserPluginSettings.Add(module, result);
+                return (T)result;
             }
         }
 

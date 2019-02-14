@@ -14,6 +14,15 @@ namespace CDP4Composition.PluginSettingService
     public interface IPluginSettingsService
     {
         /// <summary>
+        /// Reads the <see cref="T"/>
+        /// </summary>
+        /// <typeparam name="T">A type of <see cref="PluginSettings"/></typeparam>
+        /// <returns>
+        /// An instance of <see cref="PluginSettings"/>
+        /// </returns>
+        T Read<T>() where T : PluginSettings;
+
+        /// <summary>
         /// Reads the <see cref="PluginSettings"/> from disk
         /// </summary>
         /// <returns>

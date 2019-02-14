@@ -15,3 +15,6 @@ Help_128x128.png https://www.iconfinder.com/icons/27853/help_question_support_ic
 Info_128x128.png https://www.iconfinder.com/icons/27854/about_i_information_icon#size=128, https://creativecommons.org/licenses/by-nd/3.0/, Visual Pharm https://icons8.com/
 Log\link_16x16.png https://www.flaticon.com/free-icon/link_321834#term=chain&page=1&position=18, https://file000.flaticon.com/downloads/license/license.pdf, Vectors market
 Log\link_32x32.png https://www.flaticon.com/free-icon/link_321834#term=chain&page=1&position=18, https://file000.flaticon.com/downloads/license/license.pdf, Vectors market
+to-up-arrow_16x16.png https://www.flaticon.com/free-icon/upward-arrow_74329#term=upward&page=1&position=4 by Freepik
+up-and-left-arrow_16x16.png https://www.flaticon.com/free-icon/up-and-left-arrow_63510#term=up%20left&page=1&position=14 by Freepik
+to-left-arrow_16x16.png https://www.flaticon.com/free-icon/back-left-arrow-curve-symbol_55013#term=left&page=3&position=72 by Linh Pham

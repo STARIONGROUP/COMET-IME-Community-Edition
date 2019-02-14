@@ -4,7 +4,6 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-using CDP4Composition.PluginSettingService;
 
 namespace CDP4Composition.Mvvm
 {
@@ -13,14 +12,13 @@ namespace CDP4Composition.Mvvm
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;    
+    using CDP4Common.EngineeringModelData;
     using CDP4Common;
-    using CDP4Common.ReportingData;
-    using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Converters;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
     using CDP4Composition.ViewModels;
     using CDP4Dal;
     using CDP4Dal.Events;
