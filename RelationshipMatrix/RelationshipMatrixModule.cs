@@ -6,15 +6,18 @@
 
 namespace CDP4RelationshipMatrix
 {
+    using System;
     using System.ComponentModel.Composition;
-
+    using CDP4Common.CommonData;
     using CDP4Composition;
+    using CDP4Composition.Exceptions;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
+    using NLog;
     using Views;
 
     /// <summary>
@@ -23,6 +26,11 @@ namespace CDP4RelationshipMatrix
     [ModuleExportName(typeof(RelationshipMatrixModule), "Module that provide a relationship-matrix view")]
     public class RelationshipMatrixModule : IModule
     {
+        /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixModule"/> class.
         /// </summary>
@@ -93,7 +101,7 @@ namespace CDP4RelationshipMatrix
         {
             this.RegisterRegions();
             this.RegisterRibbonParts();
-            this.PluginSettingService.Read<RelationshipMatrixPluginSettings>(this);
+            this.ReadPluginSettings();            
         }
 
         /// <summary>
@@ -109,6 +117,39 @@ namespace CDP4RelationshipMatrix
         /// </summary>
         private void RegisterRibbonParts()
         {
+        }
+
+        /// <summary>
+        /// Reads the plugin settings from disk
+        /// </summary>
+        private void ReadPluginSettings()
+        {
+            try
+            {
+               this.PluginSettingService.Read<RelationshipMatrixPluginSettings>(this);
+            }
+            catch (PluginSettingsException pluginSettingsException)
+            {
+                var relationshipMatrixPluginSettings = new RelationshipMatrixPluginSettings();
+                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.ElementDefinition);
+                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.ElementUsage);
+                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.NestedElement);
+                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.Option);
+                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.Parameter);
+                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.ParametricConstraint);
+                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.RequirementsSpecification);
+                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.RequirementsGroup);
+                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.Requirement);
+                
+                this.PluginSettingService.Write(relationshipMatrixPluginSettings, this);
+                
+                logger.Error(pluginSettingsException);
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal(ex);
+                throw ex;
+            }
         }
     }
 }

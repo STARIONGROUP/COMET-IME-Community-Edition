@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="PluginSettingsService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2018 RHEA System S.A.
+//   Copyright (c) 2018-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -12,6 +12,7 @@ namespace CDP4Composition.PluginSettingService
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using CDP4Composition.Exceptions;
     using Microsoft.Practices.Prism.Modularity;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
@@ -92,17 +93,27 @@ namespace CDP4Composition.PluginSettingService
 
             var path = Path.Combine(ApplicationConfigurationDirectory, assemblyName);
 
-            using (var file = File.OpenText($"{path}{SETTING_FILE_EXTENSION}"))
+            try
             {
-                var serializer = new JsonSerializer();
-                result = (T)serializer.Deserialize(file, typeof(T));
-                this.applicationUserPluginSettings.Add(module, result);
-                return (T)result;
+                using (var file = File.OpenText($"{path}{SETTING_FILE_EXTENSION}"))
+                {
+                    var serializer = new JsonSerializer();
+                    result = (T)serializer.Deserialize(file, typeof(T));
+
+                    // once the settings have been read from disk, add them to the cache for fast access
+                    this.applicationUserPluginSettings.Add(module, result);
+
+                    return (T)result;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new PluginSettingsException("The PluginSettings could not be read", ex);
             }
         }
 
         /// <summary>
-        /// Writes the <see cref="PluginSettings"/> for the specified <see cref="IModule"/>
+        /// Writes the <see cref="PluginSettings"/> for the specified <see cref="IModule"/> to disks and adds to the cache
         /// </summary>
         /// <param name="pluginSettings">
         /// The <see cref="PluginSettings"/> that will be persisted
@@ -124,7 +135,7 @@ namespace CDP4Composition.PluginSettingService
             
             var assemblyName = this.QueryAssemblyName(module);
 
-            var path = Path.Combine(ApplicationConfigurationDirectory, assemblyName);
+            var path = Path.Combine(ApplicationConfigurationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}" );
 
             using (var streamWriter = File.CreateText(path))
             {
@@ -135,6 +146,16 @@ namespace CDP4Composition.PluginSettingService
                 };
 
                 serializer.Serialize(streamWriter, pluginSettings);
+            }
+
+            // once the settings have been written to disk, add them to the cache for fast access, or update the cache if the item is already present
+            if (this.applicationUserPluginSettings.ContainsKey(module))
+            {
+                this.applicationUserPluginSettings[module] = pluginSettings;
+            }
+            else
+            {
+                this.applicationUserPluginSettings.Add(module, pluginSettings);
             }
         }
 

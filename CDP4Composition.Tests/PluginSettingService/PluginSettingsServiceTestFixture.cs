@@ -24,7 +24,7 @@ namespace CDP4Composition.Tests.PluginSettingService
         [SetUp]
         public void SetUp()
         {
-            this.expectedSettingsPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"RHEA/CDP4/CDP4Composition.Tests");
+            this.expectedSettingsPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"RHEA/CDP4/CDP4Composition.Tests.settings.json");
             
             this.pluginSettingsService = new PluginSettingsService();
             this.testModule = new TestModule(this.pluginSettingsService);
@@ -63,7 +63,7 @@ namespace CDP4Composition.Tests.PluginSettingService
 
             Assert.DoesNotThrow(() => this.pluginSettingsService.Write(settings, this.testModule));
 
-            var expectedSettingsContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.json"));
+            var expectedSettingsContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"));
             var writtenContent = File.ReadAllText(this.expectedSettingsPath);
             Assert.AreEqual(expectedSettingsContent, writtenContent);
         }
@@ -71,7 +71,7 @@ namespace CDP4Composition.Tests.PluginSettingService
         [Test]
         public void Verify_that_the_settings_can_be_read_from_disk()
         {
-            File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.json"), this.expectedSettingsPath);
+            File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"), this.expectedSettingsPath);
             
             var settings = this.pluginSettingsService.Read<TestSettings>(this.testModule);
             Assert.AreEqual(Guid.Parse("78d90eda-bc57-45fe-8bfa-b9ca23130a00"), settings.Identifier);
@@ -81,7 +81,7 @@ namespace CDP4Composition.Tests.PluginSettingService
         [Test]
         public void Verify_that_settings_can_be_read_and_written_to_disk()
         {
-            File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.json"), this.expectedSettingsPath);
+            File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"), this.expectedSettingsPath);
 
             var settings = this.pluginSettingsService.Read<TestSettings>(this.testModule);
             Assert.AreEqual(Guid.Parse("78d90eda-bc57-45fe-8bfa-b9ca23130a00"), settings.Identifier);

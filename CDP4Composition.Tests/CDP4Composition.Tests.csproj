@@ -245,7 +245,7 @@
     <EmbeddedResource Include="Resources\RibbonXml\customui14.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="PluginSettingService\expectedSettings.json">
+    <None Include="PluginSettingService\expectedSettings.settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="SpellingChecker\en_US.aff">
