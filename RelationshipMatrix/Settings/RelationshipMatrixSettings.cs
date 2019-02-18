@@ -20,7 +20,16 @@ namespace CDP4RelationshipMatrix
         /// </summary>
         public RelationshipMatrixPluginSettings()
         {
-            this.PossibleClassKinds = new List<ClassKind>();
+            this.PossibleClassKinds = new List<ClassKind> {ClassKind.ElementDefinition,
+                ClassKind.ElementUsage,
+                ClassKind.NestedElement,
+                ClassKind.Option,
+                ClassKind.Parameter,
+                ClassKind.ParametricConstraint,
+                ClassKind.RequirementsSpecification,
+                ClassKind.RequirementsGroup,
+                ClassKind.Requirement
+            };
         }
 
         /// <summary>

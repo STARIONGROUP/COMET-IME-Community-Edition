@@ -8,7 +8,6 @@ namespace CDP4RelationshipMatrix
 {
     using System;
     using System.ComponentModel.Composition;
-    using CDP4Common.CommonData;
     using CDP4Composition;
     using CDP4Composition.Exceptions;
     using CDP4Composition.Attributes;
@@ -23,7 +22,7 @@ namespace CDP4RelationshipMatrix
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="RelationshipMatrixModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(RelationshipMatrixModule), "Module that provide a relationship-matrix view")]
+    [ModuleExportName(typeof(RelationshipMatrixModule), "Module that provides a relationship-matrix view - Community Edition")]
     public class RelationshipMatrixModule : IModule
     {
         /// <summary>
@@ -122,7 +121,7 @@ namespace CDP4RelationshipMatrix
         /// <summary>
         /// Reads the plugin settings from disk
         /// </summary>
-        private void ReadPluginSettings()
+        internal void ReadPluginSettings()
         {
             try
             {
@@ -131,16 +130,7 @@ namespace CDP4RelationshipMatrix
             catch (PluginSettingsException pluginSettingsException)
             {
                 var relationshipMatrixPluginSettings = new RelationshipMatrixPluginSettings();
-                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.ElementDefinition);
-                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.ElementUsage);
-                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.NestedElement);
-                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.Option);
-                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.Parameter);
-                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.ParametricConstraint);
-                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.RequirementsSpecification);
-                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.RequirementsGroup);
-                relationshipMatrixPluginSettings.PossibleClassKinds.Add(ClassKind.Requirement);
-                
+
                 this.PluginSettingService.Write(relationshipMatrixPluginSettings, this);
                 
                 logger.Error(pluginSettingsException);
