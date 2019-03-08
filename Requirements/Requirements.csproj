@@ -221,9 +221,17 @@
     <Compile Include="ReqIFDal\ImportMap\DatatypeDefinitionMap.cs" />
     <Compile Include="ReqIFDal\ImportMap\SpecObjectTypeMap.cs" />
     <Compile Include="ReqIFDal\ImportMap\RelationGroupTypeMap.cs" />
+    <Compile Include="Settings\OrderSettings.cs" />
+    <Compile Include="Settings\RequirementsModuleSettings.cs" />
+    <Compile Include="Utils\RequirementsContainerOrderHandlerService.cs" />
+    <Compile Include="Utils\OrderHandlerService.cs" />
+    <Compile Include="Utils\RequirementsSpecificationOrderHandlerService.cs" />
+    <Compile Include="Utils\RequirementsGroupOrderHandlerService.cs" />
+    <Compile Include="Utils\RequirementOrderHandlerService.cs" />
     <Compile Include="ViewModels\Dialogs\RequirementContainerParameterValueDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\RequirementsContainerParameterValueRowViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SimpleParameterValueRowViewModel.cs" />
+    <Compile Include="ViewModels\RequirementBrowser\Comparers\RequirementsSpecificationComparer.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Rows\BinaryRelationshipRowViewModel.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Rows\RelationshipParameterValueRowViewModel.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Rows\RequirementsContainerParameterValueRowViewModel.cs" />
@@ -524,6 +532,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\DotLiquidTemplate\RequirementsSpecificationReportTemplate.liquid" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

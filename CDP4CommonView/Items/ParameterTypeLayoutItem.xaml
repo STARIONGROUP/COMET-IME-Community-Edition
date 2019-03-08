@@ -23,9 +23,13 @@
                                               Mode=TwoWay,
                                               UpdateSourceTrigger=PropertyChanged}"
                           IsReadOnly="{Binding IsReadOnly}"
-                          IsTextEditable="False"
+                          IsTextEditable="True"
+                          ImmediatePopup="True"
+                          IncrementalFiltering="True"
+                          IncrementalSearch="True"
+                          DisplayMember="Name"
+                          AutoComplete="True"
                           ItemsSource="{Binding Path=PossibleParameterType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                          SelectedItem=""
                           ShowCustomItems="False">
             <dxe:ComboBoxEdit.ItemTemplate>
                 <DataTemplate>

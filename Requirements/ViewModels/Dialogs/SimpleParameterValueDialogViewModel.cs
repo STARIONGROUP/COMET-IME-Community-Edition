@@ -130,7 +130,7 @@ namespace CDP4Requirements.ViewModels
                 {
                     var allTypes = new List<ParameterType>(containerRdl.ParameterType);
                     allTypes.AddRange(containerRdl.GetRequiredRdls().SelectMany(rdl => rdl.ParameterType));
-                    this.PossibleParameterType.AddRange(allTypes.OrderBy(p => p.ShortName));
+                    this.PossibleParameterType.AddRange(allTypes.OrderBy(p => p.Name));
                 }
             }
         }

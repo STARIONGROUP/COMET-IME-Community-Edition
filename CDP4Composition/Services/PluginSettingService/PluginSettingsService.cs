@@ -55,6 +55,15 @@ namespace CDP4Composition.PluginSettingService
             this.applicationUserPluginSettings = new Dictionary<IModule, PluginSettings>();
         }
 
+
+        /// <summary>
+        /// Configuration file Directory
+        /// </summary>
+        public string ApplicationConfigurationDirectory
+        {
+            get { return Path.Combine(AppDataFolder, ConfigurationDirectoryFolder); }
+        }
+
         /// <summary>
         /// Reads the <see cref="T"/>
         /// </summary>
@@ -91,7 +100,7 @@ namespace CDP4Composition.PluginSettingService
 
             var assemblyName = this.QueryAssemblyName(module);
 
-            var path = Path.Combine(ApplicationConfigurationDirectory, assemblyName);
+            var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
 
             try
             {
@@ -157,14 +166,6 @@ namespace CDP4Composition.PluginSettingService
             {
                 this.applicationUserPluginSettings.Add(module, pluginSettings);
             }
-        }
-
-        /// <summary>
-        /// Configuration file Directory
-        /// </summary>
-        public string ApplicationConfigurationDirectory
-        {
-            get { return Path.Combine(AppDataFolder, ConfigurationDirectoryFolder); }
         }
 
         /// <summary>

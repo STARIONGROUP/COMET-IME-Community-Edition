@@ -9,7 +9,6 @@ namespace CDP4Composition.DragDrop
     using System;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Input;
     using System.Windows.Interactivity;
 
     /// <summary>
@@ -130,7 +129,7 @@ namespace CDP4Composition.DragDrop
         private void PreviewDragLeave(object sender, DragEventArgs e)
         {
             this.dropInfo = null;
-            e.Handled = true;            
+            e.Handled = true;
         }
 
         /// <summary>

@@ -27,8 +27,10 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Requirements.Views;
+    using Comparers;
     using NLog;
     using ReactiveUI;
+    using Utils;
 
     /// <summary>
     /// The View-Model for the <see cref="RequirementsBrowser"/>
@@ -41,6 +43,11 @@ namespace CDP4Requirements.ViewModels
         /// The logger for the current class
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        ///  The comparer for <see cref="RequirementsSpecification"/>
+        /// </summary>
+        private static RequirementsSpecificationComparer SpecComparer = new RequirementsSpecificationComparer();
 
         /// <summary>
         /// Backing field for <see cref="CanCreateReqSpec"/>
@@ -102,7 +109,7 @@ namespace CDP4Requirements.ViewModels
             this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
 
-            this.ReqSpecificationRows = new ReactiveList<RequirementsSpecificationRowViewModel>();
+            this.ReqSpecificationRows = new ReactiveList<IRowViewModelBase<Thing>>();
             var model = (EngineeringModel)this.Thing.Container;
             this.ActiveParticipant = model.GetActiveParticipant(this.Session.ActivePerson);
 
@@ -153,7 +160,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the <see cref="RequirementsSpecificationRowViewModel"/> rows
         /// </summary>
-        public ReactiveList<RequirementsSpecificationRowViewModel> ReqSpecificationRows { get; private set; }
+        public ReactiveList<IRowViewModelBase<Thing>> ReqSpecificationRows { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="BinaryRelationship"/>
@@ -278,8 +285,8 @@ namespace CDP4Requirements.ViewModels
             var currentReqSpec = this.ReqSpecificationRows.Select(x => x.Thing).ToList();
             var updatedReqSpec = this.Thing.RequirementsSpecification;
 
-            var added = updatedReqSpec.Except(currentReqSpec).ToList();
-            var removed = currentReqSpec.Except(updatedReqSpec).ToList();
+            var added = updatedReqSpec.Except(currentReqSpec).Cast<RequirementsSpecification>().ToList();
+            var removed = currentReqSpec.Except(updatedReqSpec).Cast<RequirementsSpecification>().ToList();
 
             foreach (var requirementsSpecification in added)
             {
@@ -301,7 +308,18 @@ namespace CDP4Requirements.ViewModels
             if (!this.ReqSpecificationRows.Select(x => x.Thing).Contains(spec))
             {
                 var row = new RequirementsSpecificationRowViewModel(spec, this.Session, this);
-                this.ReqSpecificationRows.Add(row);
+                this.ReqSpecificationRows.SortedInsert(row, SpecComparer);
+
+                var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
+                if (orderPt != null)
+                {
+                    var orderListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue))
+                        .Where(objectChange => ((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType == orderPt && spec.ParameterValue.Contains(objectChange.ChangedThing))
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(x => this.UpdateSpecRowPosition((RequirementsSpecification)x.ChangedThing.Container));
+
+                    this.Disposables.Add(orderListener);
+                }
             }
         }
 
@@ -317,6 +335,22 @@ namespace CDP4Requirements.ViewModels
                 this.ReqSpecificationRows.Remove(row);
                 row.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Updates the <see cref="RequirementsSpecificationRowViewModel"/> position according to the order-key value
+        /// </summary>
+        /// <param name="updatedSpec">The updated <see cref="RequirementsSpecification"/></param>
+        private void UpdateSpecRowPosition(RequirementsSpecification updatedSpec)
+        {
+            var row = this.ReqSpecificationRows.SingleOrDefault(x => x.Thing.Iid == updatedSpec.Iid);
+            if (row == null)
+            {
+                return;
+            }
+
+            this.ReqSpecificationRows.Remove(row);
+            this.ReqSpecificationRows.SortedInsert(row, SpecComparer);
         }
 
         /// <summary>

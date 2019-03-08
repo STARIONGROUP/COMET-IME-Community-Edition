@@ -8,6 +8,7 @@
 namespace CDP4Requirements.Test
 {
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Requirements.Comparers;
     using CDP4Requirements.ViewModels;
@@ -23,12 +24,16 @@ namespace CDP4Requirements.Test
         [Test]
         public void VerifyThatComparerWorks()
         {
+            var model = new EngineeringModel() { EngineeringModelSetup = new EngineeringModelSetup()};
+            var iteration = new Iteration();
             var spec = new RequirementsSpecification();
             var grp = new RequirementsGroup() { ShortName = "a" };
             var req1 = new Requirement { ShortName = "a"};
             var req2 = new Requirement { ShortName = "b"};
             var req3 = new Requirement { ShortName = "x" };
 
+            model.Iteration.Add(iteration);
+            iteration.RequirementsSpecification.Add(spec);
             spec.Requirement.Add(req1);
             spec.Requirement.Add(req2);
             spec.Requirement.Add(req3);

@@ -11,6 +11,7 @@ namespace CDP4Requirements.Comparers
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.Comparers;
+    using CDP4Common.EngineeringModelData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Requirements.ViewModels;
@@ -72,11 +73,82 @@ namespace CDP4Requirements.Comparers
 
             if (xType == yType)
             {
+                if (xType == typeof(RequirementRowViewModel))
+                {
+                    return this.CompareOrderValue((Requirement) x.Thing, (Requirement) y.Thing);
+                }
+
+                if (xType == typeof(RequirementsGroupRowViewModel))
+                {
+                    return this.CompareOrderValue((RequirementsGroup)x.Thing, (RequirementsGroup)y.Thing);
+                }
+
                 return shortNameThingComparer.Compare((IShortNamedThing)x.Thing, (IShortNamedThing)y.Thing);
             }
             
-            // x is a group, y is ElementUsageRow
             return 1;
+        }
+
+        /// <summary>
+        /// Compares 2 <see cref="Requirement"/>
+        /// </summary>
+        /// <param name="x">The first requirement</param>
+        /// <param name="y">The second requirement</param>
+        /// <returns>
+        /// Less than zero : x is "lower" than y 
+        /// Zero: x "equals" y. 
+        /// Greater than zero: x is "greater" than y.
+        /// </returns>
+        private int CompareOrderValue(Requirement x, Requirement y)
+        {
+            if (RequirementsModule.PluginSettings?.OrderSettings != null && RequirementsModule.PluginSettings.OrderSettings.ParameterType != Guid.Empty)
+            {
+                var xOrder = x.ParameterValue.FirstOrDefault(z => z.ParameterType.Iid == RequirementsModule.PluginSettings.OrderSettings.ParameterType)?.Value.FirstOrDefault();
+                var yOrder = y.ParameterValue.FirstOrDefault(z => z.ParameterType.Iid == RequirementsModule.PluginSettings.OrderSettings.ParameterType)?.Value.FirstOrDefault();
+
+                int xOrderKey, yOrderKey;
+                if (xOrder != null && int.TryParse(xOrder, out xOrderKey) && yOrder != null && int.TryParse(yOrder, out yOrderKey))
+                {
+                    return xOrderKey > yOrderKey
+                        ? 1
+                        : xOrderKey < yOrderKey
+                            ? -1
+                            : shortNameThingComparer.Compare(x, y);
+                }
+            }
+
+            return shortNameThingComparer.Compare(x, y);
+        }
+
+        /// <summary>
+        /// Compares 2 <see cref="RequirementsGroup"/>
+        /// </summary>
+        /// <param name="x">The first group</param>
+        /// <param name="y">The second group</param>
+        /// <returns>
+        /// Less than zero : x is "lower" than y 
+        /// Zero: x "equals" y. 
+        /// Greater than zero: x is "greater" than y.
+        /// </returns>
+        private int CompareOrderValue(RequirementsGroup x, RequirementsGroup y)
+        {
+            if (RequirementsModule.PluginSettings?.OrderSettings != null && RequirementsModule.PluginSettings.OrderSettings.ParameterType != Guid.Empty)
+            {
+                var xOrder = x.ParameterValue.FirstOrDefault(z => z.ParameterType.Iid == RequirementsModule.PluginSettings.OrderSettings.ParameterType)?.Value.FirstOrDefault();
+                var yOrder = y.ParameterValue.FirstOrDefault(z => z.ParameterType.Iid == RequirementsModule.PluginSettings.OrderSettings.ParameterType)?.Value.FirstOrDefault();
+
+                int xOrderKey, yOrderKey;
+                if (xOrder != null && int.TryParse(xOrder, out xOrderKey) && yOrder != null && int.TryParse(yOrder, out yOrderKey))
+                {
+                    return xOrderKey > yOrderKey
+                        ? 1
+                        : xOrderKey < yOrderKey
+                            ? -1
+                            : shortNameThingComparer.Compare(x, y);
+                }
+            }
+
+            return shortNameThingComparer.Compare(x, y);
         }
     }
 }

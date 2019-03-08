@@ -216,6 +216,10 @@
     <Compile Include="RequirementsSpecificationEditor\BreadCrumbComputerTestFixture.cs" />
     <Compile Include="RequirementsSpecificationEditor\RequirementSpecificationContentComparerTestFixture.cs" />
     <Compile Include="RequirementsSpecificationEditor\RequirementsSpecificationEditorViewModelTestFixture.cs" />
+    <Compile Include="Services\OrderHandlerServiceTestFixtureBase.cs" />
+    <Compile Include="Services\RequirementsSpecificationHandlerServiceTestFixture.cs" />
+    <Compile Include="Services\RequirementsGroupHandlerServiceTestFixture.cs" />
+    <Compile Include="Services\RequirementOrderHandlerServiceTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">

@@ -24,6 +24,11 @@ namespace CDP4Composition.DragDrop
         private static Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
+        /// The target actual height
+        /// </summary>
+        private double targetHeight;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DropInfo"/> class.
         /// </summary>
         /// <param name="sender">
@@ -40,20 +45,20 @@ namespace CDP4Composition.DragDrop
             this.Effects = e.Effects;
             this.VisualTarget = sender as UIElement;
             this.DropPosition = e.GetPosition(this.VisualTarget);
-
+            
             var control = sender as Control;
             this.TargetGroup = VisualTreeExtensions.FindGroup(control, this.DropPosition);
 
             var gridcontrol = sender as GridControl;
             if (gridcontrol != null)
             {
-                this.SetTargetItem(gridcontrol);
+                this.SetTargetItem(gridcontrol, e);
             }
 
             var treeListControl = sender as TreeListControl;
             if (treeListControl != null)
             {
-                this.SetTargetItem(treeListControl);
+                this.SetTargetItem(treeListControl, e);
             }
 
             var itemsControl = sender as ItemsControl;
@@ -69,7 +74,7 @@ namespace CDP4Composition.DragDrop
         /// <param name="gridControl">
         /// The <see cref="GridControl"/> that the mouse is moving over
         /// </param>
-        private void SetTargetItem(GridControl gridControl)
+        private void SetTargetItem(GridControl gridControl, DragEventArgs e)
         {
             var tableView = gridControl.View as TableView;
             if (tableView != null)
@@ -80,6 +85,13 @@ namespace CDP4Composition.DragDrop
                     var rowHandle = tableViewHitInfo.RowHandle;
                     if (tableViewHitInfo.InRow)
                     {
+                        var dropPosition = tableView.GetCellElementByRowHandleAndColumn(rowHandle, tableViewHitInfo.Column);
+                        if (dropPosition != null)
+                        {
+                            this.targetHeight = dropPosition.ActualHeight;
+                            this.RelativePositionToDrop = e.GetPosition(dropPosition);
+                        }
+
                         var row = gridControl.GetRow(rowHandle);
                         this.TargetItem = row;
                     }
@@ -111,6 +123,12 @@ namespace CDP4Composition.DragDrop
                     
                     if (listViewHitInfo.InRow)
                     {
+                        var dropPosition = treeListView.GetCellElementByRowHandleAndColumn(rowHandle, listViewHitInfo.Column);
+                        if (dropPosition != null)
+                        {
+                            this.targetHeight = dropPosition.ActualHeight;
+                            this.RelativePositionToDrop = e.GetPosition(dropPosition);
+                        }
                         var row = gridControl.GetRow(rowHandle);
                         this.TargetItem = row;
                     }       
@@ -129,7 +147,7 @@ namespace CDP4Composition.DragDrop
         /// <param name="treeListControl">
         /// The <see cref="TreeListControl"/> that the mouse is moving over
         /// </param>
-        private void SetTargetItem(TreeListControl treeListControl)
+        private void SetTargetItem(TreeListControl treeListControl, DragEventArgs e)
         {
             try
             {
@@ -142,7 +160,15 @@ namespace CDP4Composition.DragDrop
 
                 if (treeListViewHitInfo.InRow)
                 {
+                    var dropPosition = treeListControl.View.GetCellElementByRowHandleAndColumn(rowHandle, treeListViewHitInfo.Column);
                     var row = treeListControl.GetRow(rowHandle);
+                    
+                    if (dropPosition != null)
+                    {
+                        this.targetHeight = dropPosition.ActualHeight;
+                        this.RelativePositionToDrop = e.GetPosition(dropPosition);
+                    }
+
                     this.TargetItem = row;
                 }
             }
@@ -167,7 +193,7 @@ namespace CDP4Composition.DragDrop
                 this.VisualTargetOrientation = VisualTreeExtensions.GetItemsPanelOrientation(itemsControl);
 
                 var itemParent = ItemsControl.ItemsControlFromItemContainer(item);
-                this.TargetItem = itemParent.ItemContainerGenerator.ItemFromContainer(item);                                    
+                this.TargetItem = itemParent.ItemContainerGenerator.ItemFromContainer(item);
             }            
         }
 
@@ -180,6 +206,16 @@ namespace CDP4Composition.DragDrop
         /// Gets the mouse position relative to the VisualTarget
         /// </summary>
         public Point DropPosition { get; private set; }
+
+        /// <summary>
+        /// Gets the mouse position relative to the drop target
+        /// </summary>
+        public Point RelativePositionToDrop { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the item is dropped after this <see cref="TargetItem"/> (false means before)
+        /// </summary>
+        public bool IsDroppedAfter => this.RelativePositionToDrop.Y - this.targetHeight/2 >= 0; 
 
         /// <summary>
         /// Gets or sets the class of drop target to display.

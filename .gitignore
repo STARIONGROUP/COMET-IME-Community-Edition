@@ -70,3 +70,5 @@ packages/
 *.testsettings
 CDP4.v12.suo
 .vs
+
+/RelationshipMatrix/Settings.StyleCop

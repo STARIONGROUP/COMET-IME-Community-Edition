@@ -28,73 +28,18 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using RequirementsSpecificationRowViewModel = CDP4Requirements.ViewModels.RequirementsSpecificationRowViewModel;
 
     [TestFixture]
-    internal class RequirementsSpecificationRowViewModelTestFixture
+    internal class RequirementsSpecificationRowViewModelTestFixture : OrderHandlerServiceTestFixtureBase
     {
         private readonly PropertyInfo revision = typeof (Thing).GetProperty("RevisionNumber");
-        private readonly Uri uri = new Uri("http://test.com");
-        private EngineeringModel model;
-        private EngineeringModelSetup modelSetup;
-        private Iteration iteration;
-        private IterationSetup iterationSetup;
-        private RequirementsSpecification reqSpec;
-        private DomainOfExpertise domain;
-        private Mock<ISession> session;
-        private Mock<IPermissionService> permissionService;
+
         private RequirementsBrowserViewModel requirementBrowserViewModel;
-        private RequirementsGroup grp1;
-        private RequirementsGroup grp11;
-        private RequirementsGroup grp2;
-
-        private Requirement req;
-        private Assembler assembler;
-
 
         [SetUp]
-        public void Setup()
+        public override void Setup()
         {
-            this.assembler = new Assembler(this.uri);
-
+            base.Setup();
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.session = new Mock<ISession>();
-            this.permissionService = new Mock<IPermissionService>();
-            this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
-            this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
-            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
-            var person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test" };
-            var participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = person, Domain = new List<DomainOfExpertise>{ this.domain } };
-            this.session.Setup(x => x.ActivePerson).Returns(person);
-
-            this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "model" };
-            this.modelSetup.Participant.Add(participant);
-            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.modelSetup.IterationSetup.Add(this.iterationSetup);
-            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "rs1", ShortName = "1"};
-            var tuple = new Tuple<DomainOfExpertise, Participant>(domain, participant);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, tuple } });
-
-            this.reqSpec.Owner = this.domain;
-
-            this.iteration.RequirementsSpecification.Add(this.reqSpec);
-            this.iteration.IterationSetup = this.iterationSetup;
-            this.model.EngineeringModelSetup = this.modelSetup;
-            this.model.Iteration.Add(this.iteration);
-
-            this.grp1 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.grp11 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.grp2 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-
-            this.reqSpec.Group.Add(this.grp1);
-            this.reqSpec.Group.Add(this.grp2);
-            this.grp1.Group.Add(this.grp11);
-
-            this.req = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.reqSpec.Requirement.Add(this.req);
-
-            this.requirementBrowserViewModel = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            this.requirementBrowserViewModel = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, this.pluginService.Object);
         }
 
         [TearDown]
@@ -106,10 +51,10 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var row = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, this.requirementBrowserViewModel);
+            var row = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, this.requirementBrowserViewModel);
         
-            Assert.AreEqual("rs1", row.Name);
-            Assert.AreEqual("1", row.ShortName);
+            Assert.AreEqual("spec1", row.Name);
+            Assert.AreEqual("spec1", row.ShortName);
             Assert.AreSame(this.domain, row.Owner);
             Assert.That(row.Definition, Is.Null.Or.Empty);
         }
@@ -117,107 +62,108 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         [Test]
         public void VerifyThatGroupsCanBeAddedOrRemoved()
         {
-            var row = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, this.requirementBrowserViewModel);
+            var row = new RequirementsSpecificationRowViewModel(this.spec2, this.session.Object, this.requirementBrowserViewModel);
 
             var groups = row.ContainedRows.Where(x => x.Thing is RequirementsGroup);
-            Assert.AreEqual(2, groups.Count());
+            Assert.AreEqual(3, groups.Count());
 
             var grp1Row = row.ContainedRows.Single(x => x.Thing.Iid == this.grp1.Iid);
-            Assert.AreEqual(2, grp1Row.ContainedRows.Count);
+            Assert.AreEqual(5, grp1Row.ContainedRows.Count);
 
             var newgrp = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.grp1.Group.Add(newgrp);
 
             this.revision.SetValue(this.grp1, 2);
-            this.revision.SetValue(this.reqSpec, 2);
+            this.revision.SetValue(this.spec2, 2);
             CDPMessageBus.Current.SendObjectChangeEvent(this.grp1, EventKind.Updated);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.reqSpec, EventKind.Updated);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
 
-            Assert.AreEqual(3, grp1Row.ContainedRows.Count);
+            Assert.AreEqual(6, grp1Row.ContainedRows.Count);
 
-            this.reqSpec.Group.Remove(this.grp2);
-            this.revision.SetValue(this.reqSpec, 3);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.reqSpec, EventKind.Updated);
+            this.spec2.Group.Remove(this.grp2);
+            this.revision.SetValue(this.spec2, 3);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
 
             groups = row.ContainedRows.Where(x => x.Thing is RequirementsGroup);
-            Assert.AreEqual(1, groups.Count());
+            Assert.AreEqual(2, groups.Count());
         }
 
         [Test]
         public void VerifyThatRequirementCanBeAddedOrRemoved()
         {
-            var row = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, this.requirementBrowserViewModel);
+            var spec2Row = new RequirementsSpecificationRowViewModel(this.spec2, this.session.Object, this.requirementBrowserViewModel);
 
-            var reqRows = row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
-            Assert.AreEqual(1, reqRows.Count);
-
-            this.req.Group = this.grp1;
-            this.revision.SetValue(this.req, 2);
-             
-            CDPMessageBus.Current.SendObjectChangeEvent(this.req, EventKind.Updated);
-            reqRows = row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
+            var reqRows = spec2Row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
             Assert.AreEqual(0, reqRows.Count);
 
-            var grp1Row = row.ContainedRows.Single(x => x.Thing.Iid == this.grp1.Iid);
-            Assert.IsTrue(grp1Row.ContainedRows.Any(x => x.Thing.Iid == this.req.Iid));
-            this.req.Group = this.grp11;
-            this.revision.SetValue(this.req, 3);
+            this.req21.Group = null;
+            this.revision.SetValue(this.req21, 2);
+             
+            CDPMessageBus.Current.SendObjectChangeEvent(this.req21, EventKind.Updated);
+            reqRows = spec2Row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
+            Assert.AreEqual(1, reqRows.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.req, EventKind.Updated);
-            Assert.IsFalse(grp1Row.ContainedRows.Any(x => x.Thing.Iid == this.req.Iid));
 
-            var grp11Row = grp1Row.ContainedRows.Single(x => x.Thing.Iid == this.grp11.Iid);
-            Assert.IsTrue(grp11Row.ContainedRows.Any(x => x.Thing.Iid == this.req.Iid));
-            this.req.Group = null;
-            this.revision.SetValue(this.req, 4);
+            var grp1Row = spec2Row.ContainedRows.Single(x => x.Thing.Iid == this.grp1.Iid);
+            Assert.IsFalse(grp1Row.ContainedRows.Any(x => x.Thing.Iid == this.req21.Iid));
+            this.req21.Group = this.grp4;
+            this.revision.SetValue(this.req21, 3);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.req, EventKind.Updated);
-            Assert.IsFalse(grp11Row.ContainedRows.Any(x => x.Thing.Iid == this.req.Iid));
-            Assert.IsTrue(row.ContainedRows.Any(x => x.Thing.Iid == this.req.Iid));
+            CDPMessageBus.Current.SendObjectChangeEvent(this.req21, EventKind.Updated);
+            Assert.IsFalse(grp1Row.ContainedRows.Any(x => x.Thing.Iid == this.req21.Iid));
+
+            var grp11Row = grp1Row.ContainedRows.Single(x => x.Thing.Iid == this.grp4.Iid);
+            Assert.IsTrue(grp11Row.ContainedRows.Any(x => x.Thing.Iid == this.req21.Iid));
+            this.req21.Group = null;
+            this.revision.SetValue(this.req21, 4);
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.req21, EventKind.Updated);
+            Assert.IsFalse(grp11Row.ContainedRows.Any(x => x.Thing.Iid == this.req21.Iid));
+            Assert.IsTrue(spec2Row.ContainedRows.Any(x => x.Thing.Iid == this.req21.Iid));
 
             var newreq = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.reqSpec.Requirement.Add(newreq);
-            this.revision.SetValue(this.reqSpec, 5);
+            this.spec2.Requirement.Add(newreq);
+            this.revision.SetValue(this.spec2, 5);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.reqSpec, EventKind.Updated);
-            reqRows = row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
+            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+            reqRows = spec2Row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
             Assert.AreEqual(2, reqRows.Count);
 
-            this.reqSpec.Requirement.Remove(newreq);
-            this.revision.SetValue(this.reqSpec, 6);
+            this.spec2.Requirement.Remove(newreq);
+            this.revision.SetValue(this.spec2, 6);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.reqSpec, EventKind.Updated);
-            reqRows = row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
+            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+            reqRows = spec2Row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
             Assert.AreEqual(1, reqRows.Count);
         }
 
         [Test]
         public void VerifyThatAddingRequirementGroupUpdatesRequirementsSpecificationContainedRows()
         {
-            var row = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, this.requirementBrowserViewModel);
+            var row = new RequirementsSpecificationRowViewModel(this.spec2, this.session.Object, this.requirementBrowserViewModel);
 
             var groups = row.ContainedRows.Where(x => x.Thing is RequirementsGroup);
-            Assert.AreEqual(2, groups.Count());
+            Assert.AreEqual(3, groups.Count());
 
             var grp1Row = row.ContainedRows.Single(x => x.Thing.Iid == this.grp1.Iid);
-            Assert.AreEqual(2, grp1Row.ContainedRows.Count);
+            Assert.AreEqual(5, grp1Row.ContainedRows.Count);
 
             var newgrp = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.grp1.Group.Add(newgrp);
 
             this.revision.SetValue(this.grp1, 2);
-            this.revision.SetValue(this.reqSpec, 2);
+            this.revision.SetValue(this.spec2, 2);
             CDPMessageBus.Current.SendObjectChangeEvent(this.grp1, EventKind.Updated);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.reqSpec, EventKind.Updated);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
 
-            Assert.AreEqual(3, grp1Row.ContainedRows.Count);
+            Assert.AreEqual(6, grp1Row.ContainedRows.Count);
 
-            this.reqSpec.Group.Remove(this.grp2);
-            this.revision.SetValue(this.reqSpec, 3);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.reqSpec, EventKind.Updated);
+            this.spec2.Group.Remove(this.grp2);
+            this.revision.SetValue(this.spec2, 3);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
 
             groups = row.ContainedRows.Where(x => x.Thing is RequirementsGroup);
-            Assert.AreEqual(1, groups.Count());
+            Assert.AreEqual(2, groups.Count());
         }
 
 
@@ -225,11 +171,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         public void VerifyDragOver()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
-            var row = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
+            var row = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, null);
 
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
-            dropinfo.Setup(x => x.Payload).Returns(this.req);
+            dropinfo.Setup(x => x.Payload).Returns(this.req1);
 
             row.DragOver(dropinfo.Object);
             Assert.AreEqual(DragDropEffects.Move, dropinfo.Object.Effects);
@@ -247,10 +193,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         public void VerifyRequirementDrop()
         {
             var dropInfo = new Mock<IDropInfo>();
-            dropInfo.Setup(x => x.Payload).Returns(this.req);
+            dropInfo.Setup(x => x.Payload).Returns(this.req1);
             dropInfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
-            var row = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
-            Assert.AreEqual(1, this.reqSpec.Requirement.Count);
+            this.spec1.Requirement.Clear();
+            var row = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, this.requirementBrowserViewModel);
+            Assert.AreEqual(0, this.spec1.Requirement.Count);
 
             row.Drop(dropInfo.Object);
 
@@ -261,11 +208,12 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         public void VerifyRequirementGroupDrop()
         {
             var dropInfo = new Mock<IDropInfo>();
-            dropInfo.Setup(x => x.Payload).Returns(this.grp11);
+            dropInfo.Setup(x => x.Payload).Returns(this.grp1);
             dropInfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
-            var row = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
-            Assert.AreEqual(2, this.reqSpec.Group.Count);
-            Assert.AreEqual(4, row.ContainedRows.Count);
+            dropInfo.Setup(x => x.KeyStates).Returns(DragDropKeyStates.LeftMouseButton);
+            var row = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, this.requirementBrowserViewModel);
+            Assert.AreEqual(0, this.spec1.Group.Count);
+            Assert.AreEqual(5, row.ContainedRows.Count);
 
             row.Drop(dropInfo.Object);
 
@@ -275,38 +223,39 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         [Test]
         public void VerifyThatWhenSpecIsDeprecatedTheRowIsDeprecatedAsWell()
         {
-            this.reqSpec.IsDeprecated = true;
-            var row = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, this.requirementBrowserViewModel);
+            this.spec1.IsDeprecated = true;
+            var row = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, this.requirementBrowserViewModel);
             Assert.IsTrue(row.IsDeprecated); 
         }
 
         [Test]
         public void VerifyThatDragOverParameterWorks()
         {
-            var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
-
+            var containerRow = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, null);
             var param = new BooleanParameterType();
             var tuple = new Tuple<ParameterType, MeasurementScale>(param, null);
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(tuple);
             dropinfo.SetupProperty(x => x.Effects);
 
+            this.permissionService.Setup(x => x.CanWrite(ClassKind.RequirementsContainerParameterValue, It.IsAny<RequirementsSpecification>())).Returns(false);
+
             containerRow.DragOver(dropinfo.Object);
-            Assert.AreEqual(dropinfo.Object.Effects, DragDropEffects.None);
+            Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
 
             this.permissionService.Setup(x => x.CanWrite(ClassKind.RequirementsContainerParameterValue, It.IsAny<RequirementsSpecification>())).Returns(true);
             containerRow.DragOver(dropinfo.Object);
-            Assert.AreEqual(dropinfo.Object.Effects, DragDropEffects.Copy);
+            Assert.AreEqual(DragDropEffects.Copy, dropinfo.Object.Effects);
 
-            this.reqSpec.ParameterValue.Add(new RequirementsContainerParameterValue { ParameterType = param });
+            this.spec1.ParameterValue.Add(new RequirementsContainerParameterValue { ParameterType = param });
             containerRow.DragOver(dropinfo.Object);
-            Assert.AreEqual(dropinfo.Object.Effects, DragDropEffects.None);
+            Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
         }
 
         [Test]
         public void VerifyThatDropParameterTypeWorks()
         {
-            var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
+            var containerRow = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, null);
 
             var param = new BooleanParameterType();
             var tuple = new Tuple<ParameterType, MeasurementScale>(param, null);

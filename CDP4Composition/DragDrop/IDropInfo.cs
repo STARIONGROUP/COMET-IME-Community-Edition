@@ -75,5 +75,15 @@ namespace CDP4Composition.DragDrop
         /// Gets the current state of the modifier keys (SHIFT, CTRL, and ALT), as well as the state of the mouse buttons.
         /// </summary>
         DragDropKeyStates KeyStates { get; }
+
+        /// <summary>
+        /// Gets the mouse position relative to the drop target
+        /// </summary>
+        Point RelativePositionToDrop { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the item is dropped after this <see cref="TargetItem"/> (false means before)
+        /// </summary>
+        bool IsDroppedAfter { get; }
     }
 }

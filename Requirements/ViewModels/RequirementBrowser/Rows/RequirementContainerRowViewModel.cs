@@ -9,6 +9,7 @@ namespace CDP4Requirements.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
@@ -20,8 +21,10 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Dal;
+    using CDP4Dal.Events;
     using CDP4Requirements.Comparers;
     using ReactiveUI;
+    using Utils;
 
     /// <summary>
     /// A Row view model that represents a <see cref="RequirementsContainer"/>
@@ -137,6 +140,27 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Updates the <see cref="RequirementsGroupRowViewModel"/> within the current <see cref="RequirementsGroupRowViewModel"/>
+        /// </summary>
+        /// <param name="group">The updated <see cref="RequirementsGroup"/></param>
+        private void UpdateReqGroupPosition(RequirementsGroup group)
+        {
+            if (!this.Thing.Group.Contains(group))
+            {
+                return;
+            }
+
+            var groupRow = this.ContainedRows.OfType<RequirementsGroupRowViewModel>().SingleOrDefault(x => x.Thing.Iid == group.Iid);
+            if (groupRow == null)
+            {
+                return;
+            }
+
+            this.ContainedRows.Remove(groupRow);
+            this.ContainedRows.SortedInsert(groupRow, ChildRowComparer);
+        }
+
+        /// <summary>
         /// Add a nested <see cref="RequirementsContainer"/> row
         /// </summary>
         /// <param name="group">The <see cref="RequirementsContainer"/> to add</param>
@@ -145,6 +169,17 @@ namespace CDP4Requirements.ViewModels
             var row = new RequirementsGroupRowViewModel(group, this.Session, this, this.TopParentRow);
             this.ContainedRows.SortedInsert(row, ChildRowComparer);
             this.TopParentRow.GroupCache[group] = row;
+
+            var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
+            if (orderPt != null)
+            {
+                var orderListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue))
+                    .Where(objectChange => ((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType == orderPt && this.Thing.Group.Any(g => g.ParameterValue.Contains(objectChange.ChangedThing)))
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => this.UpdateReqGroupPosition((RequirementsGroup)x.ChangedThing.Container));
+
+                this.Disposables.Add(orderListener);
+            }
         }
 
         /// <summary>

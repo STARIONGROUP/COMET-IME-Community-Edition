@@ -115,7 +115,8 @@ namespace CDP4Composition.DragDrop
                             var data = new DataObject(DataFormat.Name, this.dragInfo.Payload);
                             
                             this.dragInProgress = true;
-                            Dispatcher.BeginInvoke(new Action(() =>
+
+                            this.Dispatcher.BeginInvoke(new Action(() =>
                             {
                                 try
                                 {

@@ -33,7 +33,7 @@ namespace CDP4Requirements.Tests
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
 
             var regionManager = new RegionManager();
-            var module = new RequirementsModule(regionManager, this.ribbonManager.Object, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNAvigationService.Object);
+            var module = new RequirementsModule(regionManager, this.ribbonManager.Object, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNAvigationService.Object, null);
             Assert.AreEqual(regionManager, module.RegionManager);
         }
     }

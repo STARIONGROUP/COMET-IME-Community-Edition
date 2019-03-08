@@ -22,6 +22,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
+    using Utils;
     using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
 
     /// <summary>
@@ -142,6 +143,13 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
+            var req = dropInfo.Payload as Requirement;
+            if (req != null)
+            {
+                this.DragOver(req, dropInfo);
+                return;
+            }
+
             dropInfo.Effects = DragDropEffects.None;
         }
 
@@ -164,6 +172,13 @@ namespace CDP4Requirements.ViewModels
             if (tuple != null)
             {
                 await this.Drop(tuple);
+                return;
+            }
+
+            var req = dropInfo.Payload as Requirement;
+            if (req != null)
+            {
+                await this.Drop(req, dropInfo);
                 return;
             }
         }
@@ -224,6 +239,23 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Handle the drag-over of a <see cref="Requirement"/>
+        /// </summary>
+        /// <param name="req">The <see cref="Requirement"/></param>
+        /// <param name="dropInfo">The <see cref="IDropInfo"/></param>
+        private void DragOver(Requirement req, IDropInfo dropInfo)
+        {
+            if (req.Container != this.Thing.Container)
+            {
+                dropInfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            // moving requirements before the current one
+            dropInfo.Effects = DragDropEffects.Move;
+        }
+
+        /// <summary>
         /// Handles the drop action of a <see cref="Category"/>
         /// </summary>
         /// <param name="category">The dropped <see cref="Category"/></param>
@@ -254,6 +286,26 @@ namespace CDP4Requirements.ViewModels
             transaction.CreateOrUpdate(clone);
 
             await this.DalWrite(transaction);
+        }
+
+        /// <summary>
+        /// Handles the drop action of a <see cref="Requirement"/>
+        /// </summary>
+        /// <param name="req">The <see cref="Requirement"/></param>
+        /// <param name="dropinfo">The dropinfo</param>
+        private async Task Drop(Requirement req, IDropInfo dropinfo)
+        {
+            var model = (EngineeringModel)this.Thing.TopContainer;
+            var orderPt = OrderHandlerService.GetOrderParameterType(model);
+
+            if (orderPt == null)
+            {
+                return;
+            }
+
+            var orderService = new RequirementOrderHandlerService(this.Session, orderPt);
+            var transaction = orderService.Insert(req, this.Thing, dropinfo.IsDroppedAfter ? InsertKind.InsertAfter : InsertKind.InsertBefore);
+            await this.Session.Write(transaction.FinalizeTransaction());
         }
 
         #endregion Drag, Drop
