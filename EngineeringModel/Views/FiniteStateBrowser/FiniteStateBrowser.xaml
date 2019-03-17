@@ -194,6 +194,7 @@
                                     <Setter Property="Background" Value="Yellow"/>
                                 </DataTrigger>
                             </Style.Triggers>
+                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
                         </Style>
                     </dxg:TreeListView.RowStyle>
                 </dxg:TreeListView>
