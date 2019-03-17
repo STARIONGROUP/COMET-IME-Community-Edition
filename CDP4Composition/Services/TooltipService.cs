@@ -6,18 +6,25 @@
 
 namespace CDP4Composition.Services
 {
+    using System;
     using System.Linq;
     using System.Text;
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using NLog;
 
     /// <summary>
     /// The purpose of the <see cref="TooltipService"/> is to derive the tooltp text of a specific <see cref="Thing"/>
     /// </summary>
     public static class TooltipService
     {
+        /// <summary>
+        /// The current logger
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Returns a string that represents a tooltip text for the specified <see cref="Thing"/>
         /// </summary>
@@ -42,7 +49,18 @@ namespace CDP4Composition.Services
             var ownedThing = thing as IOwnedThing;
             if (ownedThing != null)
             {
-                sb.AppendLine($"Owner: {ownedThing.Owner.ShortName}");
+                var owner = string.Empty;
+                if (ownedThing.Owner != null)
+                {
+                    owner = ownedThing.Owner.ShortName;
+                }
+                else
+                {
+                    owner = "NA";
+                    logger.Debug($"Owner if {thing.ClassKind} null");
+                }
+
+                sb.AppendLine($"Owner: {owner}");
             }
 
             var categorizableThing = thing as ICategorizableThing;
@@ -55,7 +73,19 @@ namespace CDP4Composition.Services
             var modelCodeThing = thing as IModelCode;
             if (modelCodeThing != null)
             {
-                sb.AppendLine($"Model Code: {modelCodeThing.ModelCode()}");
+                var modelCode = string.Empty;
+
+                try
+                {
+                    modelCode = modelCodeThing.ModelCode();
+                }
+                catch (Exception e)
+                {
+                    modelCode = "Invalid Model Code";
+                    logger.Error(e);
+                }
+
+                sb.AppendLine($"Model Code: {modelCode}");
             }
             
             var definedThing = thing as DefinedThing;
