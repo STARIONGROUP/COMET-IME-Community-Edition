@@ -80,6 +80,7 @@
                                     <Setter Property="Opacity" Value="0.5"/>
                                 </DataTrigger>
                             </Style.Triggers>
+                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
                         </Style>
                     </dxg:TableView.RowStyle>
                 </dxg:TableView>
