@@ -1,12 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PersonRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.ViewModels
 {
     using System;
+    using System.Text;
     using System.Linq;
     using System.Reactive.Linq;
     using CDP4Common.CommonData;
@@ -21,7 +22,6 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class PersonRowViewModel : CDP4CommonView.PersonRowViewModel
     {
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonRowViewModel"/> class.
         /// </summary>
@@ -35,9 +35,7 @@ namespace CDP4SiteDirectory.ViewModels
             this.UpdateParticipants(sitedir);
             this.UpdateProperties();
         }
-        #endregion
-
-        #region row-base
+        
         /// <summary>
         /// Initializes the subscriptions
         /// </summary>
@@ -64,7 +62,49 @@ namespace CDP4SiteDirectory.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
+
+        /// <summary>
+        /// Update <see cref="Tooltip"/> of the <see cref="PersonRowViewModel"/>
+        /// </summary>
+        protected override void UpdateTooltip()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"Name: {this.Thing.Name}");
+            
+            if (this.Thing.Organization != null)
+            {
+                sb.AppendLine($"Organization: {this.Thing.Organization.ShortName}");
+            }
+
+            if (this.Thing.Role != null)
+            {
+                sb.AppendLine($"Role: {this.Thing.Role.Name} [{this.Thing.Role.ShortName}]");
+            }
+
+            if (this.Thing.DefaultDomain != null)
+            {
+                sb.AppendLine($"Default Domain: {this.Thing.DefaultDomain .Name} [{this.Thing.DefaultDomain.ShortName}]");
+            }
+            else
+            {
+                sb.AppendLine("Default Domain: -");
+            }
+
+            if (this.Thing.DefaultEmailAddress != null)
+            {
+                sb.AppendLine($"Email: {this.Thing.DefaultEmailAddress.Value} [{this.Thing.DefaultEmailAddress.VcardType}]");
+            }
+
+            if (this.Thing.DefaultTelephoneNumber != null)
+            {
+                sb.AppendLine($"Phone: {this.Thing.DefaultTelephoneNumber.Value} [{string.Join(", ", this.Thing.DefaultTelephoneNumber.VcardType.Select(x => x.ToString()))}]");
+            }
+
+            sb.Append(this.Thing.IsActive ? $"Active: yes" : $"Active: no");
+
+
+            this.Tooltip = sb.ToString();
+        }
 
         /// <summary>
         /// Update the properties of this row

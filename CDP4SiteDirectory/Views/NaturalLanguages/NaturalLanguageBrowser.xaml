@@ -62,6 +62,11 @@
                     <dxg:TableView.ContextMenu>
                         <ContextMenu Name="RowContextMenu" />
                     </dxg:TableView.ContextMenu>
+                    <dxg:TableView.RowStyle>
+                        <Style TargetType="{x:Type dxg:RowControl}">
+                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                        </Style>
+                    </dxg:TableView.RowStyle>
                     <dxg:TableView.FocusedRow>
                         <dynamic:ExpandoObject />
                     </dxg:TableView.FocusedRow>
