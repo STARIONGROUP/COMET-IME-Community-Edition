@@ -306,6 +306,12 @@
                                   TreeLineStyle="Solid"
                                   VerticalScrollbarVisibility="Auto"
                                   ShowFilterPanelMode="Never">
+                        <dxg:TreeListView.RowStyle>
+                            <Style TargetType="{x:Type dxg:RowControl}">
+                                <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                            </Style>
+                        </dxg:TreeListView.RowStyle>
+
                         <dxg:TreeListView.FocusedRow>
                             <dynamic:ExpandoObject />
                         </dxg:TreeListView.FocusedRow>
