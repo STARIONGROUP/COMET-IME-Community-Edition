@@ -234,6 +234,7 @@
     <Compile Include="PluginSettingService\TestModule.cs" />
     <Compile Include="PluginSettingService\TestSettings.cs" />
     <Compile Include="RuleVerification\RuleVerificationServiceTestFixture.cs" />
+    <Compile Include="Services\TooltipServiceTestFixture.cs" />
     <Compile Include="SpellingChecker\DictionaryServiceTestFixture.cs" />
     <Compile Include="StaticPanelViewModelTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -268,6 +269,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\RibbonXml\testribbon.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -17,12 +17,11 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-    using DevExpress.XtraPrinting.Native;
-
     using ReactiveUI;
 
     /// <summary>
@@ -31,7 +30,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// <typeparam name="T">A <see cref="ParameterBase"/> type</typeparam>
     public abstract class ParameterBaseRowViewModel<T> : CDP4CommonView.ParameterBaseRowViewModel<T>, IValueSetRow, IModelCodeRowViewModel where T : ParameterBase
     {
-        #region Fields
         /// <summary>
         /// The current <see cref="ParameterGroup"/>
         /// </summary>
@@ -61,9 +59,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
         private string modelCode;
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}"/> class. 
         /// </summary>
@@ -92,9 +88,6 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.UpdateProperties();
         }
-        #endregion
-
-        #region public properties
         
         /// <summary>
         /// Gets or sets the owner listener
@@ -175,9 +168,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ClassKind"/> of the <see cref="ParameterType"/> represented by this <see cref="IValueSetRow"/>
         /// </summary>
         public ClassKind ParameterTypeClassKind { get; protected set; }
-        #endregion
 
-        #region Public Methods
         /// <summary>
         /// Sets the values of this row in case where the <see cref="ParameterBase"/> is neither option-dependent nor state-dependent and is a <see cref="ScalarParameterType"/>
         /// </summary>
@@ -211,10 +202,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             return !this.isParameterBaseReadOnlyInDataContext && base.IsEditable(propertyName);
         }
-
-        #endregion
-
-        #region Row Base
+        
         /// <summary>
         /// Initializes the subscription of this row
         /// </summary>
@@ -256,7 +244,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
-
         }
 
         /// <summary>
@@ -282,9 +269,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.ThingStatus = new ThingStatus(this.Thing);
         }
-        #endregion
-
-        #region Private method
 
         /// <summary>
         /// Update this ParameterBase row and its child nodes
@@ -346,7 +330,7 @@ namespace CDP4EngineeringModel.ViewModels
                 }
             }
         }
-
+        
         /// <summary>
         /// Sets the option dependent rows contained in this row.
         /// </summary>
@@ -476,6 +460,5 @@ namespace CDP4EngineeringModel.ViewModels
             this.Scale = null;
             this.Published = null;
         }
-        #endregion
     }
 }

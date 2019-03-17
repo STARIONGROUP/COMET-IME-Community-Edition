@@ -19,6 +19,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4EngineeringModel.Comparers;
@@ -86,8 +87,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.parameterGroupCache = new Dictionary<ParameterGroup, ParameterGroupRowViewModel>();
             this.parameterGroupContainment = new Dictionary<ParameterGroup, ParameterGroup>();
             this.ParameterBaseListener = new Dictionary<ParameterBase, IDisposable>();
-            this.currentDomain = currentDomain;
-            this.UpdateTooltip();
+            this.currentDomain = currentDomain;            
             this.UpdateOwnerProperties();
             this.WhenAnyValue(vm => vm.Owner).Subscribe(_ => this.UpdateOwnerProperties());
             this.ModelCode = ((IModelCode)this.Thing).ModelCode();
@@ -243,10 +243,9 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
-            this.UpdateTooltip();
             this.ModelCode = ((IModelCode)this.Thing).ModelCode();
         }
-
+        
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>

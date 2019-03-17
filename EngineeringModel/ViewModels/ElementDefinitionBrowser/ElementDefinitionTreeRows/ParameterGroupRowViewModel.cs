@@ -27,7 +27,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ParameterGroupRowViewModel : CDP4CommonView.ParameterGroupRowViewModel, IDropTarget
     {
-        #region Fields
         /// <summary>
         /// The <see cref="IComparer{T}"/>
         /// </summary>
@@ -42,9 +41,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// The current <see cref="ParameterGroup"/>
         /// </summary>
         private ParameterGroup currentGroup;
-        #endregion
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterGroupRowViewModel"/> class
         /// </summary>
@@ -59,9 +56,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.currentGroup = this.Thing.ContainingGroup;
             this.UpdateProperties();
         }
-        #endregion
-
-        #region public Properties
+        
         /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
@@ -74,9 +69,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return false; }
         }
-        #endregion
         
-        #region IDropTarget
         /// <summary>
         /// Queries whether a drag can be started
         /// </summary>
@@ -168,8 +161,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             dropInfo.Effects = DragDropEffects.None;
         }
-        #endregion
-
+        
         /// <summary>
         /// Update the properties of this row on update
         /// </summary>
@@ -187,8 +179,7 @@ namespace CDP4EngineeringModel.ViewModels
                 }
             }
         }
-
-        #region Row-Base
+        
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>
@@ -196,7 +187,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.ThingStatus = new ThingStatus(this.Thing);
         }
-
+        
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -206,10 +197,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-
-        #endregion
-
-        #region Drag-over handler
+        
         /// <summary>
         /// Update the drag state when the payload is a <see cref="Tuple{ParameterType, MeasurementScale}"/>
         /// </summary>
@@ -302,9 +290,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             dropInfo.Effects = DragDropEffects.None;
         }
-        #endregion
-
-        #region Drop Methods
+        
         /// <summary>
         /// Performs the drop operation when the payload is a <see cref="Tuple{ParameterType, MeasurementScale}"/>
         /// </summary>
@@ -380,6 +366,5 @@ namespace CDP4EngineeringModel.ViewModels
                 await this.DalWrite(clone);
             }
         }
-        #endregion
     }
 }

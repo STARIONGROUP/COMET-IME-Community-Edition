@@ -36,7 +36,6 @@ namespace CDP4Composition.Mvvm
     /// <typeparam name="T">The <see cref="Thing"/> represented by the row</typeparam>
     public abstract class RowViewModelBase<T> : ViewModelBase<T>, IRowViewModelBase<T> where T : Thing
     {
-        #region Fields
         /// <summary>
         /// The <see cref="IDialogNavigationService"/> that is responsible for navigating to a <see cref="IDialogViewModel"/>
         /// </summary>
@@ -86,9 +85,7 @@ namespace CDP4Composition.Mvvm
         /// Backing field for <see cref="ThingStatus"/>
         /// </summary>
         private ThingStatus thingStatus;
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="RowViewModelBase{T}"/> class. 
         /// </summary>
@@ -120,11 +117,9 @@ namespace CDP4Composition.Mvvm
             }
 
             this.InitializeSubscriptions();
+            this.UpdateTooltip();
         }
-        #endregion
-
-        #region Properties
-
+        
         /// <summary>
         /// Gets or sets a value representing the <see cref="RowStatusKind"/>
         /// </summary>
@@ -221,7 +216,7 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Collapases the current row and all contained rows along the containment hierarchy
+        /// Collapses the current row and all contained rows along the containment hierarchy
         /// </summary>
         public void CollapseAllRows()
         {
@@ -279,10 +274,7 @@ namespace CDP4Composition.Mvvm
                 return (this.Thing == null)? "-" : converter.Convert(this.Thing.ClassKind, null, null, null).ToString();
             }
         }
-
-        #endregion
-
-        #region IDataErrorInfo
+        
         /// <summary>
         /// Gets the validation error message
         /// </summary>
@@ -345,9 +337,7 @@ namespace CDP4Composition.Mvvm
         {
             return this.Session.PermissionService.CanWrite(this.Thing);
         }
-
-        #endregion
-
+        
         /// <summary>
         /// Initializes the subscriptions
         /// </summary>
@@ -404,7 +394,7 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Udate the <see cref="ThingStatus"/> property
+        /// Update the <see cref="ThingStatus"/> property
         /// </summary>
         protected virtual void UpdateThingStatus()
         {
@@ -572,10 +562,24 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// The event-handler that is invoked by the subscription that listens for updates
+        /// on the <see cref="Thing"/> that is being represented by the view-model
+        /// </summary>
+        /// <param name="objectChange">
+        /// The payload of the event that is being handled
+        /// </param>
+        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
+        {
+            base.ObjectChangeEventHandler(objectChange);
+            this.UpdateTooltip();
+        }
+
+        /// <summary>
         /// Update this <see cref="Tooltip"/>
         /// </summary>
         protected virtual void UpdateTooltip()
         {
+            this.Tooltip = this.Thing.Tooltip();
         }
 
         /// <summary>

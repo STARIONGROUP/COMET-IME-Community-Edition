@@ -289,6 +289,7 @@
     <Compile Include="Services\RuleVerification\IRuleVerificationService.cs" />
     <Compile Include="Services\RuleVerification\RuleVerificationService.cs" />
     <Compile Include="Services\ThingCreator.cs" />
+    <Compile Include="Services\TooltipService.cs" />
     <Compile Include="SpecialTerms\ISpecialTermsService.cs" />
     <Compile Include="SpecialTerms\SpecialTermsService.cs" />
     <Compile Include="SpellingChecker\SpellDictionaryService.cs" />

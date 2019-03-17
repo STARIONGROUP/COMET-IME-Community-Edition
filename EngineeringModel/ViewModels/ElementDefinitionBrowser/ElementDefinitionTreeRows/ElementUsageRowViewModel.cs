@@ -1,12 +1,11 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
-    using CDP4Composition.Events;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -18,7 +17,9 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
 
@@ -29,7 +30,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ElementUsageRowViewModel : ElementBaseRowViewModel<ElementUsage>, IDropTarget
     {
-        #region Fields
         /// <summary>
         /// Backing field for the <see cref="AllOptions"/> property.
         /// </summary>
@@ -54,9 +54,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="HasExcludes"/> 
         /// </summary>
         private bool? hasExcludes;
-        #endregion
-
-        #region Constructor
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageRowViewModel"/> class
         /// </summary>
@@ -103,9 +101,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.PopulateParameterGroups();
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Public properties
+        
         /// <summary>
         /// Gets or sets the <see cref="ReactiveList{T}"/> of all <see cref="Option"/>s
         /// in this iteration.
@@ -151,10 +147,7 @@ namespace CDP4EngineeringModel.ViewModels
             get { return this.selectedOptions; }
             set { this.RaiseAndSetIfChanged(ref this.selectedOptions, value); }
         }
-
-        #endregion
-
-        #region public methods
+        
         /// <summary>
         /// Update the children rows of the current row
         /// </summary>
@@ -162,9 +155,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateProperties();
         }
-        #endregion
-
-        #region row base
+        
         /// <summary>
         /// Initializes the subscriptions
         /// </summary>
@@ -199,15 +190,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.Disposables.Add(optionRemoveListener);
             this.Disposables.Add(elementDefListener);
         }
-
-        /// <summary>
-        /// Update the tooltip
-        /// </summary>
-        protected override void UpdateTooltip()
-        {
-            this.Tooltip = string.Join(Environment.NewLine, this.Thing.Category.Union(this.Thing.ElementDefinition.Category).OrderBy(x => x.ShortName).Select(x => x.ShortName));
-        }
-
+        
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -217,9 +200,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Private Methods
+        
         /// <summary>
         /// Update this row upon a <see cref="ObjectChangedEvent"/> on this <see cref="ElementUsage"/>
         /// </summary>
@@ -323,9 +304,6 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.DalWrite(transaction);
         }
-        #endregion
-        
-        #region DragDrop
         
         /// <summary>
         /// Updates the current drag state.
@@ -364,7 +342,5 @@ namespace CDP4EngineeringModel.ViewModels
                 this.Drop(dropInfo, category);
             }
         }
-
-        #endregion
     }
 }

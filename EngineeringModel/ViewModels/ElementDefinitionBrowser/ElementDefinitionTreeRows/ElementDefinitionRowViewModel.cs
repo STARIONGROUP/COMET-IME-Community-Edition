@@ -173,15 +173,7 @@ namespace CDP4EngineeringModel.ViewModels
                 await this.Drop(dropInfo, category);
             }
         }
-
-        /// <summary>
-        /// Update the tooltip
-        /// </summary>
-        protected override void UpdateTooltip()
-        {
-            this.Tooltip = string.Join(Environment.NewLine, this.Thing.Category.OrderBy(x => x.ShortName).Select(x => x.ShortName));
-        }
-
+        
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>

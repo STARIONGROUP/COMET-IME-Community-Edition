@@ -20,8 +20,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ParameterOverrideRowViewModel : ParameterOrOverrideBaseRowViewModel
     {
-        #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOverrideRowViewModel"/> class. 
         /// </summary>
@@ -39,9 +37,8 @@ namespace CDP4EngineeringModel.ViewModels
         {
         }
 
-        #endregion
         /// <summary>
-        /// Initiallizes the subscriptions
+        /// Initializes the subscriptions
         /// </summary>
         protected override void InitializeSubscriptions()
         {
