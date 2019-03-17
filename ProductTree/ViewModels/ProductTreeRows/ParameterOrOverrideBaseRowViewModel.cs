@@ -24,7 +24,6 @@ namespace CDP4ProductTree.ViewModels
     /// </summary>
     public abstract class ParameterOrOverrideBaseRowViewModel : CDP4CommonView.ParameterOrOverrideBaseRowViewModel<ParameterOrOverrideBase>, IModelCodeRowViewModel
     {
-        #region Fields
         /// <summary>
         /// The current <see cref="ParameterGroup"/>
         /// </summary>
@@ -59,9 +58,7 @@ namespace CDP4ProductTree.ViewModels
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
         private string modelCode;
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOrOverrideBaseRowViewModel"/> class
         /// </summary>
@@ -82,9 +79,7 @@ namespace CDP4ProductTree.ViewModels
             
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Public properties
+        
         /// <summary>
         /// Gets or sets a value indicating whether the current represented <see cref="ParameterOrOverrideBase"/> is publishable
         /// </summary>
@@ -116,9 +111,7 @@ namespace CDP4ProductTree.ViewModels
             get { return this.modelCode; }
             private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
         }
-        #endregion
-
-        #region Row-Base
+        
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>
@@ -170,8 +163,7 @@ namespace CDP4ProductTree.ViewModels
             }
             this.valueSetListeners.Clear();
         }
-        #endregion
-
+        
         /// <summary>
         /// Update the properties of this row. Automatically call on Update of this <see cref="ParameterOrOverrideBaseRowViewModel.Thing"/>
         /// </summary>
@@ -435,6 +427,7 @@ namespace CDP4ProductTree.ViewModels
             }
 
         }
+
         /// <summary>
         /// Populate the row if this <see cref="ParameterOrOverrideBase"/> is state-dependent
         /// </summary>

@@ -9,8 +9,6 @@ namespace CDP4ProductTree.ViewModels
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
     using CDP4Composition.Mvvm;
     using CDP4Dal;
     using ReactiveUI;

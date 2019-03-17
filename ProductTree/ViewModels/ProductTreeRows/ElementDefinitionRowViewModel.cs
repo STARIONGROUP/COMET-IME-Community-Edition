@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -10,6 +10,7 @@ namespace CDP4ProductTree.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
@@ -29,7 +30,6 @@ namespace CDP4ProductTree.ViewModels
     /// </summary>
     public class ElementDefinitionRowViewModel : CDP4CommonView.ElementDefinitionRowViewModel, IParameterRowContainer, IDropTarget
     {
-        #region Fields
         /// <summary>
         /// The <see cref="IComparer{T}"/>
         /// </summary>
@@ -69,9 +69,7 @@ namespace CDP4ProductTree.ViewModels
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
         private string modelCode;
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionRowViewModel"/> class
         /// </summary>
@@ -90,8 +88,7 @@ namespace CDP4ProductTree.ViewModels
             this.UpdateProperties();
             this.UpdateTooltip();
         }
-        #endregion
-
+        
         /// <summary>
         /// Gets the model-code
         /// </summary>
@@ -105,9 +102,7 @@ namespace CDP4ProductTree.ViewModels
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
         public IThingCreator ThingCreator { get; set; }
-
-        #region IParameterRowContainer public methods
-
+        
         /// <summary>
         /// Update the row containment associated to a <see cref="ParameterBase"/>
         /// </summary>
@@ -173,9 +168,7 @@ namespace CDP4ProductTree.ViewModels
                 this.parameterGroupContainment[parameterGroup] = newContainer;
             }
         }
-        #endregion
-
-
+        
         /// <summary>
         /// Updates the current drag state.
         /// </summary>
@@ -213,15 +206,59 @@ namespace CDP4ProductTree.ViewModels
                 await this.Drop(dropInfo, elementDefinition);
             }
         }
-
-
-        #region Row-Base
+        
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>
         protected override void UpdateThingStatus()
         {
             this.ThingStatus = new ThingStatus(this.Thing);
+        }
+
+        /// <summary>
+        /// Update this <see cref="Tooltip"/>
+        /// </summary>
+        protected override void UpdateTooltip()
+        {
+            if (this.Option == null)
+            {
+                return;
+            }
+
+            var sb = new StringBuilder();
+            
+            string owner;
+            if (this.Thing.Owner != null)
+            {
+                owner = this.Thing.Owner.ShortName;
+            }
+            else
+            {
+                owner = "NA";
+                logger.Debug($"Owner if {this.Thing.ClassKind} null");
+            }
+            sb.AppendLine($"Owner: {owner}");
+            
+            var categories = this.Thing.Category.Any() ? string.Join(" ", this.Thing.Category.OrderBy(x => x.ShortName).Select(x => x.ShortName)) : "-";
+            sb.AppendLine($"Category: {categories}");
+            
+            sb.AppendLine($"Model Code: {this.Path()}");
+            
+            var definition = this.Thing.Definition.FirstOrDefault();
+            sb.AppendLine(definition == null
+                ? $"Definition : -"
+                : $"Definition [{definition.LanguageCode}]: {definition.Content}");
+            
+            this.Tooltip = sb.ToString();
+        }
+
+        /// <summary>
+        /// Computes the path of the row-view-model
+        /// </summary>
+        /// <returns></returns>
+        public string Path()
+        {
+            return $"{this.Option.ShortName}.{this.Thing.ShortName}";
         }
 
         /// <summary>
@@ -232,17 +269,8 @@ namespace CDP4ProductTree.ViewModels
         {
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
-            this.UpdateTooltip();
         }
-
-        /// <summary>
-        /// Update the tooltip
-        /// </summary>
-        protected override void UpdateTooltip()
-        {
-            this.Tooltip = string.Join(Environment.NewLine, this.Thing.Category.OrderBy(x => x.ShortName).Select(x => x.ShortName));
-        }
-
+        
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -269,7 +297,6 @@ namespace CDP4ProductTree.ViewModels
 
             this.elementUsageListenerCache.Clear();
         }
-        #endregion
 
         /// <summary>
         /// Update the properties
