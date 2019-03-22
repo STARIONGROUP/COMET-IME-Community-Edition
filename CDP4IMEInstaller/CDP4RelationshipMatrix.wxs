@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
+  <Fragment>
+    <ComponentGroup Id="RELATIONSHIPMATRIX_CG" Directory="RELATIONSHIPMATRIX">
+      <Component Id="comp_RelationshipMatrix" Guid="{E64C24C8-615F-420A-B06A-FEABCF31A002}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_RelationshipMatrix"  Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetPath)" KeyPath="yes"></File>
+      </Component>
+    </ComponentGroup>
+	</Fragment>
+</Wix>

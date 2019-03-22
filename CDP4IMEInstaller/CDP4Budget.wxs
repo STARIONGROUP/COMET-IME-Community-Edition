@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
+  <Fragment>
+    <ComponentGroup Id="BUDGET_CG" Directory="BUDGET">
+      <Component Id="comp_Budget" Guid="{22399B02-D4D4-4726-8869-5D8BB9E81722}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Budget"  Vital="yes" Source="$(var.CDP4Budget.TargetPath)" KeyPath="yes"></File>
+      </Component>
+    </ComponentGroup>
+	</Fragment>
+</Wix>

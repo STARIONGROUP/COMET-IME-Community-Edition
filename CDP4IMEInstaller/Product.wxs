@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
-  <Product Id="*" Name="CDP4-CE" Language="1033" Version="2.0.2.0" Manufacturer="RHEA System S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
+  <Product Id="*" Name="CDP4-CE" Language="1033" Version="2.1.0.0" Manufacturer="RHEA System S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
 
     <?include variables.wxi ?>
 
@@ -107,5 +107,14 @@
     <Feature Id="SCRIPTINGPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Scripting Plugin" Level="1">
       <ComponentGroupRef Id="SCRIPTING_CG" />
     </Feature>
+
+    <Feature Id="RELATIONMATRIXPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Relationship Matrix Plugin" Level="1">
+      <ComponentGroupRef Id="RELATIONSHIPMATRIX_CG" />
+    </Feature>
+    
+    <Feature Id="BUDGETPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Budget Plugin" Level="1">
+      <ComponentGroupRef Id="BUDGET_CG" />
+    </Feature>
+
   </Product>
 </Wix>

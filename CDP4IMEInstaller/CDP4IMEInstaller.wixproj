@@ -16,7 +16,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <InstallerPlatform>x86</InstallerPlatform>
-    <OutputName>CDP4IME-CE.x86</OutputName  >
+    <OutputName>CDP4IME-CE.x86</OutputName>
     <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -39,6 +39,7 @@
     <OutputName>CDP4IME-CE.x64</OutputName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CDP4Budget.wxs" />
     <Compile Include="CDP4IME.wxs" />
     <Compile Include="CDP4Addin.wxs" />
     <Compile Include="BasicRDLPlugin.wxs" />
@@ -46,6 +47,7 @@
     <Compile Include="CDP4ObjectBrowserPlugin.wxs" />
     <Compile Include="CDP4PropertyGridPlugin.wxs" />
     <Compile Include="CDP4RelationshipEditor.wxs" />
+    <Compile Include="CDP4RelationshipMatrix.wxs" />
     <Compile Include="CDP4Scripting.wxs" />
     <Compile Include="CDP4SiteDirectoryPlugin.wxs" />
     <Compile Include="CDP4WspDalPlugin.wxs" />
@@ -125,6 +127,14 @@
     <ProjectReference Include="..\CDP4Addin\CDP4Addin.csproj">
       <Name>CDP4Addin</Name>
       <Project>{161e536a-db05-4bfd-badd-a5b9ef605da5}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4BudgetViewer\CDP4Budget.csproj">
+      <Name>CDP4Budget</Name>
+      <Project>{7d862014-4ce6-41ac-940c-49d7de4c485d}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
@@ -261,6 +271,14 @@
     <ProjectReference Include="..\ProductTree\ProductTree.csproj">
       <Name>ProductTree</Name>
       <Project>{2fff0b74-7e29-41a2-a1ff-5004ce27d22a}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\RelationshipMatrix\CDP4RelationshipMatrix.csproj">
+      <Name>CDP4RelationshipMatrix</Name>
+      <Project>{a9ef51f8-4f27-4f50-8ee3-33bc2f69df12}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
