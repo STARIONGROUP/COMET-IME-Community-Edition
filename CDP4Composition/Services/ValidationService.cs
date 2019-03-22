@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ValidationService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +50,7 @@ namespace CDP4Composition.Services
             { "Value", new ValidationRule { PropertyName = "Value", Rule = @"^(?!\s*$).+", ErrorText = "The Value must not be empty." } },
             { "ModelSetupShortName", new ValidationRule { PropertyName = "ShortName", Rule =  @"^[a-zA-Z0-9_]*$", ErrorText = "The ShortName shall only contain alpha-numerical character." } },
             { "PersonShortName", new ValidationRule { PropertyName = "Value", Rule = @"^\w+[\s\w]*$", ErrorText = "The User Name cannot be empty and must contain only alphanumeric characters and spaces." } },
+            { "RequirementShortName", new ValidationRule { PropertyName = "Value", Rule = @"^\w+[\w-]*$", ErrorText = "The Requirement ShortName cannot be empty and must contain only alphanumeric characters and dashes." } },
             { "ModelSetupName", new ValidationRule { PropertyName = "Name", Rule = @"^([^()\s][\S\s]*)$", ErrorText = "The Name can not be empty or start with a whitespace." } },
             { "ConversionFactor", new ValidationRule { PropertyName = "ConversionFactor", Rule = @"^(?!\s*$).+", ErrorText = "The ConversionFactor must not be empty" } },
             { "Description", new ValidationRule { PropertyName = "Description", Rule = @"^(?!\s*$).+", ErrorText = "The Description must not be empty." } },

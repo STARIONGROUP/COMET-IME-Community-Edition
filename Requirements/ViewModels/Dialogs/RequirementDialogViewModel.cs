@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -32,6 +32,11 @@ namespace CDP4Requirements.ViewModels
     [ThingDialogViewModelExport(ClassKind.Requirement)]
     public class RequirementDialogViewModel : CDP4CommonView.RequirementDialogViewModel, IThingDialogViewModel
     {
+        /// <summary>
+        /// Backing field for <see cref="ShortName"/> property
+        /// </summary>
+        private string shortName;
+
         /// <summary>
         /// The Required Referance-Data-library for the current <see cref="Iteration"/>
         /// </summary>
@@ -148,6 +153,16 @@ namespace CDP4Requirements.ViewModels
         {
             get { return this.selectedSimpleParameterValue; }
             set { this.RaiseAndSetIfChanged(ref this.selectedSimpleParameterValue, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the ShortName
+        /// </summary>
+        [ValidationOverride(true, "RequirementShortName")]
+        public override string ShortName
+        {
+            get { return this.shortName; }
+            set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
         }
 
         /// <summary>

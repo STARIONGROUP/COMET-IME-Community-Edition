@@ -1,13 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsSpecificationDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
@@ -17,6 +15,9 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
+    using ReactiveUI;
+    using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// The purpose of the <see cref="RequirementsSpecificationDialogViewModel"/> is to allow a <see cref="Person"/> to
@@ -29,6 +30,11 @@ namespace CDP4Requirements.ViewModels
     [ThingDialogViewModelExport(ClassKind.RequirementsSpecification)]
     public class RequirementsSpecificationDialogViewModel : CDP4CommonView.RequirementsSpecificationDialogViewModel, IThingDialogViewModel
     {
+        /// <summary>
+        /// Backing field for <see cref="ShortName"/> property
+        /// </summary>
+        private string shortName;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementsSpecificationDialogViewModel"/> class.
         /// </summary>
@@ -66,6 +72,16 @@ namespace CDP4Requirements.ViewModels
         public RequirementsSpecificationDialogViewModel(RequirementsSpecification requirementsSpecification, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(requirementsSpecification, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
+        }
+
+        /// <summary>
+        /// Gets or sets the ShortName
+        /// </summary>
+        [ValidationOverride(true, "RequirementShortName")]
+        public override string ShortName
+        {
+            get { return this.shortName; }
+            set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
         }
 
         /// <summary>
