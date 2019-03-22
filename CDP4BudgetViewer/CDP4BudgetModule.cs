@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CDP4BudgetModule.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -84,7 +84,6 @@ namespace CDP4Budget
         public void Initialize()
         {
             this.RegisterRegions();
-            //this.RegisterRibbonParts();
         }
 
         /// <summary>
@@ -94,14 +93,5 @@ namespace CDP4Budget
         {
             this.regionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(BudgetRibbon));
         }
-
-        ///// <summary>
-        ///// Register the <see cref="RibbonPart"/> implementations of the current Module
-        ///// </summary>
-        //private void RegisterRibbonParts()
-        //{
-        //    var rdlRibbonPart = new EngineeringModelRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService);
-        //    this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
-        //}
     }
 }

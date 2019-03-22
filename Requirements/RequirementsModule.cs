@@ -15,11 +15,9 @@ namespace CDP4Requirements
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Requirements.Views;
-    using Comparers;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
     using NLog;
-    using Utils;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="RequirementsModule"/> Component
