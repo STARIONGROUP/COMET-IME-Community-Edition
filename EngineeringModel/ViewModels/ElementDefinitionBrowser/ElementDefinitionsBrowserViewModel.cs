@@ -541,64 +541,7 @@ namespace CDP4EngineeringModel.ViewModels
             var vm = new AnnotationFloatingDialogViewModel(annotation, this.Session);
             this.DialogNavigationService.NavigateFloating(vm);
         }
-
-        /// <summary>
-        /// Creates an new <see cref="ElementDefinition"/> on the connected data-source and updates and valuesests of created contained parameters
-        /// </summary>
-        /// <param name="elementDefinition">The <see cref="ElementDefinition"/></param>
-        /// <returns>The async task</returns>
-        /// <remarks>
-        /// This may be used in other plugins somehow
-        /// </remarks>
-        private async Task CreateElementDefinitionFromTemplate(ElementDefinition elementDefinition)
-        {
-            var owner = this.QueryCurrentDomainOfExpertise();
-            if (owner == null)
-            {
-                return;
-            }
-
-            elementDefinition.Owner = owner;
-            foreach (var parameter in elementDefinition.Parameter)
-            {
-                parameter.Owner = owner;
-            }
-
-            var clonedParameters = new List<Parameter>();
-            foreach (var parameter in elementDefinition.Parameter)
-            {
-                clonedParameters.Add(parameter.Clone(true));
-
-                parameter.ValueSet.Clear();
-            }
-
-            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
-            var iterationClone = this.Thing.Clone(false);
-
-            var createTransaction = new ThingTransaction(transactionContext);
-            createTransaction.CreateDeep(elementDefinition, iterationClone);
-            var createOperationContainer = createTransaction.FinalizeTransaction();
-            await Session.Write(createOperationContainer);
-
-            var updateTransaction = new ThingTransaction(transactionContext);
-            var createdElementDefinition = this.Thing.Element.SingleOrDefault(x => x.Iid == elementDefinition.Iid);
-            foreach (var parameter in createdElementDefinition.Parameter)
-            {
-                var clonedParameter = clonedParameters.SingleOrDefault(x => x.ParameterType.Iid == parameter.ParameterType.Iid);
-                if (clonedParameter != null)
-                {
-                    var parameterValueSet = parameter.ValueSet[0];
-                    var clonedParameterValuesSet = parameterValueSet.Clone(false);
-                    clonedParameterValuesSet.Manual = clonedParameter.ValueSet[0].Manual;
-
-                    updateTransaction.CreateOrUpdate(clonedParameterValuesSet);
-                }
-            }
-
-            var updateOperationContainer = updateTransaction.FinalizeTransaction();
-            await Session.Write(updateOperationContainer);
-        }
-
+        
         /// <summary>
         /// Update the rows to display
         /// </summary>
@@ -791,12 +734,17 @@ namespace CDP4EngineeringModel.ViewModels
 
             try
             {
+                this.IsBusy = true;
                 var copyCreator = new CopyElementDefinitionCreator(this.Session);
-                await copyCreator.Copy((ElementDefinition)this.SelectedThing.Thing, copyUsage);
+                await copyCreator.Copy((ElementDefinition) this.SelectedThing.Thing, copyUsage);
             }
             catch (Exception exception)
             {
                 logger.Error(exception, "An error occured when creating a copy of an Element Definition");
+            }
+            finally
+            {
+                this.IsBusy = false;
             }
         }
 

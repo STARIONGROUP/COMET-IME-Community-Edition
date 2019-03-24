@@ -667,6 +667,7 @@ namespace CDP4Composition.Mvvm
         {
             try
             {
+                this.IsBusy = true;
                 var operationContainer = transaction.FinalizeTransaction();
                 await this.Session.Write(operationContainer);
             }
@@ -674,6 +675,10 @@ namespace CDP4Composition.Mvvm
             {
                 logger.Error(exception, "The inline update operation failed");
                 this.Feedback = exception.Message;
+            }
+            finally
+            {
+                this.IsBusy = false;
             }
         }
 
