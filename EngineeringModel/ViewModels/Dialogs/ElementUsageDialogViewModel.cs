@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -31,7 +31,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private ReactiveList<Option> includeOption;
 
-        #region constructors
+        /// <summary>
+        /// Backing field for the <see cref="ModelCode"/> property.
+        /// </summary>
+        private string modelCode;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageDialogViewModel"/> class.
         /// </summary>
@@ -83,8 +87,7 @@ namespace CDP4EngineeringModel.ViewModels
                 .Subscribe(
                     _ => this.ExcludeOption = new ReactiveList<Option>(this.PossibleExcludeOption.Except(this.IncludeOption)));
         }
-        #endregion
-
+        
         /// <summary>
         /// Gets or sets the list of selected <see cref="Option"/>s
         /// </summary>
@@ -98,9 +101,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="Category"/> instances of which the referenced <see cref="ElementDefinition"/> is a member.
         /// </summary>
         public List<Category> ElementDefinitionCategories { get; private set; }
-
-        #region Private methods
-
+        
+        /// <summary>
+        /// Gets or sets a value that represents the ModelCode of the current <see cref="ElementDefinition"/>
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
+        
         /// <summary>
         /// Populate the possible <see cref="Category"/> for this <see cref="ElementUsage"/>
         /// </summary>
@@ -147,10 +157,7 @@ namespace CDP4EngineeringModel.ViewModels
             var categories = this.Thing.ElementDefinition.Category;
             this.ElementDefinitionCategories = new List<Category>(categories);
         }
-
-        #endregion
-
-        #region overriden methods
+        
         /// <summary>
         /// Initializes the dialog
         /// </summary>
@@ -160,6 +167,16 @@ namespace CDP4EngineeringModel.ViewModels
             this.PopulatePossibleCategories();
             this.PopulatePossibleOptions();
             this.PopulateElementDefinitionCategories();
+        }
+
+        /// <summary>
+        /// Update the properties
+        /// </summary>
+        protected override void UpdateProperties()
+        {
+            base.UpdateProperties();
+            
+            this.ModelCode = this.Thing.ModelCode();
         }
 
         /// <summary>
@@ -185,6 +202,5 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name));
         }
-        #endregion
     }
 }

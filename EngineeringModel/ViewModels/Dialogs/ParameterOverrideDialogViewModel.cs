@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOverrideDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -31,7 +31,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private bool isOwnerReadonly;
 
-        #region Constructors
+        /// <summary>
+        /// Backing field for the <see cref="ModelCode"/> property.
+        /// </summary>
+        private string modelCode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOverrideDialogViewModel"/> class.
@@ -79,10 +82,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.IsNameVisible = this.Thing.ParameterType is CompoundParameterType || this.Thing.IsOptionDependent || this.Thing.StateDependence != null;
             this.CheckValueValidation();
         }
-
-        #endregion
-
-        #region Properties
+        
         /// <summary>
         /// Gets a value indicating if the scale shall be made visible
         /// </summary>
@@ -144,10 +144,16 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return this.SelectedParameter.IsOptionDependent; }
         }
+        
+        /// <summary>
+        /// Gets or sets a value that represents the ModelCode of the current <see cref="ElementDefinition"/>
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
 
-        #endregion
-
-        #region Methods
         /// <summary>
         /// Initialize the dialog
         /// </summary>
@@ -166,6 +172,8 @@ namespace CDP4EngineeringModel.ViewModels
              base.UpdateProperties();
              this.SelectedParameterType = this.Thing.Parameter.ParameterType;
              this.PopulateValueSet();
+
+             this.ModelCode = this.Thing.ModelCode();
          }
 
         /// <summary>
@@ -233,9 +241,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.transaction.CreateOrUpdate(parameterOverrideValueSet);
             }
         }
-
-        #endregion
-
+        
         /// <summary>
         /// Check the validation status of the value rows
         /// </summary>

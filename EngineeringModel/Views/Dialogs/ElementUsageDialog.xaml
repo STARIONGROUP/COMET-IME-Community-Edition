@@ -57,6 +57,11 @@
                         </Button>
                     </Grid>
                 </lc:LayoutItem>
+                <lc:LayoutItem Label="Model Code: ">
+                    <dxe:TextEdit Name="ModelCode" 
+                                  Text="{Binding Path=ModelCode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                  IsReadOnly="True"/>
+                </lc:LayoutItem>
             </lc:LayoutGroup>
             <items:ExcludeOptionsLayoutGroup />
             <items:CategoryLayoutGroup />

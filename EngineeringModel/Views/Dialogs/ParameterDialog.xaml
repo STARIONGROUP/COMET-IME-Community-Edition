@@ -73,6 +73,11 @@
                 <lc:LayoutItem Label="Different owner on override:">
                     <dxe:CheckEdit IsChecked="{Binding AllowDifferentOwnerOfOverride, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsReadOnly}" />
                 </lc:LayoutItem>
+                <lc:LayoutItem Label="Model Code: ">
+                    <dxe:TextEdit Name="ModelCode" 
+                                  Text="{Binding Path=ModelCode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                  IsReadOnly="True"/>
+                </lc:LayoutItem>
                 <views:ParameterValueSetLayoutItem />
             </lc:LayoutGroup>
             <items:ParameterSubscriptionLayoutGroup />

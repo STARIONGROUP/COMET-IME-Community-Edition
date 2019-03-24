@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -46,6 +46,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="IsValueSetEditable"/>
         /// </summary>
         private bool isValueSetEditable;
+
+        /// <summary>
+        /// Backing field for the <see cref="ModelCode"/> property.
+        /// </summary>
+        private string modelCode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterDialogViewModel"/> class.
@@ -177,6 +182,14 @@ namespace CDP4EngineeringModel.ViewModels
             get { return true; }
         }
         
+        /// <summary>
+        /// Gets or sets a value that represents the ModelCode of the current <see cref="ElementDefinition"/>
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
         
         /// <summary>
         /// Initialize the dialog
@@ -206,6 +219,8 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void UpdateProperties()
         {
             base.UpdateProperties();
+
+            this.ModelCode = this.Thing.ModelCode();
             this.IsOptionDependent = this.Thing.IsOptionDependent;
             this.IsStateDependent = this.Thing.StateDependence != null;
             this.SelectedParameterType = this.Thing.ParameterType;

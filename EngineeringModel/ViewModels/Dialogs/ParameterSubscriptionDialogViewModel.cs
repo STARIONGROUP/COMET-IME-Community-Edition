@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSubscriptionDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,10 @@ namespace CDP4EngineeringModel.ViewModels
     [ThingDialogViewModelExport(ClassKind.ParameterSubscription)]
     public class ParameterSubscriptionDialogViewModel : CDP4CommonView.ParameterSubscriptionDialogViewModel, IThingDialogViewModel
     {
-        #region Constructors
+        /// <summary>
+        /// Backing field for the <see cref="ModelCode"/> property.
+        /// </summary>
+        private string modelCode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterSubscriptionDialogViewModel"/> class.
@@ -71,10 +74,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.IsNameVisible = this.Thing.ParameterType is CompoundParameterType || this.Thing.IsOptionDependent || this.Thing.StateDependence != null;
             this.CheckValueValidation();
         }
-
-        #endregion
-
-        #region Properties
+        
         /// <summary>
         /// Gets a value indicating whether is owner visible.
         /// </summary>
@@ -132,9 +132,13 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets a value indicating if the scale shall be made visible
         /// </summary>
         public bool IsScaleVisible => this.Thing.ParameterType is CompoundParameterType;
-        #endregion
+        
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
 
-        #region Methods
         /// <summary>
         /// Initialize the dialog
         /// </summary>
@@ -165,6 +169,8 @@ namespace CDP4EngineeringModel.ViewModels
              this.SelectedParameterType = ((ParameterOrOverrideBase)this.Thing.Container).ParameterType;
              this.PossibleOwner.Add(this.SelectedOwner);
              this.PopulateValueSet();
+            
+             this.ModelCode = this.Thing.ModelCode();         
          }
 
         /// <summary>
@@ -196,9 +202,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.transaction.CreateOrUpdate(parameterSubscriptionValueSet);
             }
         }
-
-        #endregion
-
+        
         /// <summary>
         /// Check the validation status of the value rows
         /// </summary>

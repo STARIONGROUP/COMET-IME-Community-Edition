@@ -51,6 +51,11 @@
                     </Grid>
                 </lc:LayoutItem>
                 <items:OwnerLayoutItem IsEnabled="{Binding SelectedParameter.AllowDifferentOwnerOfOverride}"/>
+                <lc:LayoutItem Label="Model Code: ">
+                    <dxe:TextEdit Name="ModelCode" 
+                                  Text="{Binding Path=ModelCode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                  IsReadOnly="True"/>
+                </lc:LayoutItem>
                 <views:ParameterValueSetLayoutItem/>
             </lc:LayoutGroup>
             <items:ParameterSubscriptionLayoutGroup/>

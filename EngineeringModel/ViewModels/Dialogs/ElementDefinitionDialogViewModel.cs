@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -30,6 +30,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for the <see cref="IsTopElement"/> property.
         /// </summary>
         private bool isTopElement;
+
+        /// <summary>
+        /// Backing field for the <see cref="ModelCode"/> property.
+        /// </summary>
+        private string modelCode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionDialogViewModel"/> class.
@@ -84,6 +89,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets a value that represents the ModelCode of the current <see cref="ElementDefinition"/>
+        /// </summary>
+        public string ModelCode
+        {
+            get { return this.modelCode; }
+            set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
+
+        /// <summary>
         /// Initialize the dialog
         /// </summary>
         protected override void Initialize()
@@ -104,6 +118,8 @@ namespace CDP4EngineeringModel.ViewModels
                 this.IsTopElement = ((Iteration)this.Container).TopElement.Iid == this.Thing.Iid; 
             }
 
+            this.ModelCode = this.Thing.ModelCode();
+            
             if (this.SelectedOwner == null)
             {
                 this.SelectedOwner = this.QueryCurrentDomainOfExpertise(this.Session, (Iteration)this.Container);
