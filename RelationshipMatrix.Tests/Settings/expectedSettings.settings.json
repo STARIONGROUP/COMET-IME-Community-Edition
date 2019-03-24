@@ -1,0 +1,10 @@
+﻿{
+  "possibleClassKinds": [
+    "ElementDefinition",
+    "ElementUsage",
+    "NestedElement",
+    "RequirementsSpecification",
+    "RequirementsGroup",
+    "Requirement"
+  ]
+}

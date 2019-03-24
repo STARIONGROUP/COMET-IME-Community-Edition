@@ -64,13 +64,10 @@ namespace CDP4RelationshipMatrix.Tests
             this.pluginSettingsService
                 .Setup(x => x.Read<RelationshipMatrixPluginSettings>(this.relationshipMatrixModule))
                 .Throws<PluginSettingsException>();
-
             
             Assert.DoesNotThrow(() => this.relationshipMatrixModule.ReadPluginSettings());
 
             this.pluginSettingsService.Verify(x => x.Write(It.IsAny<RelationshipMatrixPluginSettings>(),  this.relationshipMatrixModule));
-
-
         }
     }
 }
