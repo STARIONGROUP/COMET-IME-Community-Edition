@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PersonDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -33,8 +33,6 @@ namespace CDP4SiteDirectory.ViewModels
     [ThingDialogViewModelExport(ClassKind.Person)]
     public class PersonDialogViewModel : CDP4CommonView.PersonDialogViewModel, IThingDialogViewModel
     {
-        #region Fields
-
         /// <summary>
         /// Backing field for <see cref="PasswordConfirmation"/>
         /// </summary>
@@ -49,9 +47,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// The backing field for <see cref="ShortName"/>
         /// </summary>
         private string shortName;
-
-        #endregion
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonDialogViewModel"/> class.
         /// </summary>
@@ -99,9 +95,7 @@ namespace CDP4SiteDirectory.ViewModels
                 this.RaisePropertyChanged("PasswordConfirmation");
             });
         }
-        #endregion
-
-        #region Properties
+        
         /// <summary>
         /// Gets or sets the password confirmation value
         /// </summary>
@@ -119,8 +113,7 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.pwdEditIsChecked; }
             set { this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value); }
         }
-
-
+        
         /// <summary>
         /// Gets or sets the ShortName
         /// </summary>
@@ -140,9 +133,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// Gets the <see cref="ICommand"/> to set the default <see cref="EmailAddress"/>
         /// </summary>
         public ReactiveCommand<object> SetDefaultEmailAddressCommand { get; private set; } 
-        #endregion
-
-        #region Dialog Base
+        
         /// <summary>
         /// Gets the error message for the property with the given name.
         /// </summary>
@@ -290,7 +281,6 @@ namespace CDP4SiteDirectory.ViewModels
                 this.Thing.Password = this.Password;
             }
         }
-        #endregion
 
         /// <summary>
         /// Executes the <see cref="SetDefaultTelephoneNumberCommand"/>

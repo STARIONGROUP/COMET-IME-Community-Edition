@@ -29,8 +29,6 @@ namespace CDP4Composition.Services
             { "RDLName", new ValidationRule { PropertyName = "Name", Rule = @"^([^()\s][\S\s]*)$", ErrorText = "The Name can not be empty or start with a whitespace." } },
             { "NativeName", new ValidationRule { PropertyName = "NativeName", Rule = @"^[a-zA-Z][a-zA-Z0-9_]*$", ErrorText = "The NativeName must start with a letter and not contain any spaces or non alphanumeric characters." } },
             { "Name", new ValidationRule { PropertyName = "Name", Rule = @"^(\p{L}|\p{L}[^()]*[^()\s])$", ErrorText = "The Name must start with a letter and not contain any parentheses or trailing spaces." } },
-            { "GivenName", new ValidationRule { PropertyName = "GivenName", Rule = @"^[a-zA-Z][a-zA-Z0-9_]*$", ErrorText = "The GivenName must start with a letter and not contain any spaces or non alphanumeric characters." } },
-            { "Surname", new ValidationRule { PropertyName = "Surname", Rule = @"^[a-zA-Z][a-zA-Z0-9_]*$", ErrorText = "The Surname must start with a letter and not contain any spaces or non alphanumeric characters." } },
             { "EmailAddress", new ValidationRule { PropertyName = "EmailAddress", Rule = @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorText = "The Email must follow the RFC 5321 protocol." } },
             { "TelephoneNumber", new ValidationRule { PropertyName = "TelephoneNumber", Rule = @"^(?!\s*$).+", ErrorText = "The Telephone Number must not be empty." } },
             { "UserPreference", new ValidationRule { PropertyName = "UserPreference", Rule = @"^(?!\s*$).+", ErrorText = "The User Preference must not be empty." } },
