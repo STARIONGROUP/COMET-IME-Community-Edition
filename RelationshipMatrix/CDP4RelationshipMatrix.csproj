@@ -201,16 +201,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviour\CellSelectionBehavior.cs" />
-    <Compile Include="Converters\TooltipConverter.cs" />
-    <Compile Include="Converters\RowDoubleClickEventArgsConverter.cs" />
-    <Compile Include="Converters\MarkupExtensionBase.cs" />
     <Compile Include="Converters\NameContentConverter.cs" />
     <Compile Include="Converters\ColumnWidthConverter.cs" />
     <Compile Include="Converters\ColumnFixedConverter.cs" />
     <Compile Include="Converters\CategoryListConverter.cs" />
     <Compile Include="RelationshipMatrixModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings\DisplayKind.cs" />
     <Compile Include="ViewModels\MatrixCellViewModel.cs" />
     <Compile Include="ViewModels\MatrixConfigurationViewModelBase.cs" />
     <Compile Include="ViewModels\RelationshipConfigurationViewModel.cs" />
