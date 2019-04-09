@@ -13,6 +13,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
+    using CDP4Dal.Events;
     using ReactiveUI;
 
     /// <summary>

@@ -138,7 +138,7 @@ namespace CDP4RelationshipMatrix
             catch (Exception ex)
             {
                 logger.Fatal(ex);
-                throw ex;
+                throw;
             }
         }
     }

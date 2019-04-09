@@ -10,6 +10,8 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Dal;
+    using CDP4Dal.Events;
     using NUnit.Framework;
     using ViewModels;
 
@@ -20,9 +22,9 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         {
             base.Setup();
         }
-
+        
         [Test]
-        public void Test()
+        public void AssertViewModelWorks()
         {
             var vm = new RelationshipMatrixViewModel(
                 this.iteration,
@@ -60,6 +62,10 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             Assert.AreEqual(2, vm.Matrix.Records.Count);
             Assert.AreEqual(3, vm.Matrix.Columns.Count);
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+
+            vm.Dispose();
         }
     }
 }

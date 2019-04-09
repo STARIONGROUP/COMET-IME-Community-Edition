@@ -11,6 +11,7 @@ namespace CDP4RelationshipMatrix
     using CDP4Composition.PluginSettingService;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
+    using Settings;
 
     /// <summary>
     /// The settings for the relationship matrix
@@ -36,10 +37,17 @@ namespace CDP4RelationshipMatrix
                     ClassKind.RequirementsGroup,
                     ClassKind.Requirement
                 };
+
+                this.PossibleDisplayKinds = new List<DisplayKind>
+                {
+                    DisplayKind.Name,
+                    DisplayKind.ShortName
+                };
             }
             else
             {
                 this.PossibleClassKinds = new List<ClassKind>();
+                this.PossibleDisplayKinds = new List<DisplayKind>();
             }
         }
 
@@ -48,5 +56,11 @@ namespace CDP4RelationshipMatrix
         /// </summary>
         [JsonProperty (ItemConverterType = typeof(StringEnumConverter))]
         public List<ClassKind> PossibleClassKinds { get; set; }
+
+        /// <summary>
+        /// Gets or sets the possible <see cref="DisplayKind"/>
+        /// </summary>
+        [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
+        public List<DisplayKind> PossibleDisplayKinds { get; set; }
     }
 }

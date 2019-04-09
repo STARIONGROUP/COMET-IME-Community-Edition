@@ -30,17 +30,13 @@ namespace CDP4RelationshipMatrix
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             var header = item?.ToString();
+
             if (string.IsNullOrWhiteSpace(header))
             {
                 return base.SelectTemplate(item, container);
             }
 
-            if (header == MatrixViewModel.CDP4_NAME_HEADER)
-            {
-                return this.NameColumnTemplate;
-            }
-
-            return this.ThingColumnTemplate;
+            return header == MatrixViewModel.CDP4_NAME_HEADER ? this.NameColumnTemplate : this.ThingColumnTemplate;
         }
 
         /// <summary>
@@ -48,6 +44,9 @@ namespace CDP4RelationshipMatrix
         /// </summary>
         public DataTemplate ThingColumnTemplate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> used for the name of the column.
+        /// </summary>
         public DataTemplate NameColumnTemplate { get; set; }
     }
 }

@@ -11,6 +11,7 @@ namespace CDP4RelationshipMatrix.Tests.Settings
     using System.IO;
     using CDP4Common.CommonData;
     using CDP4Composition.PluginSettingService;
+    using CDP4RelationshipMatrix.Settings;
     using Microsoft.Practices.Prism.Regions;
     using Moq;
     using NUnit.Framework;
@@ -46,6 +47,11 @@ namespace CDP4RelationshipMatrix.Tests.Settings
                     ClassKind.RequirementsSpecification,
                     ClassKind.RequirementsGroup,
                     ClassKind.Requirement
+                },
+                PossibleDisplayKinds =  new List<DisplayKind>
+                {
+                    DisplayKind.Name,
+                    DisplayKind.ShortName
                 }
             };
         }
@@ -85,7 +91,14 @@ namespace CDP4RelationshipMatrix.Tests.Settings
                 ClassKind.Requirement
             };
 
+            var expectedDisplayKinds = new List<DisplayKind>
+            {
+                DisplayKind.Name,
+                DisplayKind.ShortName
+            };
+
             Assert.That(this.settings.PossibleClassKinds, Is.EquivalentTo(expectedClassKinds));
+            Assert.That(this.settings.PossibleDisplayKinds, Is.EquivalentTo(expectedDisplayKinds));
         }
     }
 }

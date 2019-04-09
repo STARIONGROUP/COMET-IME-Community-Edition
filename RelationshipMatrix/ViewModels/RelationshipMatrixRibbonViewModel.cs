@@ -33,7 +33,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
-        /// <param name="dialogNavigationService">The dialig navigation service</param>
+        /// <param name="dialogNavigationService">The dialog navigation service</param>
+        /// <param name="pluginSettingService">The plugin's settings service</param>
         /// <returns>An instance of <see cref="RelationshipMatrixViewModel"/></returns>
         public static RelationshipMatrixViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingService)
         {

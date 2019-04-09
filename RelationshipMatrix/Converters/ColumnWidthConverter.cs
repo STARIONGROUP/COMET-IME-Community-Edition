@@ -17,7 +17,14 @@ namespace CDP4RelationshipMatrix.Converters
     /// </summary>
     public class ColumnWidthConverter : IValueConverter
     {
-        private const int DEFAULT_WIDTH = 30;
+        /// <summary>
+        /// Default column width
+        /// </summary>
+        private const int DEFAULT_WIDTH = 35;
+
+        /// <summary>
+        /// Column name column width
+        /// </summary>
         private const int MAIN_NAME_COL_WIDTH = 100;
 
         /// <summary>
@@ -41,6 +48,7 @@ namespace CDP4RelationshipMatrix.Converters
         public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var fieldname = value?.ToString();
+
             if (string.IsNullOrWhiteSpace(fieldname))
             {
                 return DEFAULT_WIDTH;

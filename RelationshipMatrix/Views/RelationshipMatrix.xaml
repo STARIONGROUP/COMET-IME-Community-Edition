@@ -1,4 +1,4 @@
-<UserControl x:Class="CDP4RelationshipMatrix.Views.RelationshipMatrix"
+﻿<UserControl x:Class="CDP4RelationshipMatrix.Views.RelationshipMatrix"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -15,8 +15,10 @@
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:behaviour="clr-namespace:CDP4RelationshipMatrix.Behaviour"
-             d:DesignHeight="300"
-             d:DesignWidth="300"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
+             d:DesignHeight="800"
+             d:DesignWidth="800"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              mc:Ignorable="d">
     <UserControl.Resources>
@@ -25,37 +27,54 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <converters:CategoryListConverter x:Key="ObjectListConverter"></converters:CategoryListConverter>
-            <converters:ColumnFixedConverter x:Key="ColumnFixedConverter"></converters:ColumnFixedConverter>
-            <converters:ColumnWidthConverter x:Key="ColumnWidthConverter"></converters:ColumnWidthConverter>
-            <converters:NameContentConverter x:Key="NameContentConverter"></converters:NameContentConverter>
+            <converters:CategoryListConverter x:Key="ObjectListConverter" />
+            <converters:ColumnFixedConverter x:Key="ColumnFixedConverter" />
+            <converters:ColumnWidthConverter x:Key="ColumnWidthConverter" />
+            <converters:NameContentConverter x:Key="NameContentConverter" />
+            <converters:TooltipConverter x:Key="TooltipConverter" />
 
             <DataTemplate x:Key="Source1ToSource2">
-                <Image x:Name="PART_Editor" Source="pack://application:,,,/CDP4Composition;component/Resources/Images/to-up-arrow_16x16.png" Stretch="None"></Image>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
+                    <TextBlock.Text>⮥</TextBlock.Text>
+                </TextBlock>
             </DataTemplate>
             <DataTemplate x:Key="Source2ToSource1">
-                <Image x:Name="PART_Editor" Source="pack://application:,,,/CDP4Composition;component/Resources/Images/to-left-arrow_16x16.png" Stretch="None"></Image>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Width="24" FontSize="24" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
+                    <TextBlock.Text>⮠</TextBlock.Text>
+                </TextBlock>
             </DataTemplate>
             <DataTemplate x:Key="BidirectionalRelationship">
-                <Image x:Name="PART_Editor" Source="pack://application:,,,/CDP4Composition;component/Resources/Images/up-and-left-arrow_16x16.png" Stretch="None"></Image>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
+                    <TextBlock.Text>⮔</TextBlock.Text>
+                </TextBlock>
             </DataTemplate>
+            <DataTemplate x:Key="NodirectionalRelationship">
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
+                    <TextBlock.Text>⨯</TextBlock.Text>
+                </TextBlock>
+            </DataTemplate>
+
             <DataTemplate x:Key="NameTemplate">
-                    <TextBlock x:Name="PART_Editor"
-                               Text="{Binding Converter={StaticResource NameContentConverter}}"
-                               ToolTip="{Binding Converter={StaticResource NameContentConverter}}"
-                               TextAlignment="Center">
-                    </TextBlock>
+                <TextBlock x:Name="PART_Editor"
+                           Text="{Binding Converter={StaticResource NameContentConverter}}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap"
+                           Margin="5"
+                           FontWeight="Bold"
+                           ToolTip="{Binding Converter={StaticResource NameContentConverter}}"
+                           TextAlignment="Center" />
             </DataTemplate>
-            <DataTemplate x:Key="None">
-            </DataTemplate>
-            
+            <DataTemplate x:Key="None" />
+
             <DataTemplate x:Key="HeaderColumnTemplate">
-                <TextBlock Text="{Binding}" 
+                <TextBlock Text="{Binding}"
                            Width="80"
                            ToolTip="{Binding}"
-                           FontWeight="Normal"
+                           FontWeight="Bold"
                            VerticalAlignment="Center"
                            TextAlignment="Center"
+                           TextWrapping="Wrap"
                            HorizontalAlignment="Center">
                     <TextBlock.LayoutTransform>
                         <RotateTransform Angle="270" />
@@ -63,43 +82,42 @@
                 </TextBlock>
             </DataTemplate>
             <DataTemplate x:Key="NameHeaderColumnTemplate">
-                <TextBlock Text="{Binding}" 
+                <TextBlock Text="{Binding}"
                            ToolTip="{Binding}"
-                           FontWeight="Normal"
+                           FontWeight="Bold"
+                           x:Name="HeaderTextBlock"
+                           Margin="5"
                            VerticalAlignment="Center"
                            TextAlignment="Center"
-                           HorizontalAlignment="Center">
-                </TextBlock>
+                           HorizontalAlignment="Center" />
             </DataTemplate>
-            
+
             <relationshipMatrix:HeaderDataTemplateSelector x:Key="HeaderTemplateSelector"
                                                            ThingColumnTemplate="{StaticResource HeaderColumnTemplate}"
-                                                           NameColumnTemplate="{StaticResource NameHeaderColumnTemplate}">
-            </relationshipMatrix:HeaderDataTemplateSelector>
+                                                           NameColumnTemplate="{StaticResource NameHeaderColumnTemplate}" />
 
             <relationshipMatrix:MatrixCellDataTemplateSelector x:Key="MatrixCellTemplateSelector"
                                                                BiDirectionalTemplate="{StaticResource BidirectionalRelationship}"
+                                                               NoDirectionalTemplate="{StaticResource NodirectionalRelationship}"
                                                                Source1ToSource2Template="{StaticResource Source1ToSource2}"
                                                                Source2ToSource1Template="{StaticResource Source2ToSource1}"
                                                                NameColumnTemplate="{StaticResource NameTemplate}"
-                                                               NoTemplate="{StaticResource None}">
-            </relationshipMatrix:MatrixCellDataTemplateSelector>
+                                                               NoTemplate="{StaticResource None}" />
 
             <DataTemplate x:Key="DefaultColumnTemplate">
                 <ContentControl>
-                    <dxg:GridColumn Header="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).Header, RelativeSource={RelativeSource Self}}"
-                                    FieldName="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}"
-                                    AllowEditing="False"
-                                    Fixed="{Binding Path=FieldName, RelativeSource={RelativeSource Self}, Converter={StaticResource ColumnFixedConverter}}"
-                                    Width="{Binding Path=FieldName, RelativeSource={RelativeSource Self}, Converter={StaticResource ColumnWidthConverter}}"
-                                    FixedWidth="False"
-                                    MinWidth="30"
-                                    CellTemplateSelector="{StaticResource MatrixCellTemplateSelector}"
-                                    HeaderTemplateSelector="{StaticResource HeaderTemplateSelector}">
-                    </dxg:GridColumn>
+                    <dxg:GridColumn
+                        Header="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).Header, RelativeSource={RelativeSource Self}}"
+                        FieldName="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}"
+                        AllowEditing="False"
+                        Fixed="{Binding Path=FieldName, RelativeSource={RelativeSource Self}, Converter={StaticResource ColumnFixedConverter}}"
+                        Width="{Binding Path=FieldName, RelativeSource={RelativeSource Self}, Converter={StaticResource ColumnWidthConverter}}"
+                        FixedWidth="False"
+                        MinWidth="30"
+                        CellTemplateSelector="{StaticResource MatrixCellTemplateSelector}"
+                        HeaderTemplateSelector="{StaticResource HeaderTemplateSelector}" />
                 </ContentControl>
             </DataTemplate>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -107,106 +125,34 @@
                          OwnerLock="LoadingContent"
                          BorderEffect="Default"
                          BorderEffectColor="Blue">
-        <dxlc:LayoutControl HorizontalAlignment="Stretch" ScrollBars="None">
-                <dxlc:LayoutGroup Orientation="Vertical"
-                                  View="Group">
+        <dxlc:LayoutControl Background="AliceBlue" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            ScrollBars="None">
+            <dxlc:LayoutGroup Orientation="Vertical" VerticalAlignment="Stretch"
+                              View="Group">
                 <dxlc:LayoutItem>
-                        <views:BrowserHeader />
-                    </dxlc:LayoutItem>
+                    <views:BrowserHeader />
+                </dxlc:LayoutItem>
 
-                    <dxlc:LayoutGroup Orientation="Vertical"
+                <dxlc:LayoutGroup Orientation="Horizontal"
                                   HorizontalAlignment="Stretch"
-                                  View="GroupBox"
-                                  Header="Matrix Configuration"
-                                  IsCollapsible="True">
-                        <dxlc:LayoutGroup View="GroupBox"
-                                      Orientation="Horizontal">
-                            <dxlc:LayoutGroup View="GroupBox"
-                                          HorizontalAlignment="Stretch"
-                                          IsCollapsible="False"
-                                          Orientation="Vertical"
-                                          Header="Source 1">
-                                <dxlc:LayoutItem Label="Type">
-                                    <dxe:ComboBoxEdit EditValue="{Binding Source1Configuration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  ItemsSource="{Binding Source1Configuration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  AutoComplete="True"
-                                                  AllowNullInput="True"
-                                                  AllowDefaultButton="True">
-                                    </dxe:ComboBoxEdit>
-                                </dxlc:LayoutItem>
-                                <dxlc:LayoutItem Label="Categories">
-                                    <dxe:ComboBoxEdit EditValue="{Binding Source1Configuration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
-                                                  ItemsSource="{Binding Source1Configuration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  AutoComplete="True"
-                                                  AllowNullInput="True"
-                                                  AllowDefaultButton="True"
-                                                  DisplayMember="Name">
-                                        <dxe:ComboBoxEdit.StyleSettings>
-                                            <dxe:CheckedComboBoxStyleSettings />
-                                        </dxe:ComboBoxEdit.StyleSettings>
-                                    </dxe:ComboBoxEdit>
-                                </dxlc:LayoutItem>
-                            </dxlc:LayoutGroup>
-                            <dxlc:LayoutGroup View="GroupBox"
-                                          HorizontalAlignment="Stretch"
-                                          IsCollapsible="False"
-                                          Orientation="Vertical"
-                                          Header="Source 2">
-                                <dxlc:LayoutItem Label="Type">
-                                    <dxe:ComboBoxEdit EditValue="{Binding Source2Configuration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  ItemsSource="{Binding Source2Configuration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  AutoComplete="True"
-                                                  AllowNullInput="True"
-                                                  AllowDefaultButton="True">
-                                    </dxe:ComboBoxEdit>
-                                </dxlc:LayoutItem>
-                                <dxlc:LayoutItem Label="Categories">
-                                    <dxe:ComboBoxEdit EditValue="{Binding Source2Configuration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
-                                                  ItemsSource="{Binding Source2Configuration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  AutoComplete="True"
-                                                  AllowNullInput="True"
-                                                  AllowDefaultButton="True"
-                                                  DisplayMember="Name">
-                                        <dxe:ComboBoxEdit.StyleSettings>
-                                            <dxe:CheckedComboBoxStyleSettings />
-                                        </dxe:ComboBoxEdit.StyleSettings>
-                                    </dxe:ComboBoxEdit>
-                                </dxlc:LayoutItem>
-                            </dxlc:LayoutGroup>
-                        </dxlc:LayoutGroup>
-                        <dxlc:LayoutGroup View="GroupBox"
-                                      HorizontalAlignment="Stretch"
-                                      IsCollapsible="False"
-                                      Orientation="Horizontal"
-                                      Header="Relationship Configuration">
-                            <dxlc:LayoutItem Label="Rule">
-                                <dxe:ComboBoxEdit EditValue="{Binding RelationshipConfiguration.SelectedRule, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              ItemsSource="{Binding RelationshipConfiguration.PossibleRules, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                              AutoComplete="True"
-                                              AllowNullInput="True"
-                                              AllowDefaultButton="True"
-                                              DisplayMember="Name">
-                                </dxe:ComboBoxEdit>
-                            </dxlc:LayoutItem>
-                        </dxlc:LayoutGroup>
-
-                        
-                    </dxlc:LayoutGroup>
-
-                    <dxlc:LayoutGroup Orientation="Vertical" View="Group">
-                            <dxg:GridControl Name="MatrixGridControl"
+                                  VerticalAlignment="Stretch"
+                                  Margin="0"
+                                  View="Group">
+                    <dxlc:LayoutItem VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <dxg:GridControl Name="MatrixGridControl"
                                          ItemsSource="{Binding Matrix.Records, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                          ColumnsSource="{Binding Matrix.Columns, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                          ColumnGeneratorTemplate="{StaticResource DefaultColumnTemplate}"
                                          services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                          SelectionMode="Cell">
-                                <i:Interaction.Behaviors>
-                            <behaviour:CellSelectionBehavior SelectedCell="{Binding  Matrix.SelectedCell, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                </i:Interaction.Behaviors>
-                        <dxg:GridControl.View>
-                                    <dxg:TableView HorizontalAlignment="Stretch"
+                            <dxmvvm:Interaction.Behaviors>
+                                <behaviour:CellSelectionBehavior
+                                    SelectedCell="{Binding  Matrix.SelectedCell, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                
+                            </dxmvvm:Interaction.Behaviors>
+                            <dxg:GridControl.View>
+                                <dxg:TableView HorizontalAlignment="Stretch"
                                                VerticalAlignment="Stretch"
-                                               AutoWidth="False"
                                                ShowFilterPanelMode="Never"
                                                IsDetailButtonVisibleBinding="{x:Null}"
                                                ShowGroupPanel="False"
@@ -215,28 +161,173 @@
                                                VerticalScrollbarVisibility="Auto"
                                                ScrollingMode="Normal"
                                                AllowColumnFiltering="False"
-                                                   AllowGrouping="False"
-                                                   AllowSorting="False">
-                                        <dxg:TableView.RowCellMenuCustomizations>
-                                            <dxb:BarButtonItem Content="Edit Row Thing" Glyph="{dx:DXImage Image=EditName_16x16.png}" IsVisible="{Binding View.DataContext.CanEditSource1}" Command="{Binding View.DataContext.EditSource1Command}"/>
-                                            <dxb:BarButtonItem Content="Inspect Row Thing" Glyph="{dx:DXImage Image=Find_16x16.png}" IsVisible="{Binding View.DataContext.CanInspectSource1}" Command="{Binding View.DataContext.InspectSource1Command}"/>
-                                            <dxb:BarItemLinkSeparator/>
-                                            <dxb:BarButtonItem Content="Edit Column Thing" Glyph="{dx:DXImage Image=EditName_16x16.png}" IsVisible="{Binding View.DataContext.CanEditSource2}" Command="{Binding View.DataContext.EditSource2Command}"/>
-                                            <dxb:BarButtonItem Content="Inspect Column Thing" Glyph="{dx:DXImage Image=Find_16x16.png}" IsVisible="{Binding View.DataContext.CanInspectSource2}" Command="{Binding View.DataContext.InspectSource2Command}"/>
-                                            <dxb:BarItemLinkSeparator/>
-                                            <dxb:BarButtonItem Content="Create 1 > 2" Glyph="{dx:DXImage Image=Add_16x16.png}" IsVisible="{Binding View.DataContext.Matrix.CanCreateSource1ToSource2}" Command="{Binding View.DataContext.Matrix.CreateSource1ToSource2Link}"/>
-                                            <dxb:BarButtonItem Content="Create 2 > 1" Glyph="{dx:DXImage Image=Add_16x16.png}" IsVisible="{Binding View.DataContext.Matrix.CanCreateSource2ToSource1}" Command="{Binding View.DataContext.Matrix.CreateSource2ToSource1Link}"/>
-                                            <dxb:BarItemLinkSeparator/>
-                                            <dxb:BarButtonItem Content="Delete 1 > 2" Glyph="{dx:DXImage Image=Delete_16x16.png}" IsVisible="{Binding View.DataContext.Matrix.IsVisibleDelete1To2}" Command="{Binding View.DataContext.Matrix.DeleteSource1ToSource2Link}"/>
-                                            <dxb:BarButtonItem Content="Delete 2 > 1" Glyph="{dx:DXImage Image=Delete_16x16.png}" IsVisible="{Binding View.DataContext.Matrix.IsVisibleDelete2To1}" Command="{Binding View.DataContext.Matrix.DeleteSource2ToSource1Link}"/>
-                                            <dxb:BarButtonItem Content="Delete All" Glyph="{dx:DXImage Image=Delete_16x16.png}" IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteAll}" Command="{Binding View.DataContext.Matrix.DeleteAllRelationships}"/>
-                                        </dxg:TableView.RowCellMenuCustomizations>
-                                    </dxg:TableView>
-                                </dxg:GridControl.View>
-                            </dxg:GridControl>
-                    </dxlc:LayoutGroup>
+                                               AllowGrouping="False"
+                                               AllowSorting="False">
+                                    <dxmvvm:Interaction.Behaviors>
+                                        <dxmvvm:EventToCommand Command="{Binding Matrix.ProcessAltControlCellCommand}" EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}" EventName="RowDoubleClick" ModifierKeys="Alt+Control" PassEventArgsToCommand="True"/>
+                                        <dxmvvm:EventToCommand Command="{Binding Matrix.ProcessAltCellCommand}" EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}" EventName="RowDoubleClick" ModifierKeys="Alt" PassEventArgsToCommand="True"/>
+                                        <dxmvvm:EventToCommand Command="{Binding Matrix.ProcessCellCommand}" EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}" EventName="RowDoubleClick" ModifierKeys="" PassEventArgsToCommand="True"/>
+                                    </dxmvvm:Interaction.Behaviors>
+                                    <dxg:TableView.RowCellMenuCustomizations>
+                                        <dxb:BarButtonItem Content="Edit Row Thing"
+                                                           Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                                           IsVisible="{Binding View.DataContext.CanEditSource1}"
+                                                           Command="{Binding View.DataContext.EditSource1Command}" />
+                                        <dxb:BarButtonItem Content="Inspect Row Thing"
+                                                           Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                                           IsVisible="{Binding View.DataContext.CanInspectSource1}"
+                                                           Command="{Binding View.DataContext.InspectSource1Command}" />
+                                        <dxb:BarItemLinkSeparator />
+                                        <dxb:BarButtonItem Content="Edit Column Thing"
+                                                           Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                                           IsVisible="{Binding View.DataContext.CanEditSource2}"
+                                                           Command="{Binding View.DataContext.EditSource2Command}" />
+                                        <dxb:BarButtonItem Content="Inspect Column Thing"
+                                                           Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                                           IsVisible="{Binding View.DataContext.CanInspectSource2}"
+                                                           Command="{Binding View.DataContext.InspectSource2Command}" />
+                                        <dxb:BarItemLinkSeparator />
+                                        <dxb:BarButtonItem Content="Create ⮥"
+                                                           Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                                           IsVisible="{Binding View.DataContext.Matrix.CanCreateSource1ToSource2}"
+                                                           Command="{Binding View.DataContext.Matrix.CreateSource1ToSource2Link}" />
+                                        <dxb:BarButtonItem Content="Create ⮠"
+                                                           Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                                           IsVisible="{Binding View.DataContext.Matrix.CanCreateSource2ToSource1}"
+                                                           Command="{Binding View.DataContext.Matrix.CreateSource2ToSource1Link}" />
+                                        <dxb:BarItemLinkSeparator />
+                                        <dxb:BarButtonItem Content="Delete ⮥"
+                                                           Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDelete1To2}"
+                                                           Command="{Binding View.DataContext.Matrix.DeleteSource1ToSource2Link}" />
+                                        <dxb:BarButtonItem Content="Delete ⮠"
+                                                           Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDelete2To1}"
+                                                           Command="{Binding View.DataContext.Matrix.DeleteSource2ToSource1Link}" />
+                                        <dxb:BarButtonItem Content="Delete All"
+                                                           Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteAll}"
+                                                           Command="{Binding View.DataContext.Matrix.DeleteAllRelationships}" />
+                                    </dxg:TableView.RowCellMenuCustomizations>
+                                </dxg:TableView>
+                            </dxg:GridControl.View>
+                        </dxg:GridControl>
+                    </dxlc:LayoutItem>
+
+                    <dxlc:LayoutItem VerticalAlignment="Stretch" HorizontalAlignment="Right">
+                        <dxn:NavBarControl MaxWidth="250">
+                            <dxn:NavBarControl.View>
+                                <dxn:NavigationPaneView IsExpanded="True" />
+                            </dxn:NavBarControl.View>
+                            <dxn:NavBarControl.Groups>
+                                <dxn:NavBarGroup DisplaySource="Content" Header="Configuration">
+                                    <dxn:NavBarGroup.Content>
+                                        <dxlc:LayoutControl>
+                                            <dxlc:LayoutGroup Orientation="Vertical">
+                                                <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  IsCollapsible="False"
+                                                                  Orientation="Vertical"
+                                                                  Header="X Axis">
+                                                    <dxlc:LayoutItem Label="Type:">
+                                                        <dxe:ComboBoxEdit
+                                                            EditValue="{Binding Source2Configuration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{Binding Source2Configuration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            AutoComplete="True"
+                                                            AllowNullInput="True"
+                                                            AllowDefaultButton="True" />
+                                                    </dxlc:LayoutItem>
+                                                    <dxlc:LayoutItem Label="Categories: ">
+                                                        <dxe:ComboBoxEdit
+                                                            EditValue="{Binding Source2Configuration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
+                                                            ItemsSource="{Binding Source2Configuration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            AutoComplete="True"
+                                                            AllowNullInput="True"
+                                                            AllowDefaultButton="True"
+                                                            DisplayMember="Name">
+                                                            <dxe:ComboBoxEdit.StyleSettings>
+                                                                <dxe:CheckedComboBoxStyleSettings />
+                                                            </dxe:ComboBoxEdit.StyleSettings>
+                                                        </dxe:ComboBoxEdit>
+                                                    </dxlc:LayoutItem>
+                                                    <dxlc:LayoutItem Label="Display:">
+                                                        <dxe:ComboBoxEdit
+                                                            EditValue="{Binding Source2Configuration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{Binding Source2Configuration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            />
+                                                    </dxlc:LayoutItem>
+                                                </dxlc:LayoutGroup>
+                                                <dxlc:LayoutGroup GroupBoxDisplayMode="Light"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  IsCollapsible="False"
+                                                                  Orientation="Vertical"
+                                                                  Header="Y Axis" View="GroupBox">
+                                                    <dxlc:LayoutItem Label="Type: ">
+                                                        <dxe:ComboBoxEdit
+                                                            EditValue="{Binding Source1Configuration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{Binding Source1Configuration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            AutoComplete="True"
+                                                            AllowNullInput="True"
+                                                            AllowDefaultButton="True" />
+                                                    </dxlc:LayoutItem>
+                                                    <dxlc:LayoutItem Label="Categories: ">
+                                                        <dxe:ComboBoxEdit
+                                                            EditValue="{Binding Source1Configuration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
+                                                            ItemsSource="{Binding Source1Configuration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            AutoComplete="True"
+                                                            AllowNullInput="True"
+                                                            AllowDefaultButton="True"
+                                                            DisplayMember="Name">
+                                                            <dxe:ComboBoxEdit.StyleSettings>
+                                                                <dxe:CheckedComboBoxStyleSettings />
+                                                            </dxe:ComboBoxEdit.StyleSettings>
+                                                        </dxe:ComboBoxEdit>
+                                                    </dxlc:LayoutItem>
+                                                    <dxlc:LayoutItem Label="Display: ">
+                                                        <dxe:ComboBoxEdit
+                                                            EditValue="{Binding Source1Configuration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{Binding Source1Configuration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            AutoComplete="False"
+                                                            AllowNullInput="False"
+                                                            AllowDefaultButton="True" />
+                                                    </dxlc:LayoutItem>
+                                                </dxlc:LayoutGroup>
+                                                <dxlc:LayoutGroup View="GroupBox"
+                                                                  GroupBoxDisplayMode="Light"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  IsCollapsible="False"
+                                                                  Orientation="Horizontal"
+                                                                  Header="Relationship Configuration">
+                                                    <dxlc:LayoutItem Label="Rule">
+                                                        <dxe:ComboBoxEdit
+                                                            EditValue="{Binding RelationshipConfiguration.SelectedRule, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{Binding RelationshipConfiguration.PossibleRules, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            AutoComplete="True"
+                                                            AllowNullInput="True"
+                                                            AllowDefaultButton="True"
+                                                            DisplayMember="Name" />
+                                                    </dxlc:LayoutItem>
+                                                </dxlc:LayoutGroup>
+                                                <dxlc:LayoutGroup View="GroupBox"
+                                                                  GroupBoxDisplayMode="Light"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  IsCollapsible="False"
+                                                                  Orientation="Horizontal"
+                                                                  Header="View Options">
+                                                    <dxlc:LayoutItem>
+                                                        <dxe:CheckEdit
+                                                            EditValue="{Binding ShowDirectionality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Show Relationship Direction" ToolTip="When turned on, the relationship direction is indicated by arrows."/>
+                                                    </dxlc:LayoutItem>
+                                                </dxlc:LayoutGroup>
+                                            </dxlc:LayoutGroup>
+                                        </dxlc:LayoutControl>
+                                    </dxn:NavBarGroup.Content>
+                                </dxn:NavBarGroup>
+                            </dxn:NavBarControl.Groups>
+                        </dxn:NavBarControl>
+                    </dxlc:LayoutItem>
                 </dxlc:LayoutGroup>
-            </dxlc:LayoutControl>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
     </dx:LoadingDecorator>
 </UserControl>
-

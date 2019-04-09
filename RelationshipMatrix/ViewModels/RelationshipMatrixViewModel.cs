@@ -23,12 +23,15 @@ namespace CDP4RelationshipMatrix.ViewModels
     using NLog;
     using ReactiveUI;
 
+    /// <summary>
+    /// The view-model associated to the browser panel holding the relationship matrix.
+    /// </summary>
     public class RelationshipMatrixViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
         /// <summary>
         /// The logger for the current class
         /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private new static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -76,6 +79,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         private bool canInspectSource2;
 
         /// <summary>
+        /// Backing field for <see cref="ShowDirectionality"/>
+        /// </summary>
+        private bool showDirectionality;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel"/> class
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration"/></param>
@@ -84,29 +92,41 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
         /// <param name="pluginService">The <see cref="IPluginSettingsService"/></param>
-        public RelationshipMatrixViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginService)
-            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginService)
+        public RelationshipMatrixViewModel(Iteration iteration, ISession session,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginService)
+            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginService)
         {
             this.Caption = "Relationship Matrix";
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ShowDirectionality = true;
+
+            this.ToolTip =
+                $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             var setting = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
 
-            this.Source1Configuration = new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, setting);
-            this.Source2Configuration = new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, setting);
-            this.RelationshipConfiguration = new RelationshipConfigurationViewModel(session, iteration, this.BuildRelationshipMatrix, setting);
+            this.Source1Configuration =
+                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, setting);
+            this.Source2Configuration =
+                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, setting);
+            this.RelationshipConfiguration =
+                new RelationshipConfigurationViewModel(session, iteration, this.BuildRelationshipMatrix, setting);
             this.Matrix = new MatrixViewModel(this.Session, this.Thing, setting);
 
-            var model = (EngineeringModel)this.Thing.TopContainer;
-            this.modelSetup = model.EngineeringModelSetup;
+            this.Disposables.Add(this.Source1Configuration);
+            this.Disposables.Add(this.Source2Configuration);
+            this.Disposables.Add(this.RelationshipConfiguration);
+            this.Disposables.Add(this.Matrix);
 
+            var model = (EngineeringModel) this.Thing.TopContainer;
+
+            this.modelSetup = model.EngineeringModelSetup;
             this.iterationSetup = this.Thing.IterationSetup;
             this.CurrentIteration = this.iterationSetup.IterationNumber;
-
             this.ActiveParticipant = this.modelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
 
             this.AddSubscriptions();
-
             this.UpdateProperties();
         }
 
@@ -185,24 +205,33 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Gets the coommand to edit the current row thing
+        /// Gets the command to edit the current row thing
         /// </summary>
         public ReactiveCommand<object> EditSource1Command { get; private set; }
 
         /// <summary>
-        /// Gets the coommand to inspect the current row thing
+        /// Gets the command to inspect the current row thing
         /// </summary>
         public ReactiveCommand<object> InspectSource1Command { get; private set; }
 
         /// <summary>
-        /// Gets the coommand to edit the current column thing
+        /// Gets the command to edit the current column thing
         /// </summary>
         public ReactiveCommand<object> EditSource2Command { get; private set; }
 
         /// <summary>
-        /// Gets the coommand to inspect the current column thing
+        /// Gets the command to inspect the current column thing
         /// </summary>
         public ReactiveCommand<object> InspectSource2Command { get; private set; }
+
+        /// <summary>
+        /// Gets or sets whether directionality is displayed
+        /// </summary>
+        public bool ShowDirectionality
+        {
+            get { return this.showDirectionality; }
+            set { this.RaiseAndSetIfChanged(ref this.showDirectionality, value); }
+        }
 
         /// <summary>
         /// Builds the relationship matrix
@@ -210,7 +239,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void BuildRelationshipMatrix()
         {
             this.HasUpdateStarted = true;
-            this.Matrix.RebuildMatrix(this.Source1Configuration.SelectedClassKind, this.Source1Configuration.SelectedCategories, this.Source2Configuration.SelectedClassKind, this.Source2Configuration.SelectedCategories, this.RelationshipConfiguration.SelectedRule);
+
+            this.Matrix.RebuildMatrix(this.Source1Configuration, this.Source2Configuration, this.RelationshipConfiguration.SelectedRule);
+
             this.HasUpdateStarted = false;
         }
 
@@ -219,12 +250,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void UpdateRelationshipConfiguration()
         {
-            if (!this.Source1Configuration.SelectedClassKind.HasValue || !this.Source2Configuration.SelectedClassKind.HasValue)
+            if (!this.Source1Configuration.SelectedClassKind.HasValue ||
+                !this.Source2Configuration.SelectedClassKind.HasValue)
             {
                 return;
             }
 
-            this.RelationshipConfiguration.PopulatePossibleRules(this.Source1Configuration.SelectedClassKind, this.Source2Configuration.SelectedClassKind);
+            this.RelationshipConfiguration.PopulatePossibleRules(this.Source1Configuration.SelectedClassKind,
+                this.Source2Configuration.SelectedClassKind);
+
             if (this.RelationshipConfiguration.SelectedRule != null)
             {
                 this.BuildRelationshipMatrix();
@@ -256,15 +290,16 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.CurrentModel = this.modelSetup.Name;
 
             var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
+
             if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
             {
                 this.DomainOfExpertise = "None";
             }
             else
             {
-                this.DomainOfExpertise = (iterationDomainPair.Value.Item1 == null)
+                this.DomainOfExpertise = iterationDomainPair.Value.Item1 == null
                     ? "None"
-                    : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
+                    : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
             }
         }
 
@@ -274,28 +309,51 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void AddSubscriptions()
         {
             var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.modelSetup)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                       objectChange.ChangedThing.RevisionNumber > this.RevisionNumber &&
+                                       objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+            var domainOfExpertiseSubscription = CDPMessageBus.Current
+                .Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                       objectChange.ChangedThing.RevisionNumber > this.RevisionNumber &&
+                                       objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(domainOfExpertiseSubscription);
 
             var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationSetup)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                       objectChange.ChangedThing.RevisionNumber > this.RevisionNumber &&
+                                       objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(iterationSetupSubscription);
 
             // restricted to defined thing for now
             var thingsSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DefinedThing))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.CheckRebuildMatrix);
+
             this.Disposables.Add(thingsSubscription);
+
+            this.WhenAnyValue(x => x.ShowDirectionality).Subscribe(_ => this.BuildRelationshipMatrix());
+
+            var ruleSubscription = CDPMessageBus.Current
+                .Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
+                .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => {
+                    this.UpdateRelationshipConfiguration();
+                });
+
+            this.Disposables.Add(ruleSubscription);
 
             this.EditSource1Command = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSource1));
             this.Disposables.Add(this.EditSource1Command.Subscribe(_ => this.ExecuteEditSource1Command()));
@@ -309,7 +367,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.InspectSource2Command = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSource2));
             this.Disposables.Add(this.InspectSource2Command.Subscribe(_ => this.ExecuteInspectSource2Command()));
 
-            this.Disposables.Add(this.WhenAnyValue(x => x.Matrix.SelectedCell).Subscribe(_ => this.ComputeEditInspectCanExecute()));
+            this.Disposables.Add(this.WhenAnyValue(x => x.Matrix.SelectedCell)
+                .Subscribe(_ => this.ComputeEditInspectCanExecute()));
         }
 
         /// <summary>
@@ -322,35 +381,39 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void CheckRebuildMatrix(ObjectChangedEvent e)
         {
             var thing = e.ChangedThing as DefinedThing;
-            if (thing == null || !thing.CacheKey.Iteration.HasValue || thing.CacheKey.Iteration.Value != this.Thing.Iid)
+
+            if (thing?.CacheKey.Iteration == null || thing.CacheKey.Iteration.Value != this.Thing.Iid)
             {
                 return;
             }
 
-            if (!this.Source1Configuration.SelectedClassKind.HasValue || !this.Source2Configuration.SelectedClassKind.HasValue || this.RelationshipConfiguration.SelectedRule == null)
+            if (!this.Source1Configuration.SelectedClassKind.HasValue ||
+                !this.Source2Configuration.SelectedClassKind.HasValue ||
+                this.RelationshipConfiguration.SelectedRule == null)
             {
                 return;
             }
 
-            if (thing.ClassKind != this.Source1Configuration.SelectedClassKind.Value && thing.ClassKind != this.Source2Configuration.SelectedClassKind.Value)
+            if (thing.ClassKind != this.Source1Configuration.SelectedClassKind.Value &&
+                thing.ClassKind != this.Source2Configuration.SelectedClassKind.Value)
             {
                 return;
             }
 
-            // thing is either classkind1 or classkind2
-            if (this.Source1Configuration.SelectedCategories.Count == 0 && this.Source2Configuration.SelectedCategories.Count == 0)
+            // thing is either ClassKind1 or ClassKind2
+            if (this.Source1Configuration.SelectedCategories.Count == 0 &&
+                this.Source2Configuration.SelectedCategories.Count == 0)
             {
                 this.BuildRelationshipMatrix();
             }
-            else if (thing.ClassKind == this.Source1Configuration.SelectedClassKind.Value && this.Source1Configuration.SelectedCategories.Count > 0
-                     || thing.ClassKind == this.Source2Configuration.SelectedClassKind.Value && this.Source2Configuration.SelectedCategories.Count > 0)
+            else if (thing.ClassKind == this.Source1Configuration.SelectedClassKind.Value &&
+                     this.Source1Configuration.SelectedCategories.Count > 0 ||
+                     thing.ClassKind == this.Source2Configuration.SelectedClassKind.Value &&
+                     this.Source2Configuration.SelectedCategories.Count > 0)
             {
-                var categorizable = thing as ICategorizableThing; // thing shoudl normally be a categorizable thing
-                if (categorizable != null && categorizable.Category.Intersect(this.Source1Configuration.SelectedCategories).Any())
-                {
-                    this.BuildRelationshipMatrix();
-                }
-                else if (categorizable != null && categorizable.Category.Intersect(this.Source2Configuration.SelectedCategories).Any())
+                if (thing is ICategorizableThing categorizable && (
+                        categorizable.Category.Intersect(this.Source1Configuration.SelectedCategories).Any() ||
+                        categorizable.Category.Intersect(this.Source2Configuration.SelectedCategories).Any()))
                 {
                     this.BuildRelationshipMatrix();
                 }
@@ -363,6 +426,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void ComputeEditInspectCanExecute()
         {
             var vm = this.Matrix.SelectedCell as MatrixCellViewModel;
+
             if (vm == null)
             {
                 this.CanEditSource1 = false;
@@ -384,7 +448,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void ExecuteInspectSource1Command()
         {
             var cell = this.Matrix.SelectedCell as MatrixCellViewModel;
-            if (cell == null || cell.Source1 == null)
+
+            if (cell?.Source1 == null)
             {
                 return;
             }
@@ -398,7 +463,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void ExecuteInspectSource2Command()
         {
             var cell = this.Matrix.SelectedCell as MatrixCellViewModel;
-            if (cell == null || cell.Source2 == null)
+
+            if (cell?.Source2 == null)
             {
                 return;
             }
@@ -412,7 +478,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void ExecuteEditSource1Command()
         {
             var cell = this.Matrix.SelectedCell as MatrixCellViewModel;
-            if (cell == null || cell.Source1 == null)
+
+            if (cell?.Source1 == null)
             {
                 return;
             }
@@ -426,7 +493,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void ExecuteEditSource2Command()
         {
             var cell = this.Matrix.SelectedCell as MatrixCellViewModel;
-            if (cell == null || cell.Source2 == null)
+
+            if (cell?.Source2 == null)
             {
                 return;
             }

@@ -9,6 +9,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using System;
     using CDP4Common.CommonData;
     using ReactiveUI;
+    using Settings;
 
     /// <summary>
     /// A view-model for dynamic column definition
@@ -24,9 +25,10 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Initializes a new instance of the <see cref="ColumnDefinition"/> class
         /// </summary>
         /// <param name="thing">The represented <see cref="Thing"/></param>
-        public ColumnDefinition(DefinedThing thing)
+        /// <param name="displayKind">The <see cref="DisplayKind"/> of the column.</param>
+        public ColumnDefinition(DefinedThing thing, DisplayKind displayKind)
         {
-            this.Header = thing.Name;
+            this.Header = displayKind == DisplayKind.Name ? thing.Name : thing.ShortName; 
             this.FieldName = thing.ShortName;
             this.ThingId = thing.Iid;
         }

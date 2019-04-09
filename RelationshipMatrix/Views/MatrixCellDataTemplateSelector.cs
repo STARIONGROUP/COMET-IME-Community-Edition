@@ -10,7 +10,6 @@ namespace CDP4RelationshipMatrix
     using System.Dynamic;
     using System.Windows;
     using System.Windows.Controls;
-    using CDP4CommonView;
     using DevExpress.Xpf.Grid;
     using ViewModels;
 
@@ -33,13 +32,13 @@ namespace CDP4RelationshipMatrix
         /// </returns>
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            var gridData = item as EditGridCellData;
-            if (gridData == null)
+            if (!(item is EditGridCellData gridData))
             {
                 return base.SelectTemplate(item, container);
             }
 
             var currentColumn = gridData.Column.FieldName;
+
             if (string.IsNullOrWhiteSpace(currentColumn))
             {
                 return base.SelectTemplate(item, container);
@@ -50,8 +49,7 @@ namespace CDP4RelationshipMatrix
                 return this.NameColumnTemplate;
             }
 
-            var row = gridData.RowData.Row as ExpandoObject;
-            if (row == null)
+            if (!(gridData.RowData.Row is ExpandoObject row))
             {
                 return base.SelectTemplate(item, container);
             }
@@ -60,22 +58,26 @@ namespace CDP4RelationshipMatrix
             var currentCellValue = dic[currentColumn];
 
             var vm = (MatrixCellViewModel)currentCellValue;
+            
             if (vm == null || vm.RelationshipDirection == RelationshipDirectionKind.None)
             {
                 return this.NoTemplate;
             }
 
-            if (vm.RelationshipDirection == RelationshipDirectionKind.RowThingToColumnThing)
+            if (gridData.View.DataContext is RelationshipMatrixViewModel matrixvm && !matrixvm.ShowDirectionality)
             {
-                return this.Source1ToSource2Template;
+                return this.NoDirectionalTemplate;
             }
 
-            if (vm.RelationshipDirection == RelationshipDirectionKind.ColumnThingToRowThing)
+            switch (vm.RelationshipDirection)
             {
-                return this.Source2ToSource1Template;
+                case RelationshipDirectionKind.RowThingToColumnThing:
+                    return this.Source1ToSource2Template;
+                case RelationshipDirectionKind.ColumnThingToRowThing:
+                    return this.Source2ToSource1Template;
+                default:
+                    return this.BiDirectionalTemplate;
             }
-
-            return this.BiDirectionalTemplate;
         }
 
         /// <summary>
@@ -92,6 +94,11 @@ namespace CDP4RelationshipMatrix
         /// Gets or sets the <see cref="DataTemplate"/> to show that there is a bi-directional relationship between a source 1 and a source 2
         /// </summary>
         public DataTemplate BiDirectionalTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> to show a relationship with no directionality information
+        /// </summary>
+        public DataTemplate NoDirectionalTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the template to display nothing

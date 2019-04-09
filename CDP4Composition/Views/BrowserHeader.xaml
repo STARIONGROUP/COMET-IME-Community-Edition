@@ -6,6 +6,32 @@
              d:DesignHeight="60"
              d:DesignWidth="400"
              mc:Ignorable="d">
+    <UserControl.ToolTip>
+        <ToolTip >
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <TextBlock Text="Model:" FontWeight="Bold"/>
+                    <TextBlock  Text="{Binding CurrentModel}" Margin="3,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <TextBlock Text="Iteration:" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentIteration}" Margin="3,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <TextBlock Text="Person:" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding Person}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <TextBlock Text="Domain of Expertise:" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding DomainOfExpertise}" Margin="3,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <TextBlock Text="Source:" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding DataSource}" Margin="3,0,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </ToolTip>
+    </UserControl.ToolTip>
     <Grid Background="AliceBlue">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -13,14 +39,15 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0"
                    Grid.Column="0"
+                   FontWeight="Bold"
                    Height="Auto"
                    Margin="3"
                    FontSize="10"
@@ -28,6 +55,7 @@
         <TextBlock Grid.Row="0"
                    Grid.Column="1"
                    Height="Auto"
+                   TextTrimming="CharacterEllipsis"
                    Margin="3"
                    FontSize="10"
                    Text="{Binding CurrentModel}" />
@@ -35,12 +63,14 @@
         <TextBlock Grid.Row="0"
                    Grid.Column="2"
                    Height="Auto"
-                   Margin="3"
+                   FontWeight="Bold"
+                   Margin="6,3,3,3"
                    FontSize="10"
                    Text="Data-Source:" />
         <TextBlock Grid.Row="0"
                    Grid.Column="3"
                    Height="Auto"
+                   TextTrimming="CharacterEllipsis"
                    Margin="3"
                    FontSize="10"
                    Text="{Binding DataSource}" />
@@ -48,12 +78,14 @@
         <TextBlock Grid.Row="1"
                    Grid.Column="0"
                    Height="Auto"
+                   FontWeight="Bold"
                    Margin="3"
                    FontSize="10"
                    Text="Iteration: " />
         <TextBlock Grid.Row="1"
                    Grid.Column="1"
                    Height="Auto"
+                   TextTrimming="CharacterEllipsis"
                    Margin="3"
                    FontSize="10"
                    Text="{Binding CurrentIteration}" />
@@ -61,12 +93,14 @@
         <TextBlock Grid.Row="1"
                    Grid.Column="2"
                    Height="Auto"
-                   Margin="3"
+                   FontWeight="Bold"
+                   Margin="6,3,3,3"
                    FontSize="10"
                    Text="Person: " />
         <TextBlock Grid.Row="1"
                    Grid.Column="3"
                    Height="Auto"
+                   TextTrimming="CharacterEllipsis"
                    Margin="3"
                    FontSize="10"
                    Text="{Binding Person}" />
@@ -74,12 +108,14 @@
         <TextBlock Grid.Row="2"
                    Grid.Column="2"
                    Height="Auto"
-                   Margin="3"
+                   FontWeight="Bold"
+                   Margin="6,3,3,3"
                    FontSize="10"
                    Text="Domain Of Expertise:" />
         <TextBlock Grid.Row="2"
                    Grid.Column="3"
                    Height="Auto"
+                   TextTrimming="CharacterEllipsis"
                    Margin="3"
                    FontSize="10"
                    Text="{Binding DomainOfExpertise}" />

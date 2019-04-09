@@ -8,11 +8,13 @@ namespace CDP4RelationshipMatrix.Views
 {
     using CDP4Composition;
     using CDP4Composition.Attributes;
+    using DevExpress.Xpf.Core;
+    using DevExpress.Xpf.Grid;
 
     /// <summary>
     /// Interaction logic for RelationshipMatrix view
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [PanelViewExport(RegionNames.EditorPanel)]
     public partial class RelationshipMatrix : IPanelView
     {
         /// <summary>

@@ -6,5 +6,9 @@
     "RequirementsSpecification",
     "RequirementsGroup",
     "Requirement"
+  ],
+  "possibleDisplayKinds": [
+    "Name",
+    "ShortName"
   ]
 }
