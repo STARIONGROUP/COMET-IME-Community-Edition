@@ -280,8 +280,9 @@ namespace CDP4IME
         private void ExecuteOpenDataSourceRequest()
         {
             var openSessions = this.Sessions.Select(x => x.Session).ToList();
-            var dataSelection = new DataSourceSelectionViewModel(openSessions);
+            var dataSelection = new DataSourceSelectionViewModel(this.dialogNavigationService, openSessions);
             var result = this.dialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
+
             if (result == null || !result.Result.HasValue || !result.Result.Value)
             {
                 return;

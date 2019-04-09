@@ -6,6 +6,7 @@
 
 namespace CDP4IME.ViewModels
 {
+    using System.Reflection;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using Views;
@@ -23,5 +24,10 @@ namespace CDP4IME.ViewModels
         public AboutViewModel()
         {
         }
+
+        /// <summary>
+        /// Gets the assembly version information to display.
+        /// </summary>
+        public string Version => $"Version: {Assembly.GetEntryAssembly().GetName().Version}";
     }
 }

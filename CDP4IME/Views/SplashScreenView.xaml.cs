@@ -20,7 +20,7 @@ namespace CDP4IME.Views
         public SplashScreenView()
         {
             this.InitializeComponent();
-            this.Version.Text = string.Format("Version: {0}", Assembly.GetEntryAssembly().GetName().Version);
+            this.Version.Text = $"Version: {Assembly.GetEntryAssembly().GetName().Version}";
         }
     }
 }

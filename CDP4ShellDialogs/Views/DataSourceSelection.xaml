@@ -9,194 +9,194 @@
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              Title="Data Source Selection"
-             Width="500"
-             Height="300"
+             SizeToContent="Height"
              dx:ThemeManager.ThemeName="Seven"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
              ShowTitle="True"
-             mc:Ignorable="d">
+             mc:Ignorable="d" MinWidth="450" Width="450" MaxWidth="850" MaxHeight="550" d:DesignHeight="474">
 
     <dx:DXWindow.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </dx:DXWindow.Resources>
-
-    <dxlc:LayoutControl Height="Auto"
-                        Background="White"
-                        Orientation="Vertical">
-        <dxlc:LayoutGroup Orientation="Vertical">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="120" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <dxlc:LayoutItemLabel Grid.Row="0"
-                                      Grid.Column="0"
-                                      Margin="5"
-                                      Content="Data Source:" />
-
-                <ComboBox Grid.Row="0"
-                          Grid.Column="1"
-                          Margin="2"
-                          DisplayMemberPath="Name"
-                          ItemsSource="{Binding Path=AvailableDataSourceKinds}"
-                          SelectedItem="{Binding Path=SelectedDataSourceKind,
+    <Grid>
+        <dxlc:LayoutControl Height="Auto"
+                            Background="White"
+                            Orientation="Vertical">
+            <dxlc:LayoutGroup Orientation="Vertical">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Image Grid.Row="0" Name="logo" Stretch="Fill"
+                           Source="../Resources/cdp4logo_brand_textonly.png" Width="200" Margin="0,15,0,30" />
+                    <dxlc:LayoutControl Grid.Row="1" Orientation="Vertical">
+                        <dxlc:LayoutGroup Orientation="Vertical" ItemLabelsAlignment="Default" ItemSpace="10"
+                                          HorizontalAlignment="Stretch" View="Group">
+                            <dxlc:LayoutItem Label="Source Type">
+                                <ComboBox DisplayMemberPath="Name"
+                                          Margin="10,0,0,0"
+                                          ItemsSource="{Binding Path=AvailableDataSourceKinds}"
+                                          SelectedItem="{Binding Path=SelectedDataSourceKind,
                                                  Mode=TwoWay,
                                                  UpdateSourceTrigger=PropertyChanged}"
-                          ToolTip="{Binding Path=SelectedItem.Description,
+                                          ToolTip="{Binding Path=SelectedItem.Description,
                                             RelativeSource={RelativeSource Self}}" />
-
-                <dxlc:LayoutItemLabel Grid.Row="1"
-                                      Grid.Column="0"
-                                      Margin="5"
-                                      Content="URI:" />
-                <StackPanel Grid.Row="1"
-                            Grid.Column="1"
-                            Orientation="Horizontal">
-
-                    <ComboBox MinWidth="215"
-                              Margin="2"
-                              DisplayMemberPath="Name"
-                              IsEditable="True"
-                              ItemsSource="{Binding Path=AvailableUris}"
-                              SelectedItem="{Binding Path=SelectedUri,
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem Label="Source Address">
+                                <Grid Margin="10,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox Grid.Column="0"
+                                              HorizontalAlignment="Stretch"
+                                              DisplayMemberPath="Name"
+                                              IsEditable="True"
+                                              ItemsSource="{Binding Path=AvailableUris}"
+                                              SelectedItem="{Binding Path=SelectedUri,
                                                      Mode=TwoWay,
                                                      UpdateSourceTrigger=PropertyChanged}"
-                              Text="{Binding SelectedUriText,
-                                             UpdateSourceTrigger=PropertyChanged,
-                                             Mode=TwoWay}" />
-                    <Button Width="35"
-                            HorizontalAlignment="Right"
-                            Command="{Binding BrowseSourceCommand,
+                                              Text="{Binding SelectedUriText,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Mode=TwoWay}" />
+                                    <dx:SimpleButton Grid.Column="1"
+                                                     Margin="10,0,0,0"
+                                                     Width="35"
+                                                     HorizontalAlignment="Right"
+                                                     Command="{Binding BrowseSourceCommand,
                                               UpdateSourceTrigger=PropertyChanged}"
-                            Content="..."
-                            Visibility="{Binding ShowBrowseButton,
+                                                     Content="..."
+                                                     ToolTip="Browse for Source File"
+                                                     Visibility="{Binding ShowBrowseButton,
                                                  UpdateSourceTrigger=PropertyChanged,
-                                                 Converter={dx:BooleanToVisibilityConverter}}" />
-                    <CheckBox Name="ProxyCheckBox"
-                              IsChecked="{Binding IsProxyEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Margin="2"
-                              HorizontalAlignment="Right"
-                              Content="Proxy"
-                              ToolTip="Connect using a proxy server" />
-                </StackPanel>
-
-                <dxlc:LayoutItemLabel Grid.Row="2"
-                                      Grid.Column="0"
-                                      Margin="5"
-                                      Content="Proxy URI:"/>
-
-                <StackPanel Grid.Row="2"
-                            Grid.Column="1"
-                            Orientation="Horizontal">
-
-                    <dxe:TextEdit Name="ProxyUri"
-                                  MinWidth="180"
-                             
-                             IsEnabled="False"
-                             Text="{Binding ProxyUri,
-                                        UpdateSourceTrigger=PropertyChanged,
-                                        Mode=TwoWay}"/>
-
-                    <dxlc:LayoutItemLabel Margin="5"
-                                          Content="Port:" />
-
-                    <dxe:TextEdit Name="ProxyPort"
-                                  MinWidth="50"
-                             
-                             MaskType="RegEx" Mask="([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])"
-                             IsEnabled="False"
-                             Text="{Binding ProxyPort,
-                                        UpdateSourceTrigger=PropertyChanged,
-                                        Mode=TwoWay}"/>
-
-                </StackPanel>
-
-                <dxlc:LayoutItemLabel Grid.Row="3"
-                                      Grid.Column="0"
-                                      Margin="5"
-                                      Content="User Name: " />
-                <TextBox Name="UserName"
-                         Grid.Row="3"
-                         Grid.Column="1"
-                         MinWidth="150"
-                         Margin="2"
-                         Text="{Binding UserName,
+                                                 Converter={dx:BooleanToVisibilityConverter}}"
+                                                     Glyph="{dx:DXImage Image=BOFolder_16x16.png}" />
+                                    <dx:SimpleButton Grid.Column="2"
+                                                     Margin="10,0,0,0"
+                                                     Width="35"
+                                                     HorizontalAlignment="Right"
+                                                     Command="{Binding OpenUriManagerCommand,
+                                                   UpdateSourceTrigger=PropertyChanged}"
+                                                     Content="..."
+                                                     ToolTip="Open URI Manager"
+                                                     Glyph="{dx:DXImage Image=ManageDatasource_16x16.png}" />
+                                    <!---->
+                                </Grid>
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem Label="Username">
+                                <dxe:TextEdit Name="UserName"
+                                              MinWidth="150"
+                                              Margin="10,0,0,0"
+                                              Text="{Binding UserName,
                                         UpdateSourceTrigger=PropertyChanged,
                                         Mode=TwoWay}" />
-
-                <dxlc:LayoutItemLabel Grid.Row="4"
-                                      Grid.Column="0"
-                                      Margin="5"
-                                      Content="Password: " />
-
-                <Grid Grid.Row="4" Grid.Column="1">
-                    <dxe:PasswordBoxEdit Name="PasswordBoxEdit"
-                                         MinWidth="150"
-                                         Margin="2"
-                                         Text="{Binding Password,
-                                                        UpdateSourceTrigger=PropertyChanged,
-                                                        Mode=TwoWay}" />
-                    <dxe:TextEdit Margin="2"
-                                  EditValue="{Binding ElementName=PasswordBoxEdit,
-                                                      Path=Password,
-                                                      Mode=TwoWay}"
-                                  Visibility="{Binding ElementName=ShowPasswordBox,
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem Label="Password">
+                                <Grid Margin="10,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <dxe:PasswordBoxEdit Name="PasswordBoxEdit"
+                                                         Text="{Binding Password,
+                                                         UpdateSourceTrigger=PropertyChanged,
+                                                         Mode=TwoWay}" />
+                                    <dxe:TextEdit Grid.Column="0"
+                                                  EditValue="{Binding ElementName=PasswordBoxEdit,
+                                                  Path=Password,
+                                                  Mode=TwoWay}"
+                                                  Visibility="{Binding ElementName=ShowPasswordBox,
                                                        Path=IsChecked,
                                                        Converter={dx:BooleanToVisibilityConverter}}" />
+                                    <CheckBox Name="ShowPasswordBox"
+                                              Grid.Column="1"
+                                              Margin="10,0,10,0"
+                                              Content="Show" />
+                                </Grid>
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem Label="Use Proxy">
+                                <CheckBox Name="ProxyCheckBox"
+                                          IsChecked="{Binding IsProxyEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Margin="10,0,0,0"
+                                          HorizontalAlignment="Left"
+                                          ToolTip="Connect using a proxy server" />
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem Label="Proxy Settings"
+                                             Visibility="{Binding IsProxyEnabled, UpdateSourceTrigger=PropertyChanged,
+                                                 Converter={dx:BooleanToVisibilityConverter}}">
+                                <Grid Margin="10,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="60" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <dxe:TextEdit Name="ProxyUri"
+                                                  Grid.Column="0"
+                                                  IsEnabled="False"
+                                                  Text="{Binding ProxyUri,
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        Mode=TwoWay}" />
+                                    <dxe:TextEdit Name="ProxyPort"
+                                                  Margin="10,0,0,0"
+                                                  Grid.Column="1"
+                                                  MaskType="RegEx"
+                                                  Mask="([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])"
+                                                  IsEnabled="False"
+                                                  Text="{Binding ProxyPort,
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        Mode=TwoWay}" />
+                                    <dx:SimpleButton Grid.Column="2"
+                                                     Margin="10,0,0,0"
+                                                     Width="35"
+                                                     HorizontalAlignment="Right"
+                                                     Glyph="{dx:DXImage Image=ManageDatasource_16x16.png}"
+                                                     ToolTip="Configure Proxy"
+                                                     Command="{Binding OpenProxyConfigurationCommand,
+                                               UpdateSourceTrigger=PropertyChanged}"
+                                                     Content="..." />
+                                </Grid>
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem>
+                                <TextBlock
+                                    Text="{Binding Path=ErrorMessage,
+                                        Mode=OneWay}"
+                                    Padding="10"
+                                    Visibility="{Binding Path=HasError,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Background="#FFF5E5E5" />
+                            </dxlc:LayoutItem>
+                        </dxlc:LayoutGroup>
+                        <dxlc:LayoutGroup Margin="0,10,0,0" Orientation="Horizontal">
+                            <dx:SimpleButton MinWidth="75"
+                                             MinHeight="25"
+                                             MaxWidth="75"
+                                             MaxHeight="25"
+                                             HorizontalAlignment="Right"
+                                             Command="{Binding Path=OkCommand}"
+                                             Content="OK" IsDefault="True" />
+                            <dx:SimpleButton MinWidth="75"
+                                             MinHeight="25"
+                                             MaxWidth="75"
+                                             MaxHeight="25"
+                                             HorizontalAlignment="Right"
+                                             Command="{Binding Path=CancelCommand}"
+                                             Content="Cancel" IsCancel="True" />
+                        </dxlc:LayoutGroup>
+                    </dxlc:LayoutControl>
                 </Grid>
 
-                <CheckBox Name="ShowPasswordBox"
-                          Grid.Row="5"
-                          Grid.Column="1"
-                          Margin="2"
-                          Content="Show Password" />
+            </dxlc:LayoutGroup>
 
-                <views:LoadingControl Grid.Row="0"
-                                      Grid.RowSpan="5"
-                                      Grid.Column="0"
-                                      Grid.ColumnSpan="2"
-                                      Visibility="{Binding IsBusy,
-                                                           Converter={dx:BooleanToVisibilityConverter}}" />
-            </Grid>
-
-            <dxlc:LayoutItem>
-                <TextBox IsReadOnly="True"
-                         Text="{Binding Path=ErrorMessage,
-                                        Mode=OneWay}"
-                         Visibility="{Binding Path=HasError,
-                                              UpdateSourceTrigger=PropertyChanged,
-                                              Converter={StaticResource BooleanToVisibilityConverter}}" />
-            </dxlc:LayoutItem>
-        </dxlc:LayoutGroup>
-
-        <dxlc:LayoutGroup Orientation="Horizontal">
-            <Button MinWidth="75"
-                    MinHeight="25"
-                    MaxWidth="75"
-                    MaxHeight="25"
-                    HorizontalAlignment="Right"
-                    Command="{Binding Path=OkCommand}"
-                    Content="OK" IsDefault="True" />
-            <Button MinWidth="75"
-                    MinHeight="25"
-                    MaxWidth="75"
-                    MaxHeight="25"
-                    HorizontalAlignment="Right"
-                    Command="{Binding Path=CancelCommand}"
-                    Content="Cancel" IsCancel="True" />
-        </dxlc:LayoutGroup>
-    </dxlc:LayoutControl>
+        </dxlc:LayoutControl>
+        <views:LoadingControl Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}" />
+    </Grid>
 </dx:DXWindow>

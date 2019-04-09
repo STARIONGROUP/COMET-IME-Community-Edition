@@ -104,17 +104,24 @@ namespace CDP4ShellDialogs.ViewModels
         private readonly IEnumerable<ISession> openSessions;
 
         /// <summary>
+        /// The dialog navigation service.
+        /// </summary>
+        private IDialogNavigationService dialogNavigationService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceSelectionViewModel"/> class.
         /// </summary>
+        /// <param name="dialogNavigationService">An instance of <see cref="IDialogNavigationService"/>.</param>
         /// <param name="openSessions">
         /// The openSessions.
         /// </param>
-        public DataSourceSelectionViewModel(IEnumerable<ISession> openSessions = null)
+        public DataSourceSelectionViewModel(IDialogNavigationService dialogNavigationService, IEnumerable<ISession> openSessions = null)
         {
             // reset the loading indicator
             this.IsBusy = false;
 
             this.openSessions = openSessions;
+            this.dialogNavigationService = dialogNavigationService;
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
             this.AvailableDataSourceKinds.ChangeTrackingEnabled = true;
 
@@ -143,6 +150,12 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.BrowseSourceCommand = ReactiveCommand.Create(canBrowse);
             this.BrowseSourceCommand.Subscribe(_ => this.ExecuteBrowse());
+
+            this.OpenUriManagerCommand = ReactiveCommand.Create();
+            this.OpenUriManagerCommand.Subscribe(_ => this.ExecuteOpenUriManagerRequest());
+
+            this.OpenProxyConfigurationCommand = ReactiveCommand.Create();
+            this.OpenProxyConfigurationCommand.Subscribe(_ => this.ExecuteOpenProxyConfigurationCommand());
 
             canBrowse.Subscribe(_ => this.ResetBrowseButton());
 
@@ -357,6 +370,16 @@ namespace CDP4ShellDialogs.ViewModels
         public ReactiveCommand<object> BrowseSourceCommand { get; private set; }
 
         /// <summary>
+        /// Gets the Source Configuration open Command
+        /// </summary>
+        public ReactiveCommand<object> OpenUriManagerCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the proxy configuration Command
+        /// </summary>
+        public ReactiveCommand<object> OpenProxyConfigurationCommand { get; private set; }
+
+        /// <summary>
         /// Gets the Cancel Command
         /// </summary>
         public ReactiveCommand<object> CancelCommand { get; private set; }
@@ -461,6 +484,23 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
+        /// Reloads all saved sources from the uri config file.
+        /// </summary>
+        private void RefreshSavedSources()
+        {
+            this.AllDefinedUris = new ReactiveList<UriRowViewModel>();
+
+            var configHandler = new UriConfigFileHandler();
+            var uriList = configHandler.Read();
+
+            foreach (var uri in uriList)
+            {
+                var row = new UriRowViewModel { UriConfig = uri };
+                this.AllDefinedUris.Add(row);
+            }
+        }
+
+        /// <summary>
         /// Selects the last uri in the list
         /// </summary>
         private void ReloadAvailableUris()
@@ -512,11 +552,7 @@ namespace CDP4ShellDialogs.ViewModels
         private void ResetProperties()
         {
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
-
-            this.AllDefinedUris = new ReactiveList<UriRowViewModel>();
-
             this.ShowBrowseButton = false;
-
             this.ErrorMessage = string.Empty;
 
             var dalAvailable = ServiceLocator.Current.GetInstance<AvailableDals>();
@@ -525,16 +561,9 @@ namespace CDP4ShellDialogs.ViewModels
             foreach (var dal in this.dals)
             {
                 this.AvailableDataSourceKinds.Add(dal.Metadata);
-            }            
-
-            var configHandler = new UriConfigFileHandler();
-            var uriList = configHandler.Read();
-
-            foreach (var uri in uriList)
-            {
-                var row = new UriRowViewModel { UriConfig = uri };
-                this.AllDefinedUris.Add(row);
             }
+
+            this.RefreshSavedSources();
 
 #if DEBUG
             this.UserName = "admin";
@@ -573,6 +602,29 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
+        /// The execute open uri manager request.
+        /// </summary>
+        private void ExecuteOpenUriManagerRequest()
+        {
+            var uriManager = new UriManagerViewModel();
+            this.dialogNavigationService.NavigateModal(uriManager);
+
+            this.RefreshSavedSources();
+            this.ReloadAvailableUris();
+        }
+
+        /// <summary>
+        /// Executes the <see cref="OpenProxyConfigurationCommand"/> to load and save the web-proxy configuration
+        /// </summary>
+        private void ExecuteOpenProxyConfigurationCommand()
+        {
+            var proxyServerViewModel = new ProxyServerViewModel();
+            this.dialogNavigationService.NavigateModal(proxyServerViewModel);
+
+            this.UpdateProxyAddressProperty();
+        }
+
+        /// <summary>
         /// Assertion to compute whether the specified uriToCheck matches the select data source kind
         /// </summary>
         /// <param name="uriToCheck">
@@ -604,7 +656,17 @@ namespace CDP4ShellDialogs.ViewModels
                 return false;
             }
 
-            return this.openSessions.Any(s => s.DataSourceUri.Equals(dataSourceUri) && s.Credentials.UserName.Equals(username));
+            return this.openSessions.Any(s => this.TrimUri(s.DataSourceUri).Equals(this.TrimUri(dataSourceUri)) && s.Credentials.UserName.Equals(username));
+        }
+
+        /// <summary>
+        /// Trims the final trailing forward slash of the URI
+        /// </summary>
+        /// <param name="input">The original Uri</param>
+        /// <returns>The trimmed uri or the original if there is no slash.</returns>
+        private string TrimUri(string input)
+        {
+           return input.EndsWith("/") ? input.Substring(0, input.Length - 1) : input;
         }
     }
 }

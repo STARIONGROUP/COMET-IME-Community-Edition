@@ -14,14 +14,14 @@
              dx:ThemeManager.ThemeName="Seven"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
-             Title="Uri Manager">
+             Title="URI Manager">
     <dxlc:LayoutControl Height="Auto"
                         Background="White"
                         Orientation="Vertical">
         
     <Grid>
         <StackPanel>
-            <GroupBox Margin="5" Header="Uris">
+            <GroupBox Margin="5" Padding="5" Header="URI List">
                 <dxg:GridControl Height="200"
 					AllowLiveDataShaping="False"
                     AllowUpdateTwoWayBoundPropertiesOnSynchronization="True"
@@ -41,8 +41,8 @@
                     </dxg:GridControl.View>
                     <dxg:GridControl.Columns>
                         <dxg:GridColumn FieldName="Alias" />
-                        <dxg:GridColumn Width="300" FieldName="Uri" />
-                         <dxg:GridColumn FieldName="DalType" >
+                        <dxg:GridColumn Width="300" FieldName="Uri" Header="URI" />
+                         <dxg:GridColumn FieldName="DalType" Header="Connector Type">
                             <dxg:GridColumn.EditSettings>
                                 <dxe:ComboBoxEditSettings ItemsSource="{Binding DalTypesList}" />
                             </dxg:GridColumn.EditSettings>

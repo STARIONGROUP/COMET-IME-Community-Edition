@@ -79,8 +79,8 @@
                                            Description="Connect to a Data Source."
                                            Glyph="{dxc:DXImage Image=Database_32x32.png}"
                                            Hint="Connect to a Data Source."
-                                           LargeGlyph="{dxc:DXImage Image=Database_16x16.png}"
-                                           RibbonStyle="SmallWithText" />
+                                           LargeGlyph="{dxc:DXImage Image=Database_32x32.png}"
+                                           RibbonStyle="Large" />
 
                         <dxb:BarSplitButtonItem Name="bClose"
                                                 Content="Disconnect"
@@ -119,16 +119,7 @@
                                 </dxb:PopupMenu>
                             </dxb:BarSplitButtonItem.PopupControl>
                         </dxb:BarSplitButtonItem>
-
-                        <dxb:BarButtonItem Name="bProxyServerConfiguration"
-                                           Command="{Binding OpenProxyConfigurationCommand}"
-                                           Content="Proxy"
-                                           Description="Show the Proxy Server Configuration."
-                                           Glyph="{dxc:DXImage Image=ManageDatasource_16x16.png}"
-                                           Hint="Configure a Proxy Server."
-                                           LargeGlyph="{dxc:DXImage Image=ManageDatasource_32x32.png}"
-                                           RibbonStyle="Large" />
-
+                      
                         <dxb:BarItemLinkSeparator />
 
                         <dxb:BarSplitButtonItem Name="sbSave"
@@ -236,6 +227,15 @@
                                            Glyph="{dxc:DXImage Image=ManageDatasource_16x16.png}"
                                            Hint="Uris Manager"
                                            LargeGlyph="{dxc:DXImage Image=ManageDatasource_32x32.png}"
+                                           RibbonStyle="Large" />
+
+                        <dxb:BarButtonItem Name="bProxyServerConfiguration"
+                                           Command="{Binding OpenProxyConfigurationCommand}"
+                                           Content="Proxy"
+                                           Description="Proxy Server Manager"
+                                           Glyph="{dxc:DXImage Image=ViewOnWeb_16x16.png}"
+                                           Hint="Configure a Proxy Server."
+                                           LargeGlyph="{dxc:DXImage Image=ViewOnWeb_32x32.png}"
                                            RibbonStyle="Large" />
 
                     </dxr:RibbonPageGroup>

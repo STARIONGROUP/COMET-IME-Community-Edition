@@ -12,14 +12,15 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
     using System;
     using System.Collections.Generic;
     using System.IO;
-    
+    using System.Reflection;
+
     /// <summary>
     /// Suite of tests for the <see cref="UriManagerViewModel"/> class
     /// </summary>
     [TestFixture]
     public class UriManagerViewModelTestFixture
     {
-        private FileInfo testfile = new FileInfo("TestData\\uris.json");
+        private FileInfo testfile = new FileInfo(Path.Combine(new System.Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath, "TestData\\uris.json"));
         private FileInfo tempfile = new FileInfo("TestData\\tmp\\temporaluri.json");
 
         [SetUp]
@@ -52,7 +53,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             // Write row the same as the testing one
             List<UriConfig> rows = new List<UriConfig>();
-            rows.Add(new UriConfig() { Alias="Alias0", Uri="Uri0", DalType="Web" });
+            rows.Add(new UriConfig() { Alias="Alias0", Uri="Uri0", DalType="Web"});
             configurator.Write(rows);
 
             // Ensure the generated file is the same as the testing one
@@ -78,7 +79,6 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             // Close viewmodel
             Assert.DoesNotThrow(() => configViewModel.CloseCommand.Execute(0));
-
         }
 
         [Test]

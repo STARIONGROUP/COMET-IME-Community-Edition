@@ -75,7 +75,7 @@
                                Foreground="#FF2D2D2D"
                                Opacity="0.5"
                                TextWrapping="Wrap" >
-                        © 2017 RHEA System S.A, All Rights Reserved
+                        © 2017-2019 RHEA System S.A. All Rights Reserved.
                     </TextBlock>
                 </DockPanel>
             </Grid>

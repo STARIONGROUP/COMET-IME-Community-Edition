@@ -72,7 +72,7 @@ namespace CDP4AddinCE
             {
                 case "CDP4_Open":
                     dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
-                    var dataSelection = new DataSourceSelectionViewModel();
+                    var dataSelection = new DataSourceSelectionViewModel(dialogService);
                     var dataSelectionResult = dialogService.NavigateModal(dataSelection) as DataSourceSelectionResult;
                     break;
                 case "CDP4_Close":

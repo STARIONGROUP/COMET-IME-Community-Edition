@@ -11,7 +11,7 @@
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              SizeToContent="WidthAndHeight"
              Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
-             Title="About CDP4 Enterprise Edition">
+             Title="About CDP4">
     <dx:DXWindow.Resources>
         <views:TextDataProvider x:Key="TextData" Uri="license.rtf"/>
     </dx:DXWindow.Resources>
@@ -57,7 +57,7 @@
                            Margin="10,0,0,10"
                            Foreground="#FF2D2D2D"
                            Opacity="0.5"
-                           TextWrapping="Wrap" Grid.ColumnSpan="4" >Version: 0.x.x.x</TextBlock>
+                           TextWrapping="Wrap" Grid.ColumnSpan="4" Text="{Binding Version, Mode=OneWay}" />
                 <Border Margin="10,0,10,0" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="1" BorderThickness="1" BorderBrush="#FF969696">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" Background="WhiteSmoke">
                         <TextBlock Name="LicenceInfo" Text="{Binding Source={StaticResource TextData}, Mode=OneWay}" TextWrapping="Wrap" Padding="5"/>
@@ -70,7 +70,7 @@
                                        Foreground="#FF2D2D2D"
                                        Opacity="0.5"
                                        TextWrapping="Wrap" >
-                                © 2015-2018 RHEA System S.A, All Rights Reserved 
+                                © 2015-2019 RHEA System S.A. All Rights Reserved. 
                                 <Hyperlink NavigateUri="http://www.rheagroup.com" RequestNavigate="Hyperlink_OnRequestNavigate">www.rheagroup.com</Hyperlink>
                 </TextBlock>
             </Grid>

@@ -14,6 +14,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
     using System.Threading.Tasks;
 
     using CDP4Common.DTO;
+    using CDP4Composition.Navigation;
     using CDP4Dal;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
@@ -47,6 +48,8 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         private CancellationTokenSource tokenSource;
         private List<Thing> dalOutputs;
 
+        private Mock<IDialogNavigationService> navService;
+
         [SetUp]
         public void SetUp()
         {
@@ -54,6 +57,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             this.session = new Mock<ISession>();
             this.tokenSource = new CancellationTokenSource();
             this.mockedDal = new Mock<IDal>();
+            this.navService = new Mock<IDialogNavigationService>();
             this.mockedDal.Setup(x => x.IsValidUri(It.IsAny<string>())).Returns(true);
             var openTaskCompletionSource = new TaskCompletionSource<IEnumerable<Thing>>();
             openTaskCompletionSource.SetResult(this.dalOutputs);
@@ -84,7 +88,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void AssertThatOkCommandCanExecuteAndASessionObjectIsSet()
         {
-            var viewmodel = new DataSourceSelectionViewModel();
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
 
             Assert.IsTrue(viewmodel.CancelCommand.CanExecute(null));
 
@@ -106,9 +110,25 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         }
 
         [Test]
+        public void AssertThatUriManagerDoesNotThrow()
+        {
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
+            Assert.IsTrue(viewmodel.OpenUriManagerCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => viewmodel.OpenUriManagerCommand.Execute(null));
+        }
+
+        [Test]
+        public void AssertThatProxyManagerDoesNotThrow()
+        {
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
+            Assert.IsTrue(viewmodel.OpenProxyConfigurationCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => viewmodel.OpenProxyConfigurationCommand.Execute(null));
+        }
+
+        [Test]
         public void AssertViewModelWorksWithMultipleUris()
         {
-            var viewmodel = new DataSourceSelectionViewModel();
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
 
             Assert.IsTrue(viewmodel.CancelCommand.CanExecute(null));
             Assert.That(viewmodel.ErrorMessage, Is.Null.Or.Empty);
@@ -148,7 +168,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void VerifyThatCancelWorks()
         {
-            var viewmodel = new DataSourceSelectionViewModel();
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
 
             viewmodel.CancelCommand.Execute(null);
 
@@ -160,11 +180,17 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         {
             var sessions = new List<ISession>();
             sessions.Add(this.session.Object);
-            var viewmodel = new DataSourceSelectionViewModel(sessions);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, sessions);
 
             viewmodel.UserName = "John";
             viewmodel.Password = "Dow";
             viewmodel.Uri = "http://www.rheagroup.com";
+
+            viewmodel.OkCommand.Execute(null);
+
+            Assert.AreEqual("A session with the username John already exists", viewmodel.ErrorMessage);
+
+            viewmodel.Uri = "http://www.rheagroup.com/";
 
             viewmodel.OkCommand.Execute(null);
 
@@ -174,7 +200,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void Verify_that_when_proxy_is_enabled_proxy_address_and_port_are_set()
         {
-            var vm = new DataSourceSelectionViewModel();
+            var vm = new DataSourceSelectionViewModel(this.navService.Object);
             Assert.IsFalse(vm.IsProxyEnabled);
             Assert.AreEqual(string.Empty, vm.ProxyUri);
             Assert.AreEqual(string.Empty, vm.ProxyPort);
