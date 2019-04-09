@@ -101,7 +101,7 @@
             </lc:LayoutGroup>
             <items:CategoryLayoutGroup/>
 
-            <lc:LayoutGroup Header="Simple parameter values" Orientation="Vertical">
+            <lc:LayoutGroup Header="Simple Parameter Values" Orientation="Vertical">
                 <dxb:ToolBarControl Height="30" Background="Transparent">
                     <dxb:BarButtonItem x:Name="CreateSimpleParameterValueButton"
                                        Command="{Binding CreateSimpleParameterValueCommand}"
@@ -158,7 +158,7 @@
                 </lc:LayoutItem>
             </lc:LayoutGroup>
             
-            <lc:LayoutGroup Header="Parametric constraints" Orientation="Vertical">
+            <lc:LayoutGroup Header="Parametric Constraints" Orientation="Vertical">
                 <lc:LayoutItem>
                     <dxb:ToolBarControl Height="30" Background="Transparent">
                         <dxb:BarButtonItem x:Name="CreateParametricConstraintButton"

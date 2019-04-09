@@ -150,9 +150,10 @@ namespace CDP4Requirements.Tests.Dialogs
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.ActivePerson).Returns(new Person(Guid.NewGuid(), null, this.uri));
 
-            SimpleParameterValue simpleParameterValue = new SimpleParameterValue(Guid.NewGuid(), this.cache, this.uri) { ParameterType = null };
+            var valueClone = this.parameterValue.Clone(false);
+            this.requirementClone.ParameterValue.Add(valueClone);
 
-            var vm = new SimpleParameterValueDialogViewModel(this.parameterValue.Clone(false), this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.requirementClone);
+            var vm = new SimpleParameterValueDialogViewModel(valueClone, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.requirementClone);
             SimpleQuantityKind selectedParameter = new SimpleQuantityKind();
             vm.SelectedParameterType = selectedParameter;
             Assert.AreEqual(vm.Values.Count, 1);
@@ -167,13 +168,14 @@ namespace CDP4Requirements.Tests.Dialogs
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.ActivePerson).Returns(new Person(Guid.NewGuid(), null, this.uri));
 
-            SimpleParameterValue simpleParameterValue = new SimpleParameterValue(Guid.NewGuid(), this.cache, this.uri) { ParameterType = null };
+            var valueClone = this.parameterValue.Clone(false);
+            this.requirementClone.ParameterValue.Add(valueClone);
 
-            var vm = new SimpleParameterValueDialogViewModel(this.parameterValue.Clone(false), this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.requirementClone);
-            CompoundParameterType selectedParameter = new CompoundParameterType();
+            var vm = new SimpleParameterValueDialogViewModel(valueClone, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.requirementClone);
+            var selectedParameter = new CompoundParameterType();
 
-            ParameterTypeComponent parameterTypeComponent = new ParameterTypeComponent();
-            SimpleQuantityKind selectedSimpleParameter = new SimpleQuantityKind();
+            var parameterTypeComponent = new ParameterTypeComponent();
+            var selectedSimpleParameter = new SimpleQuantityKind();
             parameterTypeComponent.ParameterType = selectedSimpleParameter;
             selectedParameter.Component.Add(parameterTypeComponent);
             vm.SelectedParameterType = selectedParameter;
@@ -193,7 +195,7 @@ namespace CDP4Requirements.Tests.Dialogs
 
             var vm = new SimpleParameterValueDialogViewModel(this.parameterValue.Clone(false), this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.requirementClone);
 
-            ReactiveList<ParameterType> parametertypes = new ReactiveList<ParameterType>();
+            var parametertypes = new ReactiveList<ParameterType>();
 
             CollectionAssert.AreEquivalent(parametertypes, vm.PossibleParameterType);
         }

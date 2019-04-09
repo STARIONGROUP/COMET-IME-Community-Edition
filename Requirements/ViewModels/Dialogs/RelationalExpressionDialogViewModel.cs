@@ -101,20 +101,23 @@ namespace CDP4Requirements.ViewModels
         protected override void PopulatePossibleParameterType()
         {
             base.PopulatePossibleParameterType();
-            var model = this.ChainOfContainer.First().TopContainer as EngineeringModel;
-            if (model == null)
-            {
-                return;
-            }
 
-            var modelRdl = model.EngineeringModelSetup.RequiredRdl.Single();
-            var parametertypes = modelRdl.ParameterType.ToList();
-            if (modelRdl.RequiredRdl != null)
+            if (this.Thing.ParameterType != null)
             {
-                parametertypes.AddRange(modelRdl.RequiredRdl.ParameterType.Except(parametertypes));
+                this.PossibleParameterType.Add(this.Thing.ParameterType);
+                this.SelectedParameterType = this.PossibleParameterType.Single();
             }
-
-            this.PossibleParameterType.AddRange(parametertypes.OrderBy(p => p.ShortName));
+            else
+            {
+                var model = this.ChainOfContainer.First().TopContainer as EngineeringModel;
+                var containerRdl = model.EngineeringModelSetup.RequiredRdl.Single();
+                if (containerRdl != null)
+                {
+                    var allTypes = new List<ParameterType>(containerRdl.ParameterType);
+                    allTypes.AddRange(containerRdl.GetRequiredRdls().SelectMany(rdl => rdl.ParameterType));
+                    this.PossibleParameterType.AddRange(allTypes.OrderBy(p => p.Name));
+                }
+            }
 
             if (this.SelectedParameterType == null)
             {

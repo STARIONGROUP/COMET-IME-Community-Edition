@@ -25,7 +25,7 @@
                         View="Tabs"
                         dxlc:LayoutControl.AllowHorizontalSizing="True">
             <dxlc:LayoutGroup Header="Basic" Orientation="Vertical">
-                <items:SelectedParameterTypeLayoutItem />
+                <items:ParameterTypeLayoutItem />
                 <items:SelectedScaleLayoutItem/>
                 <dxlc:LayoutItem Label="Operator:">
                     <dxe:ComboBoxEdit Name="Operator"
