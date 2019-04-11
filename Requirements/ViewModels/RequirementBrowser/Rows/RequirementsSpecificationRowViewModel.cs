@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsSpecificationRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -81,7 +81,6 @@ namespace CDP4Requirements.ViewModels
             }
         }
 
-        #region Private Methods
         /// <summary>
         /// Update the <see cref="Requirement"/> nodes
         /// </summary>
@@ -239,9 +238,7 @@ namespace CDP4Requirements.ViewModels
             this.UpdateRequirementGroupRows();
             this.UpdateRequirementRows();
         }
-        #endregion
 
-        #region Overriden Methods
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -251,9 +248,6 @@ namespace CDP4Requirements.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
-
-        #region IDropTarget
 
         /// <summary>
         /// Updates the current drag state.
@@ -473,7 +467,5 @@ namespace CDP4Requirements.ViewModels
             var transaction = orderService.Insert(reqSpecPayload, this.Thing, dropinfo.IsDroppedAfter ? InsertKind.InsertAfter : InsertKind.InsertBefore);
             await this.Session.Write(transaction.FinalizeTransaction());
         }
-
-        #endregion
     }
 }

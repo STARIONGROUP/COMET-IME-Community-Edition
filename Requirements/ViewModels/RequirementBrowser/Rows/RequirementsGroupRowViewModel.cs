@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsGroupRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -50,9 +50,7 @@ namespace CDP4Requirements.ViewModels
             this.UpdateRequirementGroupRows();
             this.UpdateIsDeprecatedDerivedFromContainerRequirementsSpecification();
         }
-
-        #region Overriden Methods
-
+        
         /// <summary>
         /// Initializes the subscriptions
         /// </summary>
@@ -112,10 +110,7 @@ namespace CDP4Requirements.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
-
-        #region IDropTarget
-
+        
         /// <summary>
         /// Queries whether a drag can be started
         /// </summary>
@@ -334,6 +329,5 @@ namespace CDP4Requirements.ViewModels
             parentRequirementsGroup = parentRequirementsGroup.Container as RequirementsGroup;
             return parentRequirementsGroup != null && this.CreatesCycle(parentRequirementsGroup, draggedRequirementsGroup);
         }
-        #endregion
     }
 }

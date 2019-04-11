@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,6 @@ namespace CDP4Requirements.ViewModels
     /// </summary>
     public class RequirementRowViewModel : CDP4CommonView.RequirementRowViewModel, IDropTarget
     {
-        #region private field
         /// <summary>
         /// The folder row containing the <see cref="SimpleParameterValue"/>
         /// </summary>
@@ -65,7 +64,6 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="CategoryList"/>
         /// </summary>
         private List<Category> categoryList;
-        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementRowViewModel"/> class
@@ -85,7 +83,6 @@ namespace CDP4Requirements.ViewModels
             this.UpdateProperties();
         }
 
-        #region properties
         /// <summary>
         /// Gets the definition of the current requirement
         /// </summary>
@@ -112,9 +109,6 @@ namespace CDP4Requirements.ViewModels
             get { return this.categoryList; }
             set { this.RaiseAndSetIfChanged(ref this.categoryList, value); }
         }
-        #endregion
-
-        #region Drag, Drop
 
         /// <summary>
         /// Updates the current drag state.
@@ -308,8 +302,6 @@ namespace CDP4Requirements.ViewModels
             await this.Session.Write(transaction.FinalizeTransaction());
         }
 
-        #endregion Drag, Drop
-
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>
@@ -366,7 +358,6 @@ namespace CDP4Requirements.ViewModels
                 }
             }
         }
-
         
         /// <summary>
         /// Update the nodes of this requirement with the current <see cref="ParametricConstraint"/>

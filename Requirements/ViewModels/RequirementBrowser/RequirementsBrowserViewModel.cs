@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -37,8 +37,6 @@ namespace CDP4Requirements.ViewModels
     /// </summary>
     public class RequirementsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget
     {
-        #region Fields
-
         /// <summary>
         /// The logger for the current class
         /// </summary>
@@ -88,10 +86,7 @@ namespace CDP4Requirements.ViewModels
         /// A list of <see cref="RequirementsSpecificationEditorViewModel"/> that have been opened from the current view-model
         /// </summary>
         private readonly List<RequirementsSpecificationEditorViewModel> openRequirementsSpecificationEditorViewModels;
-        #endregion
-
-        #region constructor
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementsBrowserViewModel"/> class
         /// </summary>
@@ -122,9 +117,6 @@ namespace CDP4Requirements.ViewModels
 
             this.openRequirementsSpecificationEditorViewModels = new List<RequirementsSpecificationEditorViewModel>();
         }
-        #endregion
-
-        #region Public Properties
 
         /// <summary>
         /// Gets the active <see cref="Participant"/>
@@ -217,9 +209,6 @@ namespace CDP4Requirements.ViewModels
             get { return this.canCreateRequirementGroup; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateRequirementGroup, value); }
         }
-        #endregion
-
-        #region IDragSource, IDropTarget
 
         /// <summary>
         /// Updates the current drag state.
@@ -273,9 +262,6 @@ namespace CDP4Requirements.ViewModels
                 this.IsBusy = false;
             }
         }
-        #endregion
-
-        #region private method
 
         /// <summary>
         /// Updates the browser with the current <see cref="RequirementsSpecification"/>s in this <see cref="Iteration"/>
@@ -423,9 +409,7 @@ namespace CDP4Requirements.ViewModels
 
             this.ExecuteCreateCommand(req, reqSpecification);
         }
-        #endregion
-
-        #region override method
+        
         /// <summary>
         /// Initialize the <see cref="ICommand"/>s
         /// </summary>
@@ -595,6 +579,5 @@ namespace CDP4Requirements.ViewModels
             var transaction = new ThingTransaction(transactionContext, containerClone);
             this.ThingDialogNavigationService.Navigate(engineeringModelDataNote, transaction, this.Session, true, ThingDialogKind.Create, this.ThingDialogNavigationService, containerClone);
         }
-        #endregion
     }
 }

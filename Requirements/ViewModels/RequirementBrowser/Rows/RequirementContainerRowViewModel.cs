@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementContainerRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -106,7 +106,6 @@ namespace CDP4Requirements.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.categoryList, value); }
         }
 
-        #region private method
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>
@@ -255,8 +254,7 @@ namespace CDP4Requirements.ViewModels
             this.CategoryList = new List<Category>(this.Thing.Category);
             this.UpdateValues();
         }
-        #endregion
-
+        
         /// <summary>
         /// Handle the drag-over of a <see cref="Category"/>
         /// </summary>
