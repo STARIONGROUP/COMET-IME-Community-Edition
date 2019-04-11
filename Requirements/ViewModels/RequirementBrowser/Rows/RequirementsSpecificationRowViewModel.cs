@@ -192,7 +192,7 @@ namespace CDP4Requirements.ViewModels
         /// <param name="newOrder">A value indicating whether the order may have changed</param>
         private void UpdateRequirementRow(Requirement req, bool newOrder)
         {
-            if (req.Container != this.Thing)
+            if (req.Container != this.Thing || !this.requirementContainerGroupCache.ContainsKey(req) || !this.requirementCache.ContainsKey(req))
             {
                 return;
             }
@@ -354,22 +354,7 @@ namespace CDP4Requirements.ViewModels
             var firstRow = this.ContainedRows.OfType<RequirementRowViewModel>().FirstOrDefault();
             if (firstRow == null)
             {
-                var context = TransactionContextResolver.ResolveContext(this.Thing);
-                var transaction = new ThingTransaction(context);
-
-                var requirementClone = requirement.Clone(false);
-                requirementClone.Group = null;
-                transaction.CreateOrUpdate(requirementClone);
-
-                if (requirement.Container != this.Thing)
-                {
-                    // Add the requirement to the RequirementSpecification represented by this RowViewModel
-                    var requirementSpecificationClone = this.Thing.Clone(false);
-                    requirementSpecificationClone.Requirement.Add(requirement);
-                    transaction.CreateOrUpdate(requirementSpecificationClone);
-                }
-
-                await this.DalWrite(transaction);
+                await this.ChangeRequirementContainer(requirement);
             }
             else
             {
@@ -379,6 +364,7 @@ namespace CDP4Requirements.ViewModels
 
                 if (orderPt == null)
                 {
+                    await this.ChangeRequirementContainer(requirement);
                     return;
                 }
 
@@ -386,6 +372,31 @@ namespace CDP4Requirements.ViewModels
                 var transaction = orderService.Insert(requirement, firstRow.Thing, InsertKind.InsertBefore);
                 await this.Session.Write(transaction.FinalizeTransaction());
             }
+        }
+
+        /// <summary>
+        /// Changes the <see cref="RequirementsContainer"/> of a <see cref="Requirement"/>
+        /// </summary>
+        /// <param name="requirement">The <see cref="Requirement"/></param>
+        /// <returns>The async Task</returns>
+        private async Task ChangeRequirementContainer(Requirement requirement)
+        {
+            var context = TransactionContextResolver.ResolveContext(this.Thing);
+            var transaction = new ThingTransaction(context);
+
+            var requirementClone = requirement.Clone(false);
+            requirementClone.Group = null;
+            transaction.CreateOrUpdate(requirementClone);
+
+            if (requirement.Container != this.Thing)
+            {
+                // Add the requirement to the RequirementSpecification represented by this RowViewModel
+                var requirementSpecificationClone = this.Thing.Clone(false);
+                requirementSpecificationClone.Requirement.Add(requirement);
+                transaction.CreateOrUpdate(requirementSpecificationClone);
+            }
+
+            await this.DalWrite(transaction);
         }
 
         /// <summary>

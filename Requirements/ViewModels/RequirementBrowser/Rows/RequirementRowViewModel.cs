@@ -239,13 +239,6 @@ namespace CDP4Requirements.ViewModels
         /// <param name="dropInfo">The <see cref="IDropInfo"/></param>
         private void DragOver(Requirement req, IDropInfo dropInfo)
         {
-            if (req.Container != this.Thing.Container)
-            {
-                dropInfo.Effects = DragDropEffects.None;
-                return;
-            }
-
-            // moving requirements before the current one
             dropInfo.Effects = DragDropEffects.Move;
         }
 
@@ -294,12 +287,38 @@ namespace CDP4Requirements.ViewModels
 
             if (orderPt == null)
             {
+                await this.ChangeRequirementContainer(req);
                 return;
             }
 
             var orderService = new RequirementOrderHandlerService(this.Session, orderPt);
             var transaction = orderService.Insert(req, this.Thing, dropinfo.IsDroppedAfter ? InsertKind.InsertAfter : InsertKind.InsertBefore);
             await this.Session.Write(transaction.FinalizeTransaction());
+        }
+
+        /// <summary>
+        /// Changes the <see cref="RequirementsContainer"/> of a <see cref="Requirement"/>
+        /// </summary>
+        /// <param name="requirement">The <see cref="Requirement"/></param>
+        /// <returns>The async Task</returns>
+        private async Task ChangeRequirementContainer(Requirement requirement)
+        {
+            var context = TransactionContextResolver.ResolveContext(this.Thing);
+            var transaction = new ThingTransaction(context);
+
+            var requirementClone = requirement.Clone(false);
+            requirementClone.Group = this.Thing.Group;
+            transaction.CreateOrUpdate(requirementClone);
+
+            if (requirement.Container != this.Thing.Container)
+            {
+                // Add the requirement to the RequirementSpecification represented by this RowViewModel
+                var requirementSpecificationClone = (RequirementsSpecification)this.Thing.Container.Clone(false);
+                requirementSpecificationClone.Requirement.Add(requirement);
+                transaction.CreateOrUpdate(requirementSpecificationClone);
+            }
+
+            await this.DalWrite(transaction);
         }
 
         /// <summary>

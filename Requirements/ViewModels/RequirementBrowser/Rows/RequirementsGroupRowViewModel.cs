@@ -218,20 +218,7 @@ namespace CDP4Requirements.ViewModels
             var firstRow = this.ContainedRows.OfType<RequirementRowViewModel>().FirstOrDefault();
             if (firstRow == null)
             {
-                var context = TransactionContextResolver.ResolveContext(this.Thing);
-                var transaction = new ThingTransaction(context);
-                var requirementClone = requirement.Clone(false);
-                var requirementSpecification = this.Thing.GetContainerOfType<RequirementsSpecification>();
-                requirementClone.Group = this.Thing;
-                transaction.CreateOrUpdate(requirementClone);
-                if (requirement.Container != requirementSpecification)
-                {
-                    var requirementSpecificationClone = requirementSpecification.Clone(false);
-                    requirementSpecificationClone.Requirement.Add(requirementClone);
-                    transaction.CreateOrUpdate(requirementSpecificationClone);
-                }
-
-                await this.DalWrite(transaction);
+                await this.ChangeRequirementGroup(requirement);
             }
             else
             {
@@ -241,6 +228,7 @@ namespace CDP4Requirements.ViewModels
 
                 if (orderPt == null)
                 {
+                    await this.ChangeRequirementGroup(requirement);
                     return;
                 }
 
@@ -248,6 +236,29 @@ namespace CDP4Requirements.ViewModels
                 var transaction = orderService.Insert(requirement, firstRow.Thing, InsertKind.InsertBefore);
                 await this.Session.Write(transaction.FinalizeTransaction());
             }
+        }
+
+        /// <summary>
+        /// Changes the <see cref="RequirementsGroup"/> of a <see cref="Requirement"/>
+        /// </summary>
+        /// <param name="requirement">The <see cref="Requirement"/></param>
+        /// <returns>The async Task</returns>
+        private async Task ChangeRequirementGroup(Requirement requirement)
+        {
+            var context = TransactionContextResolver.ResolveContext(this.Thing);
+            var transaction = new ThingTransaction(context);
+            var requirementClone = requirement.Clone(false);
+            var requirementSpecification = this.Thing.GetContainerOfType<RequirementsSpecification>();
+            requirementClone.Group = this.Thing;
+            transaction.CreateOrUpdate(requirementClone);
+            if (requirement.Container != requirementSpecification)
+            {
+                var requirementSpecificationClone = requirementSpecification.Clone(false);
+                requirementSpecificationClone.Requirement.Add(requirementClone);
+                transaction.CreateOrUpdate(requirementSpecificationClone);
+            }
+
+            await this.DalWrite(transaction);
         }
 
         /// <summary>

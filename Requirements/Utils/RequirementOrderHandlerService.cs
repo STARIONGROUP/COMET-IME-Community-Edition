@@ -40,7 +40,7 @@ namespace CDP4Requirements.Utils
         public ThingTransaction Insert(Requirement reqToInsert, Requirement requirement, InsertKind insertKind)
         {
             var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(reqToInsert));
-            var specification = (RequirementsSpecification)reqToInsert.Container;
+            var specification = (RequirementsSpecification)requirement.Container;
 
             var allReqInContext = specification.Requirement.Where(x => x.Group == requirement.Group && x.Iid != reqToInsert.Iid).ToList();
             allReqInContext.Add(reqToInsert);
