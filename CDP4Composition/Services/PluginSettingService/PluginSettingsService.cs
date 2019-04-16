@@ -16,11 +16,17 @@ namespace CDP4Composition.PluginSettingService
     using Microsoft.Practices.Prism.Modularity;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
+    using NLog;
 
     [Export(typeof(IPluginSettingsService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PluginSettingsService : IPluginSettingsService
     {
+        /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Path to special windows "AppData" folder 
         /// </summary>
@@ -54,8 +60,7 @@ namespace CDP4Composition.PluginSettingService
             this.assemblyNamesCache = new Dictionary<IModule, string>();
             this.applicationUserPluginSettings = new Dictionary<IModule, PluginSettings>();
         }
-
-
+        
         /// <summary>
         /// Configuration file Directory
         /// </summary>
@@ -98,9 +103,18 @@ namespace CDP4Composition.PluginSettingService
                 return result as T;
             }
 
+            if (!Directory.Exists(this.ApplicationConfigurationDirectory))
+            {
+                logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
+                Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
+                logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
+            }
+            
             var assemblyName = this.QueryAssemblyName(module);
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
+
+            logger.Debug("Read pluggin settings for {0} from {1}", assemblyName, path);
 
             try
             {
@@ -117,6 +131,8 @@ namespace CDP4Composition.PluginSettingService
             }
             catch (Exception ex)
             {
+                logger.Error(ex, "The PluginSettings could not be read");
+
                 throw new PluginSettingsException("The PluginSettings could not be read", ex);
             }
         }
@@ -142,10 +158,19 @@ namespace CDP4Composition.PluginSettingService
                 throw new ArgumentNullException(nameof(module), "The module may not be null");
             }
             
+            if (!Directory.Exists(this.ApplicationConfigurationDirectory))
+            {
+                logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
+                Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
+                logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
+            }
+
             var assemblyName = this.QueryAssemblyName(module);
+            
+            var path = Path.Combine(this.ApplicationConfigurationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}");
 
-            var path = Path.Combine(ApplicationConfigurationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}" );
-
+            logger.Debug("write settings to for {0} to {1}", assemblyName, path);
+            
             using (var streamWriter = File.CreateText(path))
             {
                 var serializer = new JsonSerializer
