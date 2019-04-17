@@ -95,15 +95,19 @@ namespace BasicRdl.ViewModels
         protected override void PopulatePossibleCategory()
         {
             base.PopulatePossibleCategory();
-            var containerRdl = this.Container as ReferenceDataLibrary;
+            
+            var containerRdl = this.Container as ReferenceDataLibrary;            
             if (containerRdl == null)
             {
                 return;
             }
-            
-            var allCategories = containerRdl.DefinedCategory;
-            allCategories.AddRange(containerRdl.GetRequiredRdls().SelectMany(rdl => rdl.DefinedCategory));
-            this.PossibleCategory.AddRange(allCategories.OrderBy(c => c.ShortName));
+            else
+            {
+                var rdls = containerRdl.AggregatedReferenceDataLibrary;
+                
+                var allCategories = rdls.SelectMany(x => x.DefinedCategory);
+                this.PossibleCategory.AddRange(allCategories.OrderBy(c => c.ShortName));
+            }            
         }
 
         /// <summary>
