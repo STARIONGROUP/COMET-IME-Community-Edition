@@ -275,8 +275,12 @@
             <dxg:TreeListControl x:Name="RequirementBrowserTreeListControl"
                              Grid.Row="2"
                              ItemsSource="{Binding ReqSpecificationRows}"
-                             SelectedItem="{Binding SelectedThing}"
-                             services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
+                             SelectedItem="{Binding SelectedThing,
+                                                    Mode=TwoWay,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                             services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted,
+                                                                                Mode=OneWay,
+                                                                                UpdateSourceTrigger=PropertyChanged}">
                 <dxmvvm:Interaction.Behaviors>
                     <cdp4Composition:ContextMenuBehavior />
                 </dxmvvm:Interaction.Behaviors>
@@ -315,6 +319,7 @@
                         <dxg:TreeListView.FocusedRow>
                             <dynamic:ExpandoObject />
                         </dxg:TreeListView.FocusedRow>
+                        
                         <dxg:TreeListView.ContextMenu>
                             <ContextMenu Name="RowContextMenu" />
                         </dxg:TreeListView.ContextMenu>

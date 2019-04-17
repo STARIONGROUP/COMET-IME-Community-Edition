@@ -8,15 +8,23 @@ namespace CDP4Requirements.Views
 {
     using CDP4Composition;
     using CDP4Composition.Attributes;
-    using System.Windows.Controls;
     using DevExpress.Xpf.Grid;
+    using NLog;
 
     /// <summary>
     /// Interaction logic for RequirementsBrowser.xaml
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class RequirementsBrowser : UserControl, IPanelView
+    public partial class RequirementsBrowser : IPanelView
     {
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RequirementsBrowser"/> class
+        /// </summary>
         public RequirementsBrowser()
         {
         }
@@ -39,6 +47,7 @@ namespace CDP4Requirements.Views
                 if (control != null)
                 {
                     FilterStringService.FilterString.AddTreeListControl(control);
+                    logger.Debug("{0} Added to the FilterStringService", control.Name);
                 }
             }
         }
