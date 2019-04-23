@@ -7,7 +7,6 @@
 namespace CDP4RelationshipMatrix
 {
     using System.Collections.Generic;
-    using System.Dynamic;
     using System.Windows;
     using System.Windows.Controls;
     using DevExpress.Xpf.Grid;
@@ -49,17 +48,14 @@ namespace CDP4RelationshipMatrix
                 return this.NameColumnTemplate;
             }
 
-            if (!(gridData.RowData.Row is ExpandoObject row))
+            if (!(gridData.RowData.Row is IDictionary<string, MatrixCellViewModel> row))
             {
                 return base.SelectTemplate(item, container);
             }
 
-            var dic = (IDictionary<string, object>)row;
-            var currentCellValue = dic[currentColumn];
+            var currentCellValue = row[currentColumn];
 
-            var vm = (MatrixCellViewModel)currentCellValue;
-            
-            if (vm == null || vm.RelationshipDirection == RelationshipDirectionKind.None)
+            if (currentCellValue == null || currentCellValue.RelationshipDirection == RelationshipDirectionKind.None)
             {
                 return this.NoTemplate;
             }
@@ -69,12 +65,12 @@ namespace CDP4RelationshipMatrix
                 return this.NoDirectionalTemplate;
             }
 
-            switch (vm.RelationshipDirection)
+            switch (currentCellValue.RelationshipDirection)
             {
                 case RelationshipDirectionKind.RowThingToColumnThing:
-                    return this.Source1ToSource2Template;
+                    return this.SourceYToSourceXTemplate;
                 case RelationshipDirectionKind.ColumnThingToRowThing:
-                    return this.Source2ToSource1Template;
+                    return this.SourceXToSourceYTemplate;
                 default:
                     return this.BiDirectionalTemplate;
             }
@@ -83,12 +79,12 @@ namespace CDP4RelationshipMatrix
         /// <summary>
         /// Gets or sets the <see cref="DataTemplate"/> to show that there is a relationship between a source 1 to a source 2
         /// </summary>
-        public DataTemplate Source1ToSource2Template { get; set; }
+        public DataTemplate SourceYToSourceXTemplate { get; set; }
 
         /// <summary>
         ///  Gets or sets the <see cref="DataTemplate"/> to show that there is a relationship between a source 2 to a source 1
         /// </summary>
-        public DataTemplate Source2ToSource1Template { get; set; }
+        public DataTemplate SourceXToSourceYTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="DataTemplate"/> to show that there is a bi-directional relationship between a source 1 and a source 2

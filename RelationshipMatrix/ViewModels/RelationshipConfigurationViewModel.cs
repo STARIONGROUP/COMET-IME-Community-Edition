@@ -55,22 +55,22 @@ namespace CDP4RelationshipMatrix.ViewModels
         public ReactiveList<BinaryRelationshipRule> PossibleRules { get; }
 
         /// <summary>
-        /// Populates the possible <see cref="BinaryRelationshipRule"/> based on <paramref name="source1"/> and <paramref name="source2"/>
+        /// Populates the possible <see cref="BinaryRelationshipRule"/> based on <paramref name="sourceY"/> and <paramref name="sourceX"/>
         /// </summary>
-        /// <param name="source1">The first type of the source/target of the <see cref="BinaryRelationship"/></param>
-        /// <param name="source2">The second type of the source/target of the <see cref="BinaryRelationship"/></param>
-        public void PopulatePossibleRules(ClassKind? source1, ClassKind? source2)
+        /// <param name="sourceY">The first type of the source/target of the <see cref="BinaryRelationship"/></param>
+        /// <param name="sourceX">The second type of the source/target of the <see cref="BinaryRelationship"/></param>
+        public void PopulatePossibleRules(ClassKind? sourceY, ClassKind? sourceX)
         {
             this.PossibleRules.Clear();
-            if (!source1.HasValue || !source2.HasValue)
+            if (!sourceY.HasValue || !sourceX.HasValue)
             {
                 return;
             }
 
             var rules = this.ReferenceDataLibraries.SelectMany(x => x.Rule).OfType<BinaryRelationshipRule>().Where(
                 x =>
-                    (x.SourceCategory.PermissibleClass.Contains(source1.Value) || x.SourceCategory.PermissibleClass.Contains(source2.Value))
-                    && (x.TargetCategory.PermissibleClass.Contains(source1.Value) || x.TargetCategory.PermissibleClass.Contains(source2.Value))).ToList();
+                    (x.SourceCategory.PermissibleClass.Contains(sourceY.Value) || x.SourceCategory.PermissibleClass.Contains(sourceX.Value))
+                    && (x.TargetCategory.PermissibleClass.Contains(sourceY.Value) || x.TargetCategory.PermissibleClass.Contains(sourceX.Value))).ToList();
 
             this.PossibleRules.AddRange(rules.OrderBy(x => x.Name));
             this.SelectedRule = this.PossibleRules.FirstOrDefault(x => x == this.SelectedRule);

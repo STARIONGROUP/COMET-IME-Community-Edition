@@ -12,6 +12,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4RelationshipMatrix.Settings;
     using NUnit.Framework;
     using ViewModels;
 
@@ -55,12 +56,35 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             Assert.IsEmpty(vm.Matrix.Records);
             Assert.IsEmpty(vm.Matrix.Columns);
 
-            vm.Source1Configuration.SelectedCategories = new List<Category>(vm.Source1Configuration.PossibleCategories.Where(x => x.Iid == this.catEd1.Iid));
+            vm.Source1Configuration.SelectedCategories = new List<Category>(vm.Source1Configuration.PossibleCategories.Where(x => x.Iid == this.catEd1.Iid || x.Iid == this.catEd2.Iid));
             vm.Source2Configuration.SelectedCategories = new List<Category>(vm.Source2Configuration.PossibleCategories.Where(x => x.Iid == this.catEd2.Iid));
-
+            vm.Source1Configuration.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.OR;
             vm.RelationshipConfiguration.SelectedRule = vm.RelationshipConfiguration.PossibleRules.Single();
 
+            vm.Source1Configuration.IncludeSubctegories = false;
+
+            Assert.AreEqual(3, vm.Matrix.Records.Count);
+            Assert.AreEqual(3, vm.Matrix.Columns.Count);
+
+            vm.Source1Configuration.IncludeSubctegories = true;
+            
+            Assert.AreEqual(5, vm.Matrix.Records.Count);
+            Assert.AreEqual(3, vm.Matrix.Columns.Count);
+
+            vm.Source1Configuration.SelectedCategories = new List<Category>(vm.Source1Configuration.PossibleCategories.Where(x => x.Iid == this.catEd3.Iid));
+
             Assert.AreEqual(2, vm.Matrix.Records.Count);
+            Assert.AreEqual(3, vm.Matrix.Columns.Count);
+
+            vm.Source1Configuration.SelectedCategories = new List<Category>(vm.Source1Configuration.PossibleCategories.Where(x => x.Iid == this.catEd4.Iid));
+
+            Assert.AreEqual(1, vm.Matrix.Records.Count);
+            Assert.AreEqual(3, vm.Matrix.Columns.Count);
+
+            vm.Source1Configuration.SelectedCategories = new List<Category>(vm.Source1Configuration.PossibleCategories.Where(x => x.Iid == this.catEd1.Iid || x.Iid == this.catEd2.Iid));
+            vm.Source1Configuration.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.AND;
+
+            Assert.AreEqual(1, vm.Matrix.Records.Count);
             Assert.AreEqual(3, vm.Matrix.Columns.Count);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);

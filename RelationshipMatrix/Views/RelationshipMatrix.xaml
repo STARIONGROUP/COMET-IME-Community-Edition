@@ -33,12 +33,12 @@
             <converters:NameContentConverter x:Key="NameContentConverter" />
             <converters:TooltipConverter x:Key="TooltipConverter" />
 
-            <DataTemplate x:Key="Source1ToSource2">
+            <DataTemplate x:Key="SourceYToSourceX">
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
                     <TextBlock.Text>⮥</TextBlock.Text>
                 </TextBlock>
             </DataTemplate>
-            <DataTemplate x:Key="Source2ToSource1">
+            <DataTemplate x:Key="SourceXToSourceY">
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Width="24" FontSize="24" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
                     <TextBlock.Text>⮠</TextBlock.Text>
                 </TextBlock>
@@ -62,15 +62,27 @@
                            TextWrapping="Wrap"
                            Margin="5"
                            FontWeight="Bold"
-                           ToolTip="{Binding Converter={StaticResource NameContentConverter}}"
-                           TextAlignment="Center" />
+                           TextAlignment="Center">
+                    <TextBlock.Resources>
+                        <Style x:Key="RowToolTipStyle">
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </TextBlock.Resources>
+                    <TextBlock.ToolTip>
+                        <ToolTip Content="{Binding Converter={StaticResource TooltipConverter}}"
+                                 Style="{StaticResource RowToolTipStyle}"
+                                 FontWeight="Normal"
+                                 HorizontalContentAlignment="Left"
+                                 HorizontalAlignment="Left">
+                        </ToolTip>
+                    </TextBlock.ToolTip>
+                </TextBlock>
             </DataTemplate>
             <DataTemplate x:Key="None" />
 
             <DataTemplate x:Key="HeaderColumnTemplate">
                 <TextBlock Text="{Binding}"
                            Width="80"
-                           ToolTip="{Binding}"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
                            TextAlignment="Center"
@@ -84,12 +96,8 @@
             <DataTemplate x:Key="NameHeaderColumnTemplate">
                 <TextBlock Text="{Binding}"
                            ToolTip="{Binding}"
-                           FontWeight="Bold"
                            x:Name="HeaderTextBlock"
-                           Margin="5"
-                           VerticalAlignment="Center"
-                           TextAlignment="Center"
-                           HorizontalAlignment="Center" />
+                           Margin="5"/>
             </DataTemplate>
 
             <relationshipMatrix:HeaderDataTemplateSelector x:Key="HeaderTemplateSelector"
@@ -99,8 +107,8 @@
             <relationshipMatrix:MatrixCellDataTemplateSelector x:Key="MatrixCellTemplateSelector"
                                                                BiDirectionalTemplate="{StaticResource BidirectionalRelationship}"
                                                                NoDirectionalTemplate="{StaticResource NodirectionalRelationship}"
-                                                               Source1ToSource2Template="{StaticResource Source1ToSource2}"
-                                                               Source2ToSource1Template="{StaticResource Source2ToSource1}"
+                                                               SourceYToSourceXTemplate="{StaticResource SourceYToSourceX}"
+                                                               SourceXToSourceYTemplate="{StaticResource SourceXToSourceY}"
                                                                NameColumnTemplate="{StaticResource NameTemplate}"
                                                                NoTemplate="{StaticResource None}" />
 
@@ -114,6 +122,8 @@
                         Width="{Binding Path=FieldName, RelativeSource={RelativeSource Self}, Converter={StaticResource ColumnWidthConverter}}"
                         FixedWidth="False"
                         MinWidth="30"
+                        HeaderToolTip="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).ToolTip, RelativeSource={RelativeSource Self}}"
+                        ToolTip="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).ToolTip, RelativeSource={RelativeSource Self}}"
                         CellTemplateSelector="{StaticResource MatrixCellTemplateSelector}"
                         HeaderTemplateSelector="{StaticResource HeaderTemplateSelector}" />
                 </ContentControl>
@@ -171,39 +181,39 @@
                                     <dxg:TableView.RowCellMenuCustomizations>
                                         <dxb:BarButtonItem Content="Edit Row Thing"
                                                            Glyph="{dx:DXImage Image=EditName_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.CanEditSource1}"
-                                                           Command="{Binding View.DataContext.EditSource1Command}" />
+                                                           IsVisible="{Binding View.DataContext.CanEditSourceY}"
+                                                           Command="{Binding View.DataContext.EditSourceYCommand}" />
                                         <dxb:BarButtonItem Content="Inspect Row Thing"
                                                            Glyph="{dx:DXImage Image=Find_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.CanInspectSource1}"
-                                                           Command="{Binding View.DataContext.InspectSource1Command}" />
+                                                           IsVisible="{Binding View.DataContext.CanInspectSourceY}"
+                                                           Command="{Binding View.DataContext.InspectSourceYCommand}" />
                                         <dxb:BarItemLinkSeparator />
                                         <dxb:BarButtonItem Content="Edit Column Thing"
                                                            Glyph="{dx:DXImage Image=EditName_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.CanEditSource2}"
-                                                           Command="{Binding View.DataContext.EditSource2Command}" />
+                                                           IsVisible="{Binding View.DataContext.CanEditSourceX}"
+                                                           Command="{Binding View.DataContext.EditSourceXCommand}" />
                                         <dxb:BarButtonItem Content="Inspect Column Thing"
                                                            Glyph="{dx:DXImage Image=Find_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.CanInspectSource2}"
-                                                           Command="{Binding View.DataContext.InspectSource2Command}" />
+                                                           IsVisible="{Binding View.DataContext.CanInspectSourceX}"
+                                                           Command="{Binding View.DataContext.InspectSourceXCommand}" />
                                         <dxb:BarItemLinkSeparator />
                                         <dxb:BarButtonItem Content="Create ⮥"
                                                            Glyph="{dx:DXImage Image=Add_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.Matrix.CanCreateSource1ToSource2}"
-                                                           Command="{Binding View.DataContext.Matrix.CreateSource1ToSource2Link}" />
+                                                           IsVisible="{Binding View.DataContext.Matrix.CanCreateSourceYToSourceX}"
+                                                           Command="{Binding View.DataContext.Matrix.CreateSourceYToSourceXLink}" />
                                         <dxb:BarButtonItem Content="Create ⮠"
                                                            Glyph="{dx:DXImage Image=Add_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.Matrix.CanCreateSource2ToSource1}"
-                                                           Command="{Binding View.DataContext.Matrix.CreateSource2ToSource1Link}" />
+                                                           IsVisible="{Binding View.DataContext.Matrix.CanCreateSourceXToSourceY}"
+                                                           Command="{Binding View.DataContext.Matrix.CreateSourceXToSourceYLink}" />
                                         <dxb:BarItemLinkSeparator />
                                         <dxb:BarButtonItem Content="Delete ⮥"
                                                            Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDelete1To2}"
-                                                           Command="{Binding View.DataContext.Matrix.DeleteSource1ToSource2Link}" />
+                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteYToX}"
+                                                           Command="{Binding View.DataContext.Matrix.DeleteSourceYToSourceXLink}" />
                                         <dxb:BarButtonItem Content="Delete ⮠"
                                                            Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDelete2To1}"
-                                                           Command="{Binding View.DataContext.Matrix.DeleteSource2ToSource1Link}" />
+                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteXToY}"
+                                                           Command="{Binding View.DataContext.Matrix.DeleteSourceXToSourceYLink}" />
                                         <dxb:BarButtonItem Content="Delete All"
                                                            Glyph="{dx:DXImage Image=Delete_16x16.png}"
                                                            IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteAll}"
@@ -215,7 +225,7 @@
                     </dxlc:LayoutItem>
 
                     <dxlc:LayoutItem VerticalAlignment="Stretch" HorizontalAlignment="Right">
-                        <dxn:NavBarControl MaxWidth="250">
+                        <dxn:NavBarControl MaxWidth="350">
                             <dxn:NavBarControl.View>
                                 <dxn:NavigationPaneView IsExpanded="True" />
                             </dxn:NavBarControl.View>
@@ -231,29 +241,47 @@
                                                                   Header="X Axis">
                                                     <dxlc:LayoutItem Label="Type:">
                                                         <dxe:ComboBoxEdit
-                                                            EditValue="{Binding Source2Configuration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                            ItemsSource="{Binding Source2Configuration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            EditValue="{Binding SourceXConfiguration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{Binding SourceXConfiguration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             AutoComplete="True"
                                                             AllowNullInput="True"
                                                             AllowDefaultButton="True" />
                                                     </dxlc:LayoutItem>
                                                     <dxlc:LayoutItem Label="Categories: ">
-                                                        <dxe:ComboBoxEdit
-                                                            EditValue="{Binding Source2Configuration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
-                                                            ItemsSource="{Binding Source2Configuration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                            AutoComplete="True"
-                                                            AllowNullInput="True"
-                                                            AllowDefaultButton="True"
-                                                            DisplayMember="Name">
-                                                            <dxe:ComboBoxEdit.StyleSettings>
-                                                                <dxe:CheckedComboBoxStyleSettings />
-                                                            </dxe:ComboBoxEdit.StyleSettings>
-                                                        </dxe:ComboBoxEdit>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <dxe:ComboBoxEdit
+                                                                Grid.Column="0"
+                                                                EditValue="{Binding SourceXConfiguration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
+                                                                ItemsSource="{Binding SourceXConfiguration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                AutoComplete="True"
+                                                                AllowNullInput="True"
+                                                                AllowDefaultButton="True"
+                                                                DisplayMember="Name">
+                                                                <dxe:ComboBoxEdit.StyleSettings>
+                                                                    <dxe:CheckedComboBoxStyleSettings />
+                                                                </dxe:ComboBoxEdit.StyleSettings>
+                                                            </dxe:ComboBoxEdit>
+                                                            <dxe:ComboBoxEdit Grid.Column="1"
+                                                                              MinWidth="60"
+                                                                              ToolTip="Boolean Operator used to seperate the selected Categories."
+                                                                              Margin="5,0,0,0"
+                                                                EditValue="{Binding SourceXConfiguration.SelectedBooleanOperatorKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                ItemsSource="{Binding SourceXConfiguration.PossibleBooleanOperatorKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            />
+                                                        </Grid>
+                                                    </dxlc:LayoutItem>
+                                                    <dxlc:LayoutItem Label=" ">
+                                                        <dxe:CheckEdit
+                                                            EditValue="{Binding SourceXConfiguration.IncludeSubctegories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Include Subcategories of Selected" ToolTip="Recursivelly includes all subcategories of the selected Categories."/>
                                                     </dxlc:LayoutItem>
                                                     <dxlc:LayoutItem Label="Display:">
                                                         <dxe:ComboBoxEdit
-                                                            EditValue="{Binding Source2Configuration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                            ItemsSource="{Binding Source2Configuration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            EditValue="{Binding SourceXConfiguration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{Binding SourceXConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             />
                                                     </dxlc:LayoutItem>
                                                 </dxlc:LayoutGroup>
@@ -264,29 +292,47 @@
                                                                   Header="Y Axis" View="GroupBox">
                                                     <dxlc:LayoutItem Label="Type: ">
                                                         <dxe:ComboBoxEdit
-                                                            EditValue="{Binding Source1Configuration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                            ItemsSource="{Binding Source1Configuration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            EditValue="{Binding SourceYConfiguration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{Binding SourceYConfiguration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             AutoComplete="True"
                                                             AllowNullInput="True"
                                                             AllowDefaultButton="True" />
                                                     </dxlc:LayoutItem>
                                                     <dxlc:LayoutItem Label="Categories: ">
-                                                        <dxe:ComboBoxEdit
-                                                            EditValue="{Binding Source1Configuration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
-                                                            ItemsSource="{Binding Source1Configuration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                            AutoComplete="True"
-                                                            AllowNullInput="True"
-                                                            AllowDefaultButton="True"
-                                                            DisplayMember="Name">
-                                                            <dxe:ComboBoxEdit.StyleSettings>
-                                                                <dxe:CheckedComboBoxStyleSettings />
-                                                            </dxe:ComboBoxEdit.StyleSettings>
-                                                        </dxe:ComboBoxEdit>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <dxe:ComboBoxEdit
+                                                                Grid.Column="0"
+                                                                EditValue="{Binding SourceYConfiguration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
+                                                                ItemsSource="{Binding SourceYConfiguration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                AutoComplete="True"
+                                                                AllowNullInput="True"
+                                                                AllowDefaultButton="True"
+                                                                DisplayMember="Name">
+                                                                <dxe:ComboBoxEdit.StyleSettings>
+                                                                    <dxe:CheckedComboBoxStyleSettings />
+                                                                </dxe:ComboBoxEdit.StyleSettings>
+                                                            </dxe:ComboBoxEdit>
+                                                            <dxe:ComboBoxEdit Grid.Column="1"
+                                                                              MinWidth="60"
+                                                                              ToolTip="Boolean Operator used to seperate the selected Categories."
+                                                                              Margin="5,0,0,0"
+                                                                EditValue="{Binding SourceYConfiguration.SelectedBooleanOperatorKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                ItemsSource="{Binding SourceYConfiguration.PossibleBooleanOperatorKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            />
+                                                        </Grid>
+                                                    </dxlc:LayoutItem>
+                                                    <dxlc:LayoutItem Label=" ">
+                                                        <dxe:CheckEdit
+                                                            EditValue="{Binding SourceYConfiguration.IncludeSubctegories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Include Subcategories of Selected" ToolTip="Recursivelly includes all subcategories of the selected Categories."/>
                                                     </dxlc:LayoutItem>
                                                     <dxlc:LayoutItem Label="Display: ">
                                                         <dxe:ComboBoxEdit
-                                                            EditValue="{Binding Source1Configuration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                            ItemsSource="{Binding Source1Configuration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            EditValue="{Binding SourceYConfiguration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{Binding SourceYConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             AutoComplete="False"
                                                             AllowNullInput="False"
                                                             AllowDefaultButton="True" />
@@ -312,11 +358,15 @@
                                                                   GroupBoxDisplayMode="Light"
                                                                   HorizontalAlignment="Stretch"
                                                                   IsCollapsible="False"
-                                                                  Orientation="Horizontal"
+                                                                  Orientation="Vertical"
                                                                   Header="View Options">
                                                     <dxlc:LayoutItem>
                                                         <dxe:CheckEdit
                                                             EditValue="{Binding ShowDirectionality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Show Relationship Direction" ToolTip="When turned on, the relationship direction is indicated by arrows."/>
+                                                    </dxlc:LayoutItem>
+                                                    <dxlc:LayoutItem>
+                                                        <dxe:CheckEdit
+                                                            EditValue="{Binding ShowRelatedOnly, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Show Related Only" ToolTip="Only includes objects that have the specified relationships into the view."/>
                                                     </dxlc:LayoutItem>
                                                 </dxlc:LayoutGroup>
                                             </dxlc:LayoutGroup>

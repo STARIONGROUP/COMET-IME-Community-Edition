@@ -12,6 +12,7 @@ namespace CDP4RelationshipMatrix.Tests
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using DevExpress.Data.Filtering.Helpers;
     using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
     using Moq;
@@ -46,8 +47,10 @@ namespace CDP4RelationshipMatrix.Tests
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
-
+            
             this.relationshipMatrixModule = new RelationshipMatrixModule(this.regionManager.Object,this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, this.pluginSettingsService.Object);
+            this.pluginSettingsService.Setup(s => s.Read<RelationshipMatrixPluginSettings>(this.relationshipMatrixModule))
+                .Returns(new RelationshipMatrixPluginSettings(true));
         }
 
         [Test]

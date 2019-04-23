@@ -8,7 +8,6 @@ namespace CDP4RelationshipMatrix.Converters
 {
     using System;
     using System.Collections.Generic;
-    using System.Dynamic;
     using System.Globalization;
     using System.Windows.Data;
     using DevExpress.Xpf.Grid;
@@ -46,16 +45,14 @@ namespace CDP4RelationshipMatrix.Converters
                 return null;
             }
 
-            var row = gridData.RowData.Row as ExpandoObject;
+            var row = gridData.RowData.Row as IDictionary<string, MatrixCellViewModel>;
 
             if (row == null)
             {
                 return null;
             }
 
-            var dic = (IDictionary<string, object>)row;
-
-            var matrixCellViewModel = dic[gridData.Column.FieldName] as MatrixCellViewModel;
+            var matrixCellViewModel = row[gridData.Column.FieldName];
 
             return matrixCellViewModel?.Tooltip ?? "-";
         }

@@ -8,6 +8,7 @@ namespace CDP4RelationshipMatrix
 {
     using System;
     using System.ComponentModel.Composition;
+    using System.Linq;
     using CDP4Composition;
     using CDP4Composition.Exceptions;
     using CDP4Composition.Attributes;
@@ -125,7 +126,14 @@ namespace CDP4RelationshipMatrix
         {
             try
             {
-               this.PluginSettingService.Read<RelationshipMatrixPluginSettings>(this);
+                var settings = this.PluginSettingService.Read<RelationshipMatrixPluginSettings>(this);
+
+                if (!settings.PossibleDisplayKinds.Any())
+                {
+                    // if setting is empty, repopulate with default set and save it
+                    settings.PossibleDisplayKinds = RelationshipMatrixPluginSettings.DefaultDisplayKinds;
+                    this.PluginSettingService.Write(settings, this);
+                }
             }
             catch (PluginSettingsException pluginSettingsException)
             {

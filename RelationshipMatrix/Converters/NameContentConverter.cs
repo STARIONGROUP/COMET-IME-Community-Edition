@@ -8,7 +8,6 @@ namespace CDP4RelationshipMatrix.Converters
 {
     using System;
     using System.Collections.Generic;
-    using System.Dynamic;
     using System.Globalization;
     using System.Windows.Data;
     using CDP4Common.CommonData;
@@ -47,29 +46,27 @@ namespace CDP4RelationshipMatrix.Converters
                 return null;
             }
 
-            var row = gridData.RowData?.Row as ExpandoObject;
+            var row = gridData.RowData?.Row as IDictionary<string, MatrixCellViewModel>;
 
             if (row == null)
             {
                 return null;
             }
 
-            return this.ConvertExpandoObject(row, gridData.Column.FieldName);
+            return this.ConvertRowObject(row, gridData.Column.FieldName);
         }
 
         /// <summary>
-        /// Converts the ExpandoObject contents into useable name
+        /// Converts the Row object contents into useable name
         /// </summary>
         /// <param name="row">The row data object.</param>
-        /// <param name="fieldName">The field name to be used as key in the ExpandoObject</param>
+        /// <param name="fieldName">The field name to be used as key in the row object</param>
         /// <returns>The required display name of the row.</returns>
-        public object ConvertExpandoObject(ExpandoObject row, string fieldName)
+        public object ConvertRowObject(IDictionary<string, MatrixCellViewModel> row, string fieldName)
         {
-            var dic = (IDictionary<string, object>)row;
+            var matrixCellViewModel = row[fieldName];
 
-            var matrixCellViewModel = dic[fieldName] as MatrixCellViewModel;
-
-            return matrixCellViewModel?.Source1 is DefinedThing definedThing ? typeof(DefinedThing).GetProperty(matrixCellViewModel.DisplayKind.ToString()).GetValue(matrixCellViewModel.Source1) : "-";
+            return matrixCellViewModel?.SourceY is DefinedThing definedThing ? typeof(DefinedThing).GetProperty(matrixCellViewModel.DisplayKind.ToString()).GetValue(matrixCellViewModel.SourceY) : "-";
         }
 
         /// <summary>

@@ -19,30 +19,39 @@ namespace CDP4RelationshipMatrix
     public class RelationshipMatrixPluginSettings : PluginSettings
     {
         /// <summary>
+        /// A set of default possible <see cref="ClassKind"/>.
+        /// </summary>
+        public static List<ClassKind> DefaultClassKinds = new List<ClassKind>
+        {
+            ClassKind.ElementDefinition,
+            ClassKind.ElementUsage,
+            ClassKind.NestedElement,
+            ClassKind.Option,
+            ClassKind.Parameter,
+            ClassKind.ParametricConstraint,
+            ClassKind.RequirementsSpecification,
+            ClassKind.RequirementsGroup,
+            ClassKind.Requirement
+        };
+
+        /// <summary>
+        /// A set of default possible <see cref="DisplayKind"/>.
+        /// </summary>
+        public static List<DisplayKind> DefaultDisplayKinds = new List<DisplayKind>
+        {
+            DisplayKind.Name,
+            DisplayKind.ShortName
+        };
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixPluginSettings"/> class
         /// </summary>
         public RelationshipMatrixPluginSettings(bool initializeDefaults = false)
         {
             if (initializeDefaults)
             {
-                this.PossibleClassKinds = new List<ClassKind>
-                {
-                    ClassKind.ElementDefinition,
-                    ClassKind.ElementUsage,
-                    ClassKind.NestedElement,
-                    ClassKind.Option,
-                    ClassKind.Parameter,
-                    ClassKind.ParametricConstraint,
-                    ClassKind.RequirementsSpecification,
-                    ClassKind.RequirementsGroup,
-                    ClassKind.Requirement
-                };
-
-                this.PossibleDisplayKinds = new List<DisplayKind>
-                {
-                    DisplayKind.Name,
-                    DisplayKind.ShortName
-                };
+                this.PossibleClassKinds = DefaultClassKinds;
+                this.PossibleDisplayKinds = DefaultDisplayKinds;
             }
             else
             {
@@ -54,7 +63,7 @@ namespace CDP4RelationshipMatrix
         /// <summary>
         /// Gets or sets the possible <see cref="ClassKind"/>
         /// </summary>
-        [JsonProperty (ItemConverterType = typeof(StringEnumConverter))]
+        [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
         public List<ClassKind> PossibleClassKinds { get; set; }
 
         /// <summary>

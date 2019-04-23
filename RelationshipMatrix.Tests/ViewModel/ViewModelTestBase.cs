@@ -46,6 +46,8 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         protected DomainOfExpertise domain;
         protected Category catEd1;
         protected Category catEd2;
+        protected Category catEd3;
+        protected Category catEd4;
         protected Category catRel;
         protected BinaryRelationshipRule rule;
 
@@ -55,6 +57,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         protected ElementDefinition elementDef12;
         protected ElementDefinition elementDef21;
         protected ElementDefinition elementDef22;
+        protected ElementDefinition elementDef31;
         protected PropertyInfo rev = typeof(Thing).GetProperty("RevisionNumber");
 
         public virtual void Setup()
@@ -78,10 +81,14 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             this.catEd1 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "cat1" };
             this.catEd2 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "cat2" };
+            this.catEd3 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat3sub1", ShortName = "cat3sub1", SuperCategory = new List<Category> { this.catEd1 }};
+            this.catEd4 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat4sub3", ShortName = "cat3sub4", SuperCategory = new List<Category> { this.catEd3 } };
             this.catRel = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "catrel", ShortName = "catrel" };
 
             this.catEd1.PermissibleClass.Add(ClassKind.ElementDefinition);
             this.catEd2.PermissibleClass.Add(ClassKind.ElementDefinition);
+            this.catEd3.PermissibleClass.Add(ClassKind.ElementDefinition);
+            this.catEd4.PermissibleClass.Add(ClassKind.ElementDefinition);
             this.catRel.PermissibleClass.Add(ClassKind.BinaryRelationship);
 
             this.rule = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { SourceCategory = this.catEd1, TargetCategory = this.catEd2, RelationshipCategory = this.catRel, Name = "rel", ShortName = "rel" };
@@ -96,6 +103,8 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             this.srdl.DefinedCategory.Add(this.catEd1);
             this.srdl.DefinedCategory.Add(this.catEd2);
+            this.srdl.DefinedCategory.Add(this.catEd3);
+            this.srdl.DefinedCategory.Add(this.catEd4);
             this.srdl.DefinedCategory.Add(this.catRel);
             this.srdl.Rule.Add(this.rule);
 
@@ -105,17 +114,22 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.elementDef12 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed12", ShortName = "ed12" };
             this.elementDef21 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed21", ShortName = "ed21" };
             this.elementDef22 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed22", ShortName = "ed22" };
+            this.elementDef31 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed31", ShortName = "ed31" };
 
             this.elementDef11.Category.Add(this.catEd1);
-            this.elementDef12.Category.Add(this.catEd1);
+            this.elementDef12.Category.Add(this.catEd3);
             this.elementDef21.Category.Add(this.catEd2);
-            this.elementDef22.Category.Add(this.catEd2);
+            this.elementDef22.Category.Add(this.catEd4);
+
+            this.elementDef31.Category.Add(this.catEd1);
+            this.elementDef31.Category.Add(this.catEd2);
 
             this.model.Iteration.Add(this.iteration);
             this.iteration.Element.Add(this.elementDef11);
             this.iteration.Element.Add(this.elementDef12);
             this.iteration.Element.Add(this.elementDef21);
             this.iteration.Element.Add(this.elementDef22);
+            this.iteration.Element.Add(this.elementDef31);
 
             this.assembler.Cache.TryAdd(new CacheKey(this.sitedir.Iid, null), new Lazy<Thing>(() => this.sitedir));
             this.assembler.Cache.TryAdd(new CacheKey(this.engineeringModelSetup.Iid, null), new Lazy<Thing>(() => this.engineeringModelSetup));
@@ -127,6 +141,8 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.assembler.Cache.TryAdd(new CacheKey(this.participant.Iid, null), new Lazy<Thing>(() => this.participant));
             this.assembler.Cache.TryAdd(new CacheKey(this.catEd1.Iid, null), new Lazy<Thing>(() => this.catEd1));
             this.assembler.Cache.TryAdd(new CacheKey(this.catEd2.Iid, null), new Lazy<Thing>(() => this.catEd2));
+            this.assembler.Cache.TryAdd(new CacheKey(this.catEd3.Iid, null), new Lazy<Thing>(() => this.catEd3));
+            this.assembler.Cache.TryAdd(new CacheKey(this.catEd4.Iid, null), new Lazy<Thing>(() => this.catEd4));
             this.assembler.Cache.TryAdd(new CacheKey(this.catRel.Iid, null), new Lazy<Thing>(() => this.catRel));
             this.assembler.Cache.TryAdd(new CacheKey(this.rule.Iid, null), new Lazy<Thing>(() => this.rule));
 
@@ -136,6 +152,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.assembler.Cache.TryAdd(new CacheKey(this.elementDef12.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.elementDef12));
             this.assembler.Cache.TryAdd(new CacheKey(this.elementDef21.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.elementDef21));
             this.assembler.Cache.TryAdd(new CacheKey(this.elementDef22.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.elementDef22));
+            this.assembler.Cache.TryAdd(new CacheKey(this.elementDef31.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.elementDef31));
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);

@@ -19,6 +19,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Operations;
+    using DevExpress.XtraPrinting.Native;
     using NLog;
     using ReactiveUI;
     using Settings;
@@ -74,14 +75,14 @@ namespace CDP4RelationshipMatrix.ViewModels
         private object selectedCell;
 
         /// <summary>
-        /// Backing field for <see cref="CanCreateSource1ToSource2"/>
+        /// Backing field for <see cref="CanCreateSourceYToSourceX"/>
         /// </summary>
-        private bool canCreateSource1ToSource2;
+        private bool canCreateSourceYToSourceX;
 
         /// <summary>
-        /// Backing field for <see cref="CanCreateSource2ToSource1"/>
+        /// Backing field for <see cref="CanCreateSourceXToSourceY"/>
         /// </summary>
-        private bool canCreateSource2ToSource1;
+        private bool canCreateSourceXToSourceY;
 
         /// <summary>
         /// Backing field for <see cref="CanDelete"/>
@@ -89,14 +90,14 @@ namespace CDP4RelationshipMatrix.ViewModels
         private bool canDelete;
 
         /// <summary>
-        /// Backing field for <see cref="IsVisibleDelete1To2"/>
+        /// Backing field for <see cref="IsVisibleDeleteYToX"/>
         /// </summary>
-        private bool isVisibleDelete1To2;
+        private bool isVisibleDeleteYToX;
 
         /// <summary>
-        /// Backing field for <see cref="IsVisibleDelete2To1"/>
+        /// Backing field for <see cref="IsVisibleDeleteXToY"/>
         /// </summary>
-        private bool isVisibleDelete2To1;
+        private bool isVisibleDeleteXToY;
 
         /// <summary>
         /// Backing field for <see cref="IsVisibleDeleteAll"/>
@@ -119,28 +120,28 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             this.Disposables = new List<IDisposable>();
 
-            this.Records = new ReactiveList<ExpandoObject>();
+            this.Records = new ReactiveList<IDictionary<string, MatrixCellViewModel>>();
             this.Columns = new ReactiveList<ColumnDefinition>();
 
             this.session = session;
             this.iteration = iteration;
 
-            this.CreateSource1ToSource2Link = ReactiveCommand.CreateAsyncTask(
-                this.WhenAnyValue(x => x.CanCreateSource1ToSource2),
+            this.CreateSourceYToSourceXLink = ReactiveCommand.CreateAsyncTask(
+                this.WhenAnyValue(x => x.CanCreateSourceYToSourceX),
                 x => this.CreateRelationship(RelationshipDirectionKind.RowThingToColumnThing),
                 RxApp.MainThreadScheduler);
 
-            this.CreateSource2ToSource1Link = ReactiveCommand.CreateAsyncTask(
-                this.WhenAnyValue(x => x.CanCreateSource2ToSource1),
+            this.CreateSourceXToSourceYLink = ReactiveCommand.CreateAsyncTask(
+                this.WhenAnyValue(x => x.CanCreateSourceXToSourceY),
                 x => this.CreateRelationship(RelationshipDirectionKind.ColumnThingToRowThing),
                 RxApp.MainThreadScheduler);
 
-            this.DeleteSource1ToSource2Link = ReactiveCommand.CreateAsyncTask(
+            this.DeleteSourceYToSourceXLink = ReactiveCommand.CreateAsyncTask(
                 this.WhenAnyValue(x => x.CanDelete),
                 x => this.DeleteRelationship(RelationshipDirectionKind.RowThingToColumnThing),
                 RxApp.MainThreadScheduler);
 
-            this.DeleteSource2ToSource1Link = ReactiveCommand.CreateAsyncTask(
+            this.DeleteSourceXToSourceYLink = ReactiveCommand.CreateAsyncTask(
                 this.WhenAnyValue(x => x.CanDelete),
                 x => this.DeleteRelationship(RelationshipDirectionKind.ColumnThingToRowThing),
                 RxApp.MainThreadScheduler);
@@ -165,25 +166,25 @@ namespace CDP4RelationshipMatrix.ViewModels
         protected List<IDisposable> Disposables { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether a <see cref="BinaryRelationship"/> can be created from source1 to source2
+        /// Gets or sets a value indicating whether a <see cref="BinaryRelationship"/> can be created from sourceY to sourceX
         /// </summary>
-        public bool CanCreateSource1ToSource2
+        public bool CanCreateSourceYToSourceX
         {
-            get { return this.canCreateSource1ToSource2; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateSource1ToSource2, value); }
+            get { return this.canCreateSourceYToSourceX; }
+            private set { this.RaiseAndSetIfChanged(ref this.canCreateSourceYToSourceX, value); }
         }
 
         /// <summary>
-        /// Gets a value indicating whether a <see cref="BinaryRelationship"/> can be created from source2 to source1
+        /// Gets or sets a value indicating whether a <see cref="BinaryRelationship"/> can be created from sourceX to sourceY
         /// </summary>
-        public bool CanCreateSource2ToSource1
+        public bool CanCreateSourceXToSourceY
         {
-            get { return this.canCreateSource2ToSource1; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateSource2ToSource1, value); }
+            get { return this.canCreateSourceXToSourceY; }
+            private set { this.RaiseAndSetIfChanged(ref this.canCreateSourceXToSourceY, value); }
         }
 
         /// <summary>
-        /// Gets a value indicating whether <see cref="BinaryRelationship"/>s can be deleted
+        /// Gets or sets a value indicating whether <see cref="BinaryRelationship"/>s can be deleted
         /// </summary>
         public bool CanDelete
         {
@@ -192,25 +193,25 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether the <see cref="DeleteSource1ToSource2Link"/> button is visible
+        /// Gets or sets a value indicating whether the <see cref="DeleteSourceYToSourceXLink"/> button is visible
         /// </summary>
-        public bool IsVisibleDelete1To2
+        public bool IsVisibleDeleteYToX
         {
-            get { return this.isVisibleDelete1To2; }
-            private set { this.RaiseAndSetIfChanged(ref this.isVisibleDelete1To2, value); }
+            get { return this.isVisibleDeleteYToX; }
+            private set { this.RaiseAndSetIfChanged(ref this.isVisibleDeleteYToX, value); }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the <see cref="DeleteSource2ToSource1Link"/> button is visible
+        /// Gets or sets a value indicating whether the <see cref="DeleteSourceXToSourceYLink"/> button is visible
         /// </summary>
-        public bool IsVisibleDelete2To1
+        public bool IsVisibleDeleteXToY
         {
-            get { return this.isVisibleDelete2To1; }
-            private set { this.RaiseAndSetIfChanged(ref this.isVisibleDelete2To1, value); }
+            get { return this.isVisibleDeleteXToY; }
+            private set { this.RaiseAndSetIfChanged(ref this.isVisibleDeleteXToY, value); }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the <see cref="DeleteAllRelationships"/> button is visible
+        /// Gets or sets a value indicating whether the <see cref="DeleteAllRelationships"/> button is visible
         /// </summary>
         public bool IsVisibleDeleteAll
         {
@@ -219,34 +220,34 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Gets the element-definition overview
+        /// Gets or sets the recods used for row construction.
         /// </summary>
-        public ReactiveList<ExpandoObject> Records { get; private set; }
+        public ReactiveList<IDictionary<string, MatrixCellViewModel>> Records { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="Option"/> name
+        /// Gets or sets the column definitions.
         /// </summary>
-        public ReactiveList<ColumnDefinition> Columns { get; private set; }
+        public ReactiveList<ColumnDefinition> Columns { get; set; }
 
         /// <summary>
-        /// Gets the command to create a <see cref="BinaryRelationship"/> from source1 to source2
+        /// Gets the command to create a <see cref="BinaryRelationship"/> from sourceY to sourceX
         /// </summary>
-        public ReactiveCommand<Unit> CreateSource1ToSource2Link { get; private set; }
+        public ReactiveCommand<Unit> CreateSourceYToSourceXLink { get; private set; }
 
         /// <summary>
-        /// Gets the command to create a <see cref="BinaryRelationship"/> from source2 to source1
+        /// Gets the command to create a <see cref="BinaryRelationship"/> from sourceX to sourceY
         /// </summary>
-        public ReactiveCommand<Unit> CreateSource2ToSource1Link { get; private set; }
+        public ReactiveCommand<Unit> CreateSourceXToSourceYLink { get; private set; }
 
         /// <summary>
-        /// Gets the command to delete a <see cref="BinaryRelationship"/> from source1 to source2
+        /// Gets the command to delete a <see cref="BinaryRelationship"/> from sourceY to sourceX
         /// </summary>
-        public ReactiveCommand<Unit> DeleteSource1ToSource2Link { get; private set; }
+        public ReactiveCommand<Unit> DeleteSourceYToSourceXLink { get; private set; }
 
         /// <summary>
-        /// Gets the command to delete a <see cref="BinaryRelationship"/> from source2 to source1
+        /// Gets the command to delete a <see cref="BinaryRelationship"/> from sourceX to sourceY
         /// </summary>
-        public ReactiveCommand<Unit> DeleteSource2ToSource1Link { get; private set; }
+        public ReactiveCommand<Unit> DeleteSourceXToSourceYLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete all <see cref="BinaryRelationship"/> currently displayed
@@ -332,11 +333,14 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="sourceY">The <see cref="SourceConfigurationViewModel"/> of the Y axis.</param>
         /// <param name="sourceX">The <see cref="SourceConfigurationViewModel"/> of the X axis.</param>
         /// <param name="relationshipRule">The <see cref="BinaryRelationshipRule"/></param>
+        /// <param name="showRelatedOnly">Show only the related rows and columns.</param>
         public void RebuildMatrix(SourceConfigurationViewModel sourceY, SourceConfigurationViewModel sourceX,
-            BinaryRelationshipRule relationshipRule)
+            BinaryRelationshipRule relationshipRule, bool showRelatedOnly)
         {
             this.Columns.Clear();
             this.Records.Clear();
+
+            var unfilteredRecords = new List<IDictionary<string, MatrixCellViewModel>>();
 
             this.Title = "-";
 
@@ -353,14 +357,14 @@ namespace CDP4RelationshipMatrix.ViewModels
                 .Where(x => x.ClassKind == sourceX.SelectedClassKind.Value ||
                             x.ClassKind == sourceY.SelectedClassKind.Value).ToList();
 
-            List<DefinedThing> source1Thing;
-            List<DefinedThing> source2Thing;
+            List<DefinedThing> sourceXThing;
+            List<DefinedThing> sourceYThing;
 
             try
             {
-                source1Thing = things.Where(x => x.ClassKind == sourceY.SelectedClassKind.Value).Cast<DefinedThing>()
+                sourceYThing = things.Where(x => x.ClassKind == sourceY.SelectedClassKind.Value).Cast<DefinedThing>()
                     .ToList();
-                source2Thing = things.Where(x => x.ClassKind == sourceX.SelectedClassKind.Value).Cast<DefinedThing>()
+                sourceXThing = things.Where(x => x.ClassKind == sourceX.SelectedClassKind.Value).Cast<DefinedThing>()
                     .ToList();
             }
             catch (InvalidCastException)
@@ -368,32 +372,53 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
-            if (source1Thing.Count == 0 || source2Thing.Count == 0)
+            if (sourceYThing.Count == 0 || sourceXThing.Count == 0)
             {
                 return;
             }
 
-            var source2ToUse =
-                new List<DefinedThing>(this.FilterSourceByCategory(source2Thing, sourceX.SelectedCategories)
+            var sourceXToUse =
+                new List<DefinedThing>(this.FilterSourceByCategory(sourceXThing, sourceX)
                     .OrderBy(x => x.Name));
-            var source1ToUse =
-                new List<DefinedThing>(this.FilterSourceByCategory(source1Thing, sourceY.SelectedCategories)
+            var sourceYToUse =
+                new List<DefinedThing>(this.FilterSourceByCategory(sourceYThing, sourceY)
                     .OrderBy(x => x.Name));
 
-            if (source1ToUse.Count == 0 || source2ToUse.Count == 0)
+            if (sourceYToUse.Count == 0 || sourceXToUse.Count == 0)
             {
                 return;
             }
 
-            this.CreateColumns(source2ToUse, sourceX.SelectedDisplayKind);
-
-            // generates records
+            // get relationships
             var relationships = this.QueryBinaryRelationshipInContext(relationshipRule).ToList();
 
-            foreach (var definedThing in source1ToUse)
+            // create columns
+            var unfilteredColumns = this.CreateColumns(sourceXToUse, sourceX.SelectedDisplayKind, showRelatedOnly, relationships);
+
+            // create rows
+            foreach (var definedThing in sourceYToUse)
             {
-                this.Records.Add(this.ComputeRow(definedThing, source2ToUse, relationships, relationshipRule,
-                    sourceY.SelectedDisplayKind));
+                if (showRelatedOnly && !relationships.Any(x =>
+                        x.Source.Iid.Equals(definedThing.Iid) || x.Target.Iid.Equals(definedThing.Iid)))
+                {
+                    // if thing is ont in any relationships, skip
+                    continue;
+                }
+
+                unfilteredRecords.Add(this.ComputeRow(definedThing, sourceXToUse, relationships, relationshipRule,
+                    sourceY.SelectedDisplayKind, unfilteredColumns));
+            }
+
+            // secondary filter remove unvanted rows and columns
+            if (showRelatedOnly)
+            {
+                this.Columns.AddRange(unfilteredColumns.Where(x => x.RelationshipCount != 0).ToList());
+                this.Records.AddRange(unfilteredRecords.Where(x => x.Any(c => c.Value.RelationshipDirection != RelationshipDirectionKind.None)));
+            }
+            else
+            {
+                this.Columns.AddRange(unfilteredColumns);
+                this.Records.AddRange(unfilteredRecords);
             }
         }
 
@@ -418,8 +443,8 @@ namespace CDP4RelationshipMatrix.ViewModels
                     continue;
                 }
 
-                var sourceRow = (IDictionary<string, object>) this.QueryRow(relationship.Source.Iid);
-                var targetRow = (IDictionary<string, object>) this.QueryRow(relationship.Target.Iid);
+                var sourceRow = this.QueryRow(relationship.Source.Iid);
+                var targetRow = this.QueryRow(relationship.Target.Iid);
                 if (sourceRow != null)
                 {
                     var cellValue = this.ComputeCell(definedSource, definedTarget, updatedRelationships,
@@ -445,13 +470,13 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void SubscribeCommandExceptions()
         {
-            this.Disposables.Add(this.CreateSource1ToSource2Link.ThrownExceptions.Subscribe(x =>
+            this.Disposables.Add(this.CreateSourceYToSourceXLink.ThrownExceptions.Subscribe(x =>
                 logger.Error("The relationship could not be created")));
-            this.Disposables.Add(this.CreateSource2ToSource1Link.ThrownExceptions.Subscribe(x =>
+            this.Disposables.Add(this.CreateSourceXToSourceYLink.ThrownExceptions.Subscribe(x =>
                 logger.Error("The relationship could not be created")));
-            this.Disposables.Add(this.DeleteSource1ToSource2Link.ThrownExceptions.Subscribe(x =>
+            this.Disposables.Add(this.DeleteSourceYToSourceXLink.ThrownExceptions.Subscribe(x =>
                 logger.Error("The relationship could not be deleted")));
-            this.Disposables.Add(this.DeleteSource2ToSource1Link.ThrownExceptions.Subscribe(x =>
+            this.Disposables.Add(this.DeleteSourceXToSourceYLink.ThrownExceptions.Subscribe(x =>
                 logger.Error("The relationship could not be deleted")));
             this.Disposables.Add(this.DeleteAllRelationships.ThrownExceptions.Subscribe(x =>
                 logger.Error("The relationships could not be deleted")));
@@ -462,22 +487,35 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         /// <param name="source">The <see cref="Thing"/> representing the columns</param>
         /// <param name="displayKind">The <see cref="DisplayKind"/> of the column.</param>
-        private void CreateColumns(IReadOnlyList<DefinedThing> source, DisplayKind displayKind)
+        /// <param name="showRelatedOnly">Indicate whether to only show related elements.</param>
+        /// <param name="relationships">The list of all relationships.</param>
+        private IList<ColumnDefinition> CreateColumns(IReadOnlyList<DefinedThing> source, DisplayKind displayKind, bool showRelatedOnly, IList<BinaryRelationship> relationships)
         {
+            var columns = new List<ColumnDefinition>();
+
             // column that contains the name of the thing to display for each row
-            this.Columns.Add(new ColumnDefinition(CDP4_NAME_HEADER, ROW_NAME_COLUMN));
+            columns.Add(new ColumnDefinition(CDP4_NAME_HEADER, ROW_NAME_COLUMN, true));
 
             foreach (var definedThing in source.DistinctBy(x => x.ShortName))
             {
-                if (this.Columns.Any(x => x.FieldName == definedThing.ShortName))
+                if (showRelatedOnly && !relationships.Any(x =>
+                        x.Source.Iid.Equals(definedThing.Iid) || x.Target.Iid.Equals(definedThing.Iid)))
+                {
+                    // if thing is ont in any relationships, skip
+                    continue;
+                }
+
+                if (columns.Any(x => x.FieldName == definedThing.ShortName))
                 {
                     // skip duplicated shortname
                     continue;
                 }
 
                 // Set fieldname to use as iid
-                this.Columns.Add(new ColumnDefinition(definedThing, displayKind));
+                columns.Add(new ColumnDefinition(definedThing, displayKind));
             }
+
+            return columns;
         }
 
         /// <summary>
@@ -488,30 +526,35 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="relationships">The current set of <see cref="BinaryRelationship"/></param>
         /// <param name="relationshipRule">The current <see cref="BinaryRelationshipRule"/></param>
         /// <param name="displayKind">The <see cref="DisplayKind"/> of the current Row.</param>
-        /// <returns>The <see cref="ExpandoObject"/> that corresponds to a row</returns>
-        private ExpandoObject ComputeRow(DefinedThing rowThing, IReadOnlyList<DefinedThing> columnThings,
+        /// <param name="columnDefinitions">The defined columns.</param>
+        /// <returns>The <see cref="IDictionary{TKey,TValue}"/> that corresponds to a row</returns>
+        private IDictionary<string, MatrixCellViewModel> ComputeRow(DefinedThing rowThing, IReadOnlyList<DefinedThing> columnThings,
             IReadOnlyList<BinaryRelationship> relationships, BinaryRelationshipRule relationshipRule,
-            DisplayKind displayKind)
+            DisplayKind displayKind, IList<ColumnDefinition> columnDefinitions)
         {
-            var record = new ExpandoObject();
-            var dic = (IDictionary<string, object>) record;
+            var record = new Dictionary<string, MatrixCellViewModel>();
 
-            dic.Add(ROW_NAME_COLUMN, new MatrixCellViewModel(rowThing, null, null, relationshipRule, displayKind));
+            record.Add(ROW_NAME_COLUMN, new MatrixCellViewModel(rowThing, null, null, relationshipRule, displayKind));
 
             foreach (var definedThing in columnThings)
             {
-                if (this.Columns.All(x => x.ThingId != definedThing.Iid))
+                if (columnDefinitions.All(x => !x.ThingId.Equals(definedThing.Iid)))
                 {
                     continue;
                 }
 
                 var cellValue = this.ComputeCell(rowThing, definedThing, relationships, relationshipRule);
-                dic.Add(definedThing.ShortName, cellValue);
+                record.Add(definedThing.ShortName, cellValue);
 
                 this.UpdateCurrentCell(rowThing, definedThing, cellValue);
+
+                if (cellValue.RelationshipDirection != RelationshipDirectionKind.None)
+                {
+                    columnDefinitions.Single(s => s.ThingId.Equals(definedThing.Iid)).RelationshipCount++;
+                }
             }
 
-            return (ExpandoObject) dic;
+            return record;
         }
 
         /// <summary>
@@ -564,16 +607,16 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         /// <param name="id">The identifier</param>
         /// <returns>The <see cref="ExpandoObject"/> representing the row</returns>
-        private ExpandoObject QueryRow(Guid id)
+        private IDictionary<string, MatrixCellViewModel> QueryRow(Guid id)
         {
-            var rows = this.Records.Cast<IDictionary<string, object>>().ToList();
+            var rows = this.Records.Cast<IDictionary<string, MatrixCellViewModel>>().ToList();
             foreach (var row in rows)
             {
                 var firstCell = row.Values.OfType<MatrixCellViewModel>().FirstOrDefault();
 
-                if (firstCell != null && firstCell.Source1.Iid == id)
+                if (firstCell != null && firstCell.SourceY.Iid == id)
                 {
-                    return (ExpandoObject) row;
+                    return row;
                 }
             }
 
@@ -587,26 +630,26 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="sourceCat">The filter <see cref="Category"/></param>
         /// <returns>The filtered <see cref="Thing"/></returns>
         private IEnumerable<DefinedThing> FilterSourceByCategory(IReadOnlyList<DefinedThing> source,
-            IReadOnlyList<Category> sourceCat)
+            SourceConfigurationViewModel sourceCat)
         {
-            var source2CatThing = new List<DefinedThing>();
+            var sourceXCatThing = new List<DefinedThing>();
 
-            if (sourceCat == null || sourceCat.Count == 0)
+            if (sourceCat?.SelectedCategories == null || sourceCat.SelectedCategories.Count == 0)
             {
-                return source;
+                return sourceXCatThing;
             }
 
             foreach (var definedThing in source)
             {
                 var thing = (ICategorizableThing) definedThing;
 
-                if (thing.Category.Intersect(sourceCat).Any())
+                if (RelationshipMatrixViewModel.IsCategoryApplicableToConfiguration(thing, sourceCat))
                 {
-                    source2CatThing.Add(definedThing);
+                    sourceXCatThing.Add(definedThing);
                 }
             }
 
-            return source2CatThing;
+            return sourceXCatThing;
         }
 
         /// <summary>
@@ -627,13 +670,13 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             var vm = this.SelectedCell as MatrixCellViewModel;
 
-            if (vm?.Source2 == null)
+            if (vm?.SourceX == null)
             {
-                this.CanCreateSource1ToSource2 = false;
-                this.CanCreateSource2ToSource1 = false;
+                this.CanCreateSourceYToSourceX = false;
+                this.CanCreateSourceXToSourceY = false;
                 this.CanDelete = false;
-                this.IsVisibleDelete1To2 = false;
-                this.IsVisibleDelete2To1 = false;
+                this.IsVisibleDeleteYToX = false;
+                this.IsVisibleDeleteXToY = false;
                 this.IsVisibleDeleteAll = false;
 
                 return;
@@ -641,11 +684,11 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             var canWrite = this.session.PermissionService.CanWrite(ClassKind.BinaryRelationship, this.iteration);
 
-            this.CanCreateSource1ToSource2 = canWrite && vm.Source1.Iid != vm.Source2.Iid &&
+            this.CanCreateSourceYToSourceX = canWrite && vm.SourceY.Iid != vm.SourceX.Iid &&
                                              vm.RelationshipDirection !=
                                              RelationshipDirectionKind.RowThingToColumnThing &&
                                              vm.RelationshipDirection != RelationshipDirectionKind.BiDirectional;
-            this.CanCreateSource2ToSource1 = canWrite && vm.Source1.Iid != vm.Source2.Iid &&
+            this.CanCreateSourceXToSourceY = canWrite && vm.SourceY.Iid != vm.SourceX.Iid &&
                                              vm.RelationshipDirection !=
                                              RelationshipDirectionKind.ColumnThingToRowThing &&
                                              vm.RelationshipDirection != RelationshipDirectionKind.BiDirectional;
@@ -653,10 +696,10 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.IsVisibleDeleteAll = this.CanDelete &&
                                       vm.RelationshipDirection == RelationshipDirectionKind.BiDirectional;
-            this.IsVisibleDelete1To2 = this.IsVisibleDeleteAll ||
+            this.IsVisibleDeleteYToX = this.IsVisibleDeleteAll ||
                                        (this.CanDelete && vm.RelationshipDirection ==
                                         RelationshipDirectionKind.RowThingToColumnThing);
-            this.IsVisibleDelete2To1 = this.IsVisibleDeleteAll ||
+            this.IsVisibleDeleteXToY = this.IsVisibleDeleteAll ||
                                        (this.CanDelete && vm.RelationshipDirection ==
                                         RelationshipDirectionKind.ColumnThingToRowThing);
         }
@@ -673,16 +716,16 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
-            // if relationship from 1 to 2 does not exist create one, if it does, delete it
-            if (this.CanCreateSource1ToSource2)
+            // if relationship from y to x does not exist create one, if it does, delete it
+            if (this.CanCreateSourceYToSourceX)
             {
-                await this.CreateSource1ToSource2Link.ExecuteAsync();
+                await this.CreateSourceYToSourceXLink.ExecuteAsync();
                 return;
             }
 
-            if (this.CanDelete && this.IsVisibleDelete1To2)
+            if (this.CanDelete && this.IsVisibleDeleteYToX)
             {
-                await this.DeleteSource1ToSource2Link.ExecuteAsync();
+                await this.DeleteSourceYToSourceXLink.ExecuteAsync();
                 return;
             }
         }
@@ -698,16 +741,16 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
-            // if relationship from 2 to 1 does not exist create one, if it does, delete it
-            if (this.CanCreateSource2ToSource1)
+            // if relationship from x to y does not exist create one, if it does, delete it
+            if (this.CanCreateSourceXToSourceY)
             {
-                await this.CreateSource2ToSource1Link.ExecuteAsync();
+                await this.CreateSourceXToSourceYLink.ExecuteAsync();
                 return;
             }
 
-            if (this.CanDelete && this.IsVisibleDelete2To1)
+            if (this.CanDelete && this.IsVisibleDeleteXToY)
             {
-                await this.DeleteSource2ToSource1Link.ExecuteAsync();
+                await this.DeleteSourceXToSourceYLink.ExecuteAsync();
                 return;
             }
         }
@@ -731,16 +774,16 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             // if 1 to 2
-            if (this.CanDelete && this.IsVisibleDelete1To2)
+            if (this.CanDelete && this.IsVisibleDeleteYToX)
             {
-                await this.DeleteSource1ToSource2Link.ExecuteAsync();
+                await this.DeleteSourceYToSourceXLink.ExecuteAsync();
                 return;
             }
 
             // if 2 - 1
-            if (this.CanDelete && this.IsVisibleDelete2To1)
+            if (this.CanDelete && this.IsVisibleDeleteXToY)
             {
-                await this.DeleteSource2ToSource1Link.ExecuteAsync();
+                await this.DeleteSourceXToSourceYLink.ExecuteAsync();
                 return;
             }
         }
@@ -765,9 +808,9 @@ namespace CDP4RelationshipMatrix.ViewModels
             relationship.Category.Add(vm.Rule.RelationshipCategory);
 
             relationship.Source =
-                direction == RelationshipDirectionKind.RowThingToColumnThing ? vm.Source1 : vm.Source2;
+                direction == RelationshipDirectionKind.RowThingToColumnThing ? vm.SourceY : vm.SourceX;
             relationship.Target =
-                direction == RelationshipDirectionKind.RowThingToColumnThing ? vm.Source2 : vm.Source1;
+                direction == RelationshipDirectionKind.RowThingToColumnThing ? vm.SourceX : vm.SourceY;
 
             var iterationClone = this.iteration.Clone(false);
             iterationClone.Relationship.Add(relationship);
@@ -805,12 +848,12 @@ namespace CDP4RelationshipMatrix.ViewModels
                     transaction.Delete(clone);
                 }
                 else if (direction == RelationshipDirectionKind.RowThingToColumnThing &&
-                         vm.Source1.Iid == binaryRelationship.Source.Iid)
+                         vm.SourceY.Iid == binaryRelationship.Source.Iid)
                 {
                     transaction.Delete(clone);
                 }
                 else if (direction == RelationshipDirectionKind.ColumnThingToRowThing &&
-                         vm.Source2.Iid == binaryRelationship.Source.Iid)
+                         vm.SourceX.Iid == binaryRelationship.Source.Iid)
                 {
                     transaction.Delete(clone);
                 }

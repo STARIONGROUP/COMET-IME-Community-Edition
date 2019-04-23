@@ -22,6 +22,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Dal.Events;
     using NLog;
     using ReactiveUI;
+    using Settings;
 
     /// <summary>
     /// The view-model associated to the browser panel holding the relationship matrix.
@@ -59,29 +60,34 @@ namespace CDP4RelationshipMatrix.ViewModels
         private readonly IterationSetup iterationSetup;
 
         /// <summary>
-        /// Backing field for <see cref="CanEditSource1"/>
+        /// Backing field for <see cref="CanEditSourceY"/>
         /// </summary>
-        private bool canEditSource1;
+        private bool canEditSourceY;
 
         /// <summary>
-        /// Backing field for <see cref="CanEditSource2"/>
+        /// Backing field for <see cref="CanEditSourceX"/>
         /// </summary>
-        private bool canEditSource2;
+        private bool canEditSourceX;
 
         /// <summary>
-        /// Backing field for <see cref="CanInspectSource1"/>
+        /// Backing field for <see cref="CanInspectSourceY"/>
         /// </summary>
-        private bool canInspectSource1;
+        private bool canInspectSourceY;
 
         /// <summary>
-        /// Backing field for <see cref="CanInspectSource2"/>
+        /// Backing field for <see cref="CanInspectSourceX"/>
         /// </summary>
-        private bool canInspectSource2;
+        private bool canInspectSourceX;
 
         /// <summary>
         /// Backing field for <see cref="ShowDirectionality"/>
         /// </summary>
         private bool showDirectionality;
+
+        /// <summary>
+        /// Backing field for <see cref="ShowRelatedOnly"/>
+        /// </summary>
+        private bool showRelatedOnly;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel"/> class
@@ -100,22 +106,23 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             this.Caption = "Relationship Matrix";
             this.ShowDirectionality = true;
+            this.ShowRelatedOnly = false;
 
             this.ToolTip =
                 $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             var setting = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
 
-            this.Source1Configuration =
+            this.SourceYConfiguration =
                 new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, setting);
-            this.Source2Configuration =
+            this.SourceXConfiguration =
                 new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, setting);
             this.RelationshipConfiguration =
                 new RelationshipConfigurationViewModel(session, iteration, this.BuildRelationshipMatrix, setting);
             this.Matrix = new MatrixViewModel(this.Session, this.Thing, setting);
 
-            this.Disposables.Add(this.Source1Configuration);
-            this.Disposables.Add(this.Source2Configuration);
+            this.Disposables.Add(this.SourceYConfiguration);
+            this.Disposables.Add(this.SourceXConfiguration);
             this.Disposables.Add(this.RelationshipConfiguration);
             this.Disposables.Add(this.Matrix);
 
@@ -151,12 +158,12 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets the <see cref="SourceConfigurationViewModel"/> to configure the first kind of sources
         /// </summary>
-        public SourceConfigurationViewModel Source1Configuration { get; private set; }
+        public SourceConfigurationViewModel SourceYConfiguration { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="SourceConfigurationViewModel"/> to configure the second kind of sources
         /// </summary>
-        public SourceConfigurationViewModel Source2Configuration { get; private set; }
+        public SourceConfigurationViewModel SourceXConfiguration { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="RelationshipConfigurationViewModel"/> to configure the kind of <see cref="BinaryRelationship"/> to display
@@ -171,58 +178,58 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets a value indicating whether the edit row command is enabled
         /// </summary>
-        public bool CanEditSource1
+        public bool CanEditSourceY
         {
-            get { return this.canEditSource1; }
-            private set { this.RaiseAndSetIfChanged(ref this.canEditSource1, value); }
+            get { return this.canEditSourceY; }
+            private set { this.RaiseAndSetIfChanged(ref this.canEditSourceY, value); }
         }
 
         /// <summary>
         /// Gets a value indicating whether the edit column command is enabled
         /// </summary>
-        public bool CanEditSource2
+        public bool CanEditSourceX
         {
-            get { return this.canEditSource2; }
-            private set { this.RaiseAndSetIfChanged(ref this.canEditSource2, value); }
+            get { return this.canEditSourceX; }
+            private set { this.RaiseAndSetIfChanged(ref this.canEditSourceX, value); }
         }
 
         /// <summary>
         /// Gets a value indicating whether the edit row command is enabled
         /// </summary>
-        public bool CanInspectSource1
+        public bool CanInspectSourceY
         {
-            get { return this.canInspectSource1; }
-            private set { this.RaiseAndSetIfChanged(ref this.canInspectSource1, value); }
+            get { return this.canInspectSourceY; }
+            private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceY, value); }
         }
 
         /// <summary>
         /// Gets a value indicating whether the edit row command is enabled
         /// </summary>
-        public bool CanInspectSource2
+        public bool CanInspectSourceX
         {
-            get { return this.canInspectSource2; }
-            private set { this.RaiseAndSetIfChanged(ref this.canInspectSource2, value); }
+            get { return this.canInspectSourceX; }
+            private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceX, value); }
         }
 
         /// <summary>
         /// Gets the command to edit the current row thing
         /// </summary>
-        public ReactiveCommand<object> EditSource1Command { get; private set; }
+        public ReactiveCommand<object> EditSourceYCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to inspect the current row thing
         /// </summary>
-        public ReactiveCommand<object> InspectSource1Command { get; private set; }
+        public ReactiveCommand<object> InspectSourceYCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to edit the current column thing
         /// </summary>
-        public ReactiveCommand<object> EditSource2Command { get; private set; }
+        public ReactiveCommand<object> EditSourceXCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to inspect the current column thing
         /// </summary>
-        public ReactiveCommand<object> InspectSource2Command { get; private set; }
+        public ReactiveCommand<object> InspectSourceXCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets whether directionality is displayed
@@ -234,13 +241,23 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets whether only related objects should be shown in the matrix.
+        /// </summary>
+        public bool ShowRelatedOnly
+        {
+            get { return this.showRelatedOnly; }
+            set { this.RaiseAndSetIfChanged(ref this.showRelatedOnly, value); }
+        }
+
+        /// <summary>
         /// Builds the relationship matrix
         /// </summary>
         private void BuildRelationshipMatrix()
         {
             this.HasUpdateStarted = true;
 
-            this.Matrix.RebuildMatrix(this.Source1Configuration, this.Source2Configuration, this.RelationshipConfiguration.SelectedRule);
+            this.Matrix.RebuildMatrix(this.SourceYConfiguration, this.SourceXConfiguration,
+                this.RelationshipConfiguration.SelectedRule, this.ShowRelatedOnly);
 
             this.HasUpdateStarted = false;
         }
@@ -250,14 +267,14 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void UpdateRelationshipConfiguration()
         {
-            if (!this.Source1Configuration.SelectedClassKind.HasValue ||
-                !this.Source2Configuration.SelectedClassKind.HasValue)
+            if (!this.SourceYConfiguration.SelectedClassKind.HasValue ||
+                !this.SourceXConfiguration.SelectedClassKind.HasValue)
             {
                 return;
             }
 
-            this.RelationshipConfiguration.PopulatePossibleRules(this.Source1Configuration.SelectedClassKind,
-                this.Source2Configuration.SelectedClassKind);
+            this.RelationshipConfiguration.PopulatePossibleRules(this.SourceYConfiguration.SelectedClassKind,
+                this.SourceXConfiguration.SelectedClassKind);
 
             if (this.RelationshipConfiguration.SelectedRule != null)
             {
@@ -344,28 +361,35 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.Disposables.Add(thingsSubscription);
 
             this.WhenAnyValue(x => x.ShowDirectionality).Subscribe(_ => this.BuildRelationshipMatrix());
+            this.WhenAnyValue(x => x.ShowRelatedOnly).Subscribe(_ => this.BuildRelationshipMatrix());
 
             var ruleSubscription = CDPMessageBus.Current
                 .Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
                 .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => {
-                    this.UpdateRelationshipConfiguration();
-                });
+                .Subscribe(_ => { this.UpdateRelationshipConfiguration(); });
 
             this.Disposables.Add(ruleSubscription);
 
-            this.EditSource1Command = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSource1));
-            this.Disposables.Add(this.EditSource1Command.Subscribe(_ => this.ExecuteEditSource1Command()));
+            var relationshipSubscription = CDPMessageBus.Current
+                .Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
+                .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => { this.UpdateRelationshipConfiguration(); });
 
-            this.EditSource2Command = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSource2));
-            this.Disposables.Add(this.EditSource2Command.Subscribe(_ => this.ExecuteEditSource2Command()));
+            this.Disposables.Add(relationshipSubscription);
 
-            this.InspectSource1Command = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSource1));
-            this.Disposables.Add(this.InspectSource1Command.Subscribe(_ => this.ExecuteInspectSource1Command()));
+            this.EditSourceYCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSourceY));
+            this.Disposables.Add(this.EditSourceYCommand.Subscribe(_ => this.ExecuteEditSourceYCommand()));
 
-            this.InspectSource2Command = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSource2));
-            this.Disposables.Add(this.InspectSource2Command.Subscribe(_ => this.ExecuteInspectSource2Command()));
+            this.EditSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSourceX));
+            this.Disposables.Add(this.EditSourceXCommand.Subscribe(_ => this.ExecuteEditSourceXCommand()));
+
+            this.InspectSourceYCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceY));
+            this.Disposables.Add(this.InspectSourceYCommand.Subscribe(_ => this.ExecuteInspectSourceYCommand()));
+
+            this.InspectSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceX));
+            this.Disposables.Add(this.InspectSourceXCommand.Subscribe(_ => this.ExecuteInspectSourceXCommand()));
 
             this.Disposables.Add(this.WhenAnyValue(x => x.Matrix.SelectedCell)
                 .Subscribe(_ => this.ComputeEditInspectCanExecute()));
@@ -387,37 +411,82 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
-            if (!this.Source1Configuration.SelectedClassKind.HasValue ||
-                !this.Source2Configuration.SelectedClassKind.HasValue ||
+            if (!this.SourceYConfiguration.SelectedClassKind.HasValue ||
+                !this.SourceXConfiguration.SelectedClassKind.HasValue ||
                 this.RelationshipConfiguration.SelectedRule == null)
             {
                 return;
             }
 
-            if (thing.ClassKind != this.Source1Configuration.SelectedClassKind.Value &&
-                thing.ClassKind != this.Source2Configuration.SelectedClassKind.Value)
+            if (thing.ClassKind != this.SourceYConfiguration.SelectedClassKind.Value &&
+                thing.ClassKind != this.SourceXConfiguration.SelectedClassKind.Value)
             {
                 return;
             }
 
             // thing is either ClassKind1 or ClassKind2
-            if (this.Source1Configuration.SelectedCategories.Count == 0 &&
-                this.Source2Configuration.SelectedCategories.Count == 0)
+            if (this.SourceYConfiguration.SelectedCategories.Count == 0 &&
+                this.SourceXConfiguration.SelectedCategories.Count == 0)
             {
                 this.BuildRelationshipMatrix();
             }
-            else if (thing.ClassKind == this.Source1Configuration.SelectedClassKind.Value &&
-                     this.Source1Configuration.SelectedCategories.Count > 0 ||
-                     thing.ClassKind == this.Source2Configuration.SelectedClassKind.Value &&
-                     this.Source2Configuration.SelectedCategories.Count > 0)
+            else if (thing.ClassKind == this.SourceYConfiguration.SelectedClassKind.Value &&
+                     this.SourceYConfiguration.SelectedCategories.Count > 0 ||
+                     thing.ClassKind == this.SourceXConfiguration.SelectedClassKind.Value &&
+                     this.SourceXConfiguration.SelectedCategories.Count > 0)
             {
                 if (thing is ICategorizableThing categorizable && (
-                        categorizable.Category.Intersect(this.Source1Configuration.SelectedCategories).Any() ||
-                        categorizable.Category.Intersect(this.Source2Configuration.SelectedCategories).Any()))
+                        IsCategoryApplicableToConfiguration(categorizable, this.SourceYConfiguration) ||
+                        IsCategoryApplicableToConfiguration(categorizable, this.SourceXConfiguration)))
                 {
                     this.BuildRelationshipMatrix();
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks if the <see cref="ICategorizableThing"/> has any categories that fall under the filter criteria
+        /// </summary>
+        /// <param name="thing">The <see cref="ICategorizableThing"/> to check</param>
+        /// <param name="sourceConfiguration">The <see cref="SourceConfigurationViewModel"/> that defines the parameters.</param>
+        /// <returns>True if the criteria is met.</returns>
+        public static bool IsCategoryApplicableToConfiguration(ICategorizableThing thing,
+            SourceConfigurationViewModel sourceConfiguration)
+        {
+            switch (sourceConfiguration.SelectedBooleanOperatorKind)
+            {
+                case CategoryBooleanOperatorKind.OR:
+                    // if subcategories should be selected, expan the list
+                    var allcategories = new List<Category>(sourceConfiguration.SelectedCategories);
+
+                    if (sourceConfiguration.IncludeSubctegories)
+                    {
+                        foreach (var category in sourceConfiguration.SelectedCategories)
+                        {
+                            allcategories.AddRange(category.AllDerivedCategories());
+                        }
+                    }
+
+                    return thing.Category.Intersect(allcategories).Any();
+                case CategoryBooleanOperatorKind.AND:
+                    var categoryLists = new List<bool>();
+
+                    foreach (var category in sourceConfiguration.SelectedCategories)
+                    {
+                        var categoryGroup = new List<Category> { category };
+
+                        if (sourceConfiguration.IncludeSubctegories)
+                        {
+                            categoryGroup.AddRange(category.AllDerivedCategories());
+                        }
+
+                        categoryLists.Add(thing.Category.Intersect(categoryGroup).Any());
+                    }
+
+                    return !categoryLists.Any(x => x == false);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -429,77 +498,77 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             if (vm == null)
             {
-                this.CanEditSource1 = false;
-                this.CanEditSource2 = false;
-                this.CanInspectSource1 = false;
-                this.CanInspectSource2 = false;
+                this.CanEditSourceY = false;
+                this.CanEditSourceX = false;
+                this.CanInspectSourceY = false;
+                this.CanInspectSourceX = false;
                 return;
             }
 
-            this.CanEditSource1 = vm.Source1 != null && this.PermissionService.CanWrite(vm.Source1);
-            this.CanEditSource2 = vm.Source2 != null && this.PermissionService.CanWrite(vm.Source2);
-            this.CanInspectSource1 = vm.Source1 != null;
-            this.CanInspectSource2 = vm.Source2 != null;
+            this.CanEditSourceY = vm.SourceY != null && this.PermissionService.CanWrite(vm.SourceY);
+            this.CanEditSourceX = vm.SourceX != null && this.PermissionService.CanWrite(vm.SourceX);
+            this.CanInspectSourceY = vm.SourceY != null;
+            this.CanInspectSourceX = vm.SourceX != null;
         }
 
         /// <summary>
         /// Executes the inspect command
         /// </summary>
-        private void ExecuteInspectSource1Command()
+        private void ExecuteInspectSourceYCommand()
         {
             var cell = this.Matrix.SelectedCell as MatrixCellViewModel;
 
-            if (cell?.Source1 == null)
+            if (cell?.SourceY == null)
             {
                 return;
             }
 
-            this.ExecuteInspectCommand(cell.Source1);
+            this.ExecuteInspectCommand(cell.SourceY);
         }
 
         /// <summary>
         /// Executes the inspect command
         /// </summary>
-        private void ExecuteInspectSource2Command()
+        private void ExecuteInspectSourceXCommand()
         {
             var cell = this.Matrix.SelectedCell as MatrixCellViewModel;
 
-            if (cell?.Source2 == null)
+            if (cell?.SourceX == null)
             {
                 return;
             }
 
-            this.ExecuteInspectCommand(cell.Source2);
+            this.ExecuteInspectCommand(cell.SourceX);
         }
 
         /// <summary>
         /// Executes the inspect command
         /// </summary>
-        private void ExecuteEditSource1Command()
+        private void ExecuteEditSourceYCommand()
         {
             var cell = this.Matrix.SelectedCell as MatrixCellViewModel;
 
-            if (cell?.Source1 == null)
+            if (cell?.SourceY == null)
             {
                 return;
             }
 
-            this.ExecuteUpdateCommand(cell.Source1);
+            this.ExecuteUpdateCommand(cell.SourceY);
         }
 
         /// <summary>
         /// Executes the inspect command
         /// </summary>
-        private void ExecuteEditSource2Command()
+        private void ExecuteEditSourceXCommand()
         {
             var cell = this.Matrix.SelectedCell as MatrixCellViewModel;
 
-            if (cell?.Source2 == null)
+            if (cell?.SourceX == null)
             {
                 return;
             }
 
-            this.ExecuteUpdateCommand(cell.Source2);
+            this.ExecuteUpdateCommand(cell.SourceX);
         }
     }
 }

@@ -8,6 +8,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 {
     using System;
     using CDP4Common.CommonData;
+    using CDP4Composition.Services;
     using ReactiveUI;
     using Settings;
 
@@ -22,13 +23,20 @@ namespace CDP4RelationshipMatrix.ViewModels
         private string header;
 
         /// <summary>
+        /// Backing field for <see cref="ToolTip"/>
+        /// </summary>
+        private string toolTip;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ColumnDefinition"/> class
         /// </summary>
         /// <param name="thing">The represented <see cref="Thing"/></param>
         /// <param name="displayKind">The <see cref="DisplayKind"/> of the column.</param>
         public ColumnDefinition(DefinedThing thing, DisplayKind displayKind)
         {
-            this.Header = displayKind == DisplayKind.Name ? thing.Name : thing.ShortName; 
+            this.RelationshipCount = 0;
+            this.Header = displayKind == DisplayKind.Name ? thing.Name : thing.ShortName;
+            this.ToolTip = thing.Tooltip();
             this.FieldName = thing.ShortName;
             this.ThingId = thing.Iid;
         }
@@ -38,8 +46,10 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         /// <param name="header">The header</param>
         /// <param name="fieldname">The field-name</param>
-        public ColumnDefinition(string header, string fieldname)
+        /// <param name="offsetCount">By offsetting count we keep this column from being filtered out even though it does not hold relationships.</param>
+        public ColumnDefinition(string header, string fieldname, bool offsetCount = false)
         {
+            this.RelationshipCount = offsetCount? -1 : 0;
             this.Header = header;
             this.FieldName = fieldname;
         }
@@ -59,8 +69,22 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets the tooltip to display
+        /// </summary>
+        public string ToolTip
+        {
+            get { return this.toolTip; }
+            private set { this.RaiseAndSetIfChanged(ref this.toolTip, value); }
+        }
+
+        /// <summary>
         /// Gets the name of the fieldname for this column
         /// </summary>
         public string FieldName { get; }
+
+        /// <summary>
+        /// Gets or sets the total count of relationships this column has.
+        /// </summary>
+        public int RelationshipCount { get; set; }
     }
 }

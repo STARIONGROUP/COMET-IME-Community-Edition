@@ -7,11 +7,11 @@
 namespace CDP4RelationshipMatrix.Behaviour
 {
     using System.Collections.Generic;
-    using System.Dynamic;
     using System.Linq;
     using System.Windows;
     using DevExpress.Mvvm.UI.Interactivity;
     using DevExpress.Xpf.Grid;
+    using ViewModels;
 
     /// <summary>
     /// An attached behaviour to add a selected-cell capability to the <see cref="GridControl"/>
@@ -76,12 +76,11 @@ namespace CDP4RelationshipMatrix.Behaviour
             this.SelectedCells = ((TableView) this.AssociatedObject.View).GetSelectedCells().Cast<object>().ToList();
 
             var firstCell = ((TableView) this.AssociatedObject.View).GetSelectedCells().FirstOrDefault();
-            var selectedRow = this.AssociatedObject.SelectedItem as ExpandoObject;
-            var dic = (IDictionary<string, object>) selectedRow;
+            var selectedRow = this.AssociatedObject.SelectedItem as IDictionary<string, MatrixCellViewModel>;
 
             this.SelectedCell =
-                firstCell?.Column.FieldName != null && dic != null &&
-                dic.TryGetValue(firstCell.Column.FieldName, out var output)
+                firstCell?.Column.FieldName != null && selectedRow != null &&
+                selectedRow.TryGetValue(firstCell.Column.FieldName, out var output)
                     ? output
                     : null;
         }

@@ -49,6 +49,21 @@ namespace CDP4RelationshipMatrix.ViewModels
         private List<Category> selectedCategories;
 
         /// <summary>
+        /// The possible choices of <see cref="CategoryBooleanOperatorKind"/>
+        /// </summary>
+        private readonly List<CategoryBooleanOperatorKind> possibleBooleanOperatorKinds = Enum.GetValues(typeof(CategoryBooleanOperatorKind)).Cast<CategoryBooleanOperatorKind>().ToList();
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedBooleanOperatorKind"/>
+        /// </summary>
+        private CategoryBooleanOperatorKind _selectedBooleanOperatorKind;
+
+        /// <summary>
+        /// Backing field for <see cref="IncludeSubctegories"/>
+        /// </summary>
+        private bool includeSubctegories;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SourceConfigurationViewModel"/> class
         /// </summary>
         /// <param name="session">The current session</param>
@@ -63,6 +78,10 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.PossibleCategories = new ReactiveList<Category>();
 
+            // default boolean operator is AND
+            this.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.AND;
+            this.IncludeSubctegories = true;
+
             this.WhenAnyValue(x => x.SelectedClassKind).Skip(1).Subscribe(_ =>
             {
                 this.PopulatePossibleCategories();
@@ -75,6 +94,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             });
 
             this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ => this.OnUpdateAction());
+            this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ => this.OnUpdateAction());
+            this.WhenAnyValue(x => x.IncludeSubctegories).Skip(1).Subscribe(_ => this.OnUpdateAction());
 
             var categorySubscription = CDPMessageBus.Current
                 .Listen<ObjectChangedEvent>(typeof(Category))
@@ -132,6 +153,29 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// If <see cref="SelectedClassKind"/> is null then all <see cref="Category"/> for <see cref="PossibleClassKinds"/> are used
         /// </remarks>
         public ReactiveList<Category> PossibleCategories { get; }
+
+        /// <summary>
+        /// Gets the possible <see cref="CategoryBooleanOperatorKind"/> that may be used to filter the categpries.
+        /// </summary>
+        public List<CategoryBooleanOperatorKind> PossibleBooleanOperatorKinds => this.possibleBooleanOperatorKinds;
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="CategoryBooleanOperatorKind"/>
+        /// </summary>
+        public CategoryBooleanOperatorKind SelectedBooleanOperatorKind
+        {
+            get { return this._selectedBooleanOperatorKind; }
+            set { this.RaiseAndSetIfChanged(ref this._selectedBooleanOperatorKind, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the the value indicating whether subcategories should be included
+        /// </summary>
+        public bool IncludeSubctegories
+        {
+            get { return this.includeSubctegories; }
+            set { this.RaiseAndSetIfChanged(ref this.includeSubctegories, value); }
+        }
 
         /// <summary>
         /// Populates the possible <see cref="Category"/>

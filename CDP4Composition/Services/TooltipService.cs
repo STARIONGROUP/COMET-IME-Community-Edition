@@ -33,23 +33,21 @@ namespace CDP4Composition.Services
         public static string Tooltip(this Thing thing)
         {
             var sb = new StringBuilder();
-            
-            var shortNamedThing = thing as IShortNamedThing;
-            if (shortNamedThing != null)
+
+            if (thing is IShortNamedThing shortNamedThing)
             {
                 sb.AppendLine($"Short Name: {shortNamedThing.ShortName}");
             }
 
-            var namedThing = thing as INamedThing;
-            if (namedThing != null)
+            if (thing is INamedThing namedThing)
             {
                 sb.AppendLine($"Name: {namedThing.Name}");
             }
 
-            var ownedThing = thing as IOwnedThing;
-            if (ownedThing != null)
+            if (thing is IOwnedThing ownedThing)
             {
-                var owner = string.Empty;
+                string owner;
+
                 if (ownedThing.Owner != null)
                 {
                     owner = ownedThing.Owner.ShortName;
@@ -57,23 +55,21 @@ namespace CDP4Composition.Services
                 else
                 {
                     owner = "NA";
-                    logger.Debug($"Owner if {thing.ClassKind} null");
+                    logger.Debug($"Owner of {thing.ClassKind} is null");
                 }
 
                 sb.AppendLine($"Owner: {owner}");
             }
 
-            var categorizableThing = thing as ICategorizableThing;
-            if (categorizableThing != null)
+            if (thing is ICategorizableThing categorizableThing)
             {
                 var categories = categorizableThing.Category.Any() ? string.Join(" ", categorizableThing.Category.OrderBy(x => x.ShortName).Select(x => x.ShortName)) : "-";
                 sb.AppendLine($"Category: {categories}");
             }
 
-            var modelCodeThing = thing as IModelCode;
-            if (modelCodeThing != null)
+            if (thing is IModelCode modelCodeThing)
             {
-                var modelCode = string.Empty;
+                string modelCode;
 
                 try
                 {
@@ -87,13 +83,12 @@ namespace CDP4Composition.Services
 
                 sb.AppendLine($"Model Code: {modelCode}");
             }
-            
-            var definedThing = thing as DefinedThing;
-            if (definedThing != null)
+
+            if (thing is DefinedThing definedThing)
             {
                 var definition = definedThing.Definition.FirstOrDefault();
                 sb.AppendLine(definition == null
-                    ? $"Definition : -"
+                    ? "Definition : -"
                     : $"Definition [{definition.LanguageCode}]: {definition.Content}");
             }
 

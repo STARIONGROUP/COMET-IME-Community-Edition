@@ -6,11 +6,13 @@
 
 namespace CDP4RelationshipMatrix.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Composition.Services;
     using ReactiveUI;
     using Settings;
 
@@ -58,15 +60,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="MatrixCellViewModel"/> class
         /// </summary>
-        /// <param name="source1">The row that represents the <see cref="Thing"/></param>
-        /// <param name="source2">The column that represents the <see cref="Thing"/></param>
+        /// <param name="sourceY">The row that represents the <see cref="Thing"/></param>
+        /// <param name="sourceX">The column that represents the <see cref="Thing"/></param>
         /// <param name="binaryRelationship">The current set of <see cref="BinaryRelationship"/></param>
         /// <param name="rule">The current <see cref="BinaryRelationshipRule"/></param>
         /// <param name="displayKind">The <see cref="DisplayKind"/> of the item.</param>
-        public MatrixCellViewModel(Thing source1, Thing source2, IReadOnlyList<BinaryRelationship> binaryRelationship, BinaryRelationshipRule rule, DisplayKind? displayKind = null)
+        public MatrixCellViewModel(Thing sourceY, Thing sourceX, IReadOnlyList<BinaryRelationship> binaryRelationship, BinaryRelationshipRule rule, DisplayKind? displayKind = null)
         {
-            this.Source1 = source1;
-            this.Source2 = source2;
+            this.SourceY = sourceY;
+            this.SourceX = sourceX;
             this.Rule = rule;
             this.Relationships = binaryRelationship ?? new List<BinaryRelationship>();
             this.DisplayKind = displayKind;
@@ -77,24 +79,25 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
             else
             {
-                this.RelationshipDirection = binaryRelationship.All(x => x.Source.Iid == source1.Iid)
+                this.RelationshipDirection = binaryRelationship.All(x => x.Source.Iid == sourceY.Iid)
                     ? RelationshipDirectionKind.RowThingToColumnThing
-                    : binaryRelationship.All(x => x.Source.Iid == source2.Iid)
+                    : binaryRelationship.All(x => x.Source.Iid == sourceX.Iid)
                         ? RelationshipDirectionKind.ColumnThingToRowThing
                         : RelationshipDirectionKind.BiDirectional;
-                this.BuildToolTip();
             }
+
+            this.BuildToolTip();
         }
 
         /// <summary>
         /// Gets the <see cref="Thing"/> in the row context
         /// </summary>
-        public Thing Source1 { get; }
+        public Thing SourceY { get; }
 
         /// <summary>
         /// Gets the <see cref="Thing"/> in the column context
         /// </summary>
-        public Thing Source2 { get; }
+        public Thing SourceX { get; }
 
         /// <summary>
         /// Gets the <see cref="BinaryRelationshipRule"/> in the current context
@@ -134,11 +137,31 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void BuildToolTip()
         {
+            if (this.SourceY == null)
+            {
+                // no content
+                this.Tooltip = string.Empty;
+                return;
+            }
+
+            if (this.SourceX == null)
+            {
+                // row header
+                this.Tooltip = this.SourceY.Tooltip();
+                return;
+            }
+
+            if (this.RelationshipDirection == RelationshipDirectionKind.None)
+            {
+                // no relationship
+                this.Tooltip = String.Empty;
+            }
+
             this.Tooltip = this.RelationshipDirection == RelationshipDirectionKind.RowThingToColumnThing
-                ? $"{this.Source1.UserFriendlyName} --({this.Rule.ForwardRelationshipName})--> {this.Source2.UserFriendlyName}"
+                ? $"{this.SourceY.UserFriendlyName} --({this.Rule.ForwardRelationshipName})--> {this.SourceX.UserFriendlyName}"
                 : this.RelationshipDirection == RelationshipDirectionKind.ColumnThingToRowThing
-                    ? $"{this.Source1.UserFriendlyName} <--({this.Rule.ForwardRelationshipName})-- {this.Source2.UserFriendlyName}"
-                    : $"{this.Source1.UserFriendlyName} <--({this.Rule.ForwardRelationshipName})--> {this.Source2.UserFriendlyName}";
+                    ? $"{this.SourceY.UserFriendlyName} <--({this.Rule.ForwardRelationshipName})-- {this.SourceX.UserFriendlyName}"
+                    : $"{this.SourceY.UserFriendlyName} <--({this.Rule.ForwardRelationshipName})--> {this.SourceX.UserFriendlyName}";
         }
     }
 }
