@@ -194,6 +194,7 @@
     <Compile Include="RelationshipMatrixModuleTestFixture.cs" />
     <Compile Include="Ribbon\RelationshipMatrixRibbonViewModelTestFixture.cs" />
     <Compile Include="Settings\RelationshipMatrixPluginSettingsTestFixture.cs" />
+    <Compile Include="ViewModel\RelationshipConfigurationViewModelTestFixture.cs" />
     <Compile Include="ViewModel\RelationshipMatrixViewModelTestFixture.cs" />
     <Compile Include="ViewModel\ViewModelTestBase.cs" />
   </ItemGroup>

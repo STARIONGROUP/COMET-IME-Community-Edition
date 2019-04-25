@@ -12,8 +12,9 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
-    using CDP4Dal.Events;
     using ReactiveUI;
 
     /// <summary>
@@ -24,20 +25,31 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Backing field for <see cref="SelectedRule"/>
         /// </summary>
-
         private BinaryRelationshipRule selectedRule;
+
+        /// <summary>
+        /// The <see cref="IThingDialogNavigationService"/> used to navigate to details dialog of a <see cref="Thing"/>
+        /// </summary>
+        private readonly IThingDialogNavigationService thingDialogNavigationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipConfigurationViewModel"/>
         /// </summary>
         /// <param name="session">The current session</param>
+        /// <param name="thingDialogNavigationService">
+        /// The <see cref="IThingDialogNavigationService"/> used to navigate to details dialog of a <see cref="Thing"/>
+        /// </param>
         /// <param name="iteration">The current iteration</param>
         /// <param name="action">The action to perform on update</param>
         /// <param name="settings">The module settings</param>
-        public RelationshipConfigurationViewModel(ISession session, Iteration iteration, Action action, RelationshipMatrixPluginSettings settings) : base(session, iteration, action, settings)
+        public RelationshipConfigurationViewModel(ISession session, IThingDialogNavigationService thingDialogNavigationService, Iteration iteration, Action action, RelationshipMatrixPluginSettings settings) : base(session, iteration, action, settings)
         {
+            this.thingDialogNavigationService = thingDialogNavigationService;
+
             this.PossibleRules = new ReactiveList<BinaryRelationshipRule>();
             this.WhenAnyValue(x => x.SelectedRule).Skip(1).Subscribe(_ => this.OnUpdateAction());
+
+            this.InitializeCommands();
         }
 
         /// <summary>
@@ -74,6 +86,30 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.PossibleRules.AddRange(rules.OrderBy(x => x.Name));
             this.SelectedRule = this.PossibleRules.FirstOrDefault(x => x == this.SelectedRule);
+        }
+
+        /// <summary>
+        /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the selected <see cref="BinaryRelationshipRule"/>
+        /// </summary>
+        public ReactiveCommand<object> InspectRuleCommand { get; protected set; }
+
+        /// <summary>
+        /// Initializes the <see cref="ICommand"/>s of this dialog
+        /// </summary>
+        private void InitializeCommands()
+        {
+            var canExecuteInpsectRuleCommand = this.WhenAny(vm => vm.SelectedRule, v => v.Value != null);
+            this.InspectRuleCommand = ReactiveCommand.Create(canExecuteInpsectRuleCommand);
+            this.InspectRuleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRule));
+        }
+
+        /// <summary>
+        /// Execute the Inspect command for a <see cref="Thing"/>
+        /// </summary>
+        /// <param name="thing">the <see cref="Thing"/> to inspect</param>
+        protected void ExecuteInspectCommand(Thing thing)
+        {
+            this.thingDialogNavigationService.Navigate(thing, null, this.Session, false, ThingDialogKind.Inspect, this.thingDialogNavigationService, thing.Container);
         }
     }
 }

@@ -118,7 +118,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.SourceXConfiguration =
                 new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, setting);
             this.RelationshipConfiguration =
-                new RelationshipConfigurationViewModel(session, iteration, this.BuildRelationshipMatrix, setting);
+                new RelationshipConfigurationViewModel(session, thingDialogNavigationService, iteration, this.BuildRelationshipMatrix, setting);
             this.Matrix = new MatrixViewModel(this.Session, this.Thing, setting);
 
             this.Disposables.Add(this.SourceYConfiguration);

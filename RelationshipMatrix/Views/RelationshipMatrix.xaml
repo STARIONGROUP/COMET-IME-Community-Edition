@@ -352,7 +352,16 @@
                                                             AllowNullInput="True"
                                                             AllowDefaultButton="True"
                                                             DisplayMember="Name" />
+                                                        
                                                     </dxlc:LayoutItem>
+
+                                                    <dxlc:LayoutItem Width="40" HorizontalAlignment="Right">
+
+                                                        <dx:SimpleButton Command="{Binding RelationshipConfiguration.InspectRuleCommand}"
+                                                                         Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                                                         ToolTip="Inspect the selected Rule"/>
+                                                    </dxlc:LayoutItem>
+
                                                 </dxlc:LayoutGroup>
                                                 <dxlc:LayoutGroup View="GroupBox"
                                                                   GroupBoxDisplayMode="Light"
