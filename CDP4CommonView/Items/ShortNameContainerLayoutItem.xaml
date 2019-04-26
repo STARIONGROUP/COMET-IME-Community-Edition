@@ -16,7 +16,7 @@
             <ColumnDefinition Width="35" />
         </Grid.ColumnDefinitions>
         <dxe:ComboBoxEdit Name="Container"
-                          DisplayMember="ShortName"
+                          DisplayMember="Name"
                           EditValue="{Binding Path=Container,
                                               Mode=TwoWay,
                                               UpdateSourceTrigger=PropertyChanged}"

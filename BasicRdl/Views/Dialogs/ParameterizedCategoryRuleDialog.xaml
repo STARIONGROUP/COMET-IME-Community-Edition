@@ -38,7 +38,7 @@
                             <ColumnDefinition Width="35" />
                         </Grid.ColumnDefinitions>
                         <dxe:ComboBoxEdit Name="Category"
-                                          DisplayMember="ShortName"
+                                          DisplayMember="Name"
                                           EditValue="{Binding Path=SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           IsReadOnly="{Binding IsReadOnly}"
                                           IsTextEditable="False"

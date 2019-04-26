@@ -57,7 +57,7 @@
                             <ColumnDefinition Width="35" />
                         </Grid.ColumnDefinitions>
                         <dxe:ComboBoxEdit Name="RelationshipCategory"
-                                          DisplayMember="ShortName"
+                                          DisplayMember="Name"
                                           EditValue="{Binding Path=SelectedRelationshipCategory,
                                                               Mode=TwoWay,
                                                               UpdateSourceTrigger=PropertyChanged}"
@@ -93,7 +93,7 @@
                             <ColumnDefinition Width="35" />
                         </Grid.ColumnDefinitions>
                         <dxe:ComboBoxEdit Name="SourceCategory"
-                                          DisplayMember="ShortName"
+                                          DisplayMember="Name"
                                           EditValue="{Binding Path=SelectedSourceCategory,
                                                               Mode=TwoWay,
                                                               UpdateSourceTrigger=PropertyChanged}"
@@ -129,7 +129,7 @@
                             <ColumnDefinition Width="35" />
                         </Grid.ColumnDefinitions>
                         <dxe:ComboBoxEdit Name="TargetCategory"
-                                          DisplayMember="ShortName"
+                                          DisplayMember="Name"
                                           EditValue="{Binding Path=SelectedTargetCategory,
                                                               Mode=TwoWay,
                                                               UpdateSourceTrigger=PropertyChanged}"

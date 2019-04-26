@@ -40,7 +40,7 @@
                             <ColumnDefinition Width="35" />
                         </Grid.ColumnDefinitions>
                         <dxe:ComboBoxEdit Name="ReferencingCategory"
-                                          DisplayMember="ShortName"
+                                          DisplayMember="Name"
                                           EditValue="{Binding Path=SelectedRelationshipCategory,
                                                               Mode=TwoWay,
                                                               UpdateSourceTrigger=PropertyChanged}"
@@ -63,7 +63,7 @@
                     <dxe:ListBoxEdit Name="ReferencedCategoryList"
                                      MaxHeight="250"
                                      Margin="10"
-                                     DisplayMember="ShortName"
+                                     DisplayMember="Name"
                                      EditValue="{Binding ReferencedCategory,
                                                          Converter={StaticResource ReactiveCategoryToObjectListConverter},
                                                          UpdateSourceTrigger=PropertyChanged}"

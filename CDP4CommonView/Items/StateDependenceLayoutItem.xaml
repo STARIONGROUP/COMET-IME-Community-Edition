@@ -6,7 +6,7 @@
                  xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                  xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 Label="State dependence:"
+                 Label="State Dependence:"
                  mc:Ignorable="d">
     <dxlc:LayoutItem.Resources>
     </dxlc:LayoutItem.Resources>
@@ -16,7 +16,7 @@
             <ColumnDefinition Width="35" />
         </Grid.ColumnDefinitions>
         <dxe:ComboBoxEdit Name="SelectedStateDependence"
-                          DisplayMember="ShortName"
+                          DisplayMember="Name"
                           EditValue="{Binding Path=SelectedStateDependence,
                                               Mode=TwoWay,
                                               UpdateSourceTrigger=PropertyChanged}"

@@ -62,7 +62,7 @@
                     <dxe:ListBoxEdit Name="SuperCategoriesList"
                                      MaxHeight="250"
                                      Margin="10"
-                                     DisplayMember="ShortName"
+                                     DisplayMember="Name"
                                      IsReadOnly="{Binding IsReadOnly}"
                                      EditValue="{Binding SuperCategory,
                                                          Converter={StaticResource ReactiveCategoryToObjectListConverter},

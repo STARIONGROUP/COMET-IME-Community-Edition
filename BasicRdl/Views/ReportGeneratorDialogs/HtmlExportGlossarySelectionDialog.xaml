@@ -19,7 +19,7 @@
         <dxlc:LayoutItem AddColonToLabel="True" Name="GlossarySelection"  Label="Glossary" ToolTip="Select a Glossary">
             <dxe:ComboBoxEdit ItemsSource="{Binding PossibleGlossaries}"
                               SelectedItem="{Binding SelectedGlossary, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              DisplayMember="ShortName"></dxe:ComboBoxEdit>
+                              DisplayMember="Name"></dxe:ComboBoxEdit>
         </dxlc:LayoutItem>
         <dxlc:LayoutItem AddColonToLabel="True" 
                                  LabelPosition="Left"

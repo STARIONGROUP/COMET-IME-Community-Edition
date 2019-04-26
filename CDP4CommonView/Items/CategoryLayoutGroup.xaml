@@ -23,7 +23,7 @@
                          HorizontalAlignment="Stretch"
                         Margin="10"
                         IsReadOnly="{Binding IsReadOnly}"
-                        DisplayMember="ShortName"
+                        DisplayMember="Name"
                         EditValue="{Binding Category,
                                             Converter={StaticResource ReactiveCategoryToObjectListConverter},
                                             UpdateSourceTrigger=PropertyChanged}"

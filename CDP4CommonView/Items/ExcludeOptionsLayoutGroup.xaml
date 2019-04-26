@@ -27,7 +27,7 @@
                         HorizontalAlignment="Stretch"
                         Margin="10"
                         IsReadOnly="{Binding IsReadOnly}"
-                        DisplayMember="ShortName"
+                        DisplayMember="Name"
                         EditValue="{Binding IncludeOption,
                                             Converter={StaticResource IncludeOptionListToObjectListConverter},
                                             UpdateSourceTrigger=PropertyChanged}"

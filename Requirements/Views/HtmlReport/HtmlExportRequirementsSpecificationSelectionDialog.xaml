@@ -34,7 +34,7 @@
         <dxlc:LayoutItem AddColonToLabel="True" Name="RequirementsSpecificationSelection"  Label="Requirements Specification" ToolTip="Select a Requirements Specification">
             <dxe:ComboBoxEdit ItemsSource="{Binding PossibleRequirementsSpecifications}"
                               SelectedItem="{Binding SelectedRequirementsSpecification, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              DisplayMember="ShortName"></dxe:ComboBoxEdit>
+                              DisplayMember="Name"></dxe:ComboBoxEdit>
         </dxlc:LayoutItem>
 
         <dxlc:LayoutItem AddColonToLabel="True" 

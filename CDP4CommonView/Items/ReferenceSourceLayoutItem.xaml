@@ -16,7 +16,7 @@
             <ColumnDefinition Width="35" />
         </Grid.ColumnDefinitions>
         <dxe:ComboBoxEdit Name="ReferenceSource"
-                          DisplayMember="ShortName"
+                          DisplayMember="Name"
                           EditValue="{Binding Path=SelectedSource,
                                               Mode=TwoWay,
                                                 ValidatesOnDataErrors=True,

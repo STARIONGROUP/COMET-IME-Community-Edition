@@ -63,7 +63,7 @@
                             <ColumnDefinition Width="35" />
                         </Grid.ColumnDefinitions>
                         <dxe:ComboBoxEdit Name="ContainingCategory"
-                                          DisplayMember="ShortName"
+                                          DisplayMember="Name"
                                           EditValue="{Binding Path=SelectedContainingCategory,
                                                               Mode=TwoWay,
                                                               UpdateSourceTrigger=PropertyChanged}"
@@ -104,7 +104,7 @@
                                     Margin="10"
                                      IsEnabled="{Binding HasLibrary}"
                                     IsReadOnly="{Binding IsReadOnly}"
-                                    DisplayMember="ShortName"
+                                    DisplayMember="Name"
                                     EditValue="{Binding ContainedCategory,
                                                         Converter={StaticResource ReactiveCategoryToObjectListConverter},
                                                         UpdateSourceTrigger=PropertyChanged}"

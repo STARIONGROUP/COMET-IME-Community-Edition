@@ -66,7 +66,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                         <dxe:ComboBoxEdit Name="Publisher"
                                           MinWidth="325"
-                                          DisplayMember="ShortName"
+                                          DisplayMember="Name"
                                           ItemsSource="{Binding Path=PossiblePublisher}"                                    
                                           EditValue="{Binding Path=SelectedPublisher, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           IsReadOnly="{Binding IsReadOnly}"
@@ -96,7 +96,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                         <dxe:ComboBoxEdit Name="PublishedIn"
                                           MinWidth="325"
-                                          DisplayMember="ShortName"
+                                          DisplayMember="Name"
                                           EditValue="{Binding Path=SelectedPublishedIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           IsReadOnly="{Binding IsReadOnly}"
                                           IsTextEditable="False"
