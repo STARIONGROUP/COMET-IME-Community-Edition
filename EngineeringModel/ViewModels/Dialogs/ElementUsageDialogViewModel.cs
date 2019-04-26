@@ -18,6 +18,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.Permission;
+    using CDP4EngineeringModel.ViewModels.Dialogs.Rows;
     using ReactiveUI;
 
     /// <summary>
@@ -98,11 +99,6 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="Category"/> instances of which the referenced <see cref="ElementDefinition"/> is a member.
-        /// </summary>
-        public List<Category> ElementDefinitionCategories { get; private set; }
-        
-        /// <summary>
         /// Gets or sets a value that represents the ModelCode of the current <see cref="ElementDefinition"/>
         /// </summary>
         public string ModelCode
@@ -111,6 +107,12 @@ namespace CDP4EngineeringModel.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
         }
         
+        /// <summary>
+        /// Gets the <see cref="List{CategoryRowViewModel}"/> that have been applied to both the referenced <see cref="ElementDefinition"/>
+        /// and the current <see cref="ElementUsage"/>
+        /// </summary>
+        public List<CategoryRowViewModel> AppliedCategories { get; private set; }
+
         /// <summary>
         /// Populate the possible <see cref="Category"/> for this <see cref="ElementUsage"/>
         /// </summary>
@@ -152,10 +154,21 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Populate the <see cref="Category"/> instances of the referenced <see cref="ElementDefinition"/>
         /// </summary>
-        private void PopulateElementDefinitionCategories()
+        private void PopulateAppliedCategories()
         {
-            var categories = this.Thing.ElementDefinition.Category;
-            this.ElementDefinitionCategories = new List<Category>(categories);
+            this.AppliedCategories = new List<CategoryRowViewModel>();
+
+            foreach (var category in this.Thing.ElementDefinition.Category.OrderBy(x => x.ShortName))
+            {
+                var categoryRowViewModel = new CategoryRowViewModel(category, this.Thing.ElementDefinition);
+                this.AppliedCategories.Add(categoryRowViewModel);
+            }
+
+            foreach (var category in this.Thing.Category.OrderBy(x => x.ShortName))
+            {
+                var categoryRowViewModel = new CategoryRowViewModel(category, this.Thing);
+                this.AppliedCategories.Add(categoryRowViewModel);
+            }
         }
         
         /// <summary>
@@ -166,7 +179,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.Initialize();
             this.PopulatePossibleCategories();
             this.PopulatePossibleOptions();
-            this.PopulateElementDefinitionCategories();
+            this.PopulateAppliedCategories();
         }
 
         /// <summary>

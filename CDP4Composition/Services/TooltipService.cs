@@ -63,8 +63,42 @@ namespace CDP4Composition.Services
 
             if (thing is ICategorizableThing categorizableThing)
             {
-                var categories = categorizableThing.Category.Any() ? string.Join(" ", categorizableThing.Category.OrderBy(x => x.ShortName).Select(x => x.ShortName)) : "-";
-                sb.AppendLine($"Category: {categories}");
+                if (!categorizableThing.Category.Any())
+                {
+                    sb.AppendLine($"Category: -");
+                }
+                else
+                {
+                    var categoryCounter = 1;
+                    foreach (var category in categorizableThing.Category)
+                    {
+                        var superCategoryShortNames = category.SuperCategory.Count != 0 ? " {" + string.Join(", ", category.SuperCategory.Select(x => x.ShortName)) + "}" : string.Empty;
+                        var categoryEntry = $"{category.ShortName}{superCategoryShortNames}";
+                        sb.AppendLine(categoryCounter == 1 ? $"Category: {categoryEntry}" : $"          {categoryEntry}");
+
+                        categoryCounter++;
+                    }
+                }
+
+                if (thing is ElementUsage elementUsage)
+                {
+                    if (elementUsage.ElementDefinition.Category.Count == 0)
+                    {
+                        sb.AppendLine($"ED Category: -");
+                    }
+                    else
+                    {
+                        var categoryCounter = 1;
+                        foreach (var category in elementUsage.ElementDefinition.Category)
+                        {
+                            var superCategoryShortNames = category.SuperCategory.Count != 0 ? " {" + string.Join(", ", category.SuperCategory.Select(x => x.ShortName)) + "}" : string.Empty;
+                            var categoryEntry = $"{category.ShortName}{superCategoryShortNames}";
+                            sb.AppendLine(categoryCounter == 1 ? $"ED Category: {categoryEntry}" : $"           {categoryEntry}");
+
+                            categoryCounter++;
+                        }
+                    }
+                }
             }
 
             if (thing is IModelCode modelCodeThing)

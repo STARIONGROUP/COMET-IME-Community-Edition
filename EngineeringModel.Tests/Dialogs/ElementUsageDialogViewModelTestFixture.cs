@@ -8,6 +8,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
@@ -137,7 +138,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.usageClone = this.usage.Clone(false);
             var vm = new ElementUsageDialogViewModel(this.usageClone, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.definition1Clone);
 
-            CollectionAssert.Contains(vm.ElementDefinitionCategories, productCategory);
+            Assert.That(vm.AppliedCategories.Any(x => x.Category == productCategory), Is.True); 
         }
 
         [Test]
@@ -151,7 +152,6 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         {
             Assert.Throws<InvalidOperationException>(() => new ElementUsageDialogViewModel(this.usageClone, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, null));
         }
-
 
         [Test]
         public void VerifyInspectReferencedElementDefinitionCommand()

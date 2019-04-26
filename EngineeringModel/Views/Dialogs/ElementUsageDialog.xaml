@@ -9,6 +9,13 @@
              xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+             xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              Height="450"
              d:DesignWidth="700"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -62,22 +69,47 @@
                                   Text="{Binding Path=ModelCode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                   IsReadOnly="True"/>
                 </lc:LayoutItem>
+                
+                <lc:LayoutItem MaxHeight="350" MaxWidth="700" Label="Applied Categories:" LabelPosition="Top">
+                    <dxg:GridControl 
+                         Name="AppliedCategoriesGridControl"
+                         AllowLiveDataShaping="False"
+                         ItemsSource="{Binding AppliedCategories}">
+                        
+                        <dxg:GridControl.View>
+                            <dxg:TableView Name="View"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           AllowColumnMoving="True"
+                                           AllowEditing="False"
+                                           AllowGrouping="True"
+                                           ShowFilterPanelMode="Never"
+                                           AutoWidth="true"
+                                           IsDetailButtonVisibleBinding="{x:Null}"
+                                           ShowGroupPanel="False">
+                                <dxg:TableView.FocusedRow>
+                                    <dynamic:ExpandoObject />
+                                </dxg:TableView.FocusedRow>                                
+                                <dxg:TableView.RowStyle>
+                                    <Style TargetType="{x:Type dxg:RowControl}">
+                                        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                                    </Style>
+                                </dxg:TableView.RowStyle>
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn FieldName="Name" Header="Name" />
+                            <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
+                            <dxg:GridColumn FieldName="SuperCategories" Header="Super Categories" />
+                            <dxg:GridColumn FieldName="ContainerRdl" Header="Container RDL" />
+                            <dxg:GridColumn FieldName="Level" Header="Level" />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </lc:LayoutItem>
+
             </lc:LayoutGroup>
             <items:ExcludeOptionsLayoutGroup />
             <items:CategoryLayoutGroup />
-
-            <lc:LayoutGroup Header="Definition Categories">
-                <dxe:ListBoxEdit Name="DefinitionCategoriesList"
-                                 MaxHeight="350"
-                                 Margin="10"
-                                 HorizontalAlignment="Stretch"
-                                 VerticalAlignment="Stretch"
-                                 DisplayMember="ShortName"
-                                 IsReadOnly="True"
-                                 ItemsSource="{Binding ElementDefinitionCategories}"
-                                 SelectionMode="Single" />
-            </lc:LayoutGroup>
-
             <items:AliasLayoutGroup />
             <items:DefinitionLayoutGroup />
             <items:HyperLinkLayoutGroup />

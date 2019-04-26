@@ -239,6 +239,7 @@
     <Compile Include="ViewModels\Dialogs\ParameterGroupDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ParameterOverrideDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\Rows\ActualFiniteStateRowViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\Rows\CategoryRowViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\Rows\DomainOfExpertiseRowViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\Rows\GroupSelectionViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\Rows\IDialogValueSetRow.cs" />

@@ -185,6 +185,7 @@
     <Compile Include="Dialogs\PossibleFiniteStateListDialogViewModelTestFixture.cs" />
     <Compile Include="Dialogs\PossibleFiniteStateDialogViewModelTestFixture.cs" />
     <Compile Include="Dialogs\ParameterOverrideDialogViewModelTestFixture.cs" />
+    <Compile Include="Dialogs\Rows\CategoryRowViewModelTestFixture.cs" />
     <Compile Include="Dialogs\Rows\ParameterBaseRowViewModelTestFixture.cs" />
     <Compile Include="Dialogs\Rows\ParameterComponentValueRowViewModelTestFixture.cs" />
     <Compile Include="Dialogs\Rows\ParameterOverrideRowViewModelTestFixture.cs" />
