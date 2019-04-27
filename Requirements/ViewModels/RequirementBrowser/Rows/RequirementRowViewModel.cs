@@ -19,6 +19,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.Types;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -184,28 +185,7 @@ namespace CDP4Requirements.ViewModels
         /// <param name="dropInfo">The <see cref="IDropInfo"/></param>
         private void DragOver(Category category, IDropInfo dropInfo)
         {
-            if (!this.Session.PermissionService.CanWrite(this.Thing))
-            {
-                logger.Info("Permission denied to perform the drop.");
-                dropInfo.Effects = DragDropEffects.None;
-                return;
-            }
-
-            if (!category.PermissibleClass.Contains(this.Thing.ClassKind))
-            {
-                logger.Info("The Category {0} can not be applied to this kind of Thing", category.ShortName);
-                dropInfo.Effects = DragDropEffects.None;
-                return;
-            }
-
-            if (this.Thing.Category.Contains(category))
-            {
-                logger.Info("The Category {0} has already been applied to this Thing", category.ShortName);
-                dropInfo.Effects = DragDropEffects.None;
-                return;
-            }
-
-            dropInfo.Effects = DragDropEffects.Copy;
+            dropInfo.Effects = CategoryApplicationValidationService.ValidateDragDrop(this.Session.PermissionService, this.Thing, category, logger);
         }
 
         /// <summary>

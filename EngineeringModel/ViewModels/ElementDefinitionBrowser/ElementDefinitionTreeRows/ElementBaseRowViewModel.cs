@@ -596,13 +596,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="category">The <see cref="Category"/> to drop</param>
         protected void DragOver(IDropInfo dropInfo, Category category)
         {
-            if (!this.PermissionService.CanWrite(this.Thing) || this.Thing.Category.Contains(category) || !category.PermissibleClass.Contains(this.Thing.ClassKind))
-            {
-                dropInfo.Effects = DragDropEffects.None;
-                return;
-            }
+            //if (!this.PermissionService.CanWrite(this.Thing) || this.Thing.Category.Contains(category) || !category.PermissibleClass.Contains(this.Thing.ClassKind))
+            //{
+            //    dropInfo.Effects = DragDropEffects.None;
+            //    return;
+            //}
 
-            dropInfo.Effects = DragDropEffects.Copy;
+            //dropInfo.Effects = DragDropEffects.Copy;
+
+            dropInfo.Effects = CategoryApplicationValidationService.ValidateDragDrop(this.Session.PermissionService, this.Thing, category, logger);
         }
 
         /// <summary>

@@ -1,22 +1,27 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="PossibleFiniteStateListRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
     using System.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
 
     /// <summary>
     /// A row representing a <see cref="PossibleFiniteStateList"/>
     /// </summary>
-    public class PossibleFiniteStateListRowViewModel : CDP4CommonView.PossibleFiniteStateListRowViewModel
+    public class PossibleFiniteStateListRowViewModel : CDP4CommonView.PossibleFiniteStateListRowViewModel, IDropTarget
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PossibleFiniteStateListRowViewModel"/> class
@@ -30,7 +35,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateProperties();
         }
 
-        #region RowBase
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -40,7 +44,6 @@ namespace CDP4EngineeringModel.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
 
         /// <summary>
         /// Updates the properties of this row on the update of the current <see cref="Thing"/>
@@ -93,6 +96,45 @@ namespace CDP4EngineeringModel.ViewModels
             if (!this.Thing.PossibleState.SequenceEqual(this.ContainedRows.Select(x => x.Thing)))
             {
                 this.ContainedRows.Sort((c1, c2) => this.Thing.PossibleState.FindIndex(c => c.Iid == c1.Thing.Iid) - this.Thing.PossibleState.FindIndex(c => c.Iid == c2.Thing.Iid));
+            }
+        }
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            if (dropInfo.Payload is Category category)
+            {
+                dropInfo.Effects = CategoryApplicationValidationService.ValidateDragDrop(this.Session.PermissionService, this.Thing, category, logger);
+                return;
+            }
+
+            dropInfo.Effects = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            var category = dropInfo.Payload as Category;
+            if (category != null)
+            {
+                var clone = this.Thing.Clone(false);
+                clone.Category.Add(category);
+                await this.DalWrite(clone);
             }
         }
     }

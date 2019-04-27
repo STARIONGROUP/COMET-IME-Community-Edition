@@ -49,6 +49,7 @@
                                                                             UpdateSourceTrigger=PropertyChanged}">
             <i:Interaction.Behaviors>
                 <dragDrop:FrameworkElementDragBehavior />
+                <dragDrop:FrameworkElementDropBehavior />
             </i:Interaction.Behaviors>
             <dxmvvm:Interaction.Behaviors>
                 <cdp4Composition:ContextMenuBehavior />

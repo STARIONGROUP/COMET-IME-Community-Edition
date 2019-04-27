@@ -36,38 +36,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     [TestFixture]
     public class ElementDefinitionRowViewModelTestFixture
     {
-        /// <summary>
-        /// A mock of the session.
-        /// </summary>
         private Mock<ISession> session;
-        
-        /// <summary>
-        /// A mock of the <see cref="IPermissionService"/>
-        /// </summary>
         private Mock<IPermissionService> permissionService;
-
-        /// <summary>
-        /// A mock of <see cref="IThingDialogNavigationService"/>
-        /// </summary>
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
-
         private Mock<IDialogNavigationService> dialogNavigationService;
-
-        /// <summary>
-        /// A mock of <see cref="IThingCreator"/>
-        /// </summary>
         private Mock<IThingCreator> thingCreator;
-        
-        /// <summary>
-        /// The uri.
-        /// </summary>
         private Uri uri;
-
-        /// <summary>
-        /// The iteration.
-        /// </summary>
         private Iteration iteration;
-
+        private ModelReferenceDataLibrary modelReferenceDataLibrary;
         private Assembler assembler;
 
         [SetUp]
@@ -84,20 +60,25 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.thingCreator = new Mock<IThingCreator>();
 
-            var sitedir = new SiteDirectory();
+            var siteDirectory = new SiteDirectory();
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var iterationsetup = new IterationSetup();
-            var engModel = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            modelSetup.IterationSetup.Add(iterationsetup);
+            var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) {EngineeringModelSetup = engineeringModelSetup};            
+            engineeringModelSetup.IterationSetup.Add(iterationsetup);
 
+            var siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            siteDirectory.SiteReferenceDataLibrary.Add(siteReferenceDataLibrary);
+            this.modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) {RequiredRdl = siteReferenceDataLibrary};
+            engineeringModelSetup.RequiredRdl.Add(this.modelReferenceDataLibrary);
+            
             var person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "test", Surname = "test" };
             var participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = person };
-            modelSetup.Participant.Add(participant);
-            engModel.EngineeringModelSetup = modelSetup;
+            engineeringModelSetup.Participant.Add(participant);
+            
             this.session.Setup(x => x.ActivePerson).Returns(person);
             this.iteration = new Iteration(Guid.NewGuid(), null, this.uri) {IterationSetup = iterationsetup};
-            engModel.Iteration.Add(this.iteration);
-            sitedir.Model.Add(modelSetup);
+            engineeringModel.Iteration.Add(this.iteration);
+            siteDirectory.Model.Add(engineeringModelSetup);
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, participant)}});
@@ -228,8 +209,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
-            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) {ShortName = "PROD", Name = "Products"};
             category.PermissibleClass.Add(ClassKind.ElementDefinition);
+            this.modelReferenceDataLibrary.DefinedCategory.Add(category);
 
             this.iteration.Element.Add(elementDefinition);
 
@@ -242,8 +224,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             row.DragOver(dropInfo.Object);
 
-            Assert.AreEqual(dropInfo.Object.Effects, DragDropEffects.Copy);
-
+            Assert.That(dropInfo.Object.Effects, Is.EqualTo(DragDropEffects.Copy));
+            
             row.Drop(dropInfo.Object);
             Assert.IsFalse(row.HasError);
         }
@@ -277,6 +259,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             category.PermissibleClass.Add(ClassKind.ElementDefinition);
             elementDefinition.Category.Add(category);
+
+            this.iteration.Element.Add(elementDefinition);
+
+            this.modelReferenceDataLibrary.DefinedCategory.Add(category);
 
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
 

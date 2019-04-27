@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReferenceSourceBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,22 +9,31 @@ namespace BasicRdl.ViewModels
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using NLog;
     using ReactiveUI;
 
     /// <summary>
     /// The purpose of the <see cref="ReferenceSourceBrowserViewModel"/> is to represent the view-model for <see cref="ReferenceSource"/>s
     /// </summary>
-    public class ReferenceSourceBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class ReferenceSourceBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget
     {
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -49,8 +58,8 @@ namespace BasicRdl.ViewModels
         public ReferenceSourceBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, {this.Thing.Name}";
+            this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.ReferenceSources.ChangeTrackingEnabled = true;
 
@@ -216,6 +225,55 @@ namespace BasicRdl.ViewModels
                 if (referenceSource.ContainerRdl != rdl.ShortName)
                 {
                     referenceSource.ContainerRdl = rdl.ShortName;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            logger.Trace("drag over {0}", dropInfo.TargetItem);
+            var droptarget = dropInfo.TargetItem as IDropTarget;
+            if (droptarget != null)
+            {
+                droptarget.DragOver(dropInfo);
+            }
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            var droptarget = dropInfo.TargetItem as IDropTarget;
+            if (droptarget != null)
+            {
+                try
+                {
+                    this.IsBusy = true;
+                    await droptarget.Drop(dropInfo);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                    this.Feedback = ex.Message;
+                }
+                finally
+                {
+                    this.IsBusy = false;
                 }
             }
         }

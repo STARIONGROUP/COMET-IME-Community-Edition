@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GlossaryRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,6 +15,7 @@ namespace BasicRdl.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -24,14 +25,11 @@ namespace BasicRdl.ViewModels
     /// </summary>
     public class GlossaryRowViewModel : CDP4CommonView.GlossaryRowViewModel, IDropTarget
     {
-        #region Fields
         /// <summary>
         /// Backing field for <see cref="ContainerRdlShortName"/>
         /// </summary>
         private string containerRdlShortName;
-        #endregion
-
-        #region Constructors
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="GlossaryRowViewModel"/> class. 
         /// </summary>
@@ -47,9 +45,7 @@ namespace BasicRdl.ViewModels
         {
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Properties
+        
         /// <summary>
         /// Gets or sets the Container RDL ShortName.
         /// </summary>
@@ -58,9 +54,7 @@ namespace BasicRdl.ViewModels
             get { return this.containerRdlShortName; }
             set { this.RaiseAndSetIfChanged(ref this.containerRdlShortName, value); }
         }
-        #endregion
-
-        #region RowViewModelBase Implementation
+        
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -73,9 +67,7 @@ namespace BasicRdl.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
-
-        #region IDropTarget
+        
         /// <summary>
         /// Updates the current drag state.
         /// </summary>
@@ -89,6 +81,12 @@ namespace BasicRdl.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
+            if (dropInfo.Payload is Category category)
+            {
+                dropInfo.Effects = CategoryApplicationValidationService.ValidateDragDrop(this.Session.PermissionService, this.Thing, category, logger);
+                return;
+            }
+
             var termPayload = dropInfo.Payload as Term;
             var canDropTerm = this.PermissionService.CanWrite(ClassKind.Term, this.Thing);
 
@@ -134,6 +132,14 @@ namespace BasicRdl.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
+            if (dropInfo.Payload is Category category)
+            {
+                var clone = this.Thing.Clone(false);
+                clone.Category.Add(category);
+                await this.DalWrite(clone);
+                return;
+            }
+
             var termPayload = dropInfo.Payload as Term;
             if (termPayload == null)
             {
@@ -151,15 +157,14 @@ namespace BasicRdl.ViewModels
 
                 transaction.CreateOrUpdate(currentGlossary);
                 await this.DalWrite(transaction);
+                return;
             }
             else if (dropInfo.Effects == DragDropEffects.Copy)
             {
                 throw new NotImplementedException("drag and drop on a different data-source is not implemented yet.");
             }
         }
-        #endregion
 
-        #region Own Private Methods
         /// <summary>
         /// Updates the columns values
         /// </summary>
@@ -219,6 +224,5 @@ namespace BasicRdl.ViewModels
                 row.Dispose();
             }
         }
-        #endregion
     }
 }

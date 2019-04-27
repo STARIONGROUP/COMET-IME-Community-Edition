@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,11 +8,13 @@ namespace BasicRdl.ViewModels
 {
     using System;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -20,9 +22,8 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// A row view model that represents a <see cref="ParameterType"/>
     /// </summary>
-    public class ParameterTypeRowViewModel : CDP4CommonView.ParameterTypeRowViewModel<ParameterType>
+    public class ParameterTypeRowViewModel : CDP4CommonView.ParameterTypeRowViewModel<ParameterType>, IDropTarget
     {
-        #region field
         /// <summary>
         /// The subscription for the default scale
         /// </summary>
@@ -47,9 +48,7 @@ namespace BasicRdl.ViewModels
         /// Backing field for the is base quantity kind.
         /// </summary>
         private bool isBaseQuantityKind;
-        #endregion
-
-        #region constructor
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeRowViewModel"/> class.
         /// </summary>
@@ -65,9 +64,7 @@ namespace BasicRdl.ViewModels
         {
             this.UpdateProperties();
         }
-        #endregion
-
-        #region properties
+        
         /// <summary>
         /// Gets or sets the default scale of the referenced <see cref="ParameterType"/>
         /// </summary>
@@ -126,7 +123,6 @@ namespace BasicRdl.ViewModels
                 this.RaiseAndSetIfChanged(ref this.isBaseQuantityKind, value);
             }
         }
-        #endregion
 
         /// <summary>
         /// Updates the properties of the current view-model
@@ -217,6 +213,55 @@ namespace BasicRdl.ViewModels
             var payload = new Tuple<ParameterType, MeasurementScale>(this.Thing, scale);
             dragInfo.Payload = payload;
             dragInfo.Effects = DragDropEffects.Copy;
+        }
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            if (dropInfo.Payload is Category category)
+            {
+                dropInfo.Effects = CategoryApplicationValidationService.ValidateDragDrop(this.Session.PermissionService, this.Thing, category, logger);
+                return;
+            }
+
+            dropInfo.Effects = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            var category = dropInfo.Payload as Category;
+            if (category != null)
+            {
+                await this.Drop(category);
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Handles the drop action of a <see cref="Category"/>
+        /// </summary>
+        /// <param name="category">The dropped <see cref="Category"/></param>
+        private async Task Drop(Category category)
+        {
+            var clone = this.Thing.Clone(false);
+            clone.Category.Add(category);
+            await this.DalWrite(clone);
         }
     }
 }

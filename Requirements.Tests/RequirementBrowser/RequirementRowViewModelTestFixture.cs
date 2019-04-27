@@ -33,8 +33,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private Mock<IPermissionService> permissionService;
         private readonly PropertyInfo revision = typeof (Thing).GetProperty("RevisionNumber");
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private SiteDirectory siteDirectory;
         private EngineeringModel model;
         private EngineeringModelSetup modelSetup;
+        private ModelReferenceDataLibrary modelReferenceDataLibrary;
+        private SiteReferenceDataLibrary siteReferenceDataLibrary;
         private Iteration iteration;
         private IterationSetup iterationSetup;
         private RequirementsSpecification reqSpec;
@@ -59,8 +62,16 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
 
+            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteReferenceDataLibrary);
+
+            this.modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { RequiredRdl = this.siteReferenceDataLibrary };
+
             this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "model" };
+            this.modelSetup.RequiredRdl.Add(this.modelReferenceDataLibrary);
+            
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "rs1", ShortName = "1"};
@@ -194,6 +205,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             
             var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             category.PermissibleClass.Add(ClassKind.Requirement);
+
+            this.modelReferenceDataLibrary.DefinedCategory.Add(category);
 
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(category);

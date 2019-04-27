@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="OptionBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,7 +11,9 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
     using CDP4Common.CommonData;
+    using CDP4Composition.DragDrop;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
@@ -22,12 +24,13 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4EngineeringModel.Views;
     using ReactiveUI;
 
     /// <summary>
     /// The view-model for the <see cref="OptionBrowser"/> view
     /// </summary>
-    public class OptionBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
+    public class OptionBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget
     {
         /// <summary>
         /// The row associated to the default <see cref="Option"/>
@@ -339,6 +342,59 @@ namespace CDP4EngineeringModel.ViewModels
 
             transaction.CreateOrUpdate(clone);
             await this.DalWrite(transaction);
+        }
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            logger.Trace("drag over {0}", dropInfo.TargetItem);
+            var droptarget = dropInfo.TargetItem as IDropTarget;
+            if (droptarget == null)
+            {
+                dropInfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            droptarget.DragOver(dropInfo);
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            var droptarget = dropInfo.TargetItem as IDropTarget;
+            if (droptarget == null)
+            {
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+                await droptarget.Drop(dropInfo);
+            }
+            catch (Exception ex)
+            {
+                this.Feedback = ex.Message;
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
         }
     }
 }

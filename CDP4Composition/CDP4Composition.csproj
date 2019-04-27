@@ -51,8 +51,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.3.1.0\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=3.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.3.2.0\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4Dal, Version=5.0.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -271,6 +271,7 @@
     <Compile Include="Navigation\Interfaces\IFloatingDialogViewModel.cs" />
     <Compile Include="Navigation\Interfaces\IOpenSaveFileDialogService.cs" />
     <Compile Include="Navigation\OpenSaveFileDialogService.cs" />
+    <Compile Include="Services\CategoryApplicationValidationService.cs" />
     <Compile Include="Services\GridUpdateService.cs" />
     <Compile Include="Services\IconCacheService\IconCacheService.cs" />
     <Compile Include="Services\IconCacheService\IIconCacheService.cs" />

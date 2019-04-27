@@ -51,6 +51,7 @@
             </dxmvvm:Interaction.Behaviors>
             <i:Interaction.Behaviors>
                 <dragDrop:FrameworkElementDragBehavior />
+                <dragDrop:FrameworkElementDropBehavior />
             </i:Interaction.Behaviors>
             <dxg:GridControl.View>
                 <dxg:TableView Name="View"

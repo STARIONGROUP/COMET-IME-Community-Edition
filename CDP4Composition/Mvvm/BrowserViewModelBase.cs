@@ -5,6 +5,8 @@
 // -------------------------------------------------------------------------------------------------
 
 
+using CDP4Common.SiteDirectoryData;
+
 namespace CDP4Composition.Mvvm
 {
     using System;
@@ -754,8 +756,6 @@ namespace CDP4Composition.Mvvm
             }
         }
 
-
-
         /// <summary>
         /// Executes the collapse rows logic
         /// </summary>
@@ -855,9 +855,67 @@ namespace CDP4Composition.Mvvm
                 this.ContextMenu.Add(new ContextMenuItemViewModel(deprecableThing.IsDeprecated? "Un-Deprecate" : "Deprecate" , "", this.DeprecateCommand, MenuItemKind.Deprecate));
             }
 
+            var categorizableThing = this.SelectedThing.Thing as ICategorizableThing;
+            if (categorizableThing != null && categorizableThing.Category.Any())
+            {
+                var categoriesMenu = new ContextMenuItemViewModel("Categories", "", null, MenuItemKind.None);
+
+                foreach (var category in categorizableThing.Category)
+                {
+                    var removeCategory = new ContextMenuItemViewModel($" Remove {category.Name} [{category.ShortName}]", "", this.RemoveCategoryFromSelectedThing, category, this.PermissionService.CanWrite(this.SelectedThing.Thing), MenuItemKind.Edit);
+                    categoriesMenu.SubMenu.Add(removeCategory);
+                }
+
+                this.ContextMenu.Add(categoriesMenu);
+            }
+
             this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
                     new ContextMenuItemViewModel("Collapse Rows","", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
                      new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+        }
+
+        /// <summary>
+        /// removes the <see cref="Category"/> from the selected <see cref="ICategorizableThing"/>
+        /// </summary>
+        /// <param name="category">
+        /// The <see cref="Category"/> that is to be removed,
+        /// </param>
+        private async void RemoveCategoryFromSelectedThing(Thing category)
+        {
+            if (!(category is Category categoryToRemove))
+            {
+                return;
+            }
+
+            if (!(this.SelectedThing.Thing is ICategorizableThing))
+            {
+                return;
+            }
+
+            var clone = this.SelectedThing.Thing.Clone(false);
+            var categorizableClone = clone as ICategorizableThing;
+            categorizableClone.Category.Remove(categoryToRemove);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
+            var transaction = new ThingTransaction(transactionContext, clone);
+
+            transaction.CreateOrUpdate(clone);
+
+            try
+            {
+                this.IsBusy = true;
+                await this.Session.Write(transaction.FinalizeTransaction());
+                logger.Info("Category {0} removed from from {1}", categoryToRemove.ShortName, this.SelectedThing.Thing.ClassKind);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "An error was produced when removing Category {0} from {1}", categoryToRemove.ShortName, this.SelectedThing.Thing.ClassKind);
+                this.Feedback = ex.Message;
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
         }
 
         /// <summary>
