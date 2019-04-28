@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSheetGeneratorRibbonPart.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -200,13 +200,13 @@ namespace CDP4ParameterSheetGenerator
                 case "SynchronizeSubscriptions":
                     break;
                 case "SubmitAll":
-                    this.SubmitAll();
+                    await this.SubmitAll();
                     break;
                 case "SubmitParameters":
-                    this.SubmitParameters();
+                    await this.SubmitParameters();
                     break;
                 case "SubmitSubscriptions":
-                    this.SubmitParameterSubscriptions();
+                    await this.SubmitParameterSubscriptions();
                     break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
@@ -480,7 +480,7 @@ namespace CDP4ParameterSheetGenerator
         /// <summary>
         /// Submit the parameter value sets that have changed on the Parameter sheet of the active workbook.
         /// </summary>
-        private void SubmitParameters()
+        private async Task SubmitParameters()
         {
             var application = this.officeApplicationWrapper.Excel;
 
@@ -507,7 +507,7 @@ namespace CDP4ParameterSheetGenerator
             try
             {
                 var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService);
-                workbookOperator.SubmitOutput(this.Session, iteration);
+                await workbookOperator.SubmitOutput(this.Session, iteration);
             }
             catch (Exception ex)
             {
@@ -518,7 +518,7 @@ namespace CDP4ParameterSheetGenerator
         /// <summary>
         /// Submit the subscription value sets that have changed on the Parameter sheet of the active workbook.
         /// </summary>
-        private void SubmitParameterSubscriptions()
+        private async Task SubmitParameterSubscriptions()
         {
             var application = this.officeApplicationWrapper.Excel;
 
@@ -545,7 +545,7 @@ namespace CDP4ParameterSheetGenerator
             try
             {
                 var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService);
-                workbookOperator.SubmitInput(this.Session, iteration);
+                await workbookOperator.SubmitInput(this.Session, iteration);
             }
             catch (Exception ex)
             {
@@ -556,7 +556,7 @@ namespace CDP4ParameterSheetGenerator
         /// <summary>
         /// Submit all values sets that have changed on the parameter sheet of the active workbook
         /// </summary>
-        private void SubmitAll()
+        private async Task SubmitAll()
         {
             var application = this.officeApplicationWrapper.Excel;
 
@@ -583,7 +583,7 @@ namespace CDP4ParameterSheetGenerator
             try
             {
                 var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService);
-                workbookOperator.SubmitAll(this.Session, iteration);
+                await workbookOperator.SubmitAll(this.Session, iteration);
             }
             catch (Exception ex)
             {

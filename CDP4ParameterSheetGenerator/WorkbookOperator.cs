@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="WorkbookOperator.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,7 +14,6 @@ namespace CDP4ParameterSheetGenerator
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Validation;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -207,7 +206,7 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="iteration">
         /// The <see cref="Iteration"/> that that contains the value sets that value-sets that if changed need to be submitted.
         /// </param>
-        public async void SubmitOutput(ISession session, Iteration iteration)
+        public async Task SubmitOutput(ISession session, Iteration iteration)
         {
             this.application.StatusBar = string.Empty;
 
@@ -317,7 +316,7 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="iteration">
         /// The <see cref="Iteration"/> that that contains the value sets that value-sets that if changed need to be submitted.
         /// </param>
-        public async void SubmitInput(ISession session, Iteration iteration)
+        public async Task SubmitInput(ISession session, Iteration iteration)
         {
             this.application.StatusBar = string.Empty;
 
@@ -425,7 +424,7 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="iteration">
         /// The <see cref="Iteration"/> that that contains the value sets that value-sets that if changed need to be submitted.
         /// </param>
-        public async void SubmitAll(ISession session, Iteration iteration)
+        public async Task SubmitAll(ISession session, Iteration iteration)
         {
             this.application.StatusBar = string.Empty;
 
