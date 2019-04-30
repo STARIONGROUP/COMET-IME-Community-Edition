@@ -81,7 +81,6 @@
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
                                            AllowColumnMoving="True"
-                                           DisplayMember="Name"
                                            AllowEditing="False"
                                            AllowGrouping="True"
                                            ShowFilterPanelMode="Never"
