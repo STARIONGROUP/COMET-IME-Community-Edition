@@ -131,7 +131,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <dx:LoadingDecorator IsSplashScreenShown="{Binding IsBusy}"
+    <dx:LoadingDecorator IsSplashScreenShown="{Binding HasUpdateStarted}"
                          OwnerLock="LoadingContent"
                          BorderEffect="Default"
                          BorderEffectColor="Blue">
@@ -284,6 +284,18 @@
                                                             ItemsSource="{Binding SourceXConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             />
                                                     </dxlc:LayoutItem>
+                                                </dxlc:LayoutGroup>
+                                                <dxlc:LayoutGroup View="Group" GroupBoxDisplayMode="Light"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  IsCollapsible="False"
+                                                                  Orientation="Horizontal">
+                                                    <dxlc:LayoutItem>
+                                                        <dx:SimpleButton Width="40"
+                                                                         Command="{Binding SwitchAxisCommand}"
+                                                                         ToolTip="Switch Axis"
+                                                                         Glyph="{dx:DXImage Image=SwitchRowColumn_16x16.png}"/>
+                                                    </dxlc:LayoutItem>
+
                                                 </dxlc:LayoutGroup>
                                                 <dxlc:LayoutGroup GroupBoxDisplayMode="Light"
                                                                   HorizontalAlignment="Stretch"

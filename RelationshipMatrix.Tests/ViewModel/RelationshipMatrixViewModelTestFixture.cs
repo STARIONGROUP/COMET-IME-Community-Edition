@@ -89,6 +89,11 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
+            vm.SwitchAxisCommand.Execute(null);
+
+            Assert.AreEqual(2, vm.Matrix.Records.Count);
+            Assert.AreEqual(2, vm.Matrix.Columns.Count);
+
             vm.Dispose();
         }
     }

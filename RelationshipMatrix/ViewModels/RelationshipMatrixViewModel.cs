@@ -90,6 +90,16 @@ namespace CDP4RelationshipMatrix.ViewModels
         private bool showRelatedOnly;
 
         /// <summary>
+        /// Backing field for <see cref="SourceYConfiguration"/>
+        /// </summary>
+        private SourceConfigurationViewModel sourceYConfiguration;
+
+        /// <summary>
+        /// Backing field for <see cref="SourceXConfiguration"/>
+        /// </summary>
+        private SourceConfigurationViewModel sourceXConfiguration;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel"/> class
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration"/></param>
@@ -158,12 +168,20 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets the <see cref="SourceConfigurationViewModel"/> to configure the first kind of sources
         /// </summary>
-        public SourceConfigurationViewModel SourceYConfiguration { get; private set; }
+        public SourceConfigurationViewModel SourceYConfiguration
+        {
+            get { return this.sourceYConfiguration; }
+            private set { this.RaiseAndSetIfChanged(ref this.sourceYConfiguration, value); }
+        }
 
         /// <summary>
         /// Gets the <see cref="SourceConfigurationViewModel"/> to configure the second kind of sources
         /// </summary>
-        public SourceConfigurationViewModel SourceXConfiguration { get; private set; }
+        public SourceConfigurationViewModel SourceXConfiguration
+        {
+            get { return this.sourceXConfiguration; }
+            private set { this.RaiseAndSetIfChanged(ref this.sourceXConfiguration, value); }
+        }
 
         /// <summary>
         /// Gets the <see cref="RelationshipConfigurationViewModel"/> to configure the kind of <see cref="BinaryRelationship"/> to display
@@ -230,6 +248,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Gets the command to inspect the current column thing
         /// </summary>
         public ReactiveCommand<object> InspectSourceXCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command to switch axis
+        /// </summary>
+        public ReactiveCommand<object> SwitchAxisCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets whether directionality is displayed
@@ -391,6 +414,9 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.InspectSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceX));
             this.Disposables.Add(this.InspectSourceXCommand.Subscribe(_ => this.ExecuteInspectSourceXCommand()));
 
+            this.SwitchAxisCommand = ReactiveCommand.Create();
+            this.Disposables.Add(this.SwitchAxisCommand.Subscribe(_ => this.ExecuteSwitchAxisCommand()));
+
             this.Disposables.Add(this.WhenAnyValue(x => x.Matrix.SelectedCell)
                 .Subscribe(_ => this.ComputeEditInspectCanExecute()));
         }
@@ -509,6 +535,20 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.CanEditSourceX = vm.SourceX != null && this.PermissionService.CanWrite(vm.SourceX);
             this.CanInspectSourceY = vm.SourceY != null;
             this.CanInspectSourceX = vm.SourceX != null;
+        }
+
+        /// <summary>
+        /// Executes the switch axis command
+        /// </summary>
+        private void ExecuteSwitchAxisCommand()
+        {
+            var currentSourceX = this.SourceXConfiguration;
+            var currentSourceY = this.SourceYConfiguration;
+
+            this.SourceYConfiguration = currentSourceX;
+            this.SourceXConfiguration = currentSourceY;
+
+            this.BuildRelationshipMatrix();
         }
 
         /// <summary>
