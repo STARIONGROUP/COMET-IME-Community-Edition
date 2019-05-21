@@ -444,8 +444,8 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
-            if (thing.ClassKind != this.SourceYConfiguration.SelectedClassKind.Value &&
-                thing.ClassKind != this.SourceXConfiguration.SelectedClassKind.Value)
+            if (!this.IsClassKindValidForRebuild(thing.ClassKind, this.SourceYConfiguration.SelectedClassKind.Value) &&
+                !this.IsClassKindValidForRebuild(thing.ClassKind, this.SourceXConfiguration.SelectedClassKind.Value))
             {
                 return;
             }
@@ -456,9 +456,9 @@ namespace CDP4RelationshipMatrix.ViewModels
             {
                 this.BuildRelationshipMatrix();
             }
-            else if (thing.ClassKind == this.SourceYConfiguration.SelectedClassKind.Value &&
+            else if (this.IsClassKindValidForRebuild(thing.ClassKind, this.SourceYConfiguration.SelectedClassKind.Value) &&
                      this.SourceYConfiguration.SelectedCategories.Count > 0 ||
-                     thing.ClassKind == this.SourceXConfiguration.SelectedClassKind.Value &&
+                     this.IsClassKindValidForRebuild(thing.ClassKind, this.SourceXConfiguration.SelectedClassKind.Value) &&
                      this.SourceXConfiguration.SelectedCategories.Count > 0)
             {
                 if (thing is ICategorizableThing categorizable && (
@@ -471,6 +471,18 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Checks whether the <see cref="ClassKind"/> of the <see cref="Thing"/> matches criteria for a rebuild of the matrix.
+        /// </summary>
+        /// <param name="thingClassKind">The <see cref="ClassKind"/> of the relevant <see cref="Thing"/></param>
+        /// <param name="expectedClassKind">The <see cref="ClassKind"/> selected in the configuration.</param>
+        /// <returns>True if the <see cref="ClassKind"/> matches the criteria.</returns>
+        private bool IsClassKindValidForRebuild(ClassKind thingClassKind, ClassKind expectedClassKind)
+        {
+            // class kind should match, or in case of ElementUsage, ElementDefinition should be taken into account.
+            return thingClassKind == expectedClassKind || (expectedClassKind == ClassKind.ElementUsage && thingClassKind == ClassKind.ElementDefinition);
+        }
+
+        /// <summary>
         /// Checks if the <see cref="ICategorizableThing"/> has any categories that fall under the filter criteria
         /// </summary>
         /// <param name="thing">The <see cref="ICategorizableThing"/> to check</param>
@@ -479,6 +491,14 @@ namespace CDP4RelationshipMatrix.ViewModels
         public static bool IsCategoryApplicableToConfiguration(ICategorizableThing thing,
             SourceConfigurationViewModel sourceConfiguration)
         {
+            var thingCategories = new List<Category>(thing.Category);
+
+            // if the thing is ElementUsage, add the ElementDefinition categories
+            if (thing is ElementUsage usage)
+            {
+                thingCategories.AddRange(usage.ElementDefinition.Category);
+            }
+
             switch (sourceConfiguration.SelectedBooleanOperatorKind)
             {
                 case CategoryBooleanOperatorKind.OR:
@@ -493,7 +513,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                         }
                     }
 
-                    return thing.Category.Intersect(allcategories).Any();
+                    return thingCategories.Intersect(allcategories).Any();
                 case CategoryBooleanOperatorKind.AND:
                     var categoryLists = new List<bool>();
 
@@ -506,7 +526,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                             categoryGroup.AddRange(category.AllDerivedCategories());
                         }
 
-                        categoryLists.Add(thing.Category.Intersect(categoryGroup).Any());
+                        categoryLists.Add(thingCategories.Intersect(categoryGroup).Any());
                     }
 
                     return !categoryLists.Any(x => x == false);

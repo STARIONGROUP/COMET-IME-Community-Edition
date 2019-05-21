@@ -34,24 +34,16 @@
             <converters:TooltipConverter x:Key="TooltipConverter" />
 
             <DataTemplate x:Key="SourceYToSourceX">
-                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
-                    <TextBlock.Text>⮥</TextBlock.Text>
-                </TextBlock>
+                <Image Width="24" Height="24" x:Name="PART_Editor" Source="/CDP4RelationshipMatrix;component/Resources/Images/ytox.png" ToolTip="{Binding Converter={StaticResource TooltipConverter}}"></Image>
             </DataTemplate>
             <DataTemplate x:Key="SourceXToSourceY">
-                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Width="24" FontSize="24" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
-                    <TextBlock.Text>⮠</TextBlock.Text>
-                </TextBlock>
+                <Image Width="24" Height="24" x:Name="PART_Editor" Source="/CDP4RelationshipMatrix;component/Resources/Images/xtoy.png" ToolTip="{Binding Converter={StaticResource TooltipConverter}}"></Image>
             </DataTemplate>
             <DataTemplate x:Key="BidirectionalRelationship">
-                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
-                    <TextBlock.Text>⮔</TextBlock.Text>
-                </TextBlock>
+                <Image Width="24" Height="24" x:Name="PART_Editor" Source="/CDP4RelationshipMatrix;component/Resources/Images/bidir.png" ToolTip="{Binding Converter={StaticResource TooltipConverter}}"></Image>
             </DataTemplate>
             <DataTemplate x:Key="NodirectionalRelationship">
-                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" ToolTip="{Binding Converter={StaticResource TooltipConverter}}">
-                    <TextBlock.Text>⨯</TextBlock.Text>
-                </TextBlock>
+                <Image Width="24" Height="24" x:Name="PART_Editor" Source="/CDP4RelationshipMatrix;component/Resources/Images/nodir.png" ToolTip="{Binding Converter={StaticResource TooltipConverter}}"></Image>
             </DataTemplate>
 
             <DataTemplate x:Key="NameTemplate">
