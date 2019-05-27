@@ -250,7 +250,6 @@ namespace CDP4Composition.Services
             {
                 Name = referencedDefinition.Name,
                 ShortName = referencedDefinition.ShortName,
-                Category = referencedDefinition.Category,
                 Owner = owner,
                 ElementDefinition = referencedDefinition
             };
