@@ -613,6 +613,12 @@ namespace CDP4EngineeringModel.Tests
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.IsFalse(defRow.IsTopElement);
             Assert.IsTrue(def2Row.IsTopElement);
+
+            //this.iteration.Element.Remove(def2);
+            this.iteration.Element.Remove(def2);
+            rev.SetValue(this.iteration, 51);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            Assert.IsTrue(def2Row.IsTopElement);
         }
 
         [Test]

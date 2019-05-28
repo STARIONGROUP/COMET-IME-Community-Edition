@@ -574,9 +574,7 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            var topElementDefinitionNew = this.ElementDefinitionRowViewModels.First(vm => vm.Thing.Iid == this.Thing.TopElement.Iid) as ElementDefinitionRowViewModel;
-
-            if (topElementDefinitionNew != null)
+            if (this.ElementDefinitionRowViewModels.FirstOrDefault(vm => vm.Thing.Iid == this.Thing.TopElement.Iid) is ElementDefinitionRowViewModel topElementDefinitionNew)
             {
                 topElementDefinitionNew.IsTopElement = true;
 
