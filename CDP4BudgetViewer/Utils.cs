@@ -18,11 +18,13 @@ namespace CDP4Budget
         /// <param name="usage">The <see cref="ElementUsage"/></param>
         /// <param name="pt">The <see cref="ParameterType"/></param>
         /// <param name="state">The state</param>
+        /// <param name="option">The value associated to the option to get</param>
+        /// <param name="domain">The current domain</param>
         /// <returns>The value</returns>
         public static string GetActualValue(this ElementUsage usage, ParameterType pt, ActualFiniteState state, Option option, DomainOfExpertise domain)
         {
-            var parameterOrOverride = (ParameterOrOverrideBase)usage.ParameterOverride.FirstOrDefault(x => x.ParameterType.Iid == pt.Iid)
-                                      ?? usage.ElementDefinition.Parameter.FirstOrDefault(x => x.ParameterType.Iid == pt.Iid);
+            var parameterOrOverride = (ParameterOrOverrideBase)usage.ParameterOverride.FirstOrDefault(x => x.ParameterType.Iid.Equals(pt.Iid))
+                                      ?? usage.ElementDefinition.Parameter.FirstOrDefault(x => x.ParameterType.Iid.Equals(pt.Iid));
 
             if (parameterOrOverride == null)
             {
@@ -30,8 +32,8 @@ namespace CDP4Budget
                 return null;
             }
 
-            var parameterBase = (ParameterBase)parameterOrOverride.ParameterSubscription.FirstOrDefault(x => x.Owner.Iid == domain.Iid) ?? parameterOrOverride;
-            var valueset = parameterBase.ValueSets.FirstOrDefault(x => (x.ActualOption == null || x.ActualOption.Iid == option.Iid) && (x.ActualState == null || x.ActualState.Iid == state.Iid));
+            var parameterBase = (ParameterBase)parameterOrOverride.ParameterSubscription.FirstOrDefault(x => x.Owner.Iid.Equals(domain?.Iid)) ?? parameterOrOverride;
+            var valueset = parameterBase.ValueSets.FirstOrDefault(x => (x.ActualOption == null || x.ActualOption.Iid.Equals(option.Iid)) && (x.ActualState == null || x.ActualState.Iid.Equals(state?.Iid)));
 
             return valueset?.ActualValue.FirstOrDefault();
         }
@@ -65,7 +67,7 @@ namespace CDP4Budget
         /// <returns>The <see cref="MeasurementScale"/></returns>
         public static MeasurementScale GetScale(this ElementUsage usage, QuantityKind pt)
         {
-            return usage.ElementDefinition.Parameter.FirstOrDefault(x => x.ParameterType.Iid == pt.Iid)?.Scale;
+            return usage.ElementDefinition.Parameter.FirstOrDefault(x => x.ParameterType.Iid.Equals(pt.Iid))?.Scale;
         }
     }
 }
