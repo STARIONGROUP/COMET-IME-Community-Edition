@@ -99,8 +99,16 @@ namespace CDP4Requirements.ViewModels
         public RequirementDialogViewModel(Requirement requirement, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(requirement, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
-            this.SelectedOwner = this.Session.ActivePerson.DefaultDomain ?? this.PossibleOwner.First();
+            if (dialogKind == ThingDialogKind.Create)
+            {
+                var iteration = (Iteration)container.Container;
 
+                if (this.Session.OpenIterations.TryGetValue(iteration, out var domainOfExpertiseParticipantTuple))
+                {
+                    this.SelectedOwner = domainOfExpertiseParticipantTuple.Item1 ?? this.PossibleOwner.First();
+                }
+            }
+            
             this.WhenAnyValue(vm => vm.RequirementText).Subscribe(_ => this.UpdateOkCanExecute());
         }
         

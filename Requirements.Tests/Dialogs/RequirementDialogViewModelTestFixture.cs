@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -8,6 +8,7 @@ namespace CDP4Requirements.Tests.Dialogs
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -128,6 +129,17 @@ namespace CDP4Requirements.Tests.Dialogs
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
+
+            var openIterations = new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>();
+            var participant = new Participant(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Person = person,
+                Domain = new List<DomainOfExpertise>() {this.domain},
+                SelectedDomain = this.domain
+            };
+
+            openIterations.Add(this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, participant));
+            this.session.Setup(x => x.OpenIterations).Returns(openIterations);
         }
 
         [TearDown]
