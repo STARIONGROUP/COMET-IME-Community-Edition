@@ -106,19 +106,19 @@
                     <dxb:BarButtonItem x:Name="CreateSimpleParameterValueButton"
                                        Command="{Binding CreateSimpleParameterValueCommand}"
                                        Glyph="{dx:DXImage Image=Add_16x16.png}"
-                                       Hint="Create a new ParametricConstraint" />
+                                       Hint="Create a new Simple Parameter Value" />
                     <dxb:BarButtonItem x:Name="DeleteSimpleParameterValueButton"
                                        Command="{Binding DeleteSimpleParameterValueCommand}"
                                        Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                       Hint="Delete the selected ParametricConstraint" />
+                                       Hint="Delete the selected Simple Parameter Value" />
                     <dxb:BarButtonItem x:Name="EditSimpleParameterValueButton"
                                        Command="{Binding EditSimpleParameterValueCommand}"
                                        Glyph="{dx:DXImage Image=EditName_16x16.png}"
-                                       Hint="Edit the selected ParametricConstraint" />
+                                       Hint="Edit the selected Simple Parameter Value" />
                     <dxb:BarButtonItem x:Name="InspectSimpleParameterValueButton"
                                        Command="{Binding InspectSimpleParameterValueCommand}"
                                        Glyph="{dx:DXImage Image=Find_16x16.png}"
-                                       Hint="Inspect the selected ParametricConstraint" />
+                                       Hint="Inspect the selected Simple Parameter Value" />
                 </dxb:ToolBarControl>
                 <lc:LayoutItem VerticalAlignment="Stretch"
                                HorizontalAlignment="Stretch"
