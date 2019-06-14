@@ -49,28 +49,28 @@ namespace CDP4RelationshipMatrix.Tests
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
             
             this.relationshipMatrixModule = new RelationshipMatrixModule(this.regionManager.Object,this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, this.pluginSettingsService.Object);
-            this.pluginSettingsService.Setup(s => s.Read<RelationshipMatrixPluginSettings>(this.relationshipMatrixModule))
+            this.pluginSettingsService.Setup(s => s.Read<RelationshipMatrixPluginSettings>())
                 .Returns(new RelationshipMatrixPluginSettings(true));
         }
 
         [Test]
         public void Verify_that_when_plugin_service_can_read_settings_no_exception_is_raised()
         {
-            Assert.DoesNotThrow(() => this.relationshipMatrixModule.ReadPluginSettings());
+           Assert.DoesNotThrow(() => this.relationshipMatrixModule.ReadPluginSettings());
             
-            this.pluginSettingsService.Verify(x => x.Read<RelationshipMatrixPluginSettings>(this.relationshipMatrixModule));
+            this.pluginSettingsService.Verify(x => x.Read<RelationshipMatrixPluginSettings>());
         }
 
         [Test]
         public void Verify_that_when_settings_file_cannot_be_read_the_module_recovers_with_the_default_SettingsClass()
         {
             this.pluginSettingsService
-                .Setup(x => x.Read<RelationshipMatrixPluginSettings>(this.relationshipMatrixModule))
+                .Setup(x => x.Read<RelationshipMatrixPluginSettings>())
                 .Throws<PluginSettingsException>();
             
             Assert.DoesNotThrow(() => this.relationshipMatrixModule.ReadPluginSettings());
 
-            this.pluginSettingsService.Verify(x => x.Write(It.IsAny<RelationshipMatrixPluginSettings>(),  this.relationshipMatrixModule));
+            this.pluginSettingsService.Verify(x => x.Write(It.IsAny<RelationshipMatrixPluginSettings>()));
         }
     }
 }

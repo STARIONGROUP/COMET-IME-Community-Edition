@@ -1,0 +1,90 @@
+﻿<dx:DXWindow x:Class="CDP4RelationshipMatrix.Views.SavedConfigurationDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CDP4RelationshipMatrix.Views"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             dx:ThemeManager.ThemeName="Seven"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             Title="Save Relationship Matrix Configuration"
+             SizeToContent="Height"
+             mc:Ignorable="d" Width="500">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+    <Grid>
+        <dxlc:LayoutControl Height="Auto"
+                            Background="White"
+                            Orientation="Vertical">
+            <dxlc:LayoutGroup Orientation="Vertical">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <dxlc:LayoutControl Grid.Row="1" Orientation="Vertical">
+                        <dxlc:LayoutGroup Orientation="Vertical" ItemLabelsAlignment="Default" ItemSpace="10"
+                                          HorizontalAlignment="Stretch" View="GroupBox" Header="New Configuration">
+                            <dxlc:LayoutItem Label="Name">
+                                <dxe:TextEdit Name="Name"
+                                              MinWidth="150"
+                                              Margin="10,0,0,0"
+                                              Text="{Binding Name,
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        Mode=TwoWay}" />
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem Label="Description">
+                                <dxe:TextEdit Name="Description"
+                                              Height="80"
+                                              MaxHeight="80" 
+                                              VerticalScrollBarVisibility="Auto"
+                                              VerticalContentAlignment="Top"
+                                              MinWidth="150"
+                                              Margin="10,0,0,0"
+                                              Text="{Binding Description,
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        Mode=TwoWay}" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap" />
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem>
+                                <TextBlock
+                                    Text="{Binding Path=ErrorMessage,
+                                        Mode=OneWay}"
+                                    Padding="10"
+                                    Visibility="{Binding Path=HasError,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Background="#FFF5E5E5" />
+                            </dxlc:LayoutItem>
+                        </dxlc:LayoutGroup>
+                        
+                        <dxlc:LayoutGroup Margin="0,10,0,0" Orientation="Horizontal">
+                            <dx:SimpleButton MinWidth="75"
+                                             MinHeight="25"
+                                             MaxWidth="75"
+                                             MaxHeight="25"
+                                             HorizontalAlignment="Right"
+                                             Command="{Binding Path=OkCommand}"
+                                             Content="OK" IsDefault="True" />
+                            <dx:SimpleButton MinWidth="75"
+                                             MinHeight="25"
+                                             MaxWidth="75"
+                                             MaxHeight="25"
+                                             HorizontalAlignment="Right"
+                                             Command="{Binding Path=CancelCommand}"
+                                             Content="Cancel" IsCancel="True" />
+                        </dxlc:LayoutGroup>
+                    </dxlc:LayoutControl>
+                </Grid>
+
+            </dxlc:LayoutGroup>
+
+        </dxlc:LayoutControl>
+        <views:LoadingControl Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}" />
+    </Grid>
+</dx:DXWindow>

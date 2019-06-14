@@ -58,6 +58,8 @@ namespace CDP4RelationshipMatrix
                 this.PossibleClassKinds = new List<ClassKind>();
                 this.PossibleDisplayKinds = new List<DisplayKind>();
             }
+
+            this.SavedConfigurations = new List<SavedConfiguration>();
         }
 
         /// <summary>
@@ -71,5 +73,11 @@ namespace CDP4RelationshipMatrix
         /// </summary>
         [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
         public List<DisplayKind> PossibleDisplayKinds { get; set; }
+
+        /// <summary>
+        /// Gets or sets the saved <see cref="SavedConfiguration"/>s
+        /// </summary>
+        [JsonProperty]
+        public List<SavedConfiguration> SavedConfigurations { get; set; }
     }
 }

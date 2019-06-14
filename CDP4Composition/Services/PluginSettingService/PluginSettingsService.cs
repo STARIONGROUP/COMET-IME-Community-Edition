@@ -10,10 +10,8 @@ namespace CDP4Composition.PluginSettingService
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
     using CDP4Composition.Exceptions;
-    using Microsoft.Practices.Prism.Modularity;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
     using NLog;
@@ -43,22 +41,17 @@ namespace CDP4Composition.PluginSettingService
         public const string SETTING_FILE_EXTENSION = ".settings.json";
 
         /// <summary>
-        /// a dictionary used to cache the names of assemblies
-        /// </summary>
-        private readonly Dictionary<IModule, string> assemblyNamesCache;
-
-        /// <summary>
         /// A dictionary used to store the user plugin-setting of the application
         /// </summary>
-        private readonly Dictionary<IModule, PluginSettings> applicationUserPluginSettings;
+        private readonly Dictionary<string, PluginSettings> applicationUserPluginSettings;
 
         /// <summary>
         /// Initializes a new instance of <see cref="PluginSettingsService"/>
         /// </summary>
         public PluginSettingsService()
         {
-            this.assemblyNamesCache = new Dictionary<IModule, string>();
-            this.applicationUserPluginSettings = new Dictionary<IModule, PluginSettings>();
+            //this.assemblyNamesCache = new Dictionary<IModule, string>();
+            this.applicationUserPluginSettings = new Dictionary<string, PluginSettings>();
         }
         
         /// <summary>
@@ -70,7 +63,7 @@ namespace CDP4Composition.PluginSettingService
         }
 
         /// <summary>
-        /// Reads the <see cref="T"/>
+        /// Reads the <see cref="T"/> plug in settings
         /// </summary>
         /// <typeparam name="T">A type of <see cref="PluginSettings"/></typeparam>
         /// <returns>
@@ -78,27 +71,9 @@ namespace CDP4Composition.PluginSettingService
         /// </returns>
         public T Read<T>() where T : PluginSettings
         {
-            return this.applicationUserPluginSettings.Values.OfType<T>().SingleOrDefault();
-        }
+            var assemblyName = this.QueryAssemblyTitle(typeof(T));
 
-        /// <summary>
-        /// Reads the <see cref="PluginSettings"/> for the specified <see cref="IModule"/>
-        /// </summary>
-        /// <param name="module">
-        /// The <see cref="IModule"/> for which the settings need to be read
-        /// </param>
-        /// <returns>
-        /// An instance of <see cref="PluginSettings"/>
-        /// </returns>
-        public T Read<T>(IModule module) where T : PluginSettings
-        {
-            if (module == null)
-            {
-                throw new ArgumentNullException(nameof(module), "The module may not be null");
-            }
-
-            PluginSettings result;
-            if (this.applicationUserPluginSettings.TryGetValue(module, out result))
+            if (this.applicationUserPluginSettings.TryGetValue(assemblyName, out var result))
             {
                 return result as T;
             }
@@ -109,8 +84,6 @@ namespace CDP4Composition.PluginSettingService
                 Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
                 logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
             }
-            
-            var assemblyName = this.QueryAssemblyName(module);
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
 
@@ -124,7 +97,7 @@ namespace CDP4Composition.PluginSettingService
                     result = (T)serializer.Deserialize(file, typeof(T));
 
                     // once the settings have been read from disk, add them to the cache for fast access
-                    this.applicationUserPluginSettings.Add(module, result);
+                    this.applicationUserPluginSettings.Add(assemblyName, result);
 
                     return (T)result;
                 }
@@ -138,26 +111,20 @@ namespace CDP4Composition.PluginSettingService
         }
 
         /// <summary>
-        /// Writes the <see cref="PluginSettings"/> for the specified <see cref="IModule"/> to disks and adds to the cache
+        /// Writes the <see cref="PluginSettings"/> to disk
         /// </summary>
         /// <param name="pluginSettings">
         /// The <see cref="PluginSettings"/> that will be persisted
         /// </param>
-        /// <param name="module">
-        /// The <see cref="IModule"/> for which the <see cref="PluginSettings"/> are written.
-        /// </param>
-        public void Write<T>(T pluginSettings, IModule module) where T : PluginSettings
+        public void Write<T>(T pluginSettings) where T : PluginSettings
         {
             if (pluginSettings == null)
             {
                 throw new ArgumentNullException(nameof(pluginSettings), "The pluginSettings may not be null");
             }
 
-            if (module == null)
-            {
-                throw new ArgumentNullException(nameof(module), "The module may not be null");
-            }
-            
+            var assemblyName = this.QueryAssemblyTitle(pluginSettings.GetType());
+
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
                 logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
@@ -165,12 +132,10 @@ namespace CDP4Composition.PluginSettingService
                 logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
             }
 
-            var assemblyName = this.QueryAssemblyName(module);
-            
             var path = Path.Combine(this.ApplicationConfigurationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}");
 
             logger.Debug("write settings to for {0} to {1}", assemblyName, path);
-            
+
             using (var streamWriter = File.CreateText(path))
             {
                 var serializer = new JsonSerializer
@@ -182,40 +147,29 @@ namespace CDP4Composition.PluginSettingService
                 serializer.Serialize(streamWriter, pluginSettings);
             }
 
-            // once the settings have been written to disk, add them to the cache for fast access, or update the cache if the item is already present
-            if (this.applicationUserPluginSettings.ContainsKey(module))
+            if (this.applicationUserPluginSettings.ContainsKey(assemblyName))
             {
-                this.applicationUserPluginSettings[module] = pluginSettings;
+                this.applicationUserPluginSettings[assemblyName] = pluginSettings;
             }
             else
             {
-                this.applicationUserPluginSettings.Add(module, pluginSettings);
+                this.applicationUserPluginSettings.Add(assemblyName, pluginSettings);
             }
         }
 
         /// <summary>
-        /// Queries the name of the assembly that contains the <see cref="IModule"/>
+        /// Queries the name of the assembly that contains the <see cref="Type"/>
         /// </summary>
-        /// <param name="module">
-        /// The <see cref="IModule"/> that is contained in the assembly for which the name is queried.
+        /// <param name="type">
+        /// The <see cref="Type"/> that is contained in the assembly for which the name is queried.
         /// </param>
         /// <returns>
         /// A string that contains the name of the assembly
         /// </returns>
-        private string QueryAssemblyName(IModule module)
+        private string QueryAssemblyTitle(Type type)
         {
-            string assemblyName;
-
-            if (!this.assemblyNamesCache.TryGetValue(module, out assemblyName))
-            {
-                assemblyName =
-                    ((AssemblyTitleAttribute)module.GetType().Assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute)))
-                    .Title;
-
-                this.assemblyNamesCache.Add(module, assemblyName);
-            }
-            
-            return assemblyName;
+            return ((AssemblyTitleAttribute)type.Assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute)))
+                .Title;
         }
     }
 }

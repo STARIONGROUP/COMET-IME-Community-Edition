@@ -20,6 +20,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using DialogResult;
     using NLog;
     using ReactiveUI;
     using Settings;
@@ -100,6 +101,26 @@ namespace CDP4RelationshipMatrix.ViewModels
         private SourceConfigurationViewModel sourceXConfiguration;
 
         /// <summary>
+        /// Backing field for <see cref="RelationshipConfiguration"/>
+        /// </summary>
+        private RelationshipConfigurationViewModel relationshipConfiguration;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedSavedConfiguration"/>
+        /// </summary>
+        private SavedConfiguration selectedSavedConfiguration;
+
+        /// <summary>
+        /// Backing field for <see cref="SavedConfigurations"/>
+        /// </summary>
+        private ReactiveList<SavedConfiguration> savedConfigurations;
+
+        /// <summary>
+        /// The plugin settings
+        /// </summary>
+        private RelationshipMatrixPluginSettings settings;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel"/> class
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration"/></param>
@@ -117,19 +138,25 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.Caption = "Relationship Matrix";
             this.ShowDirectionality = true;
             this.ShowRelatedOnly = false;
+            this.IsBusy = false;
 
             this.ToolTip =
                 $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
-            var setting = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
+            this.settings = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
+
+            this.SavedConfigurations = new ReactiveList<SavedConfiguration>(this.settings.SavedConfigurations);
+            this.SavedConfigurations.ChangeTrackingEnabled = true;
+
+            this.ReloadSavedConfigurations();
 
             this.SourceYConfiguration =
-                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, setting);
+                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, this.settings);
             this.SourceXConfiguration =
-                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, setting);
+                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, this.settings);
             this.RelationshipConfiguration =
-                new RelationshipConfigurationViewModel(session, thingDialogNavigationService, iteration, this.BuildRelationshipMatrix, setting);
-            this.Matrix = new MatrixViewModel(this.Session, this.Thing, setting);
+                new RelationshipConfigurationViewModel(session, thingDialogNavigationService, iteration, this.BuildRelationshipMatrix, this.settings);
+            this.Matrix = new MatrixViewModel(this.Session, this.Thing, this.settings);
 
             this.Disposables.Add(this.SourceYConfiguration);
             this.Disposables.Add(this.SourceXConfiguration);
@@ -184,9 +211,31 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets the <see cref="SavedConfiguration"/> to configure the entire matrix
+        /// </summary>
+        public SavedConfiguration SelectedSavedConfiguration
+        {
+            get { return this.selectedSavedConfiguration; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedSavedConfiguration, value); }
+        }
+
+        /// <summary>
+        /// Gets the list of all <see cref="SavedConfiguration"/> to configure the entire matrix
+        /// </summary>
+        public ReactiveList<SavedConfiguration> SavedConfigurations
+        {
+            get { return this.savedConfigurations; }
+            set { this.RaiseAndSetIfChanged(ref this.savedConfigurations, value); }
+        }
+
+        /// <summary>
         /// Gets the <see cref="RelationshipConfigurationViewModel"/> to configure the kind of <see cref="BinaryRelationship"/> to display
         /// </summary>
-        public RelationshipConfigurationViewModel RelationshipConfiguration { get; private set; }
+        public RelationshipConfigurationViewModel RelationshipConfiguration
+        {
+            get { return this.relationshipConfiguration; }
+            set { this.RaiseAndSetIfChanged(ref this.relationshipConfiguration, value); }
+        }
 
         /// <summary>
         /// Gets the <see cref="MatrixViewModel"/>
@@ -255,6 +304,16 @@ namespace CDP4RelationshipMatrix.ViewModels
         public ReactiveCommand<object> SwitchAxisCommand { get; private set; }
 
         /// <summary>
+        /// Gets the command to manage saved configurations.
+        /// </summary>
+        public ReactiveCommand<object> ManageSavedConfigurations { get; private set; }
+
+        /// <summary>
+        /// Gets the command to save current.
+        /// </summary>
+        public ReactiveCommand<object> SaveCurrentConfiguration { get; private set; }
+
+        /// <summary>
         /// Gets or sets whether directionality is displayed
         /// </summary>
         public bool ShowDirectionality
@@ -273,16 +332,25 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Reloads the saved configurations.
+        /// </summary>
+        private void ReloadSavedConfigurations()
+        {
+            this.settings = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
+            this.SavedConfigurations = new ReactiveList<SavedConfiguration>(this.settings.SavedConfigurations);
+        }
+
+        /// <summary>
         /// Builds the relationship matrix
         /// </summary>
         private void BuildRelationshipMatrix()
         {
-            this.HasUpdateStarted = true;
+            this.IsBusy = true;
 
             this.Matrix.RebuildMatrix(this.SourceYConfiguration, this.SourceXConfiguration,
                 this.RelationshipConfiguration.SelectedRule, this.ShowRelatedOnly);
 
-            this.HasUpdateStarted = false;
+            this.IsBusy = false;
         }
 
         /// <summary>
@@ -386,6 +454,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.WhenAnyValue(x => x.ShowDirectionality).Subscribe(_ => this.BuildRelationshipMatrix());
             this.WhenAnyValue(x => x.ShowRelatedOnly).Subscribe(_ => this.BuildRelationshipMatrix());
 
+            this.WhenAny(x => x.SelectedSavedConfiguration, vm => vm.Value != null).Subscribe(_ => this.LoadSavedConfiguration());
+
             var ruleSubscription = CDPMessageBus.Current
                 .Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
                 .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -401,6 +471,12 @@ namespace CDP4RelationshipMatrix.ViewModels
                 .Subscribe(_ => { this.UpdateRelationshipConfiguration(); });
 
             this.Disposables.Add(relationshipSubscription);
+
+            this.ManageSavedConfigurations = ReactiveCommand.Create();
+            this.Disposables.Add(this.ManageSavedConfigurations.Subscribe(_ => this.ExecuteManageSavedConfigurations()));
+
+            this.SaveCurrentConfiguration = ReactiveCommand.Create();
+            this.Disposables.Add(this.SaveCurrentConfiguration.Subscribe(_ => this.ExecuteSaveCurrentConfiguration()));
 
             this.EditSourceYCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSourceY));
             this.Disposables.Add(this.EditSourceYCommand.Subscribe(_ => this.ExecuteEditSourceYCommand()));
@@ -419,6 +495,38 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(this.WhenAnyValue(x => x.Matrix.SelectedCell)
                 .Subscribe(_ => this.ComputeEditInspectCanExecute()));
+        }
+
+        /// <summary>
+        /// Loads the selected saved configuration.
+        /// </summary>
+        private void LoadSavedConfiguration()
+        {
+            if (this.SelectedSavedConfiguration == null)
+            {
+                return;
+            }
+
+            if (this.SelectedSavedConfiguration.SourceConfigurationX != null)
+            {
+                this.SourceXConfiguration = new
+                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration, this.settings, this.SelectedSavedConfiguration.SourceConfigurationX);
+            }
+
+            if (this.SelectedSavedConfiguration.SourceConfigurationY != null)
+            {
+                this.SourceYConfiguration = new
+                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration, this.settings, this.SelectedSavedConfiguration.SourceConfigurationY);
+            }
+
+            if (this.SelectedSavedConfiguration.RelationshipConfiguration != null)
+            {
+                this.RelationshipConfiguration = new
+                    RelationshipConfigurationViewModel(this.Session, this.ThingDialogNavigationService, this.Thing, this.BuildRelationshipMatrix, this.settings, this.SelectedSavedConfiguration.RelationshipConfiguration, this.SelectedSavedConfiguration.SourceConfigurationY?.SelectedClassKind, this.SelectedSavedConfiguration.SourceConfigurationX?.SelectedClassKind);
+            }
+
+            this.ShowDirectionality = this.SelectedSavedConfiguration.ShowDirectionality;
+            this.ShowRelatedOnly = this.SelectedSavedConfiguration.ShowRelatedOnly;
         }
 
         /// <summary>
@@ -505,7 +613,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                     // if subcategories should be selected, expan the list
                     var allcategories = new List<Category>(sourceConfiguration.SelectedCategories);
 
-                    if (sourceConfiguration.IncludeSubctegories)
+                    if (sourceConfiguration.IncludeSubcategories)
                     {
                         foreach (var category in sourceConfiguration.SelectedCategories)
                         {
@@ -521,7 +629,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                     {
                         var categoryGroup = new List<Category> { category };
 
-                        if (sourceConfiguration.IncludeSubctegories)
+                        if (sourceConfiguration.IncludeSubcategories)
                         {
                             categoryGroup.AddRange(category.AllDerivedCategories());
                         }
@@ -533,6 +641,47 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Executes the manager of saved configurations
+        /// </summary>
+        private void ExecuteManageSavedConfigurations()
+        {
+            var vm = new ManageConfigurationsDialogViewModel(this.DialogNavigationService, this.PluginSettingsService);
+            var result = this.DialogNavigationService.NavigateModal(vm) as ManageConfigurationsResult;
+
+            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            {
+                return;
+            }
+
+            this.ReloadSavedConfigurations();
+        }
+
+        /// <summary>
+        /// Executes the save of current configuration
+        /// </summary>
+        private void ExecuteSaveCurrentConfiguration()
+        {
+            var savedConfiguration = new SavedConfiguration
+            {
+                RelationshipConfiguration = new RelationshipConfiguration(this.RelationshipConfiguration),
+                ShowDirectionality = this.ShowDirectionality,
+                SourceConfigurationX = new SourceConfiguration(this.SourceXConfiguration),
+                SourceConfigurationY = new SourceConfiguration(this.SourceYConfiguration),
+                ShowRelatedOnly = this.ShowRelatedOnly
+            };
+
+            var vm = new SavedConfigurationDialogViewModel(this.DialogNavigationService, this.PluginSettingsService, savedConfiguration);
+            var result = this.DialogNavigationService.NavigateModal(vm) as SavedConfigurationResult;
+
+            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            {
+                return;
+            }
+
+            this.ReloadSavedConfigurations();
         }
 
         /// <summary>

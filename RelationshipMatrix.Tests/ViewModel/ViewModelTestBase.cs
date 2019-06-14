@@ -19,6 +19,8 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using CDP4Dal;
     using CDP4Dal.Permission;
     using Moq;
+    using ViewModels;
+    using ViewModels.DialogResult;
 
     public abstract class ViewModelTestBase
     {
@@ -65,6 +67,13 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
+
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<ManageConfigurationsDialogViewModel>()))
+                .Returns(new ManageConfigurationsResult(true));
+
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<SavedConfigurationDialogViewModel>()))
+                .Returns(new SavedConfigurationResult(true));
+
             this.permissionService = new Mock<IPermissionService>();
             this.pluginService = new Mock<IPluginSettingsService>();
             this.session = new Mock<ISession>();
@@ -166,6 +175,8 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.settings.PossibleClassKinds.Add(ClassKind.ElementDefinition);
             this.settings.PossibleClassKinds.Add(ClassKind.ElementUsage);
             this.pluginService.Setup(x => x.Read<RelationshipMatrixPluginSettings>()).Returns(this.settings);
+
+            this.pluginService.Setup(x => x.Write(It.IsAny<RelationshipMatrixPluginSettings>()));
         }
     }
 }

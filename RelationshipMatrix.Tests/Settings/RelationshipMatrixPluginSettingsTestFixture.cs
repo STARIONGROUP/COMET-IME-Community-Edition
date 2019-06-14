@@ -68,7 +68,7 @@ namespace CDP4RelationshipMatrix.Tests.Settings
         {
             var expectedSettingsContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "Settings", "expectedSettings.settings.json"));
 
-            Assert.DoesNotThrow(() => this.pluginSettingsService.Write(settings, this.relationshipMatrixModule));
+            Assert.DoesNotThrow(() => this.pluginSettingsService.Write(settings));
 
             var writtenContent = File.ReadAllText(this.expectedSettingsPath);
             Assert.That(expectedSettingsContent, Is.EqualTo(writtenContent));
@@ -79,7 +79,7 @@ namespace CDP4RelationshipMatrix.Tests.Settings
         {
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "Settings", "expectedSettings.settings.json"), this.expectedSettingsPath, true);
 
-            this.settings = this.pluginSettingsService.Read<RelationshipMatrixPluginSettings>(this.relationshipMatrixModule);
+            this.settings = this.pluginSettingsService.Read<RelationshipMatrixPluginSettings>();
 
             var expectedClassKinds = new List<ClassKind>
             {

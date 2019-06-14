@@ -16,6 +16,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using ReactiveUI;
+    using Settings;
 
     /// <summary>
     /// A view-model for dynamic column definition
@@ -42,7 +43,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="iteration">The current iteration</param>
         /// <param name="action">The action to perform on update</param>
         /// <param name="settings">The module settings</param>
-        public RelationshipConfigurationViewModel(ISession session, IThingDialogNavigationService thingDialogNavigationService, Iteration iteration, Action action, RelationshipMatrixPluginSettings settings) : base(session, iteration, action, settings)
+        public RelationshipConfigurationViewModel(ISession session,
+            IThingDialogNavigationService thingDialogNavigationService, Iteration iteration, Action action,
+            RelationshipMatrixPluginSettings settings) : base(session, iteration, action, settings)
         {
             this.thingDialogNavigationService = thingDialogNavigationService;
 
@@ -50,6 +53,33 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.WhenAnyValue(x => x.SelectedRule).Skip(1).Subscribe(_ => this.OnUpdateAction());
 
             this.InitializeCommands();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RelationshipConfigurationViewModel"/>
+        /// </summary>
+        /// <param name="session">The current session</param>
+        /// <param name="thingDialogNavigationService">
+        /// The <see cref="IThingDialogNavigationService"/> used to navigate to details dialog of a <see cref="Thing"/>
+        /// </param>
+        /// <param name="iteration">The current iteration</param>
+        /// <param name="action">The action to perform on update</param>
+        /// <param name="settings">The module settings</param>
+        /// <param name="source">The source <see cref="RelationshipConfiguration"/></param>
+        /// <param name="sourceY">The <see cref="ClassKind"/> of source Y</param>
+        /// <param name="sourceX">The <see cref="ClassKind"/> of source X</param>
+        public RelationshipConfigurationViewModel(ISession session,
+            IThingDialogNavigationService thingDialogNavigationService, Iteration iteration, Action action,
+            RelationshipMatrixPluginSettings settings, RelationshipConfiguration source, ClassKind? sourceY,
+            ClassKind? sourceX) : this(session,
+            thingDialogNavigationService, iteration, action, settings)
+        {
+            this.PopulatePossibleRules(sourceY, sourceX);
+
+            if (source.SelectedRule != null)
+            {
+                this.SelectedRule = this.PossibleRules.SingleOrDefault(x => x.Iid == source.SelectedRule);
+            }
         }
 
         /// <summary>
@@ -81,8 +111,10 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             var rules = this.ReferenceDataLibraries.SelectMany(x => x.Rule).OfType<BinaryRelationshipRule>().Where(
                 x =>
-                    (x.SourceCategory.PermissibleClass.Contains(sourceY.Value) || x.SourceCategory.PermissibleClass.Contains(sourceX.Value))
-                    && (x.TargetCategory.PermissibleClass.Contains(sourceY.Value) || x.TargetCategory.PermissibleClass.Contains(sourceX.Value))).ToList();
+                    (x.SourceCategory.PermissibleClass.Contains(sourceY.Value) ||
+                     x.SourceCategory.PermissibleClass.Contains(sourceX.Value))
+                    && (x.TargetCategory.PermissibleClass.Contains(sourceY.Value) ||
+                        x.TargetCategory.PermissibleClass.Contains(sourceX.Value))).ToList();
 
             this.PossibleRules.AddRange(rules.OrderBy(x => x.Name));
             this.SelectedRule = this.PossibleRules.FirstOrDefault(x => x == this.SelectedRule);
@@ -109,7 +141,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="thing">the <see cref="Thing"/> to inspect</param>
         protected void ExecuteInspectCommand(Thing thing)
         {
-            this.thingDialogNavigationService.Navigate(thing, null, this.Session, false, ThingDialogKind.Inspect, this.thingDialogNavigationService, thing.Container);
+            this.thingDialogNavigationService.Navigate(thing, null, this.Session, false, ThingDialogKind.Inspect,
+                this.thingDialogNavigationService, thing.Container);
         }
     }
 }

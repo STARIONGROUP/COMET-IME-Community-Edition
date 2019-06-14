@@ -216,22 +216,35 @@
     <Compile Include="Converters\CategoryListConverter.cs" />
     <Compile Include="RelationshipMatrixModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\RelationshipConfiguration.cs" />
+    <Compile Include="Settings\SavedConfiguration.cs" />
+    <Compile Include="Settings\SourceConfiguration.cs" />
+    <Compile Include="ViewModels\DialogResult\ManageConfigurationsResult.cs" />
+    <Compile Include="ViewModels\DialogResult\SavedConfigurationResult.cs" />
     <Compile Include="ViewModels\MatrixCellViewModel.cs" />
     <Compile Include="ViewModels\MatrixConfigurationViewModelBase.cs" />
     <Compile Include="ViewModels\RelationshipConfigurationViewModel.cs" />
     <Compile Include="Settings\RelationshipMatrixSettings.cs" />
+    <Compile Include="ViewModels\ManageConfigurationsDialogViewModel.cs" />
+    <Compile Include="ViewModels\SavedConfigurationDialogViewModel.cs" />
     <Compile Include="ViewModels\SourceConfigurationViewModel.cs" />
     <Compile Include="ViewModels\ColumnDefinition.cs" />
     <Compile Include="ViewModels\MatrixViewModel.cs" />
     <Compile Include="ViewModels\RelationshipMatrixRibbonViewModel.cs" />
     <Compile Include="ViewModels\RelationshipMatrixViewModel.cs" />
     <Compile Include="Views\HeaderDataTemplateSelector.cs" />
+    <Compile Include="Views\ManageConfigurationsDialog.xaml.cs">
+      <DependentUpon>ManageConfigurationsDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MatrixCellDataTemplateSelector.cs" />
     <Compile Include="Views\RelationshipMatrix.xaml.cs">
       <DependentUpon>RelationshipMatrix.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\RelationshipMatrixRibbon.xaml.cs">
       <DependentUpon>RelationshipMatrixRibbon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SavedConfigurationDialog.xaml.cs">
+      <DependentUpon>SavedConfigurationDialog.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -250,11 +263,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\ManageConfigurationsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\RelationshipMatrix.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\RelationshipMatrixRibbon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SavedConfigurationDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

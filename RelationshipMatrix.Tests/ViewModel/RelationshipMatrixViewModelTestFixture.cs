@@ -61,12 +61,12 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             vm.SourceYConfiguration.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.OR;
             vm.RelationshipConfiguration.SelectedRule = vm.RelationshipConfiguration.PossibleRules.Single();
 
-            vm.SourceYConfiguration.IncludeSubctegories = false;
+            vm.SourceYConfiguration.IncludeSubcategories = false;
 
             Assert.AreEqual(3, vm.Matrix.Records.Count);
             Assert.AreEqual(3, vm.Matrix.Columns.Count);
 
-            vm.SourceYConfiguration.IncludeSubctegories = true;
+            vm.SourceYConfiguration.IncludeSubcategories = true;
             
             Assert.AreEqual(5, vm.Matrix.Records.Count);
             Assert.AreEqual(3, vm.Matrix.Columns.Count);
@@ -93,6 +93,33 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             Assert.AreEqual(2, vm.Matrix.Records.Count);
             Assert.AreEqual(2, vm.Matrix.Columns.Count);
+
+            vm.Dispose();
+        }
+
+        [Test]
+        public void AssertSavingConfigurationsWork()
+        {
+            var vm = new RelationshipMatrixViewModel(
+                this.iteration,
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.panelNavigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginService.Object);
+
+            vm.SourceYConfiguration.SelectedClassKind = vm.SourceYConfiguration.PossibleClassKinds.First(x => x == ClassKind.ElementDefinition);
+            vm.SourceXConfiguration.SelectedClassKind = vm.SourceXConfiguration.PossibleClassKinds.First(x => x == ClassKind.ElementDefinition);
+
+            vm.SourceYConfiguration.SelectedCategories = new List<Category>(vm.SourceYConfiguration.PossibleCategories.Where(x => x.Iid == this.catEd1.Iid || x.Iid == this.catEd2.Iid));
+            vm.SourceXConfiguration.SelectedCategories = new List<Category>(vm.SourceXConfiguration.PossibleCategories.Where(x => x.Iid == this.catEd2.Iid));
+            vm.SourceYConfiguration.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.OR;
+            vm.RelationshipConfiguration.SelectedRule = vm.RelationshipConfiguration.PossibleRules.Single();
+
+            vm.SourceYConfiguration.IncludeSubcategories = false;
+
+            Assert.DoesNotThrow(() => vm.SaveCurrentConfiguration.Execute(null));
+            Assert.DoesNotThrow(() => vm.ManageSavedConfigurations.Execute(null));
 
             vm.Dispose();
         }

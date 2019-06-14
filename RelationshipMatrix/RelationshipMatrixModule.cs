@@ -126,20 +126,20 @@ namespace CDP4RelationshipMatrix
         {
             try
             {
-                var settings = this.PluginSettingService.Read<RelationshipMatrixPluginSettings>(this);
+                var settings = this.PluginSettingService.Read<RelationshipMatrixPluginSettings>();
 
                 if (!settings.PossibleDisplayKinds.Any())
                 {
                     // if setting is empty, repopulate with default set and save it
                     settings.PossibleDisplayKinds = RelationshipMatrixPluginSettings.DefaultDisplayKinds;
-                    this.PluginSettingService.Write(settings, this);
+                    this.PluginSettingService.Write(settings);
                 }
             }
             catch (PluginSettingsException pluginSettingsException)
             {
                 var relationshipMatrixPluginSettings = new RelationshipMatrixPluginSettings(true);
 
-                this.PluginSettingService.Write(relationshipMatrixPluginSettings, this);
+                this.PluginSettingService.Write(relationshipMatrixPluginSettings);
                 
                 logger.Error(pluginSettingsException);
             }

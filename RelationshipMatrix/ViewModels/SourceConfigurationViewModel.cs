@@ -59,9 +59,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         private CategoryBooleanOperatorKind _selectedBooleanOperatorKind;
 
         /// <summary>
-        /// Backing field for <see cref="IncludeSubctegories"/>
+        /// Backing field for <see cref="IncludeSubcategories"/>
         /// </summary>
-        private bool includeSubctegories;
+        private bool includeSubcategories;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SourceConfigurationViewModel"/> class
@@ -77,10 +77,12 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.possibleDisplayKinds.AddRange(this.PluginSetting.PossibleDisplayKinds.OrderBy(x => x.ToString()));
 
             this.PossibleCategories = new ReactiveList<Category>();
+            this.PossibleCategories.ChangeTrackingEnabled = true;
+            this.SelectedCategories = new List<Category>();
 
             // default boolean operator is AND
             this.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.AND;
-            this.IncludeSubctegories = true;
+            this.IncludeSubcategories = true;
 
             this.WhenAnyValue(x => x.SelectedClassKind).Skip(1).Subscribe(_ =>
             {
@@ -95,7 +97,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ => this.OnUpdateAction());
             this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ => this.OnUpdateAction());
-            this.WhenAnyValue(x => x.IncludeSubctegories).Skip(1).Subscribe(_ => this.OnUpdateAction());
+            this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ => this.OnUpdateAction());
 
             var categorySubscription = CDPMessageBus.Current
                 .Listen<ObjectChangedEvent>(typeof(Category))
@@ -107,6 +109,38 @@ namespace CDP4RelationshipMatrix.ViewModels
                 });
 
             this.Disposables.Add(categorySubscription);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SourceConfigurationViewModel"/> class
+        /// </summary>
+        /// <param name="session">The current session</param>
+        /// <param name="iteration">The current iteration</param>
+        /// <param name="onUpdateAction">The action to perform on update</param>
+        /// <param name="settings">The module settings</param>
+        /// <param name="source">The source <see cref="SourceConfiguration"/></param>
+        public SourceConfigurationViewModel(ISession session, Iteration iteration, Action onUpdateAction,
+            RelationshipMatrixPluginSettings settings, SourceConfiguration source) : this(session, iteration, onUpdateAction, settings)
+        {
+            this.IncludeSubcategories = source.IncludeSubcategories;
+
+            this.SelectedBooleanOperatorKind = source.SelectedBooleanOperatorKind;
+            this.SelectedClassKind = source.SelectedClassKind;
+            this.SelectedDisplayKind = source.SelectedDisplayKind;
+
+            var categories = new List<Category>();
+
+            foreach (var sourceSelectedCategoryIid in source.SelectedCategories)
+            {
+                var category = this.PossibleCategories.FirstOrDefault(c => c.Iid == sourceSelectedCategoryIid);
+
+                if (category != null)
+                {
+                    categories.Add(category);
+                }
+            }
+
+            this.SelectedCategories = new List<Category>(categories);
         }
 
         /// <summary>
@@ -171,10 +205,10 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets or sets the the value indicating whether subcategories should be included
         /// </summary>
-        public bool IncludeSubctegories
+        public bool IncludeSubcategories
         {
-            get { return this.includeSubctegories; }
-            set { this.RaiseAndSetIfChanged(ref this.includeSubctegories, value); }
+            get { return this.includeSubcategories; }
+            set { this.RaiseAndSetIfChanged(ref this.includeSubcategories, value); }
         }
 
         /// <summary>

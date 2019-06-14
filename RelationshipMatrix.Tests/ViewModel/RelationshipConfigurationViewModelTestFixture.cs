@@ -13,6 +13,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using CDP4Dal.Operations;
+    using CDP4RelationshipMatrix.Settings;
     using CDP4RelationshipMatrix.ViewModels;
     using NUnit.Framework;
     using Moq;    
@@ -24,13 +25,19 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     public class RelationshipConfigurationViewModelTestFixture : ViewModelTestBase
     {
         private RelationshipConfigurationViewModel relationshipConfigurationViewModel;
+        private RelationshipConfiguration relationshipConfiguration;
 
         [SetUp]
         public void SetUp()
         {
             base.Setup();
 
-            this.relationshipConfigurationViewModel = new RelationshipConfigurationViewModel(this.session.Object, this.thingDialogNavigationService.Object, this.iteration, this.UpdateAction, null);
+            this.relationshipConfiguration = new RelationshipConfiguration
+            {
+                SelectedRule = this.rule.Iid
+            };
+
+            this.relationshipConfigurationViewModel = new RelationshipConfigurationViewModel(this.session.Object, this.thingDialogNavigationService.Object, this.iteration, this.UpdateAction, null, this.relationshipConfiguration, ClassKind.Requirement, ClassKind.ElementUsage);
         }
 
         /// <summary>
@@ -63,6 +70,18 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.relationshipConfigurationViewModel.InspectRuleCommand.Execute(null);
 
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<Rule>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, It.IsAny<Thing>(), null));
+        }
+
+        [Test]
+        public void Verify_that_relationship_configuration_can_be_created()
+        {
+            this.relationshipConfigurationViewModel.PossibleRules.Add(this.rule);
+
+            this.relationshipConfigurationViewModel.SelectedRule = this.relationshipConfigurationViewModel.PossibleRules.First();
+
+            var relConfig = new RelationshipConfiguration(this.relationshipConfigurationViewModel);
+
+            Assert.AreEqual(this.rule.Iid, relConfig.SelectedRule);
         }
     }
 }

@@ -40,16 +40,7 @@ namespace CDP4Composition.Tests.PluginSettingService
         [Test]
         public void Verify_that_on_write_ArgumentNullException_is_thrown()
         {
-            Assert.Throws<ArgumentNullException>(() => this.pluginSettingsService.Write<TestSettings>(null, this.testModule));
-
-            var settings = new TestSettings();
-            Assert.Throws<ArgumentNullException>(() => this.pluginSettingsService.Write(settings, null));
-        }
-
-        [Test]
-        public void Verify_that_on_read_ArgumentNullException_is_thrown()
-        {
-            Assert.Throws<ArgumentNullException>(() => this.pluginSettingsService.Read<TestSettings>(null));
+            Assert.Throws<ArgumentNullException>(() => this.pluginSettingsService.Write<TestSettings>(null));
         }
 
         [Test]
@@ -61,7 +52,7 @@ namespace CDP4Composition.Tests.PluginSettingService
                 Description = "this is a description"
             };
 
-            Assert.DoesNotThrow(() => this.pluginSettingsService.Write(settings, this.testModule));
+            Assert.DoesNotThrow(() => this.pluginSettingsService.Write(settings));
 
             var expectedSettingsContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"));
             var writtenContent = File.ReadAllText(this.expectedSettingsPath);
@@ -73,7 +64,7 @@ namespace CDP4Composition.Tests.PluginSettingService
         {
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"), this.expectedSettingsPath);
             
-            var settings = this.pluginSettingsService.Read<TestSettings>(this.testModule);
+            var settings = this.pluginSettingsService.Read<TestSettings>();
             Assert.AreEqual(Guid.Parse("78d90eda-bc57-45fe-8bfa-b9ca23130a00"), settings.Identifier);
             Assert.AreEqual("this is a description", settings.Description);
         }
@@ -83,7 +74,7 @@ namespace CDP4Composition.Tests.PluginSettingService
         {
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"), this.expectedSettingsPath);
 
-            var settings = this.pluginSettingsService.Read<TestSettings>(this.testModule);
+            var settings = this.pluginSettingsService.Read<TestSettings>();
             Assert.AreEqual(Guid.Parse("78d90eda-bc57-45fe-8bfa-b9ca23130a00"), settings.Identifier);
             Assert.AreEqual("this is a description", settings.Description);
 
@@ -93,9 +84,9 @@ namespace CDP4Composition.Tests.PluginSettingService
             settings.Identifier = id;
             settings.Description = description;
 
-            this.pluginSettingsService.Write(settings, this.testModule);
+            this.pluginSettingsService.Write(settings);
 
-            var newSettings = this.pluginSettingsService.Read<TestSettings>(this.testModule);
+            var newSettings = this.pluginSettingsService.Read<TestSettings>();
 
             Assert.AreEqual(id, newSettings.Identifier);
             Assert.AreEqual(description, newSettings.Description);
