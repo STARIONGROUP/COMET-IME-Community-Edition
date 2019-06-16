@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ namespace CDP4EngineeringModel.Tests
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reflection;
+    using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -247,7 +248,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatDropsWorkDomain()
+        public async Task VerifyThatDropsWorkDomain()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             var dropinfo = new Mock<IDropInfo>();
@@ -256,7 +257,7 @@ namespace CDP4EngineeringModel.Tests
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
             droptarget.Setup(x => x.Drop(It.IsAny<IDropInfo>())).Throws(new Exception("ex"));
 
-            vm.Drop(dropinfo.Object);
+            await vm.Drop(dropinfo.Object);
             droptarget.Verify(x => x.Drop(dropinfo.Object));
 
             Assert.AreEqual("ex", vm.Feedback);
@@ -429,7 +430,7 @@ namespace CDP4EngineeringModel.Tests
 
 
         [Test]
-        public void VerifyDropElementDef()
+        public async Task VerifyDropElementDef()
         {
             var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.sitedir.Domain.Add(domain);
@@ -472,12 +473,12 @@ namespace CDP4EngineeringModel.Tests
             dropinfo.SetupProperty(x => x.Effects);
             dropinfo.Object.Effects = DragDropEffects.All;
 
-            vm.Drop(dropinfo.Object);           
+            await vm.Drop(dropinfo.Object);           
             Assert.That(vm.Feedback, Is.Null.Or.Empty);
         }
 
         [Test]
-        public void VerifyDropElementDefExceptionCaught()
+        public async Task VerifyDropElementDefExceptionCaught()
         {
             var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.sitedir.Domain.Add(domain);
@@ -522,7 +523,7 @@ namespace CDP4EngineeringModel.Tests
 
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
-            vm.Drop(dropinfo.Object);
+            await vm.Drop(dropinfo.Object);
             Assert.AreEqual("test", vm.Feedback);
         }
 
@@ -614,7 +615,6 @@ namespace CDP4EngineeringModel.Tests
             Assert.IsFalse(defRow.IsTopElement);
             Assert.IsTrue(def2Row.IsTopElement);
 
-            //this.iteration.Element.Remove(def2);
             this.iteration.Element.Remove(def2);
             rev.SetValue(this.iteration, 51);
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
