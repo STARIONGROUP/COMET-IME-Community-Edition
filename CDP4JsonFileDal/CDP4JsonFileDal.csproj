@@ -59,8 +59,8 @@
       <HintPath>..\packages\CDP4Dal-CE.5.0.1\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4JsonFileDal, Version=5.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonFileDal-CE.5.0.1\lib\net452\CDP4JsonFileDal.dll</HintPath>
+    <Reference Include="CDP4JsonFileDal, Version=5.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonFileDal-CE.5.0.2\lib\net452\CDP4JsonFileDal.dll</HintPath>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CDP4JsonSerializer-CE.3.0.1\lib\net452\CDP4JsonSerializer.dll</HintPath>
