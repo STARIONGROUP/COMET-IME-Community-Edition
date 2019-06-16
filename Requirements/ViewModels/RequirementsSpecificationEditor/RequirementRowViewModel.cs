@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="RequirementRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,6 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
     /// </summary>
     public class RequirementRowViewModel : CDP4CommonView.RequirementRowViewModel, IBreadCrumb
     {
-        #region Fields
         /// <summary>
         /// Backing field for the <see cref="BreadCrumb"/> property
         /// </summary>
@@ -66,7 +65,6 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         /// The subscription on <see cref="definition"/>
         /// </summary>
         private IDisposable definitionSubscription;
-        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementRowViewModel"/> class
@@ -255,10 +253,7 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
             }
             else
             {
-                foreach (var category in this.Thing.Category)
-                {
-                    string.Format("{0}, {1}", this.Categories, category.ShortName);
-                }
+                this.Categories = string.Join(", ", this.Thing.Category.Select(x => x.ShortName));
             }
         }
 
