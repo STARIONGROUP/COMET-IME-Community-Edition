@@ -207,6 +207,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateProperties()
         {
             this.UpdateThingStatus();
+            this.UpdateOptionLists();
             this.PopulateParameters();
         }
 
