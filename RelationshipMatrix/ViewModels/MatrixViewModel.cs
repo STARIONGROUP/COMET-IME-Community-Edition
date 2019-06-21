@@ -377,12 +377,9 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
-            var sourceXToUse =
-                new List<DefinedThing>(this.FilterSourceByCategory(sourceXThing, sourceX)
-                    .OrderBy(x => x.Name));
-            var sourceYToUse =
-                new List<DefinedThing>(this.FilterSourceByCategory(sourceYThing, sourceY)
-                    .OrderBy(x => x.Name));
+            var sourceXToUse = new List<DefinedThing>(this.FilterAndSortSourceByCategory(sourceXThing, sourceX));
+            
+            var sourceYToUse = new List<DefinedThing>(this.FilterAndSortSourceByCategory(sourceYThing, sourceY));
 
             if (sourceYToUse.Count == 0 || sourceXToUse.Count == 0)
             {
@@ -624,17 +621,17 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Filters the <paramref name="source"/> with the <paramref name="sourceCat"/>
+        /// Filters and sort the <paramref name="source"/> with the <paramref name="sourceConfigurationViewModel"/>
         /// </summary>
         /// <param name="source">The <see cref="Thing"/> to filter</param>
-        /// <param name="sourceCat">The filter <see cref="Category"/></param>
+        /// <param name="sourceConfigurationViewModel">The filter and sort settings</param>
         /// <returns>The filtered <see cref="Thing"/></returns>
-        private IEnumerable<DefinedThing> FilterSourceByCategory(IReadOnlyList<DefinedThing> source,
-            SourceConfigurationViewModel sourceCat)
+        private IEnumerable<DefinedThing> FilterAndSortSourceByCategory(IReadOnlyList<DefinedThing> source,
+            SourceConfigurationViewModel sourceConfigurationViewModel)
         {
             var sourceXCatThing = new List<DefinedThing>();
 
-            if (sourceCat?.SelectedCategories == null || sourceCat.SelectedCategories.Count == 0)
+            if (sourceConfigurationViewModel?.SelectedCategories == null || sourceConfigurationViewModel.SelectedCategories.Count == 0)
             {
                 return sourceXCatThing;
             }
@@ -643,9 +640,32 @@ namespace CDP4RelationshipMatrix.ViewModels
             {
                 var thing = (ICategorizableThing) definedThing;
 
-                if (RelationshipMatrixViewModel.IsCategoryApplicableToConfiguration(thing, sourceCat))
+                if (RelationshipMatrixViewModel.IsCategoryApplicableToConfiguration(thing, sourceConfigurationViewModel))
                 {
                     sourceXCatThing.Add(definedThing);
+                }
+            }
+
+            if (sourceConfigurationViewModel.SelectedSortOrder == SortOrder.Ascending)
+            {
+                if (sourceConfigurationViewModel.SelectedDisplayKind == DisplayKind.Name)
+                {
+                    sourceXCatThing = sourceXCatThing.OrderBy(x => x.Name).ToList();
+                }
+                else
+                {
+                    sourceXCatThing = sourceXCatThing.OrderBy(x => x.ShortName).ToList();
+                }
+            }
+            else
+            {
+                if (sourceConfigurationViewModel.SelectedDisplayKind == DisplayKind.Name)
+                {
+                    sourceXCatThing = sourceXCatThing.OrderByDescending(x => x.Name).ToList();
+                }
+                else
+                {
+                    sourceXCatThing = sourceXCatThing.OrderByDescending(x => x.ShortName).ToList();
                 }
             }
 

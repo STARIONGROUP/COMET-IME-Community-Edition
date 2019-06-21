@@ -36,6 +36,7 @@ namespace CDP4RelationshipMatrix.Settings
             this.SelectedBooleanOperatorKind = source.SelectedBooleanOperatorKind;
             this.SelectedClassKind = source.SelectedClassKind;
             this.SelectedDisplayKind = source.SelectedDisplayKind;
+            this.SortOrder = SortOrder.Ascending;
 
             this.SelectedCategories.AddRange(source.SelectedCategories.Select(x => x.Iid));
         }
@@ -67,5 +68,11 @@ namespace CDP4RelationshipMatrix.Settings
         /// Gets or sets the the value indicating whether subcategories should be included
         /// </summary>
         public bool IncludeSubcategories { get; set; }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="SortOrder"/>
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public SortOrder SortOrder { get; set; }
     }
 }

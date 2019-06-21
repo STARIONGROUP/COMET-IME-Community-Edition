@@ -13,10 +13,10 @@
              xmlns:relationshipMatrix="clr-namespace:CDP4RelationshipMatrix"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:behaviour="clr-namespace:CDP4RelationshipMatrix.Behaviour"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
+             xmlns:settings="clr-namespace:CDP4RelationshipMatrix.Settings"
              d:DesignHeight="800"
              d:DesignWidth="800"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
@@ -330,6 +330,12 @@
                                                             EditValue="{Binding SourceXConfiguration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ItemsSource="{Binding SourceXConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                                                     </dxlc:LayoutItem>
+                                                    <dxlc:LayoutItem Label="Sort Order: ">
+                                                        <dxe:ComboBoxEdit
+                                                            IsTextEditable="False"
+                                                            EditValue="{Binding SourceXConfiguration.SelectedSortOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{dxe:EnumItemsSource EnumType=settings:SortOrder,UseNumericEnumValue=False}" />
+                                                    </dxlc:LayoutItem>
                                                 </dxlc:LayoutGroup>
                                                 <dxlc:LayoutGroup View="Group" GroupBoxDisplayMode="Light"
                                                                   HorizontalAlignment="Stretch"
@@ -395,6 +401,12 @@
                                                             AutoComplete="False"
                                                             AllowNullInput="False"
                                                             AllowDefaultButton="True" />
+                                                    </dxlc:LayoutItem>
+                                                    <dxlc:LayoutItem Label="Sort Order: ">
+                                                        <dxe:ComboBoxEdit
+                                                            IsTextEditable="False"
+                                                            EditValue="{Binding SourceYConfiguration.SelectedSortOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            ItemsSource="{dxe:EnumItemsSource EnumType=settings:SortOrder,UseNumericEnumValue=False}" />
                                                     </dxlc:LayoutItem>
                                                 </dxlc:LayoutGroup>
                                                 <dxlc:LayoutGroup View="GroupBox"

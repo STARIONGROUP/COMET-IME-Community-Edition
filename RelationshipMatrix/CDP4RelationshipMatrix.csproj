@@ -209,6 +209,7 @@
     <Compile Include="Converters\RowDoubleClickEventArgsConverter.cs" />
     <Compile Include="Converters\MarkupExtensionBase.cs" />
     <Compile Include="Settings\CategoryBooleanOperatorKind.cs" />
+    <Compile Include="Settings\SortOrder.cs" />
     <Compile Include="Settings\DisplayKind.cs" />
     <Compile Include="Converters\NameContentConverter.cs" />
     <Compile Include="Converters\ColumnWidthConverter.cs" />

@@ -34,15 +34,20 @@ namespace CDP4RelationshipMatrix.ViewModels
         private readonly List<DisplayKind> possibleDisplayKinds = new List<DisplayKind>();
 
         /// <summary>
-        /// Backing field for <see cref="SelectedClassKind"/>
+        /// Backing field for <see cref="SelectedClassKind"/> property.
         /// </summary>
         private ClassKind? selectedClassKind;
 
         /// <summary>
-        /// Backing field for <see cref="SelectedDisplay"/>
+        /// Backing field for <see cref="SelectedDisplay"/> property.
         /// </summary>
         private DisplayKind selectedDisplayKind;
 
+        /// <summary>
+        /// Backing field for <see cref="SelectedSortOrder"/> property.
+        /// </summary>
+        private SortOrder selectedSortOrder;
+        
         /// <summary>
         /// Backing field for <see cref="SelectedCategories"/>
         /// </summary>
@@ -95,6 +100,11 @@ namespace CDP4RelationshipMatrix.ViewModels
                 this.OnUpdateAction();
             });
 
+            this.WhenAnyValue(x => x.SelectedSortOrder).Skip(1).Subscribe(_ =>
+            {
+                this.OnUpdateAction();
+            });
+
             this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ => this.OnUpdateAction());
             this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ => this.OnUpdateAction());
             this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ => this.OnUpdateAction());
@@ -127,6 +137,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.SelectedBooleanOperatorKind = source.SelectedBooleanOperatorKind;
             this.SelectedClassKind = source.SelectedClassKind;
             this.SelectedDisplayKind = source.SelectedDisplayKind;
+            this.selectedSortOrder = source.SortOrder;
 
             var categories = new List<Category>();
 
@@ -159,6 +170,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             get { return this.selectedDisplayKind; }
             set { this.RaiseAndSetIfChanged(ref this.selectedDisplayKind, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="SortOrder"/>
+        /// </summary>
+        public SortOrder SelectedSortOrder
+        {
+            get { return this.selectedSortOrder; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedSortOrder, value); }
         }
 
         /// <summary>

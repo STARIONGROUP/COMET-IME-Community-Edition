@@ -11,7 +11,7 @@ namespace CDP4RelationshipMatrix
     using ViewModels;
 
     /// <summary>
-    /// The purpose of this class is to select the right template based on thee column to display
+    /// The purpose of this class is to select the right template based on the column to display
     /// </summary>
     public class HeaderDataTemplateSelector : DataTemplateSelector
     {
