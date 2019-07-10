@@ -10,11 +10,9 @@ namespace CDP4RelationshipMatrix.Behaviour
     using System.Windows;
     using System.Windows.Input;
     using DevExpress.Mvvm.UI.Interactivity;
-    using DevExpress.Utils.Design;
     using DevExpress.Xpf.Bars;
     using DevExpress.Xpf.Core;
-
-
+    
     /// <summary>
     /// Behavior defining manipulation of the column header context menus of the matrix
     /// </summary>
@@ -80,18 +78,18 @@ namespace CDP4RelationshipMatrix.Behaviour
             });
 
             // Create a custom menu item and add it to the context menu.
-            var bi = new BarButtonItem();
+            var barButtonItem = new BarButtonItem();
 
-            bi.Name = "toggleHighlight";
-            bi.Content = "Toggle Highlight";
-            bi.Command = this.Command;
-            bi.CommandParameter = e.MenuInfo.Column;
+            barButtonItem.Name = "toggleHighlight";
+            barButtonItem.Content = "Toggle Highlight";
+            barButtonItem.Command = this.Command;
+            barButtonItem.CommandParameter = e.MenuInfo.Column;
 
-            bi.Glyph = DXImageHelper.GetImageSource(@"Images/Conditional Formatting/HighlightCellsRules_16x16.png");
+            barButtonItem.Glyph = DXImageHelper.GetImageSource(@"Images/Conditional Formatting/HighlightCellsRules_16x16.png");
 
-            bi.SetValue(BarItemLinkActionBase.ItemLinkIndexProperty, 0);
+            barButtonItem.SetValue(BarItemLinkActionBase.ItemLinkIndexProperty, 0);
 
-            e.Customizations.Add(bi);
+            e.Customizations.Add(barButtonItem);
         }
     }
 }
