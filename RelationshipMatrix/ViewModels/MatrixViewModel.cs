@@ -20,7 +20,6 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
     using DevExpress.Xpf.Grid;
-    using DevExpress.XtraPrinting.Native;
     using NLog;
     using ReactiveUI;
     using Settings;
