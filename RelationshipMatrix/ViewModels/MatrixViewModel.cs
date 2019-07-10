@@ -19,7 +19,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Operations;
-    using DevExpress.XtraPrinting.Native;
+    using DevExpress.Xpf.Grid;
     using NLog;
     using ReactiveUI;
     using Settings;
@@ -155,6 +155,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.ProcessAltCellCommand = ReactiveCommand.CreateAsyncTask(x => this.ProcessAltCellCommandExecute((List<object>)x), RxApp.MainThreadScheduler);
             this.ProcessAltControlCellCommand = ReactiveCommand.CreateAsyncTask(x => this.ProcessAltControlCellCommandExecute((List<object>)x), RxApp.MainThreadScheduler);
 
+            this.ToggleColumnHighlightCommand = ReactiveCommand.CreateAsyncTask(x => this.ToggleColumnHighlightCommandExecute(x as GridColumn), RxApp.MainThreadScheduler);
+
             this.SubscribeCommandExceptions();
 
             this.WhenAnyValue(x => x.SelectedCell).Subscribe(_ => this.ComputeCommandCanExecute());
@@ -268,6 +270,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Gets the command to process Alt + Ctrl + cell double click.
         /// </summary>
         public ReactiveCommand<Unit> ProcessAltControlCellCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command to process column highlight toggle.
+        /// </summary>
+        public ReactiveCommand<Unit> ToggleColumnHighlightCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the selected cell
@@ -489,10 +496,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         private IList<ColumnDefinition> CreateColumns(IReadOnlyList<DefinedThing> source, DisplayKind displayKind, bool showRelatedOnly, IList<BinaryRelationship> relationships)
         {
             var columns = new List<ColumnDefinition>();
-
-            // column that contains the name of the thing to display for each row
-            columns.Add(new ColumnDefinition(CDP4_NAME_HEADER, ROW_NAME_COLUMN, true));
-
+            
             foreach (var definedThing in source.DistinctBy(x => x.ShortName))
             {
                 if (showRelatedOnly && !relationships.Any(x =>
@@ -510,6 +514,12 @@ namespace CDP4RelationshipMatrix.ViewModels
 
                 // Set fieldname to use as iid
                 columns.Add(new ColumnDefinition(definedThing, displayKind));
+            }
+
+            if (columns.Any())
+            {
+                // column that contains the name of the thing to display for each row
+                columns.Insert(0, new ColumnDefinition(CDP4_NAME_HEADER, ROW_NAME_COLUMN, true));
             }
 
             return columns;
@@ -806,6 +816,22 @@ namespace CDP4RelationshipMatrix.ViewModels
                 await this.DeleteSourceXToSourceYLink.ExecuteAsync();
                 return;
             }
+        }
+
+        /// <summary>
+        /// Executes a toggle of column highlight command
+        /// </summary>
+        /// <param name="column">The column.</param>
+        private async Task ToggleColumnHighlightCommandExecute(GridColumn column)
+        {
+            if (column == null)
+            {
+                return;
+            }
+
+            var vm = column.DataContext as ColumnDefinition;
+
+            vm?.ToggleHighlight();
         }
 
         /// <summary>

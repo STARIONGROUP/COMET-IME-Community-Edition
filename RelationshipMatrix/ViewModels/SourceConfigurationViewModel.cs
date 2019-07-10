@@ -74,10 +74,13 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="session">The current session</param>
         /// <param name="iteration">The current iteration</param>
         /// <param name="onUpdateAction">The action to perform on update</param>
+        /// <param name="onLightUpdateAction">The action to perform on update without need to rebuild relationship configiguration</param>
         /// <param name="settings">The module settings</param>
-        public SourceConfigurationViewModel(ISession session, Iteration iteration, Action onUpdateAction,
+        public SourceConfigurationViewModel(ISession session, Iteration iteration, Action onUpdateAction, Action onLightUpdateAction,
             RelationshipMatrixPluginSettings settings) : base(session, iteration, onUpdateAction, settings)
         {
+            this.OnLightUpdateAction = onLightUpdateAction;
+
             this.possibleClassKind.AddRange(this.PluginSetting.PossibleClassKinds.OrderBy(x => x.ToString()));
             this.possibleDisplayKinds.AddRange(this.PluginSetting.PossibleDisplayKinds.OrderBy(x => x.ToString()));
 
@@ -97,17 +100,17 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.WhenAnyValue(x => x.SelectedDisplayKind).Skip(1).Subscribe(_ =>
             {
-                this.OnUpdateAction();
+                this.OnLightUpdateAction();
             });
 
             this.WhenAnyValue(x => x.SelectedSortOrder).Skip(1).Subscribe(_ =>
             {
-                this.OnUpdateAction();
+                this.OnLightUpdateAction();
             });
 
-            this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ => this.OnUpdateAction());
-            this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ => this.OnUpdateAction());
-            this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ => this.OnUpdateAction());
+            this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
+            this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
+            this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
 
             var categorySubscription = CDPMessageBus.Current
                 .Listen<ObjectChangedEvent>(typeof(Category))
@@ -115,7 +118,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => {
                     this.PopulatePossibleCategories();
-                    this.OnUpdateAction();
+                    this.OnLightUpdateAction();
                 });
 
             this.Disposables.Add(categorySubscription);
@@ -127,10 +130,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="session">The current session</param>
         /// <param name="iteration">The current iteration</param>
         /// <param name="onUpdateAction">The action to perform on update</param>
+        /// <param name="onLightUpdateAction">The action to perform on update without need to rebuild relationship configiguration</param>
         /// <param name="settings">The module settings</param>
         /// <param name="source">The source <see cref="SourceConfiguration"/></param>
-        public SourceConfigurationViewModel(ISession session, Iteration iteration, Action onUpdateAction,
-            RelationshipMatrixPluginSettings settings, SourceConfiguration source) : this(session, iteration, onUpdateAction, settings)
+        public SourceConfigurationViewModel(ISession session, Iteration iteration, Action onUpdateAction, Action onLightUpdateAction,
+            RelationshipMatrixPluginSettings settings, SourceConfiguration source) : this(session, iteration, onUpdateAction, onLightUpdateAction, settings)
         {
             this.IncludeSubcategories = source.IncludeSubcategories;
 
@@ -138,6 +142,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.SelectedClassKind = source.SelectedClassKind;
             this.SelectedDisplayKind = source.SelectedDisplayKind;
             this.selectedSortOrder = source.SortOrder;
+
+            this.OnLightUpdateAction = onLightUpdateAction;
 
             var categories = new List<Category>();
 
@@ -153,6 +159,11 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.SelectedCategories = new List<Category>(categories);
         }
+
+        /// <summary>
+        /// Gets the action that shall be performed when an instance of <see cref="MatrixConfigurationViewModelBase"/> is updated that does not need a relationship list rebuild
+        /// </summary>
+        protected Action OnLightUpdateAction { get; }
 
         /// <summary>
         /// Gets or sets the selected <see cref="ClassKind"/>

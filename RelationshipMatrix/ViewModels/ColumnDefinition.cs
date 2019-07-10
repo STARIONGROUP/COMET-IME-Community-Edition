@@ -28,6 +28,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         private string toolTip;
 
         /// <summary>
+        /// Backing field for <see cref="IsHighlighted"/>
+        /// </summary>
+        private bool isHighlighted;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ColumnDefinition"/> class
         /// </summary>
         /// <param name="thing">The represented <see cref="Thing"/></param>
@@ -39,6 +44,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.ToolTip = thing.Tooltip();
             this.FieldName = thing.ShortName;
             this.ThingId = thing.Iid;
+            this.IsHighlighted = false;
         }
 
         /// <summary>
@@ -52,6 +58,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.RelationshipCount = offsetCount? -1 : 0;
             this.Header = header;
             this.FieldName = fieldname;
+            this.IsHighlighted = false;
         }
 
         /// <summary>
@@ -78,6 +85,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the highlighted state.
+        /// </summary>
+        public bool IsHighlighted
+        {
+            get { return this.isHighlighted; }
+            private set { this.RaiseAndSetIfChanged(ref this.isHighlighted, value); }
+        }
+
+        /// <summary>
         /// Gets the name of the fieldname for this column
         /// </summary>
         public string FieldName { get; }
@@ -86,5 +102,13 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Gets or sets the total count of relationships this column has.
         /// </summary>
         public int RelationshipCount { get; set; }
+
+        /// <summary>
+        /// Toggles column highlight;
+        /// </summary>
+        public void ToggleHighlight()
+        {
+            this.IsHighlighted = !this.IsHighlighted;
+        }
     }
 }

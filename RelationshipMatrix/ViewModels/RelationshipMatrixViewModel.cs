@@ -121,6 +121,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         private RelationshipMatrixPluginSettings settings;
 
         /// <summary>
+        /// Flag to supress rebuild.
+        /// </summary>
+        private bool rebuildSupressed;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel"/> class
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration"/></param>
@@ -145,15 +150,16 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.settings = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
 
-            this.SavedConfigurations = new ReactiveList<SavedConfiguration>(this.settings.SavedConfigurations);
+            this.SavedConfigurations = new ReactiveList<SavedConfiguration>();
+
             this.SavedConfigurations.ChangeTrackingEnabled = true;
 
             this.ReloadSavedConfigurations();
 
             this.SourceYConfiguration =
-                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, this.settings);
+                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, this.BuildRelationshipMatrix, this.settings);
             this.SourceXConfiguration =
-                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, this.settings);
+                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, this.BuildRelationshipMatrix, this.settings);
             this.RelationshipConfiguration =
                 new RelationshipConfigurationViewModel(session, thingDialogNavigationService, iteration, this.BuildRelationshipMatrix, this.settings);
             this.Matrix = new MatrixViewModel(this.Session, this.Thing, this.settings);
@@ -338,6 +344,16 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             this.settings = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
             this.SavedConfigurations = new ReactiveList<SavedConfiguration>(this.settings.SavedConfigurations);
+
+            this.SavedConfigurations.Insert(0, new SavedConfiguration()
+            {
+                Name = "(Clear)",
+                RelationshipConfiguration = new RelationshipConfiguration(),
+                ShowRelatedOnly = false,
+                ShowDirectionality = true,
+                SourceConfigurationX = new SourceConfiguration(),
+                SourceConfigurationY = new SourceConfiguration()
+            });
         }
 
         /// <summary>
@@ -345,6 +361,12 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void BuildRelationshipMatrix()
         {
+            if (this.rebuildSupressed || this.IsBusy)
+            {
+                // if we are supressing rebuild or it is already
+                return;
+            }
+
             this.IsBusy = true;
 
             this.Matrix.RebuildMatrix(this.SourceYConfiguration, this.SourceXConfiguration,
@@ -507,16 +529,18 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
+            this.SupressRebuild();
+
             if (this.SelectedSavedConfiguration.SourceConfigurationX != null)
             {
                 this.SourceXConfiguration = new
-                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration, this.settings, this.SelectedSavedConfiguration.SourceConfigurationX);
+                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration, this.BuildRelationshipMatrix, this.settings, this.SelectedSavedConfiguration.SourceConfigurationX);
             }
 
             if (this.SelectedSavedConfiguration.SourceConfigurationY != null)
             {
                 this.SourceYConfiguration = new
-                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration, this.settings, this.SelectedSavedConfiguration.SourceConfigurationY);
+                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration, this.BuildRelationshipMatrix, this.settings, this.SelectedSavedConfiguration.SourceConfigurationY);
             }
 
             if (this.SelectedSavedConfiguration.RelationshipConfiguration != null)
@@ -527,6 +551,30 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.ShowDirectionality = this.SelectedSavedConfiguration.ShowDirectionality;
             this.ShowRelatedOnly = this.SelectedSavedConfiguration.ShowRelatedOnly;
+
+            this.EnableRebuild(true);
+        }
+
+        /// <summary>
+        /// Supresses the rebuild of the matrix.
+        /// </summary>
+        public void SupressRebuild()
+        {
+            this.rebuildSupressed = true;
+        }
+
+        /// <summary>
+        /// Disable matrix rebuild supression
+        /// </summary>
+        /// <param name="force">If true, forces a rebuild.</param>
+        public void EnableRebuild(bool force = false)
+        {
+            this.rebuildSupressed = false;
+
+            if (force)
+            {
+                this.BuildRelationshipMatrix();
+            }
         }
 
         /// <summary>
@@ -711,13 +759,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void ExecuteSwitchAxisCommand()
         {
+            this.SupressRebuild();
+
             var currentSourceX = this.SourceXConfiguration;
             var currentSourceY = this.SourceYConfiguration;
 
             this.SourceYConfiguration = currentSourceX;
             this.SourceXConfiguration = currentSourceY;
 
-            this.BuildRelationshipMatrix();
+            this.EnableRebuild(true);
         }
 
         /// <summary>

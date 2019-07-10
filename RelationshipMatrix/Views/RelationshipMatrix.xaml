@@ -31,6 +31,7 @@
             <converters:ColumnFixedConverter x:Key="ColumnFixedConverter" />
             <converters:ColumnWidthConverter x:Key="ColumnWidthConverter" />
             <converters:NameContentConverter x:Key="NameContentConverter" />
+            <converters:BooleanToHighlightConverter x:Key="BooleanToHighlightConverter"/>
             <converters:TooltipConverter x:Key="TooltipConverter" />
 
             <DataTemplate x:Key="SourceYToSourceX">
@@ -80,21 +81,29 @@
             <DataTemplate x:Key="None" />
 
             <DataTemplate x:Key="HeaderColumnTemplate">
-                <TextBlock Text="{Binding}"
-                           Width="80"
-                           FontWeight="Bold"
-                           VerticalAlignment="Center"
-                           TextAlignment="Center"
-                           TextWrapping="Wrap"
-                           HorizontalAlignment="Center">
-                    <TextBlock.LayoutTransform>
-                        <RotateTransform Angle="270" />
-                    </TextBlock.LayoutTransform>
-                </TextBlock>
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      Background="{Binding Path=IsHighlighted, Converter={StaticResource BooleanToHighlightConverter}}">
+                    <Grid.Width>
+                        <Binding Path="ActualWidth" 
+                                 RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type dxg:GridColumnHeader}}" />
+                    </Grid.Width>
+                    <TextBlock Text="{Binding Header}"
+                               Width="90"
+                               Height="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dxg:GridColumnHeader}}}"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="270" />
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </Grid>
             </DataTemplate>
             <DataTemplate x:Key="NameHeaderColumnTemplate">
-                <TextBlock Text="{Binding}"
-                           ToolTip="{Binding}"
+                <TextBlock Text="{Binding Header}"
+                           ToolTip="{Binding Header}"
                            x:Name="HeaderTextBlock"
                            Margin="5" />
             </DataTemplate>
@@ -114,13 +123,14 @@
             <DataTemplate x:Key="DefaultColumnTemplate">
                 <ContentControl>
                     <dxg:GridColumn
-                        Header="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).Header, RelativeSource={RelativeSource Self}}"
+                        Header="{Binding Path=(dxci:DependencyObjectExtensions.DataContext), RelativeSource={RelativeSource Self}}"
                         FieldName="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}"
                         AllowEditing="False"
                         Fixed="{Binding Path=FieldName, RelativeSource={RelativeSource Self}, Converter={StaticResource ColumnFixedConverter}}"
                         Width="{Binding Path=FieldName, RelativeSource={RelativeSource Self}, Converter={StaticResource ColumnWidthConverter}}"
                         FixedWidth="False"
                         MinWidth="30"
+                        HorizontalHeaderContentAlignment="Stretch"
                         HeaderToolTip="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).ToolTip, RelativeSource={RelativeSource Self}}"
                         ToolTip="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).ToolTip, RelativeSource={RelativeSource Self}}"
                         CellTemplateSelector="{StaticResource MatrixCellTemplateSelector}"
@@ -182,6 +192,7 @@
                                                                EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}"
                                                                EventName="RowDoubleClick" ModifierKeys=""
                                                                PassEventArgsToCommand="True" />
+                                        <behaviour:TableViewMenuBehavior Command="{Binding Matrix.ToggleColumnHighlightCommand}"/>
                                     </dxmvvm:Interaction.Behaviors>
                                     <dxg:TableView.RowCellMenuCustomizations>
                                         <dxb:BarButtonItem Content="Edit Row Thing"
