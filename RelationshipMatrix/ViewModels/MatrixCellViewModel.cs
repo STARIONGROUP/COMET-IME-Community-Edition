@@ -58,6 +58,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         private string tooltip;
 
         /// <summary>
+        /// Backing field for <see cref="IsHighlighted"/>
+        /// </summary>
+        private bool isHighlighted;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MatrixCellViewModel"/> class
         /// </summary>
         /// <param name="sourceY">The row that represents the <see cref="Thing"/></param>
@@ -72,7 +77,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.Rule = rule;
             this.Relationships = binaryRelationship ?? new List<BinaryRelationship>();
             this.DisplayKind = displayKind;
-            
+            this.IsHighlighted = false;
+
             if (binaryRelationship == null || binaryRelationship.Count == 0)
             {
                 this.RelationshipDirection = RelationshipDirectionKind.None;
@@ -113,6 +119,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Gets the <see cref="DisplayKind"/> of the cell.
         /// </summary>
         public DisplayKind? DisplayKind { get; }
+
+        /// <summary>
+        /// Gets or sets the highlighted state.
+        /// </summary>
+        public bool IsHighlighted
+        {
+            get { return this.isHighlighted; }
+            private set { this.RaiseAndSetIfChanged(ref this.isHighlighted, value); }
+        }
 
         /// <summary>
         /// Gets or sets the tooltip of the cell.

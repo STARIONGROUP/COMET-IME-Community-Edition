@@ -205,6 +205,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviour\CellSelectionBehavior.cs" />
+    <Compile Include="Behaviour\TableViewMenuBehavior.cs" />
+    <Compile Include="Converters\BooleanToHighlightConverter.cs" />
     <Compile Include="Converters\TooltipConverter.cs" />
     <Compile Include="Converters\RowDoubleClickEventArgsConverter.cs" />
     <Compile Include="Converters\MarkupExtensionBase.cs" />
