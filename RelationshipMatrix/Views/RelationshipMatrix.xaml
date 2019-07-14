@@ -140,130 +140,152 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid>
-        <dxlc:LayoutControl Background="AliceBlue" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+    <dxlc:LayoutControl Background="AliceBlue" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                             ScrollBars="None">
-            <dxlc:LayoutGroup Orientation="Vertical" VerticalAlignment="Stretch"
+        <dxlc:LayoutGroup Orientation="Vertical" VerticalAlignment="Stretch"
                               View="Group">
-                <dxlc:LayoutItem>
-                    <views:BrowserHeader />
-                </dxlc:LayoutItem>
+            <dxlc:LayoutItem>
+                <views:BrowserHeader />
+            </dxlc:LayoutItem>
 
-                <dxlc:LayoutGroup Orientation="Horizontal"
+            <dxlc:LayoutGroup Orientation="Horizontal"
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch"
                                   Margin="0"
                                   View="Group">
-                    <dxlc:LayoutItem VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                        <dxg:GridControl Name="MatrixGridControl"
-                                         ItemsSource="{Binding Matrix.Records, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                         ColumnsSource="{Binding Matrix.Columns, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                         ColumnGeneratorTemplate="{StaticResource DefaultColumnTemplate}"
-                                         services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                         SelectionMode="Cell">
-                            <dxmvvm:Interaction.Behaviors>
-                                <behaviour:CellSelectionBehavior
-                                    SelectedCell="{Binding  Matrix.SelectedCell, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                            </dxmvvm:Interaction.Behaviors>
-                            <dxg:GridControl.View>
-                                <dxg:TableView HorizontalAlignment="Stretch"
-                                               VerticalAlignment="Stretch"
-                                               ShowFilterPanelMode="Never"
-                                               IsDetailButtonVisibleBinding="{x:Null}"
-                                               ShowGroupPanel="False"
-                                               ShowSearchPanelMode="Default"
-                                               HorizontalScrollbarVisibility="Auto"
-                                               VerticalScrollbarVisibility="Auto"
-                                               ScrollingMode="Normal"
-                                               AllowColumnFiltering="False"
-                                               AllowGrouping="False"
-                                               AllowSorting="False">
-                                    <dxmvvm:Interaction.Behaviors>
-                                        <dxmvvm:EventToCommand Command="{Binding Matrix.ProcessAltControlCellCommand}"
-                                                               EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}"
-                                                               EventName="RowDoubleClick" ModifierKeys="Alt+Control"
-                                                               PassEventArgsToCommand="True" />
-                                        <dxmvvm:EventToCommand Command="{Binding Matrix.ProcessAltCellCommand}"
-                                                               EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}"
-                                                               EventName="RowDoubleClick" ModifierKeys="Alt"
-                                                               PassEventArgsToCommand="True" />
-                                        <dxmvvm:EventToCommand Command="{Binding Matrix.ProcessCellCommand}"
-                                                               EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}"
-                                                               EventName="RowDoubleClick" ModifierKeys=""
-                                                               PassEventArgsToCommand="True" />
-                                        <behaviour:TableViewMenuBehavior Command="{Binding Matrix.ToggleColumnHighlightCommand}"/>
-                                    </dxmvvm:Interaction.Behaviors>
-                                    <dxg:TableView.RowCellMenuCustomizations>
-                                        <dxb:BarButtonItem Content="Edit Row Thing"
-                                                           Glyph="{dx:DXImage Image=EditName_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.CanEditSourceY}"
-                                                           Command="{Binding View.DataContext.EditSourceYCommand}" />
-                                        <dxb:BarButtonItem Content="Inspect Row Thing"
-                                                           Glyph="{dx:DXImage Image=Find_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.CanInspectSourceY}"
-                                                           Command="{Binding View.DataContext.InspectSourceYCommand}" />
-                                        <dxb:BarItemLinkSeparator />
-                                        <dxb:BarButtonItem Content="Edit Column Thing"
-                                                           Glyph="{dx:DXImage Image=EditName_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.CanEditSourceX}"
-                                                           Command="{Binding View.DataContext.EditSourceXCommand}" />
-                                        <dxb:BarButtonItem Content="Inspect Column Thing"
-                                                           Glyph="{dx:DXImage Image=Find_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.CanInspectSourceX}"
-                                                           Command="{Binding View.DataContext.InspectSourceXCommand}" />
-                                        <dxb:BarItemLinkSeparator />
-                                        <dxb:BarButtonItem Content="Create ⮥"
-                                                           Glyph="{dx:DXImage Image=Add_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.Matrix.CanCreateSourceYToSourceX}"
-                                                           Command="{Binding View.DataContext.Matrix.CreateSourceYToSourceXLink}" />
-                                        <dxb:BarButtonItem Content="Create ⮠"
-                                                           Glyph="{dx:DXImage Image=Add_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.Matrix.CanCreateSourceXToSourceY}"
-                                                           Command="{Binding View.DataContext.Matrix.CreateSourceXToSourceYLink}" />
-                                        <dxb:BarItemLinkSeparator />
-                                        <dxb:BarButtonItem Content="Delete ⮥"
-                                                           Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteYToX}"
-                                                           Command="{Binding View.DataContext.Matrix.DeleteSourceYToSourceXLink}" />
-                                        <dxb:BarButtonItem Content="Delete ⮠"
-                                                           Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteXToY}"
-                                                           Command="{Binding View.DataContext.Matrix.DeleteSourceXToSourceYLink}" />
-                                        <dxb:BarButtonItem Content="Delete All"
-                                                           Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                                           IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteAll}"
-                                                           Command="{Binding View.DataContext.Matrix.DeleteAllRelationships}" />
-                                    </dxg:TableView.RowCellMenuCustomizations>
-                                </dxg:TableView>
-                            </dxg:GridControl.View>
-                        </dxg:GridControl>
-                    </dxlc:LayoutItem>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                    <dxlc:LayoutItem VerticalAlignment="Stretch" HorizontalAlignment="Right">
-                        <dxn:NavBarControl MaxWidth="350">
-                            <dxn:NavBarControl.View>
-                                <dxn:NavigationPaneView IsExpanded="True" />
-                            </dxn:NavBarControl.View>
-                            <dxn:NavBarControl.Groups>
-                                <dxn:NavBarGroup DisplaySource="Content" Header="Configuration">
-                                    <dxn:NavBarGroup.Content>
-                                        <dxlc:LayoutControl>
-                                            <dxlc:LayoutGroup Orientation="Vertical">
-                                                <dxlc:LayoutGroup View="GroupBox"
+                    <dxg:GridControl Grid.Row="0"  Name="MatrixGridControl"
+                                             ItemsSource="{Binding Matrix.Records, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                             ColumnsSource="{Binding Matrix.Columns, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                             ColumnGeneratorTemplate="{StaticResource DefaultColumnTemplate}"
+                                             services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                             SelectionMode="Cell">
+                        <dxmvvm:Interaction.Behaviors>
+                            <behaviour:CellSelectionBehavior
+                                        SelectedCell="{Binding  Matrix.SelectedCell, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </dxmvvm:Interaction.Behaviors>
+                        <dxg:GridControl.View>
+                            <dxg:TableView HorizontalAlignment="Stretch"
+                                                   VerticalAlignment="Stretch"
+                                                   ShowFilterPanelMode="Never"
+                                                   IsDetailButtonVisibleBinding="{x:Null}"
+                                                   ShowGroupPanel="False"
+                                                   ShowSearchPanelMode="Default"
+                                                   HorizontalScrollbarVisibility="Auto"
+                                                   VerticalScrollbarVisibility="Auto"
+                                                   ScrollingMode="Normal"
+                                                   AllowColumnFiltering="False"
+                                                   AllowGrouping="False"
+                                                   AllowSorting="False">
+                                <dxmvvm:Interaction.Behaviors>
+                                    <dxmvvm:EventToCommand Command="{Binding Matrix.ProcessAltControlCellCommand}"
+                                                                   EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}"
+                                                                   EventName="RowDoubleClick" ModifierKeys="Alt+Control"
+                                                                   PassEventArgsToCommand="True" />
+                                    <dxmvvm:EventToCommand Command="{Binding Matrix.ProcessAltCellCommand}"
+                                                                   EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}"
+                                                                   EventName="RowDoubleClick" ModifierKeys="Alt"
+                                                                   PassEventArgsToCommand="True" />
+                                    <dxmvvm:EventToCommand Command="{Binding Matrix.ProcessCellCommand}"
+                                                                   EventArgsConverter="{converters:RowDoubleClickEventArgsConverter}"
+                                                                   EventName="RowDoubleClick" ModifierKeys=""
+                                                                   PassEventArgsToCommand="True" />
+                                    <dxmvvm:EventToCommand Command="{Binding Matrix.MouseDownCommand}"
+                                                                   EventArgsConverter="{converters:PreviewMouseDownArgsConverter}"
+                                                                   EventName="PreviewMouseDown" ModifierKeys=""
+                                                                   PassEventArgsToCommand="True" />
+                                    
+                                    <behaviour:TableViewMenuBehavior Command="{Binding Matrix.ToggleColumnHighlightCommand}"/>
+                                </dxmvvm:Interaction.Behaviors>
+                                <dxg:TableView.RowCellMenuCustomizations>
+                                    <dxb:BarButtonItem Content="Edit Row Thing"
+                                                               Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.CanEditSourceY}"
+                                                               Command="{Binding View.DataContext.EditSourceYCommand}" />
+                                    <dxb:BarButtonItem Content="Inspect Row Thing"
+                                                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.CanInspectSourceY}"
+                                                               Command="{Binding View.DataContext.InspectSourceYCommand}" />
+                                    <dxb:BarItemLinkSeparator />
+                                    <dxb:BarButtonItem Content="Edit Column Thing"
+                                                               Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.CanEditSourceX}"
+                                                               Command="{Binding View.DataContext.EditSourceXCommand}" />
+                                    <dxb:BarButtonItem Content="Inspect Column Thing"
+                                                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.CanInspectSourceX}"
+                                                               Command="{Binding View.DataContext.InspectSourceXCommand}" />
+                                    <dxb:BarItemLinkSeparator />
+                                    <dxb:BarButtonItem Content="Create ⮥"
+                                                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.Matrix.CanCreateSourceYToSourceX}"
+                                                               Command="{Binding View.DataContext.Matrix.CreateSourceYToSourceXLink}" />
+                                    <dxb:BarButtonItem Content="Create ⮠"
+                                                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.Matrix.CanCreateSourceXToSourceY}"
+                                                               Command="{Binding View.DataContext.Matrix.CreateSourceXToSourceYLink}" />
+                                    <dxb:BarItemLinkSeparator />
+                                    <dxb:BarButtonItem Content="Delete ⮥"
+                                                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteYToX}"
+                                                               Command="{Binding View.DataContext.Matrix.DeleteSourceYToSourceXLink}" />
+                                    <dxb:BarButtonItem Content="Delete ⮠"
+                                                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteXToY}"
+                                                               Command="{Binding View.DataContext.Matrix.DeleteSourceXToSourceYLink}" />
+                                    <dxb:BarButtonItem Content="Delete All"
+                                                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteAll}"
+                                                               Command="{Binding View.DataContext.Matrix.DeleteAllRelationships}" />
+                                </dxg:TableView.RowCellMenuCustomizations>
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                    </dxg:GridControl>
+
+                    <dxlc:LayoutGroup Grid.Row="1"
+                                      Header="Item Details"
+                                      View="GroupBox"
+                                      IsCollapsible="True"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
+                                      GroupBoxDisplayMode="Normal">
+                        <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedItemDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                      VerticalScrollBarVisibility="Auto"
+                                      TextWrapping="Wrap"
+                                      IsReadOnly="True" />
+                    </dxlc:LayoutGroup>
+                </Grid>
+
+                <dxlc:LayoutItem VerticalAlignment="Stretch" HorizontalAlignment="Right">
+                    <dxn:NavBarControl MaxWidth="350">
+                        <dxn:NavBarControl.View>
+                            <dxn:NavigationPaneView IsExpanded="True" />
+                        </dxn:NavBarControl.View>
+                        <dxn:NavBarControl.Groups>
+                            <dxn:NavBarGroup DisplaySource="Content" Header="Configuration">
+                                <dxn:NavBarGroup.Content>
+                                    <dxlc:LayoutControl>
+                                        <dxlc:LayoutGroup Orientation="Vertical">
+                                            <dxlc:LayoutGroup View="GroupBox"
                                                                   GroupBoxDisplayMode="Light"
                                                                   HorizontalAlignment="Stretch"
                                                                   IsCollapsible="False"
                                                                   Orientation="Vertical"
                                                                   Header="Saved Configurations">
-                                                    <dxlc:LayoutItem>
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <dxe:ComboBoxEdit
+                                                <dxlc:LayoutItem>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <dxe:ComboBoxEdit
                                                                 Grid.Column="0"
                                                                 EditValue="{Binding SelectedSavedConfiguration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                 ItemsSource="{Binding SavedConfigurations, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -272,45 +294,45 @@
                                                                 AllowNullInput="True"
                                                                 AllowDefaultButton="True"
                                                                 DisplayMember="Name">
-                                                                <dxe:ComboBoxEdit.ItemContainerStyle>
-                                                                    <Style TargetType="dxe:ComboBoxEditItem">
-                                                                        <Setter Property="ToolTip"
+                                                            <dxe:ComboBoxEdit.ItemContainerStyle>
+                                                                <Style TargetType="dxe:ComboBoxEditItem">
+                                                                    <Setter Property="ToolTip"
                                                                                 Value="{Binding Description}" />
-                                                                    </Style>
-                                                                </dxe:ComboBoxEdit.ItemContainerStyle>
-                                                            </dxe:ComboBoxEdit>
-                                                            <dx:SimpleButton Grid.Column="1" Width="40"
+                                                                </Style>
+                                                            </dxe:ComboBoxEdit.ItemContainerStyle>
+                                                        </dxe:ComboBoxEdit>
+                                                        <dx:SimpleButton Grid.Column="1" Width="40"
                                                                              Margin="5,0"
                                                                              Command="{Binding ManageSavedConfigurations}"
                                                                              ToolTip="Manage Saved Configurations"
                                                                              Glyph="{dx:DXImage Image=ChartXAxisSettings_16x16.png}" />
-                                                            <dx:SimpleButton Grid.Column="2" Width="40"
+                                                        <dx:SimpleButton Grid.Column="2" Width="40"
                                                                              Command="{Binding SaveCurrentConfiguration}"
                                                                              ToolTip="Save Current Configuration"
                                                                              Glyph="{dx:DXImage Image=Save_16x16.png}" />
-                                                        </Grid>
-                                                    </dxlc:LayoutItem>
-                                                </dxlc:LayoutGroup>
-                                                <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light"
+                                                    </Grid>
+                                                </dxlc:LayoutItem>
+                                            </dxlc:LayoutGroup>
+                                            <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light"
                                                                   HorizontalAlignment="Stretch"
                                                                   IsCollapsible="False"
                                                                   Orientation="Vertical"
                                                                   Header="X Axis">
-                                                    <dxlc:LayoutItem Label="Type:">
-                                                        <dxe:ComboBoxEdit
+                                                <dxlc:LayoutItem Label="Type:">
+                                                    <dxe:ComboBoxEdit
                                                             EditValue="{Binding SourceXConfiguration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ItemsSource="{Binding SourceXConfiguration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             AutoComplete="True"
                                                             AllowNullInput="True"
                                                             AllowDefaultButton="True" />
-                                                    </dxlc:LayoutItem>
-                                                    <dxlc:LayoutItem Label="Categories: ">
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <dxe:ComboBoxEdit
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label="Categories: ">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <dxe:ComboBoxEdit
                                                                 Grid.Column="0"
                                                                 EditValue="{Binding SourceXConfiguration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
                                                                 ItemsSource="{Binding SourceXConfiguration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -318,68 +340,68 @@
                                                                 AllowNullInput="True"
                                                                 AllowDefaultButton="True"
                                                                 DisplayMember="Name">
-                                                                <dxe:ComboBoxEdit.StyleSettings>
-                                                                    <dxe:CheckedComboBoxStyleSettings />
-                                                                </dxe:ComboBoxEdit.StyleSettings>
-                                                            </dxe:ComboBoxEdit>
-                                                            <dxe:ComboBoxEdit Grid.Column="1"
+                                                            <dxe:ComboBoxEdit.StyleSettings>
+                                                                <dxe:CheckedComboBoxStyleSettings />
+                                                            </dxe:ComboBoxEdit.StyleSettings>
+                                                        </dxe:ComboBoxEdit>
+                                                        <dxe:ComboBoxEdit Grid.Column="1"
                                                                               MinWidth="60"
                                                                               ToolTip="Boolean Operator used to seperate the selected Categories."
                                                                               Margin="5,0,0,0"
                                                                               EditValue="{Binding SourceXConfiguration.SelectedBooleanOperatorKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                               ItemsSource="{Binding SourceXConfiguration.PossibleBooleanOperatorKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                        </Grid>
-                                                    </dxlc:LayoutItem>
-                                                    <dxlc:LayoutItem Label=" ">
-                                                        <dxe:CheckEdit
+                                                    </Grid>
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label=" ">
+                                                    <dxe:CheckEdit
                                                             EditValue="{Binding SourceXConfiguration.IncludeSubcategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             Content="Include Subcategories of Selected"
                                                             ToolTip="Recursivelly includes all subcategories of the selected Categories." />
-                                                    </dxlc:LayoutItem>
-                                                    <dxlc:LayoutItem Label="Display:">
-                                                        <dxe:ComboBoxEdit
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label="Display:">
+                                                    <dxe:ComboBoxEdit
                                                             EditValue="{Binding SourceXConfiguration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ItemsSource="{Binding SourceXConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                    </dxlc:LayoutItem>
-                                                    <dxlc:LayoutItem Label="Sort Order: ">
-                                                        <dxe:ComboBoxEdit
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label="Sort Order: ">
+                                                    <dxe:ComboBoxEdit
                                                             IsTextEditable="False"
                                                             EditValue="{Binding SourceXConfiguration.SelectedSortOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ItemsSource="{dxe:EnumItemsSource EnumType=settings:SortOrder,UseNumericEnumValue=False}" />
-                                                    </dxlc:LayoutItem>
-                                                </dxlc:LayoutGroup>
-                                                <dxlc:LayoutGroup View="Group" GroupBoxDisplayMode="Light"
+                                                </dxlc:LayoutItem>
+                                            </dxlc:LayoutGroup>
+                                            <dxlc:LayoutGroup View="Group" GroupBoxDisplayMode="Light"
                                                                   HorizontalAlignment="Stretch"
                                                                   IsCollapsible="False"
                                                                   Orientation="Horizontal">
-                                                    <dxlc:LayoutItem>
-                                                        <dx:SimpleButton Width="40"
+                                                <dxlc:LayoutItem>
+                                                    <dx:SimpleButton Width="40"
                                                                          Command="{Binding SwitchAxisCommand}"
                                                                          ToolTip="Switch Axis"
                                                                          Glyph="{dx:DXImage Image=SwitchRowColumn_16x16.png}" />
-                                                    </dxlc:LayoutItem>
+                                                </dxlc:LayoutItem>
 
-                                                </dxlc:LayoutGroup>
-                                                <dxlc:LayoutGroup GroupBoxDisplayMode="Light"
+                                            </dxlc:LayoutGroup>
+                                            <dxlc:LayoutGroup GroupBoxDisplayMode="Light"
                                                                   HorizontalAlignment="Stretch"
                                                                   IsCollapsible="False"
                                                                   Orientation="Vertical"
                                                                   Header="Y Axis" View="GroupBox">
-                                                    <dxlc:LayoutItem Label="Type: ">
-                                                        <dxe:ComboBoxEdit
+                                                <dxlc:LayoutItem Label="Type: ">
+                                                    <dxe:ComboBoxEdit
                                                             EditValue="{Binding SourceYConfiguration.SelectedClassKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ItemsSource="{Binding SourceYConfiguration.PossibleClassKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             AutoComplete="True"
                                                             AllowNullInput="True"
                                                             AllowDefaultButton="True" />
-                                                    </dxlc:LayoutItem>
-                                                    <dxlc:LayoutItem Label="Categories: ">
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <dxe:ComboBoxEdit
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label="Categories: ">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <dxe:ComboBoxEdit
                                                                 Grid.Column="0"
                                                                 EditValue="{Binding SourceYConfiguration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
                                                                 ItemsSource="{Binding SourceYConfiguration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -387,47 +409,47 @@
                                                                 AllowNullInput="True"
                                                                 AllowDefaultButton="True"
                                                                 DisplayMember="Name">
-                                                                <dxe:ComboBoxEdit.StyleSettings>
-                                                                    <dxe:CheckedComboBoxStyleSettings />
-                                                                </dxe:ComboBoxEdit.StyleSettings>
-                                                            </dxe:ComboBoxEdit>
-                                                            <dxe:ComboBoxEdit Grid.Column="1"
+                                                            <dxe:ComboBoxEdit.StyleSettings>
+                                                                <dxe:CheckedComboBoxStyleSettings />
+                                                            </dxe:ComboBoxEdit.StyleSettings>
+                                                        </dxe:ComboBoxEdit>
+                                                        <dxe:ComboBoxEdit Grid.Column="1"
                                                                               MinWidth="60"
                                                                               ToolTip="Boolean Operator used to seperate the selected Categories."
                                                                               Margin="5,0,0,0"
                                                                               EditValue="{Binding SourceYConfiguration.SelectedBooleanOperatorKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                               ItemsSource="{Binding SourceYConfiguration.PossibleBooleanOperatorKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                        </Grid>
-                                                    </dxlc:LayoutItem>
-                                                    <dxlc:LayoutItem Label=" ">
-                                                        <dxe:CheckEdit
+                                                    </Grid>
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label=" ">
+                                                    <dxe:CheckEdit
                                                             EditValue="{Binding SourceYConfiguration.IncludeSubcategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             Content="Include Subcategories of Selected"
                                                             ToolTip="Recursivelly includes all subcategories of the selected Categories." />
-                                                    </dxlc:LayoutItem>
-                                                    <dxlc:LayoutItem Label="Display: ">
-                                                        <dxe:ComboBoxEdit
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label="Display: ">
+                                                    <dxe:ComboBoxEdit
                                                             EditValue="{Binding SourceYConfiguration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ItemsSource="{Binding SourceYConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             AutoComplete="False"
                                                             AllowNullInput="False"
                                                             AllowDefaultButton="True" />
-                                                    </dxlc:LayoutItem>
-                                                    <dxlc:LayoutItem Label="Sort Order: ">
-                                                        <dxe:ComboBoxEdit
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label="Sort Order: ">
+                                                    <dxe:ComboBoxEdit
                                                             IsTextEditable="False"
                                                             EditValue="{Binding SourceYConfiguration.SelectedSortOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ItemsSource="{dxe:EnumItemsSource EnumType=settings:SortOrder,UseNumericEnumValue=False}" />
-                                                    </dxlc:LayoutItem>
-                                                </dxlc:LayoutGroup>
-                                                <dxlc:LayoutGroup View="GroupBox"
+                                                </dxlc:LayoutItem>
+                                            </dxlc:LayoutGroup>
+                                            <dxlc:LayoutGroup View="GroupBox"
                                                                   GroupBoxDisplayMode="Light"
                                                                   HorizontalAlignment="Stretch"
                                                                   IsCollapsible="False"
                                                                   Orientation="Horizontal"
                                                                   Header="Relationship Configuration">
-                                                    <dxlc:LayoutItem Label="Rule">
-                                                        <dxe:ComboBoxEdit
+                                                <dxlc:LayoutItem Label="Rule">
+                                                    <dxe:ComboBoxEdit
                                                             EditValue="{Binding RelationshipConfiguration.SelectedRule, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ItemsSource="{Binding RelationshipConfiguration.PossibleRules, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                             AutoComplete="True"
@@ -435,45 +457,44 @@
                                                             AllowDefaultButton="True"
                                                             DisplayMember="Name" />
 
-                                                    </dxlc:LayoutItem>
+                                                </dxlc:LayoutItem>
 
-                                                    <dxlc:LayoutItem Width="40" HorizontalAlignment="Right">
+                                                <dxlc:LayoutItem Width="40" HorizontalAlignment="Right">
 
-                                                        <dx:SimpleButton
+                                                    <dx:SimpleButton
                                                             Command="{Binding RelationshipConfiguration.InspectRuleCommand}"
                                                             Glyph="{dx:DXImage Image=Find_16x16.png}"
                                                             ToolTip="Inspect the selected Rule" />
-                                                    </dxlc:LayoutItem>
+                                                </dxlc:LayoutItem>
 
-                                                </dxlc:LayoutGroup>
-                                                <dxlc:LayoutGroup View="GroupBox"
+                                            </dxlc:LayoutGroup>
+                                            <dxlc:LayoutGroup View="GroupBox"
                                                                   GroupBoxDisplayMode="Light"
                                                                   HorizontalAlignment="Stretch"
                                                                   IsCollapsible="False"
                                                                   Orientation="Vertical"
                                                                   Header="View Options">
-                                                    <dxlc:LayoutItem>
-                                                        <dxe:CheckEdit
+                                                <dxlc:LayoutItem>
+                                                    <dxe:CheckEdit
                                                             EditValue="{Binding ShowDirectionality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             Content="Show Relationship Direction"
                                                             ToolTip="When turned on, the relationship direction is indicated by arrows." />
-                                                    </dxlc:LayoutItem>
-                                                    <dxlc:LayoutItem>
-                                                        <dxe:CheckEdit
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem>
+                                                    <dxe:CheckEdit
                                                             EditValue="{Binding ShowRelatedOnly, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             Content="Show Related Only"
                                                             ToolTip="Only includes objects that have the specified relationships into the view." />
-                                                    </dxlc:LayoutItem>
-                                                </dxlc:LayoutGroup>
+                                                </dxlc:LayoutItem>
                                             </dxlc:LayoutGroup>
-                                        </dxlc:LayoutControl>
-                                    </dxn:NavBarGroup.Content>
-                                </dxn:NavBarGroup>
-                            </dxn:NavBarControl.Groups>
-                        </dxn:NavBarControl>
-                    </dxlc:LayoutItem>
-                </dxlc:LayoutGroup>
+                                        </dxlc:LayoutGroup>
+                                    </dxlc:LayoutControl>
+                                </dxn:NavBarGroup.Content>
+                            </dxn:NavBarGroup>
+                        </dxn:NavBarControl.Groups>
+                    </dxn:NavBarControl>
+                </dxlc:LayoutItem>
             </dxlc:LayoutGroup>
-        </dxlc:LayoutControl>
-    </Grid>
+        </dxlc:LayoutGroup>
+    </dxlc:LayoutControl>
 </UserControl>

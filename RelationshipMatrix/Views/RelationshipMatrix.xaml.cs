@@ -7,10 +7,8 @@
 namespace CDP4RelationshipMatrix.Views
 {
     using CDP4Composition;
-    using CDP4Composition.Attributes;
-    using DevExpress.Xpf.Core;
-    using DevExpress.Xpf.Grid;
-
+    using CDP4Composition.Attributes;    
+    
     /// <summary>
     /// Interaction logic for RelationshipMatrix view
     /// </summary>

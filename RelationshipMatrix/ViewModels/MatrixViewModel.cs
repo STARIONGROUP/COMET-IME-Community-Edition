@@ -19,6 +19,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Operations;
+    using CDP4RelationshipMatrix.DataTypes;
     using DevExpress.Xpf.Grid;
     using NLog;
     using ReactiveUI;
@@ -68,6 +69,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Backing field for <see cref="Title"/>
         /// </summary>
         private string title;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedItemDetails"/>
+        /// </summary>
+        private string selectedItemDetails;
 
         /// <summary>
         /// Backing field for <see cref="SelectedCell"/>
@@ -154,8 +160,10 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.ProcessCellCommand = ReactiveCommand.CreateAsyncTask(x => this.ProcessCellCommandExecute((List<object>) x), RxApp.MainThreadScheduler);
             this.ProcessAltCellCommand = ReactiveCommand.CreateAsyncTask(x => this.ProcessAltCellCommandExecute((List<object>)x), RxApp.MainThreadScheduler);
             this.ProcessAltControlCellCommand = ReactiveCommand.CreateAsyncTask(x => this.ProcessAltControlCellCommandExecute((List<object>)x), RxApp.MainThreadScheduler);
-
             this.ToggleColumnHighlightCommand = ReactiveCommand.CreateAsyncTask(x => this.ToggleColumnHighlightCommandExecute(x as GridColumn), RxApp.MainThreadScheduler);
+
+            this.MouseDownCommand = ReactiveCommand.Create();
+            this.MouseDownCommand.Subscribe(x => this.MouseDownCommandExecute((MatrixAddress) x));
 
             this.SubscribeCommandExceptions();
 
@@ -272,6 +280,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         public ReactiveCommand<Unit> ProcessAltControlCellCommand { get; private set; }
 
         /// <summary>
+        /// Gets the command to process the mousedown click.
+        /// </summary>
+        public ReactiveCommand<object> MouseDownCommand { get; private set; }
+
+        /// <summary>
         /// Gets the command to process column highlight toggle.
         /// </summary>
         public ReactiveCommand<Unit> ToggleColumnHighlightCommand { get; private set; }
@@ -292,6 +305,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             get { return this.title; }
             private set { this.RaiseAndSetIfChanged(ref this.title, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the string that represents the details of the selected item
+        /// </summary>
+        public string SelectedItemDetails
+        {
+            get { return this.selectedItemDetails; }
+            private set { this.RaiseAndSetIfChanged(ref this.selectedItemDetails, value); }
         }
 
         /// <summary>
@@ -502,7 +524,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 if (showRelatedOnly && !relationships.Any(x =>
                         x.Source.Iid.Equals(definedThing.Iid) || x.Target.Iid.Equals(definedThing.Iid)))
                 {
-                    // if thing is ont in any relationships, skip
+                    // if thing is not in any relationships, skip
                     continue;
                 }
 
@@ -740,6 +762,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="cellInfo">The array of cell information.</param>
         private async Task ProcessCellCommandExecute(List<object> cellInfo)
         {
+            if (cellInfo == null)
+            {
+                return;
+            }
+
             // if not a relationship cell do nothing
             if (cellInfo[1] == null || cellInfo[1].Equals(CDP4_NAME_HEADER))
             {
@@ -766,6 +793,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="cellInfo">The array of cell information.</param>
         private async Task ProcessAltCellCommandExecute(List<object> cellInfo)
         {
+            if (cellInfo == null)
+            {
+                return;
+            }
+
             if (cellInfo[1] == null || cellInfo[1].Equals(CDP4_NAME_HEADER))
             {
                 return;
@@ -791,6 +823,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="cellInfo">The array of cell information.</param>
         private async Task ProcessAltControlCellCommandExecute(List<object> cellInfo)
         {
+            if (cellInfo == null)
+            { 
+                return;
+            }
+
             if (cellInfo[1] == null || cellInfo[1].Equals(CDP4_NAME_HEADER))
             {
                 return;
@@ -816,6 +853,24 @@ namespace CDP4RelationshipMatrix.ViewModels
                 await this.DeleteSourceXToSourceYLink.ExecuteAsync();
                 return;
             }
+        }
+
+        /// <summary>
+        /// Executes the <see cref="ProcessColumnCommand"/> 
+        /// </summary>
+        /// <param name="matrixAddress">
+        /// the address of the selected column
+        /// </param>
+        private void MouseDownCommandExecute(MatrixAddress matrixAddress)
+        {
+            if (matrixAddress == null)
+            {
+                this.SelectedItemDetails = string.Empty;
+                return;
+            }
+
+            var columnDefinition = this.Columns.SingleOrDefault(c => c.FieldName == matrixAddress.Column);
+            this.SelectedItemDetails = columnDefinition?.ToolTip;
         }
 
         /// <summary>
