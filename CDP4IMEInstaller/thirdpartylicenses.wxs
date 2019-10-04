@@ -45,9 +45,13 @@
       <Component Id="comp_license_IronPython" Guid="{EA96D593-72DE-4557-A3F4-4B621927A51F}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_license_IronPython" Vital="yes" Source="ThirdPartyLicense\IronPython.txt" KeyPath="yes"></File>
       </Component>
-
+      
       <Component Id="comp_license_MoonSharp" Guid="{232D81F7-4871-4F44-95CE-0060BDBF266D}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_license_MoonSharp" Vital="yes" Source="ThirdPartyLicense\MoonSharp.txt" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_license_Markdown_Xaml" Guid="{45EB0CA6-EA59-4519-8DD3-445ABA621FDC}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_license_Markdown_Xaml" Vital="yes" Source="ThirdPartyLicense\Markdown.Xaml.txt" KeyPath="yes"></File>
       </Component>
       
       <Component Id="comp_license_NetOffice" Guid="{EBDA3F5F-1E4D-4B9C-A555-06D9DF991841}" Location="local" Win64="$(var.Win64)">

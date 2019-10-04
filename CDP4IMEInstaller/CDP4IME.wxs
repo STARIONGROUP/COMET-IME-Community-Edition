@@ -24,11 +24,11 @@
       <Component Id="_45FDB1056059" Guid="{D28C464F-5B94-4A9B-8F8B-45FDB1056059}" Location="local" Win64="$(var.Win64)">
         <File Id="_D28C464F" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)CDP4Dal.dll" KeyPath="yes" />
       </Component>
-        
-      <Component Id="_6F5427FA92FD" Guid="{5B83E041-2B8B-4E85-8B3C-6F5427FA92FD}" Location="local" Win64="$(var.Win64)">
-          <File Id="_5B83E041"  Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)MarkdownXAML.dll" KeyPath="yes"></File>
+
+      <Component Id="_7D7C7995B7FC" Guid="{DE458569-7B72-45C5-A2A2-7D7C7995B7FC}" Location="local" Win64="$(var.Win64)">
+        <File Id="_DE458569"  Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Markdown.Xaml.dll" KeyPath="yes"></File>
       </Component>
-      
+
       <Component Id="_0023C8C8A530" Guid="{2EAB5754-130B-4335-80A1-0023C8C8A530}" Location="local" Win64="$(var.Win64)">
         <File Id="_2EAB5754" Vital="yes" Source="$(var.CDP4Composition.TargetPath)" KeyPath="yes" />
       </Component>
