@@ -13,7 +13,6 @@
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              xmlns:cdp4ProductTree="clr-namespace:CDP4ProductTree"
-             xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              d:DesignHeight="300"
