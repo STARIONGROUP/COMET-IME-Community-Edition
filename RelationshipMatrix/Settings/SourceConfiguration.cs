@@ -36,6 +36,7 @@ namespace CDP4RelationshipMatrix.Settings
             this.SelectedBooleanOperatorKind = source.SelectedBooleanOperatorKind;
             this.SelectedClassKind = source.SelectedClassKind;
             this.SelectedDisplayKind = source.SelectedDisplayKind;
+            this.SelectedSortKind = source.SelectedSortKind;
             this.SortOrder = SortOrder.Ascending;
 
             this.SelectedCategories.AddRange(source.SelectedCategories.Select(x => x.Iid));
@@ -52,6 +53,12 @@ namespace CDP4RelationshipMatrix.Settings
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
         public DisplayKind SelectedDisplayKind { get; set; }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="DisplayKind"/> for order
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DisplayKind SelectedSortKind { get; set; }
 
         /// <summary>
         /// Gets or sets the selected categories
