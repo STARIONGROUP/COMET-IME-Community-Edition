@@ -363,6 +363,11 @@
                                                             EditValue="{Binding SourceXConfiguration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             ItemsSource="{Binding SourceXConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                                                 </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label="Sort On:">
+                                                    <dxe:ComboBoxEdit
+                                                        EditValue="{Binding SourceXConfiguration.SelectedSortKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        ItemsSource="{Binding SourceXConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                </dxlc:LayoutItem>
                                                 <dxlc:LayoutItem Label="Sort Order: ">
                                                     <dxe:ComboBoxEdit
                                                             IsTextEditable="False"
@@ -430,10 +435,12 @@
                                                 <dxlc:LayoutItem Label="Display: ">
                                                     <dxe:ComboBoxEdit
                                                             EditValue="{Binding SourceYConfiguration.SelectedDisplayKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                            ItemsSource="{Binding SourceYConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                            AutoComplete="False"
-                                                            AllowNullInput="False"
-                                                            AllowDefaultButton="True" />
+                                                            ItemsSource="{Binding SourceYConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem Label="Sort On: ">
+                                                    <dxe:ComboBoxEdit
+                                                        EditValue="{Binding SourceYConfiguration.SelectedSortKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        ItemsSource="{Binding SourceYConfiguration.PossibleDisplayKinds, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                                                 </dxlc:LayoutItem>
                                                 <dxlc:LayoutItem Label="Sort Order: ">
                                                     <dxe:ComboBoxEdit

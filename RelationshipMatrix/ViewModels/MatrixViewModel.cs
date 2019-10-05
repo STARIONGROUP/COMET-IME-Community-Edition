@@ -680,7 +680,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             if (sourceConfigurationViewModel.SelectedSortOrder == SortOrder.Ascending)
             {
-                if (sourceConfigurationViewModel.SelectedDisplayKind == DisplayKind.Name)
+                if (sourceConfigurationViewModel.SelectedSortKind == DisplayKind.Name)
                 {
                     sourceXCatThing = sourceXCatThing.OrderBy(x => x.Name).ToList();
                 }
@@ -691,7 +691,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
             else
             {
-                if (sourceConfigurationViewModel.SelectedDisplayKind == DisplayKind.Name)
+                if (sourceConfigurationViewModel.SelectedSortKind == DisplayKind.Name)
                 {
                     sourceXCatThing = sourceXCatThing.OrderByDescending(x => x.Name).ToList();
                 }

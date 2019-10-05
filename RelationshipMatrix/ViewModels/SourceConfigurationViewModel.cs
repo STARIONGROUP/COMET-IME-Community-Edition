@@ -39,9 +39,14 @@ namespace CDP4RelationshipMatrix.ViewModels
         private ClassKind? selectedClassKind;
 
         /// <summary>
-        /// Backing field for <see cref="SelectedDisplay"/> property.
+        /// Backing field for <see cref="SelectedDisplayKind"/> property.
         /// </summary>
         private DisplayKind selectedDisplayKind;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedSortKind"/> property.
+        /// </summary>
+        private DisplayKind selectedSortKind;
 
         /// <summary>
         /// Backing field for <see cref="SelectedSortOrder"/> property.
@@ -103,6 +108,11 @@ namespace CDP4RelationshipMatrix.ViewModels
                 this.OnLightUpdateAction();
             });
 
+            this.WhenAnyValue(x => x.SelectedSortKind).Skip(1).Subscribe(_ =>
+            {
+                this.OnLightUpdateAction();
+            });
+
             this.WhenAnyValue(x => x.SelectedSortOrder).Skip(1).Subscribe(_ =>
             {
                 this.OnLightUpdateAction();
@@ -141,6 +151,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.SelectedBooleanOperatorKind = source.SelectedBooleanOperatorKind;
             this.SelectedClassKind = source.SelectedClassKind;
             this.SelectedDisplayKind = source.SelectedDisplayKind;
+            this.SelectedSortKind = source.SelectedSortKind;
             this.selectedSortOrder = source.SortOrder;
 
             this.OnLightUpdateAction = onLightUpdateAction;
@@ -181,6 +192,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             get { return this.selectedDisplayKind; }
             set { this.RaiseAndSetIfChanged(ref this.selectedDisplayKind, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="DisplayKind"/> for sorting
+        /// </summary>
+        public DisplayKind SelectedSortKind
+        {
+            get { return this.selectedSortKind; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedSortKind, value); }
         }
 
         /// <summary>
