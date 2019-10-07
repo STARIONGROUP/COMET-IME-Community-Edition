@@ -14,6 +14,7 @@ namespace CDP4Requirements
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4OfficeInfrastructure;
     using CDP4Requirements.Views;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
@@ -56,8 +57,11 @@ namespace CDP4Requirements
         /// <param name="pluginSettingsService">
         /// The MEF injected instance of <see cref="IPluginSettingsService"/>
         /// </param>
+        /// <param name="officeApplicationWrapper">
+        /// The MEF injected instance of <see cref="IOfficeApplicationWrapper"/>
+        /// </param>
         [ImportingConstructor]
-        public RequirementsModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        public RequirementsModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper)
         {
             this.RegionManager = regionManager;
             this.RibbonManager = ribbonManager;
@@ -65,6 +69,7 @@ namespace CDP4Requirements
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.DialogNavigationService = dialogNavigationService;
             this.PluginSettingsService = pluginSettingsService;
+            this.OfficeApplicationWrapper = officeApplicationWrapper;
         }
 
         /// <summary>
@@ -98,6 +103,11 @@ namespace CDP4Requirements
         internal IPluginSettingsService PluginSettingsService { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="IOfficeApplicationWrapper"/> used in the application
+        /// </summary>
+        internal IOfficeApplicationWrapper OfficeApplicationWrapper { get; private set; }
+
+        /// <summary>
         /// Initialize the Module
         /// </summary>
         public void Initialize()
@@ -128,7 +138,7 @@ namespace CDP4Requirements
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var requirementRibbonPart = new RequirementRibbonPart(2000, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService);
+            var requirementRibbonPart = new RequirementRibbonPart(2000, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService, this.OfficeApplicationWrapper);
             this.RibbonManager.RegisterRibbonPart(requirementRibbonPart);
         }
     }

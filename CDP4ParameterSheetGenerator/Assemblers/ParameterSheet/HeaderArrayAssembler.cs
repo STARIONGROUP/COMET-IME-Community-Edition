@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="HeaderArrayAssembler.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,8 +10,8 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
-    using CDP4ParameterSheetGenerator.Assemblers;
-
+    using CDP4OfficeInfrastructure.Assemblers;
+    
     /// <summary>
     /// The purpose of the <see cref="HeaderArrayAssembler"/> is to create and populate arrays to
     /// write as header information to the Parameter Sheet
@@ -41,7 +41,7 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <summary>
         /// Initialize the arrays that will contain data that is to be written to the Parameter sheet 
         /// </summary>
-        internal override void InitializeArrays()
+        public override void InitializeArrays()
         {
             this.HeaderArray = new object[6, 13];
             this.LockArray = new object[6, 13];
@@ -51,7 +51,7 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <summary>
         /// Populates the format array with values
         /// </summary>
-        internal override void PopulateHeaderFormatArray()
+        public override void PopulateHeaderFormatArray()
         {
             base.PopulateHeaderFormatArray();
 
@@ -61,7 +61,7 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// <summary>
         /// Populates the content of the header array
         /// </summary>
-        internal override void PopulateHeaderArray()
+        public override void PopulateHeaderArray()
         {
             this.HeaderArray[0, 0] = "Engineering Model:";
             this.HeaderArray[1, 0] = "Iteration number:";

@@ -1,16 +1,14 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AbstractHeaderArrayAssembler.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ParameterSheetGenerator.Assemblers
+namespace CDP4OfficeInfrastructure.Assemblers
 {
     using System;
-
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-
     using CDP4Dal;
 
     /// <summary>
@@ -34,17 +32,17 @@ namespace CDP4ParameterSheetGenerator.Assemblers
         {
             if (session == null)
             {
-                throw new ArgumentNullException("session", "The Session may not be null");
+                throw new ArgumentNullException(nameof(session), "The Session may not be null");
             }
 
             if (iteration == null)
             {
-                throw new ArgumentNullException("iteration", "The Iteration may not be null");
+                throw new ArgumentNullException(nameof(iteration), "The Iteration may not be null");
             }
 
             if (participant == null)
             {
-                throw new ArgumentNullException("participant", "The Participant may not be null");
+                throw new ArgumentNullException(nameof(participant), "The Participant may not be null");
             }
 
             this.Session = session;
@@ -58,17 +56,17 @@ namespace CDP4ParameterSheetGenerator.Assemblers
         /// <summary>
         /// Initialize the arrays that will contain data that is to be written to the Parameter sheet 
         /// </summary>
-        internal abstract void InitializeArrays();
+        public abstract void InitializeArrays();
 
         /// <summary>
         /// Populates the content of the header array
         /// </summary>
-        internal abstract void PopulateHeaderArray();
+        public abstract void PopulateHeaderArray();
 
         /// <summary>
         /// Populates the lock array with values
         /// </summary>
-        internal virtual void PopulateHeaderLockArray()
+        public virtual void PopulateHeaderLockArray()
         {
             for (int i = this.LockArray.GetLowerBound(0); i < this.LockArray.GetUpperBound(0); i++)
             {
@@ -82,7 +80,7 @@ namespace CDP4ParameterSheetGenerator.Assemblers
         /// <summary>
         /// Populates the format array with values
         /// </summary>
-        internal virtual void PopulateHeaderFormatArray()
+        public virtual void PopulateHeaderFormatArray()
         {
             for (int i = this.FormatArray.GetLowerBound(0); i < this.FormatArray.GetUpperBound(0); i++)
             {

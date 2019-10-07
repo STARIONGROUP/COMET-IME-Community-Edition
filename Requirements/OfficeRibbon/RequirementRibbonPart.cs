@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementRibbonPart.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -25,6 +25,8 @@ namespace CDP4Requirements
     using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4OfficeInfrastructure;
+    using CDP4Requirements.Generator;
     using NLog;
     using ReactiveUI;
     using ViewModels;
@@ -39,6 +41,16 @@ namespace CDP4Requirements
         /// The NLog logger
         /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// The <see cref="IOfficeApplicationWrapper"/> that provides access to the loaded Office application
+        /// </summary>
+        private readonly IOfficeApplicationWrapper officeApplicationWrapper;
+
+        /// <summary>
+        /// Gets or sets the <see cref="IExcelQuery"/> that is used to query the excel application
+        /// </summary>
+        internal IExcelQuery ExcelQuery { get; set; }
 
         /// <summary>
         /// The list of open <see cref="RequirementsBrowserViewModel"/>
@@ -63,9 +75,15 @@ namespace CDP4Requirements
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public RequirementRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService)
+        /// <param name="officeApplicationWrapper">
+        /// The instance of <see cref="IOfficeApplicationWrapper"/> that provides access to the loaded Office application.
+        /// </param>
+        public RequirementRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
+            this.ExcelQuery = new ExcelQuery();
+            this.officeApplicationWrapper = officeApplicationWrapper;
+
             this.openRequirementBrowser = new List<RequirementsBrowserViewModel>();
             this.Iterations = new List<Iteration>();
 
@@ -103,6 +121,12 @@ namespace CDP4Requirements
                 return;
             }
 
+            if (ribbonControlId.Contains("GenerateRequirements"))
+            {
+                await this.RebuildRequirementsSheet(ribbonControlTag);
+                return;
+            }
+
             if (ribbonControlId.Contains("ShowRequirement"))
             {
                 this.ShowOrCloseRequirements(ribbonControlTag);
@@ -135,6 +159,11 @@ namespace CDP4Requirements
                 return this.Iterations.Any();
             }
 
+            if (ribbonControlId.Contains("GenerateRequirements"))
+            {
+                return this.Iterations.Any();
+            }
+
             return false;
         }
 
@@ -156,7 +185,7 @@ namespace CDP4Requirements
 
             var menuxml = string.Empty;
 
-            if (ribbonControlId == "ShowRequirements")
+            if (ribbonControlId == "ShowRequirements" || ribbonControlId == "GenerateRequirements")
             {
                 var sb = new StringBuilder();
                 sb.Append(@"<menu xmlns=""http://schemas.microsoft.com/office/2006/01/customui"">");
@@ -168,13 +197,8 @@ namespace CDP4Requirements
                     Tuple<DomainOfExpertise, Participant> tuple;
                     this.Session.OpenIterations.TryGetValue(iteration, out tuple);
 
-                    var label = string.Format("{0} - {1} : [{2}]", 
-                                        engineeringModel.EngineeringModelSetup.ShortName, 
-                                        iteration.IterationSetup.IterationNumber, 
-                                        tuple.Item1 == null ? string.Empty : tuple.Item1.ShortName);
-
-                    var menuContent =
-                        string.Format("<button id=\"ShowRequirement_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />", iteration.Iid, label);
+                    var label = $"{engineeringModel.EngineeringModelSetup.ShortName} - {iteration.IterationSetup.IterationNumber} : [{(tuple.Item1 == null ? string.Empty : tuple.Item1.ShortName)}]";
+                    var menuContent = $"<button id=\"{ribbonControlId}_{iteration.Iid}\" label=\"{label}\" onAction=\"OnAction\" tag=\"{iteration.Iid}\" />";
                     sb.Append(menuContent);
                 }
 
@@ -232,7 +256,7 @@ namespace CDP4Requirements
         }
 
         /// <summary>
-        /// Update the <see cref="ControlIdentiefers"/> list to include the contents of the dynamic menu
+        /// Update the <see cref="ControlIdentifiers"/> list to include the contents of the dynamic menu
         /// </summary>
         /// <param name="dynamicMenuContent">
         /// The contents of the dynamic menu
@@ -295,7 +319,7 @@ namespace CDP4Requirements
             {
                 return;
             }
-
+            
             if (iterationEvent.EventKind == EventKind.Added)
             {
                 this.Iterations.Add(iterationEvent.ChangedThing as Iteration);
@@ -356,6 +380,31 @@ namespace CDP4Requirements
 
             this.openRequirementBrowser.Add(browser);
             this.PanelNavigationService.Open(browser, false);
+        }
+
+        /// <summary>
+        /// Rebuilds the requirements sheet of <see cref="RequirementsSpecification"/>
+        /// </summary>
+        /// <param name="iterationId">
+        /// The unique id of the <see cref="Iteration"/> for which the requirements sheet needs to be generated
+        /// </param>
+        private async Task RebuildRequirementsSheet(string iterationId)
+        {
+            var iterationUniqueId = Guid.Parse(iterationId);
+
+            var iteration = this.Iterations.SingleOrDefault(x => x.Iid == iterationUniqueId);
+            if (iteration == null)
+            {
+                Logger.Debug($"The Iteration with Iid {iterationUniqueId} could not be found in the open iteratinos, the Requiremens Sheet could not be generated");
+                return;
+            }
+
+            var application = this.officeApplicationWrapper.Excel;
+            if (application != null && application.ActiveWorkbook != null)
+            {
+                var generator = new RequirementSheetGenerator();
+                generator.Generate(this.Session, application, application.ActiveWorkbook, iteration);
+            }
         }
     }
 }

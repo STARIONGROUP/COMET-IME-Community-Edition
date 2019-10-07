@@ -1,5 +1,6 @@
 ﻿<ribbonxml>
   <group id="requirement" label="Requirement">
-    <dynamicMenu id="ShowRequirements" size="large" label="Requirements" screentip="Show or Hide the requirements in an Iteration"  getImage="GetImage" getEnabled="GetEnabled" getContent="GetContent"/>
+    <dynamicMenu id="ShowRequirements" size="large" label="Browser" screentip="Show or Hide the requirements in an Iteration"  getImage="GetImage" getEnabled="GetEnabled" getContent="GetContent"/>
+    <dynamicMenu id="GenerateRequirements" size="large" label="Generate" supertip="Generate a Requirements Sheet" imageMso="Refresh" getEnabled="GetEnabled" getContent="GetContent"/>
   </group>
 </ribbonxml>

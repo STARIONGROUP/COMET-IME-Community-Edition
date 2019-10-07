@@ -20,6 +20,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+    using CDP4OfficeInfrastructure;
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
@@ -43,6 +44,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
         private Mock<IPermissionService> permissionService; 
         private Mock<IDialogResult> negativeDialogResult;
         private Mock<IDialogNavigationService> negativeDialogNavigationService;
+        private Mock<IOfficeApplicationWrapper> officeApplicationWrapper;
         private Mock<ISession> session;
         private Assembler assembler;
 
@@ -68,6 +70,8 @@ namespace CDP4Requirements.Tests.OfficeRibbon
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+
+            this.officeApplicationWrapper = new Mock<IOfficeApplicationWrapper>();
 
             // inputs
             this.sitedir = new SiteDirectory(Guid.NewGuid(), null, this.uri);
@@ -126,7 +130,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
         [Test]
         public void VerifyThatIfFluentRibbonIsNotActiveTheSessionEventHasNoEffect()
         {
-            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
+            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null, this.officeApplicationWrapper.Object);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = false;
@@ -140,7 +144,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
         [Test]
         public void VerifyThatIfFluentRibbonIsNullTheSessionEventHasNoEffect()
         {
-            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
+            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null, this.officeApplicationWrapper.Object);
 
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(sessionEvent);
@@ -150,7 +154,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
         [Test]
         public void VerifyThatRibbonPartHandlesSessionOpenAndCloseEvent()
         {
-            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
+            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null, this.officeApplicationWrapper.Object);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -170,7 +174,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
         [Test]
         public void VerifyThatButtonsAreEnabledAsExpected()
         {
-            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null);
+            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.negativeDialogNavigationService.Object, null, null, this.officeApplicationWrapper.Object);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -202,7 +206,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
         [Test]
         public void VerifyThatOnActionProductTreeWorks()
         {
-            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null);
+            this.ribbonPart = new RequirementRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null, this.officeApplicationWrapper.Object);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSheetUtilities.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ namespace CDP4ParameterSheetGenerator.Generator
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Validation;
+    using CDP4OfficeInfrastructure.Excel;
     using CDP4ParameterSheetGenerator.ParameterSheet;
     using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Enums;
@@ -40,7 +41,7 @@ namespace CDP4ParameterSheetGenerator.Generator
         /// </returns>
         public static Worksheet RetrieveParameterSheet(Workbook workbook, bool replace = false)
         {
-            var parameterWorksheet = RetrieveWorksheet(workbook, ParameterSheetConstants.ParameterSheetName, replace);
+            var parameterWorksheet = workbook.RetrieveWorksheet(ParameterSheetConstants.ParameterSheetName, replace);
             return parameterWorksheet;
         }
 
@@ -61,54 +62,8 @@ namespace CDP4ParameterSheetGenerator.Generator
         /// </remarks>
         public static Worksheet RetrieveOptionSheet(Workbook workbook, Option option)
         {
-            var optionSheet = RetrieveWorksheet(workbook, option.ShortName, true);
+            var optionSheet = workbook.RetrieveWorksheet(option.ShortName, true);
             return optionSheet;
-        }
-
-        /// <summary>
-        /// Retrieve the specified sheet form the workbook
-        /// </summary>
-        /// <param name="workbook">
-        /// the <see cref="Workbook"/> to retrieve the sheet from
-        /// </param>
-        /// <param name="name">
-        /// The name of the <see cref="Worksheet"/> to retrieve
-        /// </param>
-        /// <param name="replace">
-        /// a value indicating whether the sheet shall be replaced if found
-        /// </param>
-        /// <returns>
-        /// returns the existing sheet, or a new sheet named <paramref name="name"/> that is added to the provided workbook
-        /// </returns>
-        private static Worksheet RetrieveWorksheet(Workbook workbook, string name, bool replace = false)
-        {
-            Worksheet resultingWorksheet = null;
-
-            foreach (var sheet in workbook.Worksheets)
-            {
-                var worksheet = sheet as Worksheet;
-                if (worksheet != null && worksheet.Name == name)
-                {
-                    if (replace)
-                    {
-                        resultingWorksheet = (Worksheet)workbook.Sheets.Add(before: worksheet);
-                        worksheet.Delete();
-                        resultingWorksheet.Name = name;
-                    }
-                    else
-                    {
-                        resultingWorksheet = worksheet;
-                    }
-                }
-            }
-
-            if (resultingWorksheet == null)
-            {
-                resultingWorksheet = (Worksheet)workbook.Sheets.Add();
-                resultingWorksheet.Name = name;
-            }
-
-            return resultingWorksheet;
         }
 
         /// <summary>
