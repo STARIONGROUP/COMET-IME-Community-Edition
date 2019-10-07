@@ -90,6 +90,7 @@ namespace CDP4AddinCE
         {
             logger.Debug("starting CDP4-CE addin");
 
+            this.PreloadAssemblies();
             this.RedirectAssemblies();
             this.SetupIdtExtensibility2Events();
             this.SetupEventListeners();
@@ -281,6 +282,17 @@ namespace CDP4AddinCE
         protected override void OnError(ErrorMethodKind methodKind, Exception exception)
         {
             Utils.Dialog.ShowError(exception, "Unexpected state in CDP4-CE.Addin " + methodKind.ToString());
+        }
+
+        /// <summary>
+        /// Preload specific assemblies so they can be found at runtime.
+        /// There is a problem loading the assemblies in Office x64 on a development machine.
+        /// It cannot find the library if it isn't preloaded somewhere on Excel startup.
+        /// </summary>
+        private void PreloadAssemblies()
+        {
+            logger.Trace("Markdown.Xaml");
+            Assembly.Load("Markdown.Xaml");
         }
 
         /// <summary>
