@@ -260,15 +260,22 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void CheckPublishabledStatus()
         {
-            foreach (ParameterValueSetBase valueset in this.Thing.ValueSets)
+            foreach (ParameterValueSetBase parameterValueSetBase in this.Thing.ValueSets)
             {
-                for (var i = 0; i < valueset.Published.Count(); i++)
+                try
                 {
-                    if (valueset.Published[i] != valueset.ActualValue[i])
+                    for (var i = 0; i < parameterValueSetBase.QueryParameterType().NumberOfValues; i++)
                     {
-                        this.IsPublishable = true;
-                        return;
+                        if (parameterValueSetBase.Published[i] != parameterValueSetBase.ActualValue[i])
+                        {
+                            this.IsPublishable = true;
+                            return;
+                        }
                     }
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    logger.Error($"The ParameterValueSetBase {parameterValueSetBase.Iid} has an incorrect number of values");
                 }
             }
 

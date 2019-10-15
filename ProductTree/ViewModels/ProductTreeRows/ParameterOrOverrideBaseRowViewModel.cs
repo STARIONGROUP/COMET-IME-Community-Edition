@@ -494,15 +494,23 @@ namespace CDP4ProductTree.ViewModels
                 return false;
             }
 
-            for (var i = 0; i < valueset.Published.Count(); i++)
+            try
             {
-                if (valueset.Published[i] != valueset.ActualValue[i])
+                for (var i = 0; i < valueset.QueryParameterType().NumberOfValues; i++)
                 {
-                    return true;
+                    if (valueset.Published[i] != valueset.ActualValue[i])
+                    {
+                        return true;
+                    }
                 }
-            }
 
-            return false;
+                return false;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                logger.Error($"The ParameterValueSetBase {valueset.Iid} has an incorrect number of values");
+                return false;
+            }
         }
 
         /// <summary>
