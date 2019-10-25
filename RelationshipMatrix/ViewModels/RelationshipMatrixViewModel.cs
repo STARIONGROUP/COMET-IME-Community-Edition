@@ -1,8 +1,8 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipMatrixViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 
 namespace CDP4RelationshipMatrix.ViewModels
 {
@@ -10,20 +10,25 @@ namespace CDP4RelationshipMatrix.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
+    using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using DialogResult;
-    using NLog;
+
+    using CDP4RelationshipMatrix.Settings;
+    using CDP4RelationshipMatrix.ViewModels.DialogResult;
+
     using ReactiveUI;
-    using Settings;
 
     /// <summary>
     /// The view-model associated to the browser panel holding the relationship matrix.
@@ -31,87 +36,84 @@ namespace CDP4RelationshipMatrix.ViewModels
     public class RelationshipMatrixViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
         /// <summary>
-        /// The logger for the current class
-        /// </summary>
-        private new static Logger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// Backing field for <see cref="CurrentModel"/>
+        /// Backing field for <see cref="CurrentModel" />
         /// </summary>
         private string currentModel;
 
         /// <summary>
-        /// Backing field for <see cref="CurrentIteration"/>
+        /// Backing field for <see cref="CurrentIteration" />
         /// </summary>
         private int currentIteration;
 
         /// <summary>
-        /// The active <see cref="Participant"/>
+        /// The active <see cref="Participant" />
         /// </summary>
         public readonly Participant ActiveParticipant;
 
         /// <summary>
-        /// The <see cref="EngineeringModelSetup"/> that is referenced by the <see cref="EngineeringModel"/> that contains the current <see cref="Option"/>
+        /// The <see cref="EngineeringModelSetup" /> that is referenced by the <see cref="EngineeringModel" /> that contains the
+        /// current <see cref="Option" />
         /// </summary>
         private readonly EngineeringModelSetup modelSetup;
 
         /// <summary>
-        /// The container <see cref="iterationSetup"/> that is referenced by the container <see cref="Iteration"/> of the current <see cref="Option"/>.
+        /// The container <see cref="iterationSetup" /> that is referenced by the container <see cref="Iteration" /> of the current
+        /// <see cref="Option" />.
         /// </summary>
         private readonly IterationSetup iterationSetup;
 
         /// <summary>
-        /// Backing field for <see cref="CanEditSourceY"/>
+        /// Backing field for <see cref="CanEditSourceY" />
         /// </summary>
         private bool canEditSourceY;
 
         /// <summary>
-        /// Backing field for <see cref="CanEditSourceX"/>
+        /// Backing field for <see cref="CanEditSourceX" />
         /// </summary>
         private bool canEditSourceX;
 
         /// <summary>
-        /// Backing field for <see cref="CanInspectSourceY"/>
+        /// Backing field for <see cref="CanInspectSourceY" />
         /// </summary>
         private bool canInspectSourceY;
 
         /// <summary>
-        /// Backing field for <see cref="CanInspectSourceX"/>
+        /// Backing field for <see cref="CanInspectSourceX" />
         /// </summary>
         private bool canInspectSourceX;
 
         /// <summary>
-        /// Backing field for <see cref="ShowDirectionality"/>
+        /// Backing field for <see cref="ShowDirectionality" />
         /// </summary>
         private bool showDirectionality;
 
         /// <summary>
-        /// Backing field for <see cref="ShowRelatedOnly"/>
+        /// Backing field for <see cref="ShowRelatedOnly" />
         /// </summary>
         private bool showRelatedOnly;
 
         /// <summary>
-        /// Backing field for <see cref="SourceYConfiguration"/>
+        /// Backing field for <see cref="SourceYConfiguration" />
         /// </summary>
         private SourceConfigurationViewModel sourceYConfiguration;
 
         /// <summary>
-        /// Backing field for <see cref="SourceXConfiguration"/>
+        /// Backing field for <see cref="SourceXConfiguration" />
         /// </summary>
         private SourceConfigurationViewModel sourceXConfiguration;
 
         /// <summary>
-        /// Backing field for <see cref="RelationshipConfiguration"/>
+        /// Backing field for <see cref="RelationshipConfiguration" />
         /// </summary>
         private RelationshipConfigurationViewModel relationshipConfiguration;
 
         /// <summary>
-        /// Backing field for <see cref="SelectedSavedConfiguration"/>
+        /// Backing field for <see cref="SelectedSavedConfiguration" />
         /// </summary>
         private SavedConfiguration selectedSavedConfiguration;
 
         /// <summary>
-        /// Backing field for <see cref="SavedConfigurations"/>
+        /// Backing field for <see cref="SavedConfigurations" />
         /// </summary>
         private ReactiveList<SavedConfiguration> savedConfigurations;
 
@@ -121,19 +123,19 @@ namespace CDP4RelationshipMatrix.ViewModels
         private RelationshipMatrixPluginSettings settings;
 
         /// <summary>
-        /// Flag to supress rebuild.
+        /// Flag to suppress rebuild.
         /// </summary>
-        private bool rebuildSupressed;
+        private bool rebuildSuppressed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel"/> class
+        /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel" /> class
         /// </summary>
-        /// <param name="iteration">The associated <see cref="Iteration"/></param>
+        /// <param name="iteration">The associated <see cref="Iteration" /></param>
         /// <param name="session">The session</param>
         /// <param name="thingDialogNavigationService">The thing Dialog Navigation Service</param>
-        /// <param name="panelNavigationService">The <see cref="IPanelNavigationService"/></param>
-        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        /// <param name="pluginService">The <see cref="IPluginSettingsService"/></param>
+        /// <param name="panelNavigationService">The <see cref="IPanelNavigationService" /></param>
+        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService" /></param>
+        /// <param name="pluginService">The <see cref="IPluginSettingsService" /></param>
         public RelationshipMatrixViewModel(Iteration iteration, ISession session,
             IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
             IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginService)
@@ -150,18 +152,22 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.settings = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
 
-            this.SavedConfigurations = new ReactiveList<SavedConfiguration>();
-
-            this.SavedConfigurations.ChangeTrackingEnabled = true;
+            this.SavedConfigurations = new ReactiveList<SavedConfiguration> { ChangeTrackingEnabled = true };
 
             this.ReloadSavedConfigurations();
 
             this.SourceYConfiguration =
-                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, this.BuildRelationshipMatrix, this.settings);
+                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration,
+                    this.BuildRelationshipMatrix, this.settings);
+
             this.SourceXConfiguration =
-                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration, this.BuildRelationshipMatrix, this.settings);
+                new SourceConfigurationViewModel(session, iteration, this.UpdateRelationshipConfiguration,
+                    this.BuildRelationshipMatrix, this.settings);
+
             this.RelationshipConfiguration =
-                new RelationshipConfigurationViewModel(session, thingDialogNavigationService, iteration, this.BuildRelationshipMatrix, this.settings);
+                new RelationshipConfigurationViewModel(session, thingDialogNavigationService, iteration,
+                    this.BuildRelationshipMatrix, this.settings);
+
             this.Matrix = new MatrixViewModel(this.Session, this.Thing, this.settings);
 
             this.Disposables.Add(this.SourceYConfiguration);
@@ -199,7 +205,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="SourceConfigurationViewModel"/> to configure the first kind of sources
+        /// Gets the <see cref="SourceConfigurationViewModel" /> to configure the first kind of sources
         /// </summary>
         public SourceConfigurationViewModel SourceYConfiguration
         {
@@ -208,7 +214,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="SourceConfigurationViewModel"/> to configure the second kind of sources
+        /// Gets the <see cref="SourceConfigurationViewModel" /> to configure the second kind of sources
         /// </summary>
         public SourceConfigurationViewModel SourceXConfiguration
         {
@@ -217,7 +223,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="SavedConfiguration"/> to configure the entire matrix
+        /// Gets the <see cref="SavedConfiguration" /> to configure the entire matrix
         /// </summary>
         public SavedConfiguration SelectedSavedConfiguration
         {
@@ -226,7 +232,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Gets the list of all <see cref="SavedConfiguration"/> to configure the entire matrix
+        /// Gets the list of all <see cref="SavedConfiguration" /> to configure the entire matrix
         /// </summary>
         public ReactiveList<SavedConfiguration> SavedConfigurations
         {
@@ -235,7 +241,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="RelationshipConfigurationViewModel"/> to configure the kind of <see cref="BinaryRelationship"/> to display
+        /// Gets the <see cref="RelationshipConfigurationViewModel" /> to configure the kind of <see cref="BinaryRelationship" />
+        /// to display
         /// </summary>
         public RelationshipConfigurationViewModel RelationshipConfiguration
         {
@@ -244,7 +251,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="MatrixViewModel"/>
+        /// Gets the <see cref="MatrixViewModel" />
         /// </summary>
         public MatrixViewModel Matrix { get; private set; }
 
@@ -361,9 +368,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void BuildRelationshipMatrix()
         {
-            if (this.rebuildSupressed || this.IsBusy)
+            if (this.rebuildSuppressed || this.IsBusy)
             {
-                // if we are supressing rebuild or it is already
+                // if we are suppressing rebuild or it is already
                 return;
             }
 
@@ -397,7 +404,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
-        /// on the <see cref="Thing"/> that is being represented by the view-model
+        /// on the <see cref="Thing" /> that is being represented by the view-model
         /// </summary>
         /// <param name="objectChange">
         /// The payload of the event that is being handled
@@ -476,7 +483,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.WhenAnyValue(x => x.ShowDirectionality).Subscribe(_ => this.BuildRelationshipMatrix());
             this.WhenAnyValue(x => x.ShowRelatedOnly).Subscribe(_ => this.BuildRelationshipMatrix());
 
-            this.WhenAny(x => x.SelectedSavedConfiguration, vm => vm.Value != null).Subscribe(_ => this.LoadSavedConfiguration());
+            this.WhenAny(x => x.SelectedSavedConfiguration, vm => vm.Value != null)
+                .Subscribe(_ => this.LoadSavedConfiguration());
 
             var ruleSubscription = CDPMessageBus.Current
                 .Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
@@ -494,8 +502,21 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(relationshipSubscription);
 
+            var deprecateSubscription =
+                CDPMessageBus.Current.Listen<ToggleDeprecatedThingEvent>()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x =>
+                    {
+                        this.Matrix.IsDeprecatedDisplayed = x.ShouldShow;
+                        this.BuildRelationshipMatrix();
+                    });
+
+            this.Disposables.Add(deprecateSubscription);
+
             this.ManageSavedConfigurations = ReactiveCommand.Create();
-            this.Disposables.Add(this.ManageSavedConfigurations.Subscribe(_ => this.ExecuteManageSavedConfigurations()));
+
+            this.Disposables.Add(
+                this.ManageSavedConfigurations.Subscribe(_ => this.ExecuteManageSavedConfigurations()));
 
             this.SaveCurrentConfiguration = ReactiveCommand.Create();
             this.Disposables.Add(this.SaveCurrentConfiguration.Subscribe(_ => this.ExecuteSaveCurrentConfiguration()));
@@ -529,24 +550,32 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
-            this.SupressRebuild();
+            this.SuppressRebuild();
 
             if (this.SelectedSavedConfiguration.SourceConfigurationX != null)
             {
                 this.SourceXConfiguration = new
-                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration, this.BuildRelationshipMatrix, this.settings, this.SelectedSavedConfiguration.SourceConfigurationX);
+                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration,
+                        this.BuildRelationshipMatrix, this.settings,
+                        this.SelectedSavedConfiguration.SourceConfigurationX);
             }
 
             if (this.SelectedSavedConfiguration.SourceConfigurationY != null)
             {
                 this.SourceYConfiguration = new
-                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration, this.BuildRelationshipMatrix, this.settings, this.SelectedSavedConfiguration.SourceConfigurationY);
+                    SourceConfigurationViewModel(this.Session, this.Thing, this.UpdateRelationshipConfiguration,
+                        this.BuildRelationshipMatrix, this.settings,
+                        this.SelectedSavedConfiguration.SourceConfigurationY);
             }
 
             if (this.SelectedSavedConfiguration.RelationshipConfiguration != null)
             {
                 this.RelationshipConfiguration = new
-                    RelationshipConfigurationViewModel(this.Session, this.ThingDialogNavigationService, this.Thing, this.BuildRelationshipMatrix, this.settings, this.SelectedSavedConfiguration.RelationshipConfiguration, this.SelectedSavedConfiguration.SourceConfigurationY?.SelectedClassKind, this.SelectedSavedConfiguration.SourceConfigurationX?.SelectedClassKind);
+                    RelationshipConfigurationViewModel(this.Session, this.ThingDialogNavigationService, this.Thing,
+                        this.BuildRelationshipMatrix, this.settings,
+                        this.SelectedSavedConfiguration.RelationshipConfiguration,
+                        this.SelectedSavedConfiguration.SourceConfigurationY?.SelectedClassKind,
+                        this.SelectedSavedConfiguration.SourceConfigurationX?.SelectedClassKind);
             }
 
             this.ShowDirectionality = this.SelectedSavedConfiguration.ShowDirectionality;
@@ -556,20 +585,20 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Supresses the rebuild of the matrix.
+        /// Suppresses the rebuild of the matrix.
         /// </summary>
-        public void SupressRebuild()
+        public void SuppressRebuild()
         {
-            this.rebuildSupressed = true;
+            this.rebuildSuppressed = true;
         }
 
         /// <summary>
-        /// Disable matrix rebuild supression
+        /// Disable matrix rebuild suppression
         /// </summary>
         /// <param name="force">If true, forces a rebuild.</param>
         public void EnableRebuild(bool force = false)
         {
-            this.rebuildSupressed = false;
+            this.rebuildSuppressed = false;
 
             if (force)
             {
@@ -580,7 +609,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Check whether a rebuild is required
         /// </summary>
-        /// <param name="e">The <see cref="ObjectChangedEvent"/></param>
+        /// <param name="e">The <see cref="ObjectChangedEvent" /></param>
         /// <remarks>
         /// Rebuilding is required when a row or column needs to be added or removed
         /// </remarks>
@@ -612,9 +641,11 @@ namespace CDP4RelationshipMatrix.ViewModels
             {
                 this.BuildRelationshipMatrix();
             }
-            else if (this.IsClassKindValidForRebuild(thing.ClassKind, this.SourceYConfiguration.SelectedClassKind.Value) &&
+            else if (this.IsClassKindValidForRebuild(thing.ClassKind,
+                         this.SourceYConfiguration.SelectedClassKind.Value) &&
                      this.SourceYConfiguration.SelectedCategories.Count > 0 ||
-                     this.IsClassKindValidForRebuild(thing.ClassKind, this.SourceXConfiguration.SelectedClassKind.Value) &&
+                     this.IsClassKindValidForRebuild(thing.ClassKind,
+                         this.SourceXConfiguration.SelectedClassKind.Value) &&
                      this.SourceXConfiguration.SelectedCategories.Count > 0)
             {
                 if (thing is ICategorizableThing categorizable && (
@@ -627,22 +658,23 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Checks whether the <see cref="ClassKind"/> of the <see cref="Thing"/> matches criteria for a rebuild of the matrix.
+        /// Checks whether the <see cref="ClassKind" /> of the <see cref="Thing" /> matches criteria for a rebuild of the matrix.
         /// </summary>
-        /// <param name="thingClassKind">The <see cref="ClassKind"/> of the relevant <see cref="Thing"/></param>
-        /// <param name="expectedClassKind">The <see cref="ClassKind"/> selected in the configuration.</param>
-        /// <returns>True if the <see cref="ClassKind"/> matches the criteria.</returns>
+        /// <param name="thingClassKind">The <see cref="ClassKind" /> of the relevant <see cref="Thing" /></param>
+        /// <param name="expectedClassKind">The <see cref="ClassKind" /> selected in the configuration.</param>
+        /// <returns>True if the <see cref="ClassKind" /> matches the criteria.</returns>
         private bool IsClassKindValidForRebuild(ClassKind thingClassKind, ClassKind expectedClassKind)
         {
             // class kind should match, or in case of ElementUsage, ElementDefinition should be taken into account.
-            return thingClassKind == expectedClassKind || (expectedClassKind == ClassKind.ElementUsage && thingClassKind == ClassKind.ElementDefinition);
+            return thingClassKind == expectedClassKind || expectedClassKind == ClassKind.ElementUsage &&
+                   thingClassKind == ClassKind.ElementDefinition;
         }
 
         /// <summary>
-        /// Checks if the <see cref="ICategorizableThing"/> has any categories that fall under the filter criteria
+        /// Checks if the <see cref="ICategorizableThing" /> has any categories that fall under the filter criteria
         /// </summary>
-        /// <param name="thing">The <see cref="ICategorizableThing"/> to check</param>
-        /// <param name="sourceConfiguration">The <see cref="SourceConfigurationViewModel"/> that defines the parameters.</param>
+        /// <param name="thing">The <see cref="ICategorizableThing" /> to check</param>
+        /// <param name="sourceConfiguration">The <see cref="SourceConfigurationViewModel" /> that defines the parameters.</param>
         /// <returns>True if the criteria is met.</returns>
         public static bool IsCategoryApplicableToConfiguration(ICategorizableThing thing,
             SourceConfigurationViewModel sourceConfiguration)
@@ -658,18 +690,18 @@ namespace CDP4RelationshipMatrix.ViewModels
             switch (sourceConfiguration.SelectedBooleanOperatorKind)
             {
                 case CategoryBooleanOperatorKind.OR:
-                    // if subcategories should be selected, expan the list
-                    var allcategories = new List<Category>(sourceConfiguration.SelectedCategories);
+                    // if subcategories should be selected, expand the list
+                    var allCategories = new List<Category>(sourceConfiguration.SelectedCategories);
 
                     if (sourceConfiguration.IncludeSubcategories)
                     {
                         foreach (var category in sourceConfiguration.SelectedCategories)
                         {
-                            allcategories.AddRange(category.AllDerivedCategories());
+                            allCategories.AddRange(category.AllDerivedCategories());
                         }
                     }
 
-                    return thingCategories.Intersect(allcategories).Any();
+                    return thingCategories.Intersect(allCategories).Any();
                 case CategoryBooleanOperatorKind.AND:
                     var categoryLists = new List<bool>();
 
@@ -685,7 +717,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                         categoryLists.Add(thingCategories.Intersect(categoryGroup).Any());
                     }
 
-                    return !categoryLists.Any(x => x == false);
+                    return categoryLists.All(x => x);
             }
 
             return false;
@@ -699,7 +731,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             var vm = new ManageConfigurationsDialogViewModel(this.DialogNavigationService, this.PluginSettingsService);
             var result = this.DialogNavigationService.NavigateModal(vm) as ManageConfigurationsResult;
 
-            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            if (result?.Result == null || !result.Result.Value)
             {
                 return;
             }
@@ -721,10 +753,12 @@ namespace CDP4RelationshipMatrix.ViewModels
                 ShowRelatedOnly = this.ShowRelatedOnly
             };
 
-            var vm = new SavedConfigurationDialogViewModel(this.DialogNavigationService, this.PluginSettingsService, savedConfiguration);
+            var vm = new SavedConfigurationDialogViewModel(this.DialogNavigationService, this.PluginSettingsService,
+                savedConfiguration);
+
             var result = this.DialogNavigationService.NavigateModal(vm) as SavedConfigurationResult;
 
-            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            if (result?.Result == null || !result.Result.Value)
             {
                 return;
             }
@@ -745,6 +779,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 this.CanEditSourceX = false;
                 this.CanInspectSourceY = false;
                 this.CanInspectSourceX = false;
+
                 return;
             }
 
@@ -759,7 +794,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void ExecuteSwitchAxisCommand()
         {
-            this.SupressRebuild();
+            this.SuppressRebuild();
 
             var currentSourceX = this.SourceXConfiguration;
             var currentSourceY = this.SourceYConfiguration;

@@ -33,54 +33,68 @@
             <converters:NameContentConverter x:Key="NameContentConverter" />
             <converters:BooleanToHighlightConverter x:Key="BooleanToHighlightConverter"/>
             <converters:TooltipConverter x:Key="TooltipConverter" />
+            <converters:DeprecatedBackgroundConverter x:Key="DeprecatedBackgroundConverter" />
+            <converters:DeprecatedOpacityConverter x:Key="DeprecatedOpacityConverter" />
 
             <DataTemplate x:Key="SourceYToSourceX">
-                <Image Width="24" Height="24" x:Name="PART_Editor"
+                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                    <Image Width="24" Height="24" x:Name="PART_Editor"
                        Source="/CDP4RelationshipMatrix;component/Resources/Images/ytox.png"
                        ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                </Grid>
             </DataTemplate>
             <DataTemplate x:Key="SourceXToSourceY">
-                <Image Width="24" Height="24" x:Name="PART_Editor"
-                       Source="/CDP4RelationshipMatrix;component/Resources/Images/xtoy.png"
-                       ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                    <Image Width="24" Height="24" x:Name="PART_Editor"
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/xtoy.png"
+                           ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                </Grid>
             </DataTemplate>
             <DataTemplate x:Key="BidirectionalRelationship">
-                <Image Width="24" Height="24" x:Name="PART_Editor"
-                       Source="/CDP4RelationshipMatrix;component/Resources/Images/bidir.png"
-                       ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                    <Image Width="24" Height="24" x:Name="PART_Editor"
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/bidir.png"
+                           ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                </Grid>
             </DataTemplate>
             <DataTemplate x:Key="NodirectionalRelationship">
-                <Image Width="24" Height="24" x:Name="PART_Editor"
-                       Source="/CDP4RelationshipMatrix;component/Resources/Images/nodir.png"
-                       ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                    <Image Width="24" Height="24" x:Name="PART_Editor"
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/nodir.png"
+                           ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                </Grid>
             </DataTemplate>
 
             <DataTemplate x:Key="NameTemplate">
-                <TextBlock x:Name="PART_Editor"
-                           Text="{Binding Converter={StaticResource NameContentConverter}}"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           TextWrapping="Wrap"
-                           Margin="5"
-                           FontWeight="Bold"
-                           TextAlignment="Center">
-                    <TextBlock.Resources>
-                        <Style x:Key="RowToolTipStyle">
-                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
-                        </Style>
-                    </TextBlock.Resources>
-                    <TextBlock.ToolTip>
-                        <ToolTip Content="{Binding Converter={StaticResource TooltipConverter}}"
-                                 Style="{StaticResource RowToolTipStyle}"
-                                 FontWeight="Normal"
-                                 HorizontalContentAlignment="Left"
-                                 HorizontalAlignment="Left" />
-                    </TextBlock.ToolTip>
-                </TextBlock>
+                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                    <TextBlock x:Name="PART_Editor"
+                               Text="{Binding Converter={StaticResource NameContentConverter}}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"
+                               Margin="5"
+                               FontWeight="Bold"
+                               TextAlignment="Center">
+                        <TextBlock.Resources>
+                            <Style x:Key="RowToolTipStyle">
+                                <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                            </Style>
+                        </TextBlock.Resources>
+                        <TextBlock.ToolTip>
+                            <ToolTip Content="{Binding Converter={StaticResource TooltipConverter}}"
+                                     Style="{StaticResource RowToolTipStyle}"
+                                     FontWeight="Normal"
+                                     HorizontalContentAlignment="Left"
+                                     HorizontalAlignment="Left" />
+                        </TextBlock.ToolTip>
+                    </TextBlock>
+                </Grid>
             </DataTemplate>
-            <DataTemplate x:Key="None" />
-
-            <DataTemplate x:Key="HeaderColumnTemplate">
+            <DataTemplate x:Key="None">
+                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                </Grid>
+            </DataTemplate>
+                <DataTemplate x:Key="HeaderColumnTemplate">
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                       Background="{Binding Path=IsHighlighted, Converter={StaticResource BooleanToHighlightConverter}}">
                     <Grid.Width>

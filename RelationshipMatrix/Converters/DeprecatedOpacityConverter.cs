@@ -1,27 +1,26 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TooltipConverter.cs" company="RHEA System S.A.">
+// <copyright file="DeprecatedOpacityConverter.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4RelationshipMatrix.Converters
 {
-    using DevExpress.Xpf.Grid;
     using ViewModels;
 
     /// <summary>
-    /// The converter to retrieve the tooltip to display for a row based on the <see cref="EditGridCellData"/>
+    /// The converter to retrieve the opacity for the cell to be used for deprecated things.
     /// </summary>
-    public class TooltipConverter : BaseMatrixCellViewModelConverter<string>
+    public class DeprecatedOpacityConverter : BaseMatrixCellViewModelConverter<double>
     {
         /// <summary>
         /// Returns a specific value 
         /// </summary>
         /// <param name="matrixCellViewModel">The <see cref="MatrixCellViewModel"/> that helps to return the right value</param>
-        /// <returns></returns>
-        protected override string GetValue(MatrixCellViewModel matrixCellViewModel)
+        /// <returns>Opacity</returns>
+        protected override double GetValue(MatrixCellViewModel matrixCellViewModel)
         {
-            return matrixCellViewModel?.Tooltip ?? "-";
+            return matrixCellViewModel.IsDeprecated ? 0.5D : double.PositiveInfinity;
         }
     }
 }

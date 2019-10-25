@@ -121,6 +121,23 @@ namespace CDP4RelationshipMatrix.ViewModels
         public DisplayKind? DisplayKind { get; }
 
         /// <summary>
+        /// Gets or sets the Deprecated state.
+        /// </summary>
+        public bool IsDeprecated => this.CalculateDeprecated();
+
+        /// <summary>
+        /// Calculate if this cell should show deprecated
+        /// </summary>
+        /// <returns>true if deprecated, otherwise false</returns>
+        private bool CalculateDeprecated()
+        {
+            var deprecatableThingX = this.SourceX as IDeprecatableThing;
+            var deprecatableThingY = this.SourceY as IDeprecatableThing;
+
+            return (deprecatableThingX?.IsDeprecated ?? false) || (deprecatableThingY?.IsDeprecated ?? false);
+        }
+
+        /// <summary>
         /// Gets or sets the highlighted state.
         /// </summary>
         public bool IsHighlighted
