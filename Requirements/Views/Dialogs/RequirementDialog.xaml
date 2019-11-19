@@ -149,8 +149,9 @@
                             </dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn Header="Type" FieldName="ParameterTypeName" AllowEditing="False" Width="80"/>
+                            <dxg:GridColumn Header="Type" FieldName="ParameterTypeShortName" AllowEditing="False" Width="40"/>
                             <dxg:GridColumn Header="Value" FieldName="Definition" AllowEditing="False"/>
+                            <dxg:GridColumn Header="Type Name" FieldName="ParameterTypeName" AllowEditing="False" Width="80"/>
                             <dxg:GridColumn Header="Scale" FieldName="ScaleShortName" Width="80" AllowEditing="False">
                             </dxg:GridColumn>
                         </dxg:GridControl.Columns>
