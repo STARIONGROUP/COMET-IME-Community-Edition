@@ -55,8 +55,9 @@
                             </dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn Header="Type" FieldName="ParameterType.Name" Width="80" AllowEditing="False"/>
+                            <dxg:GridColumn Header="Type" FieldName="ParameterType.ShortName" Width="40" AllowEditing="False"/>
                             <dxg:GridColumn Header="Value" FieldName="Manual" AllowEditing="True" CellTemplateSelector="{StaticResource ManualValueCellTemplateSelector}"/>
+                            <dxg:GridColumn Header="Type Name" FieldName="ParameterType.Name" Width="80" AllowEditing="False"/>
                             <dxg:GridColumn Header="Scale" FieldName="Scale" Width="80" AllowEditing="True">
                                 <dxg:GridColumn.CellTemplate>
                                     <DataTemplate>
