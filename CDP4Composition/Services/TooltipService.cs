@@ -32,6 +32,13 @@ namespace CDP4Composition.Services
         /// <returns></returns>
         public static string Tooltip(this Thing thing)
         {
+            if (thing.ChangeKind == ChangeKind.Create)
+            {
+                // when creating things, especially in nested creted dialogs there are multiple opportunities for various exceptions
+                // occuring. i.e. ContainmentException when calling .Owner when that property is derived. So skip the tooltips in this case.
+                return string.Empty;
+            }
+
             var sb = new StringBuilder();
 
             if (thing is IShortNamedThing shortNamedThing)
