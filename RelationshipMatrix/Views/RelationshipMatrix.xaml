@@ -27,7 +27,7 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <converters:CategoryListConverter x:Key="ObjectListConverter" />
+            <converters:OrderedCategoryListConverter x:Key="OrderedCategoryListConverter" />
             <converters:ColumnFixedConverter x:Key="ColumnFixedConverter" />
             <converters:ColumnWidthConverter x:Key="ColumnWidthConverter" />
             <converters:NameContentConverter x:Key="NameContentConverter" />
@@ -348,7 +348,7 @@
                                                         </Grid.ColumnDefinitions>
                                                         <dxe:ComboBoxEdit
                                                                 Grid.Column="0"
-                                                                EditValue="{Binding SourceXConfiguration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
+                                                                EditValue="{Binding SourceXConfiguration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OrderedCategoryListConverter}}"
                                                                 ItemsSource="{Binding SourceXConfiguration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                                 AutoComplete="True"
                                                                 AllowNullInput="True"
@@ -422,7 +422,7 @@
                                                         </Grid.ColumnDefinitions>
                                                         <dxe:ComboBoxEdit
                                                                 Grid.Column="0"
-                                                                EditValue="{Binding SourceYConfiguration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ObjectListConverter}}"
+                                                                EditValue="{Binding SourceYConfiguration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OrderedCategoryListConverter}}"
                                                                 ItemsSource="{Binding SourceYConfiguration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                                 AutoComplete="True"
                                                                 AllowNullInput="True"
