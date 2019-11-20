@@ -221,7 +221,7 @@
     <Compile Include="Converters\NameContentConverter.cs" />
     <Compile Include="Converters\ColumnWidthConverter.cs" />
     <Compile Include="Converters\ColumnFixedConverter.cs" />
-    <Compile Include="Converters\CategoryListConverter.cs" />
+    <Compile Include="Converters\OrderedCategoryListConverter.cs" />
     <Compile Include="RelationshipMatrixModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\RelationshipConfiguration.cs" />
