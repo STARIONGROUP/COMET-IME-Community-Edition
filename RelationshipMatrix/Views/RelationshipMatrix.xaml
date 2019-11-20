@@ -245,14 +245,31 @@
                                                                IsVisible="{Binding View.DataContext.Matrix.CanCreateSourceXToSourceY}"
                                                                Command="{Binding View.DataContext.Matrix.CreateSourceXToSourceYLink}" />
                                     <dxb:BarItemLinkSeparator />
+                                    <dxb:BarButtonItem Content="Edit ⮥"
+                                                               Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.CanEditSourceYToSourceX}"
+                                                               Command="{Binding View.DataContext.EditSourceYToSourceXCommand}" />
+                                    <dxb:BarButtonItem Content="Inspect ⮥"
+                                                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.CanInspectSourceYToSourceX}"
+                                                               Command="{Binding View.DataContext.InspectSourceYToSourceXCommand}" />
                                     <dxb:BarButtonItem Content="Delete ⮥"
                                                                Glyph="{dx:DXImage Image=Delete_16x16.png}"
                                                                IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteYToX}"
                                                                Command="{Binding View.DataContext.Matrix.DeleteSourceYToSourceXLink}" />
+                                    <dxb:BarButtonItem Content="Edit ⮠"
+                                                               Glyph="{dx:DXImage Image=EditName_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.CanEditSourceXToSourceY}"
+                                                               Command="{Binding View.DataContext.EditSourceXToSourceYCommand}" />
+                                    <dxb:BarButtonItem Content="Inspect ⮠"
+                                                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                                               IsVisible="{Binding View.DataContext.CanInspectSourceXToSourceY}"
+                                                               Command="{Binding View.DataContext.InspectSourceXToSourceYCommand}" />
                                     <dxb:BarButtonItem Content="Delete ⮠"
                                                                Glyph="{dx:DXImage Image=Delete_16x16.png}"
                                                                IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteXToY}"
                                                                Command="{Binding View.DataContext.Matrix.DeleteSourceXToSourceYLink}" />
+                                    <dxb:BarItemLinkSeparator />
                                     <dxb:BarButtonItem Content="Delete All"
                                                                Glyph="{dx:DXImage Image=Delete_16x16.png}"
                                                                IsVisible="{Binding View.DataContext.Matrix.IsVisibleDeleteAll}"

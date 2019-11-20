@@ -73,6 +73,28 @@ namespace CDP4RelationshipMatrix.ViewModels
         private bool canEditSourceX;
 
         /// <summary>
+        /// Backing field for <see cref="CanEditSourceYToSourceX" />
+        /// </summary>
+        private bool canEditSourceYToSourceX;
+
+        /// <summary>
+        /// Backing field for <see cref="CanEditSourceXToSourceY" />
+        /// </summary>
+        private bool canEditSourceXToSourceY;
+
+        /// <summary>
+        /// Backing field for <see cref="CanInspectSourceYToSourceX" />
+        /// </summary>
+        private bool canInspectSourceYToSourceX;
+
+        /// <summary>
+        /// Backing field for <see cref="CanInspectSourceXToSourceY" />
+        /// </summary>
+        private bool canInspectSourceXToSourceY;
+
+
+
+        /// <summary>
         /// Backing field for <see cref="CanInspectSourceY" />
         /// </summary>
         private bool canInspectSourceY;
@@ -274,6 +296,43 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether a <see cref="BinaryRelationship" /> can be editted from sourceY to sourceX
+        /// </summary>
+        public bool CanEditSourceYToSourceX
+        {
+            get { return this.canEditSourceYToSourceX; }
+            private set { this.RaiseAndSetIfChanged(ref this.canEditSourceYToSourceX, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a <see cref="BinaryRelationship" /> can be editted from sourceY to sourceX
+        /// </summary>
+        public bool CanEditSourceXToSourceY
+        {
+            get { return this.canEditSourceXToSourceY; }
+            private set { this.RaiseAndSetIfChanged(ref this.canEditSourceXToSourceY, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a <see cref="BinaryRelationship" /> can be inspected from sourceY to sourceX
+        /// </summary>
+        public bool CanInspectSourceYToSourceX
+        {
+            get { return this.canInspectSourceYToSourceX; }
+            private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceYToSourceX, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a <see cref="BinaryRelationship" /> can be inspected from sourceY to sourceX
+        /// </summary>
+        public bool CanInspectSourceXToSourceY
+        {
+            get { return this.canInspectSourceXToSourceY; }
+            private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceXToSourceY, value); }
+        }
+
+
+        /// <summary>
         /// Gets a value indicating whether the edit row command is enabled
         /// </summary>
         public bool CanInspectSourceY
@@ -310,6 +369,26 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Gets the command to inspect the current column thing
         /// </summary>
         public ReactiveCommand<object> InspectSourceXCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command to inspect the current relation from column to row
+        /// </summary>
+        public ReactiveCommand<object> InspectSourceXToSourceYCommand { get; set; }
+
+        /// <summary>
+        /// Gets the command to inspect the current relation from row to column
+        /// </summary>
+        public ReactiveCommand<object> InspectSourceYToSourceXCommand { get; set; }
+
+        /// <summary>
+        /// Gets the command to inspect the current relation from column to row
+        /// </summary>
+        public ReactiveCommand<object> EditSourceXToSourceYCommand { get; set; }
+
+        /// <summary>
+        /// Gets the command to inspect the current relation from row to column
+        /// </summary>
+        public ReactiveCommand<object> EditSourceYToSourceXCommand { get; set; }
 
         /// <summary>
         /// Gets the command to switch axis
@@ -532,6 +611,18 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.InspectSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceX));
             this.Disposables.Add(this.InspectSourceXCommand.Subscribe(_ => this.ExecuteInspectSourceXCommand()));
+
+            this.EditSourceYToSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSourceYToSourceX));
+            this.Disposables.Add(this.EditSourceYToSourceXCommand.Subscribe(_ => this.ExecuteEditSourceYToSourceXCommand()));
+
+            this.EditSourceXToSourceYCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSourceXToSourceY));
+            this.Disposables.Add(this.EditSourceXToSourceYCommand.Subscribe(_ => this.ExecuteEditSourceXToSourceYCommand()));
+
+            this.InspectSourceYToSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceYToSourceX));
+            this.Disposables.Add(this.InspectSourceYToSourceXCommand.Subscribe(_ => this.ExecuteInspectSourceYToSourceXCommand()));
+
+            this.InspectSourceXToSourceYCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceXToSourceY));
+            this.Disposables.Add(this.InspectSourceXToSourceYCommand.Subscribe(_ => this.ExecuteInspectSourceXToSourceYCommand()));
 
             this.SwitchAxisCommand = ReactiveCommand.Create();
             this.Disposables.Add(this.SwitchAxisCommand.Subscribe(_ => this.ExecuteSwitchAxisCommand()));
@@ -779,6 +870,10 @@ namespace CDP4RelationshipMatrix.ViewModels
                 this.CanEditSourceX = false;
                 this.CanInspectSourceY = false;
                 this.CanInspectSourceX = false;
+                this.CanEditSourceYToSourceX = false;
+                this.CanEditSourceXToSourceY = false;
+                this.CanInspectSourceYToSourceX = false;
+                this.CanInspectSourceXToSourceY = false;
 
                 return;
             }
@@ -787,6 +882,25 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.CanEditSourceX = vm.SourceX != null && this.PermissionService.CanWrite(vm.SourceX);
             this.CanInspectSourceY = vm.SourceY != null;
             this.CanInspectSourceX = vm.SourceX != null;
+
+
+            this.CanInspectSourceYToSourceX = new List<RelationshipDirectionKind>
+            {
+                RelationshipDirectionKind.RowThingToColumnThing,
+                RelationshipDirectionKind.BiDirectional
+            }.Contains(vm.RelationshipDirection);
+
+            this.CanEditSourceYToSourceX = this.CanInspectSourceYToSourceX &&
+                                           this.Session.PermissionService.CanRead(vm.Relationships.First(x => x.Source == vm.SourceY && x.Target == vm.SourceX));
+
+            this.CanInspectSourceXToSourceY = new List<RelationshipDirectionKind>
+            {
+                RelationshipDirectionKind.ColumnThingToRowThing,
+                RelationshipDirectionKind.BiDirectional
+            }.Contains(vm.RelationshipDirection);
+
+            this.CanEditSourceXToSourceY = this.CanInspectSourceXToSourceY &&
+                                           this.Session.PermissionService.CanRead(vm.Relationships.First(x => x.Source == vm.SourceX && x.Target == vm.SourceY));
         }
 
         /// <summary>
@@ -836,7 +950,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Executes the inspect command
+        /// Executes the edit command
         /// </summary>
         private void ExecuteEditSourceYCommand()
         {
@@ -851,7 +965,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Executes the inspect command
+        /// Executes the edit command
         /// </summary>
         private void ExecuteEditSourceXCommand()
         {
@@ -863,6 +977,74 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             this.ExecuteUpdateCommand(cell.SourceX);
+        }
+
+        /// <summary>
+        /// Executes the inspect command
+        /// </summary>
+        private void ExecuteInspectSourceYToSourceXCommand()
+        {
+            if (!(this.Matrix.SelectedCell is MatrixCellViewModel cell))
+            {
+                return;
+            }
+
+            var relationShip = cell.Relationships.FirstOrDefault(x => x.Source == cell.SourceY && x.Target == cell.SourceX);
+            if (relationShip != null)
+            {
+                this.ExecuteInspectCommand(relationShip);
+            }
+        }
+
+        /// <summary>
+        /// Executes the inspect command
+        /// </summary>
+        private void ExecuteInspectSourceXToSourceYCommand()
+        {
+            if (!(this.Matrix.SelectedCell is MatrixCellViewModel cell))
+            {
+                return;
+            }
+
+            var relationShip = cell.Relationships.FirstOrDefault(x => x.Source == cell.SourceX && x.Target == cell.SourceY);
+            if (relationShip != null)
+            {
+                this.ExecuteInspectCommand(relationShip);
+            }
+        }
+
+        /// <summary>
+        /// Executes the edit command
+        /// </summary>
+        private void ExecuteEditSourceYToSourceXCommand()
+        {
+            if (!(this.Matrix.SelectedCell is MatrixCellViewModel cell))
+            {
+                return;
+            }
+
+            var relationShip = cell.Relationships.FirstOrDefault(x => x.Source == cell.SourceY && x.Target == cell.SourceX);
+            if (relationShip != null)
+            {
+                this.ExecuteUpdateCommand(relationShip);
+            }
+        }
+
+        /// <summary>
+        /// Executes the edit command
+        /// </summary>
+        private void ExecuteEditSourceXToSourceYCommand()
+        {
+            if (!(this.Matrix.SelectedCell is MatrixCellViewModel cell))
+            {
+                return;
+            }
+
+            var relationShip = cell.Relationships.FirstOrDefault(x => x.Source == cell.SourceX && x.Target == cell.SourceY);
+            if (relationShip != null)
+            {
+                this.ExecuteUpdateCommand(relationShip);
+            }
         }
     }
 }
