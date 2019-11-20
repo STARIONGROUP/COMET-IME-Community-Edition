@@ -1,20 +1,18 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="FilterStringService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA-2018 System S.A.
+//   Copyright (c) 2015 RHEA-2019 System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition
 {
     using System.Collections.Generic;
-    using System.Windows;
-    using DevExpress.Mvvm.UI.Interactivity;
     using DevExpress.Xpf.Grid;
     
     /// <summary>
     /// This behavior Shows or hides the deprecated rows in all browsers
     /// </summary>
-    public class FilterStringService : Behavior<FrameworkElement>
+    public class FilterStringService
     {
         /// <summary>
         /// The string to filter rows of things that are deprecated.
@@ -22,27 +20,14 @@ namespace CDP4Composition
         private const string DeprecatedFilterString = "[IsDeprecated]=False";
 
         /// <summary>
-        /// The deprecated filter.
+        /// The DataControlBase controls of the open <see cref="DataControlBase"/>s
         /// </summary>
-        private static readonly FilterStringService filterString = new FilterStringService();
-
-        /// <summary>
-        /// The GridControls of the open <see cref="GridControl"/>s
-        /// </summary>
-        public readonly Dictionary<string, GridControl> OpenGridControls = new Dictionary<string, GridControl>();
-
-        /// <summary>
-        /// The GridControls of the open  open <see cref="TreeListControl"/>s
-        /// </summary>
-        public readonly Dictionary<string, TreeListControl> OpenTreeListControls = new Dictionary<string, TreeListControl>();
+        public readonly Dictionary<string, DataControlBase> OpenControls = new Dictionary<string, DataControlBase>();
 
         /// <summary>
         /// Gets the deprecated filter.
         /// </summary>
-        public static FilterStringService FilterString
-        {
-            get { return filterString; }
-        }
+        public static FilterStringService FilterString { get; } = new FilterStringService();
 
         /// <summary>
         /// Gets or sets a value indicating whether the deprecated filter is enabled.
@@ -50,21 +35,20 @@ namespace CDP4Composition
         public bool IsFilterActive { get; set; }
 
         /// <summary>
-        /// The refresh all <see cref="OpenGridControls"/> and the <see cref="OpenTreeListControls"/>.
+        /// The refresh all <see cref="OpenControls"/> and the <see cref="OpenTreeListControls"/>.
         /// </summary>
         public void RefreshAll()
         {
-            foreach (var grid in this.OpenGridControls.Values)
+            foreach (var grid in this.OpenControls.Values)
             {
-                grid.IsFilterEnabled = this.IsFilterActive;
-                grid.RefreshData();
+                this.RefreshElement(grid);
             }
+        }
 
-            foreach (var tree in this.OpenTreeListControls.Values)
-            {
-                tree.IsFilterEnabled = this.IsFilterActive;
-                tree.RefreshData();
-            }
+        private void RefreshElement(DataControlBase control)
+        {
+            control.IsFilterEnabled = this.IsFilterActive;
+            control.RefreshData();
         }
 
         /// <summary>
@@ -76,7 +60,8 @@ namespace CDP4Composition
         public void AddGridControl(GridControl gridControl)
         {
             gridControl.FilterString = DeprecatedFilterString;
-            this.OpenGridControls[gridControl.Name] = gridControl;
+            this.OpenControls[gridControl.Name] = gridControl;
+            this.RefreshElement(gridControl);
         }
 
         /// <summary>
@@ -88,7 +73,8 @@ namespace CDP4Composition
         public void AddTreeListControl(TreeListControl treeListControl)
         {
             treeListControl.FilterString = DeprecatedFilterString;
-            this.OpenTreeListControls[treeListControl.Name] = treeListControl;
+            this.OpenControls[treeListControl.Name] = treeListControl;
+            this.RefreshElement(treeListControl);
         }
     }
 }
