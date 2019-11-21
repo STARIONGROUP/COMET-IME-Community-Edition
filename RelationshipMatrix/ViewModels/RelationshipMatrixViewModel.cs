@@ -92,8 +92,6 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private bool canInspectSourceXToSourceY;
 
-
-
         /// <summary>
         /// Backing field for <see cref="CanInspectSourceY" />
         /// </summary>

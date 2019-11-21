@@ -237,7 +237,7 @@
     <Compile Include="FolderRowViewModel.cs" />
     <Compile Include="Mvvm\Behaviours\ContextMenuBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\ExtendedDiagramOrgChartBehavior.cs" />
-    <Compile Include="Mvvm\Behaviours\FilterStringService.cs" />
+    <Compile Include="Services\FilterStringService.cs" />
     <Compile Include="Mvvm\Behaviours\IExtendedDiagramOrgChartBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\ItemsSourceHelper.cs" />
     <Compile Include="Mvvm\Behaviours\LayoutControlItemsSourceHelper.cs" />

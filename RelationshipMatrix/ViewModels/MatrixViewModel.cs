@@ -19,7 +19,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.Extensions;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
