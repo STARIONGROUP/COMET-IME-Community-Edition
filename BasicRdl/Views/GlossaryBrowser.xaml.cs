@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GlossaryBrowser.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,7 +8,8 @@ namespace BasicRdl.Views
 {
     using CDP4Composition;
     using CDP4Composition.Attributes;
-    using DevExpress.Xpf.Grid;
+    using CDP4Composition.Services;
+
     using NLog;
 
     /// <summary>
@@ -26,7 +27,7 @@ namespace BasicRdl.Views
         /// Initializes a new instance of the <see cref="GlossaryBrowser"/> class.
         /// </summary>
         public GlossaryBrowser()
-        {            
+        {
         }
 
         /// <summary>
@@ -43,12 +44,7 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                var control = (TreeListControl)this.FindName("GlossaryTreeListControl");
-                if (control != null)
-                {
-                    FilterStringService.FilterString.AddTreeListControl(control);
-                    logger.Debug("{0} Added to the FilterStringService", control.Name);
-                }
+                FilterStringService.FilterString.AddTreeListControl(this.GlossaryTreeListControl);
             }
         }
     }

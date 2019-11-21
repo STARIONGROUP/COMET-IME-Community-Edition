@@ -11,6 +11,8 @@ namespace CDP4SiteDirectory.ViewModels
     using System.Reactive.Linq;
     using CDP4Composition;
     using CDP4Composition.Events;
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -48,7 +50,6 @@ namespace CDP4SiteDirectory.ViewModels
 
             this.ShowHideDeprecatedThingsCommand = ReactiveCommand.Create();
             this.ShowHideDeprecatedThingsCommand.Subscribe(_ => this.ExecuteShowHideDeprecatedThingsCommand());
-            this.filterStringService.IsFilterActive = true;
         }
 
         /// <summary>
@@ -96,8 +97,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private void ExecuteShowHideDeprecatedThingsCommand()
         {
-            this.filterStringService.IsFilterActive = !this.filterStringService.IsFilterActive;
-            this.filterStringService.RefreshAll();
+            this.filterStringService.ToggleIsFilterActive();
             CDPMessageBus.Current.SendMessage(new ToggleDeprecatedThingEvent(!this.filterStringService.IsFilterActive));
         }
     }

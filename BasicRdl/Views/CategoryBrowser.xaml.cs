@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CategoryBrowser.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -8,7 +8,8 @@ namespace BasicRdl.Views
 {
     using CDP4Composition;
     using CDP4Composition.Attributes;
-    using DevExpress.Xpf.Grid;
+    using CDP4Composition.Services;
+
     using NLog;
 
     /// <summary>
@@ -29,7 +30,7 @@ namespace BasicRdl.Views
         /// This constructor is called by MEF
         /// </remarks>
         public CategoryBrowser()
-        {            
+        {
         }
 
         /// <summary>
@@ -46,13 +47,8 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                var control = (GridControl)this.FindName("CategoriesGridControl");
-                if (control != null)
-                {
-                    FilterStringService.FilterString.AddGridControl(control);
-                    logger.Debug("{0} Added to the FilterStringService", control.Name);
-                }
-            }            
+                FilterStringService.FilterString.AddGridControl(this.CategoriesGridControl);
+            }
         }
     }
 }
