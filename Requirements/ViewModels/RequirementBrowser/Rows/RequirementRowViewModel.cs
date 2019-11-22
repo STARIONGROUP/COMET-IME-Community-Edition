@@ -29,7 +29,7 @@ namespace CDP4Requirements.ViewModels
     /// <summary>
     /// the row-view-model representing a <see cref="Requirement"/>
     /// </summary>
-    public class RequirementRowViewModel : CDP4CommonView.RequirementRowViewModel, IDropTarget
+    public class RequirementRowViewModel : CDP4CommonView.RequirementRowViewModel, IDropTarget, IDeprecatableThing
     {
         /// <summary>
         /// The folder row containing the <see cref="SimpleParameterValue"/>

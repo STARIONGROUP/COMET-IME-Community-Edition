@@ -85,7 +85,9 @@ namespace CDP4Composition.Mvvm
         /// Backing field for <see cref="ThingStatus"/>
         /// </summary>
         private ThingStatus thingStatus;
-        
+
+        private ObservableAsPropertyHelper<bool> isHidden;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RowViewModelBase{T}"/> class. 
         /// </summary>
@@ -113,6 +115,7 @@ namespace CDP4Composition.Mvvm
 
             if (this.Thing is NotThing)
             {
+                this.SetIsDeprecatableToIsHiddenSubscription(false);
                 return;
             }
 
@@ -200,6 +203,14 @@ namespace CDP4Composition.Mvvm
         {
             get { return this.isExpanded; }
             set { this.RaiseAndSetIfChanged(ref this.isExpanded, value); }
+        }
+
+        /// <summary>
+        /// Sets a value indicating that the row is hidden
+        /// </summary>
+        public bool IsHidden
+        {
+            get { return this.isHidden.Value; }
         }
 
         /// <summary>
@@ -382,7 +393,31 @@ namespace CDP4Composition.Mvvm
                 .Select(x => !string.IsNullOrEmpty(x))
                 .ToProperty(this, x => x.HasError, out this.hasError);
 
+            this.SetIsDeprecatableToIsHiddenSubscription(true);
+
             this.hasError.ThrownExceptions.Subscribe(e => logger.Error(e));
+        }
+
+        /// <summary>
+        /// Checks if the class is <see cref="IDeprecatableThing" /> and sets up a link between the IsDeprecated and <see cref="IsHidden"/> properties.
+        /// </summary>
+        /// <param name="allowThingCheck">
+        /// Indicates that an extra check may or may not be done on the <see cref="Thing"/> property.
+        /// </param>
+        private void SetIsDeprecatableToIsHiddenSubscription(bool allowThingCheck)
+        {
+            if (this is IDeprecatableThing thisClass)
+            {
+                thisClass.WhenAnyValue(
+                        vm => vm.IsDeprecated)
+                    .ToProperty(this, x => x.IsHidden, out this.isHidden);
+            }
+            else if (allowThingCheck && this.Thing is IDeprecatableThing thing)
+            {
+                thing.WhenAnyValue(
+                        vm => vm.IsDeprecated)
+                    .ToProperty(this, x => x.IsHidden, out this.isHidden);
+            }
         }
 
         /// <summary>

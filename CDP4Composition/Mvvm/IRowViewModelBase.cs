@@ -95,6 +95,11 @@ namespace CDP4Composition.Mvvm
         bool IsExpanded { get; set; }
 
         /// <summary>
+        /// Sets a value indicating that the row is hidden
+        /// </summary>
+        bool IsHidden { get; }
+
+        /// <summary>
         /// Expands the current row and all contained rows along the containment hierarchy
         /// </summary>
         void ExpandAllRows();
