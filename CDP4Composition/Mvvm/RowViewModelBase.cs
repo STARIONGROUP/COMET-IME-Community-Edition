@@ -72,7 +72,7 @@ namespace CDP4Composition.Mvvm
         private bool shouldBeDisplayed = true;
 
         /// <summary>
-        /// Backing field for the <see cref="isExpanded"/> property
+        /// Backing field for <see cref="IsExpanded"/>
         /// </summary>
         private bool isExpanded;
 
@@ -86,6 +86,9 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         private ThingStatus thingStatus;
 
+        /// <summary>
+        /// Backing field for <see cref="IsHidden"/>
+        /// </summary>
         private ObservableAsPropertyHelper<bool> isHidden;
 
         /// <summary>
