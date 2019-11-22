@@ -25,7 +25,7 @@ namespace CDP4Requirements.ViewModels
     /// <summary>
     /// The row-view-model that represents a <see cref="RequirementsGroup"/>
     /// </summary>
-    public class RequirementsGroupRowViewModel : RequirementContainerRowViewModel<RequirementsGroup>, IDropTarget
+    public class RequirementsGroupRowViewModel : RequirementContainerRowViewModel<RequirementsGroup>, IDropTarget, IDeprecatableThing
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementsGroupRowViewModel"/> class

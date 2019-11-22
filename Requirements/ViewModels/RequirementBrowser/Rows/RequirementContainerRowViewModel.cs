@@ -32,7 +32,7 @@ namespace CDP4Requirements.ViewModels
     /// <typeparam name="T">
     /// A type of <see cref="RequirementsContainer"/>
     /// </typeparam>
-    public abstract class RequirementContainerRowViewModel<T> : RequirementsContainerRowViewModel<T> where T : RequirementsContainer
+    public abstract class RequirementContainerRowViewModel<T> : RequirementsContainerRowViewModel<T>, IDeprecatableThing where T : RequirementsContainer
     {
         /// <summary>
         /// The <see cref="IComparer{T}"/>
@@ -77,6 +77,7 @@ namespace CDP4Requirements.ViewModels
             this.simpleParameters = new CDP4Composition.FolderRowViewModel("Simple Parameter Values", "Simple Parameter Values", this.Session, this);
             this.ContainedRows.Add(this.simpleParameters);
             this.TopParentRow = topNode ?? this as RequirementsSpecificationRowViewModel;
+            this.SetSubscriptions();
         }
 
         /// <summary>
@@ -243,6 +244,17 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Add the necessary subscriptions 
+        /// </summary>
+        private void SetSubscriptions()
+        {
+            this.Disposables.Add(
+                this
+                    .WhenAnyValue(x => x.IsDeprecated)
+                    .Subscribe(x => this.UpdateIsDeprecated()));
+        }
+
+        /// <summary>
         /// Update the values of this row
         /// </summary>
         protected virtual void UpdateProperties()
@@ -254,7 +266,18 @@ namespace CDP4Requirements.ViewModels
             this.CategoryList = new List<Category>(this.Thing.Category);
             this.UpdateValues();
         }
-        
+
+        /// <summary>
+        /// Update deprecated for <see cref="simpleParameters"/>
+        /// </summary>
+        private void UpdateIsDeprecated()
+        {
+            if (this.simpleParameters != null)
+            {
+                this.simpleParameters.IsDeprecated = this.IsDeprecated;
+            }
+        }
+
         /// <summary>
         /// Handle the drag-over of a <see cref="Category"/>
         /// </summary>

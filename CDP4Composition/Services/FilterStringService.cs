@@ -20,7 +20,7 @@ namespace CDP4Composition.Services
         /// <summary>
         /// The string to filter rows of things that are deprecated.
         /// </summary>
-        private const string DeprecatedFilterString = "[IsDeprecated]=False";
+        private const string DeprecatedFilterString = "[IsHidden]=False";
 
         /// <summary>
         /// Object used to make this singleton threadsafe
