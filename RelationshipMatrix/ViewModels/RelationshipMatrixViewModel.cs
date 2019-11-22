@@ -329,7 +329,6 @@ namespace CDP4RelationshipMatrix.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceXToSourceY, value); }
         }
 
-
         /// <summary>
         /// Gets a value indicating whether the edit row command is enabled
         /// </summary>
@@ -880,7 +879,6 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.CanEditSourceX = vm.SourceX != null && this.PermissionService.CanWrite(vm.SourceX);
             this.CanInspectSourceY = vm.SourceY != null;
             this.CanInspectSourceX = vm.SourceX != null;
-
 
             this.CanInspectSourceYToSourceX = new List<RelationshipDirectionKind>
             {
