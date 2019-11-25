@@ -214,7 +214,7 @@
                                                                    EventArgsConverter="{converters:PreviewMouseDownArgsConverter}"
                                                                    EventName="PreviewMouseDown" ModifierKeys=""
                                                                    PassEventArgsToCommand="True" />
-                                    
+
                                     <behaviour:TableViewMenuBehavior Command="{Binding Matrix.ToggleColumnHighlightCommand}"/>
                                 </dxmvvm:Interaction.Behaviors>
                                 <dxg:TableView.RowCellMenuCustomizations>
@@ -286,10 +286,27 @@
                                       HorizontalAlignment="Stretch"
                                       VerticalAlignment="Stretch"
                                       GroupBoxDisplayMode="Normal">
-                        <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedItemDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                        <dxlc:LayoutItem Label="Row:" LabelPosition="Top">
+                            <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedRowDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                       VerticalScrollBarVisibility="Auto"
                                       TextWrapping="Wrap"
-                                      IsReadOnly="True" />
+                                      IsReadOnly="True"
+                                      MaxHeight="300"/>
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem Label="Relations:" LabelPosition="Top">
+                        <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedCellDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                      VerticalScrollBarVisibility="Auto"
+                                      TextWrapping="Wrap"
+                                      IsReadOnly="True" 
+                                      MaxHeight="300" />
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem Label="Column:" LabelPosition="Top">
+                        <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedColumnDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                      VerticalScrollBarVisibility="Auto"
+                                      TextWrapping="Wrap"
+                                      IsReadOnly="True" 
+                                      MaxHeight="300" />
+                        </dxlc:LayoutItem>
                     </dxlc:LayoutGroup>
                 </Grid>
 
