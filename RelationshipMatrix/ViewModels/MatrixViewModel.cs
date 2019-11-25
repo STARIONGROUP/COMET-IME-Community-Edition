@@ -12,6 +12,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Text;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
@@ -79,9 +80,19 @@ namespace CDP4RelationshipMatrix.ViewModels
         private string title;
 
         /// <summary>
-        /// Backing field for <see cref="SelectedItemDetails" />
+        /// Backing field for <see cref="SelectedColumnDetails" />
         /// </summary>
-        private string selectedItemDetails;
+        private string selectedColumnDetails;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedRowDetails" />
+        /// </summary>
+        private string selectedRowDetails;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedCellDetails" />
+        /// </summary>
+        private string selectedCellDetails;
 
         /// <summary>
         /// Backing field for <see cref="SelectedCell" />
@@ -330,12 +341,30 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the string that represents the details of the selected column
+        /// </summary>
+        public string SelectedColumnDetails
+        {
+            get { return this.selectedColumnDetails; }
+            private set { this.RaiseAndSetIfChanged(ref this.selectedColumnDetails, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the string that represents the details of the selected item
         /// </summary>
-        public string SelectedItemDetails
+        public string SelectedRowDetails
         {
-            get { return this.selectedItemDetails; }
-            private set { this.RaiseAndSetIfChanged(ref this.selectedItemDetails, value); }
+            get { return this.selectedRowDetails; }
+            private set { this.RaiseAndSetIfChanged(ref this.selectedRowDetails, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the string that represents the details of the selected cell
+        /// </summary>
+        public string SelectedCellDetails
+        {
+            get { return this.selectedCellDetails; }
+            private set { this.RaiseAndSetIfChanged(ref this.selectedCellDetails, value); }
         }
 
         /// <summary>
@@ -775,6 +804,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void ComputeCommandCanExecute()
         {
             var vm = this.SelectedCell as MatrixCellViewModel;
+            this.SetPropertiesOnSelectedItemChanged(vm);
 
             if (vm?.SourceX == null)
             {
@@ -909,19 +939,91 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Executes the <see cref="MouseDownCommand" />
         /// </summary>
         /// <param name="matrixAddress">
-        /// the address of the selected column
+        /// the address of the selected cell
         /// </param>
         private void MouseDownCommandExecute(MatrixAddress matrixAddress)
         {
+            //Only if row is null, otherwise SelectedCell PropertyChanged handles setting properties
+            if (matrixAddress.Row is null)
+            {
+                this.SetRowAndColumnPropertiesOnSelectedItemChanged(matrixAddress);
+            }
+        }
+
+
+
+        /// <summary>
+        /// Sets the info detail properties
+        /// </summary>
+        /// <param name="vm"><see cref="MatrixCellViewModel"/> that represents the currently selected grid cell</param>
+        private void SetPropertiesOnSelectedItemChanged(MatrixCellViewModel vm)
+        {
+            this.SelectedCellDetails = string.Empty;
+
+            if (vm == null)
+            {
+                return;
+            }
+
+            var selectedRow = this.Records.FirstOrDefault(x => x.SingleOrDefault(y => y.Value == vm).Key != null);
+            if (selectedRow != null)
+            {
+                var thing = vm.SourceX as DefinedThing;
+
+                var matrixAddress = new MatrixAddress
+                {
+                    Column = thing?.Name ?? string.Empty,
+                    Row = this.Records.IndexOf(selectedRow)
+                };
+
+                this.SetRowAndColumnPropertiesOnSelectedItemChanged(matrixAddress);
+            }
+
+            var toolTip = new StringBuilder();
+            foreach (var relationship in vm.Relationships)
+            {
+                if (toolTip.Length > 0)
+                {
+                    toolTip.AppendLine("");
+                    toolTip.AppendLine("");
+                }
+
+                toolTip.AppendLine(relationship.Source.Equals(vm.SourceY) ? "------------->>>" : "<<<-------------");
+                toolTip.Append(relationship.Tooltip());
+            }
+
+            this.SelectedCellDetails = toolTip.ToString();
+        }
+
+        /// <summary>
+        /// Sets properties when the selected item changes
+        /// </summary>
+        /// <param name="matrixAddress">
+        /// the address of the selected cell
+        /// </param>
+        private void SetRowAndColumnPropertiesOnSelectedItemChanged(MatrixAddress matrixAddress)
+        {
             if (matrixAddress == null)
             {
-                this.SelectedItemDetails = string.Empty;
+                this.SelectedColumnDetails = string.Empty;
+                this.SelectedRowDetails = string.Empty;
 
                 return;
             }
 
             var columnDefinition = this.Columns.SingleOrDefault(c => c.FieldName == matrixAddress.Column);
-            this.SelectedItemDetails = columnDefinition?.ToolTip;
+            this.SelectedColumnDetails = columnDefinition?.ToolTip;
+
+            if (matrixAddress.Row != null)
+            {
+                var row = this.Records[matrixAddress.Row.Value];
+
+                var firstColumn = row.FirstOrDefault();
+                this.SelectedRowDetails = firstColumn
+                                              .Value?
+                                              .Tooltip ??
+                                          string.Empty;
+            }
         }
 
         /// <summary>
