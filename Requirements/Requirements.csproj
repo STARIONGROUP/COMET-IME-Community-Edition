@@ -279,6 +279,7 @@
     <Compile Include="ViewModels\Dialogs\RequirementsContainerParameterValueRowViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SimpleParameterValueRowViewModel.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Comparers\RequirementsSpecificationComparer.cs" />
+    <Compile Include="ViewModels\RequirementBrowser\IRequirementBrowserDisplaySettings.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Rows\BinaryRelationshipRowViewModel.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Rows\RelationshipParameterValueRowViewModel.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Rows\RequirementsContainerParameterValueRowViewModel.cs" />

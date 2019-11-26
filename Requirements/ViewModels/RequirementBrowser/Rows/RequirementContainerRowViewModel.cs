@@ -12,19 +12,26 @@ namespace CDP4Requirements.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4CommonView;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
+
     using CDP4Requirements.Comparers;
+    using CDP4Requirements.Utils;
+    using CDP4Requirements.ViewModels.RequirementBrowser;
+
     using ReactiveUI;
-    using Utils;
 
     /// <summary>
     /// A Row view model that represents a <see cref="RequirementsContainer"/>
@@ -32,7 +39,7 @@ namespace CDP4Requirements.ViewModels
     /// <typeparam name="T">
     /// A type of <see cref="RequirementsContainer"/>
     /// </typeparam>
-    public abstract class RequirementContainerRowViewModel<T> : RequirementsContainerRowViewModel<T>, IDeprecatableThing where T : RequirementsContainer
+    public abstract class RequirementContainerRowViewModel<T> : RequirementsContainerRowViewModel<T>, IDeprecatableThing, IRequirementBrowserDisplaySettings where T : RequirementsContainer
     {
         /// <summary>
         /// The <see cref="IComparer{T}"/>
@@ -60,6 +67,16 @@ namespace CDP4Requirements.ViewModels
         private bool isDeprecated;
 
         /// <summary>
+        ///Backing field for <see cref="IsSimpleParameterTypeDisplayed"/>
+        /// </summary>
+        private bool isSimpleParameterTypeDisplayed;
+
+        /// <summary>
+        ///Backing field for <see cref="IsParametricConstraintDisplayed"/>
+        /// </summary>
+        private bool isParametricConstraintDisplayed;
+
+        /// <summary>
         /// Backing field for <see cref="CategoryList"/>
         /// </summary>
         private List<Category> categoryList;
@@ -85,8 +102,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string Definition
         {
-            get { return this.definition; }
-            protected set { this.RaiseAndSetIfChanged(ref this.definition, value); }
+            get => this.definition;
+            protected set => this.RaiseAndSetIfChanged(ref this.definition, value);
         }
 
         /// <summary>
@@ -94,8 +111,26 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public bool IsDeprecated
         {
-            get { return this.isDeprecated; }
-            set { this.RaiseAndSetIfChanged(ref this.isDeprecated, value); }
+            get => this.isDeprecated;
+            set => this.RaiseAndSetIfChanged(ref this.isDeprecated, value);
+        }
+
+        /// <summary>
+        /// Gets a value whether SimpleParameterType things are displayed
+        /// </summary>
+        public bool IsSimpleParameterTypeDisplayed
+        {
+            get => this.isSimpleParameterTypeDisplayed;
+            set => this.RaiseAndSetIfChanged(ref this.isSimpleParameterTypeDisplayed, value);
+        }
+
+        /// <summary>
+        /// Gets a value whether Parametric Constraints are displayed
+        /// </summary>
+        public bool IsParametricConstraintDisplayed
+        {
+            get => this.isParametricConstraintDisplayed;
+            set => this.RaiseAndSetIfChanged(ref this.isParametricConstraintDisplayed, value);
         }
 
         /// <summary>
@@ -103,8 +138,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public List<Category> CategoryList
         {
-            get { return this.categoryList; }
-            set { this.RaiseAndSetIfChanged(ref this.categoryList, value); }
+            get => this.categoryList;
+            set => this.RaiseAndSetIfChanged(ref this.categoryList, value);
         }
 
         /// <summary>
@@ -151,6 +186,7 @@ namespace CDP4Requirements.ViewModels
             }
 
             var groupRow = this.ContainedRows.OfType<RequirementsGroupRowViewModel>().SingleOrDefault(x => x.Thing.Iid == group.Iid);
+
             if (groupRow == null)
             {
                 return;
@@ -171,10 +207,10 @@ namespace CDP4Requirements.ViewModels
             this.TopParentRow.GroupCache[group] = row;
 
             var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
+
             if (orderPt != null)
             {
-                var orderListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue))
-                    .Where(objectChange => ((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType == orderPt && this.Thing.Group.Any(g => g.ParameterValue.Contains(objectChange.ChangedThing)))
+                var orderListener = Observable.Where(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue)), objectChange => (((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType == orderPt) && this.Thing.Group.Any(g => g.ParameterValue.Contains(objectChange.ChangedThing)))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => this.UpdateReqGroupPosition((RequirementsGroup)x.ChangedThing.Container));
 
@@ -189,6 +225,7 @@ namespace CDP4Requirements.ViewModels
         private void RemoveReqGroupRow(RequirementsGroup group)
         {
             var row = this.ContainedRows.SingleOrDefault(x => x.Thing == group);
+
             if (row != null)
             {
                 this.TopParentRow.GroupCache.Remove(group);
@@ -202,7 +239,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void UpdateValues()
         {
-            var current = this.ContainedRows[0].ContainedRows.Select(x => x.Thing).OfType<RequirementsContainerParameterValue>().ToList();
+            var current = this.simpleParameters.ContainedRows.Select(x => x.Thing).OfType<RequirementsContainerParameterValue>().ToList();
             var updated = this.Thing.ParameterValue;
 
             var added = updated.Except(current).ToList();
@@ -236,6 +273,7 @@ namespace CDP4Requirements.ViewModels
         private void RemoveValue(RequirementsContainerParameterValue value)
         {
             var row = this.simpleParameters.ContainedRows.SingleOrDefault(x => x.Thing == value);
+
             if (row != null)
             {
                 this.simpleParameters.ContainedRows.Remove(row);
@@ -252,6 +290,39 @@ namespace CDP4Requirements.ViewModels
                 this
                     .WhenAnyValue(x => x.IsDeprecated)
                     .Subscribe(x => this.UpdateIsDeprecated()));
+
+            this.Disposables.Add(
+                this
+                    .WhenAnyValue(x => x.IsParametricConstraintDisplayed, y => y.IsSimpleParameterTypeDisplayed)
+                    .Subscribe(x => this.AdjustContainedRows()));
+        }
+
+        /// <summary>
+        /// Do some manual adjustments to the <see cref="ContainedRows" /> property
+        /// </summary>
+        private void AdjustContainedRows()
+        {
+            if (this.IsSimpleParameterTypeDisplayed)
+            {
+                if (!this.ContainedRows.Contains(this.simpleParameters))
+                {
+                    this.ContainedRows.Add(this.simpleParameters);
+                }
+            }
+            else
+            {
+                if (this.ContainedRows.Contains(this.simpleParameters))
+                {
+                    this.ContainedRows.Remove(this.simpleParameters);
+                }
+            }
+
+            foreach (var rowViewModelBase in this.ContainedRows.Where(x => x is IRequirementBrowserDisplaySettings))
+            {
+                var row = (IRequirementBrowserDisplaySettings)rowViewModelBase;
+                row.IsParametricConstraintDisplayed = this.IsParametricConstraintDisplayed;
+                row.IsSimpleParameterTypeDisplayed = this.IsSimpleParameterTypeDisplayed;
+            }
         }
 
         /// <summary>
@@ -260,9 +331,11 @@ namespace CDP4Requirements.ViewModels
         protected virtual void UpdateProperties()
         {
             this.UpdateThingStatus();
-            this.Definition = (this.Thing.Definition.FirstOrDefault() == null)
+
+            this.Definition = this.Thing.Definition.FirstOrDefault() == null
                 ? string.Empty
                 : this.Thing.Definition.First().Content;
+
             this.CategoryList = new List<Category>(this.Thing.Category);
             this.UpdateValues();
         }
@@ -289,6 +362,7 @@ namespace CDP4Requirements.ViewModels
             {
                 logger.Info("Permission denied to create a ParameterValue.");
                 dropInfo.Effects = DragDropEffects.None;
+
                 return;
             }
 
@@ -296,6 +370,7 @@ namespace CDP4Requirements.ViewModels
             {
                 logger.Info("A ParameterValue with this ParameterType already exists.");
                 dropInfo.Effects = DragDropEffects.None;
+
                 return;
             }
 

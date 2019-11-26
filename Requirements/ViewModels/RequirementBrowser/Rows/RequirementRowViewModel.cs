@@ -12,24 +12,30 @@ namespace CDP4Requirements.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
+    using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
+
+    using CDP4Requirements.Utils;
+    using CDP4Requirements.ViewModels.RequirementBrowser;
+
     using ReactiveUI;
-    using Utils;
-    using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
 
     /// <summary>
     /// the row-view-model representing a <see cref="Requirement"/>
     /// </summary>
-    public class RequirementRowViewModel : CDP4CommonView.RequirementRowViewModel, IDropTarget, IDeprecatableThing
+    public class RequirementRowViewModel : CDP4CommonView.RequirementRowViewModel, IDropTarget, IDeprecatableThing, IRequirementBrowserDisplaySettings
     {
         /// <summary>
         /// The folder row containing the <see cref="SimpleParameterValue"/>
@@ -67,6 +73,16 @@ namespace CDP4Requirements.ViewModels
         private List<Category> categoryList;
 
         /// <summary>
+        ///Backing field for <see cref="IsSimpleParameterTypeDisplayed"/>
+        /// </summary>
+        private bool isSimpleParameterTypeDisplayed;
+
+        /// <summary>
+        ///Backing field for <see cref="IsParametricConstraintDisplayed"/>
+        /// </summary>
+        private bool isParametricConstraintDisplayed;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RequirementRowViewModel"/> class
         /// </summary>
         /// <param name="req">The requirement</param>
@@ -78,10 +94,56 @@ namespace CDP4Requirements.ViewModels
             this.simpleParameters = new FolderRowViewModel("Simple Parameter Values", "Simple Parameter Values", this.Session, this);
             this.parametricConstraints = new FolderRowViewModel("Parametric Constraints", "Parametric Constraints", this.Session, this);
 
-            this.ContainedRows.Add(this.simpleParameters);
-            this.ContainedRows.Add(this.parametricConstraints);
+            this.SetSubscriptions();
 
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Add the necessary subscriptions 
+        /// </summary>
+        private void SetSubscriptions()
+        {
+            this.Disposables.Add(
+                this
+                    .WhenAnyValue(x => x.IsParametricConstraintDisplayed, y => y.IsSimpleParameterTypeDisplayed)
+                    .Subscribe(x => this.AdjustContainedRows()));
+        }
+
+        /// <summary>
+        /// Do some manual adjustments to the <see cref="ContainedRows" /> property
+        /// </summary>
+        private void AdjustContainedRows()
+        {
+            if (this.IsParametricConstraintDisplayed)
+            {
+                if (!this.ContainedRows.Contains(this.parametricConstraints))
+                {
+                    this.ContainedRows.Add(this.parametricConstraints);
+                }
+            }
+            else
+            {
+                if (this.ContainedRows.Contains(this.parametricConstraints))
+                {
+                    this.ContainedRows.Remove(this.parametricConstraints);
+                }
+            }
+
+            if (this.IsSimpleParameterTypeDisplayed)
+            {
+                if (!this.ContainedRows.Contains(this.simpleParameters))
+                {
+                    this.ContainedRows.Add(this.simpleParameters);
+                }
+            }
+            else
+            {
+                if (this.ContainedRows.Contains(this.simpleParameters))
+                {
+                    this.ContainedRows.Remove(this.simpleParameters);
+                }
+            }
         }
 
         /// <summary>
@@ -89,8 +151,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string Definition
         {
-            get { return this.definition; }
-            protected set { this.RaiseAndSetIfChanged(ref this.definition, value); }
+            get => this.definition;
+            protected set => this.RaiseAndSetIfChanged(ref this.definition, value);
         }
 
         /// <summary>
@@ -98,8 +160,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string Categories
         {
-            get { return this.categories; }
-            private set { this.RaiseAndSetIfChanged(ref this.categories, value); }
+            get => this.categories;
+            private set => this.RaiseAndSetIfChanged(ref this.categories, value);
         }
 
         /// <summary>
@@ -107,8 +169,26 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public List<Category> CategoryList
         {
-            get { return this.categoryList; }
-            set { this.RaiseAndSetIfChanged(ref this.categoryList, value); }
+            get => this.categoryList;
+            set => this.RaiseAndSetIfChanged(ref this.categoryList, value);
+        }
+
+        /// <summary>
+        /// Gets a value whether SimpleParameterType things are displayed
+        /// </summary>
+        public bool IsSimpleParameterTypeDisplayed
+        {
+            get => this.isSimpleParameterTypeDisplayed;
+            set => this.RaiseAndSetIfChanged(ref this.isSimpleParameterTypeDisplayed, value);
+        }
+
+        /// <summary>
+        /// Gets a value whether Parametric Constraints are displayed
+        /// </summary>
+        public bool IsParametricConstraintDisplayed
+        {
+            get => this.isParametricConstraintDisplayed;
+            set => this.RaiseAndSetIfChanged(ref this.isParametricConstraintDisplayed, value);
         }
 
         /// <summary>
@@ -125,23 +205,29 @@ namespace CDP4Requirements.ViewModels
         public void DragOver(IDropInfo dropInfo)
         {
             var category = dropInfo.Payload as Category;
+
             if (category != null)
             {
                 this.DragOver(category, dropInfo);
+
                 return;
             }
 
             var tuple = dropInfo.Payload as Tuple<ParameterType, MeasurementScale>;
+
             if (tuple != null)
             {
                 this.DragOver(tuple, dropInfo);
+
                 return;
             }
 
             var req = dropInfo.Payload as Requirement;
+
             if (req != null)
             {
                 this.DragOver(req, dropInfo);
+
                 return;
             }
 
@@ -157,23 +243,29 @@ namespace CDP4Requirements.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             var category = dropInfo.Payload as Category;
+
             if (category != null)
             {
                 await this.Drop(category);
+
                 return;
             }
 
             var tuple = dropInfo.Payload as Tuple<ParameterType, MeasurementScale>;
+
             if (tuple != null)
             {
                 await this.Drop(tuple);
+
                 return;
             }
 
             var req = dropInfo.Payload as Requirement;
+
             if (req != null)
             {
                 await this.Drop(req, dropInfo);
+
                 return;
             }
         }
@@ -199,6 +291,7 @@ namespace CDP4Requirements.ViewModels
             {
                 logger.Info("Permission denied to create a SimpleParameterValue.");
                 dropInfo.Effects = DragDropEffects.None;
+
                 return;
             }
 
@@ -206,6 +299,7 @@ namespace CDP4Requirements.ViewModels
             {
                 logger.Info("A SimpleParameterValue with this ParameterType already exists.");
                 dropInfo.Effects = DragDropEffects.None;
+
                 return;
             }
 
@@ -244,7 +338,7 @@ namespace CDP4Requirements.ViewModels
             var parameterValue = new SimpleParameterValue();
             parameterValue.ParameterType = tuple.Item1;
             parameterValue.Scale = tuple.Item2;
-            parameterValue.Value = new ValueArray<string>(new [] {"-"});
+            parameterValue.Value = new ValueArray<string>(new[] { "-" });
 
             clone.ParameterValue.Add(parameterValue);
 
@@ -268,6 +362,7 @@ namespace CDP4Requirements.ViewModels
             if (orderPt == null)
             {
                 await this.ChangeRequirementContainer(req);
+
                 return;
             }
 
@@ -317,8 +412,10 @@ namespace CDP4Requirements.ViewModels
             base.InitializeSubscriptions();
 
             var requirementsSpecificationRowViewModel = (RequirementsSpecificationRowViewModel)this.ContainerViewModel;
+
             var containerIsDeprecatedSubscription = requirementsSpecificationRowViewModel.WhenAnyValue(vm => vm.IsDeprecated)
                 .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRequirementsSpecification());
+
             this.Disposables.Add(containerIsDeprecatedSubscription);
         }
 
@@ -328,6 +425,7 @@ namespace CDP4Requirements.ViewModels
         private void UpdateIsDeprecatedDerivedFromContainerRequirementsSpecification()
         {
             var requirementsSpecification = (RequirementsSpecification)this.Thing.Container;
+
             if (requirementsSpecification.IsDeprecated)
             {
                 this.IsDeprecated = true;
@@ -357,13 +455,13 @@ namespace CDP4Requirements.ViewModels
                 }
             }
         }
-        
+
         /// <summary>
         /// Update the nodes of this requirement with the current <see cref="ParametricConstraint"/>
         /// </summary>
         private void UpdateParameterConstraintRows()
         {
-            var current = this.ContainedRows[1].ContainedRows.Select(x => x.Thing).OfType<ParametricConstraint>().ToList();
+            var current = this.parametricConstraints.ContainedRows.Select(x => x.Thing).OfType<ParametricConstraint>().ToList();
             var updated = this.Thing.ParametricConstraint;
 
             var added = updated.Except(current).ToList();
@@ -384,8 +482,8 @@ namespace CDP4Requirements.ViewModels
         /// Updates the <see cref="SimpleParameterValue"/>s contained by this <see cref="Requirement"/>.
         /// </summary>
         private void UpdateValues()
-        {            
-            var current = this.ContainedRows[0].ContainedRows.Select(x => x.Thing).OfType<SimpleParameterValue>().ToList();
+        {
+            var current = this.simpleParameters.ContainedRows.Select(x => x.Thing).OfType<SimpleParameterValue>().ToList();
             var updated = this.Thing.ParameterValue;
 
             var added = updated.Except(current).ToList();
@@ -419,6 +517,7 @@ namespace CDP4Requirements.ViewModels
         private void RemoveValue(SimpleParameterValue value)
         {
             var row = this.simpleParameters.ContainedRows.SingleOrDefault(x => x.Thing == value);
+
             if (row != null)
             {
                 this.simpleParameters.ContainedRows.Remove(row);
@@ -448,6 +547,7 @@ namespace CDP4Requirements.ViewModels
         private void RemoveConstraint(ParametricConstraint constraint)
         {
             var row = this.parametricConstraints.ContainedRows.SingleOrDefault(x => x.Thing == constraint);
+
             if (row != null)
             {
                 this.parametricConstraints.ContainedRows.Remove(row);
@@ -493,6 +593,7 @@ namespace CDP4Requirements.ViewModels
             if (this.definitionThing == null)
             {
                 this.definitionThing = this.Thing.Definition.FirstOrDefault();
+
                 if (this.definitionThing == null)
                 {
                     return;
@@ -516,10 +617,11 @@ namespace CDP4Requirements.ViewModels
         {
             if (string.IsNullOrEmpty(multilineText))
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             var lines = multilineText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+
             if (lines.Length == 1)
             {
                 return lines[0];
