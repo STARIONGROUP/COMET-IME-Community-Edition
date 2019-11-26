@@ -67,9 +67,9 @@ namespace CDP4Requirements.ViewModels
         private bool isDeprecated;
 
         /// <summary>
-        ///Backing field for <see cref="IsSimpleParameterTypeDisplayed"/>
+        ///Backing field for <see cref="IsSimpleParameterValuesDisplayed"/>
         /// </summary>
-        private bool isSimpleParameterTypeDisplayed;
+        private bool isSimpleParameterValuesDisplayed;
 
         /// <summary>
         ///Backing field for <see cref="IsParametricConstraintDisplayed"/>
@@ -116,12 +116,12 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Gets a value whether SimpleParameterType things are displayed
+        /// Gets a value whether SimpleParameterValues things are displayed
         /// </summary>
-        public bool IsSimpleParameterTypeDisplayed
+        public bool IsSimpleParameterValuesDisplayed
         {
-            get => this.isSimpleParameterTypeDisplayed;
-            set => this.RaiseAndSetIfChanged(ref this.isSimpleParameterTypeDisplayed, value);
+            get => this.isSimpleParameterValuesDisplayed;
+            set => this.RaiseAndSetIfChanged(ref this.isSimpleParameterValuesDisplayed, value);
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace CDP4Requirements.ViewModels
 
             this.Disposables.Add(
                 this
-                    .WhenAnyValue(x => x.IsParametricConstraintDisplayed, y => y.IsSimpleParameterTypeDisplayed)
+                    .WhenAnyValue(x => x.IsParametricConstraintDisplayed, y => y.IsSimpleParameterValuesDisplayed)
                     .Subscribe(x => this.AdjustContainedRows()));
 
             if (this.ContainerViewModel is IRequirementBrowserDisplaySettings requirementBrowserDisplaySettings)
@@ -305,8 +305,8 @@ namespace CDP4Requirements.ViewModels
 
                 this.Disposables.Add(
                 requirementBrowserDisplaySettings
-                    .WhenAnyValue(x => x.IsSimpleParameterTypeDisplayed)
-                    .Subscribe(y => this.IsSimpleParameterTypeDisplayed = y));
+                    .WhenAnyValue(x => x.IsSimpleParameterValuesDisplayed)
+                    .Subscribe(y => this.IsSimpleParameterValuesDisplayed = y));
             }
         }
 
@@ -315,7 +315,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void AdjustContainedRows()
         {
-            if (this.IsSimpleParameterTypeDisplayed)
+            if (this.IsSimpleParameterValuesDisplayed)
             {
                 if (!this.ContainedRows.Contains(this.simpleParameters))
                 {

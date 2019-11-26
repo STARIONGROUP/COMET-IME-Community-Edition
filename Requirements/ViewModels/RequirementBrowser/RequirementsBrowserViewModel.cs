@@ -88,9 +88,9 @@ namespace CDP4Requirements.ViewModels
         private int currentIteration;
 
         /// <summary>
-        /// Backing field for <see cref="IsSimpleParameterTypeDisplayed"/>
+        /// Backing field for <see cref="IsSimpleParameterValuesDisplayed"/>
         /// </summary>
-        private bool isSimpleParameterTypeDisplayed;
+        private bool isSimpleParameterValuesDisplayed;
 
         /// <summary>
         /// Backing field for <see cref="IsParametricConstraintDisplayed"/>
@@ -228,12 +228,12 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Gets a value whether SimpleParameterType things are displayed
+        /// Gets a value whether SimpleParameterValues things are displayed
         /// </summary>
-        public bool IsSimpleParameterTypeDisplayed
+        public bool IsSimpleParameterValuesDisplayed
         {
-            get => this.isSimpleParameterTypeDisplayed;
-            set => this.RaiseAndSetIfChanged(ref this.isSimpleParameterTypeDisplayed, value);
+            get => this.isSimpleParameterValuesDisplayed;
+            set => this.RaiseAndSetIfChanged(ref this.isSimpleParameterValuesDisplayed, value);
         }
 
         /// <summary>
