@@ -304,5 +304,30 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             row.Drop(dropinfo.Object);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
+
+        [Test]
+        public void VerifyThatDisplayAdjustmentsWorks()
+        {
+            var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
+            var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
+            
+            Assert.AreEqual(containerRow.IsParametricConstraintDisplayed, false);
+            Assert.AreEqual(containerRow.IsSimpleParameterTypeDisplayed, false);
+
+            Assert.AreEqual(row.IsParametricConstraintDisplayed, false);
+            Assert.AreEqual(row.IsSimpleParameterTypeDisplayed, false);
+
+            Assert.AreEqual(containerRow.ContainedRows.Count, 3);
+            Assert.AreEqual(row.ContainedRows.Count, 0);
+
+            containerRow.IsParametricConstraintDisplayed = true;
+            containerRow.IsSimpleParameterTypeDisplayed = true;
+
+            Assert.AreEqual(row.IsParametricConstraintDisplayed, true);
+            Assert.AreEqual(row.IsSimpleParameterTypeDisplayed, true);
+
+            Assert.AreEqual(containerRow.ContainedRows.Count, 4);
+            Assert.AreEqual(row.ContainedRows.Count, 2);
+        }
     }
 }

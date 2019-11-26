@@ -104,6 +104,19 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void SetSubscriptions()
         {
+            if (this.ContainerViewModel is IRequirementBrowserDisplaySettings requirementBrowserDisplaySettings)
+            {
+                this.Disposables.Add(
+                    requirementBrowserDisplaySettings
+                        .WhenAnyValue(x => x.IsParametricConstraintDisplayed)
+                        .Subscribe(y => this.IsParametricConstraintDisplayed = y));
+
+                this.Disposables.Add(
+                    requirementBrowserDisplaySettings
+                        .WhenAnyValue(x => x.IsSimpleParameterTypeDisplayed)
+                        .Subscribe(y => this.IsSimpleParameterTypeDisplayed = y));
+            }
+
             this.Disposables.Add(
                 this
                     .WhenAnyValue(x => x.IsParametricConstraintDisplayed, y => y.IsSimpleParameterTypeDisplayed)

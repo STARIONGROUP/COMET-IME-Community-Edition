@@ -413,23 +413,6 @@ namespace CDP4Requirements.ViewModels
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(iterationSetupSubscription);
-
-            this.Disposables.Add(
-                this.WhenAnyValue(x => x.IsParametricConstraintDisplayed, y => y.IsSimpleParameterTypeDisplayed)
-                    .Subscribe(x => this.AdjustContainedRows()));
-        }
-
-        /// <summary>
-        /// Do some manual adjustments to the <see cref="ContainedRows" /> property
-        /// </summary>
-        private void AdjustContainedRows()
-        {
-            foreach (var rowViewModelBase in this.ReqSpecificationRows.Where(x => x is IRequirementBrowserDisplaySettings))
-            {
-                var row = (IRequirementBrowserDisplaySettings)rowViewModelBase;
-                row.IsParametricConstraintDisplayed = this.IsParametricConstraintDisplayed;
-                row.IsSimpleParameterTypeDisplayed = this.IsSimpleParameterTypeDisplayed;
-            }
         }
 
         /// <summary>
