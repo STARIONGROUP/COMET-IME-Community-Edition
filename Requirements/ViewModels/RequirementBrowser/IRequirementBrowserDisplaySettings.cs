@@ -11,7 +11,14 @@ namespace CDP4Requirements.ViewModels.RequirementBrowser
     /// </summary>
     public interface IRequirementBrowserDisplaySettings
     {
-        bool IsSimpleParameterTypeDisplayed { get; set; }
+        /// <summary>
+        /// Gets a value whether SimpleParameterValues things are displayed
+        /// </summary>
+        bool IsSimpleParameterValuesDisplayed { get; set; }
+
+        /// <summary>
+        /// Gets a value whether Parametric Constraints are displayed
+        /// </summary>
         bool IsParametricConstraintDisplayed { get; set; }
     }
 }

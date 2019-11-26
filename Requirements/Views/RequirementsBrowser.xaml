@@ -332,8 +332,8 @@
                 </dxg:TreeListControl.InputBindings>
             </dxg:TreeListControl>
             <StackPanel Grid.Row="3" Orientation="Horizontal" >
-                <CheckBox Name="ShowSimpleParameterTypes" Margin="4,0,0,0" VerticalAlignment="Center" FontSize="10"
-                          Content="Show Simple Parameter Types"  IsChecked="{Binding IsSimpleParameterTypeDisplayed,
+                <CheckBox Name="ShowSimpleParameterValues" Margin="4,0,0,0" VerticalAlignment="Center" FontSize="10"
+                          Content="Show Simple Parameter Values"  IsChecked="{Binding IsSimpleParameterValuesDisplayed,
                                                                     Mode=TwoWay,
                                                                     UpdateSourceTrigger=PropertyChanged}" />
                 <CheckBox Name="ShowParametricConstraints" Margin="20,0,0,0" VerticalAlignment="Center" FontSize="10"

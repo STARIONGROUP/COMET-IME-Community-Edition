@@ -312,19 +312,19 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
             
             Assert.AreEqual(containerRow.IsParametricConstraintDisplayed, false);
-            Assert.AreEqual(containerRow.IsSimpleParameterTypeDisplayed, false);
+            Assert.AreEqual(containerRow.IsSimpleParameterValuesDisplayed, false);
 
             Assert.AreEqual(row.IsParametricConstraintDisplayed, false);
-            Assert.AreEqual(row.IsSimpleParameterTypeDisplayed, false);
+            Assert.AreEqual(row.IsSimpleParameterValuesDisplayed, false);
 
             Assert.AreEqual(containerRow.ContainedRows.Count, 3);
             Assert.AreEqual(row.ContainedRows.Count, 0);
 
             containerRow.IsParametricConstraintDisplayed = true;
-            containerRow.IsSimpleParameterTypeDisplayed = true;
+            containerRow.IsSimpleParameterValuesDisplayed = true;
 
             Assert.AreEqual(row.IsParametricConstraintDisplayed, true);
-            Assert.AreEqual(row.IsSimpleParameterTypeDisplayed, true);
+            Assert.AreEqual(row.IsSimpleParameterValuesDisplayed, true);
 
             Assert.AreEqual(containerRow.ContainedRows.Count, 4);
             Assert.AreEqual(row.ContainedRows.Count, 2);
