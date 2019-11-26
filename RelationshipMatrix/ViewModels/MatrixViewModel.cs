@@ -950,8 +950,6 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
         }
 
-
-
         /// <summary>
         /// Sets the info detail properties
         /// </summary>
