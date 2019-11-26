@@ -295,6 +295,19 @@ namespace CDP4Requirements.ViewModels
                 this
                     .WhenAnyValue(x => x.IsParametricConstraintDisplayed, y => y.IsSimpleParameterTypeDisplayed)
                     .Subscribe(x => this.AdjustContainedRows()));
+
+            if (this.ContainerViewModel is IRequirementBrowserDisplaySettings requirementBrowserDisplaySettings)
+            {
+                this.Disposables.Add(
+                requirementBrowserDisplaySettings
+                    .WhenAnyValue(x => x.IsParametricConstraintDisplayed)
+                    .Subscribe(y => this.IsParametricConstraintDisplayed = y));
+
+                this.Disposables.Add(
+                requirementBrowserDisplaySettings
+                    .WhenAnyValue(x => x.IsSimpleParameterTypeDisplayed)
+                    .Subscribe(y => this.IsSimpleParameterTypeDisplayed = y));
+            }
         }
 
         /// <summary>
@@ -315,13 +328,6 @@ namespace CDP4Requirements.ViewModels
                 {
                     this.ContainedRows.Remove(this.simpleParameters);
                 }
-            }
-
-            foreach (var rowViewModelBase in this.ContainedRows.Where(x => x is IRequirementBrowserDisplaySettings))
-            {
-                var row = (IRequirementBrowserDisplaySettings)rowViewModelBase;
-                row.IsParametricConstraintDisplayed = this.IsParametricConstraintDisplayed;
-                row.IsSimpleParameterTypeDisplayed = this.IsSimpleParameterTypeDisplayed;
             }
         }
 
