@@ -228,7 +228,7 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Gets a value whether SimpleParameterValues things are displayed
+        /// Gets or sets a value whether SimpleParameterValues things are displayed
         /// </summary>
         public bool IsSimpleParameterValuesDisplayed
         {
@@ -237,7 +237,7 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Gets a value whether Parametric Constraints are displayed
+        /// Gets or sets a value whether Parametric Constraints are displayed
         /// </summary>
         public bool IsParametricConstraintDisplayed
         {
