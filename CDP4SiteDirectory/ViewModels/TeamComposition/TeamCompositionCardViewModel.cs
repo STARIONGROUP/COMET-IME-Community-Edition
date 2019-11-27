@@ -286,10 +286,10 @@ namespace CDP4SiteDirectory.ViewModels
             this.Domains = new ReactiveList<DomainOfExpertise>(this.Thing.Domain);
             this.Person = this.Thing.Person.Name;
 
-            this.Organization = this.Thing.Person.Organization != null ? this.Thing.Person.Organization.Name : string.Empty;
-            this.OrganizationalUnit = this.Thing.Person.OrganizationalUnit;
+            this.Organization = this.Thing.Person.Organization?.Name ?? string.Empty;
+            this.OrganizationalUnit = this.Thing.Person.OrganizationalUnit ?? string.Empty;
             this.ParticipantRole = this.Thing.Role.Name;
-            this.PersonRole = this.Thing.Person.Role.Name;
+            this.PersonRole = this.Thing.Person.Role?.Name ?? string.Empty;
             this.IsActive = this.Thing.IsActive;
 
             this.UpdateEmailAddress();
