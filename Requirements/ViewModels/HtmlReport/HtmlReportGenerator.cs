@@ -107,6 +107,8 @@ namespace CDP4Requirements.ViewModels.HtmlReport
             Template.RegisterSafeType(typeof(Category), new string[] { "ShortName", "Name", "Container", "ClassKind" });
             Template.RegisterSafeType(typeof(Definition), new string[] { "Content", "LanguageCode", "Container", "ClassKind" });
             Template.RegisterSafeType(typeof(DomainOfExpertise), new string[] { "ShortName", "Name", "Container", "ClassKind" });
+            Template.RegisterSafeType(typeof(ElementDefinition), new string[] { "ShortName", "Name", "Container", "ClassKind" });
+            Template.RegisterSafeType(typeof(ElementUsage), new string[] { "ShortName", "Name", "Container", "ClassKind" });
             Template.RegisterSafeType(typeof(ClassKind), ck => ck.ToString());
         }
 
