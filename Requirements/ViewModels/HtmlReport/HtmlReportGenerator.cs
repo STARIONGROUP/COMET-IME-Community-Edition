@@ -9,6 +9,7 @@ namespace CDP4Requirements.ViewModels.HtmlReport
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Text;
     using CDP4Common.CommonData;
@@ -97,18 +98,40 @@ namespace CDP4Requirements.ViewModels.HtmlReport
         /// </summary>
         private void RegisterTypes()
         {
-            Template.RegisterSafeType(typeof(IterationSetup), new string[] { "Description", "IterationNumber", "ClassKind", "Iid" } );
-            Template.RegisterSafeType(typeof(Iteration), new string[] { "Relationship", "IterationSetup", "RuleVerificationList", "RevisionNumber", "ClassKind", "Iid" });
-            Template.RegisterSafeType(typeof(BinaryRelationship), new string[] { "Category", "ClassKind", "Container", "Target", "Source", "Iid" });
-            Template.RegisterSafeType(typeof(MultiRelationship), new string[] { "Category", "ClassKind", "Container", "RelatedThing", "Iid" });
-            Template.RegisterSafeType(typeof(RequirementsSpecification), new string[] { "Category", "Owner", "ShortName", "Name", "Requirement", "Group", "RevisionNumber", "Container", "ClassKind", "Iid" });
-            Template.RegisterSafeType(typeof(Requirement), new string[] { "Category", "Owner", "ShortName", "Name", "Definition", "Group", "Container", "ClassKind", "Iid", "IsDeprecated" });
-            Template.RegisterSafeType(typeof(RequirementsGroup), new string[] { "Category", "Owner", "ShortName", "Name", "Definition", "Group", "Container", "ClassKind" });
-            Template.RegisterSafeType(typeof(Category), new string[] { "ShortName", "Name", "Container", "ClassKind" });
-            Template.RegisterSafeType(typeof(Definition), new string[] { "Content", "LanguageCode", "Container", "ClassKind" });
-            Template.RegisterSafeType(typeof(DomainOfExpertise), new string[] { "ShortName", "Name", "Container", "ClassKind" });
-            Template.RegisterSafeType(typeof(ElementDefinition), new string[] { "ShortName", "Name", "Container", "ClassKind" });
-            Template.RegisterSafeType(typeof(ElementUsage), new string[] { "ShortName", "Name", "Container", "ClassKind" });
+            var customThingRegistrations = new Dictionary<Type, string[]>
+            {
+                { typeof(IterationSetup), new string[] { "Description", "IterationNumber", "ClassKind", "Iid" } },
+                { typeof(Iteration), new string[] { "Relationship", "IterationSetup", "RuleVerificationList", "RevisionNumber", "ClassKind", "Iid" } },
+                { typeof(BinaryRelationship), new string[] { "Category", "ClassKind", "Container", "Target", "Source", "Iid" } },
+                { typeof(MultiRelationship), new string[] { "Category", "ClassKind", "Container", "RelatedThing", "Iid" } },
+                { typeof(RequirementsSpecification), new string[] { "Category", "Owner", "ShortName", "Name", "Requirement", "Group", "RevisionNumber", "Container", "ClassKind", "Iid" } },
+                { typeof(Requirement), new string[] { "Category", "Owner", "ShortName", "Name", "Definition", "Group", "Container", "ClassKind", "Iid", "IsDeprecated" } },
+                { typeof(RequirementsGroup), new string[] { "Category", "Owner", "ShortName", "Name", "Definition", "Group", "Container", "ClassKind" } },
+                { typeof(Definition), new string[] { "Content", "LanguageCode", "Container", "ClassKind" } }
+            };
+
+            foreach (var entry in customThingRegistrations)
+            {
+                Template.RegisterSafeType(entry.Key, entry.Value);
+            }
+
+            var definedClassKinds = typeof(DefinedThing).Assembly.GetTypes()
+                .Where(t => typeof(DefinedThing).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
+                .Where(x => !customThingRegistrations.ContainsKey(x));
+
+            var defaultPropertyArray = new[]
+            {
+                nameof(DefinedThing.ShortName),
+                nameof(DefinedThing.Name),
+                nameof(DefinedThing.Container),
+                nameof(DefinedThing.ClassKind)
+            };
+
+            foreach (var classKind in definedClassKinds)
+            {
+                Template.RegisterSafeType(classKind, defaultPropertyArray);
+            }
+
             Template.RegisterSafeType(typeof(ClassKind), ck => ck.ToString());
         }
 
