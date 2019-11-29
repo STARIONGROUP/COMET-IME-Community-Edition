@@ -1,19 +1,21 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
-    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
 
     /// <summary>
@@ -21,8 +23,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ParameterRowViewModel : ParameterOrOverrideBaseRowViewModel, IDropTarget
     {
-        #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterRowViewModel"/> class.
         /// </summary>
@@ -43,9 +43,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
         }
 
-        #endregion
-
-        #region Drag, Drop
         /// <summary>
         /// Queries whether a drag can be started
         /// </summary>
@@ -76,18 +73,25 @@ namespace CDP4EngineeringModel.ViewModels
         public void DragOver(IDropInfo dropInfo)
         {
             // moving the paramenter into a group of the same element definition
-            var parameter = dropInfo.Payload as Parameter;
-            if (parameter != null)
+            if (dropInfo.Payload is Parameter parameter)
             {
                 this.DragOver(dropInfo, parameter);
+
                 return;
             }
 
             // moving the group into a group of the same element definition
-            var group = dropInfo.Payload as ParameterGroup;
-            if (group != null && group.Container == this.Thing.Container)
+            if (dropInfo.Payload is ParameterGroup group && (group.Container == this.Thing.Container))
             {
                 this.DragOver(dropInfo, group);
+
+                return;
+            }
+
+            if (dropInfo.Payload is RelationalExpression expression && (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            {
+                this.DragOver(dropInfo, expression);
+
                 return;
             }
 
@@ -103,24 +107,25 @@ namespace CDP4EngineeringModel.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             // moving 
-            var parameter = dropInfo.Payload as Parameter;
-            if (parameter != null)
+            if (dropInfo.Payload is Parameter parameter)
             {
                 await this.Drop(dropInfo, parameter);
             }
 
             // moving the group into this parameter's group
-            var group = dropInfo.Payload as ParameterGroup;
-            if (group != null && dropInfo.Effects == DragDropEffects.Move)
+            if (dropInfo.Payload is ParameterGroup group && (dropInfo.Effects == DragDropEffects.Move))
             {
                 await this.Drop(dropInfo, group);
             }
 
+            if (dropInfo.Payload is RelationalExpression expression && (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            {
+                await this.Drop(dropInfo, expression);
+            }
+
             dropInfo.Effects = DragDropEffects.None;
         }
-        #endregion
 
-        #region DragOver Handler
         /// <summary>
         /// Update the drag state when the payload is a <see cref="Parameter"/>
         /// </summary>
@@ -133,10 +138,12 @@ namespace CDP4EngineeringModel.ViewModels
                 if (!this.PermissionService.CanWrite(parameter))
                 {
                     dropInfo.Effects = DragDropEffects.None;
+
                     return;
                 }
 
                 dropInfo.Effects = DragDropEffects.Move;
+
                 return;
             }
 
@@ -155,28 +162,40 @@ namespace CDP4EngineeringModel.ViewModels
                 if (this.Thing.Group == null)
                 {
                     dropInfo.Effects = DragDropEffects.Move;
+
                     return;
                 }
 
                 var containedGroups = group.ContainedGroup(true).ToList();
-                if (group != this.Thing.Group && !containedGroups.Contains(this.Thing.Group))
+
+                if ((@group != this.Thing.Group) && !containedGroups.Contains(this.Thing.Group))
                 {
                     if (!this.PermissionService.CanWrite(group))
                     {
                         dropInfo.Effects = DragDropEffects.None;
+
                         return;
                     }
 
                     dropInfo.Effects = DragDropEffects.Move;
+
                     return;
                 }
             }
 
             dropInfo.Effects = DragDropEffects.None;
         }
-        #endregion
 
-        #region Drop methods
+        /// <summary>
+        /// Update the drag state when the payload is a <see cref="RelationalExpression"/>
+        /// </summary>
+        /// <param name="dropInfo">The <see cref="IDropInfo"/> to update</param>
+        /// <param name="expression">The <see cref="RelationalExpression"/> payload</param>
+        private void DragOver(IDropInfo dropInfo, RelationalExpression expression)
+        {
+            dropInfo.Effects = DragDropEffects.Copy;
+        }
+
         /// <summary>
         /// Performs the drop operation when the payload is a <see cref="Parameter"/>
         /// </summary>
@@ -214,6 +233,22 @@ namespace CDP4EngineeringModel.ViewModels
                 await this.DalWrite(clone);
             }
         }
-        #endregion
+
+        /// <summary>
+        /// Performs the drop operation when the payload is a <see cref="RelationalExpression"/>
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        /// <param name="expression">
+        /// The <see cref="RelationalExpression"/> payload
+        /// </param>
+        private async Task Drop(IDropInfo dropInfo, RelationalExpression expression)
+        {
+            if (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid)
+            {
+                MessageBox.Show("That hurts man!", "Ow", MessageBoxButton.OK);
+            }
+        }
     }
 }

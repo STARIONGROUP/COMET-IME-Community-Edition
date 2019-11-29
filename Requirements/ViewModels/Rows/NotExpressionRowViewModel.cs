@@ -109,17 +109,17 @@ namespace CDP4Requirements.ViewModels
 
             if (parametricConstraintDialog != null)
             {
-                updatedTerm = parametricConstraintDialog.Thing.Expression.Single(e => e.Iid == term.Iid);
+                updatedTerm = parametricConstraintDialog.Thing?.Expression?.SingleOrDefault(e => e.Iid == term.Iid);
             }
             else
             {
                 if (this.TopContainerViewModel is RequirementDialogViewModel requirementDialog)
                 {
-                    updatedTerm = requirementDialog.Thing.ParametricConstraint.Single(c => c.Iid == term.Container.Iid).Expression.Single(e => e.Iid == term.Iid);
+                    updatedTerm = requirementDialog.Thing?.ParametricConstraint?.SingleOrDefault(c => c.Iid == term.Container.Iid)?.Expression?.SingleOrDefault(e => e.Iid == term.Iid);
                 }
             }
 
-            return updatedTerm;
+            return updatedTerm ?? term;
         }
 
         /// <summary>
