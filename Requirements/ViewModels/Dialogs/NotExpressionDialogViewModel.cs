@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="NotExpressionDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -9,13 +9,19 @@ namespace CDP4Requirements.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+    using CDP4Dal.Operations;
+
+    using CDP4Requirements.ExtensionMethods;
+
     using ReactiveUI;
 
     /// <summary>
@@ -24,8 +30,6 @@ namespace CDP4Requirements.ViewModels
     [ThingDialogViewModelExport(ClassKind.NotExpression)]
     public class NotExpressionDialogViewModel : CDP4CommonView.NotExpressionDialogViewModel, IThingDialogViewModel
     {
-        #region constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="NotExpressionDialogViewModel"/> class.
         /// </summary>
@@ -64,19 +68,11 @@ namespace CDP4Requirements.ViewModels
         /// <param name="chainOfContainers">
         /// The optional chain of containers that contains the <paramref name="container"/> argument
         /// </param>
-        public NotExpressionDialogViewModel(NotExpression andExpression, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null) 
+        public NotExpressionDialogViewModel(NotExpression andExpression, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(andExpression, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
-            this.WhenAnyValue(vm => vm.SelectedTerm).Subscribe(_=> this.UpdateOkCanExecute());
+            this.WhenAnyValue(vm => vm.SelectedTerm).Subscribe(_ => this.UpdateOkCanExecute());
         }
-
-        #endregion
-
-        #region Properties & Commands
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Initialize the dialog
@@ -93,7 +89,17 @@ namespace CDP4Requirements.ViewModels
         protected override void PopulatePossibleTerm()
         {
             base.PopulatePossibleTerm();
-            this.PossibleTerm.AddRange(((ParametricConstraint)this.Container).Expression.Where(e => e.Iid != this.Thing.Iid));
+
+            if (this.dialogKind == ThingDialogKind.Create)
+            {
+                this.PossibleTerm.AddRange(((ParametricConstraint)this.Container).Expression.GetTopLevelExpressions());
+            }
+
+            if (new List<ThingDialogKind> { ThingDialogKind.Update, ThingDialogKind.Inspect }.Contains(this.dialogKind))
+            {
+                this.PossibleTerm.AddRange(((ParametricConstraint)this.Container).Expression.GetMyAndFreeExpressions(this.Thing).Where(e => e.Iid != this.Thing.Iid));
+            }
+
             if (this.SelectedTerm == null)
             {
                 this.SelectedTerm = this.PossibleTerm.FirstOrDefault();
@@ -106,8 +112,7 @@ namespace CDP4Requirements.ViewModels
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
-            this.OkCanExecute = this.OkCanExecute && this.SelectedTerm != null;
+            this.OkCanExecute = this.OkCanExecute && (this.SelectedTerm != null);
         }
-        #endregion
     }
 }

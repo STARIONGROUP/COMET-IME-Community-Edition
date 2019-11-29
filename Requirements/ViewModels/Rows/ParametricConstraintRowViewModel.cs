@@ -1,41 +1,43 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParametricConstraintRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using CDP4Requirements.ExtensionMethods;
+    using CDP4Requirements.Views;
+
     using ReactiveUI;
-    using System;
 
     /// <summary>
     /// the row-view-model representing a <see cref="ParametricConstraint"/>
     /// </summary>
     public class ParametricConstraintRowViewModel : CDP4CommonView.ParametricConstraintRowViewModel, IDeprecatableThing
     {
-        #region Fields
-
         /// <summary>
-        /// Backing field for <see cref="StringTopExpression"/>
+        /// Backing field for <see cref="StringExpression"/>
         /// </summary>
-        private string stringTopExpression;
+        private string stringExpression;
 
         /// <summary>
         /// Backing field for <see cref="IsDeprecated"/> property.
         /// </summary>
         private bool isDeprecated;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParametricConstraintRowViewModel"/> class
@@ -49,17 +51,13 @@ namespace CDP4Requirements.ViewModels
             this.UpdateProperties();
         }
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets the string representation of the current ParametricConstraint
         /// </summary>
-        public string StringTopExpression
+        public string StringExpression
         {
-            get { return this.stringTopExpression; }
-            set { this.RaiseAndSetIfChanged(ref this.stringTopExpression, value); }
+            get => this.stringExpression;
+            set => this.RaiseAndSetIfChanged(ref this.stringExpression, value);
         }
 
         /// <summary>
@@ -67,21 +65,14 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public bool IsDeprecated
         {
-            get { return this.isDeprecated; }
-            set { this.RaiseAndSetIfChanged(ref this.isDeprecated, value); }
+            get => this.isDeprecated;
+            set => this.RaiseAndSetIfChanged(ref this.isDeprecated, value);
         }
 
         /// <summary>
-        /// Gets the string representation of the current ParametricConstraint's Collection of Expressions to be displayed in the <see cref="RequirementsBrowser"/>
+        /// Gets the string representation of the current Collection of Expressions to be displayed in the <see cref="RequirementsBrowser"/>
         /// </summary>
-        public string Name
-        {
-            get  { return this.StringTopExpression; }
-        }
-
-        #endregion
-
-        #region Methods
+        public string ShortName => this.StringExpression;
 
         /// <summary>
         /// Updates the properties of this row
@@ -89,56 +80,72 @@ namespace CDP4Requirements.ViewModels
         private void UpdateProperties()
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
-            this.TopExpression = this.Thing.Expression.SingleOrDefault(e => e.Iid == this.Thing.TopExpression.Iid);
+            var topExpressions = this.GetTopExpressions();
+
             this.ContainedRows.Clear();
-            if (this.TopExpression == null)
+
+            foreach (var expression in topExpressions)
             {
-                this.StringTopExpression = string.Empty;
-                return;
+                var expressionRow = expression.GetBooleanExpressionViewModel(this);
+
+                if (expressionRow != null)
+                {
+                    this.ContainedRows.Add(expressionRow);
+                }
             }
 
-            var expression = this.TopExpression;
-            switch (expression.ClassKind)
-            {
-                case ClassKind.NotExpression:
-                    var notExpressionRow = new NotExpressionRowViewModel((NotExpression)expression, this.Session, this);
-                    this.ContainedRows.Add(notExpressionRow);
-                    break;
-                case ClassKind.AndExpression:
-                    var andExpressionRow = new AndExpressionRowViewModel((AndExpression)expression, this.Session, this);
-                    this.ContainedRows.Add(andExpressionRow);
-                    break;
-                case ClassKind.OrExpression:
-                    var orExpressionRow = new OrExpressionRowViewModel((OrExpression)expression, this.Session, this);
-                    this.ContainedRows.Add(orExpressionRow);
-                    break;
-                case ClassKind.ExclusiveOrExpression:
-                    var exclusiveOrExpressionRow = new ExclusiveOrExpressionRowViewModel((ExclusiveOrExpression)expression, this.Session, this);
-                    this.ContainedRows.Add(exclusiveOrExpressionRow);
-                    break;
-                case ClassKind.RelationalExpression:
-                    var relationalExpressionRow = new RelationalExpressionRowViewModel((RelationalExpression)expression, this.Session, this);
-                    this.ContainedRows.Add(relationalExpressionRow);
-                    break;
-            }
-
-            if (this.ContainedRows.Count != 1)
-            {
-                return;
-            }
-            this.StringTopExpression = string.Empty;
-            this.BuildStringExpression(this.ContainedRows.Single() as IRowViewModelBase<BooleanExpression>);
-
+            this.UpdateStringExpression();
             this.UpdateIsDeprecatedDerivedFromContainerRequirementRowViewModelModel();
         }
 
         /// <summary>
-        /// Updates the StringTopExpression to display when a <see cref="BooleanExpression"/> contained by this <see cref="ParametricConstraint"/ changes.
+        /// Gets the expressions that are toplevel for this Parametric Constraint
         /// </summary>
-        private void UpdateStringTopExpression()
+        /// <returns></returns>
+        private IReadOnlyList<BooleanExpression> GetTopExpressions()
         {
-            this.StringTopExpression = string.Empty;
-            this.BuildStringExpression(this.ContainedRows.Single() as IRowViewModelBase<BooleanExpression>);
+            if (this.Thing.TopExpression != null)
+            {
+                this.TopExpression = this.Thing.Expression.SingleOrDefault(e => e.Iid == this.Thing.TopExpression.Iid);
+            }
+
+            var notInTerms = new List<BooleanExpression>();
+
+            foreach (var expression in this.Thing.Expression)
+            {
+                switch (expression.ClassKind)
+                {
+                    case ClassKind.NotExpression:
+                        if (expression is NotExpression notExpression && !notInTerms.Contains(notExpression.Term))
+                        {
+                            notInTerms.Add(notExpression.Term);
+                        }
+
+                        break;
+                    case ClassKind.AndExpression:
+                        notInTerms.AddRange(((AndExpression)expression).Term.Where(x => !notInTerms.Contains(x)));
+
+                        break;
+                    case ClassKind.OrExpression:
+                        notInTerms.AddRange(((OrExpression)expression).Term.Where(x => !notInTerms.Contains(x)));
+
+                        break;
+                    case ClassKind.ExclusiveOrExpression:
+                        notInTerms.AddRange(((ExclusiveOrExpression)expression).Term.Where(x => !notInTerms.Contains(x)));
+
+                        break;
+                }
+            }
+
+            return this.Thing.Expression.Where(x => !notInTerms.Contains(x)).ToList();
+        }
+
+        /// <summary>
+        /// Updates the <see cref="StringExpression"/> to display when a <see cref="BooleanExpression"/> contained by this <see cref="ParametricConstraint"/ changes.
+        /// </summary>
+        private void UpdateStringExpression()
+        {
+            this.StringExpression = this.ContainedRows.OfType<IRowViewModelBase<BooleanExpression>>().ToExpressionString(this.Thing);
         }
 
         /// <summary>
@@ -149,18 +156,33 @@ namespace CDP4Requirements.ViewModels
             base.InitializeSubscriptions();
 
             var booleanExpressionsListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BooleanExpression))
-                .Where(x => x.EventKind == EventKind.Updated && this.Thing != null && x.ChangedThing.Container != null && x.ChangedThing.Container.Iid == this.Thing.Iid)
+                .Where(x => (x.EventKind == EventKind.Updated) && (this.Thing != null) && (x.ChangedThing.Container != null) && (x.ChangedThing.Container.Iid == this.Thing.Iid))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateStringTopExpression());
+                .Subscribe(this.UpdatePropertiesWhenNeededAndUpdateStringExpression);
+
             this.Disposables.Add(booleanExpressionsListener);
 
-            var requirementRowViewModel = this.ContainerViewModel as RequirementRowViewModel;
-            if (requirementRowViewModel != null)
+            if (this.ContainerViewModel is RequirementRowViewModel requirementRowViewModel)
             {
                 var containerIsDeprecatedSubscription = requirementRowViewModel.WhenAnyValue(vm => vm.IsDeprecated)
-                .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRequirementRowViewModelModel());
+                    .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRequirementRowViewModelModel());
+
                 this.Disposables.Add(containerIsDeprecatedSubscription);
             }
+        }
+
+        private void UpdatePropertiesWhenNeededAndUpdateStringExpression(ObjectChangedEvent objectChangedEvent)
+        {
+            if (objectChangedEvent.ChangedThing?.ClassKind != null)
+            {
+                if (new List<ClassKind> { ClassKind.AndExpression, ClassKind.OrExpression, ClassKind.ExclusiveOrExpression, ClassKind.NotExpression }.Contains(objectChangedEvent.ChangedThing.ClassKind))
+                {
+                    this.UpdateProperties();
+                    return;
+                }
+            }
+
+            this.UpdateStringExpression();
         }
 
         /// <summary>
@@ -168,55 +190,20 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void UpdateIsDeprecatedDerivedFromContainerRequirementRowViewModelModel()
         {
-            var requirementRowViewModel = this.ContainerViewModel as RequirementRowViewModel;
-            if (requirementRowViewModel != null)
+            if (this.ContainerViewModel is RequirementRowViewModel requirementRowViewModel)
             {
                 this.IsDeprecated = requirementRowViewModel.IsDeprecated;
-
-
             }
         }
 
         /// <summary>
-        /// Builds a string that represents the whole tree for the <see cref="BooleanExpression"/> of the given row.
+        /// The <see cref="ObjectChangedEvent"/> Handler that is invoked upon a update on the current iteration
         /// </summary>
-        private void BuildStringExpression(IRowViewModelBase<BooleanExpression> expressionRow)
+        /// <param name="objectChange">The <see cref="ObjectChangedEvent"/> containing this <see cref="Iteration"/></param>
+        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
-            if (expressionRow.Thing.ClassKind == ClassKind.RelationalExpression)
-            {
-                this.StringTopExpression += expressionRow.Thing.StringValue;
-            }
-            else
-            {
-                if (expressionRow.ContainerViewModel is IRowViewModelBase<BooleanExpression>)
-                {
-                    this.StringTopExpression += "(";
-                }
-
-                foreach (var containedExpressionRow in expressionRow.ContainedRows)
-                {
-                    if (expressionRow.Thing.ClassKind == ClassKind.NotExpression)
-                    {
-                        this.StringTopExpression += string.Format(" {0} ", expressionRow.Thing.StringValue);
-                        this.BuildStringExpression(containedExpressionRow as IRowViewModelBase<BooleanExpression>);
-                    }
-                    else
-                    {
-                        this.BuildStringExpression(containedExpressionRow as IRowViewModelBase<BooleanExpression>);
-                        if (containedExpressionRow != expressionRow.ContainedRows.Last())
-                        {
-                            this.StringTopExpression += string.Format(" {0} ",expressionRow.Thing.StringValue);
-                        }
-                    }
-                }
-
-                if (expressionRow.ContainerViewModel is IRowViewModelBase<BooleanExpression>)
-                {
-                    this.StringTopExpression += ")";
-                }
-            }
+            base.ObjectChangeEventHandler(objectChange);
+            this.UpdateProperties();
         }
-
-        #endregion
     }
 }

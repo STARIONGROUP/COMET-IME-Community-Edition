@@ -14,7 +14,7 @@
     Title="Relational expression" Height="350" Width="525"
     navigation:DialogCloser.DialogResult="{Binding DialogResult}">
     <dx:DXWindow.Resources>
-        <converters:UnderscoreCapitalsToSpacedTitleCaseConverter x:Key="UnderscoreCapitalsToSpacedTitleCaseConverter" />
+        <converters:RelationalOperatorKindConverter x:Key="RelationalOperatorKindConverter" />
         <converters:NotConverter x:Key="NotConverter"/>
     </dx:DXWindow.Resources>
     <dxlc:LayoutControl Margin="5"
@@ -40,7 +40,7 @@
                         </dxmvvm:Interaction.Behaviors>
                         <dxe:ComboBoxEdit.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Name, Converter={StaticResource UnderscoreCapitalsToSpacedTitleCaseConverter}}" />
+                                <TextBlock Text="{Binding Name, Converter={StaticResource RelationalOperatorKindConverter}}" />
                             </DataTemplate>
                         </dxe:ComboBoxEdit.ItemTemplate>
                     </dxe:ComboBoxEdit>

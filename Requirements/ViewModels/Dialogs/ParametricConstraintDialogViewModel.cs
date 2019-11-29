@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParametricConstraintDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -9,15 +9,21 @@ namespace CDP4Requirements.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Windows.Controls;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
+
     using CDP4CommonView;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+    using CDP4Dal.Operations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -26,8 +32,6 @@ namespace CDP4Requirements.ViewModels
     [ThingDialogViewModelExport(ClassKind.ParametricConstraint)]
     public class ParametricConstraintDialogViewModel : CDP4CommonView.ParametricConstraintDialogViewModel, IThingDialogViewModel
     {
-        #region Fields
-
         /// <summary>
         /// Backing field for the <see cref="SelectedValue"/> property.
         /// </summary>
@@ -38,9 +42,6 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private ReactiveList<IRowViewModelBase<BooleanExpression>> expression;
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ParametricConstraintDialogViewModel"/> class.
         /// </summary>
@@ -79,22 +80,17 @@ namespace CDP4Requirements.ViewModels
         /// <param name="chainOfContainers">
         /// The optional chain of containers that contains the <paramref name="container"/> argument
         /// </param>
-        public ParametricConstraintDialogViewModel(ParametricConstraint simpleParameterValue, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null) 
+        public ParametricConstraintDialogViewModel(ParametricConstraint simpleParameterValue, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(simpleParameterValue, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
             this.PopulateCreateContextMenu();
             this.WhenAnyValue(vm => vm.SelectedTopExpression).Subscribe(_ => this.UpdateOkCanExecute());
         }
 
-        #endregion
-
-        #region Properties and Commands
-
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> to create an  <see cref="AndExpression"/>
         /// </summary>
         public ReactiveCommand<object> CreateAndExpression { get; protected set; }
-
 
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> to create an  <see cref="ExclusiveOrExpression"/>
@@ -126,9 +122,6 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public ReactiveList<BooleanExpression> BooleanExpression { get; protected set; }
 
-        #endregion
-        #region Methods
-
         /// <summary>
         /// Initialize the dialog
         /// </summary>
@@ -146,8 +139,8 @@ namespace CDP4Requirements.ViewModels
             base.InitializeCommands();
 
             var canExecuteCreateRelationalExpressionCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
-            var canExecuteCreateNotExpressionCommand = this.WhenAnyValue(vm => vm.BooleanExpression.Count, (count) => !this.IsReadOnly && count > 0);
-            var canExecuteCreateAndExpressionCommand = this.WhenAnyValue(vm => vm.BooleanExpression.Count, (count) => !this.IsReadOnly && count > 1);
+            var canExecuteCreateNotExpressionCommand = this.WhenAnyValue(vm => vm.BooleanExpression.Count, (count) => !this.IsReadOnly && (count > 0));
+            var canExecuteCreateAndExpressionCommand = this.WhenAnyValue(vm => vm.BooleanExpression.Count, (count) => !this.IsReadOnly && (count > 1));
 
             this.CreateAndExpression = ReactiveCommand.Create(canExecuteCreateAndExpressionCommand);
             this.CreateAndExpression.Subscribe(_ => this.ExecuteCreateCommand<AndExpression>(this.PopulateExpression));
@@ -182,33 +175,40 @@ namespace CDP4Requirements.ViewModels
         private void RefreshExpressionTree()
         {
             this.Expression.Clear();
+
             foreach (var booleanExpression in this.BooleanExpression.OrderBy(e => e.ClassKind))
             {
                 if (this.GetDisplayedExpressionsIids().Contains(booleanExpression.Iid))
                 {
                     continue;
                 }
+
                 switch (booleanExpression.ClassKind)
                 {
                     case ClassKind.NotExpression:
-                       var notExpressionRow = new NotExpressionRowViewModel((NotExpression)booleanExpression, this.Session, this);
+                        var notExpressionRow = new NotExpressionRowViewModel((NotExpression)booleanExpression, this.Session, this);
                         this.Expression.Add(notExpressionRow);
+
                         break;
                     case ClassKind.AndExpression:
                         var andExpressionRow = new AndExpressionRowViewModel((AndExpression)booleanExpression, this.Session, this);
                         this.Expression.Add(andExpressionRow);
+
                         break;
                     case ClassKind.OrExpression:
                         var orExpressionRow = new OrExpressionRowViewModel((OrExpression)booleanExpression, this.Session, this);
                         this.Expression.Add(orExpressionRow);
+
                         break;
                     case ClassKind.ExclusiveOrExpression:
                         var exclusiveOrExpressionRow = new ExclusiveOrExpressionRowViewModel((ExclusiveOrExpression)booleanExpression, this.Session, this);
                         this.Expression.Add(exclusiveOrExpressionRow);
+
                         break;
                     case ClassKind.RelationalExpression:
                         var relationalExpressionRow = new RelationalExpressionRowViewModel((RelationalExpression)booleanExpression, this.Session, this);
                         this.Expression.Add(relationalExpressionRow);
+
                         break;
                 }
             }
@@ -240,10 +240,12 @@ namespace CDP4Requirements.ViewModels
         private void AddContainedExpression(IRowViewModelBase<BooleanExpression> containedExpressionRow, ICollection<BooleanExpression> booleanExpressions)
         {
             booleanExpressions.Add(containedExpressionRow.Thing);
+
             if (!containedExpressionRow.ContainedRows.Any())
             {
                 return;
             }
+
             foreach (var containedRow in containedExpressionRow.ContainedRows.OfType<IRowViewModelBase<BooleanExpression>>())
             {
                 this.AddContainedExpression(containedRow, booleanExpressions);
@@ -283,8 +285,7 @@ namespace CDP4Requirements.ViewModels
         /// </remarks>
         protected override void UpdateOkCanExecute()
         {
-            this.OkCanExecute = this.Container != null && this.SelectedTopExpression != null;
+            this.OkCanExecute = (this.Container != null) && (this.SelectedTopExpression != null);
         }
-        #endregion
     }
 }
