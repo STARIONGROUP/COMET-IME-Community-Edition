@@ -1,21 +1,27 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ParameterRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
 namespace CDP4ProductTree.ViewModels
 {
     using System.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
 
     /// <summary>
     /// row-view-model that represent a <see cref="Parameter"/> in the product tree
     /// </summary>
-    public class ParameterRowViewModel : ParameterOrOverrideBaseRowViewModel
+    public class ParameterRowViewModel : ParameterOrOverrideBaseRowViewModel, IDropTarget
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterRowViewModel"/> class
@@ -39,8 +45,75 @@ namespace CDP4ProductTree.ViewModels
         {
             var isStateDependent = this.StateDependence != null;
             var parameter = (Parameter)this.Thing;
-            var valueset = parameter.ValueSet.SingleOrDefault(x => (!isStateDependent || x.ActualState == actualState) && (!this.IsOptionDependent || x.ActualOption == actualOption));
+            var valueset = parameter.ValueSet.SingleOrDefault(x => (!isStateDependent || (x.ActualState == actualState)) && (!this.IsOptionDependent || (x.ActualOption == actualOption)));
+
             return valueset;
+        }
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            if (dropInfo.Payload is RelationalExpression expression && (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            {
+                this.DragOver(dropInfo, expression);
+
+                return;
+            }
+
+            dropInfo.Effects = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// Update the drag state when the payload is a <see cref="RelationalExpression"/>
+        /// </summary>
+        /// <param name="dropInfo">The <see cref="IDropInfo"/> to update</param>
+        /// <param name="expression">The <see cref="RelationalExpression"/> payload</param>
+        private void DragOver(IDropInfo dropInfo, RelationalExpression expression)
+        {
+            dropInfo.Effects = DragDropEffects.Copy;
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            if (dropInfo.Payload is RelationalExpression expression && (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            {
+                await this.Drop(dropInfo, expression);
+            }
+
+            dropInfo.Effects = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// Performs the drop operation when the payload is a <see cref="RelationalExpression"/>
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        /// <param name="expression">
+        /// The <see cref="RelationalExpression"/> payload
+        /// </param>
+        private async Task Drop(IDropInfo dropInfo, RelationalExpression expression)
+        {
+            if (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid)
+            {
+                MessageBox.Show("That hurts man!", "Ow", MessageBoxButton.OK);
+            }
         }
     }
 }
