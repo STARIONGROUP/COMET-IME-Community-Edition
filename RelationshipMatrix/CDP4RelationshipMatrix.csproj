@@ -52,15 +52,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CDP4Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.4.0.0-rc2\lib\net452\CDP4Common.dll</HintPath>
+      <HintPath>..\packages\CDP4Common-CE.2019.11.28.3\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4Dal, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.5.1.0-rc2\lib\net452\CDP4Dal.dll</HintPath>
+      <HintPath>..\packages\CDP4Dal-CE.2019.11.28.3\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.3.1.0-rc2\lib\net452\CDP4JsonSerializer.dll</HintPath>
+      <HintPath>..\packages\CDP4JsonSerializer-CE.2019.11.28.3\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CsvHelper, Version=12.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">

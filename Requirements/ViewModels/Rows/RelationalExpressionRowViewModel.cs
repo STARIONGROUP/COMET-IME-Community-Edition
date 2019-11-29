@@ -8,7 +8,9 @@ namespace CDP4Requirements.ViewModels
 {
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
 
     /// <summary>
@@ -21,17 +23,24 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         /// <param name="notExpression">The <see cref="RelationalExpression"/> associated with this row</param>
         /// <param name="session">The session</param>
-        /// <param name="containerViewModel">The <see cref="IViewModelBase{Thing}"/> that is the container of this <see cref="IRowViewModelBase{Thing}"/></param>
+        /// <param name="containerViewModel">The <see cref="IViewModelBase{T}"/> that is the container of this <see cref="IRowViewModelBase{Thing}"/></param>
         public RelationalExpressionRowViewModel(RelationalExpression notExpression, ISession session, IViewModelBase<Thing> containerViewModel) : base(notExpression, session, containerViewModel)
         {
         }
 
         /// <summary>
-        /// Gets the string representation of the current AndExpression
+        /// Gets the short string representation of the current RelationalExpression
         /// </summary>
-        public string Name
-        {
-            get { return this.Thing.StringValue; }
-        }
+        public string ShortName => this.Thing.StringValue;
+
+        /// <summary>
+        /// Gets the parameter type name of the current RelationalExpression
+        /// </summary>
+        public string Name => this.Thing.ParameterType?.Name;
+
+        /// <summary>
+        /// Gets the value of the current RelationalExpression
+        /// </summary>
+        public string Definition => string.Join(", ", this.Thing.Value);
     }
 }
