@@ -1,15 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7DF9AD6D-DBF2-4568-92C1-2C9478AA3A94}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDP4IME-CE", "CDP4IME\CDP4IME-CE.csproj", "{E8A6C54E-80C1-42E3-A2C2-D698B97BE7C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDP4IME-CE.Tests", "CDP4IME.Tests\CDP4IME-CE.Tests.csproj", "{FD3403C2-8210-46AE-AF2E-0085FAB270E0}"
@@ -101,6 +94,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDP4RelationshipMatrix", "RelationshipMatrix\CDP4RelationshipMatrix.csproj", "{A9EF51F8-4F27-4F50-8EE3-33BC2F69DF12}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDP4RelationshipMatrix.Tests", "RelationshipMatrix.Tests\CDP4RelationshipMatrix.Tests.csproj", "{C464941A-5965-4D25-8C42-1968BB31383C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{98A495E0-3540-497F-B219-01267E3B3170}"
+	ProjectSection(SolutionItems) = preProject
+		Nuget.Config = Nuget.Config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -796,5 +794,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1FD47C6E-4058-4BA3-9E65-CC1E98175E07}
 	EndGlobalSection
 EndGlobal

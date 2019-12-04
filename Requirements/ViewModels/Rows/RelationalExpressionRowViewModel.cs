@@ -1,23 +1,23 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RelationalExpressionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
-    using System;
     using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
+    using CDP4Dal.Events;
 
     /// <summary>
     /// the row-view-model representing a <see cref="RelationalExpression"/>
@@ -32,6 +32,7 @@ namespace CDP4Requirements.ViewModels
         /// <param name="containerViewModel">The <see cref="IViewModelBase{T}"/> that is the container of this <see cref="IRowViewModelBase{Thing}"/></param>
         public RelationalExpressionRowViewModel(RelationalExpression notExpression, ISession session, IViewModelBase<Thing> containerViewModel) : base(notExpression, session, containerViewModel)
         {
+            this.UpdateProperties();
         }
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace CDP4Requirements.ViewModels
         /// Gets the value of the current RelationalExpression
         /// </summary>
         public string Definition => string.Join(", ", this.Thing.Value);
+
         /// <summary>
         /// Updates the current drag state.
         /// </summary>
@@ -61,12 +63,13 @@ namespace CDP4Requirements.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is Parameter dropParameter && (dropParameter.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            if (dropInfo.Payload is ParameterOrOverrideBase parameter && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(parameter, this.Thing))
             {
                 dropInfo.Effects = DragDropEffects.Copy;
 
                 return;
             }
+
             dropInfo.Effects = DragDropEffects.None;
         }
 
@@ -78,13 +81,54 @@ namespace CDP4Requirements.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is Parameter dropParameter && (dropParameter.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            if (dropInfo.Payload is ParameterOrOverrideBase parameter && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(parameter, this.Thing))
             {
-                MessageBox.Show("That hurts man!", "Ow", MessageBoxButton.OK);
+                await this.CreateBinaryRelationship(parameter, this.Thing);
+
                 return;
             }
 
             dropInfo.Effects = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// Create a <see cref="BinaryRelationship"/> between this expression and a <see cref="Parameter"/>
+        /// </summary>
+        /// <param name="parameter">The <see cref="ParameterOrOverrideBase"/></param>
+        /// <param name="relationalExpression">The <see cref="RelationalExpression"/></param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        private async Task CreateBinaryRelationship(ParameterOrOverrideBase parameter, RelationalExpression relationalExpression)
+        {
+            if (this.Thing?.GetContainerOfType<Iteration>() is Iteration iteration)
+            {
+                await BinaryRelationshipCreator.CreateBinaryRelationship(this.Session, iteration, parameter, relationalExpression);
+            }
+        }
+
+        /// <summary>
+        /// Update this row and its children
+        /// </summary>
+        private void UpdateProperties()
+        {
+            this.UpdateThingStatus();
+        }
+
+        /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
+        }
+
+        /// <summary>
+        /// The object changed event handler
+        /// </summary>
+        /// <param name="objectChange">The <see cref="ObjectChangedEvent"/></param>
+        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
+        {
+            base.ObjectChangeEventHandler(objectChange);
+            this.UpdateProperties();
         }
     }
 }

@@ -40,8 +40,6 @@ namespace CDP4Requirements.ViewModels
 
     using ReactiveUI;
 
-    using Observable = System.Reactive.Linq.Observable;
-
     /// <summary>
     /// The View-Model for the <see cref="RequirementsBrowser"/>
     /// </summary>
@@ -565,11 +563,43 @@ namespace CDP4Requirements.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement Group", "", this.CreateRequirementGroupCommand, MenuItemKind.Create, ClassKind.RequirementsGroup));
             }
 
+            if (this.SelectedThing is RelationalExpressionRowViewModel relExpRow)
+            {
+                var binaryRelationships = relExpRow.Thing.QueryRelationships.Where(x => x is BinaryRelationship binaryRelationship && binaryRelationship.Source is ParameterOrOverrideBase).ToList();
+
+                if (binaryRelationships.Any())
+                {
+                    var relationshipMenu = new ContextMenuItemViewModel("Requirement satisfaction", "", null, MenuItemKind.None);
+
+                    foreach (var relationship in binaryRelationships)
+                    {
+                        var parameter = (ParameterOrOverrideBase)((BinaryRelationship)relationship).Source;
+                        var suffix = parameter is ParameterOverride ? " (Override)" : "";
+
+                        relationshipMenu.SubMenu.Add(new ContextMenuItemViewModel($"Remove relationship to {parameter.UserFriendlyShortName}{suffix}", "", this.DeleteBinaryRelationship, relationship, this.PermissionService.CanWrite(relationship), MenuItemKind.Delete));
+                    }
+
+                    this.ContextMenu.Add(relationshipMenu);
+                }
+            }
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Model Note", "", this.CreateEngineeringModelDataNoteCommand, MenuItemKind.Create, ClassKind.EngineeringModelDataNote));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
+        }
+
+        /// <summary>
+        /// Start a delete operation on a specific BinaryRelationship
+        /// </summary>
+        /// <param name="obj"></param>
+        private void DeleteBinaryRelationship(Thing obj)
+        {
+            if (obj is BinaryRelationship binaryRelationship)
+            {
+                this.ExecuteDeleteCommand(binaryRelationship);
+            }
         }
 
         /// <summary>

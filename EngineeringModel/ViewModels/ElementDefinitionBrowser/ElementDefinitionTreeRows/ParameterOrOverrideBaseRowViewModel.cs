@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -10,14 +10,20 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
@@ -25,7 +31,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public abstract class ParameterOrOverrideBaseRowViewModel : ParameterBaseRowViewModel<ParameterOrOverrideBase>
     {
-        #region Fields
         /// <summary>
         /// The active participant.
         /// </summary>
@@ -35,9 +40,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="IsPublishable"/>
         /// </summary>
         private bool isPublishable;
-        #endregion
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOrOverrideBaseRowViewModel"/> class
         /// </summary>
@@ -60,18 +63,15 @@ namespace CDP4EngineeringModel.ViewModels
             this.activeParticipant = engineeringModel.GetActiveParticipant(this.Session.ActivePerson);
             this.SetOwnerValue();
         }
-        #endregion
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="ParameterOrOverrideBase"/> has publishable values
         /// </summary>
         public bool IsPublishable
         {
-            get { return this.isPublishable; }
-            private set { this.RaiseAndSetIfChanged(ref this.isPublishable, value); }
+            get => this.isPublishable;
+            private set => this.RaiseAndSetIfChanged(ref this.isPublishable, value);
         }
-
-        #region Base Override
 
         /// <summary>
         /// Sets the values of this row in case where the <see cref="ParameterOrOverrideBase"/> is neither option-dependent nor state-dependent and is a <see cref="ScalarParameterType"/>
@@ -79,9 +79,11 @@ namespace CDP4EngineeringModel.ViewModels
         public override void SetProperties()
         {
             var valueset = this.GetValueSet();
+
             if (valueset == null)
             {
                 this.LogNoValueSetError();
+
                 return;
             }
 
@@ -94,9 +96,10 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(valueset)
-                            .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                            .ObserveOn(RxApp.MainThreadScheduler)
-                            .Subscribe(_ => this.SetProperties());
+                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.SetProperties());
+
             this.valueSetListener.Add(listener);
         }
 
@@ -108,6 +111,7 @@ namespace CDP4EngineeringModel.ViewModels
         public override void CreateCloneAndWrite(object newValue, string fieldName)
         {
             var valueset = this.GetValueSet();
+
             if (valueset == null)
             {
                 return;
@@ -139,9 +143,10 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var valueSet in this.Thing.ValueSets)
             {
                 var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(valueSet)
-                                   .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                                   .ObserveOn(RxApp.MainThreadScheduler)
-                                   .Subscribe(x => this.CheckPublishabledStatus());
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => this.CheckPublishabledStatus());
+
                 this.valueSetListener.Add(listener);
             }
         }
@@ -152,14 +157,17 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void SetOwnerListener()
         {
             var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Owner)
-                                   .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                                   .ObserveOn(RxApp.MainThreadScheduler)
-                                   .Subscribe(x => { this.OwnerName = this.Thing.Owner.Name; this.OwnerShortName = this.Thing.Owner.ShortName; });
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(
+                    x =>
+                    {
+                        this.OwnerName = this.Thing.Owner.Name;
+                        this.OwnerShortName = this.Thing.Owner.ShortName;
+                    });
 
             this.OwnerListener = new KeyValuePair<DomainOfExpertise, IDisposable>(this.Thing.Owner, listener);
         }
-
-        #endregion
 
         /// <summary>
         /// Update the properties of this row
@@ -172,8 +180,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.SetOwnerValue();
 
             // refresh the container row if this is replaced by a subscription
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
+
             if (this.Thing.ParameterSubscription.Any(x => x.Owner == tuple.Item1))
             {
                 this.RefreshContainerRows();
@@ -204,10 +212,10 @@ namespace CDP4EngineeringModel.ViewModels
         private void RefreshContainerRows()
         {
             var containerUsageRow = this.ContainerViewModel as ElementUsageRowViewModel;
+
             if (containerUsageRow == null)
             {
-                var elementDefinitionRow = this.ContainerViewModel as ElementDefinitionRowViewModel;
-                if (elementDefinitionRow != null)
+                if (this.ContainerViewModel is ElementDefinitionRowViewModel elementDefinitionRow)
                 {
                     elementDefinitionRow.UpdateChildren();
                 }
@@ -227,7 +235,6 @@ namespace CDP4EngineeringModel.ViewModels
             return (ParameterValueSetBase)this.Thing.ValueSets.FirstOrDefault();
         }
 
-
         /// <summary>
         /// Sets the properties of this <see cref="ParameterOrOverrideBaseRowViewModel"/> from a <see cref="ParameterValueSetBase"/>.
         /// </summary>
@@ -237,19 +244,24 @@ namespace CDP4EngineeringModel.ViewModels
         private void SetProperties(ParameterValueSetBase valueSet)
         {
             this.Value = valueSet.ActualValue.Any() ? valueSet.ActualValue.First() : "-";
+
             if (this.ContainedRows.Count == 0)
             {
                 this.ScaleShortName = this.Thing.Scale == null ? "-" : this.Thing.Scale.ShortName;
             }
+
             this.Switch = valueSet.ValueSwitch;
             this.Formula = valueSet.Formula.Any() ? valueSet.Formula.First() : "-";
             this.Computed = valueSet.Computed.Any() ? valueSet.Computed.First() : "-";
+
             this.Manual = valueSet.Manual.Any()
-                              ? valueSet.Manual.First().ToValueSetObject(this.ParameterType)
-                              : ValueSetConverter.DefaultObject(this.ParameterType);
+                ? valueSet.Manual.First().ToValueSetObject(this.ParameterType)
+                : ValueSetConverter.DefaultObject(this.ParameterType);
+
             this.Reference = valueSet.Reference.Any()
-                                 ? valueSet.Reference.First().ToValueSetObject(this.ParameterType)
-                                 : ValueSetConverter.DefaultObject(this.ParameterType);
+                ? valueSet.Reference.First().ToValueSetObject(this.ParameterType)
+                : ValueSetConverter.DefaultObject(this.ParameterType);
+
             this.State = valueSet.ActualState == null ? "-" : valueSet.ActualState.ShortName;
             this.Option = valueSet.ActualOption;
             this.Published = valueSet.Published.Any() ? valueSet.Published.First() : "-";
@@ -269,6 +281,7 @@ namespace CDP4EngineeringModel.ViewModels
                         if (parameterValueSetBase.Published[i] != parameterValueSetBase.ActualValue[i])
                         {
                             this.IsPublishable = true;
+
                             return;
                         }
                     }
@@ -288,6 +301,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void LogNoValueSetError()
         {
             var elementBase = (ElementBase)this.Thing.Container;
+
             logger.Error(
                 "No value set found for the {0} {1} with id: {2} contained in the {3} {4}",
                 this.Thing.ClassKind,
@@ -297,7 +311,6 @@ namespace CDP4EngineeringModel.ViewModels
                 elementBase.Name);
         }
 
-        #region Update Value Set Methods
         /// <summary>
         /// The update component values.
         /// </summary>
@@ -312,6 +325,7 @@ namespace CDP4EngineeringModel.ViewModels
             if (actualOption != null)
             {
                 var optionRow = this.ContainedRows.Cast<ParameterOptionRowViewModel>().Single(x => x.ActualOption == actualOption);
+
                 if (actualState != null)
                 {
                     var actualStateRow = optionRow.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
@@ -363,7 +377,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </remarks>
         private void UpdateScalarValueSet(ParameterValueSetBase valueSet, ParameterValueBaseRowViewModel row = null)
         {
-            valueSet.ValueSwitch = row == null ? this.Switch.Value : row.Switch.Value;
+            valueSet.ValueSwitch = row?.Switch ?? this.Switch.Value;
             valueSet.Computed = row == null ? new ValueArray<string>(new List<string> { this.Computed }) : new ValueArray<string>(new List<string> { row.Computed });
             valueSet.Manual = row == null ? new ValueArray<string>(new List<string> { this.Manual.ToValueSetString(this.ParameterType) }) : new ValueArray<string>(new List<string> { row.Manual.ToValueSetString(this.ParameterType) });
             valueSet.Reference = row == null ? new ValueArray<string>(new List<string> { this.Reference.ToValueSetString(this.ParameterType) }) : new ValueArray<string>(new List<string> { ValueSetConverter.ToValueSetString(row.Reference, this.ParameterType) });
@@ -379,7 +393,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </remarks>
         private void UpdateCompoundValueSet(ParameterValueSetBase valueSet, ParameterValueBaseRowViewModel row = null)
         {
-            var componentRows = (row == null)
+            var componentRows = row == null
                 ? this.ContainedRows.Cast<ParameterComponentValueRowViewModel>().ToList()
                 : row.ContainedRows.Cast<ParameterComponentValueRowViewModel>().ToList();
 
@@ -387,6 +401,7 @@ namespace CDP4EngineeringModel.ViewModels
             valueSet.Manual = new ValueArray<string>(new string[componentRows.Count]);
             valueSet.Reference = new ValueArray<string>(new string[componentRows.Count]);
             valueSet.ValueSwitch = componentRows[0].Switch.Value; // all the switches should have the same value
+
             for (var i = 0; i < componentRows.Count; i++)
             {
                 valueSet.Computed[i] = componentRows[i].Computed;
@@ -395,6 +410,18 @@ namespace CDP4EngineeringModel.ViewModels
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Create a <see cref="BinaryRelationship"/> between this expression and a <see cref="ParameterOrOverrideBase"/>
+        /// </summary>
+        /// <param name="parameter">The <see cref="ParameterOrOverrideBase"/></param>
+        /// <param name="relationalExpression">The <see cref="RelationalExpression"/></param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        protected async Task CreateBinaryRelationship(ParameterOrOverrideBase parameter, RelationalExpression relationalExpression)
+        {
+            if (this.Thing?.GetContainerOfType<Iteration>() is Iteration iteration)
+            {
+                await BinaryRelationshipCreator.CreateBinaryRelationship(this.Session, iteration, parameter, relationalExpression);
+            }
+        }
     }
 }

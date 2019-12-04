@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------------------------------
 // <copyright file="IconUtilities.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -----------------------------------------------------------------------------------------------
 
@@ -14,10 +14,14 @@ namespace CDP4Common.Helpers
     using System.Windows.Interop;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+
     using CDP4Common.CommonData;
+
     using CDP4Composition.Services;
+
     using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Core.Native;
+
     using Point = System.Drawing.Point;
 
     /// <summary>
@@ -132,13 +136,13 @@ namespace CDP4Common.Helpers
             var source = new BitmapImage(iconUri);
             var overlay = new BitmapImage(overlayUri);
 
-            var overlayBitMapImage = BitmapImage2Bitmap(overlay, (int)source.Width / 2, (int)source.Height / 2);
             var thingBitMapImage = BitmapImage2Bitmap(source);
+            var overlayBitMapImage = BitmapImage2Bitmap(overlay, thingBitMapImage.Width / 2, thingBitMapImage.Height / 2);
 
             var img = new Bitmap(thingBitMapImage.Width, thingBitMapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            var xOverlay = overlayPosition == OverlayPositionKind.TopLeft || overlayPosition == OverlayPositionKind.BottomLeft ? 0 : (int) source.Width / 2;
-            var yOverlay = overlayPosition == OverlayPositionKind.TopLeft || overlayPosition == OverlayPositionKind.TopRight ? 0 : (int) source.Height / 2;
+            var xOverlay = (overlayPosition == OverlayPositionKind.TopLeft) || (overlayPosition == OverlayPositionKind.BottomLeft) ? 0 : thingBitMapImage.Width / 2;
+            var yOverlay = (overlayPosition == OverlayPositionKind.TopLeft) || (overlayPosition == OverlayPositionKind.TopRight) ? 0 : thingBitMapImage.Height / 2;
 
             using (var gr = Graphics.FromImage(img))
             {
@@ -163,7 +167,6 @@ namespace CDP4Common.Helpers
         {
             return Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
-
 
         /// <summary>
         /// Returns the <see cref="Uri"/> of the resource
@@ -190,11 +193,13 @@ namespace CDP4Common.Helpers
             {
                 case ClassKind.BinaryRelationship:
                     imagename = "LineItem";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.MultiRelationship:
                     imagename = "Line2";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.PossibleFiniteState:
                 case ClassKind.PossibleFiniteStateList:
@@ -210,20 +215,24 @@ namespace CDP4Common.Helpers
                     return "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/Book.png";
                 case ClassKind.Page:
                     imagename = "ListBox";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Section:
                     imagename = "Reading";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.BinaryNote:
                 case ClassKind.TextualNote:
                     imagename = "Notes";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.DiagramCanvas:
                     imagename = "LabelsRight";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.SimpleUnit:
                 case ClassKind.PrefixedUnit:
@@ -231,19 +240,23 @@ namespace CDP4Common.Helpers
                 case ClassKind.DerivedUnit:
                 case ClassKind.MeasurementUnit:
                     imagename = "measurementunit";
-                    return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
                 case ClassKind.UnitPrefix:
                     imagename = "VerticalAxisThousands";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.RequirementsContainer:
                 case ClassKind.RequirementsGroup:
                     imagename = "ListBox";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.RequirementsSpecification:
                     imagename = "BOReport";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.IntervalScale:
                 case ClassKind.LogarithmicScale:
@@ -252,51 +265,63 @@ namespace CDP4Common.Helpers
                 case ClassKind.CyclicRatioScale:
                 case ClassKind.MeasurementScale:
                     imagename = "ChartYAxisSettings";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Constant:
                     imagename = "RecentlyUse";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.BinaryRelationshipRule:
                     imagename = "LineItem";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Organization:
                     imagename = "Organization";
-                    return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
                 case ClassKind.Rule:
                     imagename = "TreeView";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.DecompositionRule:
                     imagename = "TreeView";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.MultiRelationshipRule:
                     imagename = "DocumentMap";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ParameterizedCategoryRule:
                     imagename = "FixedWidth";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ReferencerRule:
                     imagename = "Tag";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.SiteDirectory:
                     imagename = "Database";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.EngineeringModelSetup:
                 case ClassKind.EngineeringModel:
                     imagename = "Technology";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ParametricConstraint:
                     imagename = "ShowFormulas";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.NotExpression:
                 case ClassKind.AndExpression:
@@ -305,102 +330,125 @@ namespace CDP4Common.Helpers
                 case ClassKind.RelationalExpression:
                 case ClassKind.BooleanExpression:
                     imagename = "UseInFormula";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.File:
                     imagename = "BOFileAttachment";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.FileRevision:
                     imagename = "Version";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Folder:
                 case ClassKind.NotThing:
                     imagename = "BOFolder";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Participant:
                     imagename = "Employee";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Iteration:
                 case ClassKind.IterationSetup:
                     imagename = "GroupFieldCollection";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ElementDefinition:
                     imagename = "Product";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ElementUsage:
                     imagename = "Version";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ParameterGroup:
                     imagename = "BOFolder";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Parameter:
                 case ClassKind.SimpleParameterValue:
                     imagename = "Stepline";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ParameterValueSet:
                 case ClassKind.ParameterOverrideValueSet:
                 case ClassKind.ParameterSubscriptionValueSet:
                 case ClassKind.ParameterValueSetBase:
                     imagename = "DocumentMap";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ParameterSubscription:
                     imagename = "LabelsCenter";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ParameterOverride:
                     imagename = "LabelsBelow";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Category:
                     imagename = "category";
-                    return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
                 case ClassKind.PersonRole:
                 case ClassKind.ParticipantRole:
                     imagename = "BOUser";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Person:
                     imagename = "Customer";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.PersonPermission:
                 case ClassKind.ParticipantPermission:
                     imagename = "BOPermission";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ReferenceSource:
                     imagename = "Information";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.EmailAddress:
                     imagename = "Mail";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.TelephoneNumber:
                     imagename = "BOContact";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.UserPreference:
                     imagename = "Technology";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.DomainOfExpertise:
                     imagename = "domainofexpertise";
-                    return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
                 case ClassKind.ModelReferenceDataLibrary:
                 case ClassKind.SiteReferenceDataLibrary:
                     imagename = "siteRdl";
-                    return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
                 case ClassKind.SimpleQuantityKind:
                 case ClassKind.DerivedQuantityKind:
                 case ClassKind.SpecializedQuantityKind:
@@ -416,60 +464,72 @@ namespace CDP4Common.Helpers
                 case ClassKind.ParameterTypeComponent:
                 case ClassKind.ParameterType:
                     imagename = "parametertype";
-                    return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
                 case ClassKind.Definition:
                     imagename = "SendBehindText";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Option:
                     imagename = "Properties";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Term:
                     imagename = "TextBox";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Glossary:
                     imagename = "Text";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.FileType:
                     imagename = "TextBox2";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.Publication:
                     imagename = "CreateModelDifferences";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.CommonFileStore:
                     imagename = "Project";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ChangeRequest:
                 case ClassKind.RequestForDeviation:
                 case ClassKind.RequestForWaiver:
                     imagename = "EditComment";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ActionItem:
                     imagename = "GroupByResource";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ChangeProposal:
                     imagename = "PreviousComment";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 case ClassKind.ReviewItemDiscrepancy:
                     imagename = "InsertComment";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
                 default:
                     // TODO: create default Thing icon to be used accross the app after the branding change. Default for now uses Iteration setup icon.
                     imagename = "Technology";
-                    imageInfo = new DXImageConverter().ConvertFrom(string.Format("{0}{1}{2}", imagename, imagesize, imageextension)) as DXImageInfo;
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
                     return imageInfo.MakeUri().ToString();
             }
         }
-
     }
 }
