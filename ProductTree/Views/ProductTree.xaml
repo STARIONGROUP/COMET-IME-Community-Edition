@@ -270,6 +270,7 @@
             </dxmvvm:Interaction.Behaviors>
             <i:Interaction.Behaviors>
                 <dragDrop:FrameworkElementDropBehavior />
+                <dragDrop:FrameworkElementDragBehavior />
             </i:Interaction.Behaviors>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView x:Name="View"

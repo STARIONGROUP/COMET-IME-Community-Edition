@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -10,13 +10,19 @@ namespace CDP4ProductTree.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.Comparers;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
@@ -58,7 +64,7 @@ namespace CDP4ProductTree.ViewModels
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
         private string modelCode;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOrOverrideBaseRowViewModel"/> class
         /// </summary>
@@ -76,17 +82,17 @@ namespace CDP4ProductTree.ViewModels
             this.IsOptionDependent = this.Thing.IsOptionDependent;
             this.Option = option;
             this.StateDependence = this.Thing.StateDependence;
-            
+
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Gets or sets a value indicating whether the current represented <see cref="ParameterOrOverrideBase"/> is publishable
         /// </summary>
         public bool IsPublishable
         {
-            get { return this.isPublishable; }
-            set { this.RaiseAndSetIfChanged(ref this.isPublishable, value); }
+            get => this.isPublishable;
+            set => this.RaiseAndSetIfChanged(ref this.isPublishable, value);
         }
 
         /// <summary>
@@ -99,8 +105,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public ParameterUsageKind Usage
         {
-            get { return this.usage; }
-            set { this.RaiseAndSetIfChanged(ref this.usage, value); }
+            get => this.usage;
+            set => this.RaiseAndSetIfChanged(ref this.usage, value);
         }
 
         /// <summary>
@@ -108,10 +114,10 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public string ModelCode
         {
-            get { return this.modelCode; }
-            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+            get => this.modelCode;
+            private set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
         }
-        
+
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>
@@ -126,10 +132,11 @@ namespace CDP4ProductTree.ViewModels
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
+
             var parameterTypeListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
-               .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-               .ObserveOn(RxApp.MainThreadScheduler)
-               .Subscribe(x => this.PopulateValueSetProperty());
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.PopulateValueSetProperty());
 
             this.Disposables.Add(parameterTypeListener);
         }
@@ -157,13 +164,15 @@ namespace CDP4ProductTree.ViewModels
 
             this.actualFiniteStateListener.ForEach(x => x.Dispose());
             this.actualFiniteStateListener.Clear();
+
             foreach (var listener in this.valueSetListeners.Values)
             {
                 listener.Dispose();
             }
+
             this.valueSetListeners.Clear();
         }
-        
+
         /// <summary>
         /// Update the properties of this row. Automatically call on Update of this <see cref="ParameterOrOverrideBaseRowViewModel.Thing"/>
         /// </summary>
@@ -180,7 +189,7 @@ namespace CDP4ProductTree.ViewModels
                 this.StateDependence = this.Thing.StateDependence;
             }
 
-            if (this.MeasurementScale == null || this.MeasurementScale != this.Thing.Scale)
+            if ((this.MeasurementScale == null) || (this.MeasurementScale != this.Thing.Scale))
             {
                 if (this.measurementScaleListener != null)
                 {
@@ -260,7 +269,7 @@ namespace CDP4ProductTree.ViewModels
 
             var updatedValueSet = new List<IValueSet>();
 
-            var valueset = this.Thing.IsOptionDependent ? Thing.ValueSets.Where(x => x.ActualOption == this.Option) : this.Thing.ValueSets;
+            var valueset = this.Thing.IsOptionDependent ? this.Thing.ValueSets.Where(x => x.ActualOption == this.Option) : this.Thing.ValueSets;
             updatedValueSet.AddRange(valueset);
 
             var addedValueSet = updatedValueSet.Except(currentValueSet);
@@ -269,15 +278,17 @@ namespace CDP4ProductTree.ViewModels
             foreach (Thing parameterValueSet in addedValueSet)
             {
                 var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterValueSet)
-                                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                                .ObserveOn(RxApp.MainThreadScheduler)
-                                .Subscribe(_ => this.PopulateValueSetProperty());
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => this.PopulateValueSetProperty());
+
                 this.valueSetListeners.Add(parameterValueSet, listener);
             }
 
             foreach (Thing parameterValueSet in removedValueSet)
             {
                 IDisposable listener;
+
                 if (this.valueSetListeners.TryGetValue(parameterValueSet, out listener))
                 {
                     listener.Dispose();
@@ -322,9 +333,10 @@ namespace CDP4ProductTree.ViewModels
             var valueSet = this.GetValueSet(actualOption: actualOption);
             this.IsPublishable = this.CheckValuesPublishabledStatus(valueSet);
 
-            if (valueSet == null && !this.IsOptionDependent)
+            if ((valueSet == null) && !this.IsOptionDependent)
             {
                 logger.Warn("The value set of Parameter or override {0} is null for a option and state independent. it should not happen.", this.Thing.Iid);
+
                 return;
             }
 
@@ -342,6 +354,7 @@ namespace CDP4ProductTree.ViewModels
                 var compoundType = (CompoundParameterType)this.Thing.ParameterType;
 
                 var index = 0;
+
                 foreach (var component in compoundType.Component.SortedItems)
                 {
                     if (!(component.Value.ParameterType is ScalarParameterType))
@@ -369,7 +382,7 @@ namespace CDP4ProductTree.ViewModels
         private void UpdateActualStateRow(Option actualOption, ActualFiniteState actualState)
         {
             var existingRow = this.ContainedRows.OfType<ActualFiniteStateRowViewModel>()
-                                .SingleOrDefault(x => x.Thing == actualState);
+                .SingleOrDefault(x => x.Thing == actualState);
 
             if (actualState.Kind == ActualFiniteStateKind.FORBIDDEN)
             {
@@ -389,9 +402,11 @@ namespace CDP4ProductTree.ViewModels
             }
 
             var valueSet = this.GetValueSet(actualState, actualOption);
+
             if (valueSet == null)
             {
                 logger.Error("product tree: The valueset is null for an actualFiniteState. it should not happen.");
+
                 return;
             }
 
@@ -401,6 +416,7 @@ namespace CDP4ProductTree.ViewModels
             this.IsPublishable = this.IsPublishable || isStatePublishable;
 
             var compoundType = this.Thing.ParameterType as CompoundParameterType;
+
             if (compoundType == null)
             {
                 stateRow.SetScalarValue(this.Thing, valueSet);
@@ -409,8 +425,10 @@ namespace CDP4ProductTree.ViewModels
             else
             {
                 stateRow.IsPublishable = isStatePublishable;
+
                 // create nested state row
                 var index = 0;
+
                 foreach (var component in compoundType.Component.SortedItems)
                 {
                     if (!(component.Value.ParameterType is ScalarParameterType))
@@ -425,7 +443,6 @@ namespace CDP4ProductTree.ViewModels
                     index++;
                 }
             }
-
         }
 
         /// <summary>
@@ -440,13 +457,15 @@ namespace CDP4ProductTree.ViewModels
             foreach (var state in this.Thing.StateDependence.ActualState)
             {
                 var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(state)
-                                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                                   .ObserveOn(RxApp.MainThreadScheduler)
-                                   .Subscribe(x => this.UpdateActualStateRow(actualOption, state));
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => this.UpdateActualStateRow(actualOption, state));
+
                 this.actualFiniteStateListener.Add(listener);
             }
 
             this.Thing.StateDependence.ActualState.Sort(new ActualFiniteStateComparer());
+
             foreach (var state in this.Thing.StateDependence.ActualState.Where(x => x.Kind == ActualFiniteStateKind.MANDATORY))
             {
                 this.UpdateActualStateRow(actualOption, state);
@@ -509,6 +528,7 @@ namespace CDP4ProductTree.ViewModels
             catch (ArgumentOutOfRangeException e)
             {
                 logger.Error($"The ParameterValueSetBase {valueset.Iid} has an incorrect number of values");
+
                 return false;
             }
         }
@@ -522,8 +542,22 @@ namespace CDP4ProductTree.ViewModels
             {
                 row.Dispose();
             }
-            
+
             this.ContainedRows.Clear();
+        }
+
+        /// <summary>
+        /// Create a <see cref="BinaryRelationship"/> between this expression and a <see cref="ParameterOrOverrideBase"/>
+        /// </summary>
+        /// <param name="parameter">The <see cref="ParameterOrOverrideBase"/></param>
+        /// <param name="relationalExpression">The <see cref="RelationalExpression"/></param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        protected async Task CreateBinaryRelationship(ParameterOrOverrideBase parameter, RelationalExpression relationalExpression)
+        {
+            if (this.Thing?.GetContainerOfType<Iteration>() is Iteration iteration)
+            {
+                await BinaryRelationshipCreator.CreateBinaryRelationship(this.Session, iteration, parameter, relationalExpression);
+            }
         }
     }
 }

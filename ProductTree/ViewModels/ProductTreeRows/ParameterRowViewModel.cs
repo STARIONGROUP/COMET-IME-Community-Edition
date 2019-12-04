@@ -15,6 +15,7 @@ namespace CDP4ProductTree.ViewModels
 
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
 
@@ -51,6 +52,22 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
+        /// Queries whether a drag can be started
+        /// </summary>
+        /// <param name="dragInfo">
+        /// Information about the drag.
+        /// </param>
+        /// <remarks>
+        /// To allow a drag to be started, the <see cref="IDragInfo.Effects"/> property on <paramref name="dragInfo"/> 
+        /// should be set to a value other than <see cref="DragDropEffects.None"/>. 
+        /// </remarks>
+        public override void StartDrag(IDragInfo dragInfo)
+        {
+            dragInfo.Payload = this.Thing;
+            dragInfo.Effects = DragDropEffects.All;
+        }
+
+        /// <summary>
         /// Updates the current drag state.
         /// </summary>
         /// <param name="dropInfo">
@@ -63,7 +80,7 @@ namespace CDP4ProductTree.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is RelationalExpression expression && (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            if (dropInfo.Payload is RelationalExpression expression && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(this.Thing, expression))
             {
                 this.DragOver(dropInfo, expression);
 
@@ -91,9 +108,9 @@ namespace CDP4ProductTree.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is RelationalExpression expression && (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            if (dropInfo.Payload is RelationalExpression expression && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(this.Thing, expression))
             {
-                await this.Drop(dropInfo, expression);
+                await this.Drop(this.Thing, expression);
             }
 
             dropInfo.Effects = DragDropEffects.None;
@@ -102,18 +119,15 @@ namespace CDP4ProductTree.ViewModels
         /// <summary>
         /// Performs the drop operation when the payload is a <see cref="RelationalExpression"/>
         /// </summary>
-        /// <param name="dropInfo">
-        /// Information about the drop operation.
+        /// <param name="parameter">
+        /// The <see cref="ParameterOrOverrideBase"/>
         /// </param>
         /// <param name="expression">
-        /// The <see cref="RelationalExpression"/> payload
+        /// The <see cref="RelationalExpression"/>
         /// </param>
-        private async Task Drop(IDropInfo dropInfo, RelationalExpression expression)
+        private async Task Drop(ParameterOrOverrideBase parameter, RelationalExpression expression)
         {
-            if (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid)
-            {
-                MessageBox.Show("That hurts man!", "Ow", MessageBoxButton.OK);
-            }
+            await this.CreateBinaryRelationship(parameter, expression);
         }
     }
 }

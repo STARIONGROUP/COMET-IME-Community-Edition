@@ -15,6 +15,7 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
 
@@ -88,7 +89,7 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            if (dropInfo.Payload is RelationalExpression expression && (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            if (dropInfo.Payload is RelationalExpression expression && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(this.Thing, expression))
             {
                 this.DragOver(dropInfo, expression);
 
@@ -118,9 +119,9 @@ namespace CDP4EngineeringModel.ViewModels
                 await this.Drop(dropInfo, group);
             }
 
-            if (dropInfo.Payload is RelationalExpression expression && (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid))
+            if (dropInfo.Payload is RelationalExpression expression && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(this.Thing, expression))
             {
-                await this.Drop(dropInfo, expression);
+                await this.Drop(this.Thing, expression);
             }
 
             dropInfo.Effects = DragDropEffects.None;
@@ -237,18 +238,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Performs the drop operation when the payload is a <see cref="RelationalExpression"/>
         /// </summary>
-        /// <param name="dropInfo">
-        /// Information about the drop operation.
+        /// <param name="parameter">
+        /// The <see cref="ParameterOrOverrideBase"/>
         /// </param>
         /// <param name="expression">
-        /// The <see cref="RelationalExpression"/> payload
+        /// The <see cref="RelationalExpression"/>
         /// </param>
-        private async Task Drop(IDropInfo dropInfo, RelationalExpression expression)
+        private async Task Drop(ParameterOrOverrideBase parameter, RelationalExpression expression)
         {
-            if (expression.ParameterType.Iid == this.Thing?.ParameterType.Iid)
-            {
-                MessageBox.Show("That hurts man!", "Ow", MessageBoxButton.OK);
-            }
+            await this.CreateBinaryRelationship(parameter, expression);
         }
     }
 }
