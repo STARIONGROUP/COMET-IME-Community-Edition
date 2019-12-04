@@ -40,14 +40,14 @@ namespace CDP4Composition.Tests.Converters
         {
             foreach (var val in Enum.GetValues(typeof(RelationalOperatorKind)).Cast<RelationalOperatorKind>())
             {
-                var expected = val.ToFriendlyString();
+                var expected = val.ToScientificNotationString();
                 var converterResult1 = this.converter.Convert(val, null, null, null);
                 var converterResult2 = this.converter.Convert(val.ToString(), null, null, null);
                 var converterResult3 = this.converter.Convert((int)val, null, null, null);
 
-                Assert.AreEqual(val.ToFriendlyString(), converterResult1);
-                Assert.AreEqual(val.ToFriendlyString(), converterResult2);
-                Assert.AreEqual(val.ToFriendlyString(), converterResult3);
+                Assert.AreEqual(expected, converterResult1);
+                Assert.AreEqual(expected, converterResult2);
+                Assert.AreEqual(expected, converterResult3);
             }
         }
 
