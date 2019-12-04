@@ -40,7 +40,7 @@ namespace CDP4Composition.Converters
 
             if (Enum.TryParse<RelationalOperatorKind>(stringValue, out var relationalOperatorKind))
             {
-                return relationalOperatorKind.ToFriendlyString();
+                return relationalOperatorKind.ToScientificNotationString();
             }
 
             return stringValue;
