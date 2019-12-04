@@ -26,12 +26,12 @@ namespace CDP4Requirements.ExtensionMethods
     public static class BooleanExpressionMethods
     {
         /// <summary>
-        /// Gets the <see cref="BooleanExpression"/>s' viewmodel 
+        /// Gets the <see cref="BooleanExpression"/>'s viewmodel
         /// </summary>
         /// <typeparam name="T">Needed to correctly specify the rules the <see cref="viewModel"/> parameters needs to satisfy.</typeparam>
-        /// <param name="booleanExpression">The <see cref="BooleanExpression"/> tht nees to be checked, so the right viewmodel can be created and returned.</param>
+        /// <param name="booleanExpression">The <see cref="BooleanExpression"/> that needs to be checked, so the right viewmodel can be created and returned.</param>
         /// <param name="viewModel">A viewmodel that implements the <see cref="IViewModelBase{Thing}"/> and the <see cref="IISession"/> interfaces</param>
-        /// <returns></returns>
+        /// <returns>Implementation of <see cref="IRowViewModelBase{BooleanExpression}"/></returns>
         public static IRowViewModelBase<BooleanExpression> GetBooleanExpressionViewModel<T>(this BooleanExpression booleanExpression, T viewModel) where T : IViewModelBase<Thing>, IISession
         {
             if (booleanExpression is NotExpression notExpression)
@@ -63,8 +63,11 @@ namespace CDP4Requirements.ExtensionMethods
         }
 
         /// <summary>
-        /// Creates a string that represents the whole tree for the <see cref="BooleanExpression"/> of the given row.
+        /// Creates a string that represents a tree of (nested) <see cref="BooleanExpression"/>s.
         /// </summary>
+        /// <param name="rows">The rows which are used to create <see cref="BooleanExpression"/>'s string representation</param>
+        /// <param name="thing">The <see cref="Thing"/> for which the tree will be built</param>
+        /// <returns>A <see cref="string"/> that represents the <see cref="BooleanExpression"/> tree</returns>
         public static string ToExpressionString(this IEnumerable<IRowViewModelBase<BooleanExpression>> rows, Thing thing)
         {
             var stringBuilder = new StringBuilder();
@@ -88,6 +91,8 @@ namespace CDP4Requirements.ExtensionMethods
         /// <summary>
         /// Builds a string that represents the whole tree for the <see cref="BooleanExpression"/> of the given row.
         /// </summary>
+        /// <param name="expressionRow"></param>
+        /// <param name="stringBuilder"></param>
         private static void GetStringExpression(IRowViewModelBase<BooleanExpression> expressionRow, StringBuilder stringBuilder)
         {
             if (expressionRow.Thing.ClassKind == ClassKind.RelationalExpression)
@@ -130,9 +135,9 @@ namespace CDP4Requirements.ExtensionMethods
         }
 
         /// <summary>
-        /// Gets the expressions that are toplevel for this list of BooleanExpression
+        /// Gets the expressions that are toplevel for this list of <see cref="BooleanExpression"/>
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see cref="IReadOnlyList{BooleanExpression}"/> containing top level <see cref="BooleanExpression"/>s</returns>
         public static IReadOnlyList<BooleanExpression> GetTopLevelExpressions(this ContainerList<BooleanExpression> expressionList)
         {
             var notInTerms = new List<BooleanExpression>();
@@ -170,10 +175,28 @@ namespace CDP4Requirements.ExtensionMethods
         }
 
         /// <summary>
-        /// Gets the expressions that are children of <see cref="myself"/>
+        /// Gets the expressions that are children of <see cref="myself" /> or are "free" at the toplevel of the <see cref="BooleanExpression"/> tree.
+        /// "Free" means not set as a child of another <see cref="BooleanExpression"/>.
         /// </summary>
-        /// <returns></returns>
-        public static IReadOnlyList<BooleanExpression> GetMyExpressions(this ContainerList<BooleanExpression> expressionList, BooleanExpression myself)
+        /// <param name="expressionList">List that contains all known <see cref="BooleanExpression"/>s</param>
+        /// <param name="myself">The <see cref="BooleanExpression"/> for which its direct children must be returned</param>
+        /// <returns><see cref="IReadOnlyList{BooleanExpression}"/> containing <see cref="BooleanExpression"/>s that are direct children of the class in the <see cref="myself"/> parameter or that are not set as a child for another <see cref="BooleanExpression"/></returns>
+        public static IReadOnlyList<BooleanExpression> GetMyAndFreeExpressions(this ContainerList<BooleanExpression> expressionList, BooleanExpression myself)
+        {
+            var myExpressions = new List<BooleanExpression>();
+
+            myExpressions.AddRange(GetMyExpressions(myself));
+            myExpressions.AddRange(expressionList.GetTopLevelExpressions().OfType<RelationalExpression>().Where(x => !myExpressions.Contains(x)));
+
+            return myExpressions.ToList();
+        }
+
+        /// <summary>
+        /// Gets the expressions that are direct children of <see cref="myself"/>
+        /// </summary>
+        /// <param name="myself"></param>
+        /// <returns><see cref="IReadOnlyList{BooleanExpression}"/> containing <see cref="BooleanExpression"/>s that are direct children of the class in the <see cref="myself"/> parameter</returns>
+        private static IReadOnlyList<BooleanExpression> GetMyExpressions(BooleanExpression myself)
         {
             var myExpressions = new List<BooleanExpression>();
 
@@ -202,20 +225,6 @@ namespace CDP4Requirements.ExtensionMethods
 
                     break;
             }
-
-            return myExpressions.ToList();
-        }
-
-        /// <summary>
-        /// Gets the expressions that are children of <see cref="myself" /> or are free at the toplevel of the tree
-        /// </summary>
-        /// <returns></returns>
-        public static IReadOnlyList<BooleanExpression> GetMyAndFreeExpressions(this ContainerList<BooleanExpression> expressionList, BooleanExpression myself)
-        {
-            var myExpressions = new List<BooleanExpression>();
-
-            myExpressions.AddRange(expressionList.GetMyExpressions(myself));
-            myExpressions.AddRange(expressionList.GetTopLevelExpressions().OfType<RelationalExpression>().Where(x => !myExpressions.Contains(x)));
 
             return myExpressions.ToList();
         }
