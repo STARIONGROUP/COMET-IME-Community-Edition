@@ -211,7 +211,7 @@
                             </dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn Binding="{Binding StringTopExpression}" Header="Expression" />
+                            <dxg:GridColumn Binding="{Binding TopExpression.StringValue}" Header="Expression" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </lc:LayoutItem>
