@@ -92,7 +92,7 @@ namespace CDP4EngineeringModel.ViewModels
         public ElementDefinitionsBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = "Element definitions";
+            this.Caption = "Element Definitions";
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
 
             this.ElementDefinitionRowViewModels = new ReactiveList<IRowViewModelBase<Thing>>();

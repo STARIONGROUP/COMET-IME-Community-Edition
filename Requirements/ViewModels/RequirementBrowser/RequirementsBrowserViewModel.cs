@@ -569,7 +569,7 @@ namespace CDP4Requirements.ViewModels
 
                 if (binaryRelationships.Any())
                 {
-                    var relationshipMenu = new ContextMenuItemViewModel("Requirement satisfaction", "", null, MenuItemKind.None);
+                    var relationshipMenu = new ContextMenuItemViewModel("Requirement Verification Relationship", "", null, MenuItemKind.None);
 
                     foreach (var relationship in binaryRelationships)
                     {
