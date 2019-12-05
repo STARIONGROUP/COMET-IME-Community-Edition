@@ -221,7 +221,7 @@
             <views:BrowserHeader Grid.Row="1" />
 
             <dxg:TreeListControl Grid.Row="2"
-                                 MaxHeight="1080"
+                                 
                                  ItemsSource="{Binding ElementDefinitionRowViewModels}"
                                  SelectedItem="{Binding SelectedThing}"
                                  CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -236,7 +236,6 @@
                 </dxmvvm:Interaction.Behaviors>
                 <dxg:TreeListControl.View>
                     <dxg:TreeListView Name="View"
-                                      MaxHeight="1080"
                                       AllowEditing="False"
                                       AutoWidth="False"
                                       EditorShowMode="MouseUpFocused"

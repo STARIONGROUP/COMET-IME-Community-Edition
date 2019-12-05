@@ -284,28 +284,37 @@
                                       View="GroupBox"
                                       IsCollapsible="True"
                                       HorizontalAlignment="Stretch"
-                                      VerticalAlignment="Stretch"
                                       GroupBoxDisplayMode="Normal">
-                        <dxlc:LayoutItem Label="Row:" LabelPosition="Top">
+                        <dxlc:LayoutItem VerticalAlignment="Stretch"
+                                         
+                                         Label="Row:"
+                                         LabelPosition="Top">        
                             <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedRowDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                       VerticalScrollBarVisibility="Auto"
+                                      VerticalContentAlignment="Top"
+                                      TextWrapping="Wrap"
+                                      Height="200"
+                                      IsReadOnly="True"
+                                      />
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem VerticalAlignment="Stretch"
+                                         Label="Relations:"
+                                         LabelPosition="Top">
+                            <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedCellDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                      VerticalScrollBarVisibility="Auto"
+                                      VerticalContentAlignment="Top"
+                                      TextWrapping="Wrap"
+                                      IsReadOnly="True" />
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem VerticalAlignment="Stretch"
+                                         Label="Column:"
+                                         LabelPosition="Top">
+                            <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedColumnDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                      VerticalScrollBarVisibility="Auto"
+                                      VerticalContentAlignment="Top"
                                       TextWrapping="Wrap"
                                       IsReadOnly="True"
-                                      MaxHeight="300"/>
-                        </dxlc:LayoutItem>
-                        <dxlc:LayoutItem Label="Relations:" LabelPosition="Top">
-                        <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedCellDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                                      VerticalScrollBarVisibility="Auto"
-                                      TextWrapping="Wrap"
-                                      IsReadOnly="True" 
-                                      MaxHeight="300" />
-                        </dxlc:LayoutItem>
-                        <dxlc:LayoutItem Label="Column:" LabelPosition="Top">
-                        <dxe:TextEdit EditValue="{Binding Path=Matrix.SelectedColumnDetails, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                                      VerticalScrollBarVisibility="Auto"
-                                      TextWrapping="Wrap"
-                                      IsReadOnly="True" 
-                                      MaxHeight="300" />
+                                      />
                         </dxlc:LayoutItem>
                     </dxlc:LayoutGroup>
                 </Grid>

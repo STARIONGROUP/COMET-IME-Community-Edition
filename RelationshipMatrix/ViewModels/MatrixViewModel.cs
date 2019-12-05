@@ -970,7 +970,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
                 var matrixAddress = new MatrixAddress
                 {
-                    Column = thing?.Name ?? string.Empty,
+                    Column = thing?.ShortName ?? string.Empty,
                     Row = this.Records.IndexOf(selectedRow)
                 };
 
@@ -1021,6 +1021,12 @@ namespace CDP4RelationshipMatrix.ViewModels
                                               .Value?
                                               .Tooltip ??
                                           string.Empty;
+            }
+            else
+            {
+                // column only selected
+                this.SelectedRowDetails = string.Empty;
+                this.SelectedCellDetails = string.Empty;
             }
         }
 
