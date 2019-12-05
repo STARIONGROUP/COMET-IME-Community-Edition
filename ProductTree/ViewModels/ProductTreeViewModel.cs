@@ -89,7 +89,7 @@ namespace CDP4ProductTree.ViewModels
         /// <summary>
         /// The Panel Caption
         /// </summary>
-        private const string PanelCaption = "Product tree";
+        private const string PanelCaption = "Product Tree";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductTreeViewModel"/> class
