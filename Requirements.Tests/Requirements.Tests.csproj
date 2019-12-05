@@ -58,13 +58,13 @@
       <HintPath>..\packages\Castle.Core.4.4.0\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="CDP4Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.2019.12.4.3\lib\net452\CDP4Common.dll</HintPath>
+      <HintPath>..\packages\CDP4Common-CE.4.0.0\lib\net452\CDP4Common.dll</HintPath>
     </Reference>
     <Reference Include="CDP4Dal, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.2019.12.4.3\lib\net452\CDP4Dal.dll</HintPath>
+      <HintPath>..\packages\CDP4Dal-CE.5.1.0\lib\net452\CDP4Dal.dll</HintPath>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.2019.12.4.3\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.4.0.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
     </Reference>
     <Reference Include="ExcelApi, Version=1.7.4.6, Culture=neutral, PublicKeyToken=9084b9221296229e, processorArchitecture=MSIL">
       <HintPath>..\packages\NetOfficeFw.Excel.1.7.4.6\lib\net40\ExcelApi.dll</HintPath>
