@@ -122,6 +122,7 @@ namespace CDP4Requirements.Tests.Dialogs
                                  };
             this.requirement = new Requirement(Guid.NewGuid(), this.cache, this.uri);
             this.relationalExpression = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri);
+            this.relationalExpression.ParameterType = new BooleanParameterType();
             this.andExpression = new AndExpression(Guid.NewGuid(), this.cache, this.uri);
             this.orExpression = new OrExpression(Guid.NewGuid(), this.cache, this.uri);
             this.exclusiveOrExpression = new ExclusiveOrExpression(Guid.NewGuid(), this.cache, this.uri);
