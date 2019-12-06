@@ -62,7 +62,14 @@ namespace CDP4IME.Tests.ViewModels
             this.cache = new List<Thing>();
             this.dalOutputs = new List<CDP4Common.DTO.Thing>();
             var sitedirectory = new CDP4Common.DTO.SiteDirectory(Guid.NewGuid(), 22);
+            var person = new CDP4Common.DTO.Person(Guid.NewGuid(), 22)
+            {
+                ShortName = "John"
+            };
+
+            sitedirectory.Person.Add(person.Iid);
             this.dalOutputs.Add(sitedirectory);
+            this.dalOutputs.Add(person);
             this.tokenSource = new CancellationTokenSource();
             CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(SiteDirectory)).Subscribe(x => this.OnEvent(x.ChangedThing));
 
@@ -105,7 +112,7 @@ namespace CDP4IME.Tests.ViewModels
         [Test]
         public async Task VerifyThatRefreshUpdatesTheLastUpdateDatetimeAndSynchronizeData()
         {
-            var updatedSiteDir = new CDP4Common.DTO.SiteDirectory(this.dalOutputs.Single().Iid, 30);
+            var updatedSiteDir = new CDP4Common.DTO.SiteDirectory(this.dalOutputs.Single(x => x.ClassKind == ClassKind.SiteDirectory).Iid, 30);
 
             var openTaskCompletionSource = new TaskCompletionSource<IEnumerable<CDP4Common.DTO.Thing>>();
             openTaskCompletionSource.SetResult(this.GetTestDtos());
@@ -129,7 +136,7 @@ namespace CDP4IME.Tests.ViewModels
         [Test]
         public async Task VerifyThatReloadUpdatesTheLastUpdateDatetime()
         {
-            var updatedSiteDir = new CDP4Common.DTO.SiteDirectory(this.dalOutputs.Single().Iid, 30);
+            var updatedSiteDir = new CDP4Common.DTO.SiteDirectory(this.dalOutputs.Single(x => x.ClassKind == ClassKind.SiteDirectory).Iid, 30);
 
             var openTaskCompletionSource = new TaskCompletionSource<IEnumerable<CDP4Common.DTO.Thing>>();
             openTaskCompletionSource.SetResult(this.GetTestDtos());

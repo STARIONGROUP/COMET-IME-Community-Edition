@@ -24,6 +24,8 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using CDP4Requirements.ExtensionMethods;
+
     using ReactiveUI;
 
     /// <summary>
@@ -176,13 +178,8 @@ namespace CDP4Requirements.ViewModels
         {
             this.Expression.Clear();
 
-            foreach (var booleanExpression in this.BooleanExpression.OrderBy(e => e.ClassKind))
+            foreach (var booleanExpression in this.BooleanExpression.GetTopLevelExpressions().OrderBy(e => e.ClassKind))
             {
-                if (this.GetDisplayedExpressionsIids().Contains(booleanExpression.Iid))
-                {
-                    continue;
-                }
-
                 switch (booleanExpression.ClassKind)
                 {
                     case ClassKind.NotExpression:
@@ -216,39 +213,6 @@ namespace CDP4Requirements.ViewModels
             if (this.Expression.Count == 1)
             {
                 this.SelectedTopExpression = this.Expression.Single().Thing;
-            }
-        }
-
-        /// <summary>
-        /// Gets all the <see cref="BooleanExpression"/>s that are already in the tree 
-        /// </summary>
-        private IEnumerable<Guid> GetDisplayedExpressionsIids()
-        {
-            var booleanExpressions = new List<BooleanExpression>();
-
-            foreach (var containedExpressionRow in this.Expression)
-            {
-                this.AddContainedExpression(containedExpressionRow, booleanExpressions);
-            }
-
-            return booleanExpressions.Select(e => e.Iid);
-        }
-
-        /// <summary>
-        /// Adds the <see cref="BooleanExpression"/>s contained in this <see cref="IRowViewModelBase<BooleanExpression>"/> to the list of <see cref="BooleanExpression"/s>
-        /// </summary>
-        private void AddContainedExpression(IRowViewModelBase<BooleanExpression> containedExpressionRow, ICollection<BooleanExpression> booleanExpressions)
-        {
-            booleanExpressions.Add(containedExpressionRow.Thing);
-
-            if (!containedExpressionRow.ContainedRows.Any())
-            {
-                return;
-            }
-
-            foreach (var containedRow in containedExpressionRow.ContainedRows.OfType<IRowViewModelBase<BooleanExpression>>())
-            {
-                this.AddContainedExpression(containedRow, booleanExpressions);
             }
         }
 

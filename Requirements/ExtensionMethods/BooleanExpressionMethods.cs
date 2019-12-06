@@ -138,7 +138,7 @@ namespace CDP4Requirements.ExtensionMethods
         /// Gets the expressions that are toplevel for this list of <see cref="BooleanExpression"/>
         /// </summary>
         /// <returns><see cref="IReadOnlyList{BooleanExpression}"/> containing top level <see cref="BooleanExpression"/>s</returns>
-        public static IReadOnlyList<BooleanExpression> GetTopLevelExpressions(this ContainerList<BooleanExpression> expressionList)
+        public static IReadOnlyList<BooleanExpression> GetTopLevelExpressions(this IList<BooleanExpression> expressionList)
         {
             var notInTerms = new List<BooleanExpression>();
 
@@ -181,7 +181,7 @@ namespace CDP4Requirements.ExtensionMethods
         /// <param name="expressionList">List that contains all known <see cref="BooleanExpression"/>s</param>
         /// <param name="myself">The <see cref="BooleanExpression"/> for which its direct children must be returned</param>
         /// <returns><see cref="IReadOnlyList{BooleanExpression}"/> containing <see cref="BooleanExpression"/>s that are direct children of the class in the <see cref="myself"/> parameter or that are not set as a child for another <see cref="BooleanExpression"/></returns>
-        public static IReadOnlyList<BooleanExpression> GetMyAndFreeExpressions(this ContainerList<BooleanExpression> expressionList, BooleanExpression myself)
+        public static IReadOnlyList<BooleanExpression> GetMyAndFreeExpressions(this IList<BooleanExpression> expressionList, BooleanExpression myself)
         {
             var myExpressions = new List<BooleanExpression>();
 
