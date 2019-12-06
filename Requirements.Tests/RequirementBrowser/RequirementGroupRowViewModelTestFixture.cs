@@ -160,6 +160,9 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             dropInfo.Setup(x => x.Payload).Returns(this.req);
             dropInfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
             var row = new RequirementsGroupRowViewModel(this.grp2, this.session.Object, this.requirementSpecificationRow, this.requirementSpecificationRow);
+            row.IsParametricConstraintDisplayed = true;
+            row.IsSimpleParameterValuesDisplayed = true;
+
             Assert.IsNull(this.req.Group);
             Assert.AreEqual(1, row.ContainedRows.Count);
 
@@ -175,6 +178,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             dropInfo.Setup(x => x.Payload).Returns(this.grp11);
             dropInfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
             var row = new RequirementsGroupRowViewModel(this.grp2, this.session.Object, this.requirementSpecificationRow, this.requirementSpecificationRow);
+            row.IsParametricConstraintDisplayed = true;
+            row.IsSimpleParameterValuesDisplayed = true;
 
             Assert.AreEqual(0, this.grp2.Group.Count);
             Assert.AreEqual(this.grp1, this.grp11.Container);

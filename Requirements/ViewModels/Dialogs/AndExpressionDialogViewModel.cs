@@ -101,7 +101,7 @@ namespace CDP4Requirements.ViewModels
 
             if (this.dialogKind == ThingDialogKind.Create)
             {
-                this.PossibleTerm.AddRange(((ParametricConstraint)this.Container).Expression.GetTopLevelExpressions());
+                this.PossibleTerm.AddRange(((ParametricConstraint)this.Container).Expression.GetTopLevelExpressions().Where(e => e.Iid != this.Thing.Iid));
             }
 
             if (new List<ThingDialogKind> {ThingDialogKind.Update, ThingDialogKind.Inspect}.Contains(this.dialogKind))

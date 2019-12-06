@@ -63,6 +63,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         public void VerifyThatGroupsCanBeAddedOrRemoved()
         {
             var row = new RequirementsSpecificationRowViewModel(this.spec2, this.session.Object, this.requirementBrowserViewModel);
+            row.IsParametricConstraintDisplayed = true;
+            row.IsSimpleParameterValuesDisplayed = true;
 
             var groups = row.ContainedRows.Where(x => x.Thing is RequirementsGroup);
             Assert.AreEqual(3, groups.Count());
@@ -141,6 +143,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         public void VerifyThatAddingRequirementGroupUpdatesRequirementsSpecificationContainedRows()
         {
             var row = new RequirementsSpecificationRowViewModel(this.spec2, this.session.Object, this.requirementBrowserViewModel);
+            row.IsParametricConstraintDisplayed = true;
+            row.IsSimpleParameterValuesDisplayed = true;
 
             var groups = row.ContainedRows.Where(x => x.Thing is RequirementsGroup);
             Assert.AreEqual(3, groups.Count());
@@ -211,7 +215,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             dropInfo.Setup(x => x.Payload).Returns(this.grp1);
             dropInfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
             dropInfo.Setup(x => x.KeyStates).Returns(DragDropKeyStates.LeftMouseButton);
+
             var row = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, this.requirementBrowserViewModel);
+            row.IsParametricConstraintDisplayed = true;
+            row.IsSimpleParameterValuesDisplayed = true;
+
             Assert.AreEqual(0, this.spec1.Group.Count);
             Assert.AreEqual(5, row.ContainedRows.Count);
 

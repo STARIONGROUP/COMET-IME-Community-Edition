@@ -282,6 +282,7 @@ namespace CDP4Requirements.Tests.Dialogs
             Assert.AreEqual(0, vm.Expression.Single().ContainedRows.Count);
 
             var relationalExpression2 = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri);
+            relationalExpression2.ParameterType = new BooleanParameterType();
             this.andExpression.Term.Add(this.relationalExpression);
             this.andExpression.Term.Add(relationalExpression2);
             this.parametricConstraint.Expression.Add(relationalExpression2);
@@ -314,6 +315,7 @@ namespace CDP4Requirements.Tests.Dialogs
             Assert.AreEqual(0, vm.Expression.Single().ContainedRows.Count);
 
             var relationalExpression2 = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri);
+            relationalExpression2.ParameterType = new BooleanParameterType();
             this.orExpression.Term.Add(this.relationalExpression);
             this.orExpression.Term.Add(relationalExpression2);
             this.parametricConstraint.Expression.Add(relationalExpression2);
@@ -346,6 +348,7 @@ namespace CDP4Requirements.Tests.Dialogs
             Assert.AreEqual(0, vm.Expression.Single().ContainedRows.Count);
 
             var relationalExpression2 = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri);
+            relationalExpression2.ParameterType = new BooleanParameterType();
             this.exclusiveOrExpression.Term.Add(this.relationalExpression);
             this.exclusiveOrExpression.Term.Add(relationalExpression2);
             this.parametricConstraint.Expression.Add(relationalExpression2);
@@ -366,7 +369,9 @@ namespace CDP4Requirements.Tests.Dialogs
         public void VerifyCreateNestedBooleanExpression()
         {
             var relationalExpression2 = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri);
+            relationalExpression2.ParameterType = new BooleanParameterType();
             var relationalExpression3 = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri);
+            relationalExpression3.ParameterType = new BooleanParameterType();
             this.exclusiveOrExpression.Term.Add(relationalExpression2);
             this.exclusiveOrExpression.Term.Add(relationalExpression3);
             this.notExpression.Term = this.relationalExpression;
