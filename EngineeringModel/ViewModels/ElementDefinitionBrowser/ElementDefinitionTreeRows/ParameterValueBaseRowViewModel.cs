@@ -102,8 +102,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.ValueIndex = valueIndex;
             this.ParameterTypeClassKind = this.Thing.ParameterType.ClassKind;
 
+            this.SetValues();
             this.SetOwnerValue();
-            this.UpdateThingStatus();
         }
         #endregion
 
@@ -221,6 +221,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.ScaleShortName = this.Thing.Scale == null ? "-" : this.Thing.Scale.ShortName;
+            this.UpdateThingStatus();
         }
 
         /// <summary>
@@ -540,14 +541,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="valueset">The clone of the <see cref="ParameterValueSetBase"/> to update</param>
         private void UpdateValueSet(ParameterValueSetBase valueset)
         {
-            var parameterValueBaseRow = this.ContainerViewModel as ParameterValueBaseRowViewModel;
-            if (parameterValueBaseRow != null)
+            if (this.ContainerViewModel is ParameterValueBaseRowViewModel parameterValueBaseRow)
             {
                 parameterValueBaseRow.UpdateValueSet(valueset);
             }
 
-            var parameterOrOverrideRow = this.ContainerViewModel as ParameterOrOverrideBaseRowViewModel;
-            if (parameterOrOverrideRow != null)
+            if (this.ContainerViewModel is ParameterOrOverrideBaseRowViewModel parameterOrOverrideRow)
             {
                 parameterOrOverrideRow.UpdateValueSets(valueset);
             }
@@ -559,14 +558,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="valueset">The clone of the <see cref="ParameterSubscriptionValueSet"/> to update</param>
         private void UpdateValueSet(ParameterSubscriptionValueSet valueset)
         {
-            var parameterValueBaseRow = this.ContainerViewModel as ParameterValueBaseRowViewModel;
-            if (parameterValueBaseRow != null)
+            if (this.ContainerViewModel is ParameterValueBaseRowViewModel parameterValueBaseRow)
             {
                 parameterValueBaseRow.UpdateValueSet(valueset);
             }
 
-            var parameterSubscriptionRow = this.ContainerViewModel as ParameterSubscriptionRowViewModel;
-            if (parameterSubscriptionRow != null)
+            if (this.ContainerViewModel is ParameterSubscriptionRowViewModel parameterSubscriptionRow)
             {
                 parameterSubscriptionRow.UpdateValueSets(valueset);
             }

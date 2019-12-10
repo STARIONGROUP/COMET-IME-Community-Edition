@@ -193,6 +193,7 @@
     <Compile Include="ViewModels\DomainFileStoreRowViewModelTestFixture.cs" />
     <Compile Include="ViewModels\ElementDefinitionBrowserViewModelTestFixture.cs" />
     <Compile Include="ViewModels\ElementDefinitionsBrowser\ElementDefinitionRibbonViewModelTestFixture.cs" />
+    <Compile Include="ViewModels\ElementDefinitionTreeRows\ParameterOptionRowViewModelTestFixture.cs" />
     <Compile Include="ViewModels\ElementDefinitionTreeRows\ParameterComponentValueRowViewModelTestFixture.cs" />
     <Compile Include="ViewModels\ElementDefinitionTreeRows\ParameterOverrideRowViewModelTestFixture.cs" />
     <Compile Include="ViewModels\ElementDefinitionTreeRows\ParameterSubscriptionRowViewModelTestFixture.cs" />
