@@ -103,6 +103,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.ParameterTypeClassKind = this.Thing.ParameterType.ClassKind;
 
             this.SetOwnerValue();
+            this.UpdateThingStatus();
         }
         #endregion
 
@@ -289,6 +290,14 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             return base.IsEditable(propertyName);
+        }
+
+        /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing);
         }
 
         #region Validation
