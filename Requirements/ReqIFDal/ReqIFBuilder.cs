@@ -300,15 +300,10 @@ namespace CDP4Requirements.ReqIFDal
             var requirements = this.exportedIteration.RequirementsSpecification.SelectMany(s => s.Requirement);
             foreach (var requirement in requirements)
             {
+                // TODO: short term fix. The intent of reuse of spec type with use of applied rules is a bit unintuitive and convoluted without clear reasoning. Needs to be completely looked over.
+                // current solution will create a spec type per requirement and not reuse them (which leads to errors due to no use of rules/different SPVs)
                 var appliedRules = rules.Where(r => requirement.IsMemberOfCategory(r.Category)).ToArray();
-                var existingTypes = this.specTypeMap.Where(x => x.Value.Count == appliedRules.Length && !x.Value.Except(appliedRules).Any());
-                var existingReqType = existingTypes.Select(x => x.Key).OfType<SpecObjectType>().SingleOrDefault(x => !x.LongName.StartsWith(ThingToReqIfMapper.GroupNamePrefix));
-                if (existingReqType != null)
-                {
-                    this.specType.Add(requirement, existingReqType);
-                    continue;
-                }
-
+                
                 var reqType = this.mapper.ToReqIfSpecObjectType(requirement, appliedRules, this.parameterTypeMap);
 
                 this.specTypeMap.Add(reqType, appliedRules);
