@@ -21,7 +21,7 @@ namespace CDP4Composition.Mvvm
     /// <summary>
     /// The base class representing Ribbon button that depends on available <see cref="EngineeringModelSetup"/> to show a <see cref="IPanelView"/>
     /// </summary>
-    public abstract class RibbonButtonEngineeringModelSetupDependentViewModel : ReactiveObject 
+    public abstract class RibbonButtonEngineeringModelSetupDependentViewModel : ReactiveObject
     {
         /// <summary>
         /// The Function returning an instance of <see cref="IPanelViewModel"/>
@@ -131,6 +131,34 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// The method will remove the group under a closed session
+        /// </summary>
+        /// <param name="session">the session that has been removed</param>
+        protected virtual void SessionRemoveGroup(ISession session)
+        {
+            var sessionEngineeringModelSetupMenuGroupViewModel = this.EngineeringModelSetups.SingleOrDefault(x => x.Session == session);
+
+            if (sessionEngineeringModelSetupMenuGroupViewModel == null)
+            {
+                return;
+            }
+
+            foreach (var menuItemToRemove in sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.ToList())
+            {
+                sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.Remove(menuItemToRemove);
+
+                // removes the group if there are no more of its iterations opened
+                if (sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.Count == 0)
+                {
+                    this.EngineeringModelSetups.Remove(sessionEngineeringModelSetupMenuGroupViewModel);
+                }
+
+                menuItemToRemove.IsChecked = false;
+                menuItemToRemove.ShowOrClosePanelCommand.Execute(null);
+            }
+        }
+
+        /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Session"/> that is being represented by the view-model
         /// </summary>
@@ -151,6 +179,7 @@ namespace CDP4Composition.Mvvm
             else if (sessionChange.Status == SessionStatus.Closed)
             {
                 this.Sessions.Remove(sessionChange.Session);
+                this.SessionRemoveGroup(sessionChange.Session);
             }
         }
 
