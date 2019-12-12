@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RibbonButtonEngineeringModelSetupDependentViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2017 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -190,7 +190,7 @@ namespace CDP4Composition.Mvvm
         /// The <see cref="ISession"/> that is used to assert compatibility
         /// </param>
         /// <returns>
-        /// true when the version is suppported by the <paramref name="session"/>, false if not supported
+        /// true when the version is supported by the <paramref name="session"/>, false if not supported
         /// </returns>
         private bool IsVersionSupported(ISession session)
         {
