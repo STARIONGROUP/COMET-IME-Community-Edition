@@ -284,7 +284,7 @@
             <dxdo:LayoutGroup DestroyOnClosingChildren="False" Orientation="Horizontal">
 
                 <dxdo:LayoutGroup ItemHeight="0.7*" Orientation="Horizontal">
-                    <dxdo:LayoutGroup Name="LeftGroup"
+                    <dxdo:TabbedGroup Name="LeftGroup"
                                       DestroyOnClosingChildren="False"
                                       ItemWidth="0.2*"
                                       regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.LeftPanel}" />
@@ -292,7 +292,7 @@
                                         DestroyOnClosingChildren="False"
                                         ItemWidth="0.6*"
                                         regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.EditorPanel}" />
-                    <dxdo:LayoutGroup Name="rightGroup"
+                    <dxdo:TabbedGroup Name="rightGroup"
                                       DestroyOnClosingChildren="False"
                                       ItemWidth="0.2*"
                                       regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.RightPanel}" />

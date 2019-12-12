@@ -12,7 +12,7 @@ namespace CDP4EngineeringModel.Views
     /// <summary>
     /// Interaction logic for ElementDefinitions view
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [PanelViewExport(RegionNames.EditorPanel)]
     public partial class ElementDefinitionsBrowser : IPanelView
     {
         /// <summary>
