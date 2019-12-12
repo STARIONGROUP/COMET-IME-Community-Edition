@@ -8,13 +8,14 @@ namespace BasicRdl.Views
 {
     using System.ComponentModel.Composition;
     using BasicRdl.ViewModels;
+    using DevExpress.Xpf.Bars;
     using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>
     /// Interaction logic for CategoryRibbon.xaml
     /// </summary>
     [Export(typeof(CategoryRibbon))]
-    public partial class CategoryRibbon : IView
+    public partial class CategoryRibbon : IView, IBarItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CategoryRibbon"/> class.
