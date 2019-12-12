@@ -94,9 +94,10 @@ namespace CDP4Composition.DragDrop
         {
             if (e.LeftButton != MouseButtonState.Pressed)
             {
+                this.dragInfo = null;
                 return;
             }
-
+            
             if (this.dragInfo != null && !this.dragInProgress)
             {
                 var dragStart = this.dragInfo.DragStartPosition;
