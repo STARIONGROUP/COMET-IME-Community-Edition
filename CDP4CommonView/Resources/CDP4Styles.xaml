@@ -13,6 +13,7 @@
     <Image x:Key="CopyIcon" x:Shared="False" Source="{dx:DXImage Image=Copy_16x16.png}" Height="16" Width="16"/>
     <Image x:Key="SaveIcon" x:Shared="False" Source="{dx:DXImage Image=Save_16x16.png}" Height="16" Width="16"/>
     <Image x:Key="NavigateIcon" x:Shared="False" Source="{dx:DXImage Image=Redo_16x16.png}" Height="16" Width="16"/>
+    <Image x:Key="FavoriteIcon" x:Shared="False" Source="{dx:DXImage Image=NewContact_16x16.png}" Height="16" Width="16"/>
 
     <Style TargetType="ScrollBar">
         <!-- 
@@ -80,6 +81,9 @@
                         </DataTrigger>
                         <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Navigate}">
                             <Setter Property="Icon" Value="{StaticResource NavigateIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Favorite}">
+                            <Setter Property="Icon" Value="{StaticResource FavoriteIcon}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

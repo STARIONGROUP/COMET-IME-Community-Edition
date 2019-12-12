@@ -869,6 +869,7 @@ namespace CDP4Composition.Mvvm
                 this.ContextMenu.Add(categoriesMenu);
             }
 
+            // TODO: This is really only applicable to expandable things, and certainly does not even need to be in grids.
             this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
                     new ContextMenuItemViewModel("Collapse Rows","", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
                      new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));

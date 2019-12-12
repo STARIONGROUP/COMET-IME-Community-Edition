@@ -77,6 +77,11 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Assertion that the associated menu item is used to navigate to a Thing
         /// </summary>
-        Navigate = 12
+        Navigate = 12,
+
+        /// <summary>
+        /// Assertion that the associated menu item is used to save a Thing to favorites
+        /// </summary>
+        Favorite = 13
     }
 }

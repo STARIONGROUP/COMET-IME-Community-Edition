@@ -139,7 +139,12 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ArrayParameterType"/>
         /// </summary>
         public ReactiveCommand<object> CreateArrayParameterType { get; private set; }
-        
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> used to toggle the state of <see cref="IsFavorite"/> for a perticulat row.
+        /// </summary>
+        public ReactiveCommand<object> ToggleFavoriteCommand { get; private set; }
+
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -209,6 +214,9 @@ namespace BasicRdl.ViewModels
 
             this.CreateArrayParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateArrayParameterType.Subscribe(_ => this.ExecuteCreateCommand<ArrayParameterType>());
+
+            this.ToggleFavoriteCommand = ReactiveCommand.Create();
+            this.ToggleFavoriteCommand.Subscribe(_ => this.ExecuteToggleFavoriteCommand());
         }
 
         /// <summary>
@@ -227,6 +235,11 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
+            if (this.SelectedThing is ParameterTypeRowViewModel selectedParameterTypeRow)
+            {
+                this.ContextMenu.Add(new ContextMenuItemViewModel(!selectedParameterTypeRow.IsFavorite ? "Add to Favorites" : "Remove from Favorites", "", this.ToggleFavoriteCommand, MenuItemKind.Favorite));
+            }
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Array Parameter Type", "", this.CreateArrayParameterType, MenuItemKind.Create, ClassKind.ArrayParameterType));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Boolean Parameter Type", "", this.CreateBooleanParameterType, MenuItemKind.Create, ClassKind.BooleanParameterType));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Compound Parameter Type", "", this.CreateCompoundParameterType, MenuItemKind.Create, ClassKind.CompoundParameterType));
@@ -238,6 +251,19 @@ namespace BasicRdl.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Specialized Quantity Kind", "", this.CreateSpecializedQuantityKind, MenuItemKind.Create, ClassKind.SpecializedQuantityKind));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Text Parameter Type", "", this.CreateTextParameterType, MenuItemKind.Create, ClassKind.TextParameterType));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Time of Day Parameter Type", "", this.CreateTimeOfDayParameterType, MenuItemKind.Create, ClassKind.TimeOfDayParameterType));
+        }
+
+        /// <summary>
+        /// Execute the <see cref="ToggleFavoriteCommand"/>
+        /// </summary>
+        private void ExecuteToggleFavoriteCommand()
+        {
+            if (this.SelectedThing == null)
+            {
+                return;
+            }
+
+            //this.ExecuteDeleteCommand(this.SelectedThing.Thing);
         }
 
         /// <summary>

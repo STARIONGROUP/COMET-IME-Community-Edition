@@ -48,6 +48,11 @@ namespace BasicRdl.ViewModels
         /// Backing field for the is base quantity kind.
         /// </summary>
         private bool isBaseQuantityKind;
+
+        /// <summary>
+        /// Backing field for the <see cref="IsFavorite"/> property
+        /// </summary>
+        private bool isFavorite;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeRowViewModel"/> class.
@@ -125,6 +130,22 @@ namespace BasicRdl.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the item that is represented by the current row-view-model is marked as favorite
+        /// </summary>
+        public bool IsFavorite
+        {
+            get
+            {
+                return this.isFavorite;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.isFavorite, value);
+            }
+        }
+
+        /// <summary>
         /// Updates the properties of the current view-model
         /// </summary>
         private void UpdateProperties()
@@ -134,6 +155,21 @@ namespace BasicRdl.ViewModels
             this.ContainerRdl = container == null ? string.Empty : container.ShortName;
             var quantityKind = this.Thing as QuantityKind;
             this.IsBaseQuantityKind = container != null && (quantityKind != null && container.BaseQuantityKind.Contains(quantityKind));
+
+            // random favorites
+            this.IsFavorite = new Random().Next(100) <= 30;
+            this.UpdateThingStatus();
+        }
+
+        /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            this.ThingStatus = new ThingStatus(this.Thing)
+            {
+                IsFavorite = this.IsFavorite
+            };
         }
 
         /// <summary>
@@ -194,6 +230,8 @@ namespace BasicRdl.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
+
+        
 
         /// <summary>
         /// Queries whether a drag can be started

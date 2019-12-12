@@ -39,5 +39,10 @@ namespace CDP4Composition.Mvvm
         /// Gets a value indicating whether the thing has associated relationships
         /// </summary>
         public bool HasRelationship { get; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the thing is marked as a user's favorite
+        /// </summary>
+        public bool IsFavorite { get; set; } = false;
     }
 }
