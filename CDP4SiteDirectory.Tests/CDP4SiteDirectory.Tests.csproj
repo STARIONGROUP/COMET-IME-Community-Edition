@@ -197,6 +197,7 @@
     <Compile Include="TeamComposition\TeamCompositionBrowserRibbonViewModelTestFixture.cs" />
     <Compile Include="TeamComposition\TeamCompositionBrowserViewModelTestFixture.cs" />
     <Compile Include="TeamComposition\TeamCompositionCardViewModelTestFixture.cs" />
+    <Compile Include="TeamComposition\TeamCompositionDisconnectViewModelTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
