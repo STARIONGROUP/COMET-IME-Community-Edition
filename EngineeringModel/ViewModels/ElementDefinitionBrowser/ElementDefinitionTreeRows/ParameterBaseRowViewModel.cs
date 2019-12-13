@@ -16,6 +16,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.ExtensionMethods;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
@@ -297,7 +299,7 @@ namespace CDP4EngineeringModel.ViewModels
                 row.Dispose();
             }
 
-            this.ContainedRows.Clear();
+            this.ContainedRows.DisposeAndClear();
 
             if (this.Thing.IsOptionDependent)
             {

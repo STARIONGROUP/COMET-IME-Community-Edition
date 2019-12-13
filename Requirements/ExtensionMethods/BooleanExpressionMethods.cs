@@ -12,7 +12,6 @@ namespace CDP4Requirements.ExtensionMethods
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Types;
 
     using CDP4Composition.Mvvm;
 
@@ -21,7 +20,7 @@ namespace CDP4Requirements.ExtensionMethods
     using CDP4Requirements.ViewModels;
 
     /// <summary>
-    /// This class contains methods for specific BooleanExpression related functionality 
+    /// This class contains methods for specific <see cref="BooleanExpression"/> related functionality 
     /// </summary>
     public static class BooleanExpressionMethods
     {
@@ -135,46 +134,6 @@ namespace CDP4Requirements.ExtensionMethods
         }
 
         /// <summary>
-        /// Gets the expressions that are toplevel for this list of <see cref="BooleanExpression"/>
-        /// </summary>
-        /// <returns><see cref="IReadOnlyList{BooleanExpression}"/> containing top level <see cref="BooleanExpression"/>s</returns>
-        public static IReadOnlyList<BooleanExpression> GetTopLevelExpressions(this IList<BooleanExpression> expressionList)
-        {
-            var notInTerms = new List<BooleanExpression>();
-
-            foreach (var thingExpression in expressionList)
-            {
-                switch (thingExpression.ClassKind)
-                {
-                    case ClassKind.NotExpression:
-                        if (thingExpression is NotExpression notExpression && !notInTerms.Contains(notExpression.Term))
-                        {
-                            notInTerms.Add(notExpression.Term);
-                        }
-
-                        break;
-
-                    case ClassKind.AndExpression:
-                        notInTerms.AddRange(((AndExpression)thingExpression).Term.Where(x => !notInTerms.Contains(x)));
-
-                        break;
-
-                    case ClassKind.OrExpression:
-                        notInTerms.AddRange(((OrExpression)thingExpression).Term.Where(x => !notInTerms.Contains(x)));
-
-                        break;
-
-                    case ClassKind.ExclusiveOrExpression:
-                        notInTerms.AddRange(((ExclusiveOrExpression)thingExpression).Term.Where(x => !notInTerms.Contains(x)));
-
-                        break;
-                }
-            }
-
-            return expressionList.Where(x => !notInTerms.Contains(x)).ToList();
-        }
-
-        /// <summary>
         /// Gets the expressions that are children of <see cref="myself" /> or are "free" at the toplevel of the <see cref="BooleanExpression"/> tree.
         /// "Free" means not set as a child of another <see cref="BooleanExpression"/>.
         /// </summary>
@@ -227,6 +186,77 @@ namespace CDP4Requirements.ExtensionMethods
             }
 
             return myExpressions.ToList();
+        }
+
+        /// <summary>
+        /// Gets the expressions that are direct children of <see cref="myself"/>
+        /// </summary>
+        /// <param name="myself"><see cref="BooleanExpression"/> for which the expressions should be found</param>
+        /// <returns><see cref="IReadOnlyList{BooleanExpression}"/> containing <see cref="BooleanExpression"/>s that are direct children of the class in the <see cref="myself"/> parameter</returns>
+        public static IReadOnlyList<BooleanExpression> GetAllMyExpressions(this BooleanExpression myself)
+        {
+            var myExpressions = new List<BooleanExpression>();
+
+            GetAllMyExpressions(myself, myExpressions);
+
+            return myExpressions.ToList();
+        }
+
+        /// <summary>
+        /// Gets the expressions that are direct children of <see cref="myself"/>
+        /// </summary>
+        /// <param name="myself"><see cref="BooleanExpression"/> for which the expressions should be found</param>
+        /// <param><see cref="IReadOnlyList{BooleanExpression}"/> where the <see cref="BooleanExpression"/> should be added to if not allready there</param>
+        private static void GetAllMyExpressions(BooleanExpression myself, List<BooleanExpression> myExpressions)
+        {
+            switch (myself.ClassKind)
+            {
+                case ClassKind.NotExpression:
+                    if (myself is NotExpression notExpression)
+                    {
+                        TryAddMyExpressions(myExpressions, notExpression);
+                    }
+
+                    break;
+
+                case ClassKind.AndExpression:
+
+                    foreach (var expression in ((AndExpression)myself).Term)
+                    {
+                        TryAddMyExpressions(myExpressions, expression);
+                    }
+
+                    break;
+
+                case ClassKind.OrExpression:
+                    foreach (var expression in ((OrExpression)myself).Term)
+                    {
+                        TryAddMyExpressions(myExpressions, expression);
+                    }
+
+                    break;
+
+                case ClassKind.ExclusiveOrExpression:
+                    foreach (var expression in ((ExclusiveOrExpression)myself).Term)
+                    {
+                        TryAddMyExpressions(myExpressions, expression);
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Add a<see cref="BooleanExpression"/> to a list if it is not allready contained in that list
+        /// </summary>
+        /// <param><see cref="IReadOnlyList{BooleanExpression}"/> where the <see cref="BooleanExpression"/> should be added to if not allready there</param>
+        /// <param name="expression"><see cref="BooleanExpression"/> for which the expressions should be found</param>
+        private static void TryAddMyExpressions(List<BooleanExpression> myExpressions, BooleanExpression expression)
+        {
+            if (!myExpressions.Contains(expression))
+            {
+                myExpressions.Add(expression);
+                GetAllMyExpressions(expression, myExpressions);
+            }
         }
     }
 }

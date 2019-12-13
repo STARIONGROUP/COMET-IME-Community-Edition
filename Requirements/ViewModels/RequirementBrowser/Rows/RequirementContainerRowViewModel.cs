@@ -28,6 +28,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Operations;
 
     using CDP4Requirements.Comparers;
+    using CDP4Requirements.Events;
     using CDP4Requirements.Utils;
     using CDP4Requirements.ViewModels.RequirementBrowser;
 
@@ -39,8 +40,13 @@ namespace CDP4Requirements.ViewModels
     /// <typeparam name="T">
     /// A type of <see cref="RequirementsContainer"/>
     /// </typeparam>
-    public abstract class RequirementContainerRowViewModel<T> : RequirementsContainerRowViewModel<T>, IDeprecatableThing, IRequirementBrowserDisplaySettings where T : RequirementsContainer
+    public abstract class RequirementContainerRowViewModel<T> : RequirementsContainerRowViewModel<T>, IDeprecatableThing, IRequirementBrowserDisplaySettings, IHaveWritableRequirementStateOfCompliance where T : RequirementsContainer
     {
+        /// <summary>
+        /// Backing field for <see cref="RelationalExpressionRowViewModel.RequirementStateOfCompliance"/>
+        /// </summary>
+        private RequirementStateOfCompliance requirementStateOfCompliance;
+
         /// <summary>
         /// The <see cref="IComparer{T}"/>
         /// </summary>
@@ -95,6 +101,15 @@ namespace CDP4Requirements.ViewModels
             this.ContainedRows.Add(this.simpleParameters);
             this.TopParentRow = topNode ?? this as RequirementsSpecificationRowViewModel;
             this.SetSubscriptions();
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="CDP4Requirements.RequirementStateOfCompliance"/>
+        /// </summary>
+        public RequirementStateOfCompliance RequirementStateOfCompliance
+        {
+            get => this.requirementStateOfCompliance;
+            set => this.RaiseAndSetIfChanged(ref this.requirementStateOfCompliance, value);
         }
 
         /// <summary>
@@ -308,6 +323,10 @@ namespace CDP4Requirements.ViewModels
                     .WhenAnyValue(x => x.IsSimpleParameterValuesDisplayed)
                     .Subscribe(y => this.IsSimpleParameterValuesDisplayed = y));
             }
+
+            this.Disposables.Add(CDPMessageBus.Current.Listen<RequirementStateOfComplianceChangedEvent>(this.Thing)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.RequirementStateOfCompliance = x.RequirementStateOfCompliance));
         }
 
         /// <summary>

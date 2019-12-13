@@ -13,6 +13,8 @@
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:converters="clr-namespace:CDP4Requirements.Converters"
+             xmlns:userControls="clr-namespace:CDP4Requirements.Views.UserControls"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -23,10 +25,15 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+            <converters:RequirementStateOfComplianceColorConverter x:Key="RequirementStateOfComplianceColorConverter"></converters:RequirementStateOfComplianceColorConverter>
+            <converters:RequirementStateOfComplianceToVisibilityConverter x:Key="RequirementStateOfComplianceToVisibilityConverter"></converters:RequirementStateOfComplianceToVisibilityConverter>
 
             <HierarchicalDataTemplate DataType="{x:Type viewModels:RequirementsSpecificationRowViewModel}" ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
                         <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
@@ -49,6 +56,9 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
+                        <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
                                    Margin="3">
@@ -69,6 +79,9 @@
             <HierarchicalDataTemplate DataType="{x:Type viewModels:RequirementRowViewModel}" ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
                         <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
@@ -112,6 +125,9 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
+                        <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
                                    Margin="3">
@@ -132,6 +148,9 @@
             <HierarchicalDataTemplate DataType="{x:Type viewModels:NotExpressionRowViewModel}" ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
                         <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
@@ -154,6 +173,9 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
+                        <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
                                    Margin="3">
@@ -174,6 +196,9 @@
             <HierarchicalDataTemplate DataType="{x:Type viewModels:OrExpressionRowViewModel}" ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
                         <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
@@ -196,6 +221,9 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
+                        <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
                                    Margin="3">
@@ -217,6 +245,9 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
+                        <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
                                    Margin="3">
@@ -237,6 +268,9 @@
             <HierarchicalDataTemplate DataType="{x:Type cdp4Composition:FolderRowViewModel}" ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
+                        </dx:PixelSnapper>
                         <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"
@@ -314,6 +348,7 @@
                         <dxg:TreeListView.RowStyle>
                             <Style TargetType="{x:Type dxg:RowControl}">
                                 <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                                <Setter Property="Background" Value="{Binding Row.RequirementStateOfCompliance, Mode=OneWay, Converter={StaticResource RequirementStateOfComplianceColorConverter}}" />
                             </Style>
                         </dxg:TreeListView.RowStyle>
 

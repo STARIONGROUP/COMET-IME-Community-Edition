@@ -51,16 +51,16 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.4.0.0\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.4.0.1-2019.12.13.2\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.5.1.0\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=5.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.5.1.1-2019.12.13.2\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.4.0.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.4.0.1-2019.12.13.2\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v15.2, Version=15.2.19.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
@@ -235,9 +235,11 @@
     <Compile Include="Events\HighlightEvent.cs" />
     <Compile Include="Events\ToggleDeprecatedThingEvent.cs" />
     <Compile Include="Events\TaskbarNotificationEvent.cs" />
+    <Compile Include="ExtensionMethods\ReactiveListMethods.cs" />
     <Compile Include="FolderRowViewModel.cs" />
     <Compile Include="Mvvm\Behaviours\ContextMenuBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\ExtendedDiagramOrgChartBehavior.cs" />
+    <Compile Include="Mvvm\IHaveContainerViewModel.cs" />
     <Compile Include="Services\FilterStringService.cs" />
     <Compile Include="Mvvm\Behaviours\IExtendedDiagramOrgChartBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\ItemsSourceHelper.cs" />

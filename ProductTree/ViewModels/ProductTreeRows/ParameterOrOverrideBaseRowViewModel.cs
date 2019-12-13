@@ -17,6 +17,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.ExtensionMethods;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
@@ -307,7 +308,7 @@ namespace CDP4ProductTree.ViewModels
             this.Name = this.Thing.ParameterType.Name;
             this.IsPublishable = false; // reset the status
 
-            this.DisposeRows();
+            this.ContainedRows.DisposeAndClear();
 
             this.UpdateValueSetListeners();
 
@@ -531,19 +532,6 @@ namespace CDP4ProductTree.ViewModels
 
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Dispose of the contained rows
-        /// </summary>
-        private void DisposeRows()
-        {
-            foreach (var row in this.ContainedRows)
-            {
-                row.Dispose();
-            }
-
-            this.ContainedRows.Clear();
         }
 
         /// <summary>

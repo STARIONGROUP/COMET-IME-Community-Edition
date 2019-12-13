@@ -10,16 +10,20 @@ namespace CDP4Requirements.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.ExtensionMethods;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using CDP4Requirements.Events;
     using CDP4Requirements.ExtensionMethods;
+    using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
 
     using ReactiveUI;
@@ -27,8 +31,13 @@ namespace CDP4Requirements.ViewModels
     /// <summary>
     /// the row-view-model representing a <see cref="ParametricConstraint"/>
     /// </summary>
-    public class ParametricConstraintRowViewModel : CDP4CommonView.ParametricConstraintRowViewModel, IDeprecatableThing
+    public class ParametricConstraintRowViewModel : CDP4CommonView.ParametricConstraintRowViewModel, IDeprecatableThing, IHaveWritableRequirementStateOfCompliance
     {
+        /// <summary>
+        /// Backing field for <see cref="RelationalExpressionRowViewModel.RequirementStateOfCompliance"/>
+        /// </summary>
+        private RequirementStateOfCompliance requirementStateOfCompliance;
+
         /// <summary>
         /// Backing field for <see cref="StringExpression"/>
         /// </summary>
@@ -49,6 +58,28 @@ namespace CDP4Requirements.ViewModels
             : base(req, session, containerViewModel)
         {
             this.UpdateProperties();
+            this.AddSubscriptions();
+        }
+
+        /// <summary>
+        /// Adds subscriptions to diffent types of events
+        /// </summary>
+        private void AddSubscriptions()
+        {
+            var requirementVerifierListener = CDPMessageBus.Current.Listen<RequirementStateOfComplianceChangedEvent>(this.Thing)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.RequirementStateOfCompliance = x.RequirementStateOfCompliance);
+
+            this.Disposables.Add(requirementVerifierListener);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="CDP4Requirements.RequirementStateOfCompliance"/>
+        /// </summary>
+        public RequirementStateOfCompliance RequirementStateOfCompliance
+        {
+            get => this.requirementStateOfCompliance;
+            set => this.RaiseAndSetIfChanged(ref this.requirementStateOfCompliance, value);
         }
 
         /// <summary>
@@ -82,7 +113,7 @@ namespace CDP4Requirements.ViewModels
             this.ModifiedOn = this.Thing.ModifiedOn;
             var topExpressions = this.GetTopExpressions();
 
-            this.ContainedRows.Clear();
+            this.ContainedRows.DisposeAndClear();
 
             foreach (var expression in topExpressions)
             {
@@ -101,7 +132,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the expressions that are toplevel for this Parametric Constraint
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of <see cref="BooleanExpression"/>s that are visually considered as toplevel for this instance of <see cref="ParametricConstraintRowViewModel"/></returns>
         private IReadOnlyList<BooleanExpression> GetTopExpressions()
         {
             if (this.Thing.TopExpression != null)
@@ -170,7 +201,10 @@ namespace CDP4Requirements.ViewModels
                 this.Disposables.Add(containerIsDeprecatedSubscription);
             }
         }
-
+        /// <summary>
+        /// Update properties when underlying <see cref="BooleanExpression"/>s are changed
+        /// </summary>
+        /// <param name="objectChangedEvent"></param>
         private void UpdatePropertiesWhenNeededAndUpdateStringExpression(ObjectChangedEvent objectChangedEvent)
         {
             if (objectChangedEvent.ChangedThing?.ClassKind != null)
@@ -181,8 +215,30 @@ namespace CDP4Requirements.ViewModels
                     return;
                 }
             }
-
+            this.SetRequirementStateOfCompliance();
             this.UpdateStringExpression();
+        }
+
+        /// <summary>
+        /// Set the <see cref="RequirementStateOfCompliance"/> for this ViewModel and all Parents in the Container tree
+        /// </summary>
+        private void SetRequirementStateOfCompliance()
+        {
+            var containerViewModel = this as IHaveContainerViewModel;
+
+            while (containerViewModel is IHaveWritableRequirementStateOfCompliance requirementStateOfComplianceViewModel)
+            {
+                requirementStateOfComplianceViewModel.RequirementStateOfCompliance = RequirementStateOfCompliance.Unknown;
+
+                if (containerViewModel.ContainerViewModel is IHaveContainerViewModel nextContainerViewModel)
+                {
+                    containerViewModel = nextContainerViewModel;
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
 
         /// <summary>
@@ -203,6 +259,7 @@ namespace CDP4Requirements.ViewModels
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+            this.SetRequirementStateOfCompliance();
             this.UpdateProperties();
         }
     }

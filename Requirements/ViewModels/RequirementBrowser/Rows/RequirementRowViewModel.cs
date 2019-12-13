@@ -27,16 +27,24 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
+    using CDP4Requirements.Events;
     using CDP4Requirements.Utils;
+    using CDP4Requirements.Verifiers;
     using CDP4Requirements.ViewModels.RequirementBrowser;
+    using CDP4Requirements.ViewModels.RequirementBrowser.Rows;
 
     using ReactiveUI;
 
     /// <summary>
     /// the row-view-model representing a <see cref="Requirement"/>
     /// </summary>
-    public class RequirementRowViewModel : CDP4CommonView.RequirementRowViewModel, IDropTarget, IDeprecatableThing, IRequirementBrowserDisplaySettings
+    public class RequirementRowViewModel : CDP4CommonView.RequirementRowViewModel, IDropTarget, IDeprecatableThing, IRequirementBrowserDisplaySettings, IHaveWritableRequirementStateOfCompliance
     {
+        /// <summary>
+        /// Backing field for <see cref="RelationalExpressionRowViewModel.RequirementStateOfCompliance"/>
+        /// </summary>
+        private RequirementStateOfCompliance requirementStateOfCompliance;
+
         /// <summary>
         /// The folder row containing the <see cref="SimpleParameterValue"/>
         /// </summary>
@@ -45,7 +53,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// The folder row containing the <see cref="parametricConstraints"/>
         /// </summary>
-        private readonly FolderRowViewModel parametricConstraints;
+        private readonly ParametricConstraintsFolderRowViewModel parametricConstraints;
 
         /// <summary>
         /// Backing field for <see cref="Definition"/>
@@ -83,6 +91,19 @@ namespace CDP4Requirements.ViewModels
         private bool isParametricConstraintDisplayed;
 
         /// <summary>
+        /// Gets or sets the <see cref="CDP4Requirements.RequirementStateOfCompliance"/>
+        /// </summary>
+        public RequirementStateOfCompliance RequirementStateOfCompliance
+        {
+            get => this.requirementStateOfCompliance;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.requirementStateOfCompliance, value);
+                this.parametricConstraints.RequirementStateOfCompliance = value;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RequirementRowViewModel"/> class
         /// </summary>
         /// <param name="req">The requirement</param>
@@ -92,11 +113,22 @@ namespace CDP4Requirements.ViewModels
             : base(req, session, containerViewModel)
         {
             this.simpleParameters = new FolderRowViewModel("Simple Parameter Values", "Simple Parameter Values", this.Session, this);
-            this.parametricConstraints = new FolderRowViewModel("Parametric Constraints", "Parametric Constraints", this.Session, this);
+            this.parametricConstraints = new ParametricConstraintsFolderRowViewModel("Parametric Constraints", "Parametric Constraints", this.Session, this);
 
             this.SetSubscriptions();
 
             this.UpdateProperties();
+            this.AddSubscriptions();
+        }
+
+        /// <summary>
+        /// Adds subscriptions to diffent types of events
+        /// </summary>
+        private void AddSubscriptions()
+        {
+            this.Disposables.Add(CDPMessageBus.Current.Listen<RequirementStateOfComplianceChangedEvent>(this.Thing)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.RequirementStateOfCompliance = x.RequirementStateOfCompliance));
         }
 
         /// <summary>

@@ -13,12 +13,15 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.ExtensionMethods;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using CDP4Requirements.Events;
     using CDP4Requirements.ExtensionMethods;
+    using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
 
     using ReactiveUI;
@@ -26,7 +29,7 @@ namespace CDP4Requirements.ViewModels
     /// <summary>
     /// the row-view-model representing a <see cref="ExclusiveOrExpression"/>
     /// </summary>
-    public class ExclusiveOrExpressionRowViewModel : CDP4CommonView.ExclusiveOrExpressionRowViewModel
+    public class ExclusiveOrExpressionRowViewModel : CDP4CommonView.ExclusiveOrExpressionRowViewModel, IHaveWritableRequirementStateOfCompliance
     {
         /// <summary>
         /// Backing field for <see cref="StringExpression"/>
@@ -38,6 +41,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private bool isDeprecated;
 
+        private RequirementStateOfCompliance requirementStateOfCompliance;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ExclusiveOrExpressionRowViewModel"/> class
         /// </summary>
@@ -47,6 +52,28 @@ namespace CDP4Requirements.ViewModels
         public ExclusiveOrExpressionRowViewModel(ExclusiveOrExpression notExpression, ISession session, IViewModelBase<Thing> containerViewModel) : base(notExpression, session, containerViewModel)
         {
             this.UpdateProperties();
+            this.AddSubscriptions();
+        }
+
+        /// <summary>
+        /// Adds subscriptions to diffent types of events
+        /// </summary>
+        private void AddSubscriptions()
+        {
+            var requirementVerifierListener = CDPMessageBus.Current.Listen<RequirementStateOfComplianceChangedEvent>(this.Thing)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.RequirementStateOfCompliance = x.RequirementStateOfCompliance);
+
+            this.Disposables.Add(requirementVerifierListener);
+        }
+
+        /// <summary>
+        /// Gets or sets the ParametricConstraintsVerifier
+        /// </summary>
+        public RequirementStateOfCompliance RequirementStateOfCompliance
+        {
+            get => this.requirementStateOfCompliance;
+            set => this.RaiseAndSetIfChanged(ref this.requirementStateOfCompliance, value);
         }
 
         /// <summary>
@@ -84,7 +111,7 @@ namespace CDP4Requirements.ViewModels
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
 
-            this.ContainedRows.Clear();
+            this.ContainedRows.DisposeAndClear();
             var parametricConstraintDialog = this.TopContainerViewModel as ParametricConstraintDialogViewModel;
 
             foreach (var term in this.Thing.Term)
@@ -98,7 +125,7 @@ namespace CDP4Requirements.ViewModels
                 }
 
                 this.RemoveReferencedExpressions();
-                this.UpdateStringExpression();
+                this.OnExpressionUpdate();
             }
         }
 
@@ -150,9 +177,10 @@ namespace CDP4Requirements.ViewModels
             base.InitializeSubscriptions();
 
             var booleanExpressionsListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BooleanExpression))
-                .Where(x => (x.EventKind == EventKind.Updated) && (this.Thing?.Container != null) && (x.ChangedThing.Container != null) && (x.ChangedThing.Container.Iid == this.Thing.Container.Iid))
+                .Where(x => (x.EventKind == EventKind.Updated) && (this.Thing?.Container != null) && (x.ChangedThing.Container != null) && (this.Thing.GetAllMyExpressions().Contains(x.ChangedThing)))
+                //                .Where(x => (x.EventKind == EventKind.Updated) && (this.Thing?.Container != null) && (x.ChangedThing.Container != null) && (x.ChangedThing.Container.Iid == this.Thing.Container.Iid))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateStringExpression());
+                .Subscribe(_ => this.OnExpressionUpdate());
 
             this.Disposables.Add(booleanExpressionsListener);
         }
@@ -160,9 +188,10 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Updates the <see cref="StringExpression"/> to display when a <see cref="BooleanExpression"/> contained by this <see cref="ParametricConstraint"/ changes.
         /// </summary>
-        private void UpdateStringExpression()
+        private void OnExpressionUpdate()
         {
             this.StringExpression = this.ContainedRows.OfType<IRowViewModelBase<BooleanExpression>>().ToExpressionString(this.Thing);
+            this.RequirementStateOfCompliance = RequirementStateOfCompliance.Unknown;
         }
 
         /// <summary>

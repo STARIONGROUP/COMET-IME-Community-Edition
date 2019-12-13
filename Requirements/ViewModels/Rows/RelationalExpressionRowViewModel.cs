@@ -6,6 +6,9 @@
 
 namespace CDP4Requirements.ViewModels
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -19,11 +22,21 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using CDP4Requirements.Events;
+    using CDP4Requirements.ViewModels.RequirementBrowser;
+
+    using ReactiveUI;
+
     /// <summary>
     /// the row-view-model representing a <see cref="RelationalExpression"/>
     /// </summary>
-    public class RelationalExpressionRowViewModel : CDP4CommonView.RelationalExpressionRowViewModel, IDropTarget
+    public class RelationalExpressionRowViewModel : CDP4CommonView.RelationalExpressionRowViewModel, IDropTarget, IHaveWritableRequirementStateOfCompliance
     {
+        /// <summary>
+        /// Backing field for <see cref="RelationalExpressionRowViewModel.RequirementStateOfCompliance"/>
+        /// </summary>
+        private RequirementStateOfCompliance requirementStateOfCompliance;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationalExpressionRowViewModel"/> class
         /// </summary>
@@ -33,6 +46,58 @@ namespace CDP4Requirements.ViewModels
         public RelationalExpressionRowViewModel(RelationalExpression notExpression, ISession session, IViewModelBase<Thing> containerViewModel) : base(notExpression, session, containerViewModel)
         {
             this.UpdateProperties();
+            this.AddSubscriptions();
+        }
+
+        private static System.Timers.Timer concurrentQueueTimer = new System.Timers.Timer(500);
+        private static ConcurrentQueue<Action> concurrentQueue = new ConcurrentQueue<Action>();
+        private static bool initialized;
+
+        /// <summary>
+        /// Adds subscriptions to diffent types of events
+        /// </summary>
+        private void AddSubscriptions()
+        {
+            if (!initialized)
+            {
+                initialized = true;
+                concurrentQueueTimer.Elapsed += this.ConcurrentQueueTimer_Elapsed;
+                concurrentQueueTimer.Start();
+            }
+
+            var requirementVerifierListener = CDPMessageBus.Current.Listen<RequirementStateOfComplianceChangedEvent>(this.Thing)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(
+                    x =>
+                    {
+                        if (x.RequirementStateOfCompliance == RequirementStateOfCompliance.Calculating)
+                        {
+                            this.RequirementStateOfCompliance = x.RequirementStateOfCompliance;
+                        }
+                        else
+                        {
+                            concurrentQueue.Enqueue(() => { this.RequirementStateOfCompliance = x.RequirementStateOfCompliance; });
+                        }
+                    });
+
+            this.Disposables.Add(requirementVerifierListener);
+        }
+
+        private void ConcurrentQueueTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (concurrentQueue.TryDequeue(out var action))
+            {
+                action.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the ParametricConstraintsVerifier
+        /// </summary>
+        public RequirementStateOfCompliance RequirementStateOfCompliance
+        {
+            get => this.requirementStateOfCompliance;
+            set => this.RaiseAndSetIfChanged(ref this.requirementStateOfCompliance, value);
         }
 
         /// <summary>
@@ -111,6 +176,7 @@ namespace CDP4Requirements.ViewModels
         private void UpdateProperties()
         {
             this.UpdateThingStatus();
+            this.RequirementStateOfCompliance = RequirementStateOfCompliance.Unknown;
         }
 
         /// <summary>

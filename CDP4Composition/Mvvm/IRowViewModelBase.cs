@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IRowViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ namespace CDP4Composition.Mvvm
     /// The interface for the row-view-model
     /// </summary>
     /// <typeparam name="T">The <see cref="Thing"/> represented by the row</typeparam>
-    public interface IRowViewModelBase<out T> : IViewModelBase<T>, IDragSource, IDataErrorInfo where T : Thing
+    public interface IRowViewModelBase<out T> : IViewModelBase<T>, IDragSource, IDataErrorInfo, IHaveContainerViewModel where T : Thing
     {
         /// <summary>
         /// Gets or sets the index of the row

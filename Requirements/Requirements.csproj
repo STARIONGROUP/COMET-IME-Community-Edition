@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CDP4Requirements</RootNamespace>
-    <AssemblyName>CDP4Requirements</AssemblyName>
+    <AssemblyName>CDP4RequirementsPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -54,17 +54,20 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.4.0.0\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.4.0.1-2019.12.13.2\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.5.1.0\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=5.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.5.1.1-2019.12.13.2\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.4.0.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.4.0.1-2019.12.13.2\lib\net452\CDP4JsonSerializer.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="CDP4Requirements, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Requirements-CE.0.0.1-2019.12.13.2\lib\net452\CDP4Requirements.dll</HintPath>
     </Reference>
     <Reference Include="DevExpress.Data.v15.2, Version=15.2.19.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
@@ -261,6 +264,8 @@
     <Compile Include="Assemblers\HeaderArrayAssembler.cs" />
     <Compile Include="Assemblers\RequirementArrayAssembler.cs" />
     <Compile Include="Converters\BinaryRulesListToObjectListConverter.cs" />
+    <Compile Include="Converters\RequirementStateOfComplianceToVisibilityConverter.cs" />
+    <Compile Include="Converters\RequirementStateOfComplianceColorConverter.cs" />
     <Compile Include="Converters\RulesListToObjectListConverter.cs" />
     <Compile Include="Converters\CategoryViewModelListToObjectListConverter.cs" />
     <Compile Include="Converters\ReactiveBooleanExpressionToObjectListConverter.cs" />
@@ -279,8 +284,10 @@
     <Compile Include="ViewModels\Dialogs\RequirementsContainerParameterValueRowViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SimpleParameterValueRowViewModel.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Comparers\RequirementsSpecificationComparer.cs" />
+    <Compile Include="ViewModels\RequirementBrowser\IHaveWritableRequirementStateOfCompliance.cs" />
     <Compile Include="ViewModels\RequirementBrowser\IRequirementBrowserDisplaySettings.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Rows\BinaryRelationshipRowViewModel.cs" />
+    <Compile Include="ViewModels\RequirementBrowser\Rows\ParametricConstraintsFolderRowViewModel.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Rows\RelationshipParameterValueRowViewModel.cs" />
     <Compile Include="ViewModels\RequirementBrowser\Rows\RequirementsContainerParameterValueRowViewModel.cs" />
     <Compile Include="ViewModels\ReqIF\DialogResults\RelationshipGroupMappingDialogResult.cs" />
@@ -451,6 +458,9 @@
     <Compile Include="Views\RequirementsSpecificationEditor.xaml.cs">
       <DependentUpon>RequirementsSpecificationEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\UserControls\LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
@@ -579,6 +589,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\RequirementsSpecificationEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\LoadingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

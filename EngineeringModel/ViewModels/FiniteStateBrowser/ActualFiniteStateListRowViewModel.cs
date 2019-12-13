@@ -12,6 +12,8 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Reactive.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.ExtensionMethods;
     using CDP4Composition.Mvvm;
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -92,7 +94,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void PopulateFiniteState()
         {
-            this.ContainedRows.Clear();
+            this.ContainedRows.DisposeAndClear();
             foreach (var state in this.GetOrderedActualFiniteStates())
             {
                 var row = new ActualFiniteStateRowViewModel(state, this.Session, this) { IsDefault = state.IsDefault };

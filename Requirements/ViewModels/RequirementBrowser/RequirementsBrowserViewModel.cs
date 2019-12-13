@@ -32,7 +32,9 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Operations;
 
     using CDP4Requirements.Comparers;
+    using CDP4Requirements.Events;
     using CDP4Requirements.Utils;
+    using CDP4Requirements.Verifiers;
     using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
 
@@ -74,6 +76,11 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="CanCreateRequirementGroup"/>
         /// </summary>
         private bool canCreateRequirementGroup;
+
+        /// <summary>
+        /// Backing field for <see cref="CanVerifyRequirements"/>
+        /// </summary>
+        private bool canVerifyRequirements = true;
 
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -136,6 +143,7 @@ namespace CDP4Requirements.ViewModels
             this.openRequirementsSpecificationEditorViewModels = new List<RequirementsSpecificationEditorViewModel>();
         }
 
+
         /// <summary>
         /// Gets the active <see cref="Participant"/>
         /// </summary>
@@ -185,6 +193,11 @@ namespace CDP4Requirements.ViewModels
         public ReactiveCommand<object> CreateRequirementGroupCommand { get; private set; }
 
         /// <summary>
+        /// Gets the Verify Requirement command
+        /// </summary>
+        public ReactiveCommand<object> VerifyRequirementsCommand { get; private set; }
+
+        /// <summary>
         /// Gets the Navigate To <see cref="RequirementsSpecification"/> Editor Command
         /// </summary>
         public ReactiveCommand<object> NavigateToRequirementsSpecificationEditorCommand { get; private set; }
@@ -223,6 +236,15 @@ namespace CDP4Requirements.ViewModels
         {
             get => this.canCreateRequirementGroup;
             private set => this.RaiseAndSetIfChanged(ref this.canCreateRequirementGroup, value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the VerifyRequirements command can be executed
+        /// </summary>
+        public bool CanVerifyRequirements
+        {
+            get => this.canVerifyRequirements;
+            private set => this.RaiseAndSetIfChanged(ref this.canVerifyRequirements, value);
         }
 
         /// <summary>
@@ -472,6 +494,9 @@ namespace CDP4Requirements.ViewModels
             this.CreateRequirementCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirementGroup));
             this.CreateRequirementCommand.Subscribe(_ => this.ExecuteCreateRequirement());
 
+            this.VerifyRequirementsCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanVerifyRequirements));
+            this.VerifyRequirementsCommand.Subscribe(_ => this.ExecuteVerifyRequirements());
+
             this.NavigateToRequirementsSpecificationEditorCommand = ReactiveCommand.Create();
             this.NavigateToRequirementsSpecificationEditorCommand.Subscribe(_ => this.ExecuteNavigateToRequirementsSpecificationEditor());
         }
@@ -485,6 +510,7 @@ namespace CDP4Requirements.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateRequirementSpecificationsRows();
             this.UpdateProperties();
+            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Unknown));
         }
 
         /// <summary>
@@ -588,6 +614,7 @@ namespace CDP4Requirements.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Verify Requirements", "", this.VerifyRequirementsCommand, MenuItemKind.Refresh, ClassKind.Requirement));
         }
 
         /// <summary>
@@ -599,6 +626,34 @@ namespace CDP4Requirements.ViewModels
             if (obj is BinaryRelationship binaryRelationship)
             {
                 this.ExecuteDeleteCommand(binaryRelationship);
+            }
+        }
+
+        /// <summary>
+        /// Updates requirement verification for all <see cref="RequirementsSpecification"/>s contained in this RequirementBrowser
+        /// </summary>
+        private async void ExecuteVerifyRequirements()
+        {
+            if (this.CanVerifyRequirements)
+            {
+                try
+                {
+                    this.CanVerifyRequirements = false;
+                    var iteration = this.Thing;
+                    var tasks = new List<Task>();
+
+                    foreach (var requirementsSpecification in this.ReqSpecificationRows.Select(x => x.Thing).OfType<RequirementsSpecification>().ToList())
+                    {
+                        var requirementVerifier = new RequirementsContainerVerifier(requirementsSpecification);
+                        tasks.Add(requirementVerifier.VerifyRequirements(iteration));
+                    }
+
+                    await Task.WhenAll(tasks.ToArray());
+                }
+                finally
+                {
+                    this.CanVerifyRequirements = true;
+                }
             }
         }
 
