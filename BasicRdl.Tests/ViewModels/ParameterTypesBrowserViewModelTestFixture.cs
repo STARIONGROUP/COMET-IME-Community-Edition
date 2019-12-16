@@ -15,6 +15,7 @@ namespace BasicRdl.Tests.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services.FavoritesService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
@@ -33,6 +34,7 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<ISession> session;
 
         private Mock<IPermissionService> permissionService;
+        private Mock<IFavoritesService> favoritesService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> dialogNavigationService;
 
@@ -57,25 +59,35 @@ namespace BasicRdl.Tests.ViewModels
 
         [SetUp]
         public void Setup()
-        {            
+        {
             this.session = new Mock<ISession>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IThingDialogNavigationService>();
 
             this.permissionService = new Mock<IPermissionService>();
+
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.favoritesService = new Mock<IFavoritesService>();
+            this.favoritesService.Setup(x => x.GetFavoriteItemsCollectionByType(It.IsAny<ISession>(), It.IsAny<Type>()))
+                .Returns(new HashSet<Guid>());
+            this.favoritesService.Setup(x =>
+                x.SubscribeToChanges(It.IsAny<ISession>(), It.IsAny<Type>(), It.IsAny<Action<HashSet<Guid>>>())).Returns(new Mock<IDisposable>().Object);
             this.uri = new Uri("http://test.com");
             this.assembler = new Assembler(this.uri);
 
-            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
-            this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
+            this.siteDirectory =
+                new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "site directory"};
+            this.person =
+                new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) {GivenName = "John", Surname = "Doe"};
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.ParameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigationService.Object, this.panelNavigationService.Object, null, null, null);
+            this.ParameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(this.session.Object,
+                this.siteDirectory, this.dialogNavigationService.Object, this.panelNavigationService.Object, null, null,
+                this.favoritesService.Object);
         }
 
         [TearDown]
@@ -99,7 +111,7 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyThatParameterTypeEventsAreCaught()
         {
             var textParamType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
- 
+
             CDPMessageBus.Current.SendObjectChangeEvent(textParamType, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             CDPMessageBus.Current.SendObjectChangeEvent(textParamType, EventKind.Removed);
@@ -112,19 +124,25 @@ namespace BasicRdl.Tests.ViewModels
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
             var defaultScale = new CyclicRatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale };
+            var simpleQuantityKind =
+                new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) {DefaultScale = defaultScale};
             CDPMessageBus.Current.SendObjectChangeEvent(simpleQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             CDPMessageBus.Current.SendObjectChangeEvent(simpleQuantityKind, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
-            var specializedQuantityKind = new SpecializedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale };
+            var specializedQuantityKind =
+                new SpecializedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    DefaultScale = defaultScale
+                };
             CDPMessageBus.Current.SendObjectChangeEvent(specializedQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             CDPMessageBus.Current.SendObjectChangeEvent(specializedQuantityKind, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
-            var derivedQuantityKind = new DerivedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale };
+            var derivedQuantityKind =
+                new DerivedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) {DefaultScale = defaultScale};
             CDPMessageBus.Current.SendObjectChangeEvent(derivedQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             CDPMessageBus.Current.SendObjectChangeEvent(derivedQuantityKind, EventKind.Removed);
@@ -149,9 +167,14 @@ namespace BasicRdl.Tests.ViewModels
             modelReferenceDataLibrary.ParameterType.Add(pt4);
             engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
             this.siteDirectory.Model.Add(engineeringModelSetup);
-            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary) { modelReferenceDataLibrary });     
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(
+                new HashSet<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary)
+                {
+                    modelReferenceDataLibrary
+                });
 
-            var browser = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null, null);
+            var browser = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null,
+                null, this.favoritesService.Object);
             Assert.AreEqual(4, browser.ParameterTypes.Count);
             Assert.IsNotNull(browser.ParameterTypes.First().Thing);
 
@@ -162,13 +185,24 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyThatRdlShortnameIsUpdated()
         {
-            var vm = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null, null);
+            var vm = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null,
+                this.favoritesService.Object);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;
 
-            var cat = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
-            var cat2 = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
+            var cat = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Name = "cat1",
+                ShortName = "1",
+                Container = sRdl
+            };
+            var cat2 = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Name = "cat2",
+                ShortName = "2",
+                Container = sRdl
+            };
 
             CDPMessageBus.Current.SendObjectChangeEvent(cat, EventKind.Added);
             CDPMessageBus.Current.SendObjectChangeEvent(cat2, EventKind.Added);

@@ -87,8 +87,6 @@ namespace BasicRdl.ViewModels
             this.RefreshFavorites(
                 this.favoritesService.GetFavoriteItemsCollectionByType(this.Session, typeof(ParameterType)));
 
-            this.WhenAnyValue(vm => vm.ShowOnlyFavorites).Subscribe(_ => this.ExecuteToggleShowFavoriteCommand());
-
             this.AddSubscriptions();
         }
 
@@ -188,6 +186,9 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
+            var favoritesToggleListener = this.WhenAnyValue(vm => vm.ShowOnlyFavorites).Subscribe(_ => this.ExecuteToggleShowFavoriteCommand());
+            this.Disposables.Add(favoritesToggleListener);
+
             var addListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType))
                     .Where(objectChange => objectChange.EventKind == EventKind.Added &&
