@@ -358,7 +358,7 @@ namespace CDP4Requirements.ViewModels
 
                 if (orderPt != null)
                 {
-                    var orderListener = Observable.Where(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue)), objectChange => (((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType == orderPt) && spec.ParameterValue.Contains(objectChange.ChangedThing))
+                    var orderListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue)).Where(objectChange => (((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType == orderPt) && spec.ParameterValue.Contains(objectChange.ChangedThing))
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(x => this.UpdateSpecRowPosition((RequirementsSpecification)x.ChangedThing.Container));
 
@@ -451,7 +451,7 @@ namespace CDP4Requirements.ViewModels
             }
             else
             {
-                this.DomainOfExpertise = (iterationDomainPair.Value == null) || (iterationDomainPair.Value.Item1 == null)
+                this.DomainOfExpertise = iterationDomainPair.Value?.Item1 == null
                     ? "None"
                     : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
             }
@@ -642,7 +642,7 @@ namespace CDP4Requirements.ViewModels
                     var iteration = this.Thing;
                     var tasks = new List<Task>();
 
-                    foreach (var requirementsSpecification in this.ReqSpecificationRows.Select(x => x.Thing).OfType<RequirementsSpecification>().ToList())
+                    foreach (var requirementsSpecification in this.ReqSpecificationRows.Select(x => x.Thing).OfType<RequirementsSpecification>().Where(x => !x.IsDeprecated))
                     {
                         var requirementVerifier = new RequirementsContainerVerifier(requirementsSpecification);
                         tasks.Add(requirementVerifier.VerifyRequirements(iteration));
