@@ -6,11 +6,14 @@
 
 namespace CDP4SiteDirectory.ViewModels.OrganizationBrowser
 {
+    using System;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4CommonView;
     using CDP4Composition.Mvvm;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using ReactiveUI;
 
     /// <summary>
     /// Represents a <see cref="Person"/> object that is contained in a <see cref="SiteDirectory"/>
@@ -45,6 +48,22 @@ namespace CDP4SiteDirectory.ViewModels.OrganizationBrowser
         }
 
         /// <summary>
+        /// Initializes the subscriptions
+        /// </summary>
+        protected override void InitializeSubscriptions()
+        {
+            base.InitializeSubscriptions();
+
+            if (this.ContainerViewModel is OrganizationRowViewModel deprecatable)
+            {
+                var containerIsDeprecatedSubscription = deprecatable.WhenAnyValue(vm => vm.IsDeprecated)
+                    .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRowViewModel());
+
+                this.Disposables.Add(containerIsDeprecatedSubscription);
+            }
+        }
+
+        /// <summary>
         /// Update the properties of this row
         /// </summary>
         private void UpdateProperties()
@@ -58,6 +77,19 @@ namespace CDP4SiteDirectory.ViewModels.OrganizationBrowser
             {
                 this.RoleName = string.Empty;
                 this.RoleShortName = string.Empty;
+            }
+
+            this.UpdateIsDeprecatedDerivedFromContainerRowViewModel();
+        }
+
+        /// <summary>
+        /// Updates the IsDeprecated property based on the value of the container <see cref="OrganizationRowViewModel"/>
+        /// </summary>
+        private void UpdateIsDeprecatedDerivedFromContainerRowViewModel()
+        {
+            if (this.ContainerViewModel is OrganizationRowViewModel deprecatable)
+            {
+                this.IsDeprecated = deprecatable.IsDeprecated;
             }
         }
     }

@@ -6,9 +6,9 @@
 
 namespace CDP4SiteDirectory.ViewModels
 {
+    using System;
     using System.Linq;
     using System.Reactive.Linq;
-
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
@@ -23,6 +23,7 @@ namespace CDP4SiteDirectory.ViewModels
     public class ParticipantRowViewModel : CDP4CommonView.ParticipantRowViewModel
     {
         #region Fields
+
         /// <summary>
         /// Out property for the <see cref="DomainShortnames"/> property
         /// </summary>
@@ -47,6 +48,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// Backing field for <see cref="Domains"/>
         /// </summary>
         private ReactiveList<DomainOfExpertise> domains;
+
+        /// <summary>
+        /// Backing field for <see cref="IsDeprecated"/> property.
+        /// </summary>
+        private bool isDeprecated;
+
         #endregion
 
         /// <summary>
@@ -59,20 +66,30 @@ namespace CDP4SiteDirectory.ViewModels
         /// The session.
         /// </param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
-        public ParticipantRowViewModel(Participant participant, ISession session, IViewModelBase<Thing> containerViewModel)
+        public ParticipantRowViewModel(Participant participant, ISession session,
+            IViewModelBase<Thing> containerViewModel)
             : base(participant, session, containerViewModel)
         {
             this.Domains = new ReactiveList<DomainOfExpertise>();
             this.Domains.ChangeTrackingEnabled = true;
 
             this.WhenAnyValue(row => row.Domains)
-                .Select(domains => domains.Aggregate(string.Empty, (current, domainOfExpertise) => string.Format("{0} {1}", current, domainOfExpertise.ShortName)))
+                .Select(domains => domains.Aggregate(string.Empty,
+                    (current, domainOfExpertise) => string.Format("{0} {1}", current, domainOfExpertise.ShortName)))
                 .ToProperty(this, row => row.DomainShortnames, out this.domainShortnames);
 
             this.WhenAnyValue(row => row.EngineeringModelSetup)
                 .Where(x => x != null)
                 .Select(modelSetup => modelSetup.Name)
                 .ToProperty(this, row => row.ModelName, out this.modelName);
+
+            if (this.ContainerViewModel is PersonRowViewModel deprecatable)
+            {
+                var containerIsDeprecatedSubscription = deprecatable.WhenAnyValue(vm => vm.IsDeprecated)
+                    .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRowViewModel());
+
+                this.Disposables.Add(containerIsDeprecatedSubscription);
+            }
 
             this.UpdateProperties();
         }
@@ -98,24 +115,26 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public ReactiveList<DomainOfExpertise> Domains
         {
-            get { return this.domains; } 
+            get { return this.domains; }
             private set { this.RaiseAndSetIfChanged(ref this.domains, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the IsDeprecated
+        /// </summary>
+        public bool IsDeprecated
+        {
+            get { return this.isDeprecated; }
+            set { this.RaiseAndSetIfChanged(ref this.isDeprecated, value); }
         }
 
         /// <summary>
         /// Gets or sets the <see cref="ParticipantRole"/>
         /// </summary>
-        public ParticipantRole ParticipantRole 
+        public ParticipantRole ParticipantRole
         {
-            get
-            {
-                return this.participantRole;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.participantRole, value);
-            } 
+            get { return this.participantRole; }
+            set { this.RaiseAndSetIfChanged(ref this.participantRole, value); }
         }
 
         /// <summary>
@@ -123,15 +142,9 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public EngineeringModelSetup EngineeringModelSetup
         {
-            get
-            {
-                return this.engineeringModelSetup;
-            }
+            get { return this.engineeringModelSetup; }
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.engineeringModelSetup, value);
-            }
+            set { this.RaiseAndSetIfChanged(ref this.engineeringModelSetup, value); }
         }
 
         /// <summary>
@@ -158,6 +171,8 @@ namespace CDP4SiteDirectory.ViewModels
                 this.RoleName = this.Role.Name;
                 this.RoleShortName = this.Role.ShortName;
             }
+
+            this.UpdateIsDeprecatedDerivedFromContainerRowViewModel();
         }
 
         /// <summary>
@@ -168,6 +183,17 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Updates the IsDeprecated property based on the value of the container <see cref="PersonRowViewModel"/>
+        /// </summary>
+        private void UpdateIsDeprecatedDerivedFromContainerRowViewModel()
+        {
+            if (this.ContainerViewModel is PersonRowViewModel deprecatable)
+            {
+                this.IsDeprecated = deprecatable.IsDeprecated;
+            }
         }
     }
 }

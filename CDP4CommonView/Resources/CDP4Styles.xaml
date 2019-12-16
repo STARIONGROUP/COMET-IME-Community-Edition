@@ -23,7 +23,47 @@
         <Setter Property="ContextMenu" Value="{x:Null}"/>
     </Style>
 
-    <Style TargetType ="{x:Type dxg:RowControl}">
+    <Style TargetType ="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecated">
+        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Row.IsDeprecated}" Value="True">
+                <Setter Property="Background" Value="LightGray"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecatedHighlightedBaseQuantityKind">
+        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=Row.IsBaseQuantityKind}" Value="True">
+                <Setter Property="FontWeight" Value="Bold" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=Row.IsDeprecated}" Value="True">
+                <Setter Property="Background" Value="LightGray" />
+                <Setter Property="Opacity" Value="0.5" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
+                <Setter Property="Background" Value="Yellow" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType ="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecatedHighlighted">
+        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Row.IsDeprecated}" Value="True">
+                <Setter Property="Background" Value="LightGray"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Row.IsHighlighted}" Value="True">
+                <Setter Property="Background" Value="Yellow"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType ="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecatedHighlightedDirty">
+        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Row.IsDeprecated}" Value="True">
                 <Setter Property="Background" Value="LightGray"/>

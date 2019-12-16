@@ -36,11 +36,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="permission">The <see cref="ParticipantPermission"/> that is represented by the current row</param>
         /// <param name="session">The session</param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
-        public ParticipantPermissionRowViewModel(ParticipantPermission permission, ISession session, IViewModelBase<Thing> containerViewModel)
+        public ParticipantPermissionRowViewModel(ParticipantPermission permission, ISession session,
+            IViewModelBase<Thing> containerViewModel)
             : base(permission, session, containerViewModel)
         {
             this.UpdatePermission();
-            this.WhenAnyValue(x => x.AccessRight).Subscribe(_ => this.ExecuteUpdatePermission());
+            this.UpdateIsDeprecatedDerivedFromContainerRowViewModel();
         }
 
         /// <summary>
@@ -48,10 +49,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public string Name
         {
-            get
-            {
-                return this.camelCaseToSpaceConverter.Convert(this.ObjectClass, null, null, null).ToString();
-            }
+            get { return this.camelCaseToSpaceConverter.Convert(this.ObjectClass, null, null, null).ToString(); }
         }
 
         /// <summary>
@@ -59,10 +57,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public ClassKind ShortName
         {
-            get
-            {
-                return this.ObjectClass;
-            }
+            get { return this.ObjectClass; }
         }
 
         /// <summary>
@@ -72,6 +67,26 @@ namespace CDP4SiteDirectory.ViewModels
         {
             get { return this.isReadOnly; }
             set { this.RaiseAndSetIfChanged(ref this.isReadOnly, value); }
+        }
+
+        /// <summary>
+        /// Initializes the subscriptions
+        /// </summary>
+        protected override void InitializeSubscriptions()
+        {
+            base.InitializeSubscriptions();
+
+            var accessSubscription =
+                this.WhenAnyValue(x => x.AccessRight).Subscribe(_ => this.ExecuteUpdatePermission());
+            this.Disposables.Add(accessSubscription);
+
+            if (this.ContainerViewModel is ParticipantRoleRowViewModel deprecatable)
+            {
+                var containerIsDeprecatedSubscription = deprecatable.WhenAnyValue(vm => vm.IsDeprecated)
+                    .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRowViewModel());
+
+                this.Disposables.Add(containerIsDeprecatedSubscription);
+            }
         }
 
         /// <summary>
@@ -96,7 +111,7 @@ namespace CDP4SiteDirectory.ViewModels
             catch (Exception ex)
             {
                 logger.Error(ex);
-            }            
+            }
         }
 
         /// <summary>
@@ -105,6 +120,17 @@ namespace CDP4SiteDirectory.ViewModels
         private void UpdatePermission()
         {
             this.IsReadOnly = !this.Session.PermissionService.CanWrite(this.Thing);
+        }
+
+        /// <summary>
+        /// Updates the IsDeprecated property based on the value of the container <see cref="PersonRoleRowViewModel"/>
+        /// </summary>
+        private void UpdateIsDeprecatedDerivedFromContainerRowViewModel()
+        {
+            if (this.ContainerViewModel is ParticipantRoleRowViewModel deprecatable)
+            {
+                this.IsDeprecated = deprecatable.IsDeprecated;
+            }
         }
     }
 }

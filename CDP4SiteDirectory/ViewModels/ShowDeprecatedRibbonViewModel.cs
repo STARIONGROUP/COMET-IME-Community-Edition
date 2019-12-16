@@ -20,7 +20,7 @@ namespace CDP4SiteDirectory.ViewModels
     /// <summary>
     /// The Team-Composition Ribbon view-model 
     /// </summary>
-    public class ShowDeprecatedBrowserRibbonViewModel : ReactiveObject
+    public class ShowDeprecatedBrowserRibbonViewModel : ReactiveObject, IDeprecatableToggleViewModel
     {
         /// <summary>
         /// Backing field for <see cref="HasSession"/>
@@ -33,23 +33,25 @@ namespace CDP4SiteDirectory.ViewModels
         private readonly ReactiveList<ISession> openSessions;
 
         /// <summary>
-        /// The deprecated filter behavior.
+        /// The backing field for <see cref="ShowDeprecatedThings"/> property.
         /// </summary>
-        private readonly FilterStringService filterStringService;
+        private bool showDeprecatedThings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShowDeprecatedBrowserRibbonViewModel"/> class
         /// </summary>
         public ShowDeprecatedBrowserRibbonViewModel()
         {
-            this.filterStringService = FilterStringService.FilterString;
             this.openSessions = new ReactiveList<ISession> { ChangeTrackingEnabled = true };
             this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            this.ShowHideDeprecatedThingsCommand = ReactiveCommand.Create();
-            this.ShowHideDeprecatedThingsCommand.Subscribe(_ => this.ExecuteShowHideDeprecatedThingsCommand());
+            // register this viewmodel as the toggle control for the visiility of deprecatable things
+            FilterStringService.FilterString.RegisterDeprecatableToggleViewModel(this);
+
+            this.WhenAnyValue(vm => vm.ShowDeprecatedThings)
+                .Subscribe(_ => this.RefreshAndSendShowDeprecatedThingsEvent());
         }
 
         /// <summary>
@@ -61,9 +63,13 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> to open the <see cref="EngineeringModelSetupSelectionDialogViewModel"/>
+        /// Gets or sets a value indicating whether to display deprecated items.
         /// </summary>
-        public ReactiveCommand<object> ShowHideDeprecatedThingsCommand { get; private set; }
+        public bool ShowDeprecatedThings
+        {
+            get { return this.showDeprecatedThings; }
+            set { this.RaiseAndSetIfChanged(ref this.showDeprecatedThings, value); }
+        }
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
@@ -93,12 +99,12 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
-        /// Executes the <see cref="ShowHideDeprecatedThingsCommand"/> to show or hide <see cref="IDeprecatableThing"/>s
+        /// Sends the show deprecated things event and refreshes the controls registered to the <see cref="FilterStringService"/>.
         /// </summary>
-        private void ExecuteShowHideDeprecatedThingsCommand()
+        private void RefreshAndSendShowDeprecatedThingsEvent()
         {
-            this.filterStringService.ToggleIsFilterActive();
-            CDPMessageBus.Current.SendMessage(new ToggleDeprecatedThingEvent(!this.filterStringService.IsFilterActive));
+            FilterStringService.FilterString.RefreshDeprecatableFilterAll();
+            CDPMessageBus.Current.SendMessage(new ToggleDeprecatedThingEvent(this.ShowDeprecatedThings));
         }
     }
 }

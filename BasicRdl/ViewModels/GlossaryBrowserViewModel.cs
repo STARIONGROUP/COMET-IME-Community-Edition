@@ -27,7 +27,8 @@ namespace BasicRdl.ViewModels
     /// The <see cref="GlossaryBrowserViewModel"/> is a View Model that is responsible for managing the data and interactions with that data for a view
     /// that shows all the <see cref="Glossary"/>s contained by a data-source following the containment tree that is modeled in 10-25 and the CDP4 extensions.
     /// </summary>
-    public class GlossaryBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget
+    public class GlossaryBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget,
+        IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The NLog logger
@@ -60,11 +61,15 @@ namespace BasicRdl.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public GlossaryBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public GlossaryBrowserViewModel(ISession session, SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
+                this.Session.ActivePerson.Name);
 
             this.AddSubscriptions();
         }
@@ -109,7 +114,8 @@ namespace BasicRdl.ViewModels
         {
             var addListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Glossary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Glossary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.AddGlossaryRowViewModel);
@@ -117,7 +123,8 @@ namespace BasicRdl.ViewModels
 
             var removeListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Glossary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Glossary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RemoveGlossaryRowViewModel);
@@ -125,7 +132,8 @@ namespace BasicRdl.ViewModels
 
             var rdlUpdateListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);
@@ -192,7 +200,8 @@ namespace BasicRdl.ViewModels
             this.Glossaries = new ReactiveList<GlossaryRowViewModel>();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
-            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
+            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
+                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var glossary in referenceDataLibrary.Glossary)
                 {
@@ -208,8 +217,10 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateTermCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateTerm));           
-            this.CreateTermCommand.Subscribe(_ => this.ExecuteCreateCommand<Term>(this.SelectedThing.Thing as Glossary ?? this.SelectedThing.Thing.GetContainerOfType<Glossary>()));
+            this.CreateTermCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateTerm));
+            this.CreateTermCommand.Subscribe(_ =>
+                this.ExecuteCreateCommand<Term>(this.SelectedThing.Thing as Glossary ??
+                                                this.SelectedThing.Thing.GetContainerOfType<Glossary>()));
 
             this.CreateGlossaryCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateGlossary));
             this.CreateGlossaryCommand.Subscribe(_ => this.ExecuteCreateCommand<Glossary>());
@@ -220,7 +231,8 @@ namespace BasicRdl.ViewModels
         /// </summary>
         protected override void ExecuteExportCommand()
         {
-            var dialogViewModel = new HtmlExportGlossarySelectionDialogViewModel(this.Glossaries.Select(grvm => grvm.Thing).ToList());
+            var dialogViewModel =
+                new HtmlExportGlossarySelectionDialogViewModel(this.Glossaries.Select(grvm => grvm.Thing).ToList());
             this.DialogNavigationService.NavigateModal(dialogViewModel);
         }
 
@@ -237,7 +249,8 @@ namespace BasicRdl.ViewModels
                 return;
             }
 
-            this.CanCreateTerm = this.PermissionService.CanWrite(ClassKind.Term, this.SelectedThing.Thing as Glossary ?? this.SelectedThing.Thing.GetContainerOfType<Glossary>());
+            this.CanCreateTerm = this.PermissionService.CanWrite(ClassKind.Term,
+                this.SelectedThing.Thing as Glossary ?? this.SelectedThing.Thing.GetContainerOfType<Glossary>());
         }
 
         /// <summary>
@@ -246,14 +259,16 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Glossary", "", this.CreateGlossaryCommand, MenuItemKind.Create, ClassKind.Glossary));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Glossary", "", this.CreateGlossaryCommand,
+                MenuItemKind.Create, ClassKind.Glossary));
 
             if (this.SelectedThing == null)
             {
                 return;
             }
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Term", "", this.CreateTermCommand, MenuItemKind.Create, ClassKind.Term));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Term", "", this.CreateTermCommand,
+                MenuItemKind.Create, ClassKind.Term));
         }
 
         /// <summary>

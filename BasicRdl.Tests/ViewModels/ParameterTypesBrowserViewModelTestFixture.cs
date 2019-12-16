@@ -75,7 +75,7 @@ namespace BasicRdl.Tests.ViewModels
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.ParameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            this.ParameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigationService.Object, this.panelNavigationService.Object, null, null, null);
         }
 
         [TearDown]
@@ -151,7 +151,7 @@ namespace BasicRdl.Tests.ViewModels
             this.siteDirectory.Model.Add(engineeringModelSetup);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary) { modelReferenceDataLibrary });     
 
-            var browser = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
+            var browser = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null, null);
             Assert.AreEqual(4, browser.ParameterTypes.Count);
             Assert.IsNotNull(browser.ParameterTypes.First().Thing);
 
@@ -162,7 +162,7 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyThatRdlShortnameIsUpdated()
         {
-            var vm = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
+            var vm = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;

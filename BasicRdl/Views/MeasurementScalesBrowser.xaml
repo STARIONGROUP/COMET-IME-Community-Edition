@@ -60,7 +60,7 @@
                                AllowColumnMoving="True"
                                ShowFilterPanelMode="Never"
                                AllowEditing="False"
-                               ShowSearchPanelMode="Always"
+                               ShowSearchPanelMode="Default"
                                AllowGrouping="True"
                                AutoWidth="true"
                                IsDetailButtonVisibleBinding="{x:Null}"
@@ -107,10 +107,10 @@
 
                 <dxg:GridColumn FieldName="Name" SortMode="Value" SortIndex="0" Header="Name" />
                 <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
-                <dxg:GridColumn FieldName="ClassKind" GroupIndex="1" Header="Type" />
+                <dxg:GridColumn FieldName="ClassKind" Header="Type" />
                 <dxg:GridColumn FieldName="NumberSet" Header="Number Set" />
                 <dxg:GridColumn FieldName="MeasurementUnit" Header="Unit" />
-                <dxg:GridColumn FieldName="ContainerRdl" GroupIndex="0" Header="Container RDL" />
+                <dxg:GridColumn FieldName="ContainerRdl" Header="Container RDL" />
             </dxg:GridControl.Columns>
             <dxg:GridControl.InputBindings>
                 <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>

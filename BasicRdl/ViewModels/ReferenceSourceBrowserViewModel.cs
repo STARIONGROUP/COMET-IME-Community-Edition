@@ -27,7 +27,7 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// The purpose of the <see cref="ReferenceSourceBrowserViewModel"/> is to represent the view-model for <see cref="ReferenceSource"/>s
     /// </summary>
-    public class ReferenceSourceBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget
+    public class ReferenceSourceBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The NLog logger
@@ -236,7 +236,7 @@ namespace BasicRdl.ViewModels
         ///  Information about the drag operation.
         /// </param>
         /// <remarks>
-        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on
         /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
         /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
         /// </remarks>

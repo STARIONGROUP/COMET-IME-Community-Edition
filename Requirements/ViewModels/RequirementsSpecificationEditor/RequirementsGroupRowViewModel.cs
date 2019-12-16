@@ -63,6 +63,14 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         }
 
         /// <summary>
+        /// Gets the supporting row property needed for deprecatable browsers.
+        /// </summary>
+        public bool IsDeprecated
+        {
+            get { return false; }
+        }
+
+        /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
         /// </summary>

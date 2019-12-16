@@ -26,7 +26,7 @@ namespace CDP4Requirements.ViewModels
     /// <summary>
     /// the row-view-model representing a <see cref="AndExpression"/>
     /// </summary>
-    public class AndExpressionRowViewModel : CDP4CommonView.AndExpressionRowViewModel
+    public class AndExpressionRowViewModel : CDP4CommonView.AndExpressionRowViewModel, IDeprecatableThing
     {
         /// <summary>
         /// Backing field for <see cref="StringExpression"/>
@@ -98,6 +98,7 @@ namespace CDP4Requirements.ViewModels
             }
 
             this.UpdateStringExpression();
+            this.UpdateIsDeprecatedDerivedFromContainerRowViewModel();
         }
 
         /// <summary>
@@ -137,6 +138,14 @@ namespace CDP4Requirements.ViewModels
                 .Subscribe(_ => this.UpdateStringExpression());
 
             this.Disposables.Add(booleanExpressionsListener);
+
+            if (this.ContainerViewModel is IDeprecatableThing deprecatable)
+            {
+                var containerIsDeprecatedSubscription = deprecatable.WhenAnyValue(vm => vm.IsDeprecated)
+                    .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRowViewModel());
+
+                this.Disposables.Add(containerIsDeprecatedSubscription);
+            }
         }
 
         /// <summary>
@@ -145,6 +154,17 @@ namespace CDP4Requirements.ViewModels
         private void UpdateStringExpression()
         {
             this.StringExpression = this.ContainedRows.OfType<IRowViewModelBase<BooleanExpression>>().ToExpressionString(this.Thing);
+        }
+
+        /// <summary>
+        /// Updates the IsDeprecated property based on the value of the container <see cref="RequirementRowViewModel"/>
+        /// </summary>
+        private void UpdateIsDeprecatedDerivedFromContainerRowViewModel()
+        {
+            if (this.ContainerViewModel is IDeprecatableThing deprecatable)
+            {
+                this.IsDeprecated = deprecatable.IsDeprecated;
+            }
         }
 
         /// <summary>

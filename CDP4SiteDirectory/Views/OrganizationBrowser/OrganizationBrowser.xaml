@@ -91,7 +91,7 @@
                 <dragDrop:FrameworkElementDragBehavior />
             </i:Interaction.Behaviors>
             <dxg:TreeListControl.Columns>
-                <dxg:TreeListColumn FieldName="Name" Header="Name" />
+                <dxg:TreeListColumn FieldName="Name" Header="Name" SortIndex="0"/>
                 <dxg:TreeListColumn FieldName="ShortName" Header="Short Name" />
                 <dxg:TreeListColumn FieldName="RoleName" Header="Role" />
                 <dxg:TreeListColumn FieldName="DefaultEmailAddressValue" Header="Default Email" />
@@ -106,7 +106,9 @@
                                   ShowHorizontalLines="False"
                                   ShowIndicator="False"
                                   ShowNodeImages="False"
+                                  RowStyle="{StaticResource RowStyleDeprecated}"
                                   ShowVerticalLines="False"
+                                  FilterMode="Smart"
                                   ShowFilterPanelMode="Never"
                                   TreeDerivationMode="HierarchicalDataTemplate"
                                   TreeLineStyle="Solid"
@@ -114,11 +116,7 @@
                     <dxg:TreeListView.ContextMenu>
                         <ContextMenu Name="RowContextMenu" />
                     </dxg:TreeListView.ContextMenu>
-                    <dxg:TreeListView.RowStyle>
-                        <Style TargetType="{x:Type dxg:RowControl}">
-                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
-                        </Style>
-                    </dxg:TreeListView.RowStyle>
+                    
                 </dxg:TreeListView>
             </dxg:TreeListControl.View>
             <dxg:TreeListControl.InputBindings>

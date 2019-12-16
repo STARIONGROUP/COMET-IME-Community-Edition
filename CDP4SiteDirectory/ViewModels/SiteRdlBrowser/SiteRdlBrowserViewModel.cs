@@ -18,11 +18,12 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
-    
+
     /// <summary>
     /// The view-model for the <see cref="SiteRdlBrowserViewModel"/>
     /// </summary>
-    public class SiteRdlBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class SiteRdlBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
+        IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// Backing field for <see cref="CanCreateSiteRdl"/>
@@ -49,12 +50,15 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-
-        public SiteRdlBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public SiteRdlBrowserViewModel(ISession session, SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
+                this.Session.ActivePerson.Name);
 
             this.SiteRdls = new ReactiveList<SiteRdlRowViewModel>();
             this.ComputeSiteRdlRows();
@@ -115,7 +119,8 @@ namespace CDP4SiteDirectory.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Site Rdl", "", this.CreateCommand, MenuItemKind.Create, ClassKind.SiteReferenceDataLibrary));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Site Rdl", "", this.CreateCommand,
+                MenuItemKind.Create, ClassKind.SiteReferenceDataLibrary));
         }
 
         /// <summary>

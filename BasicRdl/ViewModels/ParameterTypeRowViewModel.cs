@@ -155,9 +155,17 @@ namespace BasicRdl.ViewModels
             this.ContainerRdl = container == null ? string.Empty : container.ShortName;
             var quantityKind = this.Thing as QuantityKind;
             this.IsBaseQuantityKind = container != null && (quantityKind != null && container.BaseQuantityKind.Contains(quantityKind));
+            
+            this.UpdateThingStatus();
+        }
 
-            // random favorites
-            this.IsFavorite = new Random().Next(100) <= 30;
+        /// <summary>
+        /// Set the favorite status of the row.
+        /// </summary>
+        /// <param name="status">True if should be marked as favorite.</param>
+        public void SetFavoriteStatus(bool status)
+        {
+            this.IsFavorite = status;
             this.UpdateThingStatus();
         }
 
@@ -230,9 +238,7 @@ namespace BasicRdl.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-
         
-
         /// <summary>
         /// Queries whether a drag can be started
         /// </summary>
@@ -245,8 +251,7 @@ namespace BasicRdl.ViewModels
         /// </remarks>
         public override void StartDrag(IDragInfo dragInfo)
         {
-            var quantityKind = this.Thing as QuantityKind;
-            var scale = quantityKind != null ? quantityKind.DefaultScale : null;
+            var scale = this.Thing is QuantityKind quantityKind ? quantityKind.DefaultScale : null;
 
             var payload = new Tuple<ParameterType, MeasurementScale>(this.Thing, scale);
             dragInfo.Payload = payload;
@@ -283,8 +288,7 @@ namespace BasicRdl.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            var category = dropInfo.Payload as Category;
-            if (category != null)
+            if (dropInfo.Payload is Category category)
             {
                 await this.Drop(category);
                 return;

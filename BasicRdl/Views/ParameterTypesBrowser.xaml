@@ -31,7 +31,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <views:CommonThingControl GridView="{Binding ElementName=View}" />
+        <views:CommonThingControl GridView="{Binding ElementName=View}" IsFavoriteToggleEnabled="True" />
 
         <views:SessionHeader Grid.Row="1" />
 
@@ -64,6 +64,7 @@
                                AllowGrouping="True"
                                AutoWidth="true"
                                ShowFilterPanelMode="Never"
+                               RowStyle="{StaticResource RowStyleDeprecatedHighlightedBaseQuantityKind}"
                                IsDetailButtonVisibleBinding="{x:Null}"
                                ShowGroupPanel="False"
                                ShowSearchPanelMode="Always">
@@ -73,23 +74,6 @@
                     <dxg:TableView.ContextMenu>
                         <ContextMenu Name="RowContextMenu" />
                     </dxg:TableView.ContextMenu>
-                    <dxg:TableView.RowStyle>
-                        <Style TargetType="{x:Type dxg:RowControl}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=Row.IsBaseQuantityKind}" Value="True">
-                                    <Setter Property="FontWeight" Value="Bold" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Row.IsDeprecated}" Value="True">
-                                    <Setter Property="Background" Value="LightGray" />
-                                    <Setter Property="Opacity" Value="0.5" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
-                                    <Setter Property="Background" Value="Yellow" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
-                        </Style>
-                    </dxg:TableView.RowStyle>
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
@@ -114,9 +98,9 @@
                 <dxg:GridColumn FieldName="Name" Header="Name" SortMode="Value" SortIndex="0" />
                 <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
                 <dxg:GridColumn FieldName="Symbol" Header="Symbol" />
-                <dxg:GridColumn FieldName="Type" Header="Type" GroupIndex="1" />
-                <dxg:GridColumn FieldName="DefaultScale" Header="Default Scale" />
-                <dxg:GridColumn FieldName="ContainerRdl" Header="Container RDL" GroupIndex="0" />
+                <dxg:GridColumn FieldName="DefaultScale" Header="Default Scale"/>
+                <dxg:GridColumn FieldName="Type" Header="Type" />
+                <dxg:GridColumn FieldName="ContainerRdl" Header="Container RDL"/>
             </dxg:GridControl.Columns>
 
             <dxg:GridControl.InputBindings>

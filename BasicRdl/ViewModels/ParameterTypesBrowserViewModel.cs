@@ -7,6 +7,7 @@
 namespace BasicRdl.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -19,6 +20,8 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
+    using CDP4Composition.Services.FavoritesService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -26,7 +29,8 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// The purpose of the <see cref="ParameterTypesBrowserViewModel"/> is to represent the view-model for <see cref="ParameterType"/>s
     /// </summary>
-    public class ParameterTypesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget
+    public class ParameterTypesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget,
+        IFavoritesBrowserViewModel, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -39,10 +43,21 @@ namespace BasicRdl.ViewModels
         private bool canCreateParameterType;
 
         /// <summary>
+        /// The backing field for <see cref="ShowOnlyFavorites"/> property.
+        /// </summary>
+        private bool showOnlyFavorites;
+
+        /// <summary>
+        /// The <see cref="IFavoritesService"/> used to work with favorite Things.
+        /// </summary>
+        private readonly IFavoritesService favoritesService;
+
+        /// <summary>
         /// Backing field for the <see cref="ParameterTypes"/> property
         /// </summary>
-        private readonly ReactiveList<ParameterTypeRowViewModel> parameterTypes = new ReactiveList<ParameterTypeRowViewModel>();
-        
+        private readonly ReactiveList<ParameterTypeRowViewModel> parameterTypes =
+            new ReactiveList<ParameterTypeRowViewModel>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypesBrowserViewModel"/> class.
         /// </summary>
@@ -54,26 +69,35 @@ namespace BasicRdl.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public ParameterTypesBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        /// <param name="favoritesService">The <see cref="IFavoritesService"/>.</param>
+        public ParameterTypesBrowserViewModel(ISession session, SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService,
+            IFavoritesService favoritesService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, {this.Thing.Name}";
+            this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+
+            this.favoritesService = favoritesService;
 
             this.parameterTypes.ChangeTrackingEnabled = true;
 
+            this.RefreshFavorites(
+                this.favoritesService.GetFavoriteItemsCollectionByType(this.Session, typeof(ParameterType)));
+
+            this.WhenAnyValue(vm => vm.ShowOnlyFavorites).Subscribe(_ => this.ExecuteToggleShowFavoriteCommand());
+
             this.AddSubscriptions();
         }
-        
+
         /// <summary>
         /// Gets the <see cref="ParameterTypeRowViewModel"/> that are contained by this view-model
         /// </summary>
         public ReactiveList<ParameterTypeRowViewModel> ParameterTypes
         {
-            get
-            {
-                return this.parameterTypes;
-            }
+            get { return this.parameterTypes; }
         }
 
         /// <summary>
@@ -84,6 +108,20 @@ namespace BasicRdl.ViewModels
             get { return this.canCreateParameterType; }
             set { this.RaiseAndSetIfChanged(ref this.canCreateParameterType, value); }
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to display favorites.
+        /// </summary>
+        public bool ShowOnlyFavorites
+        {
+            get { return this.showOnlyFavorites; }
+            set { this.RaiseAndSetIfChanged(ref this.showOnlyFavorites, value); }
+        }
+
+        /// <summary>
+        /// Gets the list of Iids that correspond to favorite <see cref="ParameterType"/>.
+        /// </summary>
+        public HashSet<Guid> FavoriteParameterTypeIids { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="TextParameterType"/>
@@ -109,7 +147,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="TimeOfDayParameterType"/>
         /// </summary>
         public ReactiveCommand<object> CreateTimeOfDayParameterType { get; private set; }
-        
+
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="DateTimeParameterType"/>
         /// </summary>
@@ -152,7 +190,8 @@ namespace BasicRdl.ViewModels
         {
             var addListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ParameterType)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.AddParameterTypeRowViewModel);
@@ -160,7 +199,8 @@ namespace BasicRdl.ViewModels
 
             var removeListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ParameterType)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RemoveParameterTypeRowViewModel);
@@ -168,11 +208,16 @@ namespace BasicRdl.ViewModels
 
             var rdlUpdateListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);
             this.Disposables.Add(rdlUpdateListener);
+
+            var favoritesListener =
+                this.favoritesService.SubscribeToChanges(this.Session, typeof(ParameterType), this.RefreshFavorites);
+            this.Disposables.Add(favoritesListener);
         }
 
         /// <summary>
@@ -185,31 +230,37 @@ namespace BasicRdl.ViewModels
             this.CreateTextParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateTextParameterType.Subscribe(_ => this.ExecuteCreateCommand<TextParameterType>());
 
-            this.CreateBooleanParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateBooleanParameterType =
+                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateBooleanParameterType.Subscribe(_ => this.ExecuteCreateCommand<BooleanParameterType>());
 
             this.CreateDateParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateDateParameterType.Subscribe(_ => this.ExecuteCreateCommand<DateParameterType>());
 
-            this.CreateDateTimeParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateDateTimeParameterType =
+                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateDateTimeParameterType.Subscribe(_ => this.ExecuteCreateCommand<DateTimeParameterType>());
 
-            this.CreateEnumerationParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateEnumerationParameterType =
+                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateEnumerationParameterType.Subscribe(_ => this.ExecuteCreateCommand<EnumerationParameterType>());
 
-            this.CreateTimeOfDayParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateTimeOfDayParameterType =
+                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateTimeOfDayParameterType.Subscribe(_ => this.ExecuteCreateCommand<TimeOfDayParameterType>());
 
             this.CreateSimpleQuantityKind = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateSimpleQuantityKind.Subscribe(_ => this.ExecuteCreateCommand<SimpleQuantityKind>());
 
-            this.CreateSpecializedQuantityKind = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateSpecializedQuantityKind =
+                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateSpecializedQuantityKind.Subscribe(_ => this.ExecuteCreateCommand<SpecializedQuantityKind>());
 
             this.CreateDerivedQuantityKind = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateDerivedQuantityKind.Subscribe(_ => this.ExecuteCreateCommand<DerivedQuantityKind>());
 
-            this.CreateCompoundParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateCompoundParameterType =
+                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateCompoundParameterType.Subscribe(_ => this.ExecuteCreateCommand<CompoundParameterType>());
 
             this.CreateArrayParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
@@ -237,20 +288,56 @@ namespace BasicRdl.ViewModels
 
             if (this.SelectedThing is ParameterTypeRowViewModel selectedParameterTypeRow)
             {
-                this.ContextMenu.Add(new ContextMenuItemViewModel(!selectedParameterTypeRow.IsFavorite ? "Add to Favorites" : "Remove from Favorites", "", this.ToggleFavoriteCommand, MenuItemKind.Favorite));
+                this.ContextMenu.Add(new ContextMenuItemViewModel(
+                    !selectedParameterTypeRow.IsFavorite ? "Add to Favorites" : "Remove from Favorites", "",
+                    this.ToggleFavoriteCommand, MenuItemKind.Favorite));
             }
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Array Parameter Type", "", this.CreateArrayParameterType, MenuItemKind.Create, ClassKind.ArrayParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Boolean Parameter Type", "", this.CreateBooleanParameterType, MenuItemKind.Create, ClassKind.BooleanParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Compound Parameter Type", "", this.CreateCompoundParameterType, MenuItemKind.Create, ClassKind.CompoundParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Date Parameter Type", "", this.CreateDateParameterType, MenuItemKind.Create, ClassKind.DateParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Date Time Parameter Type", "", this.CreateDateTimeParameterType, MenuItemKind.Create, ClassKind.DateTimeParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Derived Quantity Kind", "", this.CreateDerivedQuantityKind, MenuItemKind.Create, ClassKind.DerivedQuantityKind));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Enumeration Parameter Type", "", this.CreateEnumerationParameterType, MenuItemKind.Create, ClassKind.EnumerationParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Simple Quantity Kind", "", this.CreateSimpleQuantityKind, MenuItemKind.Create, ClassKind.SimpleQuantityKind));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Specialized Quantity Kind", "", this.CreateSpecializedQuantityKind, MenuItemKind.Create, ClassKind.SpecializedQuantityKind));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Text Parameter Type", "", this.CreateTextParameterType, MenuItemKind.Create, ClassKind.TextParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Time of Day Parameter Type", "", this.CreateTimeOfDayParameterType, MenuItemKind.Create, ClassKind.TimeOfDayParameterType));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Array Parameter Type", "",
+                this.CreateArrayParameterType, MenuItemKind.Create, ClassKind.ArrayParameterType));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Boolean Parameter Type", "",
+                this.CreateBooleanParameterType, MenuItemKind.Create, ClassKind.BooleanParameterType));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Compound Parameter Type", "",
+                this.CreateCompoundParameterType, MenuItemKind.Create, ClassKind.CompoundParameterType));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Date Parameter Type", "",
+                this.CreateDateParameterType, MenuItemKind.Create, ClassKind.DateParameterType));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Date Time Parameter Type", "",
+                this.CreateDateTimeParameterType, MenuItemKind.Create, ClassKind.DateTimeParameterType));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Derived Quantity Kind", "",
+                this.CreateDerivedQuantityKind, MenuItemKind.Create, ClassKind.DerivedQuantityKind));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Enumeration Parameter Type", "",
+                this.CreateEnumerationParameterType, MenuItemKind.Create, ClassKind.EnumerationParameterType));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Simple Quantity Kind", "",
+                this.CreateSimpleQuantityKind, MenuItemKind.Create, ClassKind.SimpleQuantityKind));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Specialized Quantity Kind", "",
+                this.CreateSpecializedQuantityKind, MenuItemKind.Create, ClassKind.SpecializedQuantityKind));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Text Parameter Type", "",
+                this.CreateTextParameterType, MenuItemKind.Create, ClassKind.TextParameterType));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Time of Day Parameter Type", "",
+                this.CreateTimeOfDayParameterType, MenuItemKind.Create, ClassKind.TimeOfDayParameterType));
+        }
+
+        /// <summary>
+        /// Toggles showing only the the favorite items.
+        /// </summary>
+        private void ExecuteToggleShowFavoriteCommand()
+        {
+            FilterStringService.FilterString.RefreshFavoriteBrowser(this);
+        }
+
+        /// <summary>
+        /// Refreshes the list of favorite <see cref="ParameterType"/>
+        /// </summary>
+        private void RefreshFavorites(HashSet<Guid> iidList)
+        {
+            this.FavoriteParameterTypeIids = iidList;
+
+            // update row status
+            foreach (var parameterTypeRowViewModel in this.ParameterTypes)
+            {
+                parameterTypeRowViewModel.SetFavoriteStatus(
+                    this.FavoriteParameterTypeIids.Contains(parameterTypeRowViewModel.Thing.Iid));
+            }
         }
 
         /// <summary>
@@ -263,7 +350,19 @@ namespace BasicRdl.ViewModels
                 return;
             }
 
-            //this.ExecuteDeleteCommand(this.SelectedThing.Thing);
+            if (this.SelectedThing is ParameterTypeRowViewModel row)
+            {
+                this.ToggleFavorite(row);
+            }
+        }
+
+        /// <summary>
+        /// Toggles the favorite status of the thing on the server.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        private void ToggleFavorite(ParameterTypeRowViewModel row)
+        {
+            Task.Run(() => this.favoritesService.ToggleFavorite<ParameterType>(this.Session, row.Thing));
         }
 
         /// <summary>
@@ -275,6 +374,12 @@ namespace BasicRdl.ViewModels
         private void AddParameterTypeRowViewModel(ParameterType parameterType)
         {
             var row = new ParameterTypeRowViewModel(parameterType, this.Session, this);
+
+            if (this.FavoriteParameterTypeIids != null)
+            {
+                row.SetFavoriteStatus(this.FavoriteParameterTypeIids.Contains(row.Thing.Iid));
+            }
+
             this.ParameterTypes.Add(row);
         }
 
@@ -291,7 +396,7 @@ namespace BasicRdl.ViewModels
             {
                 this.ParameterTypes.Remove(row);
                 row.Dispose();
-            }            
+            }
         }
 
         /// <summary>
@@ -324,7 +429,8 @@ namespace BasicRdl.ViewModels
             base.Initialize();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
-            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
+            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
+                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var parameterType in referenceDataLibrary.ParameterType)
                 {

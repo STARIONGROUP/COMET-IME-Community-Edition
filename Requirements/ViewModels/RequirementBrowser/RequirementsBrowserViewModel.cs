@@ -12,38 +12,32 @@ namespace CDP4Requirements.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
-
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
-
     using CDP4CommonView.ViewModels;
-
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
-
     using CDP4Requirements.Comparers;
     using CDP4Requirements.Utils;
     using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
-
     using NLog;
-
     using ReactiveUI;
 
     /// <summary>
     /// The View-Model for the <see cref="RequirementsBrowser"/>
     /// </summary>
-    public class RequirementsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget, IRequirementBrowserDisplaySettings
+    public class RequirementsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget,
+        IRequirementBrowserDisplaySettings, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The logger for the current class
@@ -116,14 +110,18 @@ namespace CDP4Requirements.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public RequirementsBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public RequirementsBrowserViewModel(Iteration iteration, ISession session,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
-            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+            this.ToolTip =
+                $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
-            this.ReqSpecificationRows = new ReactiveList<IRowViewModelBase<Thing>>();
-            var model = (EngineeringModel)this.Thing.Container;
+            this.ReqSpecificationRows = new ReactiveList<RequirementsSpecificationRowViewModel>();
+            var model = (EngineeringModel) this.Thing.Container;
             this.ActiveParticipant = model.GetActiveParticipant(this.Session.ActivePerson);
 
             this.ComputeUserDependentPermission();
@@ -162,12 +160,13 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
+        public EngineeringModelSetup CurrentEngineeringModelSetup =>
+            this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
 
         /// <summary>
         /// Gets the <see cref="RequirementsSpecificationRowViewModel"/> rows
         /// </summary>
-        public ReactiveList<IRowViewModelBase<Thing>> ReqSpecificationRows { get; private set; }
+        public ReactiveList<RequirementsSpecificationRowViewModel> ReqSpecificationRows { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="BinaryRelationship"/>
@@ -332,13 +331,19 @@ namespace CDP4Requirements.ViewModels
                 var row = new RequirementsSpecificationRowViewModel(spec, this.Session, this);
                 this.ReqSpecificationRows.SortedInsert(row, SpecComparer);
 
-                var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
+                var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel) this.Thing.TopContainer);
 
                 if (orderPt != null)
                 {
-                    var orderListener = Observable.Where(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue)), objectChange => (((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType == orderPt) && spec.ParameterValue.Contains(objectChange.ChangedThing))
+                    var orderListener = Observable.Where(
+                            CDPMessageBus.Current.Listen<ObjectChangedEvent>(
+                                typeof(RequirementsContainerParameterValue)),
+                            objectChange =>
+                                (((RequirementsContainerParameterValue) objectChange.ChangedThing).ParameterType ==
+                                 orderPt) && spec.ParameterValue.Contains(objectChange.ChangedThing))
                         .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(x => this.UpdateSpecRowPosition((RequirementsSpecification)x.ChangedThing.Container));
+                        .Subscribe(
+                            x => this.UpdateSpecRowPosition((RequirementsSpecification) x.ChangedThing.Container));
 
                     this.Disposables.Add(orderListener);
                 }
@@ -391,22 +396,30 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
+            var engineeringModelSetupSubscription = CDPMessageBus.Current
+                .Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) &&
+                                       (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) &&
+                                       (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
+            var domainOfExpertiseSubscription = CDPMessageBus.Current
+                .Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) &&
+                                       (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) &&
+                                       (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(domainOfExpertiseSubscription);
 
             var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
-                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
+                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) &&
+                                       (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) &&
+                                       (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
@@ -429,9 +442,10 @@ namespace CDP4Requirements.ViewModels
             }
             else
             {
-                this.DomainOfExpertise = (iterationDomainPair.Value == null) || (iterationDomainPair.Value.Item1 == null)
-                    ? "None"
-                    : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
+                this.DomainOfExpertise =
+                    (iterationDomainPair.Value == null) || (iterationDomainPair.Value.Item1 == null)
+                        ? "None"
+                        : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
             }
         }
 
@@ -443,7 +457,8 @@ namespace CDP4Requirements.ViewModels
             var req = new Requirement();
             var reqGroup = this.SelectedThing.Thing as RequirementsGroup;
 
-            var reqSpecification = this.SelectedThing.Thing as RequirementsSpecification ?? this.SelectedThing.Thing.GetContainerOfType<RequirementsSpecification>();
+            var reqSpecification = this.SelectedThing.Thing as RequirementsSpecification ??
+                                   this.SelectedThing.Thing.GetContainerOfType<RequirementsSpecification>();
 
             if (reqGroup != null)
             {
@@ -467,13 +482,15 @@ namespace CDP4Requirements.ViewModels
             this.CreateRelationshipCommand.Subscribe(_ => this.ExecuteCreateCommand<BinaryRelationship>(this.Thing));
 
             this.CreateRequirementGroupCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirement));
-            this.CreateRequirementGroupCommand.Subscribe(_ => this.ExecuteCreateCommand<RequirementsGroup>(this.SelectedThing.Thing));
+            this.CreateRequirementGroupCommand.Subscribe(_ =>
+                this.ExecuteCreateCommand<RequirementsGroup>(this.SelectedThing.Thing));
 
             this.CreateRequirementCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirementGroup));
             this.CreateRequirementCommand.Subscribe(_ => this.ExecuteCreateRequirement());
 
             this.NavigateToRequirementsSpecificationEditorCommand = ReactiveCommand.Create();
-            this.NavigateToRequirementsSpecificationEditorCommand.Subscribe(_ => this.ExecuteNavigateToRequirementsSpecificationEditor());
+            this.NavigateToRequirementsSpecificationEditorCommand.Subscribe(_ =>
+                this.ExecuteNavigateToRequirementsSpecificationEditor());
         }
 
         /// <summary>
@@ -524,13 +541,16 @@ namespace CDP4Requirements.ViewModels
             if (this.SelectedThing is RequirementsSpecificationRowViewModel reqSpecRow)
             {
                 this.CanCreateRequirement = this.PermissionService.CanWrite(ClassKind.Requirement, reqSpecRow.Thing);
-                this.CanCreateRequirementGroup = this.PermissionService.CanWrite(ClassKind.RequirementsGroup, reqSpecRow.Thing);
+                this.CanCreateRequirementGroup =
+                    this.PermissionService.CanWrite(ClassKind.RequirementsGroup, reqSpecRow.Thing);
             }
 
             if (this.SelectedThing is RequirementsGroupRowViewModel reqGroupRow)
             {
-                this.CanCreateRequirement = this.PermissionService.CanWrite(ClassKind.Requirement, reqGroupRow.Thing.GetContainerOfType<RequirementsSpecification>());
-                this.CanCreateRequirementGroup = this.PermissionService.CanWrite(ClassKind.RequirementsGroup, reqGroupRow.Thing);
+                this.CanCreateRequirement = this.PermissionService.CanWrite(ClassKind.Requirement,
+                    reqGroupRow.Thing.GetContainerOfType<RequirementsSpecification>());
+                this.CanCreateRequirementGroup =
+                    this.PermissionService.CanWrite(ClassKind.RequirementsGroup, reqGroupRow.Thing);
             }
         }
 
@@ -540,54 +560,75 @@ namespace CDP4Requirements.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Binary Relationship", "", this.CreateRelationshipCommand, MenuItemKind.Create, ClassKind.BinaryRelationship));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Binary Relationship", "",
+                this.CreateRelationshipCommand, MenuItemKind.Create, ClassKind.BinaryRelationship));
 
             if (this.SelectedThing == null)
             {
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement Specification", "", this.CreateCommand, MenuItemKind.Create, ClassKind.RequirementsSpecification));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement Specification", "",
+                    this.CreateCommand, MenuItemKind.Create, ClassKind.RequirementsSpecification));
 
                 return;
             }
 
             if (this.SelectedThing is RequirementsSpecificationRowViewModel reqSpecRow)
             {
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement Specification", "", this.CreateCommand, MenuItemKind.Create, ClassKind.RequirementsSpecification));
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement", "", this.CreateRequirementCommand, MenuItemKind.Create, ClassKind.Requirement));
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement Group", "", this.CreateRequirementGroupCommand, MenuItemKind.Create, ClassKind.RequirementsGroup));
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Open Requirement Specification Editor", "", this.NavigateToRequirementsSpecificationEditorCommand, MenuItemKind.Navigate, ClassKind.RequirementsSpecification));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement Specification", "",
+                    this.CreateCommand, MenuItemKind.Create, ClassKind.RequirementsSpecification));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement", "",
+                    this.CreateRequirementCommand, MenuItemKind.Create, ClassKind.Requirement));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement Group", "",
+                    this.CreateRequirementGroupCommand, MenuItemKind.Create, ClassKind.RequirementsGroup));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Open Requirement Specification Editor", "",
+                    this.NavigateToRequirementsSpecificationEditorCommand, MenuItemKind.Navigate,
+                    ClassKind.RequirementsSpecification));
             }
 
             if (this.SelectedThing is RequirementsGroupRowViewModel reqGroupRow)
             {
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement", "", this.CreateRequirementCommand, MenuItemKind.Create, ClassKind.Requirement));
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement Group", "", this.CreateRequirementGroupCommand, MenuItemKind.Create, ClassKind.RequirementsGroup));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement", "",
+                    this.CreateRequirementCommand, MenuItemKind.Create, ClassKind.Requirement));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Requirement Group", "",
+                    this.CreateRequirementGroupCommand, MenuItemKind.Create, ClassKind.RequirementsGroup));
             }
 
             if (this.SelectedThing is RelationalExpressionRowViewModel relExpRow)
             {
-                var binaryRelationships = relExpRow.Thing.QueryRelationships.Where(x => x is BinaryRelationship binaryRelationship && binaryRelationship.Source is ParameterOrOverrideBase).ToList();
+                var binaryRelationships = relExpRow.Thing.QueryRelationships.Where(x =>
+                        x is BinaryRelationship binaryRelationship &&
+                        binaryRelationship.Source is ParameterOrOverrideBase)
+                    .ToList();
 
                 if (binaryRelationships.Any())
                 {
-                    var relationshipMenu = new ContextMenuItemViewModel("Requirement Verification Relationship", "", null, MenuItemKind.None);
+                    var relationshipMenu = new ContextMenuItemViewModel("Requirement Verification Relationship", "",
+                        null, MenuItemKind.None);
 
                     foreach (var relationship in binaryRelationships)
                     {
-                        var parameter = (ParameterOrOverrideBase)((BinaryRelationship)relationship).Source;
+                        var parameter = (ParameterOrOverrideBase) ((BinaryRelationship) relationship).Source;
                         var suffix = parameter is ParameterOverride ? " (Override)" : "";
 
-                        relationshipMenu.SubMenu.Add(new ContextMenuItemViewModel($"Remove relationship to {parameter.UserFriendlyShortName}{suffix}", "", this.DeleteBinaryRelationship, relationship, this.PermissionService.CanWrite(relationship), MenuItemKind.Delete));
+                        relationshipMenu.SubMenu.Add(new ContextMenuItemViewModel(
+                            $"Remove relationship to {parameter.UserFriendlyShortName}{suffix}", "",
+                            this.DeleteBinaryRelationship, relationship, this.PermissionService.CanWrite(relationship),
+                            MenuItemKind.Delete));
                     }
 
                     this.ContextMenu.Add(relationshipMenu);
                 }
             }
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Model Note", "", this.CreateEngineeringModelDataNoteCommand, MenuItemKind.Create, ClassKind.EngineeringModelDataNote));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Model Note", "",
+                this.CreateEngineeringModelDataNoteCommand, MenuItemKind.Create, ClassKind.EngineeringModelDataNote));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "",
+                this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Review Item Discrepancy", "",
+                this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Deviation", "",
+                this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Waiver", "",
+                this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
         }
 
         /// <summary>
@@ -619,7 +660,9 @@ namespace CDP4Requirements.ViewModels
         {
             if (this.SelectedThing.Thing is RequirementsSpecification requirementsSpecification)
             {
-                var vm = new RequirementsSpecificationEditorViewModel(requirementsSpecification, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                var vm = new RequirementsSpecificationEditorViewModel(requirementsSpecification, this.Session,
+                    this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService,
+                    this.PluginSettingsService);
                 this.openRequirementsSpecificationEditorViewModels.Add(vm);
                 this.PanelNavigationService.Open(vm, true);
             }
@@ -628,7 +671,8 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Execute the creation of a <see cref="ModellingAnnotationItem"/>
         /// </summary>
-        protected void ExecuteCreateEngineeringModelDataNoteCommand(EngineeringModelDataNote engineeringModelDataNote, Participant participant, DomainOfExpertise owner)
+        protected void ExecuteCreateEngineeringModelDataNoteCommand(EngineeringModelDataNote engineeringModelDataNote,
+            Participant participant, DomainOfExpertise owner)
         {
             if (this.SelectedThing == null)
             {
@@ -645,12 +689,14 @@ namespace CDP4Requirements.ViewModels
 
             if (model == null)
             {
-                throw new InvalidOperationException("A modelling annotation item can only be created in the context of a Engineering Model.");
+                throw new InvalidOperationException(
+                    "A modelling annotation item can only be created in the context of a Engineering Model.");
             }
 
             var containerClone = model.Clone(false);
             var transaction = new ThingTransaction(transactionContext, containerClone);
-            this.ThingDialogNavigationService.Navigate(engineeringModelDataNote, transaction, this.Session, true, ThingDialogKind.Create, this.ThingDialogNavigationService, containerClone);
+            this.ThingDialogNavigationService.Navigate(engineeringModelDataNote, transaction, this.Session, true,
+                ThingDialogKind.Create, this.ThingDialogNavigationService, containerClone);
         }
     }
 }

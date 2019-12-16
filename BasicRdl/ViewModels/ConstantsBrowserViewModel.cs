@@ -4,8 +4,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
 namespace BasicRdl.ViewModels
 {
     using System;
@@ -28,7 +26,8 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// The purpose of the <see cref="ConstantsBrowserViewModel"/> is to represent the view-model for <see cref="Constant"/>s
     /// </summary>
-    public class ConstantsBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget
+    public class ConstantsBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget,
+        IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -56,26 +55,27 @@ namespace BasicRdl.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public ConstantsBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public ConstantsBrowserViewModel(ISession session, SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
+                this.Session.ActivePerson.Name);
 
             this.constants.ChangeTrackingEnabled = true;
 
             this.AddSubscriptions();
         }
-        
+
         /// <summary>
         /// Gets the <see cref="ConstantRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<ConstantRowViewModel> Constants 
+        public ReactiveList<ConstantRowViewModel> Constants
         {
-            get
-            {
-                return this.constants;
-            }
+            get { return this.constants; }
         }
 
         /// <summary>
@@ -113,7 +113,8 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Constant", "", this.CreateCommand, MenuItemKind.Create, ClassKind.Constant));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Constant", "", this.CreateCommand,
+                MenuItemKind.Create, ClassKind.Constant));
         }
 
         /// <summary>
@@ -124,7 +125,8 @@ namespace BasicRdl.ViewModels
             base.Initialize();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
-            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
+            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
+                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var constant in referenceDataLibrary.Constant)
                 {
@@ -155,7 +157,8 @@ namespace BasicRdl.ViewModels
         {
             var addListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Constant))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Constant)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.AddConstantRowViewModel);
@@ -163,7 +166,8 @@ namespace BasicRdl.ViewModels
 
             var removeListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Constant))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Constant)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RemoveConstantRowViewModel);
@@ -171,7 +175,8 @@ namespace BasicRdl.ViewModels
 
             var rdlUpdateListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);

@@ -62,7 +62,7 @@
                                ShowFilterPanelMode="Never"
                                AllowGrouping="True"
                                AutoWidth="true"
-                               ShowSearchPanelMode="Always"
+                               ShowSearchPanelMode="Default"
                                IsDetailButtonVisibleBinding="{x:Null}"
                                ShowGroupPanel="False">
                     <dxg:TableView.FocusedRow>
@@ -107,8 +107,8 @@
 
                 <dxg:GridColumn FieldName="Name" SortMode="Value" SortIndex="1" Header="Name" />
                 <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
-                <dxg:GridColumn FieldName="ClassKind" Header="Type" GroupIndex="1" />
-                <dxg:GridColumn FieldName="ContainerRdl" GroupIndex="0" Header="Container RDL" />
+                <dxg:GridColumn FieldName="ClassKind" Header="Type" />
+                <dxg:GridColumn FieldName="ContainerRdl" Header="Container RDL" />
             </dxg:GridControl.Columns>
 
             <dxg:GridControl.InputBindings>

@@ -26,11 +26,17 @@ namespace CDP4Composition.Views
         private readonly static DependencyProperty GridViewProperty = DependencyProperty.Register("GridView", typeof(GridDataViewBase), typeof(CommonThingControl));
 
         /// <summary>
+        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="IsFavoriteToggleEnabled"/> setter method.
+        /// </summary>
+        private readonly static DependencyProperty IsFavoriteToggleEnabledProperty = DependencyProperty.Register("IsFavoriteToggleEnabled", typeof(bool), typeof(CommonThingControl));
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CommonThingControl"/> class.
         /// </summary>
         public CommonThingControl()
         {
             this.InitializeComponent();
+            this.IsFavoriteToggleEnabled = false;
         }
 
         /// <summary>
@@ -38,8 +44,17 @@ namespace CDP4Composition.Views
         /// </summary>
         public GridDataViewBase GridView
         {
-            get { return GetValue(GridViewProperty) as GridDataViewBase; }
-            set { SetValue(GridViewProperty, value); }
+            get { return this.GetValue(GridViewProperty) as GridDataViewBase; }
+            set { this.SetValue(GridViewProperty, value); }
+        }
+
+        /// <summary>
+        /// The boolean that enables or disables the visibility of the favorites toggle buttons.
+        /// </summary>
+        public bool IsFavoriteToggleEnabled
+        {
+            get { return this.GetValue(IsFavoriteToggleEnabledProperty) is bool ? (bool) this.GetValue(IsFavoriteToggleEnabledProperty) : false; }
+            set { this.SetValue(IsFavoriteToggleEnabledProperty, value); }
         }
 
         /// <summary>

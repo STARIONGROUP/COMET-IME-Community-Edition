@@ -128,7 +128,7 @@ namespace CDP4Requirements.ViewModels
             if (requirementRowViewModel != null)
             {
                 var containerIsDeprecatedSubscription = requirementRowViewModel.WhenAnyValue(vm => vm.IsDeprecated)
-                .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRequirementRowViewModelModel());
+                .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRowViewModel());
                 this.Disposables.Add(containerIsDeprecatedSubscription);
             }
         }
@@ -136,7 +136,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Updates the IsDeprecated property based on the value of the container <see cref="RequirementRowViewModel"/>
         /// </summary>
-        private void UpdateIsDeprecatedDerivedFromContainerRequirementRowViewModelModel()
+        private void UpdateIsDeprecatedDerivedFromContainerRowViewModel()
         {
             var requirementRowViewModel = this.ContainerViewModel as RequirementRowViewModel;
             if (requirementRowViewModel != null)
@@ -178,7 +178,7 @@ namespace CDP4Requirements.ViewModels
                 this.ScaleShortName = this.Scale.ShortName;
             }
 
-            this.UpdateIsDeprecatedDerivedFromContainerRequirementRowViewModelModel();
+            this.UpdateIsDeprecatedDerivedFromContainerRowViewModel();
         }
     }
 }

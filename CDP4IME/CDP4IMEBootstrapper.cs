@@ -125,7 +125,7 @@ namespace CDP4IME
         {
             this.UpdateBootstrapperState("Configuring Region Mappings");
 
-            RegionAdapterMappings mappings = base.ConfigureRegionAdapterMappings();
+            var mappings = base.ConfigureRegionAdapterMappings();
 
             mappings.RegisterMapping(typeof(LayoutPanel), this.Container.GetExportedValue<LayoutPanelAdapter>());
             mappings.RegisterMapping(typeof(LayoutGroup), this.Container.GetExportedValue<LayoutGroupAdapter>());

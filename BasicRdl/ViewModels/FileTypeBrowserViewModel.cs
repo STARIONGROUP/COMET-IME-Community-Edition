@@ -26,7 +26,8 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// The purpose of the <see cref="FileTypeBrowserViewModel"/> is to represent the view-model for <see cref="FileType"/>s
     /// </summary>
-    public class FileTypeBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget
+    public class FileTypeBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget,
+        IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -49,14 +50,17 @@ namespace BasicRdl.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public FileTypeBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public FileTypeBrowserViewModel(ISession session, SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
             this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
             this.AddSubscriptions();
         }
-        
+
         /// <summary>
         /// Gets or sets a value indicating if the current person can create, edit or delete a <see cref="FileType"/>
         /// </summary>
@@ -70,7 +74,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="FileTypes"/> rows that are contained by this view-model
         /// </summary>
         public ReactiveList<FileTypeRowViewModel> FileTypes { get; private set; }
-        
+
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -78,7 +82,8 @@ namespace BasicRdl.ViewModels
         {
             var addListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(FileType))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as FileType)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.AddFileTypeRowViewModel);
@@ -86,7 +91,8 @@ namespace BasicRdl.ViewModels
 
             var removeListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(FileType))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as FileType)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RemoveFileTypeRowViewModel);
@@ -94,7 +100,8 @@ namespace BasicRdl.ViewModels
 
             var rdlUpdateListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);
@@ -131,7 +138,7 @@ namespace BasicRdl.ViewModels
             {
                 this.FileTypes.Remove(row);
                 row.Dispose();
-            }  
+            }
         }
 
         /// <summary>
@@ -164,7 +171,8 @@ namespace BasicRdl.ViewModels
             base.Initialize();
             this.FileTypes = new ReactiveList<FileTypeRowViewModel>();
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
-            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
+            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
+                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var filetype in referenceDataLibrary.FileType)
                 {
@@ -191,7 +199,8 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a File Type", "", this.CreateCommand, MenuItemKind.Create, ClassKind.FileType));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a File Type", "", this.CreateCommand,
+                MenuItemKind.Create, ClassKind.FileType));
         }
 
         /// <summary>
@@ -216,7 +225,7 @@ namespace BasicRdl.ViewModels
         ///  Information about the drag operation.
         /// </param>
         /// <remarks>
-        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on
         /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
         /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
         /// </remarks>

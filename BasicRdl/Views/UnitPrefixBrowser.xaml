@@ -58,6 +58,7 @@
                                VerticalAlignment="Stretch"
                                AllowColumnMoving="True"
                                ShowFilterPanelMode="Never"
+                               RowStyle="{StaticResource RowStyleDeprecated}"
                                AllowEditing="False"
                                AllowGrouping="True"
                                AutoWidth="true"
@@ -69,11 +70,6 @@
                     <dxg:TableView.ContextMenu>
                         <ContextMenu Name="RowContextMenu" />
                     </dxg:TableView.ContextMenu>
-                    <dxg:TableView.RowStyle>
-                        <Style TargetType="{x:Type dxg:RowControl}">
-                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
-                        </Style>
-                    </dxg:TableView.RowStyle>
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
@@ -91,7 +87,7 @@
                         </ControlTemplate>
                     </dxg:GridColumn.DisplayTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn FieldName="Name" />
+                <dxg:GridColumn FieldName="Name" SortIndex="0" />
                 <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
                 <dxg:GridColumn FieldName="ConversionFactor" Header="Conversion Factor" />
                 <dxg:GridColumn FieldName="ContainerRdl" Header="Container RDL" />

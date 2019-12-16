@@ -23,7 +23,8 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// The purpose of the <see cref="MeasurementScalesBrowserViewModel"/> is to represent the view-model for <see cref="MeasurementScale"/>s
     /// </summary>
-    public class MeasurementScalesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class MeasurementScalesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
+        IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -38,7 +39,8 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Backing field for the <see cref="MeasurementScales"/> property.
         /// </summary>
-        private readonly ReactiveList<MeasurementScaleRowViewModel> measurementScales = new ReactiveList<MeasurementScaleRowViewModel>();
+        private readonly ReactiveList<MeasurementScaleRowViewModel> measurementScales =
+            new ReactiveList<MeasurementScaleRowViewModel>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeasurementScalesBrowserViewModel"/> class.
@@ -51,26 +53,27 @@ namespace BasicRdl.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public MeasurementScalesBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public MeasurementScalesBrowserViewModel(ISession session, SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
+                this.Session.ActivePerson.Name);
 
             this.measurementScales.ChangeTrackingEnabled = true;
 
             this.AddSubscriptions();
         }
-        
+
         /// <summary>
         /// Gets the <see cref="MeasurementScaleRowViewModel"/> that are contained by this view-model
         /// </summary>
         public ReactiveList<MeasurementScaleRowViewModel> MeasurementScales
         {
-            get
-            {
-                return this.measurementScales;
-            }
+            get { return this.measurementScales; }
         }
 
         /// <summary>
@@ -90,7 +93,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="LogarithmicScale"/>
         /// </summary>
-        public ReactiveCommand<object> CreateLogarithmicScale { get; private set; }     
+        public ReactiveCommand<object> CreateLogarithmicScale { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="OrdinalScale"/>
@@ -105,8 +108,8 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CyclicRatioScale"/>
         /// </summary>
-        public ReactiveCommand<object> CreateCyclicRatioScale { get; private set; } 
-        
+        public ReactiveCommand<object> CreateCyclicRatioScale { get; private set; }
+
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -114,7 +117,8 @@ namespace BasicRdl.ViewModels
         {
             var addListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(MeasurementScale))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as MeasurementScale)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.AddMeasurementScaleRowViewModel);
@@ -122,7 +126,8 @@ namespace BasicRdl.ViewModels
 
             var removeListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(MeasurementScale))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as MeasurementScale)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RemoveMeasurementScaleRowViewModel);
@@ -130,7 +135,8 @@ namespace BasicRdl.ViewModels
 
             var rdlUpdateListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);
@@ -195,7 +201,8 @@ namespace BasicRdl.ViewModels
             base.Initialize();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
-            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
+            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
+                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var scale in referenceDataLibrary.Scale)
                 {
@@ -258,11 +265,16 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Cyclic Ratio Scale", "", this.CreateCyclicRatioScale, MenuItemKind.Create, ClassKind.CyclicRatioScale));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Interval Scale", "", this.CreateIntervalScale, MenuItemKind.Create, ClassKind.IntervalScale));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Logarithmic Scale", "", this.CreateLogarithmicScale, MenuItemKind.Create, ClassKind.LogarithmicScale));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Ordinal Scale", "", this.CreateOrdinalScale, MenuItemKind.Create, ClassKind.OrdinalScale));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Ratio Scale", "", this.CreateRatioScale, MenuItemKind.Create, ClassKind.RatioScale));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Cyclic Ratio Scale", "",
+                this.CreateCyclicRatioScale, MenuItemKind.Create, ClassKind.CyclicRatioScale));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Interval Scale", "", this.CreateIntervalScale,
+                MenuItemKind.Create, ClassKind.IntervalScale));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Logarithmic Scale", "",
+                this.CreateLogarithmicScale, MenuItemKind.Create, ClassKind.LogarithmicScale));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Ordinal Scale", "", this.CreateOrdinalScale,
+                MenuItemKind.Create, ClassKind.OrdinalScale));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Ratio Scale", "", this.CreateRatioScale,
+                MenuItemKind.Create, ClassKind.RatioScale));
         }
     }
 }
