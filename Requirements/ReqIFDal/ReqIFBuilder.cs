@@ -300,7 +300,7 @@ namespace CDP4Requirements.ReqIFDal
             var requirements = this.exportedIteration.RequirementsSpecification.SelectMany(s => s.Requirement);
             foreach (var requirement in requirements)
             {
-                // TODO: short term fix. The intent of reuse of spec type with use of applied rules is a bit unintuitive and convoluted without clear reasoning. Needs to be completely looked over.
+                // TODO: Next step in GH IME #255. Currently a short term fix. The intent of reuse of spec type with use of applied rules is a bit unintuitive and convoluted without clear reasoning. Needs to be completely looked over.
                 // current solution will create a spec type per requirement and not reuse them (which leads to errors due to no use of rules/different SPVs)
                 var appliedRules = rules.Where(r => requirement.IsMemberOfCategory(r.Category)).ToArray();
                 
