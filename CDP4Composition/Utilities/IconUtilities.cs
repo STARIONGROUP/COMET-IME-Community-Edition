@@ -210,7 +210,7 @@ namespace CDP4Common.Helpers
                 case ClassKind.NaturalLanguage:
                     return "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/naturallanguage.png";
                 case ClassKind.Requirement:
-                    return "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/requirement.jpg";
+                    return "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/requirement.png";
                 case ClassKind.Book:
                     return "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/Book.png";
                 case ClassKind.Page:

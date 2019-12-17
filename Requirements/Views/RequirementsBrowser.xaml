@@ -15,6 +15,7 @@
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4Requirements.Converters"
              xmlns:userControls="clr-namespace:CDP4Requirements.Views.UserControls"
+             xmlns:rows="clr-namespace:CDP4Requirements.ViewModels.RequirementBrowser.Rows"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -264,13 +265,34 @@
                     </StackPanel>
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
-            
-            <HierarchicalDataTemplate DataType="{x:Type cdp4Composition:FolderRowViewModel}" ItemsSource="{Binding ContainedRows}">
+
+            <HierarchicalDataTemplate DataType="{x:Type rows:ParametricConstraintsFolderRowViewModel}" ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
+                        <dx:PixelSnapper>
+                            <Image Width="16"
+                                   Height="16"
+                                   Margin="3">
+                                <Image.Source>
+                                    <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                    </MultiBinding>
+                                </Image.Source>
+                            </Image>
+                        </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type cdp4Composition:FolderRowViewModel}" ItemsSource="{Binding ContainedRows}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
                             <Image Width="16"
                                    Height="16"

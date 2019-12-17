@@ -28,7 +28,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Operations;
 
     using CDP4Requirements.Comparers;
-    using CDP4Requirements.Events;
+    using CDP4Requirements.ExtensionMethods;
     using CDP4Requirements.Utils;
     using CDP4Requirements.ViewModels.RequirementBrowser;
 
@@ -314,19 +314,17 @@ namespace CDP4Requirements.ViewModels
             if (this.ContainerViewModel is IRequirementBrowserDisplaySettings requirementBrowserDisplaySettings)
             {
                 this.Disposables.Add(
-                requirementBrowserDisplaySettings
-                    .WhenAnyValue(x => x.IsParametricConstraintDisplayed)
-                    .Subscribe(y => this.IsParametricConstraintDisplayed = y));
+                    requirementBrowserDisplaySettings
+                        .WhenAnyValue(x => x.IsParametricConstraintDisplayed)
+                        .Subscribe(y => this.IsParametricConstraintDisplayed = y));
 
                 this.Disposables.Add(
-                requirementBrowserDisplaySettings
-                    .WhenAnyValue(x => x.IsSimpleParameterValuesDisplayed)
-                    .Subscribe(y => this.IsSimpleParameterValuesDisplayed = y));
+                    requirementBrowserDisplaySettings
+                        .WhenAnyValue(x => x.IsSimpleParameterValuesDisplayed)
+                        .Subscribe(y => this.IsSimpleParameterValuesDisplayed = y));
             }
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<RequirementStateOfComplianceChangedEvent>(this.Thing)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.RequirementStateOfCompliance = x.RequirementStateOfCompliance));
+            this.SetRequirementStateOfComplianceChangedEventSubscription(this.Thing, this.Disposables);
         }
 
         /// <summary>

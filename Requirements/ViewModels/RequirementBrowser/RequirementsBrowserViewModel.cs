@@ -32,7 +32,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Operations;
 
     using CDP4Requirements.Comparers;
-    using CDP4Requirements.Events;
     using CDP4Requirements.Utils;
     using CDP4Requirements.Verifiers;
     using CDP4Requirements.ViewModels.RequirementBrowser;
@@ -41,6 +40,8 @@ namespace CDP4Requirements.ViewModels
     using NLog;
 
     using ReactiveUI;
+
+    using Observable = System.Reactive.Linq.Observable;
 
     /// <summary>
     /// The View-Model for the <see cref="RequirementsBrowser"/>
@@ -142,7 +143,6 @@ namespace CDP4Requirements.ViewModels
 
             this.openRequirementsSpecificationEditorViewModels = new List<RequirementsSpecificationEditorViewModel>();
         }
-
 
         /// <summary>
         /// Gets the active <see cref="Participant"/>
@@ -358,7 +358,7 @@ namespace CDP4Requirements.ViewModels
 
                 if (orderPt != null)
                 {
-                    var orderListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue)).Where(objectChange => (((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType == orderPt) && spec.ParameterValue.Contains(objectChange.ChangedThing))
+                    var orderListener = Observable.Where(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue)), objectChange => (((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType == orderPt) && spec.ParameterValue.Contains(objectChange.ChangedThing))
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(x => this.UpdateSpecRowPosition((RequirementsSpecification)x.ChangedThing.Container));
 
@@ -510,7 +510,6 @@ namespace CDP4Requirements.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateRequirementSpecificationsRows();
             this.UpdateProperties();
-            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Unknown));
         }
 
         /// <summary>

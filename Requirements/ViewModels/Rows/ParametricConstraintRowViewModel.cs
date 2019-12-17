@@ -10,7 +10,6 @@ namespace CDP4Requirements.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -21,7 +20,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using CDP4Requirements.Events;
     using CDP4Requirements.ExtensionMethods;
     using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
@@ -58,19 +56,7 @@ namespace CDP4Requirements.ViewModels
             : base(req, session, containerViewModel)
         {
             this.UpdateProperties();
-            this.AddSubscriptions();
-        }
-
-        /// <summary>
-        /// Adds subscriptions to diffent types of events
-        /// </summary>
-        private void AddSubscriptions()
-        {
-            var requirementVerifierListener = CDPMessageBus.Current.Listen<RequirementStateOfComplianceChangedEvent>(this.Thing)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.RequirementStateOfCompliance = x.RequirementStateOfCompliance);
-
-            this.Disposables.Add(requirementVerifierListener);
+            this.SetRequirementStateOfComplianceChangedEventSubscription(this.Thing, this.Disposables);
         }
 
         /// <summary>
@@ -201,6 +187,7 @@ namespace CDP4Requirements.ViewModels
                 this.Disposables.Add(containerIsDeprecatedSubscription);
             }
         }
+
         /// <summary>
         /// Update properties when underlying <see cref="BooleanExpression"/>s are changed
         /// </summary>
@@ -212,9 +199,11 @@ namespace CDP4Requirements.ViewModels
                 if (new List<ClassKind> { ClassKind.AndExpression, ClassKind.OrExpression, ClassKind.ExclusiveOrExpression, ClassKind.NotExpression }.Contains(objectChangedEvent.ChangedThing.ClassKind))
                 {
                     this.UpdateProperties();
+
                     return;
                 }
             }
+
             this.SetRequirementStateOfCompliance();
             this.UpdateStringExpression();
         }
@@ -225,20 +214,7 @@ namespace CDP4Requirements.ViewModels
         private void SetRequirementStateOfCompliance()
         {
             var containerViewModel = this as IHaveContainerViewModel;
-
-            while (containerViewModel is IHaveWritableRequirementStateOfCompliance requirementStateOfComplianceViewModel)
-            {
-                requirementStateOfComplianceViewModel.RequirementStateOfCompliance = RequirementStateOfCompliance.Unknown;
-
-                if (containerViewModel.ContainerViewModel is IHaveContainerViewModel nextContainerViewModel)
-                {
-                    containerViewModel = nextContainerViewModel;
-                }
-                else
-                {
-                    break;
-                }
-            }
+            containerViewModel.SetNestedParentRequirementStateOfCompliances();
         }
 
         /// <summary>

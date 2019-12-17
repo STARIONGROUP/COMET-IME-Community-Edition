@@ -52,19 +52,7 @@ namespace CDP4Requirements.ViewModels
         public NotExpressionRowViewModel(NotExpression notExpression, ISession session, IViewModelBase<Thing> containerViewModel) : base(notExpression, session, containerViewModel)
         {
             this.UpdateProperties();
-            this.AddSubscriptions();
-        }
-
-        /// <summary>
-        /// Adds subscriptions to diffent types of events
-        /// </summary>
-        private void AddSubscriptions()
-        {
-            var requirementVerifierListener = CDPMessageBus.Current.Listen<RequirementStateOfComplianceChangedEvent>(this.Thing)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.RequirementStateOfCompliance = x.RequirementStateOfCompliance);
-
-            this.Disposables.Add(requirementVerifierListener);
+            this.SetRequirementStateOfComplianceChangedEventSubscription(this.Thing, this.Disposables);
         }
 
         /// <summary>

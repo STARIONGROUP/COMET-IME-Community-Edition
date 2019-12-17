@@ -10,13 +10,10 @@
 namespace CDP4Requirements.Converters
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Drawing;
     using System.Windows.Data;
 
     using CDP4Common.EngineeringModelData;
-
-    using DevExpress.Xpf.Editors.Settings;
 
     /// <summary>
     /// Converts a <see cref="RelationalOperatorKind"/> to its scientific representation
@@ -47,15 +44,18 @@ namespace CDP4Requirements.Converters
                 switch (relationalOperatorKind)
                 {
                     case RequirementStateOfCompliance.Failed:
-                        color = nameof(Color.LightCoral);
+                        color = "#FFACAC";
+
                         break;
 
                     case RequirementStateOfCompliance.Pass:
-                        color = nameof(Color.LightGreen);
+                        color = "#C4FFBD";
+
                         break;
 
                     case RequirementStateOfCompliance.Inconclusive:
-                        color = nameof(Color.LightYellow);
+                        color = "#FDFDBF";
+
                         break;
                 }
             }

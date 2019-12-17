@@ -27,9 +27,8 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
-    using CDP4Requirements.Events;
+    using CDP4Requirements.ExtensionMethods;
     using CDP4Requirements.Utils;
-    using CDP4Requirements.Verifiers;
     using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.ViewModels.RequirementBrowser.Rows;
 
@@ -118,17 +117,6 @@ namespace CDP4Requirements.ViewModels
             this.SetSubscriptions();
 
             this.UpdateProperties();
-            this.AddSubscriptions();
-        }
-
-        /// <summary>
-        /// Adds subscriptions to diffent types of events
-        /// </summary>
-        private void AddSubscriptions()
-        {
-            this.Disposables.Add(CDPMessageBus.Current.Listen<RequirementStateOfComplianceChangedEvent>(this.Thing)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.RequirementStateOfCompliance = x.RequirementStateOfCompliance));
         }
 
         /// <summary>
@@ -153,6 +141,8 @@ namespace CDP4Requirements.ViewModels
                 this
                     .WhenAnyValue(x => x.IsParametricConstraintDisplayed, y => y.IsSimpleParameterValuesDisplayed)
                     .Subscribe(x => this.AdjustContainedRows()));
+
+            this.SetRequirementStateOfComplianceChangedEventSubscription(this.Thing, this.Disposables);
         }
 
         /// <summary>
@@ -249,27 +239,21 @@ namespace CDP4Requirements.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            var category = dropInfo.Payload as Category;
-
-            if (category != null)
+            if (dropInfo.Payload is Category category)
             {
                 this.DragOver(category, dropInfo);
 
                 return;
             }
 
-            var tuple = dropInfo.Payload as Tuple<ParameterType, MeasurementScale>;
-
-            if (tuple != null)
+            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuple)
             {
                 this.DragOver(tuple, dropInfo);
 
                 return;
             }
 
-            var req = dropInfo.Payload as Requirement;
-
-            if (req != null)
+            if (dropInfo.Payload is Requirement req)
             {
                 this.DragOver(req, dropInfo);
 
@@ -287,27 +271,21 @@ namespace CDP4Requirements.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            var category = dropInfo.Payload as Category;
-
-            if (category != null)
+            if (dropInfo.Payload is Category category)
             {
                 await this.Drop(category);
 
                 return;
             }
 
-            var tuple = dropInfo.Payload as Tuple<ParameterType, MeasurementScale>;
-
-            if (tuple != null)
+            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuple)
             {
                 await this.Drop(tuple);
 
                 return;
             }
 
-            var req = dropInfo.Payload as Requirement;
-
-            if (req != null)
+            if (dropInfo.Payload is Requirement req)
             {
                 await this.Drop(req, dropInfo);
 
@@ -569,10 +547,7 @@ namespace CDP4Requirements.ViewModels
                 row.Dispose();
             }
 
-            if (this.definitionSubscription != null)
-            {
-                this.definitionSubscription.Dispose();
-            }
+            this.definitionSubscription?.Dispose();
         }
 
         /// <summary>
@@ -673,7 +648,7 @@ namespace CDP4Requirements.ViewModels
             }
             else
             {
-                return string.Format("{0}...", lines[0]);
+                return $"{lines[0]}...";
             }
         }
 

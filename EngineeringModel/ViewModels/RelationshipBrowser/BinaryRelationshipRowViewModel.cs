@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BinaryRelationshipRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,13 +8,17 @@ namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
-    using ReactiveUI;
     using CDP4Dal.Events;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The view-model for the <see cref="BinaryRelationshipRowViewModel"/> row
@@ -35,7 +39,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Source thing subscription
         /// </summary>
         private IDisposable sourceSubscription;
-        
+
         /// <summary>
         /// Target thing before any update
         /// </summary>
@@ -83,11 +87,11 @@ namespace CDP4EngineeringModel.ViewModels
                     this.Disposables.Remove(this.sourceSubscription);
                     this.sourceSubscription.Dispose();
                 }
-                
+
                 this.oldSource = this.Thing.Source;
 
                 this.sourceSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Source)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated )
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateName());
 
@@ -101,20 +105,19 @@ namespace CDP4EngineeringModel.ViewModels
                     this.Disposables.Remove(this.targetSubscription);
                     this.targetSubscription.Dispose();
                 }
-                
+
                 this.oldTarget = this.Thing.Target;
 
                 this.targetSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Target)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated )
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateName());
 
                 this.Disposables.Add(this.targetSubscription);
-            }            
+            }
 
             this.UpdateName();
         }
-
 
         /// <summary>
         /// Updates the relationship name
@@ -123,7 +126,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             var source = this.FormatName(this.Source);
             var target = this.FormatName(this.Target);
-            this.Name = source + " → " + target;        
+            this.Name = source + " → " + target;
         }
 
         /// <summary>
@@ -137,15 +140,32 @@ namespace CDP4EngineeringModel.ViewModels
         /// </returns>
         private string FormatName(Thing thing)
         {
-            var thingName = thing is INamedThing 
-                ? ((INamedThing)thing).Name 
-                : thing.ClassKind.ToString();
+            var thingName = this.GetThingName(thing);
 
-            var thingShortName = thing is IShortNamedThing 
-                ? string.Format(" ({0})", (thing as IShortNamedThing).ShortName)
+            var thingShortName = thing is IShortNamedThing shortNamedThing
+                ? $" ({shortNamedThing.ShortName})"
                 : string.Empty;
 
-            return string.Format("{0}{1}", thingName, thingShortName);
+            return $"{thingName}{thingShortName}";
+        }
+
+        /// <summary>
+        /// Get the visual Name of the <see cref="Thing"/>
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <returns>Name of the <see cref="Thing"/></returns>
+        private string GetThingName(Thing thing)
+        {
+            if (thing is BooleanExpression booleanExpression)
+            {
+                return booleanExpression.StringValue;
+            }
+
+            return thing is INamedThing namedThing
+                ? namedThing.Name
+                : thing.GetType().GetProperty(nameof(CDP4Common.CommonData.Thing.UserFriendlyName))?.DeclaringType == typeof(Thing)
+                    ? thing.ClassKind.ToString()
+                    : thing.UserFriendlyName;
         }
 
         /// <summary>
@@ -153,14 +173,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string Name
         {
-            get
-            {
-                return this.name;
-            }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.name, value);
-            }
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
     }
 }
