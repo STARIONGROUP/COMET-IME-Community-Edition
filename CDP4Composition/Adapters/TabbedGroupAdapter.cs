@@ -44,9 +44,6 @@ namespace CDP4Composition.Adapters
         /// <param name="behaviorFactory">
         /// The behavior factory.
         /// </param>
-        /// <param name="dialogNavigationService">
-        /// The MEF injected <see cref="IDialogNavigationService"/>
-        /// </param>
         [ImportingConstructor]
         public TabbedGroupAdapter(IRegionBehaviorFactory behaviorFactory) : base(behaviorFactory)
         {
@@ -65,7 +62,7 @@ namespace CDP4Composition.Adapters
         }
 
         /// <summary>
-        /// Adapts the <see cref="LayoutGroup"/> in the association <see cref="IRegion"/>
+        /// Adapts the <see cref="TabbedGroup"/> in the association <see cref="IRegion"/>
         /// </summary>
         /// <param name="region">
         /// The associated <see cref="IRegion"/>
@@ -76,8 +73,10 @@ namespace CDP4Composition.Adapters
         protected override void Adapt(IRegion region, TabbedGroup regionTarget)
         {
             region.Views.CollectionChanged += (s, e) => this.OnViewsCollectionChanged(region, regionTarget, s, e);
-            regionTarget.GetDockLayoutManager().DockItemClosed += (s, e) => this.OnPanelClosed(region, regionTarget, s, e);
-            regionTarget.GetDockLayoutManager().DockItemClosing += (s, e) => this.OnPanelClosing(region, regionTarget, s, e);
+            regionTarget.GetDockLayoutManager().DockItemClosed +=
+                (s, e) => this.OnPanelClosed(region, regionTarget, s, e);
+            regionTarget.GetDockLayoutManager().DockItemClosing +=
+                (s, e) => this.OnPanelClosing(region, regionTarget, s, e);
         }
 
         /// <summary>
@@ -87,7 +86,8 @@ namespace CDP4Composition.Adapters
         /// <param name="regionTarget">the region target</param>
         /// <param name="sender">the sender</param>
         /// <param name="e">the NotifyCollectionChangedEventArgs</param>
-        private void OnViewsCollectionChanged(IRegion region, LayoutGroup regionTarget, object sender, NotifyCollectionChangedEventArgs e)
+        private void OnViewsCollectionChanged(IRegion region, TabbedGroup regionTarget, object sender,
+            NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -107,21 +107,24 @@ namespace CDP4Composition.Adapters
         /// <param name="regionTarget">the region target</param>
         /// <param name="s">the sender</param>
         /// <param name="e">the NotifyCollectionChangedEventArgs</param>
-        private void OnAdd(IRegion region, LayoutGroup regionTarget, object s, NotifyCollectionChangedEventArgs e)
+        private void OnAdd(IRegion region, TabbedGroup regionTarget, object s, NotifyCollectionChangedEventArgs e)
         {
             foreach (var view in e.NewItems)
             {
-                var panel = new LayoutPanel { Content = view };
+                var panel = new LayoutPanel {Content = view};
                 var panelview = view as IPanelView;
                 if (panelview == null)
                 {
-                    throw new ArgumentException(string.Format("The added view does not respect the interface IPanelView: {0}", view));
+                    throw new ArgumentException(
+                        string.Format("The added view does not respect the interface IPanelView: {0}", view));
                 }
 
                 var viewModel = panelview.DataContext as IPanelViewModel;
                 if (viewModel == null)
                 {
-                    throw new ArgumentException(string.Format("The added view-model does not respect the interface IPanelViewModel: {0}", view));
+                    throw new ArgumentException(
+                        string.Format("The added view-model does not respect the interface IPanelViewModel: {0}",
+                            view));
                 }
 
                 var captionProperty = new Binding();
@@ -152,7 +155,7 @@ namespace CDP4Composition.Adapters
         /// <param name="regionTarget">the region target</param>
         /// <param name="s">the sender</param>
         /// <param name="e">the NotifyCollectionChangedEventArgs</param>
-        private void OnRemove(IRegion region, LayoutGroup regionTarget, object s, NotifyCollectionChangedEventArgs e)
+        private void OnRemove(IRegion region, TabbedGroup regionTarget, object s, NotifyCollectionChangedEventArgs e)
         {
             foreach (var view in e.OldItems)
             {
@@ -170,13 +173,13 @@ namespace CDP4Composition.Adapters
         }
 
         /// <summary>
-        /// Handles the Dock Panel closing event 
+        /// Handles the Dock Panel closing event
         /// </summary>
         /// <param name="region">The region</param>
         /// <param name="regionTarget">The region target</param>
         /// <param name="s">The sender</param>
         /// <param name="e">The <see cref="ItemCancelEventArgs"/></param>
-        private void OnPanelClosing(IRegion region, LayoutGroup regionTarget, object s, ItemCancelEventArgs e)
+        private void OnPanelClosing(IRegion region, TabbedGroup regionTarget, object s, ItemCancelEventArgs e)
         {
             if (!e.Item.Parent.Equals(regionTarget))
             {
@@ -189,8 +192,8 @@ namespace CDP4Composition.Adapters
                 return;
             }
 
-            var view = (UserControl)docPanel.Content;
-            var panelViewModel = (IPanelViewModel)view.DataContext;
+            var view = (UserControl) docPanel.Content;
+            var panelViewModel = (IPanelViewModel) view.DataContext;
             if (panelViewModel == null)
             {
                 return;
@@ -206,7 +209,8 @@ namespace CDP4Composition.Adapters
                 this.dialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             }
 
-            var confirmation = new GenericConfirmationDialogViewModel("Warning", MessageHelper.ClosingPanelConfirmation);
+            var confirmation =
+                new GenericConfirmationDialogViewModel("Warning", MessageHelper.ClosingPanelConfirmation);
             var result = this.dialogNavigationService.NavigateModal(confirmation);
             if (result != null && result.Result.HasValue && result.Result.Value)
             {
@@ -217,13 +221,13 @@ namespace CDP4Composition.Adapters
         }
 
         /// <summary>
-        /// Handles the Dock Panel close event 
+        /// Handles the Dock Panel close event
         /// </summary>
         /// <param name="region">the region</param>
         /// <param name="regionTarget">the region target</param>
         /// <param name="s">the sender</param>
         /// <param name="e">the NotifyCollectionChangedEventArgs</param>
-        private void OnPanelClosed(IRegion region, LayoutGroup regionTarget, object s, DockItemClosedEventArgs e)
+        private void OnPanelClosed(IRegion region, TabbedGroup regionTarget, object s, DockItemClosedEventArgs e)
         {
             foreach (var panel in e.AffectedItems)
             {
@@ -239,7 +243,9 @@ namespace CDP4Composition.Adapters
                     continue;
                 }
 
-                var regionAttribute = view.GetType().GetCustomAttributes(typeof(PanelViewExportAttribute), true).SingleOrDefault() as PanelViewExportAttribute;
+                var regionAttribute =
+                    view.GetType().GetCustomAttributes(typeof(PanelViewExportAttribute), true).SingleOrDefault() as
+                        PanelViewExportAttribute;
                 if (regionAttribute != null && regionAttribute.Region == region.Name)
                 {
                     this.viewPanelPair.Remove(view);

@@ -225,6 +225,7 @@
     <Compile Include="PluginSettingService\TestModule.cs" />
     <Compile Include="PluginSettingService\TestSettings.cs" />
     <Compile Include="RuleVerification\RuleVerificationServiceTestFixture.cs" />
+    <Compile Include="Services\FilterStringServiceTestFixture.cs" />
     <Compile Include="Services\TooltipServiceTestFixture.cs" />
     <Compile Include="SpellingChecker\DictionaryServiceTestFixture.cs" />
     <Compile Include="StaticPanelViewModelTestFixture.cs" />
