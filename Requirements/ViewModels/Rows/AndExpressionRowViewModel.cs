@@ -147,8 +147,6 @@ namespace CDP4Requirements.ViewModels
 
             var booleanExpressionsListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BooleanExpression))
                 .Where(x => (x.EventKind == EventKind.Updated) && (this.Thing?.Container != null) && (x.ChangedThing.Container != null) && this.Thing.GetAllMyExpressions().Contains(x.ChangedThing))
-
-                //                .Where(x => (x.EventKind == EventKind.Updated) && (this.Thing?.Container != null) && (x.ChangedThing.Container != null) && (x.ChangedThing.Container.Iid == this.Thing.Container.Iid))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.OnExpressionUpdate());
 
