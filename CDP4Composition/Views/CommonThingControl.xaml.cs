@@ -26,9 +26,9 @@ namespace CDP4Composition.Views
         private readonly static DependencyProperty GridViewProperty = DependencyProperty.Register("GridView", typeof(GridDataViewBase), typeof(CommonThingControl));
 
         /// <summary>
-        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="IsFavoriteToggleEnabled"/> setter method.
+        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="IsFavoriteToggleVisible"/> setter method.
         /// </summary>
-        private readonly static DependencyProperty IsFavoriteToggleEnabledProperty = DependencyProperty.Register("IsFavoriteToggleEnabled", typeof(bool), typeof(CommonThingControl));
+        private readonly static DependencyProperty IsFavoriteToggleVisibleProperty = DependencyProperty.Register("IsFavoriteToggleVisible", typeof(bool), typeof(CommonThingControl));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommonThingControl"/> class.
@@ -36,7 +36,7 @@ namespace CDP4Composition.Views
         public CommonThingControl()
         {
             this.InitializeComponent();
-            this.IsFavoriteToggleEnabled = false;
+            this.IsFavoriteToggleVisible = false;
         }
 
         /// <summary>
@@ -51,10 +51,10 @@ namespace CDP4Composition.Views
         /// <summary>
         /// The boolean that enables or disables the visibility of the favorites toggle buttons.
         /// </summary>
-        public bool IsFavoriteToggleEnabled
+        public bool IsFavoriteToggleVisible
         {
-            get { return this.GetValue(IsFavoriteToggleEnabledProperty) is bool ? (bool) this.GetValue(IsFavoriteToggleEnabledProperty) : false; }
-            set { this.SetValue(IsFavoriteToggleEnabledProperty, value); }
+            get { return this.GetValue(IsFavoriteToggleVisibleProperty) is bool ? (bool) this.GetValue(IsFavoriteToggleVisibleProperty) : false; }
+            set { this.SetValue(IsFavoriteToggleVisibleProperty, value); }
         }
 
         /// <summary>

@@ -48,13 +48,13 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.Control = this.MeasurementUnitGridControl;
+                this.FilterableControl = this.MeasurementUnitGridControl;
             }
         }
 
         /// <summary>
         /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
         /// </summary>
-        public DataControlBase Control { get; private set; }
+        public DataControlBase FilterableControl { get; private set; }
     }
 }

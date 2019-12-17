@@ -71,7 +71,7 @@
 
         <dxb:BarCheckItem 
                           IsChecked="{Binding ShowOnlyFavorites}"
-                          IsVisible="{Binding IsFavoriteToggleEnabled, ElementName=Toolbar}"
+                          IsVisible="{Binding IsFavoriteToggleVisible, ElementName=Toolbar}"
                           Content="Filter on Favorite Things"
                           Description="Toggle filtering on favorite items."
                           Glyph="{dx:DXImage Image=NewContact_16x16.png}"

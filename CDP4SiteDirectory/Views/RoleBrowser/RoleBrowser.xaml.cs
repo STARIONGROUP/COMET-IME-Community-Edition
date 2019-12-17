@@ -45,13 +45,13 @@ namespace CDP4SiteDirectory.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.Control = this.RolesTreeListControl;
+                this.FilterableControl = this.RolesTreeListControl;
             }
         }
 
         /// <summary>
         /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
         /// </summary>
-        public DataControlBase Control { get; private set; }
+        public DataControlBase FilterableControl { get; private set; }
     }
 }

@@ -145,7 +145,7 @@ namespace CDP4Composition.Services
             this.OpenDeprecatedControls.Add(view, viewModel);
             this.RefreshControl(view);
 
-            logger.Debug("{0} Added deprecatable to the FilterStringService", view.Control.Name);
+            logger.Debug("{0} Added deprecatable to the FilterStringService", view.FilterableControl.Name);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace CDP4Composition.Services
             this.OpenFavoriteControls.Add(view, viewModel);
             this.RefreshControl(view);
 
-            logger.Debug("{0} Added to the Favorites FilterStringService", view.Control.Name);
+            logger.Debug("{0} Added to the Favorites FilterStringService", view.FilterableControl.Name);
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace CDP4Composition.Services
         /// <param name="view">The view to refresh.</param>
         private void RefreshControl(IPanelFilterableDataGridView view)
         {
-            var control = view.Control;
+            var control = view.FilterableControl;
             control.FilterString = string.Empty;
 
             // filters are always reenabled in case they were manually turned off.

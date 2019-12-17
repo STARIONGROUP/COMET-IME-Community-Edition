@@ -16,6 +16,6 @@ namespace CDP4Composition.Navigation.Interfaces
         /// <summary>
         /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
         /// </summary>
-        DataControlBase Control { get; }
+        DataControlBase FilterableControl { get; }
     }
 }
