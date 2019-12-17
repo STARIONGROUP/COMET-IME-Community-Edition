@@ -31,11 +31,6 @@ namespace CDP4Composition.Mvvm
         ReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; }
 
         /// <summary>
-        /// Gets the container <see cref="IViewModelBase{T}"/>
-        /// </summary>
-        IViewModelBase<Thing> ContainerViewModel { get; }
-
-        /// <summary>
         /// Gets the top container <see cref="IViewModelBase{T}"/>
         /// </summary>
         /// <remarks>

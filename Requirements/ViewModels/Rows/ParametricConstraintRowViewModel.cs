@@ -191,7 +191,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Update properties when underlying <see cref="BooleanExpression"/>s are changed
         /// </summary>
-        /// <param name="objectChangedEvent"></param>
+        /// <param name="objectChangedEvent">The <see cref="ObjectChangedEvent"/></param>
         private void UpdatePropertiesWhenNeededAndUpdateStringExpression(ObjectChangedEvent objectChangedEvent)
         {
             if (objectChangedEvent.ChangedThing?.ClassKind != null)
