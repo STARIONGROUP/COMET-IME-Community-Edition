@@ -204,17 +204,8 @@ namespace CDP4Requirements.ViewModels
                 }
             }
 
-            this.SetRequirementStateOfCompliance();
+            this.SetRequirementStateOfComplianceTree();
             this.UpdateStringExpression();
-        }
-
-        /// <summary>
-        /// Set the <see cref="RequirementStateOfCompliance"/> for this ViewModel and all Parents in the Container tree
-        /// </summary>
-        private void SetRequirementStateOfCompliance()
-        {
-            var containerViewModel = this as IHaveContainerViewModel;
-            containerViewModel.SetNestedParentRequirementStateOfCompliances();
         }
 
         /// <summary>
@@ -235,7 +226,7 @@ namespace CDP4Requirements.ViewModels
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
-            this.SetRequirementStateOfCompliance();
+            this.SetRequirementStateOfComplianceTree();
             this.UpdateProperties();
         }
     }

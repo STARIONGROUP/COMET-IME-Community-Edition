@@ -6,6 +6,8 @@
 
 namespace CDP4Requirements.ViewModels
 {
+    using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -131,6 +133,7 @@ namespace CDP4Requirements.ViewModels
         private void UpdateProperties()
         {
             this.UpdateThingStatus();
+            this.UpdateTooltip();
         }
 
         /// <summary>
@@ -139,16 +142,37 @@ namespace CDP4Requirements.ViewModels
         protected override void UpdateThingStatus()
         {
             this.ThingStatus = new ThingStatus(this.Thing);
-            this.SetRequirementStateOfCompliance();
+            this.UpdateTooltip();
+            this.SetRequirementStateOfComplianceTree();
         }
 
         /// <summary>
-        /// Set the <see cref="RequirementStateOfCompliance"/> for this ViewModel and all Parents in the Container tree
+        /// Update this <see cref="RowViewModelBase{T}.Tooltip"/>
         /// </summary>
-        private void SetRequirementStateOfCompliance()
+        protected override void UpdateTooltip()
         {
-            var containerViewModel = this as IHaveContainerViewModel;
-            containerViewModel.SetNestedParentRequirementStateOfCompliances();
+            var relationships = this.Thing.QueryRelationships.OfType<BinaryRelationship>().Where(x => x.Source is ParameterOrOverrideBase).ToList();
+
+            if (relationships.Any())
+            {
+                var strBuild = new StringBuilder();
+
+                foreach (var relationship in relationships)
+                {
+                    if (strBuild.Length > 0)
+                    {
+                        strBuild.AppendLine("");
+                    }
+
+                    strBuild.Append($"⟶ {relationship.Source.UserFriendlyName}");
+                }
+
+                this.Tooltip = strBuild.ToString();
+
+                return;
+            }
+
+            base.UpdateTooltip();
         }
 
         /// <summary>

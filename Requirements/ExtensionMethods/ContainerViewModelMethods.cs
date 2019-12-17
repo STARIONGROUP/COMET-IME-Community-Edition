@@ -19,7 +19,7 @@ namespace CDP4Requirements.ExtensionMethods
         /// Sets al the <see cref="RequirementStateOfCompliance"/>s for this and all parent viewmodels
         /// </summary>
         /// <param name="containerViewModel">The <see cref="IHaveContainerViewModel"/> that is the starting point for looking up <see cref="IHaveWritableRequirementStateOfCompliance"/>s up the visual tree</param>
-        public static void SetNestedParentRequirementStateOfCompliances(this IHaveContainerViewModel containerViewModel)
+        public static void SetRequirementStateOfComplianceTree(this IHaveContainerViewModel containerViewModel)
         {
             while (containerViewModel is IHaveWritableRequirementStateOfCompliance requirementStateOfComplianceViewModel)
             {
