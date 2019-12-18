@@ -19,9 +19,11 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using CDP4Requirements.ExtensionMethods;
+    using CDP4Requirements.Extensions;
     using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
+
+    using CDP4RequirementsVerification;
 
     using ReactiveUI;
 
@@ -55,7 +57,7 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="CDP4Requirements.RequirementStateOfCompliance"/>
+        /// Gets or sets the <see cref="CDP4RequirementsVerification.RequirementStateOfCompliance"/>
         /// </summary>
         public RequirementStateOfCompliance RequirementStateOfCompliance
         {

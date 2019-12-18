@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements.ExtensionMethods
+namespace CDP4Requirements.Extensions
 {
     using System;
     using System.Collections.Generic;
@@ -15,15 +15,17 @@ namespace CDP4Requirements.ExtensionMethods
 
     using CDP4Dal;
 
-    using CDP4Requirements.Events;
+    using CDP4RequirementsVerification.Events;
     using CDP4Requirements.ViewModels.RequirementBrowser;
+
+    using CDP4RequirementsVerification;
 
     using ReactiveUI;
 
     /// <summary>
     /// This class contains methods for specific <see cref="IHaveWritableRequirementStateOfCompliance"/> related functionality 
     /// </summary>
-    public static class WritableRequirementStateOfComplianceMethods
+    public static class WritableRequirementStateOfComplianceExtensions
     {
         /// <summary>
         /// Creates a reactive subscription for a <see cref="IHaveWritableRequirementStateOfCompliance"/> object

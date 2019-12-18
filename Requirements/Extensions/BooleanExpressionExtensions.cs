@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements.ExtensionMethods
+namespace CDP4Requirements.Extensions
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -12,6 +12,7 @@ namespace CDP4Requirements.ExtensionMethods
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Extensions;
 
     using CDP4Composition.Mvvm;
 
@@ -22,7 +23,7 @@ namespace CDP4Requirements.ExtensionMethods
     /// <summary>
     /// This class contains methods for specific <see cref="BooleanExpression"/> related functionality 
     /// </summary>
-    public static class BooleanExpressionMethods
+    public static class BooleanExpressionExtensions
     {
         /// <summary>
         /// Gets the <see cref="BooleanExpression"/>'s viewmodel

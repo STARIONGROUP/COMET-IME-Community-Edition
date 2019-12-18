@@ -19,10 +19,11 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using CDP4Requirements.Events;
-    using CDP4Requirements.ExtensionMethods;
+    using CDP4Requirements.Extensions;
     using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
+
+    using CDP4RequirementsVerification;
 
     using ReactiveUI;
 

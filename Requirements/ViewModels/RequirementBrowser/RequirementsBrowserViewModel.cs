@@ -33,9 +33,10 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Requirements.Comparers;
     using CDP4Requirements.Utils;
-    using CDP4Requirements.Verifiers;
     using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
+
+    using CDP4RequirementsVerification.Verifiers;
 
     using NLog;
 

@@ -15,6 +15,8 @@ namespace CDP4Requirements.Converters
 
     using CDP4Common.EngineeringModelData;
 
+    using CDP4RequirementsVerification;
+
     /// <summary>
     /// Converts a <see cref="RelationalOperatorKind"/> to its scientific representation
     /// </summary>

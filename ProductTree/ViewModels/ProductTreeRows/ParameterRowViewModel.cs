@@ -80,7 +80,7 @@ namespace CDP4ProductTree.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is RelationalExpression expression && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(this.Thing, expression))
+            if (dropInfo.Payload is RelationalExpression expression && this.ThingCreator.IsCreateBinaryRelationshipForRequirementVerificationAllowed(this.Thing, expression))
             {
                 this.DragOver(dropInfo, expression);
 
@@ -108,7 +108,7 @@ namespace CDP4ProductTree.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is RelationalExpression expression && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(this.Thing, expression))
+            if (dropInfo.Payload is RelationalExpression expression && this.ThingCreator.IsCreateBinaryRelationshipForRequirementVerificationAllowed(this.Thing, expression))
             {
                 await this.Drop(this.Thing, expression);
             }

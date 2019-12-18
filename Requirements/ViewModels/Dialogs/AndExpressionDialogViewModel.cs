@@ -12,7 +12,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-
+    using CDP4Common.Extensions;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -20,7 +20,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
-    using CDP4Requirements.ExtensionMethods;
+    using CDP4Requirements.Extensions;
 
     using ReactiveUI;
 

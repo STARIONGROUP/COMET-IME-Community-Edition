@@ -89,7 +89,7 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            if (dropInfo.Payload is RelationalExpression expression && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(this.Thing, expression))
+            if (dropInfo.Payload is RelationalExpression expression && this.ThingCreator.IsCreateBinaryRelationshipForRequirementVerificationAllowed(this.Thing, expression))
             {
                 this.DragOver(dropInfo, expression);
 
@@ -119,7 +119,7 @@ namespace CDP4EngineeringModel.ViewModels
                 await this.Drop(dropInfo, group);
             }
 
-            if (dropInfo.Payload is RelationalExpression expression && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(this.Thing, expression))
+            if (dropInfo.Payload is RelationalExpression expression && this.ThingCreator.IsCreateBinaryRelationshipForRequirementVerificationAllowed(this.Thing, expression))
             {
                 await this.Drop(this.Thing, expression);
             }

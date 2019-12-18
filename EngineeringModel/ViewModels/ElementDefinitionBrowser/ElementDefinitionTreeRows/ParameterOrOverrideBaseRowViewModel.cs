@@ -65,6 +65,11 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
+        /// </summary>
+        public IThingCreator ThingCreator { get; set; } = new ThingCreator();
+
+        /// <summary>
         /// Gets a value indicating whether this <see cref="ParameterOrOverrideBase"/> has publishable values
         /// </summary>
         public bool IsPublishable
@@ -420,7 +425,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             if (this.Thing?.GetContainerOfType<Iteration>() is Iteration iteration)
             {
-                await BinaryRelationshipCreator.CreateBinaryRelationship(this.Session, iteration, parameter, relationalExpression);
+                await this.ThingCreator.CreateBinaryRelationshipForRequirementVerification(this.Session, iteration, parameter, relationalExpression);
             }
         }
     }

@@ -12,6 +12,8 @@ namespace CDP4Requirements.ViewModels.RequirementBrowser.Rows
 
     using CDP4Dal;
 
+    using CDP4RequirementsVerification;
+
     using ReactiveUI;
 
     /// <summary>

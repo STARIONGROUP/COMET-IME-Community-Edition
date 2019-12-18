@@ -22,7 +22,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Permission;
-    using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels;
     using Moq;
     using NUnit.Framework;
@@ -403,6 +402,30 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             ISession session)
         {
             throw new Exception("The Element Usage could not be created");
+        }
+
+        /// <summary>
+        /// Method for creating a <see cref="BinaryRelationship"/> between a <see cref="ParameterOrOverrideBase"/> and a <see cref="RelationalExpression"/>.
+        /// </summary>
+        /// <param name="session">The <see cref="Session"/> for which the <see cref="BinaryRelationship"/> will be created</param>
+        /// <param name="iteration">The <see cref="Iteration"/> for which the  <see cref="BinaryRelationship"/> will be created</param>
+        /// <param name="parameter">The <see cref="ParameterOrOverrideBase"/> that acts as the source of the <see cref="BinaryRelationship"/></param>
+        /// <param name="relationalExpression">The <see cref="RelationalExpression"/> that acts as the target of the <see cref="BinaryRelationship"/></param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        public Task CreateBinaryRelationshipForRequirementVerification(ISession session, Iteration iteration, ParameterOrOverrideBase parameter, RelationalExpression relationalExpression)
+        {
+            throw new Exception("The Binary Relationship could not be created");
+        }
+
+        /// <summary>
+        /// Checks if creating a <see cref="BinaryRelationship"/> is allowed for these two objects
+        /// </summary>
+        /// <param name="parameter">The <see cref="ParameterOrOverrideBase"/></param>
+        /// <param name="relationalExpression">The <see cref="RelationalExpression"/></param>
+        /// <returns>True if creation is allowed</returns>
+        public bool IsCreateBinaryRelationshipForRequirementVerificationAllowed(ParameterOrOverrideBase parameter, RelationalExpression relationalExpression)
+        {
+            return false;
         }
     }
 }

@@ -21,8 +21,10 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using CDP4Requirements.ExtensionMethods;
+    using CDP4Requirements.Extensions;
     using CDP4Requirements.ViewModels.RequirementBrowser;
+
+    using CDP4RequirementsVerification;
 
     using ReactiveUI;
 
@@ -47,6 +49,11 @@ namespace CDP4Requirements.ViewModels
             this.UpdateProperties();
             this.SetRequirementStateOfComplianceChangedEventSubscription(this.Thing, this.Disposables);
         }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
+        /// </summary>
+        public IThingCreator ThingCreator { get; set; } = new ThingCreator();
 
         /// <summary>
         /// Gets or sets the ParametricConstraintsVerifier
@@ -85,7 +92,7 @@ namespace CDP4Requirements.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is ParameterOrOverrideBase parameter && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(parameter, this.Thing))
+            if (dropInfo.Payload is ParameterOrOverrideBase parameter && this.ThingCreator.IsCreateBinaryRelationshipForRequirementVerificationAllowed(parameter, this.Thing))
             {
                 dropInfo.Effects = DragDropEffects.Copy;
 
@@ -103,7 +110,7 @@ namespace CDP4Requirements.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is ParameterOrOverrideBase parameter && BinaryRelationshipCreator.IsCreateBinaryRelationshipAllowed(parameter, this.Thing))
+            if (dropInfo.Payload is ParameterOrOverrideBase parameter && this.ThingCreator.IsCreateBinaryRelationshipForRequirementVerificationAllowed(parameter, this.Thing))
             {
                 await this.CreateBinaryRelationship(parameter, this.Thing);
 
@@ -123,7 +130,7 @@ namespace CDP4Requirements.ViewModels
         {
             if (this.Thing?.GetContainerOfType<Iteration>() is Iteration iteration)
             {
-                await BinaryRelationshipCreator.CreateBinaryRelationship(this.Session, iteration, parameter, relationalExpression);
+                await this.ThingCreator.CreateBinaryRelationshipForRequirementVerification(this.Session, iteration, parameter, relationalExpression);
             }
         }
 

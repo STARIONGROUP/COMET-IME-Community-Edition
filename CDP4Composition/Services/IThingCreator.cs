@@ -9,7 +9,6 @@ namespace CDP4Composition.Services
     using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition.Services;
     using CDP4Dal;
 
     /// <summary>
@@ -84,5 +83,23 @@ namespace CDP4Composition.Services
         /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
         /// </param>
         Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session);
+
+        /// <summary>
+        /// Method for creating a <see cref="BinaryRelationship"/> for requirement verification between a <see cref="ParameterOrOverrideBase"/> and a <see cref="RelationalExpression"/>.
+        /// </summary>
+        /// <param name="session">The <see cref="Session"/> for which the <see cref="BinaryRelationship"/> will be created</param>
+        /// <param name="iteration">The <see cref="Iteration"/> for which the  <see cref="BinaryRelationship"/> will be created</param>
+        /// <param name="parameter">The <see cref="ParameterOrOverrideBase"/> that acts as the source of the <see cref="BinaryRelationship"/></param>
+        /// <param name="relationalExpression">The <see cref="RelationalExpression"/> that acts as the target of the <see cref="BinaryRelationship"/></param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        Task CreateBinaryRelationshipForRequirementVerification(ISession session, Iteration iteration, ParameterOrOverrideBase parameter, RelationalExpression relationalExpression);
+
+        /// <summary>
+        /// Checks if creating a <see cref="BinaryRelationship"/> for requirement verification is allowed for these two objects
+        /// </summary>
+        /// <param name="parameter">The <see cref="ParameterOrOverrideBase"/></param>
+        /// <param name="relationalExpression">The <see cref="RelationalExpression"/></param>
+        /// <returns>True if creation is allowed</returns>
+        bool IsCreateBinaryRelationshipForRequirementVerificationAllowed(ParameterOrOverrideBase parameter, RelationalExpression relationalExpression);
     }
 }

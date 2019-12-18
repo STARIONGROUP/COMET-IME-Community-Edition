@@ -6,13 +6,15 @@
 
 namespace CDP4Requirements.ViewModels.RequirementBrowser
 {
+    using CDP4RequirementsVerification;
+
     /// <summary>
     /// Specification of the <see cref="IHaveWritableRequirementStateOfCompliance"/> interface.
     /// </summary>
     public interface IHaveWritableRequirementStateOfCompliance
     {
         /// <summary>
-        /// The current <see cref="CDP4Requirements.RequirementStateOfCompliance"/>>
+        /// The current <see cref="CDP4RequirementsVerification.RequirementStateOfCompliance"/>>
         /// </summary>
         RequirementStateOfCompliance RequirementStateOfCompliance { get; set; }
     }

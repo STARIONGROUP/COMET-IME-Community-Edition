@@ -13,6 +13,8 @@ namespace CDP4Requirements.Converters
 
     using CDP4Common.CommonData;
 
+    using CDP4RequirementsVerification;
+
     /// <summary>
     /// The purpose of the <see cref="RequirementStateOfComplianceToVisibilityConverter"/> is to convert the <see cref="RequirementStateOfCompliance"/> 
     /// to decorate the property of a view-model to a <see cref="Visibility"/> based on the Requirement Verification process.

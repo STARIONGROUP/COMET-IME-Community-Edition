@@ -4,16 +4,18 @@
 // </copyright>
 // -----------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements.ExtensionMethods
+namespace CDP4Requirements.Extensions
 {
     using CDP4Composition.Mvvm;
 
     using CDP4Requirements.ViewModels.RequirementBrowser;
 
+    using CDP4RequirementsVerification;
+
     /// <summary>
     /// This class contains methods for specific <see cref="IHaveContainerViewModel"/> related functionality 
     /// </summary>
-    public static class ContainerViewModelMethods
+    public static class ContainerViewModelExtensions
     {
         /// <summary>
         /// Sets al the <see cref="RequirementStateOfCompliance"/>s for this and all parent viewmodels
