@@ -40,8 +40,6 @@ namespace CDP4SiteDirectory.ViewModels
         public PersonPermissionRowViewModel(PersonPermission permission, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(permission, session, containerViewModel)
         {
-            this.UpdatePermission();
-            this.WhenAnyValue(x => x.AccessRight).Subscribe(_ => this.ExecuteUpdatePermission());
         }
 
         /// <summary>
@@ -67,51 +65,12 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
-        /// Gets the Access right to display it in the "AccessType" column of the Role browser.
-        /// </summary>
-        public string AccessType
-        {
-            get
-            {
-                return this.AccessRight.ToString();
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether the current user may change the permission
         /// </summary>
         public bool IsReadOnly
         {
             get { return this.isReadOnly; }
             set { this.RaiseAndSetIfChanged(ref this.isReadOnly, value); }
-        }
-
-        /// <summary>
-        /// Update the permission
-        /// </summary>
-        private void ExecuteUpdatePermission()
-        {
-            if (this.AccessRight == this.Thing.AccessRight)
-            {
-                return;
-            }
-
-            var clone = this.Thing.Clone(false);
-            clone.AccessRight = this.AccessRight;
-
-            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
-            var transaction = new ThingTransaction(transactionContext, clone);
-
-            //TODO: add try catch to report any error back to user?
-            this.DalWrite(transaction);
-        }
-
-        /// <summary>
-        /// Update Permission
-        /// </summary>
-        private void UpdatePermission()
-        {
-            this.IsReadOnly = !this.Session.PermissionService.CanWrite(this.Thing);
         }
     }
 }

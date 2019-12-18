@@ -162,7 +162,7 @@
             <dxg:TreeListControl.Columns>
                 <dxg:TreeListColumn FieldName="Name" />
                 <dxg:TreeListColumn FieldName="ShortName" />
-                <dxg:TreeListColumn FieldName="AccessType" />
+                <dxg:TreeListColumn FieldName="AccessRight" />
             </dxg:TreeListControl.Columns>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView x:Name="View"
