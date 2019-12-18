@@ -74,10 +74,6 @@ namespace CDP4SiteDirectory.Tests.RoleBrowser
             
             Assert.That(row.Name, Is.Not.Null.Or.Empty);
             Assert.IsNotNull(row.ShortName);
-            Assert.IsFalse(row.IsReadOnly);
-
-            row.AccessRight = PersonAccessRightKind.NONE;
-            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
     }
 }

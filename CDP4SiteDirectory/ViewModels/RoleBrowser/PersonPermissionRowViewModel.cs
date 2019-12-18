@@ -25,11 +25,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// The camel case to space converter.
         /// </summary>
         private readonly CamelCaseToSpaceConverter camelCaseToSpaceConverter = new CamelCaseToSpaceConverter();
-        
-        /// <summary>
-        /// Backing field for <see cref="IsReadOnly"/>
-        /// </summary>
-        private bool isReadOnly;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonPermissionRowViewModel"/> class.
@@ -62,15 +57,6 @@ namespace CDP4SiteDirectory.ViewModels
             {
                 return this.ObjectClass;
             }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the current user may change the permission
-        /// </summary>
-        public bool IsReadOnly
-        {
-            get { return this.isReadOnly; }
-            set { this.RaiseAndSetIfChanged(ref this.isReadOnly, value); }
         }
     }
 }
