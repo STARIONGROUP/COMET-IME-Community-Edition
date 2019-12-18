@@ -53,6 +53,8 @@ namespace CDP4SiteDirectory.ViewModels
         {
             get { return this.ObjectClass; }
         }
+
+        /// <summary>
         /// Initializes the subscriptions
         /// </summary>
         protected override void InitializeSubscriptions()
@@ -69,9 +71,6 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
-        }
-
-        /// <summary>
         /// Updates the IsDeprecated property based on the value of the container <see cref="PersonRoleRowViewModel"/>
         /// </summary>
         private void UpdateIsDeprecatedDerivedFromContainerRowViewModel()
@@ -80,5 +79,6 @@ namespace CDP4SiteDirectory.ViewModels
             {
                 this.IsDeprecated = deprecatable.IsDeprecated;
             }
+        }
     }
 }
