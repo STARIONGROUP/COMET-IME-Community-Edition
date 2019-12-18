@@ -67,6 +67,17 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
+        /// Gets the Access right to display it in the "AccessType" column of the Role browser.
+        /// </summary>
+        public string AccessType
+        {
+            get
+            {
+                return this.AccessRight.ToString();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the current user may change the permission
         /// </summary>
         public bool IsReadOnly
