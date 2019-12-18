@@ -36,13 +36,13 @@ namespace CDP4Requirements.ViewModels
     using CDP4Requirements.ViewModels.RequirementBrowser;
     using CDP4Requirements.Views;
 
+    using CDP4RequirementsVerification;
+    using CDP4RequirementsVerification.Events;
     using CDP4RequirementsVerification.Verifiers;
 
     using NLog;
 
     using ReactiveUI;
-
-    using Observable = System.Reactive.Linq.Observable;
 
     /// <summary>
     /// The View-Model for the <see cref="RequirementsBrowser"/>
@@ -434,6 +434,12 @@ namespace CDP4Requirements.ViewModels
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(iterationSetupSubscription);
+
+            var parameterOrOverrideSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Unknown), typeof(ParameterOrOverrideBase)));
+
+            this.Disposables.Add(parameterOrOverrideSubscription);
         }
 
         /// <summary>

@@ -206,7 +206,7 @@ namespace CDP4Requirements.ViewModels
                 }
             }
 
-            this.SetRequirementStateOfComplianceTree();
+            this.ResetRequirementStateOfComplianceTree();
             this.UpdateStringExpression();
         }
 
@@ -228,7 +228,7 @@ namespace CDP4Requirements.ViewModels
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
-            this.SetRequirementStateOfComplianceTree();
+            this.ResetRequirementStateOfComplianceTree();
             this.UpdateProperties();
         }
     }

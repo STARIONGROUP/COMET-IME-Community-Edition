@@ -150,7 +150,7 @@ namespace CDP4Requirements.ViewModels
         {
             this.ThingStatus = new ThingStatus(this.Thing);
             this.UpdateTooltip();
-            this.SetRequirementStateOfComplianceTree();
+            this.ResetRequirementStateOfComplianceTree();
         }
 
         /// <summary>
