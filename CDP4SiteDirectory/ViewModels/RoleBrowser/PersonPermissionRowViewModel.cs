@@ -26,11 +26,6 @@ namespace CDP4SiteDirectory.ViewModels
         private readonly CamelCaseToSpaceConverter camelCaseToSpaceConverter = new CamelCaseToSpaceConverter();
 
         /// <summary>
-        /// Backing field for <see cref="IsReadOnly"/>
-        /// </summary>
-        private bool isReadOnly;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PersonPermissionRowViewModel"/> class.
         /// </summary>
         /// <param name="permission">The <see cref="PersonPermission"/> that is represented by the current row-view-model</param>
@@ -40,7 +35,6 @@ namespace CDP4SiteDirectory.ViewModels
             IViewModelBase<Thing> containerViewModel)
             : base(permission, session, containerViewModel)
         {
-            this.UpdatePermission();
             this.UpdateIsDeprecatedDerivedFromContainerRowViewModel();
         }
 
@@ -59,26 +53,11 @@ namespace CDP4SiteDirectory.ViewModels
         {
             get { return this.ObjectClass; }
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the current user may change the permission
-        /// </summary>
-        public bool IsReadOnly
-        {
-            get { return this.isReadOnly; }
-            set { this.RaiseAndSetIfChanged(ref this.isReadOnly, value); }
-        }
-
-        /// <summary>
         /// Initializes the subscriptions
         /// </summary>
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
-
-            var accessSubscription =
-                this.WhenAnyValue(x => x.AccessRight).Subscribe(_ => this.ExecuteUpdatePermission());
-            this.Disposables.Add(accessSubscription);
 
             if (this.ContainerViewModel is PersonRoleRowViewModel deprecatable)
             {
@@ -90,31 +69,6 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
-        /// Update the permission
-        /// </summary>
-        private void ExecuteUpdatePermission()
-        {
-            if (this.AccessRight == this.Thing.AccessRight)
-            {
-                return;
-            }
-
-            var clone = this.Thing.Clone(false);
-            clone.AccessRight = this.AccessRight;
-
-            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
-            var transaction = new ThingTransaction(transactionContext, clone);
-
-            //TODO: add try catch to report any error back to user?
-            this.DalWrite(transaction);
-        }
-
-        /// <summary>
-        /// Update Permission
-        /// </summary>
-        private void UpdatePermission()
-        {
-            this.IsReadOnly = !this.Session.PermissionService.CanWrite(this.Thing);
         }
 
         /// <summary>
@@ -126,6 +80,5 @@ namespace CDP4SiteDirectory.ViewModels
             {
                 this.IsDeprecated = deprecatable.IsDeprecated;
             }
-        }
     }
 }
