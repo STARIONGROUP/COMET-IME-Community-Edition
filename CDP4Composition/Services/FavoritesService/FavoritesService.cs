@@ -28,6 +28,11 @@ namespace CDP4Composition.Services.FavoritesService
     public class FavoritesService : IFavoritesService
     {
         /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
         /// Type map for shortnames of UserPreferences holding favorite types.
         /// </summary>
         private readonly IReadOnlyDictionary<Type, string> favoritesTypeMap = new Dictionary<Type, string>()
@@ -143,7 +148,7 @@ namespace CDP4Composition.Services.FavoritesService
             }
             catch (Exception ex)
             {
-                LogManager.GetLogger(typeof(FavoritesService).FullName).Error("The inline update operation failed: {0}", ex.Message);
+                logger.Error("The inline update operation failed: {0}", ex.Message);
             }
         }
 
