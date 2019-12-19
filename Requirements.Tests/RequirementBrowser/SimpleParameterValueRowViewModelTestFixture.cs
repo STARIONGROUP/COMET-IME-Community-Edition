@@ -41,8 +41,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             this.simpleParameterValue = new SimpleParameterValue(Guid.NewGuid(), null, null)
             {
-                Scale = new CyclicRatioScale { Name = "a", ShortName = "e"},
-                ParameterType = new BooleanParameterType { Name = "a", ShortName = "a"}
+                Scale = new CyclicRatioScale { Name = "a", ShortName = "e" },
+                ParameterType = new BooleanParameterType { Name = "a", ShortName = "a" }
             };
 
             this.testParameterType = new DateParameterType(Guid.NewGuid(), null, null) { Name = "testPT", ShortName = "tpt" };
@@ -68,8 +68,9 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var vm = new SimpleParameterValueRowViewModel(this.simpleParameterValue, this.session.Object, null);
 
             Assert.AreEqual(this.testParameterType.Name, vm.Name);
-            vm.Scale.ShortName = "m";
-            Assert.AreEqual($"{this.testParameterType.ShortName} [{vm.Scale.ShortName}]", vm.ShortName);            
+            Assert.AreEqual($"{this.testParameterType.ShortName} [{vm.Scale.ShortName}]", vm.ShortName);
+            vm.Scale = null;
+            Assert.AreEqual(this.testParameterType.ShortName, vm.ShortName);
             Assert.That(vm.Definition, Is.Not.Null.Or.Empty);
             Assert.AreEqual("1, 2", vm.Definition);
         }
