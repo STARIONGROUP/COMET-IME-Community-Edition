@@ -16,7 +16,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
-    
+
     /// <summary>
     /// The simple parameter value row view model.
     /// </summary>
@@ -82,7 +82,19 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string ShortName
         {
-            get { return this.shortName; }
+            get
+            {
+
+                if (this.Scale != null)
+                {
+                    return string.Concat(this.shortName, "(", this.Scale.ShortName, ")");
+                }
+                else
+                {
+                    return this.shortName;
+                }
+
+            }
             set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
         }
 
@@ -142,7 +154,7 @@ namespace CDP4Requirements.ViewModels
             if (requirementRowViewModel != null)
             {
                 this.IsDeprecated = requirementRowViewModel.IsDeprecated;
-            }            
+            }
         }
 
         /// <summary>
