@@ -29,6 +29,17 @@
             <converters:RequirementStateOfComplianceColorConverter x:Key="RequirementStateOfComplianceColorConverter"></converters:RequirementStateOfComplianceColorConverter>
             <converters:RequirementStateOfComplianceToVisibilityConverter x:Key="RequirementStateOfComplianceToVisibilityConverter"></converters:RequirementStateOfComplianceToVisibilityConverter>
 
+            <Style TargetType ="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecatedRequirement">
+                <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                <Setter Property="Background" Value="{Binding Row.RequirementStateOfCompliance, Mode=OneWay, Converter={StaticResource RequirementStateOfComplianceColorConverter}}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Row.IsDeprecated}" Value="True">
+                        <Setter Property="Background" Value="LightGray"/>
+                        <Setter Property="Opacity" Value="0.5"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <HierarchicalDataTemplate DataType="{x:Type viewModels:RequirementsSpecificationRowViewModel}" ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
@@ -359,7 +370,7 @@
                                   HorizontalScrollbarVisibility="Auto"
                                   NavigationStyle="Cell"
                                   ShowHorizontalLines="False"
-                                  RowStyle="{StaticResource RowStyleDeprecated}"
+                                  RowStyle="{StaticResource RowStyleDeprecatedRequirement}"
                                   ShowIndicator="False"
                                   ShowNodeImages="False"
                                   ShowVerticalLines="False"
@@ -369,12 +380,6 @@
                                   TreeLineStyle="Solid"
                                   VerticalScrollbarVisibility="Auto"
                                   ShowFilterPanelMode="Never">
-                        <dxg:TreeListView.RowStyle>
-                            <Style TargetType="{x:Type dxg:RowControl}">
-                                <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
-                                <Setter Property="Background" Value="{Binding Row.RequirementStateOfCompliance, Mode=OneWay, Converter={StaticResource RequirementStateOfComplianceColorConverter}}" />
-                            </Style>
-                        </dxg:TreeListView.RowStyle>
 
                         <dxg:TreeListView.FocusedRow>
                             <dynamic:ExpandoObject />
