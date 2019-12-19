@@ -87,7 +87,7 @@ namespace CDP4Requirements.ViewModels
 
                 if (this.Scale != null)
                 {
-                    return string.Concat(this.shortName, "(", this.Scale.ShortName, ")");
+                    return $"{this.shortName} [{this.Scale.ShortName}]";
                 }
                 else
                 {
