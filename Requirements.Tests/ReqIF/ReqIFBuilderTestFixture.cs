@@ -254,7 +254,7 @@ namespace CDP4Requirements.Tests
             Assert.AreEqual(3, reqif.CoreContent.Single().DataTypes.Count); // booleanPt and boolean and Text datatype
             Assert.AreEqual(7, reqif.CoreContent.Single().SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Single().Specifications.Count); // 2 specification
-            Assert.AreEqual(5, reqif.CoreContent.Single().SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(9, reqif.CoreContent.Single().SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
             Assert.AreEqual(3, reqif.CoreContent.Single().SpecRelations.Count); // 3 specRelation from 3 relationship
             Assert.AreEqual(1, reqif.CoreContent.Single().SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
 

@@ -11,6 +11,7 @@ namespace ProductTree.Tests.ProductTreeRows
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -19,11 +20,15 @@ namespace ProductTree.Tests.ProductTreeRows
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using CDP4ProductTree.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using Moq;
     using NUnit.Framework;
@@ -34,8 +39,10 @@ namespace ProductTree.Tests.ProductTreeRows
         private Mock<IPermissionService> permissionService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
+        private Mock<IThingCreator> thingCreator;
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private Mock<IServiceLocator> serviceLocator;
 
         private SiteDirectory siteDir;
         private EngineeringModel model;
@@ -61,6 +68,13 @@ namespace ProductTree.Tests.ProductTreeRows
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" , ShortName = "dom"};
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.thingCreator = new Mock<IThingCreator>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>())
+                .Returns(this.thingCreator.Object);
 
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
@@ -277,7 +291,7 @@ namespace ProductTree.Tests.ProductTreeRows
         }
 
         [Test]
-        public void VerifyThatDropWorks()
+        public async Task VerifyThatDropWorks()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
@@ -287,8 +301,9 @@ namespace ProductTree.Tests.ProductTreeRows
             dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
 
             dropinfo.SetupProperty(x => x.Effects);
-            vm.Drop(dropinfo.Object).Wait();
-            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
+            await vm.Drop(dropinfo.Object);
+
+            this.thingCreator.Verify(x => x.CreateElementUsage(It.IsAny<ElementDefinition>(), It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), It.IsAny<ISession>()));
         }
     }
 }

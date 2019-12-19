@@ -25,6 +25,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
 
     using NUnit.Framework;
@@ -37,6 +40,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private Mock<IThingCreator> thingCreator;
         private readonly Uri uri = new Uri("http://test.com");
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private Mock<IServiceLocator> serviceLocator;
 
         private ElementDefinition elementDefinition;
         private ElementDefinition elementDefinitionForUsage1;
@@ -102,6 +106,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.thingCreator = new Mock<IThingCreator>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>())
+                .Returns(this.thingCreator.Object);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
@@ -671,7 +681,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
-        public void VerifyThatDropsWorks()
+        public async Task VerifyThatDropsWorks()
         {
             var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
 
@@ -679,9 +689,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             dropinfo.Setup(x => x.Payload).Returns(this.elementDefinitionForUsage1);
             dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
 
-            row.Drop(dropinfo.Object);
+            await row.Drop(dropinfo.Object);
 
-            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
+            this.thingCreator.Verify(x => x.CreateElementUsage(It.IsAny<ElementDefinition>(), It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), It.IsAny<ISession>()));
         }
 
         [Test]
