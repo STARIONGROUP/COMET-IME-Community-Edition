@@ -23,7 +23,7 @@ namespace CDP4SiteDirectory.ViewModels
     /// <summary>
     /// The purpose of the <see cref="RoleBrowserViewModel"/> is to represent the view-model for <see cref="CDP4Common.SiteDirectoryData.Rule"/>s
     /// </summary>
-    public class RoleBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class RoleBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The <see cref="CDP4Common.SiteDirectoryData.PersonRole"/> folder row

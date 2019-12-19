@@ -25,7 +25,7 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// Represents the view-model of the <see cref="CategoryBrowser"/> view
     /// </summary>
-    public class CategoryBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class CategoryBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -41,7 +41,7 @@ namespace BasicRdl.ViewModels
         /// Backing field for <see cref="CanCreateRdlElement"/>
         /// </summary>
         private bool canCreateRdlElement;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CategoryBrowserViewModel"/> class
         /// </summary>
@@ -53,13 +53,17 @@ namespace BasicRdl.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public CategoryBrowserViewModel(ISession session, SiteDirectory thing, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public CategoryBrowserViewModel(ISession session, SiteDirectory thing,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
+                this.Session.ActivePerson.Name);
 
-            this.AddSubscriptions();            
+            this.AddSubscriptions();
         }
 
         /// <summary>
@@ -67,10 +71,7 @@ namespace BasicRdl.ViewModels
         /// </summary>
         public ReactiveList<CategoryRowViewModel> Categories
         {
-            get
-            {
-                return this.categories;
-            }
+            get { return this.categories; }
         }
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace BasicRdl.ViewModels
                 category.Dispose();
             }
         }
-        
+
         /// <summary>
         /// Loads the <see cref="Thing"/>s from the cache when the browser is instantiated.
         /// </summary>
@@ -109,7 +110,8 @@ namespace BasicRdl.ViewModels
         {
             base.Initialize();
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
-            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
+            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
+                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var category in referenceDataLibrary.DefinedCategory)
                 {
@@ -120,7 +122,7 @@ namespace BasicRdl.ViewModels
 
         /// <summary>
         /// Initialize the <see cref="ICommand{T}"/>s
-        /// </summary>       
+        /// </summary>
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
@@ -150,8 +152,10 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Category", "", this.CreateCommand, MenuItemKind.Create, ClassKind.Category));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Highlight", "", this.HighlightCommand, MenuItemKind.Highlight));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Category", "", this.CreateCommand,
+                MenuItemKind.Create, ClassKind.Category));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Highlight", "", this.HighlightCommand,
+                MenuItemKind.Highlight));
         }
 
         /// <summary>
@@ -161,7 +165,8 @@ namespace BasicRdl.ViewModels
         {
             var addListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Category))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Category)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.AddCategoryRowViewModel);
@@ -169,7 +174,8 @@ namespace BasicRdl.ViewModels
 
             var removeListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Category))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Category)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RemoveCategoryRowViewModel);
@@ -177,7 +183,8 @@ namespace BasicRdl.ViewModels
 
             var rdlUpdateListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);
@@ -246,7 +253,8 @@ namespace BasicRdl.ViewModels
             CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
 
             // highlight the selected thing
-            CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.SelectedThing.Thing as Category), this.SelectedThing.Thing);
+            CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.SelectedThing.Thing as Category),
+                this.SelectedThing.Thing);
         }
     }
 }

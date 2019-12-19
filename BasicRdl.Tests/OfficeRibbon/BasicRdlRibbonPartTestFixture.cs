@@ -7,6 +7,7 @@
 namespace BasicRdl.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.IO.Packaging;
     using System.Reactive.Concurrency;
     using System.Threading;
@@ -18,6 +19,7 @@ namespace BasicRdl.Tests
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services.FavoritesService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
@@ -41,12 +43,14 @@ namespace BasicRdl.Tests
         private int amountOfRibbonControls;
         private int order;
         private string ribbonxmlname;
-        private Mock<IServiceLocator> serviceLocator; 
+        private Mock<IServiceLocator> serviceLocator;
+
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> dialogNavigationService;
         private Mock<IPermissionService> permittingPermissionService;
         private Mock<ISession> session;
         private Person person;
+        private Mock<IFavoritesService> favoritesService;
 
         [SetUp]
         public void SetUp()
@@ -59,7 +63,7 @@ namespace BasicRdl.Tests
             this.session = new Mock<ISession>();
             var siteDirectory = new SiteDirectory(Guid.NewGuid(), null, this.uri);
             this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "John", Surname = "Doe" };
-
+            this.favoritesService = new Mock<IFavoritesService>();
             this.session.Setup(x => x.DataSourceUri).Returns("test");
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(siteDirectory);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
@@ -72,12 +76,17 @@ namespace BasicRdl.Tests
             this.permittingPermissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permittingPermissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
+            this.favoritesService.Setup(x => x.GetFavoriteItemsCollectionByType(It.IsAny<ISession>(), It.IsAny<Type>()))
+                .Returns(new HashSet<Guid>());
+            this.favoritesService.Setup(x =>
+                x.SubscribeToChanges(It.IsAny<ISession>(), It.IsAny<Type>(), It.IsAny<Action<HashSet<Guid>>>())).Returns(new Mock<IDisposable>().Object);
+
             this.session.Setup(x => x.PermissionService).Returns(this.permittingPermissionService.Object);
 
             this.amountOfRibbonControls = 6;
             this.order = 1;
 
-            this.ribbonPart = new BasicRdlRibbonPart(this.order, this.panelNavigationService.Object, null, null, null);
+            this.ribbonPart = new BasicRdlRibbonPart(this.order, this.panelNavigationService.Object, null, null, null, this.favoritesService.Object);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>())

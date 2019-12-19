@@ -6,13 +6,14 @@
 
 namespace BasicRdl.Views
 {
+    using DevExpress.Xpf.Bars;
     using ViewModels;
     using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>
     /// Interaction logic for ReferenceSourceRibbon view
     /// </summary>
-    public partial class ReferenceSourceRibbon : IView
+    public partial class ReferenceSourceRibbon : IView, IBarItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceSourceRibbon"/> class.

@@ -18,6 +18,7 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
     using CDP4Dal;
     using CDP4Dal.Permission;
     using BasicRdl.ViewModels;
+    using CDP4Composition.Services.FavoritesService;
     using Microsoft.Practices.ServiceLocation;
     using Moq;
     using NUnit.Framework;
@@ -35,6 +36,7 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
+        private Mock<IFavoritesService> favoritesService;
 
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private Mock<IServiceLocator> serviceLocator;
@@ -57,6 +59,8 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
+            this.favoritesService = new Mock<IFavoritesService>();
 
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
@@ -104,7 +108,8 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
                 this.dialogNavigationService.Object,
-                this.pluginSettingsService.Object);
+                this.pluginSettingsService.Object,
+                this.favoritesService.Object);
 
             Assert.IsInstanceOf<ParameterTypesBrowserViewModel>(viewmodel);
         }

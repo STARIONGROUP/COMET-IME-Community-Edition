@@ -13,6 +13,7 @@ namespace BasicRdl
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services.FavoritesService;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
 
@@ -43,8 +44,9 @@ namespace BasicRdl
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
+        /// <param name="favoritesService">The <see cref="IFavoritesService"/> to be used to store and retrieve favorite things.</param>
         [ImportingConstructor]
-        public BasicRdlModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        public BasicRdlModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IFavoritesService favoritesService)
         {
             this.RegionManager = regionManager;
             this.RibbonManager = ribbonManager;
@@ -52,6 +54,7 @@ namespace BasicRdl
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.DialogNavigationService = dialogNavigationService;
             this.PluginSettingsService = pluginSettingsService;
+            this.FavoritesService = favoritesService;
         }
 
         /// <summary>
@@ -85,6 +88,11 @@ namespace BasicRdl
         internal IPluginSettingsService PluginSettingsService { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="IFavoritesService"/> used to read and write lists of favorite things to user preferences.
+        /// </summary>
+        internal IFavoritesService FavoritesService { get; private set; }
+
+        /// <summary>
         /// Initialize the Module
         /// </summary>
         public void Initialize()
@@ -99,7 +107,7 @@ namespace BasicRdl
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new BasicRdlRibbonPart(20, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+            var rdlRibbonPart = new BasicRdlRibbonPart(20, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.FavoritesService);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }

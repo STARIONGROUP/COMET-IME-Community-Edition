@@ -8,13 +8,14 @@ namespace BasicRdl.Views
 {
     using System.ComponentModel.Composition;
     using BasicRdl.ViewModels;
+    using DevExpress.Xpf.Bars;
     using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>
     /// Interaction logic for ParameterTypeRibbon.xaml
     /// </summary>
     [Export(typeof(ParameterTypeRibbon))]
-    public partial class ParameterTypeRibbon : IView
+    public partial class ParameterTypeRibbon : IView, IBarItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeRibbon"/> class.

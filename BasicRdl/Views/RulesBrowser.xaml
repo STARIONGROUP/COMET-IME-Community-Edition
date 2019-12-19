@@ -62,6 +62,7 @@
                                AllowColumnMoving="True"
                                AllowEditing="False"
                                AllowGrouping="True"
+                               RowStyle="{StaticResource RowStyleDeprecated}"
                                AutoWidth="true"
                                ShowFilterPanelMode="Never"
                                IsDetailButtonVisibleBinding="{x:Null}"
@@ -73,11 +74,6 @@
                     <dxg:TableView.ContextMenu>
                         <ContextMenu Name="RowContextMenu" />
                     </dxg:TableView.ContextMenu>
-                    <dxg:TableView.RowStyle>
-                        <Style TargetType="{x:Type dxg:RowControl}">
-                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
-                        </Style>
-                    </dxg:TableView.RowStyle>
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
@@ -99,7 +95,7 @@
                     </dxg:GridColumn.DisplayTemplate>
                 </dxg:GridColumn>
 
-                <dxg:GridColumn FieldName="Name" Header="Name" />
+                <dxg:GridColumn FieldName="Name" Header="Name" SortIndex="0"/>
                 <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
                 <dxg:GridColumn Binding="{Binding Path=RowData.Row.ClassKind,
                                                   Converter={StaticResource CamelCaseToSpaceConverter}}"

@@ -260,7 +260,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets or sets a value indicating whether deprecated items are shown
         /// </summary>
-        public bool IsDeprecatedDisplayed { get; set; } = !FilterStringService.FilterString.IsFilterActive;
+        public bool IsDeprecatedDisplayed { get; set; } = !FilterStringService.FilterString.DeprecatableToggleViewModel.ShowDeprecatedThings;
 
         /// <summary>
         /// Gets or sets the records used for row construction.

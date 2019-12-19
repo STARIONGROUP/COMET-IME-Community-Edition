@@ -23,7 +23,8 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// The purpose of the <see cref="MeasurementUnitsBrowserViewModel"/> is to represent the view-model for <see cref="MeasurementUnit"/>s
     /// </summary>
-    public class MeasurementUnitsBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class MeasurementUnitsBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
+        IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -33,7 +34,8 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Backing field for the <see cref="MeasurementUnits"/> property
         /// </summary>
-        private readonly ReactiveList<MeasurementUnitRowViewModel> measurementUnits = new ReactiveList<MeasurementUnitRowViewModel>();
+        private readonly ReactiveList<MeasurementUnitRowViewModel> measurementUnits =
+            new ReactiveList<MeasurementUnitRowViewModel>();
 
         /// <summary>
         /// Backing field for <see cref="CanCreateRdlElement"/>
@@ -51,26 +53,27 @@ namespace BasicRdl.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public MeasurementUnitsBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public MeasurementUnitsBrowserViewModel(ISession session, SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
+                this.Session.ActivePerson.Name);
 
             this.measurementUnits.ChangeTrackingEnabled = true;
 
             this.AddSubscriptions();
         }
-        
+
         /// <summary>
         /// Gets the <see cref="MeasurementUnitRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<MeasurementUnitRowViewModel> MeasurementUnits 
+        public ReactiveList<MeasurementUnitRowViewModel> MeasurementUnits
         {
-            get
-            {
-                return this.measurementUnits;
-            }
+            get { return this.measurementUnits; }
         }
 
         /// <summary>
@@ -101,7 +104,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="PrefixedUnit"/>
         /// </summary>
         public ReactiveCommand<object> CreatePrefixedUnit { get; private set; }
-        
+
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -109,7 +112,8 @@ namespace BasicRdl.ViewModels
         {
             var addListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(MeasurementUnit))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as MeasurementUnit)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.AddMeasurementUnitRowViewModel);
@@ -117,7 +121,8 @@ namespace BasicRdl.ViewModels
 
             var removeListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(MeasurementUnit))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as MeasurementUnit)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RemoveMeasurementUnitRowViewModel);
@@ -125,7 +130,8 @@ namespace BasicRdl.ViewModels
 
             var rdlUpdateListener =
                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
+                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);
@@ -196,10 +202,14 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Simple Unit", "", this.CreateSimpleUnit, MenuItemKind.Create, ClassKind.SimpleUnit));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Derived Unit", "", this.CreateDerivedUnit, MenuItemKind.Create, ClassKind.DerivedUnit));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Linear Conversion Unit", "", this.CreateLinearConversionUnit, MenuItemKind.Create, ClassKind.LinearConversionUnit));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Prefixed Unit", "", this.CreatePrefixedUnit, MenuItemKind.Create, ClassKind.PrefixedUnit));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Simple Unit", "", this.CreateSimpleUnit,
+                MenuItemKind.Create, ClassKind.SimpleUnit));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Derived Unit", "", this.CreateDerivedUnit,
+                MenuItemKind.Create, ClassKind.DerivedUnit));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Linear Conversion Unit", "",
+                this.CreateLinearConversionUnit, MenuItemKind.Create, ClassKind.LinearConversionUnit));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Prefixed Unit", "", this.CreatePrefixedUnit,
+                MenuItemKind.Create, ClassKind.PrefixedUnit));
         }
 
         /// <summary>
@@ -229,7 +239,8 @@ namespace BasicRdl.ViewModels
         {
             base.Initialize();
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
-            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
+            foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
+                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var measurementUnit in referenceDataLibrary.Unit)
                 {

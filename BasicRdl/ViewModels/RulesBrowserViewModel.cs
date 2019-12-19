@@ -23,7 +23,7 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// The purpose of the <see cref="RulesBrowserViewModel"/> is to represent the view-model for <see cref="Rule"/>s
     /// </summary>
-    public class RulesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class RulesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -106,7 +106,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ReferencerRule"/>
         /// </summary>
         public ReactiveCommand<object> CreateReferencerRule { get; private set; }
-        
+
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>

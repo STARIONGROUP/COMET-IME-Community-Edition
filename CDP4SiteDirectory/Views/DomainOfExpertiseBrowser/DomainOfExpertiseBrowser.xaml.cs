@@ -8,15 +8,16 @@ namespace CDP4SiteDirectory.Views
 {
     using CDP4Composition;
     using CDP4Composition.Attributes;
+    using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
-
+    using DevExpress.Xpf.Grid;
     using NLog;
 
     /// <summary>
     /// Interaction logic for DomainOfExpertiseBrowser
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class DomainOfExpertiseBrowser : IPanelView
+    public partial class DomainOfExpertiseBrowser : IPanelView, IPanelFilterableDataGridView
     {
         /// <summary>
         /// The NLog logger
@@ -44,8 +45,13 @@ namespace CDP4SiteDirectory.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                FilterStringService.FilterString.AddGridControl(this.DomainsGridControl);
+                this.FilterableControl = this.DomainsGridControl;
             }
         }
+
+        /// <summary>
+        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
+        /// </summary>
+        public DataControlBase FilterableControl { get; private set; }
     }
 }

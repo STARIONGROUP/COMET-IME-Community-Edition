@@ -38,6 +38,7 @@
         <dxg:GridControl Grid.Row="2"
                          AllowLiveDataShaping="False"
                          Name="MeasurementScalesGridControl"
+                         AutoExpandAllGroups="True"
                          ItemsSource="{Binding MeasurementScales}"
                          SelectedItem="{Binding SelectedThing,
                                                 Mode=TwoWay,
@@ -59,6 +60,7 @@
                                AllowColumnMoving="True"
                                ShowFilterPanelMode="Never"
                                AllowEditing="False"
+                               ShowSearchPanelMode="Default"
                                AllowGrouping="True"
                                AutoWidth="true"
                                IsDetailButtonVisibleBinding="{x:Null}"
@@ -103,7 +105,7 @@
                     </dxg:GridColumn.DisplayTemplate>
                 </dxg:GridColumn>
 
-                <dxg:GridColumn FieldName="Name" Header="Name" />
+                <dxg:GridColumn FieldName="Name" SortMode="Value" SortIndex="0" Header="Name" />
                 <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
                 <dxg:GridColumn FieldName="ClassKind" Header="Type" />
                 <dxg:GridColumn FieldName="NumberSet" Header="Number Set" />

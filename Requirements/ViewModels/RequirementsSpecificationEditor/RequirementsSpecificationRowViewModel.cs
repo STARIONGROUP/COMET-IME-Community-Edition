@@ -68,15 +68,6 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         {
             this.OwnerShortName = this.Thing.Owner != null ? this.Thing.Owner.ShortName : string.Empty;
             this.BreadCrumb = this.Thing.BreadCrumb();
-            this.UpdateRowVisibility();
-        }
-
-        /// <summary>
-        /// Update the visibility of this row
-        /// </summary>
-        protected override void UpdateRowVisibility()
-        {
-            this.ShouldBeDisplayed = !this.IsDeprecated || this.IsDeprecatedDisplayed;
         }
     }
 }

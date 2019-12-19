@@ -7,7 +7,7 @@
 namespace CDP4SiteDirectory.ViewModels
 {
     using System;
-    using System.Linq;   
+    using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4CommonView;
@@ -23,9 +23,11 @@ namespace CDP4SiteDirectory.ViewModels
     /// <summary>
     /// represents a view-model for the <see cref="DomainOfExpertise"/>s in a <see cref="SiteDirectory"/>
     /// </summary>
-    public class DomainOfExpertiseBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class DomainOfExpertiseBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
+        IDeprecatableBrowserViewModel
     {
         #region Fields
+
         /// <summary>
         /// The row comparer
         /// </summary>
@@ -39,7 +41,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// The Panel Caption
         /// </summary>
-        private const string PanelCaption = "Domains of expertise";
+        private const string PanelCaption = "Domains of Expertise";
 
         #endregion
 
@@ -58,11 +60,15 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public DomainOfExpertiseBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public DomainOfExpertiseBrowserViewModel(ISession session, SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
+                this.Session.ActivePerson.Name);
 
             this.DomainOfExpertises = new ReactiveList<DomainOfExpertiseRowViewModel>();
             this.ComputeDomains();
@@ -83,9 +89,11 @@ namespace CDP4SiteDirectory.ViewModels
         /// Gets the List of <see cref="DomainOfExpertiseRowViewModel"/>
         /// </summary>
         public ReactiveList<DomainOfExpertiseRowViewModel> DomainOfExpertises { get; private set; }
+
         #endregion
 
         #region browser base
+
         /// <summary>
         /// Initialize the <see cref="ReactiveCommand"/>s of the current view-model
         /// </summary>
@@ -137,8 +145,10 @@ namespace CDP4SiteDirectory.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Domain of Expertise", "", this.CreateCommand, MenuItemKind.Create, ClassKind.DomainOfExpertise));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Domain of Expertise", "", this.CreateCommand,
+                MenuItemKind.Create, ClassKind.DomainOfExpertise));
         }
+
         #endregion
 
         /// <summary>

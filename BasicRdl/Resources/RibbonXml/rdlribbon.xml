@@ -2,7 +2,7 @@
   <group id="basicrdl" label="Reference Data">
     <button id="ShowMeasurementUnits" size="large" label="Units" supertip="Manage Measurement Units" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
     <button id="ShowMeasurementScales" size="large" label="Scales" supertip="Manage Measurement Scales" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
-    <button id="ShowParameterTypes" size="large" label="ParameterTypes" supertip="Manage Units" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
+    <button id="ShowParameterTypes" size="large" label="ParameterTypes" supertip="Manage ParameterTypes" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
     <button id="ShowRules" size="large" label="Rules" supertip="Manage Rules" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
     <button id="ShowCategories" size="large" label="Categories" supertip="Manage Categories" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
   </group>

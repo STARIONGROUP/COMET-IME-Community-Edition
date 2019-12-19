@@ -187,6 +187,8 @@ namespace CDP4Requirements.ViewModels
             }
             if (cptPt == null)
             {
+                this.Thing.ParameterType = this.SelectedParameterType;
+
                 var row = new Dialogs.SimpleParameterValueRowViewModel(this.Thing, this.Session, this, 0, this.IsReadOnly);
                 var quantityKind = this.SelectedParameterType as QuantityKind;
                 row.ParameterType = this.SelectedParameterType;

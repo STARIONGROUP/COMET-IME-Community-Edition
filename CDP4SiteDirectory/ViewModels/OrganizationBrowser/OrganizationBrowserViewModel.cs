@@ -23,7 +23,7 @@ namespace CDP4SiteDirectory.ViewModels
     /// <summary>
     /// The view-model for the <see cref="OrganizationBrowser"/>
     /// </summary>
-    public class OrganizationBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class OrganizationBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// Backing field for <see cref="CanCreateOrganization"/>
@@ -113,7 +113,7 @@ namespace CDP4SiteDirectory.ViewModels
 
             foreach (var addedPerson in addedPersons)
             {
-                var row = new OrganizationBrowser.PersonRowViewModel(addedPerson, this.Session, this);
+                var row = new OrganizationBrowser.PersonRowViewModel(addedPerson, this.Session, organizationRow);
                 organizationRow.ContainedRows.Add(row);
             }
 

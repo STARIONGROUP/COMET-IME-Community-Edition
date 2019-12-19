@@ -12,7 +12,7 @@
                                 MergeOrder="9000"
                                 mc:Ignorable="d">
     <dxb:BarButtonItem Command="{Binding ClearHighlightingCommand}"
-                       Content="Clear highlighting"
+                       Content="Clear Highlighting"
                        Description="Clear highlighting of all things in all browsers"
                        Glyph="{dx:DXImage Image=HighlightField_16x16.png}"
                        Hint="Clear highlighting of all things in all browsers"

@@ -30,14 +30,6 @@ namespace CDP4SiteDirectory.Tests
         }
 
         [Test]
-        public void VerifyShowHideDeprecatedThingsCommandDoesNotThrowError()
-        {
-            var viewmodel = new ShowDeprecatedBrowserRibbonViewModel();
-            Assert.IsTrue(viewmodel.ShowHideDeprecatedThingsCommand.CanExecute(null));
-            viewmodel.ShowHideDeprecatedThingsCommand.Execute(null);
-        }
-
-        [Test]
         public void VerifyThatSessionArePopulated()
         {
             var viewmodel = new ShowDeprecatedBrowserRibbonViewModel();

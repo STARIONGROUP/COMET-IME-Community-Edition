@@ -23,7 +23,7 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// The purpose of the <see cref="UnitPrefixBrowserViewModel"/> is to represent the view-model for <see cref="UnitPrefix"/>es
     /// </summary>
-    public class UnitPrefixBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class UnitPrefixBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption

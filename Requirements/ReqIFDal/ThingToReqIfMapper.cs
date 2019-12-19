@@ -1,4 +1,5 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿
+// -------------------------------------------------------------------------------------------------
 // <copyright file="ThingToReqIfMapper.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015 RHEA System S.A.
 // </copyright>
@@ -195,8 +196,12 @@ namespace CDP4Requirements.ReqIFDal
             specObjectType.SpecAttributes.Add(isDeprecatedAttributeDefinition);
 
             // set the attribute-definition
-            var parameterTypes = appliedRules.SelectMany(r => r.ParameterType).Distinct();
-            foreach (var parameterType in parameterTypes)
+            var parameterTypes = appliedRules.SelectMany(r => r.ParameterType).ToList();
+            var requirementParameterTypes = requirement.ParameterValue.Select(spv => spv.ParameterType);
+
+            parameterTypes.AddRange(requirementParameterTypes);
+
+            foreach (var parameterType in parameterTypes.Distinct())
             {
                 var attibuteDef = this.ToReqIfAttributeDefinition(parameterType, parameterTypeMap);
                 specObjectType.SpecAttributes.Add(attibuteDef);

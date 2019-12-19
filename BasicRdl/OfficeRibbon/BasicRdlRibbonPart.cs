@@ -16,6 +16,7 @@ namespace BasicRdl
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services.FavoritesService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using NLog;
@@ -67,16 +68,24 @@ namespace BasicRdl
         /// </param>
         /// <param name="thingDialogNavigationService">The instance of <see cref="IThingDialogNavigationService"/> that orchestrates navigation of <see cref="IThingDialogView"/></param>
         /// <param name="dialogNavigationService">The instance of <see cref="IDialogNavigationService"/> that orchestrates navigation to dialogs</param>
-        public BasicRdlRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        /// <param name="pluginSettingsService">The instance of <see cref="IPluginSettingsService"/> that reads and writes </param>
+        /// <param name="favoritesService">The instance of <see cref="IDialogNavigationService"/> that</param>
+        public BasicRdlRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IFavoritesService favoritesService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);            
+            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.FavoritesService = favoritesService;
         }
 
         /// <summary>
         /// Gets the <see cref="ISession"/> that is active for the <see cref="RibbonPart"/>
         /// </summary>
         public ISession Session { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IFavoritesService"/> that is active for the <see cref="RibbonPart"/>
+        /// </summary>
+        public IFavoritesService FavoritesService { get; private set; }
 
         /// <summary>
         /// Gets the the current executing assembly
@@ -128,7 +137,7 @@ namespace BasicRdl
                 this.measurementScalesBrowserViewModel = new MeasurementScalesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.rulesBrowserViewModel = new RulesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.categoryBrowserViewModel = new CategoryBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
-                this.parameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+                this.parameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.FavoritesService);
 
                 this.Session = session;
             }

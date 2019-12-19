@@ -45,7 +45,7 @@ namespace BasicRdl.Tests
         {
             var ribbonManager = new FluentRibbonManager();
 
-            var module = new BasicRdlModule(this.regionManager.Object, ribbonManager, this.panelNavigationService.Object, null, null, null);
+            var module = new BasicRdlModule(this.regionManager.Object, ribbonManager, this.panelNavigationService.Object, null, null, null, null);
             //module.Initialize();
             Assert.AreEqual(this.regionManager.Object, module.RegionManager);            
         }

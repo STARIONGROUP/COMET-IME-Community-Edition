@@ -12,11 +12,11 @@
                                 MergeOrder="9000"
                                 mc:Ignorable="d">
 
-    <dxb:BarCheckItem Command="{Binding ShowHideDeprecatedThingsCommand}"
-                       Content="Show deprecated things"
-                       Description="Show or hide deprecated things in all browsers"
+    <dxb:BarCheckItem IsChecked="{Binding ShowDeprecatedThings}"
+                       Content="Show Deprecated Things"
+                       Description="Show or hide deprecated things in all browsers."
                        Glyph="{dx:DXImage Image=Show_16x16.png}"
-                       Hint="Show or hide deprecated things in all browsers"
+                       Hint="Show or hide deprecated things in all browsers."
                        IsEnabled="{Binding HasSession, UpdateSourceTrigger=PropertyChanged}"
                        LargeGlyph="{dx:DXImage Image=Show_32x32.png}"
                        RibbonStyle="large" />

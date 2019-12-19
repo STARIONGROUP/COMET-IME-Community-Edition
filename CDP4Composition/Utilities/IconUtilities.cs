@@ -39,6 +39,11 @@ namespace CDP4Common.Helpers
         /// </summary>
         public static readonly Uri RelationshipOverlayUri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/Log/linkgreen_16x16.png");
 
+        /// <summary>
+        /// The <see cref="Uri"/> to the favorite image overlay.
+        /// </summary>
+        public static readonly Uri FavoriteOverlayUri = (new DXImageConverter().ConvertFrom("NewContact_16x16.png") as DXImageInfo)?.MakeUri();
+
         public static ImageSource ToImageSource(this Icon icon)
         {
             var imageSource = Imaging.CreateBitmapSourceFromHIcon(
@@ -463,9 +468,10 @@ namespace CDP4Common.Helpers
                 case ClassKind.TimeOfDayParameterType:
                 case ClassKind.ParameterTypeComponent:
                 case ClassKind.ParameterType:
-                    imagename = "parametertype";
+                    imagename = "NameManager";
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
 
-                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
+                    return imageInfo.MakeUri().ToString();
                 case ClassKind.Definition:
                     imagename = "SendBehindText";
                     imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;

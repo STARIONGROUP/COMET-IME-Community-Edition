@@ -25,7 +25,8 @@ namespace CDP4Requirements.ViewModels
     /// <summary>
     /// The row-view-model that represents a <see cref="RequirementsGroup"/>
     /// </summary>
-    public class RequirementsGroupRowViewModel : RequirementContainerRowViewModel<RequirementsGroup>, IDropTarget, IDeprecatableThing
+    public class RequirementsGroupRowViewModel : RequirementContainerRowViewModel<RequirementsGroup>, IDropTarget,
+        IDeprecatableThing
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementsGroupRowViewModel"/> class
@@ -34,7 +35,8 @@ namespace CDP4Requirements.ViewModels
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
         /// <param name="topNode">The top level node for this row</param>
-        public RequirementsGroupRowViewModel(RequirementsGroup group, ISession session, IViewModelBase<Thing> containerViewModel, RequirementsSpecificationRowViewModel topNode)
+        public RequirementsGroupRowViewModel(RequirementsGroup group, ISession session,
+            IViewModelBase<Thing> containerViewModel, RequirementsSpecificationRowViewModel topNode)
             : base(group, session, containerViewModel, topNode)
         {
             this.UpdateProperties();
@@ -50,7 +52,7 @@ namespace CDP4Requirements.ViewModels
             this.UpdateRequirementGroupRows();
             this.UpdateIsDeprecatedDerivedFromContainerRequirementsSpecification();
         }
-        
+
         /// <summary>
         /// Initializes the subscriptions
         /// </summary>
@@ -58,7 +60,8 @@ namespace CDP4Requirements.ViewModels
         {
             base.InitializeSubscriptions();
 
-            var requirementsSpecificationRowViewModel = this.ContainerViewModel as RequirementsSpecificationRowViewModel;
+            var requirementsSpecificationRowViewModel =
+                this.ContainerViewModel as RequirementsSpecificationRowViewModel;
             if (requirementsSpecificationRowViewModel != null)
             {
                 var containerIsDeprecatedSubscription =
@@ -86,17 +89,19 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Recursively Update the IsDeprecated property
         /// </summary>
-        /// <param name="containedGroupRows">
-        /// 
+        /// <param name="groupRows">
+        /// The collection of rows in the group.
         /// </param>
-        /// <param name="isDeprecated"></param>
-        private void RecursivelyUpdateIsDeprecated(IEnumerable<RequirementsGroupRowViewModel> groupRows, bool isDeprecated)
+        /// <param name="isDeprecated">The deprecated state.</param>
+        private void RecursivelyUpdateIsDeprecated(IEnumerable<RequirementsGroupRowViewModel> groupRows,
+            bool isDeprecated)
         {
             foreach (var requirementsGroupRowViewModel in groupRows)
             {
                 requirementsGroupRowViewModel.IsDeprecated = isDeprecated;
 
-                var containedGroupRows = requirementsGroupRowViewModel.ContainedRows.OfType<RequirementsGroupRowViewModel>();
+                var containedGroupRows =
+                    requirementsGroupRowViewModel.ContainedRows.OfType<RequirementsGroupRowViewModel>();
                 requirementsGroupRowViewModel.RecursivelyUpdateIsDeprecated(containedGroupRows, isDeprecated);
             }
         }
@@ -110,7 +115,7 @@ namespace CDP4Requirements.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Queries whether a drag can be started
         /// </summary>
@@ -152,9 +157,12 @@ namespace CDP4Requirements.ViewModels
             {
                 var canDropRequirement = this.PermissionService.CanWrite(requirement);
                 var requirementSpecification = this.Thing.GetContainerOfType<RequirementsSpecification>();
-                var canModifyRequirementSpecification = (requirementSpecification == requirement.Container) || this.PermissionService.CanWrite(ClassKind.Requirement, requirementSpecification);
+                var canModifyRequirementSpecification = (requirementSpecification == requirement.Container) ||
+                                                        this.PermissionService.CanWrite(ClassKind.Requirement,
+                                                            requirementSpecification);
 
-                if (!canDropRequirement || !canModifyRequirementSpecification || requirement.IDalUri.ToString() != this.Session.DataSourceUri)
+                if (!canDropRequirement || !canModifyRequirementSpecification ||
+                    requirement.IDalUri.ToString() != this.Session.DataSourceUri)
                 {
                     dropInfo.Effects = DragDropEffects.None;
                 }
@@ -164,10 +172,10 @@ namespace CDP4Requirements.ViewModels
 
             var group = dropInfo.Payload as RequirementsGroup;
             if (group != null)
-            { 
+            {
                 var canDropRequirementGroup = this.PermissionService.CanWrite(ClassKind.RequirementsGroup, this.Thing);
                 if (!canDropRequirementGroup || group.IDalUri.ToString() != this.Session.DataSourceUri
-                    || this.CreatesCycle(this.Thing, group))
+                                             || this.CreatesCycle(this.Thing, group))
                 {
                     dropInfo.Effects = DragDropEffects.None;
                 }
@@ -223,7 +231,7 @@ namespace CDP4Requirements.ViewModels
             else
             {
                 // insert before first
-                var model = (EngineeringModel)this.Thing.TopContainer;
+                var model = (EngineeringModel) this.Thing.TopContainer;
                 var orderPt = OrderHandlerService.GetOrderParameterType(model);
 
                 if (orderPt == null)
@@ -273,7 +281,7 @@ namespace CDP4Requirements.ViewModels
             if (dropInfo.KeyStates == (DragDropKeyStates.LeftMouseButton | DragDropKeyStates.ControlKey))
             {
                 // ordered-move
-                var model = (EngineeringModel)this.Thing.TopContainer;
+                var model = (EngineeringModel) this.Thing.TopContainer;
                 var orderPt = OrderHandlerService.GetOrderParameterType(model);
 
                 if (orderPt == null)
@@ -282,7 +290,8 @@ namespace CDP4Requirements.ViewModels
                 }
 
                 var orderService = new RequirementsGroupOrderHandlerService(this.Session, orderPt);
-                var transaction = orderService.Insert(requirementGroup, this.Thing, dropInfo.IsDroppedAfter ? InsertKind.InsertAfter : InsertKind.InsertBefore);
+                var transaction = orderService.Insert(requirementGroup, this.Thing,
+                    dropInfo.IsDroppedAfter ? InsertKind.InsertAfter : InsertKind.InsertBefore);
                 await this.Session.Write(transaction.FinalizeTransaction());
             }
             else
@@ -301,7 +310,10 @@ namespace CDP4Requirements.ViewModels
                 if (previousRequirementSpec != currentRequirementSpec)
                 {
                     // Update the requirements that were inside any of the groups that have been dropped
-                    var previousRequirementSpecRow = (RequirementsSpecificationRowViewModel)((RequirementsBrowserViewModel)this.TopParentRow.ContainerViewModel).ReqSpecificationRows.Single(x => x.Thing == previousRequirementSpec);
+                    var previousRequirementSpecRow =
+                        (RequirementsSpecificationRowViewModel)
+                        ((RequirementsBrowserViewModel) this.TopParentRow.ContainerViewModel).ReqSpecificationRows
+                        .Single(x => x.Thing == previousRequirementSpec);
                     var droppedRequirementGroups = requirementGroup.ContainedGroup().ToList();
                     droppedRequirementGroups.Add(requirementGroup);
                     foreach (var keyValuePair in previousRequirementSpecRow.requirementContainerGroupCache)
@@ -338,7 +350,8 @@ namespace CDP4Requirements.ViewModels
             }
 
             parentRequirementsGroup = parentRequirementsGroup.Container as RequirementsGroup;
-            return parentRequirementsGroup != null && this.CreatesCycle(parentRequirementsGroup, draggedRequirementsGroup);
+            return parentRequirementsGroup != null &&
+                   this.CreatesCycle(parentRequirementsGroup, draggedRequirementsGroup);
         }
     }
 }

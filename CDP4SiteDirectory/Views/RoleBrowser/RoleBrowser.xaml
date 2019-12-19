@@ -106,16 +106,6 @@
                     <ContentPresenter x:Name="defaultRowPresenter"
                                       Content="{Binding}"
                                       ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
-                    <dxe:ComboBoxEdit Name="PersonAccessRight"
-                                      Width="100"
-                                      AllowSpinOnMouseWheel="False"
-                                      EditValue="{Binding Row.AccessRight,
-                                                          UpdateSourceTrigger=PropertyChanged,
-                                                          Mode=TwoWay}"
-                                      IsReadOnly="{Binding Row.IsReadOnly,
-                                                           UpdateSourceTrigger=PropertyChanged}"
-                                      IsTextEditable="False"
-                                      ItemsSource="{Binding Row.PossibleRightKinds}" />
                 </StackPanel>
             </dx:MeasurePixelSnapper>
         </HierarchicalDataTemplate>
@@ -137,16 +127,6 @@
                     <ContentPresenter x:Name="defaultRowPresenter"
                                       Content="{Binding}"
                                       ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
-                    <dxe:ComboBoxEdit Name="ParticipantAccessRight"
-                                      Width="100"
-                                      AllowSpinOnMouseWheel="False"
-                                      EditValue="{Binding Row.AccessRight,
-                                                          UpdateSourceTrigger=PropertyChanged,
-                                                          Mode=TwoWay}"
-                                      IsReadOnly="{Binding Row.IsReadOnly,
-                                                           UpdateSourceTrigger=PropertyChanged}"
-                                      IsTextEditable="False"
-                                      ItemsSource="{Binding Row.PossibleRightKinds}" />
                 </StackPanel>
             </dx:MeasurePixelSnapper>
         </HierarchicalDataTemplate>
@@ -182,6 +162,7 @@
             <dxg:TreeListControl.Columns>
                 <dxg:TreeListColumn FieldName="Name" />
                 <dxg:TreeListColumn FieldName="ShortName" />
+                <dxg:TreeListColumn FieldName="AccessRight" />
             </dxg:TreeListControl.Columns>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView x:Name="View"
@@ -192,6 +173,7 @@
                                   NavigationStyle="Cell"
                                   ShowHorizontalLines="False"
                                   ShowIndicator="False"
+                                  RowStyle="{StaticResource RowStyleDeprecated}"
                                   ShowNodeImages="False"
                                   ShowVerticalLines="False"
                                   TreeDerivationMode="HierarchicalDataTemplate"
@@ -201,11 +183,6 @@
                     <dxg:TreeListView.ContextMenu>
                         <ContextMenu Name="RowContextMenu" />
                     </dxg:TreeListView.ContextMenu>
-                    <dxg:TreeListView.RowStyle>
-                        <Style TargetType="{x:Type dxg:RowControl}">
-                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
-                        </Style>
-                    </dxg:TreeListView.RowStyle>
                 </dxg:TreeListView>
             </dxg:TreeListControl.View>
             <dxg:TreeListControl.InputBindings>

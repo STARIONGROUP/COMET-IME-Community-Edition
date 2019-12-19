@@ -23,7 +23,8 @@ namespace CDP4SiteDirectory.ViewModels
     /// The <see cref="PersonBrowserViewModel"/> is a View Model that is responsible for managing the data and interactions with that data for a view
     /// that shows the <see cref="Person"/>s and the related <see cref="Participant"/> contained by a <see cref="SiteDirectory"/>
     /// </summary>
-    public class PersonBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class PersonBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
+        IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// Backing field for <see cref="CanCreatePerson"/>
@@ -50,16 +51,20 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public PersonBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public PersonBrowserViewModel(ISession session, SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+                pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
+                this.Session.ActivePerson.Name);
 
             this.PersonRowViewModels = new ReactiveList<PersonRowViewModel>();
             this.UpdatePersonRows();
         }
-        
+
         /// <summary>
         /// Gets the <see cref="PersonRowViewModel"/> that are contained by the row-view-model
         /// </summary>
@@ -172,7 +177,6 @@ namespace CDP4SiteDirectory.ViewModels
             base.ComputePermission();
             this.CanCreatePerson = this.PermissionService.CanWrite(ClassKind.Person, this.Thing);
         }
-        
 
         /// <summary>
         /// Populate the <see cref="PersonBrowserViewModel.ContextMenu"/>
@@ -180,7 +184,8 @@ namespace CDP4SiteDirectory.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Person", "", this.CreateCommand, MenuItemKind.Create, ClassKind.Person));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Person", "", this.CreateCommand,
+                MenuItemKind.Create, ClassKind.Person));
         }
     }
 }

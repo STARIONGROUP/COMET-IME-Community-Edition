@@ -6,6 +6,7 @@
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm"
+             Name="Toolbar"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
@@ -24,7 +25,7 @@
 
     <dxb:ToolBarControl Height="30">
         <dxb:BarSplitButtonItem Glyph="{dx:DXImage Image=Add_16x16.png}" 
-                                Hint="Create an item."
+                                Hint="Create an Item."
                                 IsEnabled="{Binding IsAddButtonEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
             <dxb:BarSplitButtonItem.PopupControl>
                 <dxb:PopupMenu ItemLinksSource="{Binding Path=CreateContextMenu, Mode=OneWay}" />
@@ -67,5 +68,16 @@
         <dxb:BarButtonItem ItemClick="ButtonBase_OnClick"
                            Glyph="{dx:DXImage Image=Zoom_16x16.png}"
                            Hint="Show Search Panel" />
+
+        <dxb:BarCheckItem 
+                          IsChecked="{Binding ShowOnlyFavorites}"
+                          IsVisible="{Binding IsFavoriteToggleVisible, ElementName=Toolbar}"
+                          Content="Filter on Favorite Things"
+                          Description="Toggle filtering on favorite items."
+                          Glyph="{dx:DXImage Image=NewContact_16x16.png}"
+                          Hint="Toggle filtering on favorite items."
+                          IsEnabled="{Binding HasSession, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <dxb:BarSplitButtonItem />
     </dxb:ToolBarControl>
 </UserControl>

@@ -147,8 +147,13 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public override void SetValues()
         {
-            var compoundParameterType = (CompoundParameterType)this.Thing.ParameterType;
             base.SetValues();
+
+            if (!(this.Thing.ParameterType is CompoundParameterType compoundParameterType))
+            {
+                throw new InvalidOperationException("This row shall only be used for CompoundParameterType.");
+            }
+
             this.Scale = compoundParameterType.Component[this.ValueIndex].Scale;
             this.ScaleShortName = this.Scale == null ? "-" : this.Scale.ShortName;
         }

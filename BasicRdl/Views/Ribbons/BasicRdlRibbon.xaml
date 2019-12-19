@@ -5,22 +5,30 @@
                            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                            xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                            xmlns:views="clr-namespace:BasicRdl.Views"
+                           xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
                            Name="BasicRdlRibbonPage"
                            Caption="Reference Data"
                            IsInDefaultPageCategory="True"
                            mc:Ignorable="d"
                            MergeOrder="2000">
 
-    <views:SiteRdlSelectionRibbon/>
-    <views:MeasurementScalesRibbon/>
-    <views:MeasurementUnitsRibbon/>
-    <views:UnitPrefixRibbon/>
-    <views:CategoryRibbon/>
-    <views:ParameterTypeRibbon/>
-    <views:RulesRibbon/>
-    <views:ConstantBrowserRibbon/>
-    <views:GlossaryBrowserRibbon/>
-    <views:FileTypeBrowserRibbon/>
-    <views:ReferenceSourceRibbon/>
-    
+    <views:SiteRdlSelectionRibbon />
+    <dxr:RibbonPageGroup Caption="Parameter Types">
+        <views:ParameterTypeRibbon />
+        <views:MeasurementScalesRibbon />
+        <views:MeasurementUnitsRibbon />
+    </dxr:RibbonPageGroup>
+    <dxr:RibbonPageGroup Caption="Categorization">
+        <views:CategoryRibbon />
+        <views:RulesRibbon />
+    </dxr:RibbonPageGroup>
+    <dxr:RibbonPageGroup Caption="References">
+        <views:UnitPrefixRibbon />
+        <views:ConstantBrowserRibbon />
+        <views:GlossaryBrowserRibbon />
+        <views:FileTypeBrowserRibbon />
+        <views:ReferenceSourceRibbon />
+    </dxr:RibbonPageGroup>
+
 </ribbon:ExtendedRibbonPage>
+    

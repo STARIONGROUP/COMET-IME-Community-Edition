@@ -102,7 +102,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.ValueIndex = valueIndex;
             this.ParameterTypeClassKind = this.Thing.ParameterType.ClassKind;
 
-            this.SetValues();
+            this.UpdateThingStatus();
             this.SetOwnerValue();
         }
         #endregion

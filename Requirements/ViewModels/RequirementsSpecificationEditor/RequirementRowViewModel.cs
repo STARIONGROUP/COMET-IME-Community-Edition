@@ -11,7 +11,7 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
     using System.Linq;
     using System.Reactive;
     using System.Threading.Tasks;
-    using CDP4Common.CommonData;    
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4CommonView.EventAggregator;
     using CDP4CommonView.ViewModels;
@@ -20,7 +20,7 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
     using CDP4Dal.Events;
     using CDP4Requirements.Utils;
     using ReactiveUI;
-    
+
     /// <summary>
     /// The <see cref="RequirementRowViewModel"/> is the view-model that represents a <see cref="Requirement"/> in the <see cref="RequirementsSpecificationEditorViewModel"/>
     /// </summary>
@@ -35,7 +35,7 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         /// Backing field for the <see cref="Categories"/> property
         /// </summary>
         private string categories;
-        
+
         /// <summary>
         /// Backing field for the <see cref="DefinitionContent"/> property
         /// </summary>
@@ -72,7 +72,8 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         /// <param name="requirement">The <see cref="Requirement"/> associated with this row</param>
         /// <param name="session">The session</param>
         /// <param name="containerViewModel">The <see cref="IViewModelBase{Thing}"/> that is the container of this <see cref="IRowViewModelBase{Thing}"/></param>
-        public RequirementRowViewModel(Requirement requirement, ISession session, IViewModelBase<Thing> containerViewModel)
+        public RequirementRowViewModel(Requirement requirement, ISession session,
+            IViewModelBase<Thing> containerViewModel)
             : base(requirement, session, containerViewModel)
         {
             this.InitializeCommands();
@@ -80,17 +81,13 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
 
             this.WhenAnyValue(vm => vm.DefinitionContent).Subscribe(
                 _ =>
-                    {
-                        var originalDefinition = this.Thing.Definition.FirstOrDefault();
-                        var originalDefinitionText = originalDefinition == null ? String.Empty : originalDefinition.Content;
-                        this.IsDirty = this.DefinitionContent != originalDefinitionText;
-                    });
+                {
+                    var originalDefinition = this.Thing.Definition.FirstOrDefault();
+                    var originalDefinitionText = originalDefinition == null ? String.Empty : originalDefinition.Content;
+                    this.IsDirty = this.DefinitionContent != originalDefinitionText;
+                });
 
             this.UpdateProperties();
-
-            var specSubscription =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsSpecification)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => this.UpdateRowVisibility());
-            this.Disposables.Add(specSubscription);
         }
 
         /// <summary>
@@ -191,18 +188,8 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
             this.SetDefinitionContent();
 
             this.SetCategories();
-            
-            this.BreadCrumb = this.Thing.BreadCrumb();
-            this.UpdateRowVisibility();
-        }
 
-        /// <summary>
-        /// Update the visibility of this row
-        /// </summary>
-        protected override void UpdateRowVisibility()
-        {
-            var isDeprecated = this.IsDeprecated || ((RequirementsSpecification)this.Thing.Container).IsDeprecated;
-            this.ShouldBeDisplayed = !isDeprecated || this.IsDeprecatedDisplayed;
+            this.BreadCrumb = this.Thing.BreadCrumb();
         }
 
         /// <summary>
@@ -263,7 +250,8 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         private void InitializeCommands()
         {
             var canSave = this.WhenAnyValue(vm => vm.IsDirty).Select(_ => this.IsDirty);
-            this.SaveCommand = ReactiveCommand.CreateAsyncTask(canSave, x => this.WriteDefinitionUpdate(), RxApp.MainThreadScheduler);
+            this.SaveCommand =
+                ReactiveCommand.CreateAsyncTask(canSave, x => this.WriteDefinitionUpdate(), RxApp.MainThreadScheduler);
 
             this.CancelCommand = ReactiveCommand.Create(canSave);
             this.CancelCommand.Subscribe(_ => this.ResetContent(true));
@@ -280,7 +268,8 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
             // give a warning. If user cancels the changes are not reset.
             if (withWarning)
             {
-                var yesNoDialog = new YesNoDialogViewModel( "Cancel Edit", "Press Yes if you want to cancel the edit. All changes will be lost");
+                var yesNoDialog = new YesNoDialogViewModel("Cancel Edit",
+                    "Press Yes if you want to cancel the edit. All changes will be lost");
                 var dialogResult = this.dialogNavigationService.NavigateModal(yesNoDialog);
                 if (dialogResult != null && dialogResult.Result != null && dialogResult.Result.Value)
                 {

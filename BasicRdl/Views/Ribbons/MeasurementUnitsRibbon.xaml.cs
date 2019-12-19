@@ -8,13 +8,14 @@ namespace BasicRdl.Views
 {
     using System.ComponentModel.Composition;
     using BasicRdl.ViewModels;
+    using DevExpress.Xpf.Bars;
     using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>
     /// Interaction logic for MeasurementUnitsRibbon.xaml
     /// </summary>
     [Export(typeof(MeasurementUnitsRibbon))]
-    public partial class MeasurementUnitsRibbon : IView
+    public partial class MeasurementUnitsRibbon : IView, IBarItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MeasurementUnitsRibbon"/> class.

@@ -239,6 +239,14 @@
     <Compile Include="FolderRowViewModel.cs" />
     <Compile Include="Mvvm\Behaviours\ContextMenuBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\ExtendedDiagramOrgChartBehavior.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonButtonSessionFavoritesDependentViewModel.cs" />
+    <Compile Include="Mvvm\MenuItems\RibbonMenuItemSessionFavoritesDependentViewModel.cs" />
+    <Compile Include="Navigation\Interfaces\IDeprecatableToggleViewModel.cs" />
+    <Compile Include="Navigation\Interfaces\IDeprecatableBrowserViewModel.cs" />
+    <Compile Include="Navigation\Interfaces\IFavoritesBrowserViewModel.cs" />
+    <Compile Include="Navigation\Interfaces\IPanelFilterableDataGridView.cs" />
+    <Compile Include="Services\FavoritesService\FavoritesService.cs" />
+    <Compile Include="Services\FavoritesService\IFavoritesService.cs" />
     <Compile Include="Mvvm\IHaveContainerViewModel.cs" />
     <Compile Include="Services\FilterStringService.cs" />
     <Compile Include="Mvvm\Behaviours\IExtendedDiagramOrgChartBehavior.cs" />

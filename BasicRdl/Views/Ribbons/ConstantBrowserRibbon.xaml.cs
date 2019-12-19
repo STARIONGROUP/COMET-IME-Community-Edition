@@ -7,12 +7,13 @@
 namespace BasicRdl.Views
 {
     using BasicRdl.ViewModels;
+    using DevExpress.Xpf.Bars;
     using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>
     /// Interaction logic for ConstantBrowserRibbon.xaml
     /// </summary>
-    public partial class ConstantBrowserRibbon : IView
+    public partial class ConstantBrowserRibbon : IView, IBarItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantBrowserRibbon"/> class.

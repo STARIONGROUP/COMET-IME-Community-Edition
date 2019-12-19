@@ -67,11 +67,6 @@ namespace CDP4Composition.Mvvm
         private RowStatusKind rowStatus;
 
         /// <summary>
-        /// Backing field for <see cref="ShouldBeDisplayed"/>
-        /// </summary>
-        private bool shouldBeDisplayed = true;
-
-        /// <summary>
         /// Backing field for <see cref="IsExpanded"/>
         /// </summary>
         private bool isExpanded;
@@ -87,12 +82,7 @@ namespace CDP4Composition.Mvvm
         private ThingStatus thingStatus;
 
         /// <summary>
-        /// Backing field for <see cref="IsHidden"/>
-        /// </summary>
-        private ObservableAsPropertyHelper<bool> isHidden;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RowViewModelBase{T}"/> class. 
+        /// Initializes a new instance of the <see cref="RowViewModelBase{T}"/> class.
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> represented by the row</param>
         /// <param name="session">The session</param>
@@ -107,7 +97,9 @@ namespace CDP4Composition.Mvvm
             var rowContainerViewModel = this.ContainerViewModel as IRowViewModelBase<Thing>;
 
             // todo implement the container view-model on all rows
-            this.TopContainerViewModel = (rowContainerViewModel == null) ? this.ContainerViewModel : rowContainerViewModel.TopContainerViewModel;
+            this.TopContainerViewModel = (rowContainerViewModel == null)
+                ? this.ContainerViewModel
+                : rowContainerViewModel.TopContainerViewModel;
 
             var browser = this.TopContainerViewModel as IBrowserViewModelBase<Thing>;
             if (browser != null)
@@ -118,14 +110,13 @@ namespace CDP4Composition.Mvvm
 
             if (this.Thing is NotThing)
             {
-                this.SetIsDeprecatableToIsHiddenSubscription(false);
                 return;
             }
 
             this.InitializeSubscriptions();
             this.UpdateTooltip();
         }
-        
+
         /// <summary>
         /// Gets or sets a value representing the <see cref="RowStatusKind"/>
         /// </summary>
@@ -163,7 +154,7 @@ namespace CDP4Composition.Mvvm
         /// <remarks>
         /// this should either be a <see cref="IDialogViewModelBase{T}"/> or a <see cref="IBrowserViewModelBase{T}"/>
         /// </remarks>
-        public IViewModelBase<Thing> TopContainerViewModel { get; protected set; } 
+        public IViewModelBase<Thing> TopContainerViewModel { get; protected set; }
 
         /// <summary>
         /// Gets a value indicating whether the row has an error upon a inline operation
@@ -172,11 +163,6 @@ namespace CDP4Composition.Mvvm
         {
             get { return this.hasError.Value; }
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether <see cref="IDeprecatableThing"/> should be displayed
-        /// </summary>
-        protected bool IsDeprecatedDisplayed { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the row is highlighted
@@ -188,15 +174,12 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this row should be displayed
+        /// Gets a value indicating whether the row is favorited
         /// </summary>
-        /// <remarks>
-        /// This is use to show or hide deprecatable thing
-        /// </remarks>
-        public bool ShouldBeDisplayed
+        public bool IsFavorite
         {
-            get { return this.shouldBeDisplayed; }
-            set { this.RaiseAndSetIfChanged(ref this.shouldBeDisplayed, value); }
+            get { return this.isHighlighted; }
+            set { this.RaiseAndSetIfChanged(ref this.isHighlighted, value); }
         }
 
         /// <summary>
@@ -209,21 +192,13 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Sets a value indicating that the row is hidden
-        /// </summary>
-        public bool IsHidden
-        {
-            get { return this.isHidden.Value; }
-        }
-
-        /// <summary>
         /// Expands the current row and all contained rows along the containment hierarchy
         /// </summary>
         public void ExpandAllRows()
         {
             this.IsExpanded = true;
 
-            foreach (var row in ContainedRows)
+            foreach (var row in this.ContainedRows)
             {
                 row.ExpandAllRows();
             }
@@ -236,7 +211,7 @@ namespace CDP4Composition.Mvvm
         {
             this.IsExpanded = false;
 
-            foreach (var row in ContainedRows)
+            foreach (var row in this.ContainedRows)
             {
                 row.CollapseAllRows();
             }
@@ -285,10 +260,12 @@ namespace CDP4Composition.Mvvm
             get
             {
                 var converter = new CamelCaseToSpaceConverter();
-                return (this.Thing == null)? "-" : converter.Convert(this.Thing.ClassKind, null, null, null).ToString();
+                return (this.Thing == null)
+                    ? "-"
+                    : converter.Convert(this.Thing.ClassKind, null, null, null)?.ToString();
             }
         }
-        
+
         /// <summary>
         /// Gets the validation error message
         /// </summary>
@@ -351,7 +328,7 @@ namespace CDP4Composition.Mvvm
         {
             return this.Session.PermissionService.CanWrite(this.Thing);
         }
-        
+
         /// <summary>
         /// Initializes the subscriptions
         /// </summary>
@@ -361,16 +338,6 @@ namespace CDP4Composition.Mvvm
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
             this.Disposables.Add(highlightSubscription);
-
-            var deprecateSubscription =
-                CDPMessageBus.Current.Listen<ToggleDeprecatedThingEvent>()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x =>
-                {
-                    this.IsDeprecatedDisplayed = x.ShouldShow;
-                    this.UpdateRowVisibility();
-                });
-            this.Disposables.Add(deprecateSubscription);
 
             // category highlighting
             var thingAsCategorizableThing = this.Thing as ICategorizableThing;
@@ -396,39 +363,7 @@ namespace CDP4Composition.Mvvm
                 .Select(x => !string.IsNullOrEmpty(x))
                 .ToProperty(this, x => x.HasError, out this.hasError);
 
-            this.SetIsDeprecatableToIsHiddenSubscription(true);
-
             this.hasError.ThrownExceptions.Subscribe(e => logger.Error(e));
-        }
-
-        /// <summary>
-        /// Checks if the class is <see cref="IDeprecatableThing" /> and sets up a link between the IsDeprecated and <see cref="IsHidden"/> properties.
-        /// </summary>
-        /// <param name="allowThingCheck">
-        /// Indicates that an extra check may or may not be done on the <see cref="Thing"/> property.
-        /// </param>
-        private void SetIsDeprecatableToIsHiddenSubscription(bool allowThingCheck)
-        {
-            if (this is IDeprecatableThing thisClass)
-            {
-                thisClass.WhenAnyValue(
-                        vm => vm.IsDeprecated)
-                    .ToProperty(this, x => x.IsHidden, out this.isHidden);
-            }
-            else if (allowThingCheck && this.Thing is IDeprecatableThing thing)
-            {
-                thing.WhenAnyValue(
-                        vm => vm.IsDeprecated)
-                    .ToProperty(this, x => x.IsHidden, out this.isHidden);
-            }
-        }
-
-        /// <summary>
-        /// Update the visibility of this row
-        /// </summary>
-        protected virtual void UpdateRowVisibility()
-        {
-            this.ShouldBeDisplayed = true;
         }
 
         /// <summary>
@@ -449,7 +384,8 @@ namespace CDP4Composition.Mvvm
         {
             var current = currentThings.ToArray();
 
-            var existingRowThing = this.ContainedRows.Where(x => x.Thing is TThing).Select(x => (TThing)x.Thing).ToArray();
+            var existingRowThing = this.ContainedRows.Where(x => x.Thing is TThing).Select(x => (TThing) x.Thing)
+                .ToArray();
             var newThing = current.Except(existingRowThing);
             var oldThing = existingRowThing.Except(current);
 
@@ -558,7 +494,8 @@ namespace CDP4Composition.Mvvm
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Cannot use the generic method to publish the new value. Please override CreateCloneToPublish.", e);
+                throw new InvalidOperationException(
+                    "Cannot use the generic method to publish the new value. Please override CreateCloneToPublish.", e);
             }
         }
 
@@ -627,8 +564,8 @@ namespace CDP4Composition.Mvvm
         /// Information about the drag.
         /// </param>
         /// <remarks>
-        /// To allow a drag to be started, the <see cref="IDragInfo.Effects"/> property on <paramref name="dragInfo"/> 
-        /// should be set to a value other than <see cref="DragDropEffects.None"/>. 
+        /// To allow a drag to be started, the <see cref="IDragInfo.Effects"/> property on <paramref name="dragInfo"/>
+        /// should be set to a value other than <see cref="DragDropEffects.None"/>.
         /// </remarks>
         public virtual void StartDrag(IDragInfo dragInfo)
         {

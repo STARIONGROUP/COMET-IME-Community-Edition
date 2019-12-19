@@ -8,15 +8,15 @@ namespace BasicRdl.Views
 {
     using CDP4Composition;
     using CDP4Composition.Attributes;
-    using CDP4Composition.Services;
-
+    using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Grid;
     using NLog;
 
     /// <summary>
     /// Interaction logic for <see cref="CategoryBrowser"/>
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class CategoryBrowser : IPanelView
+    public partial class CategoryBrowser : IPanelView, IPanelFilterableDataGridView
     {
         /// <summary>
         /// The NLog logger
@@ -47,8 +47,13 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                FilterStringService.FilterString.AddGridControl(this.CategoriesGridControl);
+                this.FilterableControl = this.CategoriesGridControl;
             }
         }
+
+        /// <summary>
+        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
+        /// </summary>
+        public DataControlBase FilterableControl { get; private set; }
     }
 }

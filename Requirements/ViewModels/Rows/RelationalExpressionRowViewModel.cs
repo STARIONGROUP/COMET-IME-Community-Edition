@@ -6,6 +6,7 @@
 
 namespace CDP4Requirements.ViewModels
 {
+    using System;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using ReactiveUI;
 
     using CDP4Requirements.Extensions;
     using CDP4Requirements.ViewModels.RequirementBrowser;
@@ -33,8 +35,13 @@ namespace CDP4Requirements.ViewModels
     /// <summary>
     /// the row-view-model representing a <see cref="RelationalExpression"/>
     /// </summary>
-    public class RelationalExpressionRowViewModel : CDP4CommonView.RelationalExpressionRowViewModel, IDropTarget, IHaveWritableRequirementStateOfCompliance
+    public class RelationalExpressionRowViewModel : CDP4CommonView.RelationalExpressionRowViewModel, IDropTarget, IDeprecatableThing, IHaveWritableRequirementStateOfCompliance
     {
+        /// <summary>
+        /// Backing field for <see cref="IsDeprecated"/> property.
+        /// </summary>
+        private bool isDeprecated;
+
         /// <summary>
         /// Backing field for <see cref="RelationalExpressionRowViewModel.RequirementStateOfCompliance"/>
         /// </summary>
@@ -89,6 +96,31 @@ namespace CDP4Requirements.ViewModels
         /// Gets the value of the current RelationalExpression
         /// </summary>
         public string Definition => string.Join(", ", this.Thing.Value);
+
+        /// <summary>
+        /// Gets or sets the IsDeprecated
+        /// </summary>
+        public bool IsDeprecated
+        {
+            get => this.isDeprecated;
+            set => this.RaiseAndSetIfChanged(ref this.isDeprecated, value);
+        }
+
+        /// <summary>
+        /// Initializes the subscriptions
+        /// </summary>
+        protected override void InitializeSubscriptions()
+        {
+            base.InitializeSubscriptions();
+
+            if (this.ContainerViewModel is IDeprecatableThing deprecatable)
+            {
+                var containerIsDeprecatedSubscription = deprecatable.WhenAnyValue(vm => vm.IsDeprecated)
+                    .Subscribe(_ => this.UpdateIsDeprecatedDerivedFromContainerRowViewModel());
+
+                this.Disposables.Add(containerIsDeprecatedSubscription);
+            }
+        }
 
         /// <summary>
         /// Updates the current drag state.
@@ -151,7 +183,7 @@ namespace CDP4Requirements.ViewModels
         private void UpdateProperties()
         {
             this.UpdateThingStatus();
-            this.UpdateTooltip();
+            this.UpdateIsDeprecatedDerivedFromContainerRowViewModel();
         }
 
         /// <summary>
@@ -191,6 +223,17 @@ namespace CDP4Requirements.ViewModels
             }
 
             base.UpdateTooltip();
+        }
+
+        /// <summary>
+        /// Updates the IsDeprecated property based on the value of the container <see cref="RequirementRowViewModel"/>
+        /// </summary>
+        private void UpdateIsDeprecatedDerivedFromContainerRowViewModel()
+        {
+            if (this.ContainerViewModel is IDeprecatableThing deprecatable)
+            {
+                this.IsDeprecated = deprecatable.IsDeprecated;
+            }
         }
 
         /// <summary>

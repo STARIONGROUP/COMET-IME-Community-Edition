@@ -14,7 +14,7 @@ namespace CDP4Composition.Mvvm
     /// <summary>
     /// An Extension for the ReactiveList to order the contained rows
     /// </summary>
-    public static class ReactiveListExtension 
+    public static class ReactiveListExtension
     {
         /// <summary>
         /// Insert a <see cref="IRowViewModelBase{Thing}"/> into the list given a <see cref="IComparer{T}"/>
@@ -22,7 +22,8 @@ namespace CDP4Composition.Mvvm
         /// <param name="list">The <see cref="ReactiveList{T}"/></param>
         /// <param name="row">The <see cref="IRowViewModelBase{Thing}"/> to add</param>
         /// <param name="comparer">The <see cref="IComparer{T}"/> used to perform the sorting</param>
-        public static void SortedInsert(this ReactiveList<IRowViewModelBase<Thing>> list, IRowViewModelBase<Thing> row, IComparer<IRowViewModelBase<Thing>> comparer)
+        public static void SortedInsert<T>(this ReactiveList<T> list, T row,
+            IComparer<T> comparer)
         {
             if (row == null)
             {
@@ -33,7 +34,7 @@ namespace CDP4Composition.Mvvm
             {
                 throw new ArgumentNullException(nameof(comparer), $"The {nameof(comparer)} may not be null");
             }
-            
+
             // item is found using the comparer : returns the index of the item found
             // item not found : returns a negative number that is the bitwise complement 
             // of the index of the next element that is larger or count if none
