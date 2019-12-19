@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterGroupRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -11,16 +11,21 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4EngineeringModel.Comparers;
-    using CDP4EngineeringModel.Utilities;
+
+    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// The row representing a <see cref="ParameterGroup"/>
@@ -43,6 +48,11 @@ namespace CDP4EngineeringModel.ViewModels
         private ParameterGroup currentGroup;
 
         /// <summary>
+        /// The backing field for <see cref="ThingCreator"/>
+        /// </summary>
+        private IThingCreator thingCreator;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterGroupRowViewModel"/> class
         /// </summary>
         /// <param name="parameterGroup">The associated <see cref="ParameterGroup"/></param>
@@ -56,20 +66,21 @@ namespace CDP4EngineeringModel.ViewModels
             this.currentGroup = this.Thing.ContainingGroup;
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
-        public IThingCreator ThingCreator { get; set; }
+        public IThingCreator ThingCreator
+        {
+            get => this.thingCreator = this.thingCreator ?? ServiceLocator.Current.GetInstance<IThingCreator>();
+            set => this.thingCreator = value;
+        }
 
         /// <summary>
         /// Gets a value indicating whether the value set editors are active
         /// </summary>
-        public bool IsValueSetEditorActive
-        {
-            get { return false; }
-        }
-        
+        public bool IsValueSetEditorActive => false;
+
         /// <summary>
         /// Queries whether a drag can be started
         /// </summary>
@@ -105,24 +116,21 @@ namespace CDP4EngineeringModel.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            var parameterTypeAndScale = dropInfo.Payload as Tuple<ParameterType, MeasurementScale>;
-            if (parameterTypeAndScale != null)
+            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
             {
                 this.DragOver(dropInfo, parameterTypeAndScale);
                 return;
             }
 
             // moving the paramenter into a group of the same element definition
-            var parameter = dropInfo.Payload as Parameter;
-            if (parameter != null)
+            if (dropInfo.Payload is Parameter parameter)
             {
                 this.DragOver(dropInfo, parameter);
                 return;
             }
 
             // moving the group into a group of the same element definition
-            var group = dropInfo.Payload as ParameterGroup;
-            if (group != null)
+            if (dropInfo.Payload is ParameterGroup group)
             {
                 this.DragOver(dropInfo, group);
                 return;
@@ -139,47 +147,45 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            var parameterTypeAndScale = dropInfo.Payload as Tuple<ParameterType, MeasurementScale>;
-            if (parameterTypeAndScale != null)
+            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
             {
                 await this.Drop(dropInfo, parameterTypeAndScale);
             }
 
             // moving 
-            var parameter = dropInfo.Payload as Parameter;
-            if (parameter != null)
+            if (dropInfo.Payload is Parameter parameter)
             {
                 await this.Drop(dropInfo, parameter);
             }
 
             // moving the group into this group
-            var group = dropInfo.Payload as ParameterGroup;
-            if (group != null)
+            if (dropInfo.Payload is ParameterGroup group)
             {
                 await this.Drop(dropInfo, group);
             }
 
             dropInfo.Effects = DragDropEffects.None;
         }
-        
+
         /// <summary>
         /// Update the properties of this row on update
         /// </summary>
         private void UpdateProperties()
         {
             this.UpdateThingStatus();
+
             // update the group-row under which this row shall be displayed
             if (this.currentGroup != this.Thing.ContainingGroup)
             {
                 this.currentGroup = this.Thing.ContainingGroup;
-                var elementBaseRow = this.ContainerViewModel as IElementBaseRowViewModel;
-                if (elementBaseRow != null)
+
+                if (this.ContainerViewModel is IElementBaseRowViewModel elementBaseRow)
                 {
                     elementBaseRow.UpdateParameterGroupPosition(this.Thing);
                 }
             }
         }
-        
+
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>
@@ -187,7 +193,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.ThingStatus = new ThingStatus(this.Thing);
         }
-        
+
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -197,7 +203,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Update the drag state when the payload is a <see cref="Tuple{ParameterType, MeasurementScale}"/>
         /// </summary>
@@ -205,8 +211,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="parameterTypeAndScale">The <see cref="Tuple{ParameterType, MeasurementScale}"/> payload</param>
         private void DragOver(IDropInfo dropInfo, Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
         {
-            var usage = this.ContainerViewModel as ElementUsageRowViewModel;
-            if (usage != null)
+            if (this.ContainerViewModel is ElementUsageRowViewModel usage)
             {
                 dropInfo.Effects = DragDropEffects.None;
                 return;
@@ -225,8 +230,8 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var parameterType = parameterTypeAndScale.Item1;
-            var elementDefinition = this.Thing.Container as ElementDefinition;
-            if (elementDefinition != null)
+
+            if (this.Thing.Container is ElementDefinition elementDefinition)
             {
                 if (elementDefinition.Parameter.Any(x => x.ParameterType == parameterType))
                 {
@@ -290,7 +295,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             dropInfo.Effects = DragDropEffects.None;
         }
-        
+
         /// <summary>
         /// Performs the drop operation when the payload is a <see cref="Tuple{ParameterType, MeasurementScale}"/>
         /// </summary>
@@ -304,18 +309,13 @@ namespace CDP4EngineeringModel.ViewModels
         {
             var parameterType = parameterTypeAndScale.Item1;
             var measeurementScale = parameterTypeAndScale.Item2;
-            var elementDefinition = this.Thing.Container as ElementDefinition;
-            if (elementDefinition != null)
+
+            if (this.Thing.Container is ElementDefinition elementDefinition)
             {
                 if (elementDefinition.Parameter.Any(x => x.ParameterType == parameterType))
                 {
                     dropInfo.Effects = DragDropEffects.None;
                     return;
-                }
-
-                if (this.ThingCreator == null)
-                {
-                    this.ThingCreator = new ThingCreator();
                 }
 
                 try
@@ -325,7 +325,7 @@ namespace CDP4EngineeringModel.ViewModels
                 catch (Exception ex)
                 {
                     this.ErrorMsg = ex.Message;
-                }                
+                }
             }
         }
 

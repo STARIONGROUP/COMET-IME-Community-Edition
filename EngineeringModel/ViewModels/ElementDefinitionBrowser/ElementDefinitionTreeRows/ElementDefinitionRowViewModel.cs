@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -20,6 +20,9 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4EngineeringModel.Services;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using ReactiveUI;
     using Utilities;
 
@@ -32,7 +35,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// The backing field for <see cref="IsTopElement"/>
         /// </summary>
         private bool isTopElement;
-        
+
+        /// <summary>
+        /// The backing field for <see cref="ThingCreator"/>
+        /// </summary>
+        private IThingCreator thingCreator;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionRowViewModel"/> class
         /// </summary>
@@ -58,8 +66,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
-        public IThingCreator ThingCreator { get; set; }
-        
+        public IThingCreator ThingCreator
+        {
+            get => this.thingCreator = this.thingCreator ?? ServiceLocator.Current.GetInstance<IThingCreator>();
+            set => this.thingCreator = value;
+        }
+
         /// <summary>
         /// Queries whether a drag can be started
         /// </summary>
@@ -89,37 +101,32 @@ namespace CDP4EngineeringModel.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            var parameterTypeAndScale = dropInfo.Payload as Tuple<ParameterType, MeasurementScale>;
-            if (parameterTypeAndScale != null)
+            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
             {
                 this.DragOver(dropInfo, parameterTypeAndScale);
                 return;
             }
 
-            var elementDefinition = dropInfo.Payload as ElementDefinition;
-            if (elementDefinition != null)
+            if (dropInfo.Payload is ElementDefinition elementDefinition)
             {
                 this.DragOver(dropInfo, elementDefinition);
                 return;
             }
 
-            var category = dropInfo.Payload as Category;
-            if (category != null)
+            if (dropInfo.Payload is Category category)
             {
                 this.DragOver(dropInfo, category);
                 return;
             }
 
-            var parameter = dropInfo.Payload as Parameter;
-            if (parameter != null && parameter.Container == this.Thing)
+            if (dropInfo.Payload is Parameter parameter && parameter.Container == this.Thing)
             {
                 this.DragOver(dropInfo, parameter);
                 return;
             }
 
             // moving the group into a group of the same element definition
-            var group = dropInfo.Payload as ParameterGroup;
-            if (group != null && group.Container == this.Thing)
+            if (dropInfo.Payload is ParameterGroup @group && group.Container == this.Thing)
             {
                 this.DragOver(dropInfo, group);
                 return;
@@ -136,39 +143,29 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            if (this.ThingCreator == null)
-            {
-                this.ThingCreator = new ThingCreator();
-            }
-
-            var parameterTypeAndScale = dropInfo.Payload as Tuple<ParameterType, MeasurementScale>;
-            if (parameterTypeAndScale != null)
+            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
             {
                 await this.Drop(dropInfo, parameterTypeAndScale);
             }
 
-            var elementDefinition = dropInfo.Payload as ElementDefinition;
-            if (elementDefinition != null)
+            if (dropInfo.Payload is ElementDefinition elementDefinition)
             {
                 await this.Drop(dropInfo, elementDefinition);
             }
 
             // moving 
-            var parameter = dropInfo.Payload as Parameter;
-            if (parameter != null)
+            if (dropInfo.Payload is Parameter parameter)
             {
                 await this.Drop(dropInfo, parameter);
             }
 
             // moving the group right under the element definition
-            var group = dropInfo.Payload as ParameterGroup;
-            if (group != null)
+            if (dropInfo.Payload is ParameterGroup group)
             {
                 await this.Drop(dropInfo, group);
             }
 
-            var category = dropInfo.Payload as Category;
-            if (category != null)
+            if (dropInfo.Payload is Category category)
             {
                 await this.Drop(dropInfo, category);
             }

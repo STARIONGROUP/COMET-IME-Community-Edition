@@ -24,6 +24,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using Microsoft.Practices.ServiceLocation;
+
     using ReactiveUI;
 
     /// <summary>
@@ -40,6 +42,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="IsPublishable"/>
         /// </summary>
         private bool isPublishable;
+
+        /// <summary>
+        /// The backing field for <see cref="ThingCreator"/>
+        /// </summary>
+        private IThingCreator thingCreator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOrOverrideBaseRowViewModel"/> class
@@ -67,7 +74,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
-        public IThingCreator ThingCreator { get; set; } = new ThingCreator();
+        public IThingCreator ThingCreator
+        {
+            get => this.thingCreator = this.thingCreator ?? ServiceLocator.Current.GetInstance<IThingCreator>();
+            set => this.thingCreator = value;
+        }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="ParameterOrOverrideBase"/> has publishable values
@@ -385,7 +396,7 @@ namespace CDP4EngineeringModel.ViewModels
             valueSet.ValueSwitch = row?.Switch ?? this.Switch.Value;
             valueSet.Computed = row == null ? new ValueArray<string>(new List<string> { this.Computed }) : new ValueArray<string>(new List<string> { row.Computed });
             valueSet.Manual = row == null ? new ValueArray<string>(new List<string> { this.Manual.ToValueSetString(this.ParameterType) }) : new ValueArray<string>(new List<string> { row.Manual.ToValueSetString(this.ParameterType) });
-            valueSet.Reference = row == null ? new ValueArray<string>(new List<string> { this.Reference.ToValueSetString(this.ParameterType) }) : new ValueArray<string>(new List<string> { ValueSetConverter.ToValueSetString(row.Reference, this.ParameterType) });
+            valueSet.Reference = row == null ? new ValueArray<string>(new List<string> { this.Reference.ToValueSetString(this.ParameterType) }) : new ValueArray<string>(new List<string> { row.Reference.ToValueSetString(this.ParameterType) });
         }
 
         /// <summary>

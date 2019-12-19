@@ -3,7 +3,7 @@
 //   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -----------------------------------------------------------------------------------------------
-namespace CDP4Composition.ExtensionMethods
+namespace CDP4Composition.Extensions
 {
     using System;
 

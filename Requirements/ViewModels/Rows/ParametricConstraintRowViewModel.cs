@@ -14,7 +14,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4Composition.ExtensionMethods;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;

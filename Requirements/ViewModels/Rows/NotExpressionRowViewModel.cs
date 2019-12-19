@@ -13,7 +13,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4Composition.ExtensionMethods;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -146,7 +146,7 @@ namespace CDP4Requirements.ViewModels
             base.InitializeSubscriptions();
            
             var booleanExpressionsListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BooleanExpression))
-                .Where(x => (x.EventKind == EventKind.Updated) && (this.Thing?.Container != null) && (x.ChangedThing.Container != null) && (this.Thing.GetAllMyExpressions().Contains(x.ChangedThing)))
+                .Where(x => (x.EventKind == EventKind.Updated) && (this.Thing?.Container != null) && (x.ChangedThing.Container != null) && this.Thing.GetMeAndMyDescendantExpressions().Contains(x.ChangedThing))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.OnExpressionUpdate());
 

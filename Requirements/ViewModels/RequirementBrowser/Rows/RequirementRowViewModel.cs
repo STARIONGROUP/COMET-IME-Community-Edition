@@ -97,11 +97,7 @@ namespace CDP4Requirements.ViewModels
         public RequirementStateOfCompliance RequirementStateOfCompliance
         {
             get => this.requirementStateOfCompliance;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.requirementStateOfCompliance, value);
-                this.parametricConstraints.RequirementStateOfCompliance = value;
-            }
+            set => this.RaiseAndSetIfChanged(ref this.requirementStateOfCompliance, value);
         }
 
         /// <summary>
@@ -145,6 +141,11 @@ namespace CDP4Requirements.ViewModels
                     .Subscribe(x => this.AdjustContainedRows()));
 
             this.SetRequirementStateOfComplianceChangedEventSubscription(this.Thing, this.Disposables);
+
+            this.Disposables.Add(
+                this
+                    .WhenAnyValue(x => x.RequirementStateOfCompliance)
+                    .Subscribe(x => this.parametricConstraints.RequirementStateOfCompliance = this.requirementStateOfCompliance));
         }
 
         /// <summary>
@@ -360,10 +361,12 @@ namespace CDP4Requirements.ViewModels
         {
             var clone = this.Thing.Clone(false);
 
-            var parameterValue = new SimpleParameterValue();
-            parameterValue.ParameterType = tuple.Item1;
-            parameterValue.Scale = tuple.Item2;
-            parameterValue.Value = new ValueArray<string>(new[] { "-" });
+            var parameterValue = new SimpleParameterValue
+            {
+                ParameterType = tuple.Item1, 
+                Scale = tuple.Item2, 
+                Value = new ValueArray<string>(new[] { "-" })
+            };
 
             clone.ParameterValue.Add(parameterValue);
 

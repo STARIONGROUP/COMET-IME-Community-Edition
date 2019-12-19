@@ -17,12 +17,14 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition.ExtensionMethods;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using ReactiveUI;
 
@@ -67,6 +69,11 @@ namespace CDP4ProductTree.ViewModels
         private string modelCode;
 
         /// <summary>
+        /// The backing field for <see cref="ThingCreator"/>
+        /// </summary>
+        private IThingCreator thingCreator;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOrOverrideBaseRowViewModel"/> class
         /// </summary>
         /// <param name="parameterOrOverride">The <see cref="ParameterOrOverrideBase"/></param>
@@ -90,7 +97,11 @@ namespace CDP4ProductTree.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
-        public IThingCreator ThingCreator { get; set; } = new ThingCreator();
+        public IThingCreator ThingCreator
+        {
+            get => this.thingCreator = this.thingCreator ?? ServiceLocator.Current.GetInstance<IThingCreator>();
+            set => this.thingCreator = value;
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the current represented <see cref="ParameterOrOverrideBase"/> is publishable
@@ -197,10 +208,7 @@ namespace CDP4ProductTree.ViewModels
 
             if ((this.MeasurementScale == null) || (this.MeasurementScale != this.Thing.Scale))
             {
-                if (this.measurementScaleListener != null)
-                {
-                    this.measurementScaleListener.Dispose();
-                }
+                this.measurementScaleListener?.Dispose();
 
                 this.measurementScaleListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Scale)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
@@ -238,8 +246,7 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         private void SetUsage()
         {
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
 
             var subscribeTo = this.Thing.ParameterSubscription.Any(x => x.Owner == tuple.Item1);
             var subscribedByOthers = this.Thing.ParameterSubscription.Any(x => x.Owner != tuple.Item1);
@@ -293,9 +300,7 @@ namespace CDP4ProductTree.ViewModels
 
             foreach (Thing parameterValueSet in removedValueSet)
             {
-                IDisposable listener;
-
-                if (this.valueSetListeners.TryGetValue(parameterValueSet, out listener))
+                if (this.valueSetListeners.TryGetValue(parameterValueSet, out var listener))
                 {
                     listener.Dispose();
                 }

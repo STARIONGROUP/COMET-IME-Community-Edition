@@ -1,11 +1,11 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
 namespace CDP4ProductTree.ViewModels
-{  
+{
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -13,15 +13,22 @@ namespace CDP4ProductTree.ViewModels
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4ProductTree.Comparers;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using ReactiveUI;
 
     /// <summary>
@@ -37,7 +44,7 @@ namespace CDP4ProductTree.ViewModels
         /// <summary>
         /// The listener cache associated with a <see cref="ElementUsage"/>
         /// </summary>
-        private readonly Dictionary<ElementUsage, IDisposable> elementUsageListenerCache = new Dictionary<ElementUsage, IDisposable>(); 
+        private readonly Dictionary<ElementUsage, IDisposable> elementUsageListenerCache = new Dictionary<ElementUsage, IDisposable>();
 
         /// <summary>
         /// The selected <see cref="Option"/> for the browser this row is contained in
@@ -70,6 +77,11 @@ namespace CDP4ProductTree.ViewModels
         private string modelCode;
 
         /// <summary>
+        /// The backing field for <see cref="ThingCreator"/>
+        /// </summary>
+        private IThingCreator thingCreator;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageRowViewModel"/> class
         /// </summary>
         /// <param name="elementUsage">
@@ -97,21 +109,25 @@ namespace CDP4ProductTree.ViewModels
             this.UpdateProperties();
             this.UpdateTooltip();
         }
-        
+
         /// <summary>
         /// Gets the model-code
         /// </summary>
         public string ModelCode
         {
-            get { return this.modelCode; }
-            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+            get => this.modelCode;
+            private set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
         }
 
         /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
-        public IThingCreator ThingCreator { get; set; }
-        
+        public IThingCreator ThingCreator
+        {
+            get => this.thingCreator = this.thingCreator ?? ServiceLocator.Current.GetInstance<IThingCreator>();
+            set => this.thingCreator = value;
+        }
+
         /// <summary>
         /// Update the row containment associated to a <see cref="ParameterBase"/>
         /// </summary>
@@ -122,19 +138,19 @@ namespace CDP4ProductTree.ViewModels
             var newContainer = parameterBase.Group;
             var associatedRow = this.parameterOrOverrideBaseCache[parameterBase];
 
-            if (newContainer != null && oldContainer == null)
+            if ((newContainer != null) && (oldContainer == null))
             {
                 this.ContainedRows.Remove(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                 this.parameterOrOverrideContainerMap[parameterBase] = newContainer;
             }
-            else if (newContainer == null && oldContainer != null)
+            else if ((newContainer == null) && (oldContainer != null))
             {
                 this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
                 this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
                 this.parameterOrOverrideContainerMap[parameterBase] = null;
             }
-            else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
+            else if ((newContainer != null) && (oldContainer != null) && (newContainer != oldContainer))
             {
                 this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
@@ -185,8 +201,7 @@ namespace CDP4ProductTree.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            var elementDefinition = dropInfo.Payload as ElementDefinition;
-            if (elementDefinition != null)
+            if (dropInfo.Payload is ElementDefinition elementDefinition)
             {
                 this.DragOver(dropInfo, elementDefinition);
                 return;
@@ -203,8 +218,7 @@ namespace CDP4ProductTree.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            var elementDefinition = dropInfo.Payload as ElementDefinition;
-            if (elementDefinition != null)
+            if (dropInfo.Payload is ElementDefinition elementDefinition)
             {
                 await this.Drop(dropInfo, elementDefinition);
             }
@@ -217,27 +231,31 @@ namespace CDP4ProductTree.ViewModels
         {
             this.ThingStatus = new ThingStatus(this.Thing);
         }
-        
+
         /// <summary>
         /// Initializes the subscriptions
         /// </summary>
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
+
             var elementDefListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.UpdateElementDefinitionProperties());
+
             this.Disposables.Add(elementDefListener);
 
             var highlightSubscription = CDPMessageBus.Current.Listen<HighlightByCategoryEvent>(this.Thing.ElementDefinition)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
+
             this.Disposables.Add(highlightSubscription);
 
             var highlightUsageSubscription = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
+
             this.Disposables.Add(highlightSubscription);
         }
 
@@ -252,8 +270,9 @@ namespace CDP4ProductTree.ViewModels
             }
 
             var sb = new StringBuilder();
-            
+
             string owner;
+
             if (this.Thing.Owner != null)
             {
                 owner = this.Thing.Owner.ShortName;
@@ -263,18 +282,21 @@ namespace CDP4ProductTree.ViewModels
                 owner = "NA";
                 logger.Debug($"Owner if {this.Thing.ClassKind} null");
             }
+
             sb.AppendLine($"Owner: {owner}");
-            
+
             var categories = this.Thing.Category.Any() ? string.Join(" ", this.Thing.Category.OrderBy(x => x.ShortName).Select(x => x.ShortName)) : "-";
             sb.AppendLine($"Category: {categories}");
-            
+
             sb.AppendLine($"Model Code: {this.Path()}");
-            
+
             var definition = this.Thing.Definition.FirstOrDefault();
-            sb.AppendLine(definition == null
-                ? $"Definition : -"
-                : $"Definition [{definition.LanguageCode}]: {definition.Content}");
-            
+
+            sb.AppendLine(
+                definition == null
+                    ? $"Definition : -"
+                    : $"Definition [{definition.LanguageCode}]: {definition.Content}");
+
             this.Tooltip = sb.ToString();
         }
 
@@ -284,21 +306,19 @@ namespace CDP4ProductTree.ViewModels
         /// <returns></returns>
         public string Path()
         {
-            var elementDefinitionRowViewModel = this.ContainerViewModel as ElementDefinitionRowViewModel;
-            if (elementDefinitionRowViewModel != null)
+            if (this.ContainerViewModel is ElementDefinitionRowViewModel elementDefinitionRowViewModel)
             {
                 return $"{elementDefinitionRowViewModel.Path()}.{this.Thing.ShortName}";
             }
 
-            var elementUsageRowViewModel = this.ContainerViewModel as ElementUsageRowViewModel;
-            if (elementUsageRowViewModel != null)
+            if (this.ContainerViewModel is ElementUsageRowViewModel elementUsageRowViewModel)
             {
                 return $"{elementUsageRowViewModel.Path()}.{this.Thing.ShortName}";
             }
 
             return string.Empty;
         }
-        
+
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -318,6 +338,7 @@ namespace CDP4ProductTree.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var parameterOverride in this.parameterOrOverrideBaseCache)
             {
                 parameterOverride.Value.Dispose();
@@ -410,6 +431,7 @@ namespace CDP4ProductTree.ViewModels
                             objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => this.UpdateOptionDependentElementUsage((ElementUsage)x.ChangedThing));
+
                 this.elementUsageListenerCache.Add(elementUsage, listener);
             }
 
@@ -431,6 +453,7 @@ namespace CDP4ProductTree.ViewModels
         private void RemoveElementUsage(ElementUsage elementUsage)
         {
             var row = this.ContainedRows.SingleOrDefault(x => x.Thing == elementUsage);
+
             if (row != null)
             {
                 row.Dispose();
@@ -449,6 +472,7 @@ namespace CDP4ProductTree.ViewModels
             if (elementUsage.ExcludeOption.Contains(this.Option))
             {
                 var row = this.ContainedRows.SingleOrDefault(x => x.Thing == elementUsage);
+
                 if (row != null)
                 {
                     row.Dispose();
@@ -470,6 +494,7 @@ namespace CDP4ProductTree.ViewModels
 
             // remove deleted groups
             var oldgroup = this.parameterGroupCache.Keys.Except(definedGroups).ToList();
+
             foreach (var group in oldgroup)
             {
                 if (group.ContainingGroup == null)
@@ -478,8 +503,7 @@ namespace CDP4ProductTree.ViewModels
                 }
                 else
                 {
-                    this.parameterGroupCache[group.ContainingGroup].ContainedRows.Remove(
-                        this.parameterGroupCache[group]);
+                    this.parameterGroupCache[group.ContainingGroup].ContainedRows.Remove(this.parameterGroupCache[group]);
                 }
 
                 this.parameterGroupCache[group].Dispose();
@@ -489,6 +513,7 @@ namespace CDP4ProductTree.ViewModels
 
             // create new group rows
             var newgroup = definedGroups.Except(this.parameterGroupCache.Keys).ToList();
+
             foreach (var group in newgroup)
             {
                 var row = new ParameterGroupRowViewModel(group, this.Session, this);
@@ -527,9 +552,11 @@ namespace CDP4ProductTree.ViewModels
 
             // remove deleted ParameterOrOverride
             var oldParameterOrOverride = this.parameterOrOverrideBaseCache.Keys.Except(definedParameterOrOverride).ToList();
+
             foreach (var parameterOrOverride in oldParameterOrOverride)
             {
                 var group = this.parameterOrOverrideContainerMap[parameterOrOverride];
+
                 if (group == null)
                 {
                     this.ContainedRows.Remove(this.parameterOrOverrideBaseCache[parameterOrOverride]);
@@ -546,12 +573,12 @@ namespace CDP4ProductTree.ViewModels
 
             // create new ParameterOrOverride rows
             var newparameterOrOverrides = definedParameterOrOverride.Except(this.parameterOrOverrideBaseCache.Keys).ToList();
+
             foreach (var parameterOrOverride in newparameterOrOverrides)
             {
                 IRowViewModelBase<ParameterOrOverrideBase> row;
 
-                var parameterOverride = parameterOrOverride as ParameterOverride;
-                if (parameterOverride != null)
+                if (parameterOrOverride is ParameterOverride parameterOverride)
                 {
                     row = new ParameterOverrideRowViewModel(parameterOverride, this.Option, this.Session, this);
                 }
@@ -612,14 +639,10 @@ namespace CDP4ProductTree.ViewModels
         /// <param name="elementDefinition">The <see cref="ElementDefinition"/></param>
         private async Task Drop(IDropInfo dropInfo, ElementDefinition elementDefinition)
         {
-            if (this.ThingCreator == null)
-            {
-                this.ThingCreator = new ThingCreator();
-            }
-
             try
             {
                 var currentDomain = this.Session.QuerySelectedDomainOfExpertise(this.Thing.GetContainerOfType<Iteration>());
+
                 if (elementDefinition.TopContainer == this.Thing.TopContainer)
                 {
                     await this.ThingCreator.CreateElementUsage((ElementDefinition)this.Thing.Container, elementDefinition, currentDomain, this.Session);

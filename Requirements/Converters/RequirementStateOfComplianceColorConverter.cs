@@ -46,18 +46,15 @@ namespace CDP4Requirements.Converters
                 switch (relationalOperatorKind)
                 {
                     case RequirementStateOfCompliance.Failed:
-                        color = "#FFACAC";
-
+                        color = "#FFD9DA";
                         break;
 
                     case RequirementStateOfCompliance.Pass:
                         color = "#C4FFBD";
-
                         break;
 
                     case RequirementStateOfCompliance.Inconclusive:
                         color = "#FDFDBF";
-
                         break;
                 }
             }

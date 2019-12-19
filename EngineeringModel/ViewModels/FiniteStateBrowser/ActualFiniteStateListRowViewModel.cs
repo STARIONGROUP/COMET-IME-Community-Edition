@@ -13,7 +13,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4Composition.ExtensionMethods;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Dal;
     using CDP4Dal.Events;

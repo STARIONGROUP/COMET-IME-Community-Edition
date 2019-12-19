@@ -26,6 +26,8 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4RequirementsVerification;
 
+    using Microsoft.Practices.ServiceLocation;
+
     using ReactiveUI;
 
     /// <summary>
@@ -37,6 +39,11 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="RelationalExpressionRowViewModel.RequirementStateOfCompliance"/>
         /// </summary>
         private RequirementStateOfCompliance requirementStateOfCompliance;
+
+        /// <summary>
+        /// The backing field for <see cref="ThingCreator"/>
+        /// </summary>
+        private IThingCreator thingCreator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationalExpressionRowViewModel"/> class
@@ -53,7 +60,11 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
-        public IThingCreator ThingCreator { get; set; } = new ThingCreator();
+        public IThingCreator ThingCreator
+        {
+            get => this.thingCreator = this.thingCreator ?? ServiceLocator.Current.GetInstance<IThingCreator>();
+            set => this.thingCreator = value;
+        }
 
         /// <summary>
         /// Gets or sets the ParametricConstraintsVerifier

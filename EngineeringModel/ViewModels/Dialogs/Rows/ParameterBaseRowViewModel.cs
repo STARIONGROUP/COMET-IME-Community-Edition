@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition.ExtensionMethods;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
@@ -136,8 +136,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             {
                 var enumValues = new ReactiveList<EnumerationValueDefinition>();
 
-                var enumPt = this.ParameterType as EnumerationParameterType;
-                if (enumPt != null)
+                if (this.ParameterType is EnumerationParameterType enumPt)
                 {
                     enumValues.AddRange(enumPt.ValueDefinition);
                 }
@@ -239,8 +238,8 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         private void UpdateProperties()
         {
             this.Name = this.Thing.ParameterType.Name;
-            var subscription = this.Thing as ParameterSubscription;
-            if (subscription != null)
+
+            if (this.Thing is ParameterSubscription subscription)
             {
                 var parameter = (ParameterOrOverrideBase)subscription.Container;
                 if (parameter.Owner != null)

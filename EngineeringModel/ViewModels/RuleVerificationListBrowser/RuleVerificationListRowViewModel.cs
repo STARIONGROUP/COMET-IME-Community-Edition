@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,22 +10,30 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4EngineeringModel.Utilities;
+
+    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// A row representing a <see cref="CDP4Common.EngineeringModelData.RuleVerificationList"/>
     /// </summary>
     public class RuleVerificationListRowViewModel : CDP4CommonView.RuleVerificationListRowViewModel, IDropTarget
     {
+        /// <summary>
+        /// The backing field for <see cref="ThingCreator"/>
+        /// </summary>
+        private IThingCreator thingCreator;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RuleVerificationListRowViewModel"/> class.
         /// </summary>
@@ -44,7 +52,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateProperties();
         }
 
-        #region RowBase
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -55,14 +62,13 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateProperties();
         }
 
-        #endregion
-
         /// <summary>
         /// Updates the properties of this row on the update of the current <see cref="Thing"/>
         /// </summary>
         private void UpdateProperties()
         {
             this.PopulateRuleVerification();
+
             if (this.Owner != null)
             {
                 this.OwnerName = this.Owner.Name;
@@ -83,15 +89,13 @@ namespace CDP4EngineeringModel.ViewModels
 
             foreach (var newRuleVerification in newRuleVerifications)
             {
-                var builtInRuleVerification = newRuleVerification as BuiltInRuleVerification;
-                if (builtInRuleVerification != null)
+                if (newRuleVerification is BuiltInRuleVerification builtInRuleVerification)
                 {
                     var row = new BuiltInRuleVerificationRowViewModel(builtInRuleVerification, this.Session, this);
                     this.ContainedRows.Add(row);
                 }
 
-                var userRuleVerification = newRuleVerification as UserRuleVerification;
-                if (userRuleVerification != null)
+                if (newRuleVerification is UserRuleVerification userRuleVerification)
                 {
                     var row = new UserRuleVerificationRowViewModel(userRuleVerification, this.Session, this);
                     this.ContainedRows.Add(row);
@@ -101,6 +105,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var ruleVerification in oldRuleVerifications)
             {
                 var row = this.ContainedRows.SingleOrDefault(x => x.Thing == ruleVerification);
+
                 if (row != null)
                 {
                     this.ContainedRows.Remove(row);
@@ -111,9 +116,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
-        public IThingCreator ThingCreator { get; set; }
-
-        #region IDropTarget
+        public IThingCreator ThingCreator
+        {
+            get => this.thingCreator = this.thingCreator ?? ServiceLocator.Current.GetInstance<IThingCreator>();
+            set => this.thingCreator = value;
+        }
 
         /// <summary>
         /// Updates the current drag state.
@@ -130,8 +137,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             //TODO: Add Permission handling
 
-            var rule = dropInfo.Payload as Rule;
-            if (rule != null)
+            if (dropInfo.Payload is Rule rule)
             {
                 var rdl = (ReferenceDataLibrary)rule.Container;
 
@@ -140,6 +146,7 @@ namespace CDP4EngineeringModel.ViewModels
 
                 var requiredRdls = modelReferenceDataLibrary.GetRequiredRdls().ToList();
                 requiredRdls.Add(modelReferenceDataLibrary);
+
                 if (!requiredRdls.Contains(rdl))
                 {
                     logger.Info("Rule {0} is not in the chain of Reference Data Libraries and connot be used to create a Rule Verification.", rule.Iid);
@@ -151,8 +158,7 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            var builtInRuleMetaData = dropInfo.Payload as IBuiltInRuleMetaData;
-            if (builtInRuleMetaData != null)
+            if (dropInfo.Payload is IBuiltInRuleMetaData builtInRuleMetaData)
             {
                 dropInfo.Effects = DragDropEffects.Copy;
                 return;
@@ -172,14 +178,8 @@ namespace CDP4EngineeringModel.ViewModels
         {
             //TODO: Add Permission handling
 
-            var rule = dropInfo.Payload as Rule;
-            if (rule != null)
+            if (dropInfo.Payload is Rule rule)
             {
-                if (this.ThingCreator == null)
-                {
-                    this.ThingCreator = new ThingCreator();
-                }
-
                 try
                 {
                     await this.ThingCreator.CreateUserRuleVerification(this.Thing, rule, this.Session);
@@ -190,14 +190,8 @@ namespace CDP4EngineeringModel.ViewModels
                 }
             }
 
-            var builtInRuleMetaData = dropInfo.Payload as IBuiltInRuleMetaData;
-            if (builtInRuleMetaData != null)
+            if (dropInfo.Payload is IBuiltInRuleMetaData builtInRuleMetaData)
             {
-                if (this.ThingCreator == null)
-                {
-                    this.ThingCreator = new ThingCreator();
-                }
-
                 try
                 {
                     await this.ThingCreator.CreateBuiltInRuleVerification(this.Thing, builtInRuleMetaData.Name, this.Session);
@@ -210,7 +204,5 @@ namespace CDP4EngineeringModel.ViewModels
 
             dropInfo.Effects = DragDropEffects.None;
         }
-
-        #endregion IDropTarget
     }
 }
