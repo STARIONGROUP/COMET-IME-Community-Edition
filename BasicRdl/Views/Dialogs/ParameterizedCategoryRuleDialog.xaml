@@ -11,8 +11,9 @@
              xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
-             Width="600"
+             Width="650"
              Height="550"
+             MaxWidth="650"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
     <dx:DXWindow.Resources>
@@ -75,8 +76,8 @@
                 </lc:LayoutItem>
                 <lc:LayoutItem>
                     <dxg:GridControl x:Name="ParameterTypesGrid"
+                                     Width="Auto"
                                      MaxHeight="300"
-                                     Width="590"
                                      CustomRowFilter="SelectedParameterTypeFilter"
                                      ItemsSource="{Binding PossibleParameterType}"
                                      SelectionMode="Row">
