@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="SpecificationTypeMappingDialogTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -9,20 +9,27 @@ namespace CDP4Requirements.Tests.ReqIF
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
+    using CDP4Requirements.ReqIFDal;
+    using CDP4Requirements.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
-    using ReqIFDal;
+
     using ReqIFSharp;
-    using ViewModels;
 
     [TestFixture]
     internal class SpecificationTypeMappingDialogTestFixture
@@ -113,7 +120,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.reqIf.CoreContent.Add(corecontent);
             this.stringDatadef = new DatatypeDefinitionString();
             this.spectype = new SpecificationType();
-            this.attribute = new AttributeDefinitionString() {DatatypeDefinition = this.stringDatadef};
+            this.attribute = new AttributeDefinitionString() { DatatypeDefinition = this.stringDatadef };
 
             this.spectype.SpecAttributes.Add(this.attribute);
 
@@ -141,13 +148,13 @@ namespace CDP4Requirements.Tests.ReqIF
             this.dialog.CreateCommand.Execute(null);
 
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<Category>(),
-                        It.IsAny<IThingTransaction>(),
-                        this.session.Object,
-                        true,
-                        ThingDialogKind.Create,
-                        this.thingDialogNavigationService.Object,
-                        null,
-                        null));
+                It.IsAny<IThingTransaction>(),
+                this.session.Object,
+                true,
+                ThingDialogKind.Create,
+                this.thingDialogNavigationService.Object,
+                null,
+                null));
         }
 
         [Test]
@@ -165,7 +172,6 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.IsNotNull(res);
             Assert.IsFalse(res.GoNext.Value);
             Assert.IsTrue(res.Result.Value);
-
         }
 
         [Test]
@@ -181,6 +187,5 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.IsTrue(res.GoNext.Value);
             Assert.IsNotEmpty(res.SpecificationTypeMap);
         }
-
     }
 }

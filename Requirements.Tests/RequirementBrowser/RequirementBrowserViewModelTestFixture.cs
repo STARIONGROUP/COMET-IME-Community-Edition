@@ -1,29 +1,39 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements.Tests.Panels
+namespace CDP4Requirements.Tests.RequirementBrowser
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;
-    using CDP4Requirements.ViewModels;
-    using Moq;
-    using NUnit.Framework;
-    using System;
-    using System.Linq;
     using CDP4Dal.Operations;
+    using CDP4Dal.Permission;
+
+    using CDP4Requirements.ViewModels;
+
+    using CDP4RequirementsVerification;
+
+    using Moq;
+
+    using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -48,9 +58,9 @@ namespace CDP4Requirements.Tests.Panels
 
         [SetUp]
         public void Setup()
-        { 
+        {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            
+
             this.session = new Mock<ISession>();
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
@@ -61,9 +71,9 @@ namespace CDP4Requirements.Tests.Panels
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
             this.session = new Mock<ISession>();
-            
+
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri) { ShortName = "test" };
-            this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { SelectedDomain = null, Person = this.person};
+            this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { SelectedDomain = null, Person = this.person };
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
@@ -89,7 +99,7 @@ namespace CDP4Requirements.Tests.Panels
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString());
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, this.participant)} });
+            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, this.participant) } });
         }
 
         [TearDown]
@@ -101,7 +111,7 @@ namespace CDP4Requirements.Tests.Panels
         [Test]
         public void VerifyThatRequirementSpecificationMayBeAddedOrRemoved()
         {
-            var revision = typeof (Thing).GetProperty("RevisionNumber");
+            var revision = typeof(Thing).GetProperty("RevisionNumber");
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
 
             Assert.AreEqual(1, vm.ReqSpecificationRows.Count);
@@ -137,7 +147,7 @@ namespace CDP4Requirements.Tests.Panels
         {
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
             });
 
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
@@ -145,7 +155,7 @@ namespace CDP4Requirements.Tests.Panels
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, null}
+                { this.iteration, null }
             });
 
             vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
@@ -157,7 +167,7 @@ namespace CDP4Requirements.Tests.Panels
         {
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
             });
 
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
@@ -169,11 +179,38 @@ namespace CDP4Requirements.Tests.Panels
 
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Requirement>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.dialogNavigation.Object, It.IsAny<RequirementsSpecification>(), null));
 
-            vm.SelectedThing = (RequirementsGroupRowViewModel)reqSpecRow.ContainedRows.Single(x => x.Thing is RequirementsGroup);
+            vm.SelectedThing = (RequirementsGroupRowViewModel) reqSpecRow.ContainedRows.Single(x => x.Thing is RequirementsGroup);
             Assert.IsTrue(vm.CanCreateRequirement);
             vm.CreateRequirementCommand.Execute(null);
 
             this.dialogNavigation.Verify(x => x.Navigate(It.Is<Requirement>(r => r.Group != null), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.dialogNavigation.Object, It.IsAny<RequirementsSpecification>(), null));
+        }
+
+        [Test]
+        public async Task VerifyThatRequirementVerificationWorks()
+        {
+            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            var reqSpecRow = vm.ReqSpecificationRows.Single();
+
+            Assert.IsTrue(vm.CanVerifyRequirements);
+            vm.VerifyRequirementsCommand.Execute(null);
+            Assert.AreEqual(RequirementStateOfCompliance.Calculating, reqSpecRow.RequirementStateOfCompliance);
+            await Task.Delay(1000).ContinueWith(x => Assert.AreEqual(RequirementStateOfCompliance.Inconclusive, reqSpecRow.RequirementStateOfCompliance));
+        }
+
+        [Test]
+        public async Task VerifyThatDeprecatedRequirementSpecificationsAreNotVerified()
+        {
+            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            var reqSpecRow = vm.ReqSpecificationRows.Single();
+
+            Assert.IsTrue(vm.CanVerifyRequirements);
+            reqSpecRow.RequirementStateOfCompliance = RequirementStateOfCompliance.Unknown;
+            reqSpecRow.Thing.IsDeprecated = true;
+
+            vm.VerifyRequirementsCommand.Execute(null);
+            Assert.AreEqual(RequirementStateOfCompliance.Unknown, reqSpecRow.RequirementStateOfCompliance);
+            await Task.Delay(1000).ContinueWith(x => Assert.AreEqual(RequirementStateOfCompliance.Unknown, reqSpecRow.RequirementStateOfCompliance));
         }
     }
 }

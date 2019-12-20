@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeMappingDialogTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -9,19 +9,26 @@ namespace CDP4Requirements.Tests.ReqIF
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
+    using CDP4Requirements.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReqIFSharp;
-    using ViewModels;
 
     [TestFixture]
     internal class ParameterTypeMappingDialogTestFixture
@@ -118,7 +125,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.intDatadef = new DatatypeDefinitionInteger();
             this.realDatadef = new DatatypeDefinitionReal();
             this.enumDatadef = new DatatypeDefinitionEnumeration();
-            this.enumDatadef.SpecifiedValues.Add(new EnumValue { Properties = new EmbeddedValue {Key = 1, OtherContent = "enum1"} });
+            this.enumDatadef.SpecifiedValues.Add(new EnumValue { Properties = new EmbeddedValue { Key = 1, OtherContent = "enum1" } });
 
             this.dateDatadef = new DatatypeDefinitionDate();
 
@@ -153,7 +160,7 @@ namespace CDP4Requirements.Tests.ReqIF
         public void VerifyThatCreateGenericParameterTypeWorks()
         {
             this.thingDialogNavigationService.Setup(
-                x => x.Navigate(It.IsAny<ParameterType>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null))
+                    x => x.Navigate(It.IsAny<ParameterType>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null))
                 .Returns(true)
                 .Callback<ParameterType, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, Thing[]>((parameterType, tr, s, boolean, kind, transaction, c, chain) => this.srdl.ParameterType.Add(parameterType));
 
@@ -168,9 +175,9 @@ namespace CDP4Requirements.Tests.ReqIF
         public void VerifyThatCreateEnumWorks()
         {
             this.thingDialogNavigationService.Setup(
-               x => x.Navigate(It.IsAny<ParameterType>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null))
-               .Returns(true)
-               .Callback<ParameterType, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, Thing[]>((parameterType, tr, s, boolean, kind, transaction, c, chain) => this.srdl.ParameterType.Add(parameterType));
+                    x => x.Navigate(It.IsAny<ParameterType>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null))
+                .Returns(true)
+                .Callback<ParameterType, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, Thing[]>((parameterType, tr, s, boolean, kind, transaction, c, chain) => this.srdl.ParameterType.Add(parameterType));
 
             this.dialog.SelectedRow = this.dialog.MappingRows.First(x => x.Identifiable == this.enumDatadef);
             this.dialog.CreateParameterTypeCommands.First().MenuCommand.Execute(null);
@@ -183,8 +190,8 @@ namespace CDP4Requirements.Tests.ReqIF
         public void VerifyThatCreateScaleWorks()
         {
             this.thingDialogNavigationService.Setup(
-               x => x.Navigate(It.IsAny<MeasurementScale>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null))
-               .Returns(true);
+                    x => x.Navigate(It.IsAny<MeasurementScale>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null))
+                .Returns(true);
 
             this.dialog.SelectedRow = this.dialog.MappingRows.First(x => x.Identifiable == this.realDatadef);
             this.dialog.CreateMeasurementScaleCommands.First().MenuCommand.Execute(null);
@@ -203,7 +210,7 @@ namespace CDP4Requirements.Tests.ReqIF
         [Test]
         public void VerifyThatOkCommandWorks()
         {
-            this.dialog = new ParameterTypeMappingDialogViewModel(this.reqIf.Lang, new DatatypeDefinition[] {this.stringDatadef}, null, this.iteration, this.session.Object, this.thingDialogNavigationService.Object);
+            this.dialog = new ParameterTypeMappingDialogViewModel(this.reqIf.Lang, new DatatypeDefinition[] { this.stringDatadef }, null, this.iteration, this.session.Object, this.thingDialogNavigationService.Object);
 
             foreach (var datatypeDefinitionMappingRowViewModel in this.dialog.MappingRows)
             {

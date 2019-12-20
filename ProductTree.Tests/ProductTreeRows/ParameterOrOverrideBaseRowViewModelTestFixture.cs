@@ -1,27 +1,36 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
-
-using System.IO.Packaging;
 
 namespace CDP4ProductTree.Tests.ProductTreeRows
 {
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.IO.Packaging;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
-    using System.Windows.Media.Imaging;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
+    using CDP4Composition.DragDrop;
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4ProductTree.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -46,11 +55,14 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         private Option option;
         private DomainOfExpertise domain;
         private ProductTreeIconUriConverter converter;
+        private RelationalExpression relationalExpression;
+        private Mock<IThingCreator> thingCreator;
+        private Mock<IServiceLocator> serviceLocator;
 
         [SetUp]
         public void Setup()
         {
-            var ensurePackSchemeIsKnown = System.IO.Packaging.PackUriHelper.UriSchemePack;
+            var ensurePackSchemeIsKnown = PackUriHelper.UriSchemePack;
             this.session = new Mock<ISession>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
@@ -88,6 +100,18 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             this.cache.TryAdd(new CacheKey(this.parameter1.Iid, null), new Lazy<Thing>(() => this.parameter1));
             this.converter = new ProductTreeIconUriConverter();
+
+            this.relationalExpression = new RelationalExpression();
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.thingCreator = new Mock<IThingCreator>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>())
+                .Returns(this.thingCreator.Object);
+
+            this.thingCreator.Setup(x => x.IsCreateBinaryRelationshipForRequirementVerificationAllowed(It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()))
+                .Returns(true);
         }
 
         [TearDown]
@@ -100,7 +124,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         public void VerifyThatPropertiesArePopulatedForScalarPropertiesNoStateNoOption()
         {
             // **********************************************************************
-            var published = new ValueArray<string>(new List<string> {"manual"}, this.valueset);
+            var published = new ValueArray<string>(new List<string> { "manual" }, this.valueset);
             var actual = new ValueArray<string>(new List<string> { "different" }, this.valueset);
 
             this.valueset.Published = published;
@@ -108,6 +132,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             this.valueset.ValueSwitch = ParameterSwitchKind.MANUAL;
 
             this.parameter1.ValueSet.Add(this.valueset);
+
             // **********************************************************************
 
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
@@ -139,6 +164,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             var valueset2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
             this.parameter1.ValueSet.Add(valueset2);
+
             // **********************************************************************
 
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
@@ -171,6 +197,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             var valueset2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
             this.parameter1.ValueSet.Add(valueset2);
+
             // **********************************************************************
 
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
@@ -214,13 +241,14 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             var valueset2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
             this.parameter1.ValueSet.Add(valueset2);
+
             // **********************************************************************
 
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
             Assert.AreEqual(1, row.ContainedRows.Count);
 
             this.state1.Kind = ActualFiniteStateKind.FORBIDDEN;
-            CDPMessageBus.Current.SendObjectChangeEvent(state1, EventKind.Updated);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.state1, EventKind.Updated);
             Assert.AreEqual(0, row.ContainedRows.Count);
         }
 
@@ -237,6 +265,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             this.valueset.ActualOption = this.option;
 
             var compoundtype = new CompoundParameterType(Guid.NewGuid(), null, this.uri);
+
             var component1 = new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
             {
                 ParameterType = this.parameterType1,
@@ -266,6 +295,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             };
 
             this.parameter1.ValueSet.Add(valueset2);
+
             // **********************************************************************
 
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
@@ -301,6 +331,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             this.valueset.ActualState = this.state1;
 
             var compoundtype = new CompoundParameterType(Guid.NewGuid(), null, this.uri);
+
             var component1 = new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
             {
                 ParameterType = this.parameterType1,
@@ -334,6 +365,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             };
 
             this.parameter1.ValueSet.Add(valueset2);
+
             // **********************************************************************
 
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
@@ -361,7 +393,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             Assert.IsTrue(s2c1.Value.Contains("s2value1"));
             Assert.IsTrue(s2c2.Value.Contains("s2value2"));
         }
-        
+
         [Test]
         public void VerifyThatParameterTypeUpdatesAreHandled()
         {
@@ -374,6 +406,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             this.valueset.ValueSwitch = ParameterSwitchKind.MANUAL;
 
             this.parameter1.ValueSet.Add(this.valueset);
+
             // **********************************************************************
 
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
@@ -393,6 +426,63 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             CDPMessageBus.Current.SendObjectChangeEvent(this.parameterType1, EventKind.Updated);
 
             Assert.AreEqual("updatept1", row.Name);
+        }
+
+        [Test]
+        public void VerifyThatDragOverWorksForRelationalExpression()
+        {
+            var vm = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.relationalExpression);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.Copy, dropinfo.Object.Effects);
+        }
+
+        [Test]
+        public void VerifyThatDragOverWorksCorrectlyForNotSupportedType()
+        {
+            var vm = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.parameter1);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
+        }
+
+        [Test]
+        public async Task VerifyThatDropWorksForRelationalExpression()
+        {
+            var vm = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.relationalExpression);
+            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            await vm.Drop(dropinfo.Object);
+
+            this.thingCreator.Verify(x => x.CreateBinaryRelationshipForRequirementVerification(It.IsAny<ISession>(), It.IsAny<Iteration>(), It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()), Times.Once);
+        }
+
+        [Test]
+        public void VerifyThatDropWorksCorrectlyForNotSupportedType()
+        {
+            var vm = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.parameter1);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            this.thingCreator.Verify(x => x.CreateBinaryRelationshipForRequirementVerification(It.IsAny<ISession>(), It.IsAny<Iteration>(), It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()), Times.Never);
         }
     }
 }

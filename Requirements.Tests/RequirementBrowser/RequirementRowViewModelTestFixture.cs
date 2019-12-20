@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -9,21 +9,29 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using System;
     using System.Reactive.Concurrency;
     using System.Reflection;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.DragDrop;
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4Requirements.ViewModels;
+
+    using CDP4RequirementsVerification;
+    using CDP4RequirementsVerification.Events;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -31,7 +39,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     {
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
-        private readonly PropertyInfo revision = typeof (Thing).GetProperty("RevisionNumber");
+        private readonly PropertyInfo revision = typeof(Thing).GetProperty("RevisionNumber");
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private SiteDirectory siteDirectory;
         private EngineeringModel model;
@@ -71,10 +79,10 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "model" };
             this.modelSetup.RequiredRdl.Add(this.modelReferenceDataLibrary);
-            
+
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "rs1", ShortName = "1"};
+            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "rs1", ShortName = "1" };
 
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test" };
             this.reqSpec.Owner = this.domain;
@@ -93,7 +101,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.grp1.Group.Add(this.grp11);
 
             this.req = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "requirement1", ShortName = "r1", Owner = this.domain };
-            this.def = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) {Content = "def"};
+            this.def = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Content = "def" };
             this.reqSpec.Requirement.Add(this.req);
             this.req.Definition.Add(this.def);
         }
@@ -110,7 +118,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
 
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
-        
+
             Assert.AreEqual("requirement1", row.Name);
             Assert.AreEqual("r1", row.ShortName);
             Assert.AreSame(this.domain, row.Owner);
@@ -178,7 +186,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             var definition = new Definition() { Content = "some text\r\nsome other text", LanguageCode = "en" };
             this.req.Definition.Add(definition);
-            
+
             var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
             Assert.AreEqual("some text...", row.Definition);
@@ -202,7 +210,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         {
             var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
-            
+
             var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             category.PermissibleClass.Add(ClassKind.Requirement);
 
@@ -245,7 +253,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(category);
             dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
-            
+
             row.Drop(dropinfo.Object);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
@@ -261,7 +269,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
 
             row.StartDrag(dragInfo.Object);
-            
+
             Assert.AreEqual(this.req, dragInfo.Object.Payload);
             Assert.AreEqual(DragDropEffects.All, dragInfo.Object.Effects);
         }
@@ -285,7 +293,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             row.DragOver(dropinfo.Object);
             Assert.AreEqual(dropinfo.Object.Effects, DragDropEffects.Copy);
 
-            this.req.ParameterValue.Add(new SimpleParameterValue() {ParameterType = param});
+            this.req.ParameterValue.Add(new SimpleParameterValue() { ParameterType = param });
             row.DragOver(dropinfo.Object);
             Assert.AreEqual(dropinfo.Object.Effects, DragDropEffects.None);
         }
@@ -310,7 +318,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         {
             var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
-            
+
             Assert.AreEqual(containerRow.IsParametricConstraintDisplayed, false);
             Assert.AreEqual(containerRow.IsSimpleParameterValuesDisplayed, false);
 
@@ -328,6 +336,35 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             Assert.AreEqual(containerRow.ContainedRows.Count, 4);
             Assert.AreEqual(row.ContainedRows.Count, 2);
+        }
+
+        [Test]
+        public async Task VerifyThatRequirementVerificationStateOfComplianceIsSetForRequirementRow()
+        {
+            var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
+            var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
+
+            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Calculating), this.req);
+            Assert.AreEqual(RequirementStateOfCompliance.Calculating, row.RequirementStateOfCompliance);
+
+            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), this.req);
+            Assert.AreEqual(RequirementStateOfCompliance.Calculating, row.RequirementStateOfCompliance);
+
+            await Task.Delay(1000).ContinueWith(_ => Assert.AreEqual(RequirementStateOfCompliance.Pass, row.RequirementStateOfCompliance));
+        }
+
+        [Test]
+        public async Task VerifyThatRequirementVerificationStateOfComplianceIsSetForRequirementSpecificationRow()
+        {
+            var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
+
+            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Calculating), this.reqSpec);
+            Assert.AreEqual(RequirementStateOfCompliance.Calculating, containerRow.RequirementStateOfCompliance);
+
+            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), this.reqSpec);
+            Assert.AreEqual(RequirementStateOfCompliance.Calculating, containerRow.RequirementStateOfCompliance);
+
+            await Task.Delay(1000).ContinueWith(_ => Assert.AreEqual(RequirementStateOfCompliance.Pass, containerRow.RequirementStateOfCompliance));
         }
     }
 }

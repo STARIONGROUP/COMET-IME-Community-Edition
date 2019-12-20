@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2019 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,21 +9,32 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -64,6 +75,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
         private Assembler assembler;
 
+        private RelationalExpression relationalExpression;
+        private Mock<IThingCreator> thingCreator;
+        private Mock<IServiceLocator> serviceLocator;
+
         [SetUp]
         public void Setup()
         {
@@ -72,6 +87,19 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
+
+            this.relationalExpression = new RelationalExpression();
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.thingCreator = new Mock<IThingCreator>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>())
+                .Returns(this.thingCreator.Object);
+
+            this.thingCreator.Setup(x => x.IsCreateBinaryRelationshipForRequirementVerificationAllowed(It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()))
+                .Returns(true);
+
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.stateList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -161,8 +189,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             {
                 Owner = this.activeDomain
             };
+
             this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri){ElementDefinition = this.elementDefinitionForUsage1};
+            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { ElementDefinition = this.elementDefinitionForUsage1 };
 
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
 
@@ -203,6 +232,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void VerifyThatUpdateValueSetWorks()
         {
             var row = new ParameterRowViewModel(this.cptParameter, this.session.Object, null, false);
+
             var option1Row =
                 row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
 
@@ -210,13 +240,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
                 row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option2);
 
             var o1s1Row = option1Row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                    .Single(x => x.ActualState == this.actualState1);
+                .Single(x => x.ActualState == this.actualState1);
+
             var o1s2Row = option1Row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                    .Single(x => x.ActualState == this.actualState2);
+                .Single(x => x.ActualState == this.actualState2);
+
             var o2s1Row = option2Row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                    .Single(x => x.ActualState == this.actualState1);
+                .Single(x => x.ActualState == this.actualState1);
+
             var o2s2Row = option2Row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                    .Single(x => x.ActualState == this.actualState2);
+                .Single(x => x.ActualState == this.actualState2);
 
             var o1s1c1Row = o1s1Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().First();
             var o1s1c2Row = o1s1Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().Last();
@@ -256,7 +289,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             o2s1c2Row.Reference = new ReactiveList<EnumerationValueDefinition> { this.enum2 };
             o2s2c2Row.Reference = new ReactiveList<EnumerationValueDefinition> { this.enum2 };
 
-            var o1s1Set =this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option1 && x.ActualState == this.actualState1);
+            var o1s1Set = this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option1 && x.ActualState == this.actualState1);
             var o1s2Set = this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option1 && x.ActualState == this.actualState2);
             var o2s1Set = this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option2 && x.ActualState == this.actualState1);
             var o2s2Set = this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option2 && x.ActualState == this.actualState2);
@@ -290,11 +323,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             var row = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
 
-            var revInfo = typeof (Thing).GetProperty("RevisionNumber");
+            var revInfo = typeof(Thing).GetProperty("RevisionNumber");
             revInfo.SetValue(valueset, 10);
 
             Assert.AreEqual("-", row.Manual);
-            valueset.Manual = new ValueArray<string>(new List<string>{"test"});
+            valueset.Manual = new ValueArray<string>(new List<string> { "test" });
             CDPMessageBus.Current.SendObjectChangeEvent(valueset, EventKind.Updated);
 
             Assert.AreEqual("test", row.Manual);
@@ -305,18 +338,19 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void VerifyThatValueSetInlineEditWorksCompoundOptionState()
         {
             var row = new ParameterRowViewModel(this.cptParameter, this.session.Object, null, false);
+
             var option1Row =
                 row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
 
             var o1s1Row = option1Row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                    .Single(x => x.ActualState == this.actualState1);
+                .Single(x => x.ActualState == this.actualState1);
 
             var o1s1c1Row = o1s1Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().First();
 
             o1s1c1Row.Switch = ParameterSwitchKind.REFERENCE;
             o1s1c1Row.CreateCloneAndWrite(ParameterSwitchKind.REFERENCE, "Switch");
 
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet) op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
         [Test]
@@ -330,13 +364,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter.ValueSet.Add(set2);
 
             var row = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
+
             var option1Row =
                 row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
 
             option1Row.Switch = ParameterSwitchKind.REFERENCE;
             option1Row.CreateCloneAndWrite(ParameterSwitchKind.REFERENCE, "Switch");
 
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet) op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
         [Test]
@@ -351,13 +386,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter.ValueSet.Add(set2);
 
             var row = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
+
             var option1Row =
                 row.ContainedRows.OfType<ParameterStateRowViewModel>().Single(x => x.ActualState == this.actualState1);
 
             option1Row.Switch = ParameterSwitchKind.REFERENCE;
             option1Row.CreateCloneAndWrite(ParameterSwitchKind.REFERENCE, "Switch");
 
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet) op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
         [Test]
@@ -374,7 +410,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             row.Switch = ParameterSwitchKind.REFERENCE;
             row.CreateCloneAndWrite(ParameterSwitchKind.REFERENCE, "Switch");
 
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet) op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
         [Test]
@@ -532,6 +568,63 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
                 Published = new ValueArray<string>(new List<string> { "-" }),
                 ValueSwitch = ParameterSwitchKind.COMPUTED
             };
+        }
+
+        [Test]
+        public void VerifyThatDragOverWorksForRelationalExpression()
+        {
+            var vm = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.relationalExpression);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.Copy, dropinfo.Object.Effects);
+        }
+
+        [Test]
+        public void VerifyThatDragOverWorksCorrectlyForNotSupportedType()
+        {
+            var vm = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.person);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
+        }
+
+        [Test]
+        public async Task VerifyThatDropWorksForRelationalExpression()
+        {
+            var vm = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.relationalExpression);
+            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            await vm.Drop(dropinfo.Object);
+
+            this.thingCreator.Verify(x => x.CreateBinaryRelationshipForRequirementVerification(It.IsAny<ISession>(), It.IsAny<Iteration>(), It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()), Times.Once);
+        }
+
+        [Test]
+        public void VerifyThatDropWorksCorrectlyForNotSupportedType()
+        {
+            var vm = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.parameter);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            this.thingCreator.Verify(x => x.CreateBinaryRelationshipForRequirementVerification(It.IsAny<ISession>(), It.IsAny<Iteration>(), It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()), Times.Never);
         }
     }
 }

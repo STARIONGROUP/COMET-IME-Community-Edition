@@ -84,6 +84,11 @@ namespace CDP4Requirements.Extensions
                 }
             }
 
+            if (thing.ClassKind == ClassKind.NotExpression)
+            {
+                stringBuilder.Insert(0, $"{((NotExpression)thing).StringValue} ");
+            }
+
             return stringBuilder.ToString();
         }
 
@@ -97,7 +102,7 @@ namespace CDP4Requirements.Extensions
             if (expressionRow.Thing.ClassKind == ClassKind.RelationalExpression)
             {
                 stringBuilder.Append("(");
-                stringBuilder.Append(expressionRow.Thing.StringValue);
+                stringBuilder.Append(expressionRow.Thing.StringValue.Trim());
                 stringBuilder.Append(")");
             }
             else

@@ -14,7 +14,7 @@
     using NUnit.Framework;
     using ReqIFDal;
     using ReqIFSharp;
-    using ViewModels;
+    using CDP4Requirements.ViewModels;
 
     [TestFixture]
     internal class ReqIfImportMappingManagerTestFixture

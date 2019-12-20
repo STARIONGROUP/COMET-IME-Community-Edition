@@ -66,6 +66,9 @@
     <Reference Include="CDP4JsonSerializer, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CDP4JsonSerializer-CE.4.0.1\lib\net452\CDP4JsonSerializer.dll</HintPath>
     </Reference>
+    <Reference Include="CDP4RequirementsVerification, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4RequirementsVerification-CE.0.1.0-2019.12.19.2\lib\net452\CDP4RequirementsVerification.dll</HintPath>
+    </Reference>
     <Reference Include="ExcelApi, Version=1.7.4.6, Culture=neutral, PublicKeyToken=9084b9221296229e, processorArchitecture=MSIL">
       <HintPath>..\packages\NetOfficeFw.Excel.1.7.4.6\lib\net40\ExcelApi.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -219,6 +222,7 @@
     <Compile Include="Dialogs\RelationalExpressionDialogViewModelTestFixture.cs" />
     <Compile Include="Dialogs\RequirementsContainerParameterValueDialogViewModelTestFixture.cs" />
     <Compile Include="Dialogs\SimpleParameterValueDialogViewModelTestFixture.cs" />
+    <Compile Include="Extensions\BooleanExpressionExtensionsTestFixture.cs" />
     <Compile Include="HtmlReport\HtmlExportRequirementsSpecificationSelectionDialogViewModelTestFixture.cs" />
     <Compile Include="HtmlReport\HtmlExportRibbonViewModelTestFixture.cs" />
     <Compile Include="HtmlReport\HtmlReportGeneratorTestFixture.cs" />
@@ -234,8 +238,10 @@
     <Compile Include="RequirementBrowser\RequirementBrowserViewModelTestFixture.cs" />
     <Compile Include="RequirementBrowser\RequirementContainerChildComparerTestFixture.cs" />
     <Compile Include="RequirementBrowser\RequirementGroupRowViewModelTestFixture.cs" />
+    <Compile Include="RequirementBrowser\RelationalExpressionRowViewModelTestFixture .cs" />
     <Compile Include="RequirementBrowser\RequirementRowViewModelTestFixture.cs" />
     <Compile Include="RequirementBrowser\RequirementsSpecificationRowViewModelTestFixture.cs" />
+    <Compile Include="ViewModels\Rows\RequirementVerificationViewModelsTestFixture.cs" />
     <Compile Include="RequirementBrowser\SimpleParameterValueRowViewModelTestFixture.cs" />
     <Compile Include="RequirementsModuleTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -271,6 +277,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

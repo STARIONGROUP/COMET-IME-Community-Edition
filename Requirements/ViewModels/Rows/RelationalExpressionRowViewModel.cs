@@ -21,7 +21,6 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using ReactiveUI;
 
     using CDP4Requirements.Extensions;
     using CDP4Requirements.ViewModels.RequirementBrowser;

@@ -201,7 +201,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, this.thingDialogNavigation.Object, this.panelNavigation.Object, this.dialogNavigation.Object, null);
             Assert.AreEqual(3, vm.ContainedRows.Count);
 
-            var requirementARow = (ViewModels.RequirementsSpecificationEditor.RequirementRowViewModel)vm.ContainedRows.Single(row => row.Thing == requirementA);
+            var requirementARow = (CDP4Requirements.ViewModels.RequirementsSpecificationEditor.RequirementRowViewModel)vm.ContainedRows.Single(row => row.Thing == requirementA);
             requirementARow.DefinitionContent = "changed";
 
             Assert.IsTrue(requirementARow.IsDirty);
