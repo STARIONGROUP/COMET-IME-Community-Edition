@@ -1,8 +1,27 @@
-﻿// ------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MatrixViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2019 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -----------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4RelationshipMatrix.ViewModels
 {
@@ -14,24 +33,17 @@ namespace CDP4RelationshipMatrix.ViewModels
     using System.Reactive.Linq;
     using System.Text;
     using System.Threading.Tasks;
-
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Extensions;
     using CDP4Common.SiteDirectoryData;
-
     using CDP4Composition.Services;
-
     using CDP4Dal;
     using CDP4Dal.Operations;
-
     using CDP4RelationshipMatrix.DataTypes;
     using CDP4RelationshipMatrix.Settings;
-
     using DevExpress.Xpf.Grid;
-
     using NLog;
-
     using ReactiveUI;
 
     /// <summary>
@@ -132,8 +144,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Dictionary that contains the current cells
         /// </summary>
-        private readonly Dictionary<string, MatrixCellViewModel> currentCells =
-            new Dictionary<string, MatrixCellViewModel>();
+        private readonly Dictionary<string, MatrixCellViewModel> currentCells = new Dictionary<string, MatrixCellViewModel>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MatrixViewModel" /> class
@@ -442,10 +453,10 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             try
             {
-                sourceYThing = things.Where(x => x.ClassKind == sourceY.SelectedClassKind.Value).Cast<DefinedThing>()
+                sourceXThing = things.Where(x => x.ClassKind == sourceX.SelectedClassKind.Value).Cast<DefinedThing>()
                     .ToList();
 
-                sourceXThing = things.Where(x => x.ClassKind == sourceX.SelectedClassKind.Value).Cast<DefinedThing>()
+                sourceYThing = things.Where(x => x.ClassKind == sourceY.SelectedClassKind.Value).Cast<DefinedThing>()
                     .ToList();
             }
             catch (InvalidCastException)
@@ -458,9 +469,9 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
-            var sourceXToUse = new List<DefinedThing>(this.FilterAndSortSourceByCategory(sourceXThing, sourceX));
+            var sourceXToUse = new List<DefinedThing>(this.FilterAndSortSourceByCategoryAndOwner(sourceXThing, sourceX));
 
-            var sourceYToUse = new List<DefinedThing>(this.FilterAndSortSourceByCategory(sourceYThing, sourceY));
+            var sourceYToUse = new List<DefinedThing>(this.FilterAndSortSourceByCategoryAndOwner(sourceYThing, sourceY));
 
             if (sourceYToUse.Count == 0 || sourceXToUse.Count == 0)
             {
@@ -720,7 +731,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="source">The <see cref="Thing" /> to filter</param>
         /// <param name="sourceConfigurationViewModel">The filter and sort settings</param>
         /// <returns>The filtered <see cref="Thing" /></returns>
-        private IEnumerable<DefinedThing> FilterAndSortSourceByCategory(IReadOnlyList<DefinedThing> source,
+        private IEnumerable<DefinedThing> FilterAndSortSourceByCategoryAndOwner(IReadOnlyList<DefinedThing> source,
             SourceConfigurationViewModel sourceConfigurationViewModel)
         {
             var sourceXCatThing = new List<DefinedThing>();
@@ -740,10 +751,19 @@ namespace CDP4RelationshipMatrix.ViewModels
 
                 var thing = (ICategorizableThing) definedThing;
 
-                if (RelationshipMatrixViewModel.IsCategoryApplicableToConfiguration(thing, sourceConfigurationViewModel)
-                )
+                if (RelationshipMatrixViewModel.IsCategoryApplicableToConfiguration(thing, sourceConfigurationViewModel))
                 {
-                    sourceXCatThing.Add(definedThing);
+                    if (definedThing is IOwnedThing ownedThing)
+                    {
+                        if (sourceConfigurationViewModel.SelectedOwners.Contains(ownedThing.Owner))
+                        {
+                            sourceXCatThing.Add(definedThing);
+                        }
+                    }
+                    else
+                    {
+                        sourceXCatThing.Add(definedThing);
+                    }
                 }
             }
 

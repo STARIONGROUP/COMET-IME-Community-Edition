@@ -1,8 +1,27 @@
-﻿// ------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ViewModelTestBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2019 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4RelationshipMatrix.Tests.ViewModel
 {
@@ -109,6 +128,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.engineeringModelSetup.IterationSetup.Add(this.iterationSetup);
             this.engineeringModelSetup.RequiredRdl.Add(this.mrdl);
             this.engineeringModelSetup.Participant.Add(this.participant);
+            this.engineeringModelSetup.ActiveDomain.Add(this.domain);
 
             this.srdl.DefinedCategory.Add(this.catEd1);
             this.srdl.DefinedCategory.Add(this.catEd2);
@@ -119,11 +139,11 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) { EngineeringModelSetup = this.engineeringModelSetup };
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri) { IterationSetup = this.iterationSetup };
-            this.elementDef11 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed11", ShortName = "ed11" };
-            this.elementDef12 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed12", ShortName = "ed12" };
-            this.elementDef21 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed21", ShortName = "ed21" };
-            this.elementDef22 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed22", ShortName = "ed22" };
-            this.elementDef31 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed31", ShortName = "ed31" };
+            this.elementDef11 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed11", ShortName = "ed11", Owner = this.domain };
+            this.elementDef12 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed12", ShortName = "ed12", Owner = this.domain };
+            this.elementDef21 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed21", ShortName = "ed21", Owner = this.domain };
+            this.elementDef22 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed22", ShortName = "ed22", Owner = this.domain };
+            this.elementDef31 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ed31", ShortName = "ed31", Owner = this.domain };
 
             this.elementDef11.Category.Add(this.catEd1);
             this.elementDef12.Category.Add(this.catEd3);

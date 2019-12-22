@@ -180,6 +180,7 @@
     <Compile Include="Converters\NameContentConverterTestFixture.cs" />
     <Compile Include="Converters\ColumnWidthConverterTestFixture.cs" />
     <Compile Include="Converters\ColumnFixedConverterTestFixture.cs" />
+    <Compile Include="Converters\OrderedDomainOfExpertiseListConverterTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RelationshipMatrixModuleTestFixture.cs" />
     <Compile Include="Ribbon\RelationshipMatrixRibbonViewModelTestFixture.cs" />

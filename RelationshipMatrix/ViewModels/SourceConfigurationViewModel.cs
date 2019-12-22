@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SourceConfigurationViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2019 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +38,8 @@ namespace CDP4RelationshipMatrix.ViewModels
     using Settings;
 
     /// <summary>
-    /// A view-model for dynamic column definition
+    /// The purpose of the <see cref="SourceConfigurationViewModel"/> is to configure what kind of data
+    /// is to be shown on the column and row of the relation matrix.
     /// </summary>
     public class SourceConfigurationViewModel : MatrixConfigurationViewModelBase
     {
@@ -64,9 +84,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         private readonly List<CategoryBooleanOperatorKind> possibleBooleanOperatorKinds = Enum.GetValues(typeof(CategoryBooleanOperatorKind)).Cast<CategoryBooleanOperatorKind>().ToList();
 
         /// <summary>
-        /// Backing field for <see cref="SelectedBooleanOperatorKind"/>
+        /// Backing field for <see cref="SelectedCategoryBooleanOperatorKind"/>
         /// </summary>
-        private CategoryBooleanOperatorKind _selectedBooleanOperatorKind;
+        private CategoryBooleanOperatorKind selectedBooleanOperatorKind;
 
         /// <summary>
         /// Backing field for <see cref="IncludeSubcategories"/>
@@ -74,12 +94,17 @@ namespace CDP4RelationshipMatrix.ViewModels
         private bool includeSubcategories;
 
         /// <summary>
+        /// Backing field for <see cref="SelectedOwners"/> property
+        /// </summary>
+        private List<DomainOfExpertise> selectedOwners;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SourceConfigurationViewModel"/> class
         /// </summary>
         /// <param name="session">The current session</param>
         /// <param name="iteration">The current iteration</param>
         /// <param name="onUpdateAction">The action to perform on update</param>
-        /// <param name="onLightUpdateAction">The action to perform on update without need to rebuild relationship configiguration</param>
+        /// <param name="onLightUpdateAction">The action to perform on update without need to rebuild relationship configuration</param>
         /// <param name="settings">The module settings</param>
         public SourceConfigurationViewModel(ISession session, Iteration iteration, Action onUpdateAction, Action onLightUpdateAction,
             RelationshipMatrixPluginSettings settings) : base(session, iteration, onUpdateAction, settings)
@@ -93,6 +118,10 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.PossibleCategories.ChangeTrackingEnabled = true;
             this.SelectedCategories = new List<Category>();
 
+            this.PossibleOwners = new ReactiveList<DomainOfExpertise>();
+            this.PossibleOwners.ChangeTrackingEnabled = true;
+            this.SelectedOwners= new List<DomainOfExpertise>();
+
             // default boolean operator is AND
             this.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.AND;
             this.IncludeSubcategories = true;
@@ -100,6 +129,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.WhenAnyValue(x => x.SelectedClassKind).Skip(1).Subscribe(_ =>
             {
                 this.PopulatePossibleCategories();
+                this.PopulatePossibleOwners();
                 this.OnUpdateAction();
             });
 
@@ -119,6 +149,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             });
 
             this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
+            this.WhenAnyValue(x => x.SelectedOwners).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
             this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
             this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
 
@@ -156,19 +187,30 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.OnLightUpdateAction = onLightUpdateAction;
 
+            // populate selected categories
             var categories = new List<Category>();
-
-            foreach (var sourceSelectedCategoryIid in source.SelectedCategories)
+            foreach (var iid in source.SelectedCategories)
             {
-                var category = this.PossibleCategories.FirstOrDefault(c => c.Iid == sourceSelectedCategoryIid);
+                var category = this.PossibleCategories.FirstOrDefault(c => c.Iid == iid);
 
                 if (category != null)
                 {
                     categories.Add(category);
                 }
             }
-
             this.SelectedCategories = new List<Category>(categories);
+
+            // populate selected owners
+            var owners = new List<DomainOfExpertise>();
+            foreach (var iid in source.SelectedOwners)
+            {
+                var domainOfExpertise = this.PossibleOwners.FirstOrDefault(d => d.Iid == iid);
+                if (domainOfExpertise != null)
+                {
+                    owners.Add(domainOfExpertise);
+                }
+            }
+            this.SelectedOwners = new List<DomainOfExpertise>(owners);
         }
 
         /// <summary>
@@ -240,6 +282,23 @@ namespace CDP4RelationshipMatrix.ViewModels
         public ReactiveList<Category> PossibleCategories { get; }
 
         /// <summary>
+        /// Gets the possible <see cref="DomainOfExpertise"/> associated to the <see cref="SelectedClassKind"/>
+        /// </summary>
+        /// <remarks>
+        /// If <see cref="SelectedClassKind"/> is null then all <see cref="DomainOfExpertise"/> are used.
+        /// </remarks>
+        public ReactiveList<DomainOfExpertise> PossibleOwners { get; }
+
+        /// <summary>
+        /// Gets or sets the selected owner <see cref="DomainOfExpertise"/>
+        /// </summary>
+        public List<DomainOfExpertise> SelectedOwners
+        {
+            get { return this.selectedOwners; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedOwners, value); }
+        }
+
+        /// <summary>
         /// Gets the possible <see cref="CategoryBooleanOperatorKind"/> that may be used to filter the categpries.
         /// </summary>
         public List<CategoryBooleanOperatorKind> PossibleBooleanOperatorKinds => this.possibleBooleanOperatorKinds;
@@ -249,8 +308,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public CategoryBooleanOperatorKind SelectedBooleanOperatorKind
         {
-            get { return this._selectedBooleanOperatorKind; }
-            set { this.RaiseAndSetIfChanged(ref this._selectedBooleanOperatorKind, value); }
+            get { return this.selectedBooleanOperatorKind; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedBooleanOperatorKind, value); }
         }
 
         /// <summary>
@@ -281,6 +340,18 @@ namespace CDP4RelationshipMatrix.ViewModels
                     .Where(x => x.PermissibleClass.Intersect(this.PossibleClassKinds).Any()).OrderBy(x => x.Name);
                 this.PossibleCategories.AddRange(categories);
             }
+        }
+
+        /// <summary>
+        /// Populates the possible <see cref="DomainOfExpertise"/> of the <see cref="PossibleOwners"/> property
+        /// </summary>
+        private void PopulatePossibleOwners()
+        {
+            this.PossibleOwners.Clear();
+
+            var engineeringModel = this.Iteration.TopContainer as EngineeringModel;
+            var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
+            this.PossibleOwners.AddRange(domains);
         }
     }
 }

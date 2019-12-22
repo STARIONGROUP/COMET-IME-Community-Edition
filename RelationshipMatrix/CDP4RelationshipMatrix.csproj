@@ -209,6 +209,7 @@
     <Compile Include="Converters\BooleanToHighlightConverter.cs" />
     <Compile Include="Converters\BaseMatrixCellViewModelConverter.cs" />
     <Compile Include="Converters\DeprecatedOpacityConverter.cs" />
+    <Compile Include="Converters\OrderedDomainOfExpertiseListConverter.cs" />
     <Compile Include="Converters\PreviewMouseDownArgsConverter.cs" />
     <Compile Include="Converters\DeprecatedBackgroundConverter.cs" />
     <Compile Include="Converters\TooltipConverter.cs" />
