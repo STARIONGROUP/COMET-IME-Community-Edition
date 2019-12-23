@@ -137,7 +137,7 @@ namespace CDP4Requirements.Generator
         /// </param>
         private void PopulateSheetArrays(ISession session, Iteration iteration, Participant participant)
         {
-            var requirements = iteration.RequirementsSpecification.SelectMany(x => x.Requirement); ;
+            var requirements = iteration.RequirementsSpecification.SelectMany(x => x.Requirement).Where(x => !x.IsDeprecated); ;
             var requirementArrayAssembler = new RequirementArrayAssembler(requirements);
             this.requirementContent = requirementArrayAssembler.ContentArray;
 
