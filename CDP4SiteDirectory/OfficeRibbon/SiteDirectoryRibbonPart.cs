@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SiteDirectoryRibbonPart.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2019 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,6 +33,7 @@ namespace CDP4SiteDirectory
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using ViewModels;
@@ -68,6 +88,11 @@ namespace CDP4SiteDirectory
         private SiteRdlBrowserViewModel siteRdlBrowserViewModel;
 
         /// <summary>
+        /// The <see cref="ViewModels.ShowDeprecatedBrowserRibbonViewModel"/> of one <see cref="ISession"/> that can be opened using the current <see cref="RibbonPart"/>
+        /// </summary>
+        private readonly ShowDeprecatedBrowserRibbonViewModel showDeprecatedBrowserRibbonViewModel;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SiteDirectoryRibbonPart"/> class.
         /// </summary>
         /// <param name="order">
@@ -81,7 +106,10 @@ namespace CDP4SiteDirectory
         public SiteDirectoryRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);            
+            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+
+            this.showDeprecatedBrowserRibbonViewModel = new ShowDeprecatedBrowserRibbonViewModel();
+            FilterStringService.FilterString.RegisterDeprecatableToggleViewModel(this.showDeprecatedBrowserRibbonViewModel);
         }
 
         /// <summary>
@@ -142,7 +170,7 @@ namespace CDP4SiteDirectory
                 this.personBrowserViewModel = new PersonBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.roleBrowserViewModel = new RoleBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.siteRdlBrowserViewModel = new SiteRdlBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
-
+                
                 this.Session = session;
             }
 
@@ -219,6 +247,9 @@ namespace CDP4SiteDirectory
                 case "ShowSiteRDLs":
                     this.PanelNavigationService.Open(this.siteRdlBrowserViewModel, false);
                     break;
+                case "ShowHideDeprecatedThings":
+                    this.showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings = !showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings;
+                    break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
                     break;
@@ -255,6 +286,8 @@ namespace CDP4SiteDirectory
                     return this.roleBrowserViewModel != null;
                 case "ShowSiteRDLs":
                     return this.siteRdlBrowserViewModel != null;
+                case "ShowHideDeprecatedThings":
+                    return this.showDeprecatedBrowserRibbonViewModel.HasSession;
                 default:
                     return false;
             }            
@@ -294,6 +327,32 @@ namespace CDP4SiteDirectory
                     return converter.GetImage(ClassKind.SiteReferenceDataLibrary, false);
                 default:
                     return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the label as a <see cref="string"/> for the control
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        /// <returns>
+        /// a string that represents the content of the label
+        /// </returns>
+        /// <remarks>
+        /// minimum length of 1 character, maximum length of 1024 characters
+        /// </remarks>
+        public override string GetLabel(string ribbonControlId, string ribbonControlTag = "")
+        {
+            switch (ribbonControlId)
+            {
+                case "ShowHideDeprecatedThings":
+                    return this.showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings ? "Hide Deprecated Things" : "Show Deprecated Things";
+                default:
+                    return string.Empty;
             }
         }
     }
