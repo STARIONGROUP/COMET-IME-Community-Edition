@@ -34,6 +34,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4RelationshipMatrix.Settings;
+    using Microsoft.Practices.ServiceLocation;
     using Moq;
     using NUnit.Framework;
     using ViewModels;
@@ -44,17 +45,15 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     [TestFixture]
     public class RelationshipMatrixViewModelTestFixture : ViewModelTestBase
     {
-        private Mock<IDeprecatableToggleViewModel> toggle;
+        private Mock<IServiceLocator> serviceLocator;
+        
 
         [SetUp]
         public override void Setup()
         {
             base.Setup();
 
-            this.toggle = new Mock<IDeprecatableToggleViewModel>();
-            this.toggle.Setup(x => x.ShowDeprecatedThings).Returns(true);
-
-            FilterStringService.FilterString.RegisterDeprecatableToggleViewModel(this.toggle.Object);
+            
         }
 
         [Test]

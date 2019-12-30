@@ -14,6 +14,7 @@ namespace BasicRdl.Tests
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
     using CDP4Composition.Services.FavoritesService;
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -34,12 +35,14 @@ namespace BasicRdl.Tests
         private readonly Uri uri = new Uri("http://test.com");
         private Person person;
         private Mock<IFavoritesService> favoritesService;
+        private Mock<IFilterStringService> filterStringService;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.filterStringService = new Mock<IFilterStringService>();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
@@ -53,6 +56,7 @@ namespace BasicRdl.Tests
             this.session = new Mock<ISession>();
             this.siteDir = new SiteDirectory(Guid.NewGuid(), null, this.uri);
             this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "John", Surname = "Doe" };
+            
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(this.navigation.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IFavoritesService>()).Returns(this.favoritesService.Object);
@@ -60,6 +64,7 @@ namespace BasicRdl.Tests
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDir.SiteReferenceDataLibrary));
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
         }
 
         [TearDown]

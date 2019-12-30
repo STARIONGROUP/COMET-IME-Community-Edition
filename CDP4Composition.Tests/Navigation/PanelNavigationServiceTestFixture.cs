@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PanelNavigationServiceTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2019 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Tests.Navigation
 {
@@ -12,6 +31,7 @@ namespace CDP4Composition.Tests.Navigation
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
     using CDP4Composition.Tests.ViewModels;
     using CDP4Composition.Tests.Views;
     using CDP4Dal;
@@ -35,7 +55,7 @@ namespace CDP4Composition.Tests.Navigation
     {
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
-
+        private Mock<IFilterStringService> filterStringService;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService; 
         private Mock<IRegionManager> regionManager;
@@ -58,8 +78,6 @@ namespace CDP4Composition.Tests.Navigation
 
         private Mock<INameMetaData> describeMetaData;
 
-
-
         private PanelNavigationService NavigationService;
 
         [SetUp]
@@ -69,6 +87,7 @@ namespace CDP4Composition.Tests.Navigation
 
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
+            this.filterStringService = new Mock<IFilterStringService>();
 
             this.regionManager = new Mock<IRegionManager>();
             this.region = new Mock<IRegion>();
@@ -96,7 +115,7 @@ namespace CDP4Composition.Tests.Navigation
             this.viewModelList.Add(this.panelViewModel);
             this.viewModelList.Add(new PropertyGridViewModel());
 
-            this.NavigationService = new PanelNavigationService(this.viewList, this.viewModelList, this.regionManager.Object, this.viewModelDecoratedList);
+            this.NavigationService = new PanelNavigationService(this.viewList, this.viewModelList, this.regionManager.Object, this.viewModelDecoratedList, this.filterStringService.Object);
 
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -185,7 +204,7 @@ namespace CDP4Composition.Tests.Navigation
         public void VerifyThatNavigationServiceDoesNotThrowWhenPropertyGridNotFound()
         {
             this.NavigationService = new PanelNavigationService(new List<Lazy<IPanelView, IRegionMetaData>>(), new List<IPanelViewModel>(),
-                regionManager.Object, new List<Lazy<IPanelViewModel, INameMetaData>>());
+                regionManager.Object, new List<Lazy<IPanelViewModel, INameMetaData>>(), this.filterStringService.Object);
 
             Assert.DoesNotThrow(() => this.NavigationService.Open(new Person(Guid.NewGuid(), null, null), this.session.Object));
         }

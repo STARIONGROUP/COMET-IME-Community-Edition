@@ -43,6 +43,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4RelationshipMatrix.DataTypes;
     using CDP4RelationshipMatrix.Settings;
     using DevExpress.Xpf.Grid;
+    using Microsoft.Practices.ServiceLocation;
     using NLog;
     using ReactiveUI;
 
@@ -55,6 +56,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// a value indicating whether the instance is disposed
         /// </summary>
         private bool isDisposed;
+
+        /// <summary>
+        /// The (injected) <see cref="IFilterStringService"/>
+        /// </summary>
+        private IFilterStringService filterStringService;
 
         /// <summary>
         /// The logger for the current class
@@ -154,6 +160,10 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="settings">The module settings</param>
         public MatrixViewModel(ISession session, Iteration iteration, RelationshipMatrixPluginSettings settings)
         {
+            
+            this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
+            this.IsDeprecatedDisplayed = this.filterStringService.ShowDeprecatedThings;
+
             this.Disposables = new List<IDisposable>();
 
             this.Records = new ReactiveList<IDictionary<string, MatrixCellViewModel>>();
@@ -271,7 +281,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets or sets a value indicating whether deprecated items are shown
         /// </summary>
-        public bool IsDeprecatedDisplayed { get; set; } = !FilterStringService.FilterString.DeprecatableToggleViewModel.ShowDeprecatedThings;
+        public bool IsDeprecatedDisplayed { get; set; }
 
         /// <summary>
         /// Gets or sets the records used for row construction.

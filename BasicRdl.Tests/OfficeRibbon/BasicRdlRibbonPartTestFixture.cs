@@ -19,6 +19,7 @@ namespace BasicRdl.Tests
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
     using CDP4Composition.Services.FavoritesService;
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -51,6 +52,7 @@ namespace BasicRdl.Tests
         private Mock<ISession> session;
         private Person person;
         private Mock<IFavoritesService> favoritesService;
+        private Mock<IFilterStringService> filterStringService;
 
         [SetUp]
         public void SetUp()
@@ -70,6 +72,7 @@ namespace BasicRdl.Tests
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.serviceLocator = new Mock<IServiceLocator>();
+            this.filterStringService = new Mock<IFilterStringService>();
 
             this.permittingPermissionService = new Mock<IPermissionService>();
             this.permittingPermissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
@@ -89,8 +92,8 @@ namespace BasicRdl.Tests
             this.ribbonPart = new BasicRdlRibbonPart(this.order, this.panelNavigationService.Object, null, null, null, this.favoritesService.Object);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
-            this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>())
-                .Returns(this.dialogNavigationService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.dialogNavigationService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
         }
 
         [TearDown]

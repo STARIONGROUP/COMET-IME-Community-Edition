@@ -6,9 +6,14 @@
 
 namespace CDP4SiteDirectory.Tests
 {
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4SiteDirectory.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
     using NUnit.Framework;
 
@@ -16,11 +21,19 @@ namespace CDP4SiteDirectory.Tests
     public class ShowDeprecatedRibbonViewModelTestFixture
     {
         private Mock<ISession> session;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IFilterStringService> filterStringService;
 
         [SetUp]
         public void Setup()
         {
             this.session = new Mock<ISession>();
+            this.filterStringService = new Mock<IFilterStringService>();
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
         }
 
         [TearDown]

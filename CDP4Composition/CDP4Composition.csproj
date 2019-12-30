@@ -248,7 +248,7 @@
     <Compile Include="Services\FavoritesService\FavoritesService.cs" />
     <Compile Include="Services\FavoritesService\IFavoritesService.cs" />
     <Compile Include="Mvvm\IHaveContainerViewModel.cs" />
-    <Compile Include="Services\FilterStringService.cs" />
+    <Compile Include="Services\FilterStringService\FilterStringService.cs" />
     <Compile Include="Mvvm\Behaviours\IExtendedDiagramOrgChartBehavior.cs" />
     <Compile Include="Mvvm\Behaviours\ItemsSourceHelper.cs" />
     <Compile Include="Mvvm\Behaviours\LayoutControlItemsSourceHelper.cs" />
@@ -283,6 +283,7 @@
     <Compile Include="Navigation\Interfaces\IOpenSaveFileDialogService.cs" />
     <Compile Include="Navigation\OpenSaveFileDialogService.cs" />
     <Compile Include="Services\CategoryApplicationValidationService.cs" />
+    <Compile Include="Services\FilterStringService\IFilterStringService.cs" />
     <Compile Include="Services\GridUpdateService.cs" />
     <Compile Include="Services\IconCacheService\IconCacheService.cs" />
     <Compile Include="Services\IconCacheService\IIconCacheService.cs" />

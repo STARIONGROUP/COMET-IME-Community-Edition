@@ -109,7 +109,6 @@ namespace CDP4SiteDirectory
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.showDeprecatedBrowserRibbonViewModel = new ShowDeprecatedBrowserRibbonViewModel();
-            FilterStringService.FilterString.RegisterDeprecatableToggleViewModel(this.showDeprecatedBrowserRibbonViewModel);
         }
 
         /// <summary>

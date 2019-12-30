@@ -4,6 +4,8 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
+using CDP4Composition.Services;
+
 namespace BasicRdl.Tests.ViewModels.Ribbons
 {
     using System;
@@ -37,6 +39,7 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<IFavoritesService> favoritesService;
+        private Mock<IFilterStringService> filterStringService;
 
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private Mock<IServiceLocator> serviceLocator;
@@ -61,6 +64,7 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
             this.favoritesService = new Mock<IFavoritesService>();
+            this.filterStringService = new Mock<IFilterStringService>();
 
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
@@ -70,6 +74,7 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(this.panelNavigationService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IDialogNavigationService>()).Returns(this.dialogNavigationService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IPluginSettingsService>()).Returns(this.pluginSettingsService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
 

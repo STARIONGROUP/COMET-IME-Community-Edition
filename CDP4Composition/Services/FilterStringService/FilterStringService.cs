@@ -1,20 +1,43 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FilterStringService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA-2019 System S.A.
+//    Copyright (c) 2015-2019 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Services
 {
     using System.Collections.Generic;
+    using System.ComponentModel.Composition;
     using System.Linq;
     using Navigation.Interfaces;
     using NLog;
 
     /// <summary>
-    /// This behavior Shows or hides the deprecated rows in all browsers
+    /// The purpose of the <see cref="FilterStringService"/> is to set the <see cref="DevExpress.Xpf.Grid.DataControlBase.FilterString"/> property
+    /// on registered view/view model combinations.
     /// </summary>
-    public class FilterStringService
+    [Export(typeof(IFilterStringService))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class FilterStringService : IFilterStringService
     {
         /// <summary>
         /// The string to filter rows of things that are deprecated.
@@ -35,7 +58,7 @@ namespace CDP4Composition.Services
         /// <summary>
         /// Object used to make this singleton threadsafe
         /// </summary>
-        private static readonly object InstanceLock = new object();
+        //private static readonly object InstanceLock = new object();
 
         /// <summary>
         /// The NLog logger
@@ -55,46 +78,20 @@ namespace CDP4Composition.Services
             new Dictionary<IPanelFilterableDataGridView, IFavoritesBrowserViewModel>();
 
         /// <summary>
-        /// Field backing the <see cref="FilterString"/> property
+        /// Gets or sets a value indicating whether <see cref="CDP4Common.CommonData.IDeprecatableThing"/> are visible.
         /// </summary>
-        private static FilterStringService filterString;
+        public bool ShowDeprecatedThings { get; set; } = false;
 
         /// <summary>
-        /// Make the constructor private so the class can't be instantiated in a wrong way.
+        /// Gets or sets a value indicating whether only favorited <see cref="Thing"/> are visible.
         /// </summary>
-        private FilterStringService()
-        {
-        }
-
-        /// <summary>
-        /// Gets the grid filter string service.
-        /// </summary>
-        public static FilterStringService FilterString
-        {
-            get
-            {
-                if (filterString == null)
-                {
-                    lock (InstanceLock)
-                    {
-                        filterString = filterString ?? new FilterStringService();
-                    }
-                }
-
-                return filterString;
-            }
-        }
-
-        /// <summary>
-        /// Gets the viewmodel in charge of toggling the state of deprecatable visibility.
-        /// </summary>
-        public IDeprecatableToggleViewModel DeprecatableToggleViewModel { get; private set; }
+        public bool ShowOnlyFavorites { get; set; } = false;
 
         /// <summary>
         /// Registers a filterable panel view and viewmodel combo to this service.
         /// </summary>
-        /// <param name="view">The view.</param>
-        /// <param name="viewModel">The viewmodel.</param>
+        /// <param name="view">The view that is to be registered</param>
+        /// <param name="viewModel">The viewmodel that is to be registered</param>
         public void RegisterForService(IPanelView view, IPanelViewModel viewModel)
         {
             if (!(view is IPanelFilterableDataGridView filterableView))
@@ -215,7 +212,7 @@ namespace CDP4Composition.Services
             control.IsFilterEnabled = true;
 
             // deprecation state can be told no matter if the browser has the favorites vm assigned or not
-            if (!this.DeprecatableToggleViewModel.ShowDeprecatedThings)
+            if (!this.ShowDeprecatedThings)
             {
                 control.FilterString = DeprecatedFilterString;
             }
@@ -223,15 +220,15 @@ namespace CDP4Composition.Services
             // if the control is favoratable
             if (this.OpenFavoriteControls.TryGetValue(view, out var viewModel))
             {
-                if (!this.DeprecatableToggleViewModel.ShowDeprecatedThings && viewModel.ShowOnlyFavorites)
+                if (!this.ShowDeprecatedThings && viewModel.ShowOnlyFavorites)
                 {
                     control.FilterString = FavoriteAndHideDeprecatedFilterString;
                 }
-                else if (this.DeprecatableToggleViewModel.ShowDeprecatedThings && viewModel.ShowOnlyFavorites)
+                else if (this.ShowDeprecatedThings && viewModel.ShowOnlyFavorites)
                 {
                     control.FilterString = FavoriteFilterString;
                 }
-                else if (!this.DeprecatableToggleViewModel.ShowDeprecatedThings && !viewModel.ShowOnlyFavorites)
+                else if (!this.ShowDeprecatedThings && !viewModel.ShowOnlyFavorites)
                 {
                     control.FilterString = DeprecatedFilterString;
                 }
@@ -244,16 +241,6 @@ namespace CDP4Composition.Services
             }
 
             control.RefreshData();
-        }
-
-        /// <summary>
-        /// Register the viewmodel rsponsible for holding the state of the visibility of deprecatable things.
-        /// </summary>
-        /// <param name="showDeprecatedBrowserRibbonViewModel">The <see cref="IDeprecatableToggleViewModel"/> representing the vm.</param>
-        public void RegisterDeprecatableToggleViewModel(
-            IDeprecatableToggleViewModel showDeprecatedBrowserRibbonViewModel)
-        {
-            this.DeprecatableToggleViewModel = showDeprecatedBrowserRibbonViewModel;
         }
     }
 }

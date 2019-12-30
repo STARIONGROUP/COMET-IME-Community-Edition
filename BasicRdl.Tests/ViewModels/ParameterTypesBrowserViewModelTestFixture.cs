@@ -16,9 +16,11 @@ namespace BasicRdl.Tests.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.FavoritesService;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+    using Microsoft.Practices.ServiceLocation;
     using Moq;
     using NUnit.Framework;
 
@@ -28,15 +30,13 @@ namespace BasicRdl.Tests.ViewModels
     [TestFixture]
     public class ParameterTypesBrowserViewModelTestFixture
     {
-        /// <summary>
-        /// A mock of the session.
-        /// </summary>
         private Mock<ISession> session;
-
         private Mock<IPermissionService> permissionService;
         private Mock<IFavoritesService> favoritesService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> dialogNavigationService;
+        private Mock<IFilterStringService> filterStringService;
+        private Mock<IServiceLocator> serviceLocator;
 
         /// <summary>
         /// The uri.
@@ -60,11 +60,16 @@ namespace BasicRdl.Tests.ViewModels
         [SetUp]
         public void Setup()
         {
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.session = new Mock<ISession>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IThingDialogNavigationService>();
-
+            this.filterStringService = new Mock<IFilterStringService>();
             this.permissionService = new Mock<IPermissionService>();
+
+            this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
 
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);

@@ -35,19 +35,23 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Permission;
+    using Microsoft.Practices.ServiceLocation;
     using Moq;
     using ViewModels;
     using ViewModels.DialogResult;
 
     public abstract class ViewModelTestBase
     {
+        private Mock<IServiceLocator> serviceLocator;
         protected Mock<IPanelNavigationService> panelNavigationService;
         protected Mock<IThingDialogNavigationService> thingDialogNavigationService;
         protected Mock<IDialogNavigationService> dialogNavigationService;
         protected Mock<IPermissionService> permissionService;
         protected Mock<IPluginSettingsService> pluginService;
+        private Mock<IFilterStringService> filterStringService;
         protected Mock<ISession> session;
 
         protected RelationshipMatrixPluginSettings settings;
@@ -83,6 +87,9 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
         public virtual void Setup()
         {
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.filterStringService = new Mock<IFilterStringService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
@@ -96,8 +103,9 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.permissionService = new Mock<IPermissionService>();
             this.pluginService = new Mock<IPluginSettingsService>();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
 
+            this.assembler = new Assembler(this.uri);
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);

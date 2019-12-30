@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShowDeprecatedBrowserRibbonViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2019 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.ViewModels
 {
@@ -12,9 +31,9 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition;
     using CDP4Composition.Events;
     using CDP4Composition.Services;
-
     using CDP4Dal;
     using CDP4Dal.Events;
+    using Microsoft.Practices.ServiceLocation;
     using ReactiveUI;
 
     /// <summary>
@@ -22,6 +41,11 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class ShowDeprecatedBrowserRibbonViewModel : ReactiveObject, IDeprecatableToggleViewModel
     {
+        /// <summary>
+        /// The (injected) <see cref="IFilterStringService"/>
+        /// </summary>
+        private IFilterStringService filterStringService;
+
         /// <summary>
         /// Backing field for <see cref="HasSession"/>
         /// </summary>
@@ -42,13 +66,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public ShowDeprecatedBrowserRibbonViewModel()
         {
+            this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
+            
             this.openSessions = new ReactiveList<ISession> { ChangeTrackingEnabled = true };
             this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
-
-            // register this viewmodel as the toggle control for the visiility of deprecatable things
-            FilterStringService.FilterString.RegisterDeprecatableToggleViewModel(this);
 
             this.WhenAnyValue(vm => vm.ShowDeprecatedThings)
                 .Subscribe(_ => this.RefreshAndSendShowDeprecatedThingsEvent());
@@ -99,11 +122,14 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
+        /// Updates and calls the <see cref="FilterStringService"/> and
         /// Sends the show deprecated things event and refreshes the controls registered to the <see cref="FilterStringService"/>.
         /// </summary>
         private void RefreshAndSendShowDeprecatedThingsEvent()
         {
-            FilterStringService.FilterString.RefreshDeprecatableFilterAll();
+            this.filterStringService.ShowDeprecatedThings = this.ShowDeprecatedThings;
+            this.filterStringService.RefreshDeprecatableFilterAll();
+
             CDPMessageBus.Current.SendMessage(new ToggleDeprecatedThingEvent(this.ShowDeprecatedThings));
         }
     }

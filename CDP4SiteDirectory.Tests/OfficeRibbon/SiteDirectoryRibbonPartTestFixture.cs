@@ -36,6 +36,8 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
@@ -58,6 +60,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> dialogNavigationService;
         private Mock<IPermissionService> permittingPermissionService;
+        private Mock<IFilterStringService> filterStringService;
         private Mock<ISession> session;
         private Person person;
         private SiteDirectoryRibbonPart ribbonPart;
@@ -78,6 +81,8 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IThingDialogNavigationService>();
+            this.filterStringService = new Mock<IFilterStringService>();
+
             this.serviceLocator = new Mock<IServiceLocator>();
 
             this.permittingPermissionService = new Mock<IPermissionService>();
@@ -90,11 +95,14 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             this.amountOfRibbonControls = 9;
             this.order = 1;
 
-            this.ribbonPart = new SiteDirectoryRibbonPart(this.order, this.panelNavigationService.Object, null, null, null);
-
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>())
                 .Returns(this.dialogNavigationService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
+
+            this.ribbonPart = new SiteDirectoryRibbonPart(this.order, this.panelNavigationService.Object, null, null, null);
+
+            
         }
 
         public void TearDown()
