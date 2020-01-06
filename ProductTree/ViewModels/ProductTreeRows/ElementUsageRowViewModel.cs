@@ -645,7 +645,7 @@ namespace CDP4ProductTree.ViewModels
 
                 if (elementDefinition.TopContainer == this.Thing.TopContainer)
                 {
-                    await this.ThingCreator.CreateElementUsage((ElementDefinition)this.Thing.Container, elementDefinition, currentDomain, this.Session);
+                    await this.ThingCreator.CreateElementUsage(this.Thing.ElementDefinition, elementDefinition, currentDomain, this.Session);
                 }
             }
             catch (Exception ex)
