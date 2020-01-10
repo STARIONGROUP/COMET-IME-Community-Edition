@@ -202,6 +202,15 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
+            if (this.SelectedThing==null || this.SelectedThing.ContainedRows.Count == 0)
+            {
+                this.IsExpandRowsEnabled = false;
+            }
+            else
+            {
+                this.IsExpandRowsEnabled = true;
+            }
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Simple Unit", "", this.CreateSimpleUnit,
                 MenuItemKind.Create, ClassKind.SimpleUnit));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Derived Unit", "", this.CreateDerivedUnit,

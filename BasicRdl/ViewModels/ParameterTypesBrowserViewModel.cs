@@ -287,6 +287,15 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
+            if (this.SelectedThing == null || this.SelectedThing.ContainedRows.Count == 0)
+            {
+                this.IsExpandRowsEnabled = false;
+            }
+            else
+            {
+                this.IsExpandRowsEnabled = true;
+            }
+
             if (this.SelectedThing is ParameterTypeRowViewModel selectedParameterTypeRow)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel(

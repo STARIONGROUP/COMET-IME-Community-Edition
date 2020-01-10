@@ -203,6 +203,15 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
+            if (this.SelectedThing == null || this.SelectedThing.ContainedRows.Count == 0)
+            {
+                this.IsExpandRowsEnabled = false;
+            }
+            else
+            {
+                this.IsExpandRowsEnabled = true;
+            }
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create Binary Relationship Rule", "", this.CreateBinaryRelationshipRule, MenuItemKind.Create, ClassKind.BinaryRelationshipRule));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create Decomposition Rule", "", this.CreateDecompositionRule, MenuItemKind.Create, ClassKind.DecompositionRule));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multi Relationship Rule", "", this.CreateMultiRelationshipRule, MenuItemKind.Create, ClassKind.MultiRelationshipRule));
