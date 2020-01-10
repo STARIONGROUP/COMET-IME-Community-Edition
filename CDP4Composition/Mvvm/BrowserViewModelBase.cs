@@ -99,12 +99,7 @@ namespace CDP4Composition.Mvvm
         /// Backing field for <see cref="IsAddButtonEnabled"/> property
         /// </summary>
         private bool isAddButtonEnabled;
-
-        /// <summary>
-        /// Backing field for <see cref="IsExpandRowsEnabled"/> property
-        /// </summary>
-        private bool isExpandRowsEnabled=true;
-
+        
         /// <summary>
         /// Backing Field for Caption
         /// </summary>
@@ -224,15 +219,6 @@ namespace CDP4Composition.Mvvm
         {
             get { return this.isAddButtonEnabled; }
             private set { this.RaiseAndSetIfChanged(ref this.isAddButtonEnabled, value); }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the "Expand/Collapse Rows" context menu is enabled
-        /// </summary>
-        public bool IsExpandRowsEnabled
-        {
-            get { return this.isExpandRowsEnabled; }
-            private set { this.RaiseAndSetIfChanged(ref this.isExpandRowsEnabled, value); }
         }
 
         /// <summary>
@@ -374,17 +360,7 @@ namespace CDP4Composition.Mvvm
         {
             get { return this.selectedThing; }
             set
-            {
-                if (value == null || value.ContainedRows.Count == 0)
-                {
-                    this.IsExpandRowsEnabled = false;
-                }
-                else
-                {
-                    this.IsExpandRowsEnabled = true;
-                }
-                this.RaiseAndSetIfChanged(ref this.selectedThing, value);
-            }
+            { this.RaiseAndSetIfChanged(ref this.selectedThing, value); }
         }
 
         /// <summary>
@@ -894,7 +870,7 @@ namespace CDP4Composition.Mvvm
                 this.ContextMenu.Add(categoriesMenu);
             }
 
-            if(this.IsExpandRowsEnabled)
+            if (this.SelectedThing != null && this.SelectedThing.ContainedRows.Count > 0)
             {
                 this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
                     new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
