@@ -224,15 +224,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulateContextMenu();
 
-            if (this.SelectedThing == null || this.SelectedThing.ContainedRows.Count == 0)
-            {
-                this.IsExpandRowsEnabled = false;
-            }
-            else
-            {
-                this.IsExpandRowsEnabled = true;
-            }
-
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Option", "", this.CreateCommand, MenuItemKind.Create, ClassKind.Option));
 
             if (this.SelectedThing == null)

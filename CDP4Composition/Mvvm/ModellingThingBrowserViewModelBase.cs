@@ -190,15 +190,6 @@ namespace CDP4Composition.Mvvm
         {
             base.PopulateContextMenu();
 
-            if (this.SelectedThing == null || this.SelectedThing.ContainedRows.Count == 0)
-            {
-                this.IsExpandRowsEnabled = false;
-            }
-            else
-            {
-                this.IsExpandRowsEnabled = true;
-            }
-
             if (this.AnnotationMenuGroup == null)
             {
                 this.AnnotationMenuGroup = new ContextMenuItemViewModel("Check Annotations", "", null, MenuItemKind.Navigate, ClassKind.ModellingAnnotationItem);

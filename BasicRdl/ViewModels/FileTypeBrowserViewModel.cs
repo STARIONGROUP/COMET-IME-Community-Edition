@@ -199,16 +199,7 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-
-            if (this.SelectedThing == null || this.SelectedThing.ContainedRows.Count == 0)
-            {
-                this.IsExpandRowsEnabled = false;
-            }
-            else
-            {
-                this.IsExpandRowsEnabled = true;
-            }
-
+            
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a File Type", "", this.CreateCommand,
                 MenuItemKind.Create, ClassKind.FileType));
         }

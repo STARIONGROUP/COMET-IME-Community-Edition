@@ -185,16 +185,7 @@ namespace CDP4SiteDirectory.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-
-            if (this.SelectedThing == null || this.SelectedThing.ContainedRows.Count == 0)
-            {
-                this.IsExpandRowsEnabled = false;
-            }
-            else
-            {
-                this.IsExpandRowsEnabled = true;
-            }
-
+            
             if (this.SelectedThing == null)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Engineering Model Setup", "", this.CreateCommand, MenuItemKind.Create, ClassKind.EngineeringModelSetup));

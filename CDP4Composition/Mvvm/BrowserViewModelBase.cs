@@ -232,7 +232,7 @@ namespace CDP4Composition.Mvvm
         public bool IsExpandRowsEnabled
         {
             get { return this.isExpandRowsEnabled; }
-            set { this.RaiseAndSetIfChanged(ref this.isExpandRowsEnabled, value); }
+            private set { this.RaiseAndSetIfChanged(ref this.isExpandRowsEnabled, value); }
         }
 
         /// <summary>
@@ -373,7 +373,18 @@ namespace CDP4Composition.Mvvm
         public IRowViewModelBase<Thing> SelectedThing
         {
             get { return this.selectedThing; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedThing, value); }
+            set
+            {
+                if (value == null || value.ContainedRows.Count == 0)
+                {
+                    this.IsExpandRowsEnabled = false;
+                }
+                else
+                {
+                    this.IsExpandRowsEnabled = true;
+                }
+                this.RaiseAndSetIfChanged(ref this.selectedThing, value);
+            }
         }
 
         /// <summary>
@@ -885,7 +896,6 @@ namespace CDP4Composition.Mvvm
 
             if(this.IsExpandRowsEnabled)
             {
-                // TODO: This is really only applicable to expandable things, and certainly does not even need to be in grids.
                 this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
                     new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
                     new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));

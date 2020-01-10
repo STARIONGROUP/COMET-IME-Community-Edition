@@ -199,15 +199,6 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.PopulateContextMenu();
 
-            if (this.SelectedThing == null || this.SelectedThing.ContainedRows.Count == 0)
-            {
-                this.IsExpandRowsEnabled = false;
-            }
-            else
-            {
-                this.IsExpandRowsEnabled = true;
-            }
-
             if (this.SelectedThing == null || this.SelectedThing.Thing is Organization)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Organization", "", this.CreateCommand, MenuItemKind.Create, ClassKind.Organization));

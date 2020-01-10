@@ -265,15 +265,6 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
-            if (this.SelectedThing == null || this.SelectedThing.ContainedRows.Count == 0)
-            {
-                this.IsExpandRowsEnabled = false;
-            }
-            else
-            {
-                this.IsExpandRowsEnabled = true;
-            }
-
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Cyclic Ratio Scale", "",
                 this.CreateCyclicRatioScale, MenuItemKind.Create, ClassKind.CyclicRatioScale));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Interval Scale", "", this.CreateIntervalScale,

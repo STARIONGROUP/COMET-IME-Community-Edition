@@ -153,15 +153,6 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
-            if (this.SelectedThing == null || this.SelectedThing.ContainedRows.Count == 0)
-            {
-                this.IsExpandRowsEnabled = false;
-            }
-            else
-            {
-                this.IsExpandRowsEnabled = true;
-            }
-
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Category", "", this.CreateCommand,
                 MenuItemKind.Create, ClassKind.Category));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Highlight", "", this.HighlightCommand,
