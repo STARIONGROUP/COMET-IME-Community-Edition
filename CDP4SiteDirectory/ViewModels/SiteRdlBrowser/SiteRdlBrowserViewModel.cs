@@ -119,6 +119,7 @@ namespace CDP4SiteDirectory.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+            
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Site Rdl", "", this.CreateCommand,
                 MenuItemKind.Create, ClassKind.SiteReferenceDataLibrary));
         }

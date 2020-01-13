@@ -147,6 +147,7 @@ namespace CDP4SiteDirectory.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Participant", "", this.CreateCommand, MenuItemKind.Create, ClassKind.Participant));
         }
 

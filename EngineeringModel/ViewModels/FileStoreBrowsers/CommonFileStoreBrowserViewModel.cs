@@ -217,6 +217,7 @@ namespace CDP4EngineeringModel.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Common File Store", "", this.CreateStoreCommand, MenuItemKind.Create, ClassKind.CommonFileStore));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Upload a File to the File Store", "", this.UploadFileCommand, MenuItemKind.Create, ClassKind.File));

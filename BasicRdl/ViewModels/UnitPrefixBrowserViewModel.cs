@@ -97,6 +97,7 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a UnitPrefix", "", this.CreateCommand, MenuItemKind.Create, ClassKind.UnitPrefix));
         }
 

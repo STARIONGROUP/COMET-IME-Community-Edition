@@ -99,7 +99,7 @@ namespace CDP4Composition.Mvvm
         /// Backing field for <see cref="IsAddButtonEnabled"/> property
         /// </summary>
         private bool isAddButtonEnabled;
-
+        
         /// <summary>
         /// Backing Field for Caption
         /// </summary>
@@ -153,7 +153,7 @@ namespace CDP4Composition.Mvvm
             this.panelNavigationService = panelNavigationService;
             this.dialogNavigationService = dialogNavigationService;
             this.pluginSettingsService = pluginSettingsService;
-            
+
             var defaultThingClassKind = this.GetDefaultThingClassKind();
             this.SelectedThingClassKindString = this.camelCaseToSpaceConverter.Convert(defaultThingClassKind, null, null, null).ToString();
 
@@ -211,7 +211,7 @@ namespace CDP4Composition.Mvvm
             get { return false; }
             set { var x = value; }
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether the "add" button is enabled
         /// </summary>
@@ -234,7 +234,7 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public IPanelNavigationService PanelNavigationService
         {
-            get { return this.panelNavigationService;  }
+            get { return this.panelNavigationService; }
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets or sets the deprecate command
         /// </summary>
-        public ReactiveCommand<object> DeprecateCommand { get; protected set; } 
+        public ReactiveCommand<object> DeprecateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit Command
@@ -301,7 +301,7 @@ namespace CDP4Composition.Mvvm
         /// Gets or sets the Inspect Command
         /// </summary>
         public ReactiveCommand<object> HelpCommand { get; protected set; }
-        
+
         /// <summary>
         /// Gets the <see cref="ICommand"/> that changes the focus of a grid
         /// </summary>
@@ -359,7 +359,8 @@ namespace CDP4Composition.Mvvm
         public IRowViewModelBase<Thing> SelectedThing
         {
             get { return this.selectedThing; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedThing, value); }
+            set
+            { this.RaiseAndSetIfChanged(ref this.selectedThing, value); }
         }
 
         /// <summary>
@@ -546,14 +547,14 @@ namespace CDP4Composition.Mvvm
             {
                 logger.Error("An error was produced when (un)deprecating {0}: {1}", thing.ClassKind, ex.Message);
                 this.Feedback = ex.Message;
-            }            
+            }
         }
 
         /// <summary>
         /// Execute the <see cref="UpdateCommand"/> on the <see cref="SelectedThing"/>
         /// </summary>
         protected virtual void ExecuteUpdateCommand()
-        { 
+        {
             if (this.SelectedThing == null)
             {
                 return;
@@ -658,7 +659,7 @@ namespace CDP4Composition.Mvvm
             catch (Exception ex)
             {
                 logger.Error(ex);
-            }            
+            }
         }
 
         /// <summary>
@@ -715,7 +716,7 @@ namespace CDP4Composition.Mvvm
 
             this.ShowInPropertyGrid();
 
-            this.SelectedThingClassKindString = thing.ClassKind == ClassKind.NotThing ? string.Empty 
+            this.SelectedThingClassKindString = thing.ClassKind == ClassKind.NotThing ? string.Empty
                 : this.camelCaseToSpaceConverter.Convert(thing.ClassKind, null, null, null).ToString();
         }
 
@@ -808,7 +809,7 @@ namespace CDP4Composition.Mvvm
 
             this.ChangeFocusCommand = ReactiveCommand.Create();
             this.ChangeFocusCommand.Subscribe(_ => this.ExecuteChangeFocusCommand());
-            
+
             this.ExpandRowsCommand = ReactiveCommand.Create();
             this.ExpandRowsCommand.Subscribe(_ => this.ExecuteExpandRows());
 
@@ -825,7 +826,7 @@ namespace CDP4Composition.Mvvm
                 this.Disposables.Add(domainSwitchSubscription);
             }
         }
-        
+
         /// <summary>
         /// Populate the <see cref="ContextMenu"/>
         /// </summary>
@@ -842,7 +843,7 @@ namespace CDP4Composition.Mvvm
                 return;
             }
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Edit", "CTRL+E",this.UpdateCommand, MenuItemKind.Edit));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Edit", "CTRL+E", this.UpdateCommand, MenuItemKind.Edit));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Inspect", "CTRL+I", this.InspectCommand, MenuItemKind.Inspect));
 
             var deprecableThing = this.SelectedThing.Thing as IDeprecatableThing;
@@ -852,7 +853,7 @@ namespace CDP4Composition.Mvvm
             }
             else
             {
-                this.ContextMenu.Add(new ContextMenuItemViewModel(deprecableThing.IsDeprecated? "Un-Deprecate" : "Deprecate" , "", this.DeprecateCommand, MenuItemKind.Deprecate));
+                this.ContextMenu.Add(new ContextMenuItemViewModel(deprecableThing.IsDeprecated ? "Un-Deprecate" : "Deprecate", "", this.DeprecateCommand, MenuItemKind.Deprecate));
             }
 
             var categorizableThing = this.SelectedThing.Thing as ICategorizableThing;
@@ -869,10 +870,13 @@ namespace CDP4Composition.Mvvm
                 this.ContextMenu.Add(categoriesMenu);
             }
 
-            // TODO: This is really only applicable to expandable things, and certainly does not even need to be in grids.
-            this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
-                    new ContextMenuItemViewModel("Collapse Rows","", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
-                     new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+            if (this.SelectedThing != null && this.SelectedThing.ContainedRows.Count > 0)
+            {
+                this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
+                    new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
+                    new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+            }
+
         }
 
         /// <summary>

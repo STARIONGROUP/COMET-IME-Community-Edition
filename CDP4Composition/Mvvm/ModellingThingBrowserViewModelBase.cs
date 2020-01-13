@@ -189,6 +189,7 @@ namespace CDP4Composition.Mvvm
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
             if (this.AnnotationMenuGroup == null)
             {
                 this.AnnotationMenuGroup = new ContextMenuItemViewModel("Check Annotations", "", null, MenuItemKind.Navigate, ClassKind.ModellingAnnotationItem);

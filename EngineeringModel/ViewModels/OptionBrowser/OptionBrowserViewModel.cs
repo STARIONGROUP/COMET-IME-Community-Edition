@@ -223,6 +223,7 @@ namespace CDP4EngineeringModel.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Option", "", this.CreateCommand, MenuItemKind.Create, ClassKind.Option));
 
             if (this.SelectedThing == null)

@@ -113,6 +113,7 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+            
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Constant", "", this.CreateCommand,
                 MenuItemKind.Create, ClassKind.Constant));
         }

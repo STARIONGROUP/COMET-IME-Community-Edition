@@ -201,7 +201,7 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-
+            
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Simple Unit", "", this.CreateSimpleUnit,
                 MenuItemKind.Create, ClassKind.SimpleUnit));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Derived Unit", "", this.CreateDerivedUnit,

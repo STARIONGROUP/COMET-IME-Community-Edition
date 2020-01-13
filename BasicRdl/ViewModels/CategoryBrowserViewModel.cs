@@ -152,6 +152,7 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Category", "", this.CreateCommand,
                 MenuItemKind.Create, ClassKind.Category));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Highlight", "", this.HighlightCommand,

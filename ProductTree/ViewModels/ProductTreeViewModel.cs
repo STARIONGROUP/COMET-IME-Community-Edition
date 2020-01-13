@@ -116,7 +116,7 @@ namespace CDP4ProductTree.ViewModels
             this.iterationSetup = iteration.IterationSetup;
 
             this.ActiveParticipant = this.modelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
-            
+
             var iterationSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(iteration)
                 .Where(
                     objectChange =>
@@ -187,7 +187,7 @@ namespace CDP4ProductTree.ViewModels
             get { return this.isDisplayShortNamesOn; }
             private set { this.RaiseAndSetIfChanged(ref this.isDisplayShortNamesOn, value); }
         }
-        
+
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterSubscription"/>
@@ -311,8 +311,8 @@ namespace CDP4ProductTree.ViewModels
 
             this.DeleteSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDeleteSubscription));
 
-            Tuple<DomainOfExpertise,Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(),out tuple);
+            Tuple<DomainOfExpertise, Participant> tuple;
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
 
             this.DeleteSubscriptionCommand.Subscribe(_ => this.ExecuteDeleteCommand(
                 ((ParameterOrOverrideBase)this.SelectedThing.Thing).ParameterSubscription
@@ -389,6 +389,7 @@ namespace CDP4ProductTree.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
             if (this.SelectedThing == null)
             {
                 return;
@@ -413,7 +414,7 @@ namespace CDP4ProductTree.ViewModels
 
             if (parameterOrOverrideRow.Thing.ParameterSubscription.Any(s => s.Owner.Equals(owner)))
             {
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Delete Subscription", "", this.DeleteSubscriptionCommand, MenuItemKind.Delete, ClassKind.ParameterSubscription));   
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Delete Subscription", "", this.DeleteSubscriptionCommand, MenuItemKind.Delete, ClassKind.ParameterSubscription));
             }
 
             var parameter = parameterOrOverrideRow.Thing as Parameter;
@@ -501,7 +502,7 @@ namespace CDP4ProductTree.ViewModels
         /// Update the properties of this view-model
         /// </summary>
         private void UpdateProperties()
-        {   
+        {
             this.CurrentModel = this.modelSetup.Name;
             this.CurrentIteration = this.iterationSetup.IterationNumber;
             this.CurrentOption = this.Thing.Name;
@@ -536,7 +537,7 @@ namespace CDP4ProductTree.ViewModels
             }
 
             Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(),out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
 
             var subscription = new ParameterSubscription
             {
@@ -550,7 +551,7 @@ namespace CDP4ProductTree.ViewModels
             transaction.Create(subscription);
             transaction.CreateOrUpdate(clone);
             clone.ParameterSubscription.Add(subscription);
-            
+
             await this.DalWrite(transaction);
         }
 
@@ -577,7 +578,7 @@ namespace CDP4ProductTree.ViewModels
             }
 
             Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);            
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
 
             var parameterOverride = new ParameterOverride
             {
@@ -585,7 +586,7 @@ namespace CDP4ProductTree.ViewModels
                 Owner = tuple.Item1
             };
 
-            
+
             var transactionContext = TransactionContextResolver.ResolveContext(elementUsage);
             var transaction = new ThingTransaction(transactionContext);
 
@@ -594,7 +595,7 @@ namespace CDP4ProductTree.ViewModels
             var clone = elementUsage.Clone(false);
             transaction.CreateOrUpdate(clone);
             clone.ParameterOverride.Add(parameterOverride);
-            
+
             await this.DalWrite(transaction);
         }
 

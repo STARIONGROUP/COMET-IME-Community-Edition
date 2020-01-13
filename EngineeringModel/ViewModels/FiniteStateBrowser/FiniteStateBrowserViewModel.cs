@@ -277,6 +277,7 @@ namespace CDP4EngineeringModel.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Possible Finite State List", "", this.CreatePossibleFiniteStateListCommand, MenuItemKind.Create, ClassKind.PossibleFiniteStateList));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Actual Finite State List", "", this.CreateActualFiniteStateListCommand, MenuItemKind.Create, ClassKind.ActualFiniteStateList));
 

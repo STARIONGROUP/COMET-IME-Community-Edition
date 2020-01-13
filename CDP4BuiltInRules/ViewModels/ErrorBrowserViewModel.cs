@@ -72,6 +72,7 @@ namespace CDP4BuiltInRules.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+            
             this.ContextMenu.Add(new ContextMenuItemViewModel("Highlight", "", this.HighlightCommand, MenuItemKind.Highlight));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Error", "", this.CopyErrorCommand, MenuItemKind.Copy));
         }

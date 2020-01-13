@@ -67,7 +67,7 @@ namespace CDP4SiteDirectory.ViewModels
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
         }
-        
+
         /// <summary>
         /// Gets the <see cref="FolderRowViewModel"/> that are displayed by the TreeListControl
         /// </summary>
@@ -100,7 +100,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CDP4Common.SiteDirectoryData.ParticipantRole"/>
         /// </summary>
         public ReactiveCommand<object> CreateParticipantRoleCommand { get; private set; }
-        
+
         /// <summary>
         /// Initialize the browser
         /// </summary>
@@ -109,7 +109,7 @@ namespace CDP4SiteDirectory.ViewModels
             base.Initialize();
             this.participantRoleRow = new FolderRowViewModel("", "Participant Role", this.Session, this);
             this.personRoleRow = new FolderRowViewModel("", "Person Role", this.Session, this);
-            this.Roles = new ReactiveList<FolderRowViewModel> {this.personRoleRow, this.participantRoleRow};
+            this.Roles = new ReactiveList<FolderRowViewModel> { this.personRoleRow, this.participantRoleRow };
             this.PopulateParticipantRoles();
             this.PopulatePersonRoles();
         }
@@ -132,7 +132,7 @@ namespace CDP4SiteDirectory.ViewModels
             base.PopulateContextMenu();
 
             if (this.SelectedThing is PersonPermissionRowViewModel ||
-                this.SelectedThing is ParticipantPermissionRowViewModel)
+               this.SelectedThing is ParticipantPermissionRowViewModel)
             {
                 this.ContextMenu.Clear();
                 return;

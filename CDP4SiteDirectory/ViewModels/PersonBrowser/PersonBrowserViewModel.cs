@@ -184,6 +184,7 @@ namespace CDP4SiteDirectory.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Person", "", this.CreateCommand,
                 MenuItemKind.Create, ClassKind.Person));
         }
