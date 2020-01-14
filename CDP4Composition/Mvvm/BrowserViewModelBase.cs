@@ -99,7 +99,7 @@ namespace CDP4Composition.Mvvm
         /// Backing field for <see cref="IsAddButtonEnabled"/> property
         /// </summary>
         private bool isAddButtonEnabled;
-
+        
         /// <summary>
         /// Backing Field for Caption
         /// </summary>
@@ -868,16 +868,15 @@ namespace CDP4Composition.Mvvm
                     }
 
                     this.ContextMenu.Add(categoriesMenu);
+                  }            
+                }
+                if (this.SelectedThing != null && this.SelectedThing.ContainedRows.Count > 0)
+                {
+                    this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
+                        new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
+                        new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
                 }
             }
-            if (this.SelectedThing != null && this.SelectedThing.ContainedRows.Count > 0)
-            {
-                this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
-                    new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
-                    new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
-            }
-
-        }
 
         /// <summary>
         /// removes the <see cref="Category"/> from the selected <see cref="ICategorizableThing"/>
