@@ -96,6 +96,7 @@ namespace CDP4Composition.Services
         /// <param name="overlayUri">
         /// The uri of the overlay <see cref="BitmapSource"/>
         /// </param>
+        /// <param name="overlayPosition">The <see cref="OverlayPositionKind"/></param>
         /// <returns>
         /// An instance of <see cref="BitmapSource"/>
         /// </returns>

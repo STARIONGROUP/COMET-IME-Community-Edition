@@ -9,6 +9,7 @@ namespace CDP4Common.Helpers
     using System;
     using System.Drawing;
     using System.Drawing.Drawing2D;
+    using System.Drawing.Imaging;
     using System.IO;
     using System.Windows;
     using System.Windows.Interop;
@@ -142,21 +143,66 @@ namespace CDP4Common.Helpers
             var overlay = new BitmapImage(overlayUri);
 
             var thingBitMapImage = BitmapImage2Bitmap(source);
-            var overlayBitMapImage = BitmapImage2Bitmap(overlay, thingBitMapImage.Width / 2, thingBitMapImage.Height / 2);
+            var overlayBitMapImage = BitmapImage2Bitmap(overlay, (int)Math.Floor(thingBitMapImage.Width * 0.75D), (int)Math.Floor(thingBitMapImage.Height * 0.75D));
 
-            var img = new Bitmap(thingBitMapImage.Width, thingBitMapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            var xOverlay = (overlayPosition == OverlayPositionKind.TopLeft) || (overlayPosition == OverlayPositionKind.BottomLeft) ? 0 : thingBitMapImage.Width / 2;
-            var yOverlay = (overlayPosition == OverlayPositionKind.TopLeft) || (overlayPosition == OverlayPositionKind.TopRight) ? 0 : thingBitMapImage.Height / 2;
+            var img = new Bitmap(
+                    (int)Math.Floor(thingBitMapImage.Width * 1.5D),
+                    (int)Math.Floor(thingBitMapImage.Height * 1.0D),
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             using (var gr = Graphics.FromImage(img))
             {
                 gr.CompositingMode = CompositingMode.SourceOver;
-                gr.DrawImage(thingBitMapImage, new Point(0, 0));
-                gr.DrawImage(overlayBitMapImage, new Point(xOverlay, yOverlay));
+                gr.DrawImage(thingBitMapImage, GetMainImagePoint(overlayPosition, img, thingBitMapImage));
+                gr.DrawImage(overlayBitMapImage, GetOverlayPoint(overlayPosition, img, overlayBitMapImage));
             }
 
             return Bitmap2BitmapSource(img);
+        }
+
+        /// <summary>
+        /// Gets the starting <see cref="Point"/> where the overlay needs to be drawn
+        /// </summary>
+        /// <param name="overlayPosition">The <see cref="OverlayPositionKind"/></param>
+        /// <param name="targetImage"></param>
+        /// <param name="overlayBitMapImage"></param>
+        /// <returns>Starting <see cref="Point"/> where the overlay needs to be drawn</returns>
+        private static Point GetOverlayPoint(OverlayPositionKind overlayPosition, Image targetImage, Image overlayBitMapImage)
+        {
+            var rightXpos = targetImage.Width - overlayBitMapImage.Width;
+            var bottomYpos = targetImage.Height - overlayBitMapImage.Height;
+
+            switch (overlayPosition)
+            {
+                case OverlayPositionKind.BottomLeft:
+                    return new Point(0, bottomYpos);
+
+                case OverlayPositionKind.BottomRight:
+                    return new Point(rightXpos, bottomYpos);
+
+                case OverlayPositionKind.TopLeft:
+                    return new Point(0, 0);
+
+                case OverlayPositionKind.TopRight:
+                    return new Point(rightXpos, 0);
+
+                default:
+                    return new Point(0, 0);
+            }
+        }
+
+        /// <summary>
+        /// Gets the starting <see cref="Point"/> where the main image needs to be drawn
+        /// </summary>
+        /// <param name="overlayPosition">The <see cref="OverlayPositionKind"/></param>
+        /// <param name="targetImage"></param>
+        /// <param name="thingBitMapImage"></param>
+        /// <returns>Starting <see cref="Point"/> where the main image needs to be drawn</returns>
+        private static Point GetMainImagePoint(OverlayPositionKind overlayPosition, Image targetImage, Image thingBitMapImage)
+        {
+            var rightXpos = (targetImage.Width - thingBitMapImage.Width) / 2;
+
+            return new Point(rightXpos, 0);
         }
 
         /// <summary>

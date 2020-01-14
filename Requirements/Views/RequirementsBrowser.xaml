@@ -47,9 +47,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -71,9 +69,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -95,9 +91,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -116,9 +110,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -140,9 +132,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -164,9 +154,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -188,9 +176,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -212,9 +198,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -236,9 +220,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -260,9 +242,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -284,9 +264,7 @@
                             <userControls:LoadingControl Margin="3,3,0,3" Diameter="16" Color1="Gray" Color2="Transparent" Visibility="{Binding Path=Row.RequirementStateOfCompliance, Converter={StaticResource RequirementStateOfComplianceToVisibilityConverter}}"/>
                         </dx:PixelSnapper>
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -305,9 +283,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />

@@ -246,6 +246,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
+      <Project>{5e0e5c30-df40-4708-abae-4da03ec9b881}</Project>
+      <Name>CDP4CommonView</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>
       <Name>CDP4Composition</Name>

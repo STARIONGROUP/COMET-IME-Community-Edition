@@ -15,40 +15,42 @@
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
     <UserControl.Resources>
-        <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
-        <Style TargetType="diagram:NamedThingDiagramContentItem">
-            <Setter Property="CanMove" Value="True" />
-            <Setter Property="CanDelete" Value="True" />
-            <Setter Property="CanResize" Value="False" />
-            <Setter Property="CanRotate" Value="False" />
-            <Setter Property="ForegroundId" Value="Dark_5"/>
-            <Setter Property="BackgroundId" Value="White_2"/>
-            <Setter Property="Padding" Value="20"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter>
-                <Setter.Property>ContentTemplate</Setter.Property>
-                <Setter.Value>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="10"
-                                    >
-                                <Image.Source>
-                                    <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
-                                        <Binding />
-                                    </MultiBinding>
-                                </Image.Source>
-                            </Image>
-                            <TextBlock Text="{Binding ShortName}" Margin="10,0,10,10"></TextBlock>
-                            <TextBlock Text="{Binding Name}" Margin="10,0,10,10"></TextBlock>
-                        </StackPanel>
-                        
-                        
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+            <Style TargetType="diagram:NamedThingDiagramContentItem">
+                <Setter Property="CanMove" Value="True" />
+                <Setter Property="CanDelete" Value="True" />
+                <Setter Property="CanResize" Value="False" />
+                <Setter Property="CanRotate" Value="False" />
+                <Setter Property="ForegroundId" Value="Dark_5"/>
+                <Setter Property="BackgroundId" Value="White_2"/>
+                <Setter Property="Padding" Value="20"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter>
+                    <Setter.Property>ContentTemplate</Setter.Property>
+                    <Setter.Value>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                <Image Style="{StaticResource ThingIcon}" Margin="10">
+                                    <Image.Source>
+                                        <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                            <Binding />
+                                        </MultiBinding>
+                                    </Image.Source>
+                                </Image>
+                                <TextBlock Text="{Binding ShortName}" Margin="10,0,10,10"></TextBlock>
+                                <TextBlock Text="{Binding Name}" Margin="10,0,10,10"></TextBlock>
+                            </StackPanel>
+                            
+                            
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -139,10 +141,7 @@
                                         <MouseBinding MouseAction="LeftClick" Command="{Binding CreateRelationshipCommand}"/>
                                     </Border.InputBindings>
                                     <StackPanel Orientation="Horizontal">
-                                    <Image Width="16"
-                                           Height="16"
-                                           Margin="10"
-                                            >
+                                        <Image Style="{StaticResource ThingIcon}" Margin="10">
                                         <Image.Source>
                                             <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                                 <Binding Path="Thing"/>
