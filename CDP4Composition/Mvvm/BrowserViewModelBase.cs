@@ -834,13 +834,13 @@ namespace CDP4Composition.Mvvm
         {
             this.ContextMenu.Clear();
 
-            if (!(this.SelectedThing == null))
+            if (this.SelectedThing == null)
             {
-                if (this.SelectedThing is FolderRowViewModel)
-                {
-                    return;
-                }
+                return;
+            }
 
+            if (!(this.SelectedThing is FolderRowViewModel))
+            {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Edit", "CTRL+E", this.UpdateCommand, MenuItemKind.Edit));
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Inspect", "CTRL+I", this.InspectCommand, MenuItemKind.Inspect));
 
