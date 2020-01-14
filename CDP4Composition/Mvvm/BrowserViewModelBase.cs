@@ -99,7 +99,7 @@ namespace CDP4Composition.Mvvm
         /// Backing field for <see cref="IsAddButtonEnabled"/> property
         /// </summary>
         private bool isAddButtonEnabled;
-        
+
         /// <summary>
         /// Backing Field for Caption
         /// </summary>
@@ -833,43 +833,43 @@ namespace CDP4Composition.Mvvm
         public virtual void PopulateContextMenu()
         {
             this.ContextMenu.Clear();
-            if (this.SelectedThing == null)
-            {
-                return;
-            }
 
-            if (this.SelectedThing is FolderRowViewModel)
+            if (!(this.SelectedThing == null))
             {
-                return;
-            }
-
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Edit", "CTRL+E", this.UpdateCommand, MenuItemKind.Edit));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Inspect", "CTRL+I", this.InspectCommand, MenuItemKind.Inspect));
-
-            var deprecableThing = this.SelectedThing.Thing as IDeprecatableThing;
-            if (deprecableThing == null)
-            {
-                this.ContextMenu.Add(new ContextMenuItemViewModel(string.Format("Delete this {0}", this.camelCaseToSpaceConverter.Convert(this.SelectedThing.Thing.ClassKind, null, null, null)), "", this.DeleteCommand, MenuItemKind.Delete));
-            }
-            else
-            {
-                this.ContextMenu.Add(new ContextMenuItemViewModel(deprecableThing.IsDeprecated ? "Un-Deprecate" : "Deprecate", "", this.DeprecateCommand, MenuItemKind.Deprecate));
-            }
-
-            var categorizableThing = this.SelectedThing.Thing as ICategorizableThing;
-            if (categorizableThing != null && categorizableThing.Category.Any())
-            {
-                var categoriesMenu = new ContextMenuItemViewModel("Categories", "", null, MenuItemKind.None);
-
-                foreach (var category in categorizableThing.Category)
+                if (this.SelectedThing is FolderRowViewModel)
                 {
-                    var removeCategory = new ContextMenuItemViewModel($" Remove {category.Name} [{category.ShortName}]", "", this.RemoveCategoryFromSelectedThing, category, this.PermissionService.CanWrite(this.SelectedThing.Thing), MenuItemKind.Edit);
-                    categoriesMenu.SubMenu.Add(removeCategory);
+                    return;
                 }
 
-                this.ContextMenu.Add(categoriesMenu);
-            }
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Edit", "CTRL+E", this.UpdateCommand, MenuItemKind.Edit));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Inspect", "CTRL+I", this.InspectCommand, MenuItemKind.Inspect));
 
+                var deprecableThing = this.SelectedThing.Thing as IDeprecatableThing;
+
+                if (deprecableThing == null)
+                {
+                    this.ContextMenu.Add(new ContextMenuItemViewModel(string.Format("Delete this {0}", this.camelCaseToSpaceConverter.Convert(this.SelectedThing.Thing.ClassKind, null, null, null)), "", this.DeleteCommand, MenuItemKind.Delete));
+                }
+                else
+                {
+                    this.ContextMenu.Add(new ContextMenuItemViewModel(deprecableThing.IsDeprecated ? "Un-Deprecate" : "Deprecate", "", this.DeprecateCommand, MenuItemKind.Deprecate));
+                }
+
+                var categorizableThing = this.SelectedThing.Thing as ICategorizableThing;
+
+                if (categorizableThing != null && categorizableThing.Category.Any())
+                {
+                    var categoriesMenu = new ContextMenuItemViewModel("Categories", "", null, MenuItemKind.None);
+
+                    foreach (var category in categorizableThing.Category)
+                    {
+                        var removeCategory = new ContextMenuItemViewModel($" Remove {category.Name} [{category.ShortName}]", "", this.RemoveCategoryFromSelectedThing, category, this.PermissionService.CanWrite(this.SelectedThing.Thing), MenuItemKind.Edit);
+                        categoriesMenu.SubMenu.Add(removeCategory);
+                    }
+
+                    this.ContextMenu.Add(categoriesMenu);
+                }
+            }
             if (this.SelectedThing != null && this.SelectedThing.ContainedRows.Count > 0)
             {
                 this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
