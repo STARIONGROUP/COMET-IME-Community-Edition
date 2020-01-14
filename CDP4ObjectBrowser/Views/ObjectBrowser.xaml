@@ -24,9 +24,7 @@
                                       ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel Orientation="Horizontal">
                     <dx:PixelSnapper>
-                        <Image Width="16"
-                               Height="16"
-                               Margin="3">
+                        <Image Style="{StaticResource ThingIcon}">
                             <Image.Source>
                                 <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                     <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>
@@ -43,9 +41,7 @@
                                   ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel Orientation="Horizontal">
                     <dx:PixelSnapper>
-                        <Image Width="16"
-                               Height="16"
-                               Margin="3">
+                        <Image Style="{StaticResource ThingIcon}">
                             <Image.Source>
                                 <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                     <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}"/>

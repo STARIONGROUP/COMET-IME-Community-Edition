@@ -6,6 +6,8 @@
 
 namespace CDP4Composition.Services
 {
+    using System.Linq;
+
     /// <summary>
     /// Assertion on the overlay position
     /// </summary>
@@ -30,5 +32,27 @@ namespace CDP4Composition.Services
         /// Asserts that the overlay shall be palced on the bottom right corner
         /// </summary>
         BottomRight
+    }
+
+    public static class OverlayPositionKindExtensions
+    {
+        public static bool IsTop(this OverlayPositionKind overlayPositionKind)
+        {
+            return new[] { OverlayPositionKind.TopLeft, OverlayPositionKind.TopRight }.Contains(overlayPositionKind);
+        }
+
+        public static bool IsLeft(this OverlayPositionKind overlayPositionKind)
+        {
+            return new[] { OverlayPositionKind.TopLeft, OverlayPositionKind.BottomLeft }.Contains(overlayPositionKind);
+        }
+
+        public static bool IsRight(this OverlayPositionKind overlayPositionKind)
+        {
+            return new[] { OverlayPositionKind.TopRight, OverlayPositionKind.BottomRight }.Contains(overlayPositionKind);
+        }
+        public static bool IsBottom(this OverlayPositionKind overlayPositionKind)
+        {
+            return new[] { OverlayPositionKind.BottomRight, OverlayPositionKind.BottomLeft }.Contains(overlayPositionKind);
+        }
     }
 }

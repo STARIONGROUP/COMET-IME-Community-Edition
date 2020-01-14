@@ -12,6 +12,9 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
 
@@ -26,7 +29,7 @@
                                 CornerRadius="8,8,3,3"
                                 Visibility="{Binding Path=ShouldBeDisplayed, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <StackPanel Orientation="Horizontal">
-                                <Image Width="16" Height="16" Margin="3" >
+                                <Image Style="{StaticResource ThingIcon}">
                                     <Image.Source>
                                         <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                             <Binding Path="Thing" />
@@ -50,8 +53,7 @@
                                 CornerRadius="8,8,3,3"
                                 Visibility="{Binding Path=ShouldBeDisplayed, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <dxlc:LayoutControl Margin="8 0 0 0" Orientation="Vertical">
-
-                                <Image HorizontalAlignment="Left" Width="16" Height="16" Margin="3" >
+                                <Image Style="{StaticResource ThingIcon}">
                                     <Image.Source>
                                         <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                             <Binding Path="Thing" />
@@ -95,7 +97,7 @@
                         <Border Margin="4" Background="Linen" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,3,3">
                             <dxlc:LayoutGroup Margin="3" Orientation="Vertical">
                                 <StackPanel Orientation="Horizontal">
-                                    <Image Width="16" Height="16" Margin="3" >
+                                    <Image Style="{StaticResource ThingIcon}">
                                         <Image.Source>
                                             <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                                 <Binding Path="Thing" />

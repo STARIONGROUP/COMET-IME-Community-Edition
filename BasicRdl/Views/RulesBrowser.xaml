@@ -78,13 +78,10 @@
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
 
-                <dxg:GridColumn Width="18"
-                                MinWidth="18"
-                                Fixed="Left"
-                                FixedWidth="True">
+                <dxg:GridColumn Style="{StaticResource ThingIconGridColumn}">
                     <dxg:GridColumn.DisplayTemplate>
                         <ControlTemplate>
-                            <Image Width="16" Height="16">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />

@@ -41,9 +41,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" UpdateSourceTrigger="PropertyChanged"/>
@@ -62,9 +60,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -83,9 +79,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -105,9 +99,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -126,9 +118,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -147,9 +137,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" ConverterParameter="{x:Static commonData:ClassKind.Option}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -168,9 +156,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3">
+                            <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" ConverterParameter="{x:Static commonData:ClassKind.ActualFiniteState}" Mode="OneWay">
                                         <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
@@ -189,9 +175,7 @@
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Width="16"
-                                   Height="16"
-                                   Margin="3"
+                            <Image Style="{StaticResource ThingIcon}"
                                    Source="pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/parameterComponent_32x32.png"/>
                         </dx:PixelSnapper>
                         <ContentPresenter x:Name="defaultRowPresenter"
