@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RelationalExpressionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -8,6 +8,7 @@ namespace CDP4Requirements.Tests.Dialogs
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -44,6 +45,7 @@ namespace CDP4Requirements.Tests.Dialogs
         private Uri uri = new Uri("http://test.com");
         private ParametricConstraint parametricConstraint;
         private ParametricConstraint clone;
+        private RelationalExpression dateRelationalExpression;
 
         [SetUp]
         public void Setup()
@@ -85,6 +87,8 @@ namespace CDP4Requirements.Tests.Dialogs
             this.clone = this.parametricConstraint.Clone(false);
             var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
             this.thingTransaction = new ThingTransaction(transactionContext, this.clone);
+
+            this.dateRelationalExpression = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri);
         }
 
         [TearDown]
@@ -137,6 +141,39 @@ namespace CDP4Requirements.Tests.Dialogs
         public void VerifyThatParameterlessContructorExists()
         {
             Assert.DoesNotThrow(() => new RelationalExpressionDialogViewModel());
+        }
+
+        [Test]
+        public void VerifyThatThingContainsCorrectStringValueAfterUpdateTransactionWasCalled()
+        {
+            this.dateRelationalExpression.ParameterType = new DateParameterType();
+            this.dateRelationalExpression.Value = new ValueArray<string>(new[] { "2019-12-31" });
+
+            var vm = new CultureConversionRelationalExpressionDialogViewModel(this.dateRelationalExpression, this.thingTransaction,
+                this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.clone);
+
+            var newValue = new DateTime(2020, 1, 1).ToString("MM/dd/yyyy hh:mm:ss");
+            var convertedValue = new DateTime(2020, 1, 1).ToString("yyyy-MM-dd");
+
+            //This is what happens when set value from UI is done
+            vm.Value[0].Value = newValue;
+
+            vm.RunUpdateTransaction();
+
+            Assert.AreEqual(convertedValue, this.dateRelationalExpression.Value[0]);
+        }
+
+        private class CultureConversionRelationalExpressionDialogViewModel : RelationalExpressionDialogViewModel
+        {
+            public CultureConversionRelationalExpressionDialogViewModel(RelationalExpression relationalExpression, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
+                : base(relationalExpression, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
+            {
+            }
+
+            public void RunUpdateTransaction()
+            {
+                this.UpdateTransaction();
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RelationalExpressionDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -11,8 +11,13 @@ namespace CDP4Requirements.ViewModels
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Exceptions;
+    using CDP4Common.Helpers;
+
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -25,8 +30,6 @@ namespace CDP4Requirements.ViewModels
     [ThingDialogViewModelExport(ClassKind.RelationalExpression)]
     public class RelationalExpressionDialogViewModel : CDP4CommonView.RelationalExpressionDialogViewModel, IThingDialogViewModel
     {
-        #region constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationalExpressionDialogViewModel"/> class.
         /// </summary>
@@ -79,10 +82,6 @@ namespace CDP4Requirements.ViewModels
             });
         }
 
-        #endregion
-
-        #region Properties & Commands
-
         /// <summary>
         /// Gets a value indicating whether the ParameterType property is ReadOnly.
         /// </summary>
@@ -90,10 +89,6 @@ namespace CDP4Requirements.ViewModels
         {
             get { return this.IsReadOnly || this.dialogKind == ThingDialogKind.Update;  }
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Populates the <see cref="PossibleParameterType"/> property
@@ -163,9 +158,53 @@ namespace CDP4Requirements.ViewModels
             this.Value.Clear();
             for (var i = 0; i < this.SelectedParameterType.NumberOfValues; i++)
             {
-                var value = (this.Thing.Value.Count() > i) ? this.Thing.Value[i] : string.Empty;
-                this.Value.Add(new RelationalExpressionValueRowViewModel(this.SelectedParameterType) { Index = i, Value = value });
+                var thingValue = (this.Thing.Value.Count() > i) ? this.Thing.Value[i] : string.Empty;
+                this.Value.Add(new RelationalExpressionValueRowViewModel(this.SelectedParameterType) { Index = i, Value = thingValue });
             }
+        }
+
+        /// <summary>
+        /// Update the transaction with the Thing represented by this Dialog
+        /// </summary>
+        [Obsolete("CurrentCultureStringToValueSetString is obsolete when GitHub issue #282 is done", false)]
+        protected override void UpdateTransaction()
+        {
+            base.UpdateTransaction();
+
+            this.Thing.Value = new ValueArray<string>(this.Value.OrderBy(x => x.Index).Select(x => this.CurrentCultureStringToValueSetString(x.Value)), this.Thing);
+        }
+
+        /// <summary>
+        /// Convert a string created using <see cref="System.Globalization.CultureInfo.CurrentCulture"/> settings and converts it to the right string representation for a specific <see cref="ParameterType"/>
+        /// </summary>
+        /// <param name="currentCultureString">The <see cref="string"/> to be converted</param>
+        /// <returns>Converted <see cref="string"/></returns>
+        [Obsolete("CurrentCultureStringToValueSetString is obsolete when GitHub issue #282 is done", false)]
+        private string CurrentCultureStringToValueSetString(string currentCultureString)
+        {
+            var defaultValue = ValueSetConverter.DefaultObject(this.SelectedParameterType);
+
+            if (!currentCultureString.Equals(defaultValue))
+            {
+                if (new[] { ClassKind.DateTimeParameterType, ClassKind.DateParameterType, ClassKind.TimeOfDayParameterType }.Contains(this.SelectedParameterType.ClassKind))
+                {
+                    if (!DateTime.TryParse(currentCultureString, out var dateTimeObject))
+                    {
+                        throw new Cdp4ModelValidationException($"{currentCultureString} is not a valid value for a {this.SelectedParameterType.ClassKind}.");
+                    }
+
+                    var validationResult = ParameterValueValidator.Validate(dateTimeObject, this.SelectedParameterType, this.SelectedScale);
+
+                    if (validationResult != null)
+                    {
+                        throw new Cdp4ModelValidationException(validationResult);
+                    }
+
+                    return dateTimeObject.ToValueSetString(this.SelectedParameterType);
+                }
+            }
+
+            return currentCultureString;
         }
 
         /// <summary>
@@ -176,7 +215,5 @@ namespace CDP4Requirements.ViewModels
             base.UpdateOkCanExecute();
             this.OkCanExecute = this.OkCanExecute && this.SelectedParameterType != null && !this.Value.Any(x => string.IsNullOrEmpty(x.Value));
         }
-
-        #endregion
     }
 }
