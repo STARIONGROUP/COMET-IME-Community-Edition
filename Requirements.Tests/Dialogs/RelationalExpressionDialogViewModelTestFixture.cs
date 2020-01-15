@@ -12,6 +12,7 @@ namespace CDP4Requirements.Tests.Dialogs
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Exceptions;
     using CDP4Common.MetaInfo;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
@@ -89,6 +90,9 @@ namespace CDP4Requirements.Tests.Dialogs
             this.thingTransaction = new ThingTransaction(transactionContext, this.clone);
 
             this.dateRelationalExpression = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri);
+            this.dateRelationalExpression.ParameterType = new DateParameterType();
+            this.dateRelationalExpression.Value = new ValueArray<string>(new[] { "2019-12-31" });
+
         }
 
         [TearDown]
@@ -146,9 +150,6 @@ namespace CDP4Requirements.Tests.Dialogs
         [Test]
         public void VerifyThatThingContainsCorrectStringValueAfterUpdateTransactionWasCalled()
         {
-            this.dateRelationalExpression.ParameterType = new DateParameterType();
-            this.dateRelationalExpression.Value = new ValueArray<string>(new[] { "2019-12-31" });
-
             var vm = new CultureConversionRelationalExpressionDialogViewModel(this.dateRelationalExpression, this.thingTransaction,
                 this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.clone);
 
@@ -161,6 +162,22 @@ namespace CDP4Requirements.Tests.Dialogs
             vm.RunUpdateTransaction();
 
             Assert.AreEqual(convertedValue, this.dateRelationalExpression.Value[0]);
+        }
+
+        [Test]
+        public void VerifyThatErrorIsThrownWhenThingContainsInCorrectStringValueAfterUpdateTransactionWasCalled()
+        {
+            var vm = new CultureConversionRelationalExpressionDialogViewModel(this.dateRelationalExpression, this.thingTransaction,
+                this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.clone);
+
+            vm.Value[0].Value = "Throw error";
+            Assert.Throws<Cdp4ModelValidationException>(() => vm.RunUpdateTransaction());
+
+            vm.Value[0].Value = "-";
+            Assert.Throws<Cdp4ModelValidationException>(() => vm.RunUpdateTransaction());
+
+            vm.Value[0].Value = null;
+            Assert.DoesNotThrow(() => vm.RunUpdateTransaction());
         }
 
         private class CultureConversionRelationalExpressionDialogViewModel : RelationalExpressionDialogViewModel
