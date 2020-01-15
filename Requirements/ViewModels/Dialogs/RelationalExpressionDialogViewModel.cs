@@ -184,6 +184,11 @@ namespace CDP4Requirements.ViewModels
         {
             var defaultValue = ValueSetConverter.DefaultObject(this.SelectedParameterType);
 
+            if (currentCultureString == null)
+            {
+                return (string)defaultValue;
+            }
+
             if (!currentCultureString.Equals(defaultValue))
             {
                 if (new[] { ClassKind.DateTimeParameterType, ClassKind.DateParameterType, ClassKind.TimeOfDayParameterType }.Contains(this.SelectedParameterType.ClassKind))
