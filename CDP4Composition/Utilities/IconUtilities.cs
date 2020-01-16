@@ -153,7 +153,7 @@ namespace CDP4Common.Helpers
             using (var gr = Graphics.FromImage(img))
             {
                 gr.CompositingMode = CompositingMode.SourceOver;
-                gr.DrawImage(thingBitMapImage, GetMainImagePoint(overlayPosition, img, thingBitMapImage));
+                gr.DrawImage(thingBitMapImage, GetMainImagePoint(img, thingBitMapImage));
                 gr.DrawImage(overlayBitMapImage, GetOverlayPoint(overlayPosition, img, overlayBitMapImage));
             }
 
@@ -164,8 +164,8 @@ namespace CDP4Common.Helpers
         /// Gets the starting <see cref="Point"/> where the overlay needs to be drawn
         /// </summary>
         /// <param name="overlayPosition">The <see cref="OverlayPositionKind"/></param>
-        /// <param name="targetImage"></param>
-        /// <param name="overlayBitMapImage"></param>
+        /// <param name="targetImage">The <see cref="Image"/> that the overlay is added to</param>
+        /// <param name="overlayBitMapImage">The overlay<see cref="Image"/></param>
         /// <returns>Starting <see cref="Point"/> where the overlay needs to be drawn</returns>
         private static Point GetOverlayPoint(OverlayPositionKind overlayPosition, Image targetImage, Image overlayBitMapImage)
         {
@@ -194,11 +194,10 @@ namespace CDP4Common.Helpers
         /// <summary>
         /// Gets the starting <see cref="Point"/> where the main image needs to be drawn
         /// </summary>
-        /// <param name="overlayPosition">The <see cref="OverlayPositionKind"/></param>
-        /// <param name="targetImage"></param>
-        /// <param name="thingBitMapImage"></param>
+        /// <param name="targetImage">The <see cref="Image"/> that the main image is added to</param>
+        /// <param name="thingBitMapImage">The main <see cref="Image"/></param>
         /// <returns>Starting <see cref="Point"/> where the main image needs to be drawn</returns>
-        private static Point GetMainImagePoint(OverlayPositionKind overlayPosition, Image targetImage, Image thingBitMapImage)
+        private static Point GetMainImagePoint(Image targetImage, Image thingBitMapImage)
         {
             var rightXpos = (targetImage.Width - thingBitMapImage.Width) / 2;
 
