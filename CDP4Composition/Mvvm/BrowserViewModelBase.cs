@@ -455,7 +455,6 @@ namespace CDP4Composition.Mvvm
             }
         }
 
-
         /// <summary>
         /// Execute the <see cref="DeleteCommand"/>
         /// </summary>
@@ -663,6 +662,13 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// Gets a value indicating whether it is possible to Delete the Selected Thing />
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> that needs to be checked</param>
+        /// <returns>True if delete is allowed, otherwise false</returns>
+        protected virtual bool IsDeleteAllowed(Thing thing) => true;
+
+        /// <summary>
         /// Write the inline operations to the Data-access-layer
         /// </summary>
         /// <param name="transaction">The <see cref="ThingTransaction"/> that contains the operations</param>
@@ -784,7 +790,7 @@ namespace CDP4Composition.Mvvm
             var canDelete = this.WhenAnyValue(
                 vm => vm.SelectedThing,
                 vm => vm.CanWriteSelectedThing,
-                (selection, canWrite) => selection != null && canWrite && !(selection.Thing is IDeprecatableThing) && !(selection.Thing is ActualFiniteState));
+                (selection, canWrite) => selection != null && canWrite && !(selection.Thing is IDeprecatableThing) && !(selection.Thing is ActualFiniteState) && this.IsDeleteAllowed(selection.Thing));
 
             this.DeleteCommand = ReactiveCommand.Create(canDelete);
             this.DeleteCommand.Subscribe(_ => this.ExecuteDeleteCommand());

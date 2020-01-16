@@ -587,6 +587,24 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether it is possible to Delete the Selected Thing />
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> that needs to be checked</param>
+        /// <returns>True if delete is allowed, otherwise false</returns>
+        protected override bool IsDeleteAllowed(Thing thing)
+        {
+            if (thing is RelationalExpression relationalExpression)
+            {
+                if (!(relationalExpression.Container is ParametricConstraint parametricConstraint) || (parametricConstraint.Expression.OfType<RelationalExpression>().Count() <= 1))
+                {
+                    return false;
+                }
+            }
+
+            return base.IsDeleteAllowed(thing);
+        }
+
+        /// <summary>
         /// Populate the context menu
         /// </summary>
         public override void PopulateContextMenu()
