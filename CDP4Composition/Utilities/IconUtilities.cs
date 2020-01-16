@@ -146,7 +146,7 @@ namespace CDP4Common.Helpers
             var overlayBitMapImage = BitmapImage2Bitmap(overlay, (int)Math.Floor(thingBitMapImage.Width * 0.75D), (int)Math.Floor(thingBitMapImage.Height * 0.75D));
 
             var img = new Bitmap(
-                    (int)Math.Floor(thingBitMapImage.Width * 1.5D),
+                    (int)Math.Floor(thingBitMapImage.Width * 1.75D),
                     (int)Math.Floor(thingBitMapImage.Height * 1.0D),
                 System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
