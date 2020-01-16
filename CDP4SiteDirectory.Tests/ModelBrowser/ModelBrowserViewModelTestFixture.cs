@@ -273,27 +273,27 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(1, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(2, viewmodel.ContextMenu.Count);
 
             viewmodel.SelectedThing = iterationFolderRow;
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(1, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(2, viewmodel.ContextMenu.Count);
 
             var participantRow = participantFolderRow.ContainedRows.OfType<ModelParticipantRowViewModel>().Single(x => x.Name == "blabla blabla");
             viewmodel.SelectedThing = participantRow;
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(5, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(4, viewmodel.ContextMenu.Count);
 
             var iterationRow = iterationFolderRow.ContainedRows.Single();
             viewmodel.SelectedThing = iterationRow;
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(5, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(4, viewmodel.ContextMenu.Count);
         }
 
         [Test]
@@ -341,20 +341,20 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(1, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(2, viewmodel.ContextMenu.Count);
 
             viewmodel.SelectedThing = iterationFolderRow;
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(1, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(2, viewmodel.ContextMenu.Count);
 
             var participantRow = participantFolderRow.ContainedRows.OfType<ModelParticipantRowViewModel>().Single(x => x.Name == "blabla blabla");
             viewmodel.SelectedThing = participantRow;
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(4, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(3, viewmodel.ContextMenu.Count);
             foreach (var conMenu in viewmodel.ContextMenu)
             {
                 Assert.AreNotEqual("Delete this Participant", conMenu.Header);
@@ -365,7 +365,7 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(5, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(4, viewmodel.ContextMenu.Count);
         }
 
         [Test]
@@ -438,7 +438,7 @@ namespace CDP4SiteDirectory.Tests
             Assert.IsTrue(viewmodel.CanCreateIterationSetup);
             Assert.IsTrue(viewmodel.CanCreateEngineeringModelSetup);
             viewmodel.PopulateContextMenu();
-            Assert.AreEqual(1, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(2, viewmodel.ContextMenu.Count);
 
             viewmodel.CreateIterationSetupCommand.Execute(null);
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<IterationSetup>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<EngineeringModelSetup>(), null));

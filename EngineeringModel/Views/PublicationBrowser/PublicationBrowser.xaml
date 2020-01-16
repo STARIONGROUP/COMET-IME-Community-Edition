@@ -120,49 +120,49 @@
                          BorderEffect="Default"
                          BorderEffectColor="Blue">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <dxb:ToolBarControl Height="30">
-            <dxb:BarButtonItem Command="{Binding PublishCommand}"
+            <dxb:ToolBarControl Height="30">
+                <dxb:BarButtonItem Command="{Binding PublishCommand}"
                                Glyph="{dx:DXImage Image=CreateModelDifferences_16x16.png}"
                                IsEnabled="{Binding CanCreatePublication, UpdateSourceTrigger=PropertyChanged}"
                                Hint="Publish" />
 
-            <dxb:BarButtonItem Command="{Binding RefreshCommand}"
+                <dxb:BarButtonItem Command="{Binding RefreshCommand}"
                                Glyph="{dx:DXImage Image=Refresh2_16x16.png}"
                                Hint="{Binding SelectedThingClassKindString,
                                               Converter={dx:FormatStringConverter FormatString={}Refresh {0}}}" />
 
-            <dxb:BarButtonItem Command="{Binding ExportCommand}"
+                <dxb:BarButtonItem Command="{Binding ExportCommand}"
                                Glyph="{dx:DXImage Image=Export_16x16.png}"
                                Hint="{Binding SelectedThingClassKindString,
                                               Converter={dx:FormatStringConverter FormatString={}Export {0}}}" />
 
-            <dxb:BarSplitButtonItem />
+                <dxb:BarSplitButtonItem />
 
-            <dxb:BarButtonItem Command="{Binding HelpCommand}"
+                <dxb:BarButtonItem Command="{Binding HelpCommand}"
                                Glyph="{dx:DXImage Image=Info_16x16.png}"
                                Hint="Show Help" />
 
-            <dxb:BarSplitButtonItem />
+                <dxb:BarSplitButtonItem />
 
-        </dxb:ToolBarControl>
+            </dxb:ToolBarControl>
 
-        <views:BrowserHeader Grid.Row="1" />
+            <views:BrowserHeader Grid.Row="1" />
 
-        <Grid Grid.Row="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="5" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <dxg:TreeListControl x:Name="TreeListToBePublished"
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <dxg:TreeListControl x:Name="TreeListToBePublished"
                                  Grid.Row="0"
                                  IsEnabled="{Binding CanCreatePublication, UpdateSourceTrigger=PropertyChanged}"
                                  ItemsSource="{Binding Path=Domains}"
@@ -170,23 +170,24 @@
                                                         Mode=TwoWay,
                                                         UpdateSourceTrigger=PropertyChanged}"
                                  services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
-                <dxmvvm:Interaction.Behaviors>
-                    <cdp4Composition:ContextMenuBehavior />
-                </dxmvvm:Interaction.Behaviors>
-                <i:Interaction.Behaviors>
-                    <dragDrop:FrameworkElementDragBehavior />
-                </i:Interaction.Behaviors>
-                <dxg:TreeListControl.Columns>
-                    <dxg:TreeListColumn FieldName="Name" Header="Domain" />
-                    <dxg:TreeListColumn FieldName="Value" Header="New Value" />
-                    <dxg:TreeListColumn FieldName="Published" Header="Old Value" />
-                    <dxg:TreeListColumn FieldName="PercentageChange" Header="% Changed" />
-                    <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
-                </dxg:TreeListControl.Columns>
-                <dxg:TreeListControl.View>
-                    <dxg:TreeListView x:Name="ViewToBePublished"
+                    <dxmvvm:Interaction.Behaviors>
+                        <cdp4Composition:ContextMenuBehavior />
+                    </dxmvvm:Interaction.Behaviors>
+                    <i:Interaction.Behaviors>
+                        <dragDrop:FrameworkElementDragBehavior />
+                    </i:Interaction.Behaviors>
+                    <dxg:TreeListControl.Columns>
+                        <dxg:TreeListColumn FieldName="Name" Header="Domain" />
+                        <dxg:TreeListColumn FieldName="Value" Header="New Value" />
+                        <dxg:TreeListColumn FieldName="Published" Header="Old Value" />
+                        <dxg:TreeListColumn FieldName="PercentageChange" Header="% Changed" />
+                        <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
+                    </dxg:TreeListControl.Columns>
+                    <dxg:TreeListControl.View>
+                        <dxg:TreeListView x:Name="ViewToBePublished"
                                       AllowEditing="False"
                                       AutoWidth="False"
+                                      ExpandStateFieldName="IsExpanded"
                                       HorizontalScrollbarVisibility="Auto"
                                       NavigationStyle="Cell"
                                       ShowHorizontalLines="False"
@@ -196,31 +197,35 @@
                                       TreeDerivationMode="HierarchicalDataTemplate"
                                       TreeLineStyle="Solid"
                                       VerticalScrollbarVisibility="Auto">
-                        <dxg:TreeListView.ContextMenu>
-                            <ContextMenu Name="RowContextMenuPublication" />
-                        </dxg:TreeListView.ContextMenu>
-                    </dxg:TreeListView>
-                </dxg:TreeListControl.View>
-            </dxg:TreeListControl>
-            <GridSplitter Grid.Row="1"
+                            <dxg:TreeListView.ContextMenu>
+                                <ContextMenu Name="RowContextMenuPublication" />
+                            </dxg:TreeListView.ContextMenu>
+                        </dxg:TreeListView>
+                    </dxg:TreeListControl.View>
+                </dxg:TreeListControl>
+                <GridSplitter Grid.Row="1"
                           Height="5"
                           HorizontalAlignment="Stretch" />
-            <dxg:TreeListControl x:Name="TreeList"
+                <dxg:TreeListControl x:Name="TreeList"
                                  Grid.Row="2"
                                  ItemsSource="{Binding Path=Publications}"
                                  SelectedItem="{Binding SelectedThing,
                                                         Mode=TwoWay,
                                                         UpdateSourceTrigger=PropertyChanged}"
                                  services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
-                <dxg:TreeListControl.Columns>
-                    <dxg:TreeListColumn FieldName="Name" Header="Created On" />
-                    <dxg:TreeListColumn FieldName="OwnerShortName" Header="Domain" />
-                    <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
-                </dxg:TreeListControl.Columns>
-                <dxg:TreeListControl.View>
-                    <dxg:TreeListView x:Name="View"
+                    <dxmvvm:Interaction.Behaviors>
+                        <cdp4Composition:ContextMenuBehavior />
+                    </dxmvvm:Interaction.Behaviors>
+                    <dxg:TreeListControl.Columns>
+                        <dxg:TreeListColumn FieldName="Name" Header="Created On" />
+                        <dxg:TreeListColumn FieldName="OwnerShortName" Header="Domain" />
+                        <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
+                    </dxg:TreeListControl.Columns>
+                    <dxg:TreeListControl.View>
+                        <dxg:TreeListView x:Name="View"
                                       AllowEditing="False"
                                       AutoWidth="False"
+                                      ExpandStateFieldName="IsExpanded"
                                       HorizontalScrollbarVisibility="Auto"
                                       NavigationStyle="Cell"
                                       ShowHorizontalLines="False"
@@ -230,25 +235,18 @@
                                       TreeDerivationMode="HierarchicalDataTemplate"
                                       TreeLineStyle="Solid"
                                       VerticalScrollbarVisibility="Auto">
-                        <dxg:TreeListView.ContextMenu>
-                            <ContextMenu Name="RowContextMenu" ItemsSource="{Binding ContextMenu}">
-                                <ContextMenu.ItemContainerStyle>
-                                    <Style TargetType="{x:Type MenuItem}">
-                                        <Setter Property="Header" Value="{Binding Header}" />
-                                        <Setter Property="Command" Value="{Binding MenuCommand}" />
-                                    </Style>
-                                </ContextMenu.ItemContainerStyle>
-                            </ContextMenu>
-                        </dxg:TreeListView.ContextMenu>
-                    </dxg:TreeListView>
-                </dxg:TreeListControl.View>
-                <dxg:TreeListControl.InputBindings>
-                    <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
-                    <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
-                </dxg:TreeListControl.InputBindings>
-            </dxg:TreeListControl>
+                            <dxg:TreeListView.ContextMenu>
+                                <ContextMenu Name="RowContextMenuPublicationRow" />
+                            </dxg:TreeListView.ContextMenu>
+                        </dxg:TreeListView>
+                    </dxg:TreeListControl.View>
+                    <dxg:TreeListControl.InputBindings>
+                        <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
+                        <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
+                    </dxg:TreeListControl.InputBindings>
+                </dxg:TreeListControl>
+            </Grid>
         </Grid>
-    </Grid>
 
     </dx:LoadingDecorator>
 </UserControl>

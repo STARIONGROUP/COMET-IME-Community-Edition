@@ -606,7 +606,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public override void PopulateContextMenu()
         {
+            base.PopulateContextMenu();
             this.ContextMenu.Clear();
+
+            if (this.SelectedThing != null && this.SelectedThing.ContainedRows.Count > 0)
+            {
+                this.ContextMenu.Add(
+                    this.SelectedThing.IsExpanded ?
+                    new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
+                    new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+            }
         }
 
         /// <summary>
