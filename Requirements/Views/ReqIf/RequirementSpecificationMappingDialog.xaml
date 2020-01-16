@@ -69,7 +69,6 @@
                 </views1:CategorizableThingCellTemplateSelector.CategoryCellTemplate>
             </views1:CategorizableThingCellTemplateSelector>
             
-            
             <HierarchicalDataTemplate DataType="{x:Type viewModels:RequirementsSpecificationRowViewModel}"
                                       ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
