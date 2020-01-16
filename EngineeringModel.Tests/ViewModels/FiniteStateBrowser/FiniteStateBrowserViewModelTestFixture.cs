@@ -204,7 +204,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             viewmodel.SelectedThing = psRow;
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
-            Assert.AreEqual(8, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(7, viewmodel.ContextMenu.Count);
 
             // execute set default
             Assert.IsTrue(viewmodel.CanSetAsDefault);

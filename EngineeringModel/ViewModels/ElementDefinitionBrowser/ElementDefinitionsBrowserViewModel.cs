@@ -448,6 +448,15 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
 
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Navigates to Element Definition", "", this.ChangeFocusCommand, MenuItemKind.Navigate, ClassKind.ElementDefinition));
+
+                if (this.SelectedThing.ContainedRows.Count > 0)
+                {
+                    this.ContextMenu.Add(
+                        this.SelectedThing.IsExpanded ?
+                        new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
+                        new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+                }
+
                 return;
             }
 

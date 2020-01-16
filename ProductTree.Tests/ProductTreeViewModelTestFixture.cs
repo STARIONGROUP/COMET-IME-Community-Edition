@@ -305,7 +305,7 @@ namespace ProductTree.Tests
             vm.SelectedThing = paramRow;
 
             vm.PopulateContextMenu();
-            Assert.AreEqual(7, vm.ContextMenu.Count);
+            Assert.AreEqual(6, vm.ContextMenu.Count);
 
             Assert.IsTrue(vm.DeleteSubscriptionCommand.CanExecute(null));
             Assert.AreEqual(1, paramRow.Thing.ParameterSubscription.Count);
@@ -384,7 +384,7 @@ namespace ProductTree.Tests
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
             vm.PopulateContextMenu();
-            Assert.AreEqual(6, vm.ContextMenu.Count);
+            Assert.AreEqual(5, vm.ContextMenu.Count);
         }
 
         [Test]
@@ -414,7 +414,7 @@ namespace ProductTree.Tests
             var elemDef = vm.TopElement.Single();
             vm.SelectedThing = elemDef;
             vm.PopulateContextMenu();
-            Assert.AreEqual(5, vm.ContextMenu.Count);
+            Assert.AreEqual(4, vm.ContextMenu.Count);
         }
 
         [Test]

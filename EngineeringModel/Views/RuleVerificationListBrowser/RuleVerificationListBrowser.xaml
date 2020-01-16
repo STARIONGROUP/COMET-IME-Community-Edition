@@ -127,6 +127,7 @@
                                   MaxHeight="1080"
                                   AllowEditing="False"
                                   AutoWidth="true"
+                                  ExpandStateFieldName="IsExpanded"
                                   ExpandCollapseNodesOnNavigation="True"
                                   HorizontalScrollbarVisibility="Auto"
                                   ShowHorizontalLines="False"
