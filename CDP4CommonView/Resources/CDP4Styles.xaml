@@ -170,15 +170,15 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="ThingIcon" TargetType="{x:Type Image}">
-        <Setter Property="Width" Value="24"/>
+        <Setter Property="Width" Value="28"/>
         <Setter Property="Height" Value="16"/>
         <Setter Property="Margin" Value="1"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
     </Style>
     <Style x:Key="ThingIconGridColumn" TargetType="{x:Type dxg:GridColumn}">
         <Setter Property="AllowResizing" Value="False" />
-        <Setter Property="Width" Value="26"/>
-        <Setter Property="MinWidth" Value="26"/>
+        <Setter Property="Width" Value="28"/>
+        <Setter Property="MinWidth" Value="28"/>
         <Setter Property="FixedWidth" Value="True"/>
         <Setter Property="AllowEditing" Value="False"/>
     </Style>
