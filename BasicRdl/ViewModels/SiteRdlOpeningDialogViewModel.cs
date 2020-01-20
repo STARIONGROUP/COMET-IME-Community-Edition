@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="SiteRdlOpeningDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -14,6 +14,8 @@ namespace BasicRdl.ViewModels
     using System.Threading.Tasks;
     using System.Windows.Input;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using ReactiveUI;
@@ -32,7 +34,7 @@ namespace BasicRdl.ViewModels
         {
             this.IsBusy = false;
 
-            this.SessionsAvailable = new ReactiveList<SiteRdlSessionRowViewModel>();
+            this.SessionsAvailable = new DisposableReactiveList<SiteRdlSessionRowViewModel>();
             this.SelectedSiteRdls = new ReactiveList<object>();
             this.SelectedSiteRdls.ChangeTrackingEnabled = true;
 
@@ -44,9 +46,9 @@ namespace BasicRdl.ViewModels
         }
 
         /// <summary>
-        /// Gets the list of <see cref="SiteRdlRowViewModel"/> available
+        /// Gets the list of <see cref="SiteRdlSessionRowViewModel"/> available
         /// </summary>
-        public ReactiveList<SiteRdlSessionRowViewModel> SessionsAvailable { get; private set; }
+        public DisposableReactiveList<SiteRdlSessionRowViewModel> SessionsAvailable { get; private set; }
 
         /// <summary>
         /// Gets the list of <see cref="SiteRdlRowViewModel"/> selected

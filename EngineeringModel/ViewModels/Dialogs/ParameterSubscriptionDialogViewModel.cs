@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSubscriptionDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -15,6 +15,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -91,7 +92,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the list of <see cref="ParameterSubscriptionValueSet"/>
         /// </summary>
-        public ReactiveList<Dialogs.ParameterSubscriptionRowViewModel> ValueSet { get; protected set; }
+        public DisposableReactiveList<Dialogs.ParameterSubscriptionRowViewModel> ValueSet { get; protected set; }
 
         /// <summary>
         /// Gets the parameter that contains the subscription represented by this view-model.
@@ -145,7 +146,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.ValueSet = new ReactiveList<Dialogs.ParameterSubscriptionRowViewModel>();
+            this.ValueSet = new DisposableReactiveList<Dialogs.ParameterSubscriptionRowViewModel>();
         }
 
         /// <summary>
@@ -178,7 +179,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         protected void PopulateValueSet()
         {
-            this.ValueSet.Clear();
+            this.ValueSet.ClearAndDispose();
             var row = new Dialogs.ParameterSubscriptionRowViewModel(this.Thing, this.Session, this, this.IsReadOnly);
 
             this.ValueSet.Add(row);

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipEditorViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -22,6 +22,7 @@ namespace CDP4RelationshipEditor.ViewModels
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Behaviours;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -51,7 +52,7 @@ namespace CDP4RelationshipEditor.ViewModels
         /// <summary>
         /// Backing field for <see cref="RelationshipRules"/>
         /// </summary>
-        private ReactiveList<RuleNavBarItemViewModel> relationshipRules; 
+        private DisposableReactiveList<RuleNavBarItemViewModel> relationshipRules; 
 
         /// <summary>
         /// Backing field for <see cref="SelectedItem"/>
@@ -162,7 +163,7 @@ namespace CDP4RelationshipEditor.ViewModels
         {
             base.Initialize();
 
-            this.RelationshipRules = new ReactiveList<RuleNavBarItemViewModel> { ChangeTrackingEnabled = true };
+            this.RelationshipRules = new DisposableReactiveList<RuleNavBarItemViewModel> { ChangeTrackingEnabled = true };
             this.ThingDiagramItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
 
@@ -212,8 +213,7 @@ namespace CDP4RelationshipEditor.ViewModels
             var row = this.RelationshipRules.SingleOrDefault(rowViewModel => rowViewModel.Thing == rule);
             if (row != null)
             {
-                this.RelationshipRules.Remove(row);
-                row.Dispose();
+                this.RelationshipRules.RemoveAndDispose(row);
             }
 
             this.ResortRuleNavBarItems();
@@ -269,7 +269,7 @@ namespace CDP4RelationshipEditor.ViewModels
         /// <summary>
         /// Gets or sets the collection of <see cref="RuleNavBarItemViewModel"/> items to display.
         /// </summary>
-        public ReactiveList<RuleNavBarItemViewModel> RelationshipRules
+        public DisposableReactiveList<RuleNavBarItemViewModel> RelationshipRules
         {
             get { return this.relationshipRules; }
             set { this.RaiseAndSetIfChanged(ref this.relationshipRules, value); }

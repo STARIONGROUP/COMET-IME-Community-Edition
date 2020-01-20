@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReferenceSourceBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -69,7 +70,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ReferenceSourceRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<ReferenceSourceRowViewModel> ReferenceSources { get; private set; }
+        public DisposableReactiveList<ReferenceSourceRowViewModel> ReferenceSources { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether a RDL element may be created
@@ -116,7 +117,7 @@ namespace BasicRdl.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.ReferenceSources = new ReactiveList<ReferenceSourceRowViewModel>();
+            this.ReferenceSources = new DisposableReactiveList<ReferenceSourceRowViewModel>();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(x => x.Iid);
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
@@ -203,8 +204,7 @@ namespace BasicRdl.ViewModels
             var row = this.ReferenceSources.SingleOrDefault(rowViewModel => rowViewModel.Thing == referenceSource);
             if (row != null)
             {
-                this.ReferenceSources.Remove(row);
-                row.Dispose();
+                this.ReferenceSources.RemoveAndDispose(row);
             }
         }
 

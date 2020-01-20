@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ModelBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -14,11 +14,15 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using CDP4SiteDirectory.Views;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,7 +31,6 @@ namespace CDP4SiteDirectory.ViewModels
     [PanelViewModelExport("Model Browser", "The browser which displays the engineering models."), PartCreationPolicy(CreationPolicy.NonShared)]
     public class ModelBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
     {
-        #region Fields
         /// <summary>
         /// Backing field for <see cref="CanCreateIterationSetup"/>
         /// </summary>
@@ -48,9 +51,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private const string PanelCaption = "Engineering models";
 
-        #endregion
-
-        #region Constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelBrowserViewModel"/> class.
         /// Used by MEF.
@@ -76,13 +76,11 @@ namespace CDP4SiteDirectory.ViewModels
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
         }
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Gets the <see cref="EngineeringModelSetupRowViewModel"/>
         /// </summary>
-        public ReactiveList<EngineeringModelSetupRowViewModel> ModelSetup { get; private set; }
+        public DisposableReactiveList<EngineeringModelSetupRowViewModel> ModelSetup { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a new <see cref="Participant"/>
@@ -120,16 +118,14 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.canCreateEngineeringModelSetup; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateEngineeringModelSetup, value); }
         }
-        #endregion
 
-        #region Browser base Override
         /// <summary>
         /// Initialize the browser
         /// </summary>
         protected override void Initialize()
         {
             base.Initialize();
-            this.ModelSetup = new ReactiveList<EngineeringModelSetupRowViewModel>();
+            this.ModelSetup = new DisposableReactiveList<EngineeringModelSetupRowViewModel>();
             this.UpdateModels();
         }
 
@@ -285,7 +281,6 @@ namespace CDP4SiteDirectory.ViewModels
                 model.Dispose();
             }
         }
-        #endregion
 
         /// <summary>
         /// Update the list of <see cref="EngineeringModelSetupRowViewModel"/>
@@ -309,8 +304,7 @@ namespace CDP4SiteDirectory.ViewModels
                     continue;
                 }
 
-                row.Dispose();
-                this.ModelSetup.Remove(row);
+                this.ModelSetup.RemoveAndDispose(row);
             }
         }
 

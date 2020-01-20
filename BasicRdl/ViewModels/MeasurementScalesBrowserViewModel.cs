@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MeasurementScalesBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@ namespace BasicRdl.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -39,8 +40,8 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Backing field for the <see cref="MeasurementScales"/> property.
         /// </summary>
-        private readonly ReactiveList<MeasurementScaleRowViewModel> measurementScales =
-            new ReactiveList<MeasurementScaleRowViewModel>();
+        private readonly DisposableReactiveList<MeasurementScaleRowViewModel> measurementScales =
+            new DisposableReactiveList<MeasurementScaleRowViewModel>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeasurementScalesBrowserViewModel"/> class.
@@ -71,7 +72,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="MeasurementScaleRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<MeasurementScaleRowViewModel> MeasurementScales
+        public DisposableReactiveList<MeasurementScaleRowViewModel> MeasurementScales
         {
             get { return this.measurementScales; }
         }
@@ -166,8 +167,7 @@ namespace BasicRdl.ViewModels
             var row = this.MeasurementScales.SingleOrDefault(rowViewModel => rowViewModel.Thing == scale);
             if (row != null)
             {
-                this.MeasurementScales.Remove(row);
-                row.Dispose();
+                this.MeasurementScales.RemoveAndDispose(row);
             }
         }
 

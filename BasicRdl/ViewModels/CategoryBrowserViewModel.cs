@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CategoryBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -9,12 +9,16 @@ namespace BasicRdl.ViewModels
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+
+    using BasicRdl.Views;
+
     using CDP4Common.CommonData;
     using CDP4Common;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -35,7 +39,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Backing field for the <see cref="Categories"/> property
         /// </summary>
-        private readonly ReactiveList<CategoryRowViewModel> categories = new ReactiveList<CategoryRowViewModel>();
+        private readonly DisposableReactiveList<CategoryRowViewModel> categories = new DisposableReactiveList<CategoryRowViewModel>();
 
         /// <summary>
         /// Backing field for <see cref="CanCreateRdlElement"/>
@@ -69,7 +73,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the rows representing <see cref="Category"/>
         /// </summary>
-        public ReactiveList<CategoryRowViewModel> Categories
+        public DisposableReactiveList<CategoryRowViewModel> Categories
         {
             get { return this.categories; }
         }
@@ -218,8 +222,7 @@ namespace BasicRdl.ViewModels
             var row = this.Categories.SingleOrDefault(rowViewModel => rowViewModel.Thing == category);
             if (row != null)
             {
-                this.Categories.Remove(row);
-                row.Dispose();
+                this.Categories.RemoveAndDispose(row);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DomainFileStoreBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -92,7 +93,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
-            this.ContainedRows = new ReactiveList<IRowViewModelBase<Thing>>();
+            this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.AddSubscriptions();
             this.UpdateProperties();
         }
@@ -100,7 +101,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the Contained <see cref="IRowViewModelBase{T}"/>
         /// </summary>
-        public ReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
+        public DisposableReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -245,9 +246,8 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 if (this.domainFileStoreRow != null)
                 {
-                    this.domainFileStoreRow.Dispose();
+                    this.ContainedRows.RemoveAndDispose(this.domainFileStoreRow);
                     this.domainFileStoreRow = null;
-                    this.ContainedRows.Remove(this.domainFileStoreRow);
                 }
 
                 return;

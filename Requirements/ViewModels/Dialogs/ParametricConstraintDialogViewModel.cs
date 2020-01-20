@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParametricConstraintDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -14,8 +14,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Extensions;
-
-    using CDP4CommonView;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
@@ -33,16 +31,6 @@ namespace CDP4Requirements.ViewModels
     [ThingDialogViewModelExport(ClassKind.ParametricConstraint)]
     public class ParametricConstraintDialogViewModel : CDP4CommonView.ParametricConstraintDialogViewModel, IThingDialogViewModel
     {
-        /// <summary>
-        /// Backing field for the <see cref="SelectedValue"/> property.
-        /// </summary>
-        private PrimitiveRow<string> selectedValue;
-
-        /// <summary>
-        /// Backing field for <see cref="Expression"/>
-        /// </summary>
-        private ReactiveList<IRowViewModelBase<BooleanExpression>> expression;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ParametricConstraintDialogViewModel"/> class.
         /// </summary>

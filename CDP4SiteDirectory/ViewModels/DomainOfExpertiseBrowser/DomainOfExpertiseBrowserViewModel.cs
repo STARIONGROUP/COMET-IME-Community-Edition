@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="DomainOfExpertiseBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4CommonView;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -26,8 +27,6 @@ namespace CDP4SiteDirectory.ViewModels
     public class DomainOfExpertiseBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
         IDeprecatableBrowserViewModel
     {
-        #region Fields
-
         /// <summary>
         /// The row comparer
         /// </summary>
@@ -42,8 +41,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Domains of Expertise";
-
-        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainOfExpertiseBrowserViewModel"/> class
@@ -70,11 +67,9 @@ namespace CDP4SiteDirectory.ViewModels
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
                 this.Session.ActivePerson.Name);
 
-            this.DomainOfExpertises = new ReactiveList<DomainOfExpertiseRowViewModel>();
+            this.DomainOfExpertises = new DisposableReactiveList<DomainOfExpertiseRowViewModel>();
             this.ComputeDomains();
         }
-
-        #region Properties
 
         /// <summary>
         /// Gets a value indicating whether the create command is enable
@@ -88,11 +83,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the List of <see cref="DomainOfExpertiseRowViewModel"/>
         /// </summary>
-        public ReactiveList<DomainOfExpertiseRowViewModel> DomainOfExpertises { get; private set; }
-
-        #endregion
-
-        #region browser base
+        public DisposableReactiveList<DomainOfExpertiseRowViewModel> DomainOfExpertises { get; private set; }
 
         /// <summary>
         /// Initialize the <see cref="ReactiveCommand"/>s of the current view-model
@@ -150,8 +141,6 @@ namespace CDP4SiteDirectory.ViewModels
                 MenuItemKind.Create, ClassKind.DomainOfExpertise));
         }
 
-        #endregion
-
         /// <summary>
         /// Add a new row that represents a <see cref="DomainOfExpertise"/> to the list of <see cref="DomainOfExpertise"/>.
         /// </summary>
@@ -175,8 +164,7 @@ namespace CDP4SiteDirectory.ViewModels
             var row = this.DomainOfExpertises.SingleOrDefault(x => x.Thing == domainOfExpertise);
             if (row != null)
             {
-                this.DomainOfExpertises.Remove(row);
-                row.Dispose();
+                this.DomainOfExpertises.RemoveAndDispose(row);
             }
         }
 

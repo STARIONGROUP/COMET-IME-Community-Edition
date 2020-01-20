@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -14,8 +14,12 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4CommonView;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -153,7 +157,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the list of <see cref="ParameterValueSet"/>
         /// </summary>
-        public ReactiveList<Dialogs.ParameterRowViewModel> ValueSet { get; protected set; }
+        public DisposableReactiveList<Dialogs.ParameterRowViewModel> ValueSet { get; protected set; }
 
         /// <summary>
         /// Gets the possible groups
@@ -197,7 +201,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.ValueSet = new ReactiveList<Dialogs.ParameterRowViewModel>();
+            this.ValueSet = new DisposableReactiveList<Dialogs.ParameterRowViewModel>();
             this.PossibleGroups = new ReactiveList<GroupSelectionViewModel>();
         }
 
@@ -424,12 +428,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void PopulateValueSet()
         {
-            foreach (var parameterRowViewModel in this.ValueSet)
-            {
-                parameterRowViewModel.Dispose();
-            }
-
-            this.ValueSet.Clear();
+            this.ValueSet.ClearAndDispose();
 
             var row = new Dialogs.ParameterRowViewModel(this.Thing, this.Session, this, this.IsReadOnly);
 

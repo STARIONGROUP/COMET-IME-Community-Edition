@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="SiteRdlClosingDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -15,6 +15,7 @@ namespace BasicRdl.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using ReactiveUI;
@@ -25,14 +26,11 @@ namespace BasicRdl.ViewModels
     /// </summary>
     public class SiteRdlClosingDialogViewModel : DialogViewModelBase
     {
-        #region Fields
         /// <summary>
         /// Backing field for <see cref="SelectedSiteRdlToClose"/>
         /// </summary>
         private IRowViewModelBase<Thing> selectedSiteRdlToClose;
-        #endregion
 
-        #region Constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="SiteRdlOpeningDialogViewModel"/> class. 
         /// </summary>
@@ -41,17 +39,15 @@ namespace BasicRdl.ViewModels
         {
             this.IsBusy = false;
 
-            this.SessionsAvailable = new ReactiveList<ClosingSiteRdlSessionRowViewModel>();
+            this.SessionsAvailable = new DisposableReactiveList<ClosingSiteRdlSessionRowViewModel>();
             this.InitializeReactiveCommands();
             this.PopulateSessionsRowViewModel(sessionAvailable);
         }
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Gets the list of <see cref="SiteRdlRowViewModel"/> available
         /// </summary>
-        public ReactiveList<ClosingSiteRdlSessionRowViewModel> SessionsAvailable { get; private set; }
+        public DisposableReactiveList<ClosingSiteRdlSessionRowViewModel> SessionsAvailable { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="SiteReferenceDataLibrary"/> to close
@@ -71,7 +67,6 @@ namespace BasicRdl.ViewModels
         /// Gets the Cancel <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> CancelCommand { get; private set; }
-        #endregion
 
         /// <summary>
         /// The initialize reactive commands.

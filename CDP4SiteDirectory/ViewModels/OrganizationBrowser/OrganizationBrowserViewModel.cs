@@ -13,6 +13,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4CommonView;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -52,14 +53,14 @@ namespace CDP4SiteDirectory.ViewModels
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
 
-            this.Organizations = new ReactiveList<OrganizationRowViewModel>();
+            this.Organizations = new DisposableReactiveList<OrganizationRowViewModel>();
             this.ComputeOrganizationRows();
         }
 
         /// <summary>
         /// Gets the List of <see cref="OrganizationRowViewModel"/>
         /// </summary>
-        public ReactiveList<OrganizationRowViewModel> Organizations { get; private set; }
+        public DisposableReactiveList<OrganizationRowViewModel> Organizations { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the create command is enable
@@ -156,8 +157,7 @@ namespace CDP4SiteDirectory.ViewModels
             var row = this.Organizations.SingleOrDefault(x => x.Thing == organization);
             if (row != null)
             {
-                this.Organizations.Remove(row);
-                row.Dispose();
+                this.Organizations.RemoveAndDispose(row);
             }
         }
 

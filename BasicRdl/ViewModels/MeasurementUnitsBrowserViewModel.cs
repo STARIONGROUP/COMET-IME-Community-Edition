@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MeasurementUnitsBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@ namespace BasicRdl.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -34,8 +35,8 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Backing field for the <see cref="MeasurementUnits"/> property
         /// </summary>
-        private readonly ReactiveList<MeasurementUnitRowViewModel> measurementUnits =
-            new ReactiveList<MeasurementUnitRowViewModel>();
+        private readonly DisposableReactiveList<MeasurementUnitRowViewModel> measurementUnits =
+            new DisposableReactiveList<MeasurementUnitRowViewModel>();
 
         /// <summary>
         /// Backing field for <see cref="CanCreateRdlElement"/>
@@ -71,7 +72,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="MeasurementUnitRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<MeasurementUnitRowViewModel> MeasurementUnits
+        public DisposableReactiveList<MeasurementUnitRowViewModel> MeasurementUnits
         {
             get { return this.measurementUnits; }
         }
@@ -159,8 +160,7 @@ namespace BasicRdl.ViewModels
             var row = this.MeasurementUnits.SingleOrDefault(rowViewModel => rowViewModel.Thing == measurementUnit);
             if (row != null)
             {
-                this.MeasurementUnits.Remove(row);
-                row.Dispose();
+                this.MeasurementUnits.RemoveAndDispose(row);
             }
         }
 

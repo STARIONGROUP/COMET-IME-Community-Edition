@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="OptionBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
 //
@@ -38,6 +38,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -156,7 +157,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the rows representing <see cref="Option"/>s
         /// </summary>
-        public ReactiveList<OptionRowViewModel> Options { get; private set; }
+        public DisposableReactiveList<OptionRowViewModel> Options { get; private set; }
         
         /// <summary>
         /// Initializes the browser
@@ -164,7 +165,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.Options = new ReactiveList<OptionRowViewModel>();
+            this.Options = new DisposableReactiveList<OptionRowViewModel>();
         }
 
         /// <summary>
@@ -270,7 +271,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = this.Options.SingleOrDefault(x => x.Thing == option);
                 if (row != null)
                 {
-                    this.Options.Remove(row);
+                    this.Options.RemoveAndDispose(row);
                 }
             }
 

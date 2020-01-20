@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="NaturalLanguageBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -13,11 +13,15 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4CommonView;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using CDP4SiteDirectory.Views;
+
     using ReactiveUI;
 
     /// <summary>
@@ -56,7 +60,7 @@ namespace CDP4SiteDirectory.ViewModels
             this.Caption = PanelCaption + ", " + this.Thing.Name;
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
 
-            this.NaturalLanguageRowViewModels = new ReactiveList<NaturalLanguageRowViewModel>();
+            this.NaturalLanguageRowViewModels = new DisposableReactiveList<NaturalLanguageRowViewModel>();
 
             this.ComputeNaturalLanguageRows();
         }
@@ -64,7 +68,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="NaturalLanguageRowViewModel"/>s
         /// </summary>
-        public ReactiveList<NaturalLanguageRowViewModel> NaturalLanguageRowViewModels { get; private set; }
+        public DisposableReactiveList<NaturalLanguageRowViewModel> NaturalLanguageRowViewModels { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the create command is enable
@@ -172,8 +176,7 @@ namespace CDP4SiteDirectory.ViewModels
             var row = this.NaturalLanguageRowViewModels.SingleOrDefault(x => x.Thing == naturalLanguage);
             if (row != null)
             {
-                this.NaturalLanguageRowViewModels.Remove(row);
-                row.Dispose();
+                this.NaturalLanguageRowViewModels.RemoveAndDispose(row);
             }
         }
     }

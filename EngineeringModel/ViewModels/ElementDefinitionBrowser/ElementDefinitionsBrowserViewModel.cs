@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -22,6 +22,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -95,7 +96,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.Caption = "Element Definitions";
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
 
-            this.ElementDefinitionRowViewModels = new ReactiveList<IRowViewModelBase<Thing>>();
+            this.ElementDefinitionRowViewModels = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.UpdateElementDefinition();
 
             this.AddSubscriptions();
@@ -198,7 +199,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
         /// </summary>
         /// <remarks>This was made into a list of generic row to use the ReactiveList extension</remarks>
-        public ReactiveList<IRowViewModelBase<Thing>> ElementDefinitionRowViewModels { get; private set; }
+        public DisposableReactiveList<IRowViewModelBase<Thing>> ElementDefinitionRowViewModels { get; private set; }
 
         /// <summary>
         /// Updates the current drag state.
@@ -487,9 +488,8 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void UpdateDomain(DomainChangedEvent domainChangeEvent)
         {
             base.UpdateDomain(domainChangeEvent);
-            this.ElementDefinitionRowViewModels.Clear();
+            this.ElementDefinitionRowViewModels.ClearAndDispose();
             this.UpdateElementDefinition();
-
         }
 
         /// <summary>
@@ -621,8 +621,7 @@ namespace CDP4EngineeringModel.ViewModels
             var row = this.ElementDefinitionRowViewModels.SingleOrDefault(x => x.Thing == elementDef);
             if (row != null)
             {
-                this.ElementDefinitionRowViewModels.Remove(row);
-                row.Dispose();
+                this.ElementDefinitionRowViewModels.RemoveAndDispose(row);
             }
         }
 

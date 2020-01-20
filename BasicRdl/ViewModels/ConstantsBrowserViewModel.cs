@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ConstantsBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -37,7 +38,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Backing field for the <see cref="Constants"/> property
         /// </summary>
-        private readonly ReactiveList<ConstantRowViewModel> constants = new ReactiveList<ConstantRowViewModel>();
+        private readonly DisposableReactiveList<ConstantRowViewModel> constants = new DisposableReactiveList<ConstantRowViewModel>();
 
         /// <summary>
         /// Backing field for <see cref="CanCreateRdlElement"/>
@@ -73,7 +74,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ConstantRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<ConstantRowViewModel> Constants
+        public DisposableReactiveList<ConstantRowViewModel> Constants
         {
             get { return this.constants; }
         }
@@ -212,8 +213,7 @@ namespace BasicRdl.ViewModels
             var row = this.Constants.SingleOrDefault(rowViewModel => rowViewModel.Thing == constant);
             if (row != null)
             {
-                this.Constants.Remove(row);
-                row.Dispose();
+                this.Constants.RemoveAndDispose(row);
             }
         }
 

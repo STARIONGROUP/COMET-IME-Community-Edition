@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOverrideDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -15,6 +15,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -113,7 +114,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the list of <see cref="ParameterOverrideValueSet"/>
         /// </summary>
-        public ReactiveList<Dialogs.ParameterOverrideRowViewModel> ValueSet { get; protected set; }
+        public DisposableReactiveList<Dialogs.ParameterOverrideRowViewModel> ValueSet { get; protected set; }
 
         /// <summary>
         /// Gets the reference parameter.
@@ -160,7 +161,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.ValueSet = new ReactiveList<Dialogs.ParameterOverrideRowViewModel>();
+            this.ValueSet = new DisposableReactiveList<Dialogs.ParameterOverrideRowViewModel>();
             this.IsOwnerReadonly = !this.Thing.Parameter.AllowDifferentOwnerOfOverride;
         }
 
@@ -181,7 +182,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         protected void PopulateValueSet()
         {
-            this.ValueSet.Clear();
+            this.ValueSet.ClearAndDispose();
             var row = new Dialogs.ParameterOverrideRowViewModel(this.Thing, this.Session, this, this.IsReadOnly);
 
             this.ValueSet.Add(row);

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementSpecificationMappingDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Operations;
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -28,8 +29,6 @@ namespace CDP4Requirements.ViewModels
     [DialogViewModelExport("RequirementSpecificationMappingDialogViewModel", "The dialog used to map the Reqif DatatypeDefinition to ParameterType.")]
     public class RequirementSpecificationMappingDialogViewModel : ReqIfMappingDialogViewModelBase
     {
-        #region Fields
-
         /// <summary>
         /// Backing field for <see cref="SelectedThing"/>
         /// </summary>
@@ -39,10 +38,6 @@ namespace CDP4Requirements.ViewModels
         /// The <see cref="ThingFactory"/>
         /// </summary>
         private readonly ThingFactory thingFactory;
-
-        #endregion Fields
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementSpecificationMappingDialogViewModel"/> class.
@@ -63,17 +58,13 @@ namespace CDP4Requirements.ViewModels
         public RequirementSpecificationMappingDialogViewModel(ThingFactory thingFactory, Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, string lang)
             : base(iteration, session, thingDialogNavigationService, lang)
         {
-            this.PreviewRows = new ReactiveList<IRowViewModelBase<Thing>>();
+            this.PreviewRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.thingFactory = thingFactory;
 
             this.PopulateRows();
 
             this.InitializeCommands();
         }
-
-        #endregion Constructors
-
-        #region Public properties and Commands
 
         /// <summary>
         /// Gets the back <see cref="ICommand"/>
@@ -93,7 +84,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the <see cref="RequirementsSpecificationRowViewModel"/> rows
         /// </summary>
-        public ReactiveList<IRowViewModelBase<Thing>> PreviewRows { get; private set; }
+        public DisposableReactiveList<IRowViewModelBase<Thing>> PreviewRows { get; private set; }
 
         /// <summary>
         /// Gets or sets the selected row
@@ -103,10 +94,6 @@ namespace CDP4Requirements.ViewModels
             get { return this.selectedThing; }
             set { this.RaiseAndSetIfChanged(ref this.selectedThing, value); }
         }
-
-        #endregion Public properties and Commands
-
-        #region Methods
 
         /// <summary>
         /// Create a <see cref="ThingTransaction"/> object from the <see cref="RequirementsSpecification"/>
@@ -234,7 +221,5 @@ namespace CDP4Requirements.ViewModels
                 reqSpec.Dispose();
             }
         }
-
-        #endregion Methods
     }
 }

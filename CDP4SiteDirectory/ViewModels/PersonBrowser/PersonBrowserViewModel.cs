@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PersonBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,6 +12,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -61,14 +62,14 @@ namespace CDP4SiteDirectory.ViewModels
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
                 this.Session.ActivePerson.Name);
 
-            this.PersonRowViewModels = new ReactiveList<PersonRowViewModel>();
+            this.PersonRowViewModels = new DisposableReactiveList<PersonRowViewModel>();
             this.UpdatePersonRows();
         }
 
         /// <summary>
         /// Gets the <see cref="PersonRowViewModel"/> that are contained by the row-view-model
         /// </summary>
-        public ReactiveList<PersonRowViewModel> PersonRowViewModels { get; private set; }
+        public DisposableReactiveList<PersonRowViewModel> PersonRowViewModels { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the create command is enable
@@ -128,8 +129,7 @@ namespace CDP4SiteDirectory.ViewModels
             var row = this.PersonRowViewModels.SingleOrDefault(x => x.Thing == person);
             if (row != null)
             {
-                this.PersonRowViewModels.Remove(row);
-                row.Dispose();
+                this.PersonRowViewModels.RemoveAndDispose(row);
             }
         }
 
