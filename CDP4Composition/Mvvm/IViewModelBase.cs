@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,16 +16,11 @@ namespace CDP4Composition.Mvvm
     /// <typeparam name="T">
     /// The type parameter
     /// </typeparam>
-    public interface IViewModelBase<out T> where T : Thing
+    public interface IViewModelBase<out T> : IDisposable where T : Thing
     {
         /// <summary>
         /// Gets the <see cref="Thing"/> that is represented by the current <see cref="IViewModelBase{T}"/>
         /// </summary>
         T Thing { get; }
-
-        /// <summary>
-        /// Dispose of the <see cref="IDisposable"/> objects
-        /// </summary>
-        void Dispose();
     }
 }

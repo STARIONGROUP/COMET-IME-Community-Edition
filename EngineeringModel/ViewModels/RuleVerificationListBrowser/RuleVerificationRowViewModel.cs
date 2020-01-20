@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = this.ContainedRows.SingleOrDefault(x => x.Thing == violation);
                 if (row != null)
                 {
-                    this.ContainedRows.Remove(row);
+                    this.ContainedRows.RemoveAndDispose(row);
                 }
             }
         }

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FiniteStateBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -333,7 +333,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = this.possibleFiniteStateListFolder.ContainedRows.SingleOrDefault(x => x.Thing == statelist);
                 if (row != null)
                 {
-                    this.possibleFiniteStateListFolder.ContainedRows.Remove(row);
+                    this.possibleFiniteStateListFolder.ContainedRows.RemoveAndDispose(row);
                 }
             }
         }
@@ -360,7 +360,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = this.actualFiniteStateListFolder.ContainedRows.SingleOrDefault(x => x.Thing == statelist);
                 if (row != null)
                 {
-                    this.actualFiniteStateListFolder.ContainedRows.Remove(row);
+                    this.actualFiniteStateListFolder.ContainedRows.RemoveAndDispose(row);
                 }
             }
         }

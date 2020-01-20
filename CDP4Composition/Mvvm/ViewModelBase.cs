@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -24,10 +24,8 @@ namespace CDP4Composition.Mvvm
     /// <typeparam name="T">
     /// A type of Thing that is represented by the view-model
     /// </typeparam>
-    public abstract class ViewModelBase<T> : ReactiveObject, IViewModelBase<T>, IDisposable, IISession where T : Thing
+    public abstract class ViewModelBase<T> : ReactiveObject, IViewModelBase<T>, IISession where T : Thing
     {
-        #region Fields
-
         /// <summary>
         /// The NLog logger
         /// </summary>
@@ -51,15 +49,13 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Backing field for <see cref="ModifiedOn"/> property.
         /// </summary>
-		private DateTime modifiedOn;
+        private DateTime modifiedOn;
 
         /// <summary>
         /// Backing Field For isBusy
         /// </summary>
         private bool isBusy;
-        #endregion
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelBase{T}"/> class.
         /// </summary>
@@ -96,7 +92,6 @@ namespace CDP4Composition.Mvvm
                 .Subscribe(this.ObjectChangeEventHandler);
             this.Disposables.Add(thingSubscription);
         }
-        #endregion
 
         /// <summary>
         /// Gets the <see cref="ISession"/>
@@ -170,6 +165,7 @@ namespace CDP4Composition.Mvvm
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -180,30 +176,33 @@ namespace CDP4Composition.Mvvm
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.isDisposed)
+            if (this.isDisposed)
             {
-                if (disposing)
+                return;
+            }
+
+            if (disposing) //Free any other managed objects here
+            {
+                // Clear all property values that maybe have been set
+                // when the class was instantiated
+                this.RevisionNumber = 0;
+                this.Thing = null;
+
+                if (this.Disposables != null)
                 {
-                    // Clear all property values that maybe have been set
-                    // when the class was instantiated
-                    this.RevisionNumber = 0;
-                    this.Thing = null;
-                    if (this.Disposables != null)
+                    foreach (var disposable in this.Disposables)
                     {
-                        foreach (var disposable in this.Disposables)
-                        {
-                            disposable.Dispose();
-                        }
-                    }
-                    else
-                    {
-                        logger.Trace("The Disposables collection of the {0} is null", this.GetType().Name);
+                        disposable.Dispose();
                     }
                 }
-
-                // Indicate that the instance has been disposed.
-                this.isDisposed = true;
+                else
+                {
+                    logger.Trace("The Disposables collection of the {0} is null", this.GetType().Name);
+                }
             }
+
+            // Indicate that the instance has been disposed.
+            this.isDisposed = true;
         }
 
         /// <summary>

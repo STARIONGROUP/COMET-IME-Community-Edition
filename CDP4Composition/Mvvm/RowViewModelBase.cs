@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RowViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -18,6 +18,8 @@ namespace CDP4Composition.Mvvm
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Mvvm.Types;
+
     using Converters;
     using Navigation;
     using Services;
@@ -28,7 +30,6 @@ namespace CDP4Composition.Mvvm
     using Events;
     using Navigation.Interfaces;
     using ReactiveUI;
-    using ViewModels;
 
     /// <summary>
     /// The Base view-model class for rows
@@ -90,7 +91,7 @@ namespace CDP4Composition.Mvvm
         protected RowViewModelBase(T thing, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(thing, session)
         {
-            this.ContainedRows = new ReactiveList<IRowViewModelBase<Thing>>();
+            this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.ContainerViewModel = containerViewModel;
             this.HighlightCancelDisposables = new List<IDisposable>();
 
@@ -141,7 +142,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets or sets the Contained <see cref="IRowViewModelBase{T}"/>
         /// </summary>
-        public ReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
+        public DisposableReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
 
         /// <summary>
         /// Gets or sets the parent <see cref="IViewModelBase{T}"/>
@@ -409,8 +410,7 @@ namespace CDP4Composition.Mvvm
             var row = this.ContainedRows.SingleOrDefault(rowViewModel => rowViewModel.Thing == removedThing);
             if (row != null)
             {
-                this.ContainedRows.Remove(row);
-                row.Dispose();
+                this.ContainedRows.RemoveAndDispose(row);
             }
         }
 

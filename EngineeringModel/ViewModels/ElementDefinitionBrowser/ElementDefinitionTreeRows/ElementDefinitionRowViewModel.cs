@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -263,8 +263,7 @@ namespace CDP4EngineeringModel.ViewModels
                     continue;
                 }
 
-                row.Dispose();
-                this.ContainedRows.Remove(row);
+                this.ContainedRows.RemoveAndDispose(row);
             }
 
             var addedUsages = this.Thing.ContainedElement.Except(currentUsages).ToList();

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,6 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
@@ -299,7 +298,7 @@ namespace CDP4EngineeringModel.ViewModels
                 row.Dispose();
             }
 
-            this.ContainedRows.DisposeAndClear();
+            this.ContainedRows.ClearAndDispose();
 
             if (this.Thing.IsOptionDependent)
             {
@@ -380,8 +379,7 @@ namespace CDP4EngineeringModel.ViewModels
                         .SingleOrDefault(x => x.ActualState == actualState);
                 if (rowToRemove != null)
                 {
-                    rowToRemove.Dispose();
-                    row.ContainedRows.Remove(rowToRemove);
+                    row.ContainedRows.RemoveAndDispose(rowToRemove);
                 }
 
                 return;

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="AndExpressionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -13,7 +13,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -99,7 +98,7 @@ namespace CDP4Requirements.ViewModels
         private void UpdateProperties()
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
-            this.ContainedRows.DisposeAndClear();
+            this.ContainedRows.ClearAndDispose();
             var parametricConstraintDialog = this.TopContainerViewModel as ParametricConstraintDialogViewModel;
 
             foreach (var term in this.Thing.Term)

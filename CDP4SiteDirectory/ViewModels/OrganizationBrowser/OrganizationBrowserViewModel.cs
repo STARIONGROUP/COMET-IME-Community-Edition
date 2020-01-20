@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -122,8 +122,7 @@ namespace CDP4SiteDirectory.ViewModels
                 var row = organizationRow.ContainedRows.SingleOrDefault(x => x.Thing == removedPerson);
                 if (row != null)
                 {
-                    row.Dispose();
-                    organizationRow.ContainedRows.Remove(row);
+                    organizationRow.ContainedRows.RemoveAndDispose(row);
                 }
             }
 

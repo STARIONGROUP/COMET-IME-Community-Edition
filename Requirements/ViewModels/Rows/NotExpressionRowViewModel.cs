@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="NotExpressionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -13,7 +13,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -102,7 +101,7 @@ namespace CDP4Requirements.ViewModels
             var parametricConstraintDialog = this.TopContainerViewModel as ParametricConstraintDialogViewModel;
             var updatedTerm = this.GetUpdatedTerm(this.Thing.Term, parametricConstraintDialog);
 
-            this.ContainedRows.DisposeAndClear();
+            this.ContainedRows.ClearAndDispose();
 
             var expressionRow = updatedTerm.GetBooleanExpressionViewModel(this);
 

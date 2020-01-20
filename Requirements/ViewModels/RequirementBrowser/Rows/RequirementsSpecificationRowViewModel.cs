@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsSpecificationRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -162,8 +162,7 @@ namespace CDP4Requirements.ViewModels
         /// <param name="req">The <see cref="Requirement"/> to remove</param>
         private void RemoveRequirementRow(Requirement req)
         {
-            IRowViewModelBase<Requirement> reqRow;
-            if (!this.requirementCache.TryGetValue(req, out reqRow))
+            if (!this.requirementCache.TryGetValue(req, out var reqRow))
             {
                 return;
             }
@@ -171,15 +170,14 @@ namespace CDP4Requirements.ViewModels
             var previousGroup = this.requirementContainerGroupCache[req];
             if (previousGroup != null)
             {
-                IRowViewModelBase<Thing> groupRow;
-                if (this.GroupCache.TryGetValue(previousGroup, out groupRow))
+                if (this.GroupCache.TryGetValue(previousGroup, out var groupRow))
                 {
-                    groupRow.ContainedRows.Remove(reqRow);
+                    groupRow.ContainedRows.RemoveWithoutDispose(reqRow);
                 }
             }
             else
             {
-                this.ContainedRows.Remove(reqRow);
+                this.ContainedRows.RemoveWithoutDispose(reqRow);
             }
 
             reqRow.Dispose();
@@ -228,7 +226,7 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            currentContainerRow.ContainedRows.Remove(reqRow);
+            currentContainerRow.ContainedRows.RemoveWithoutDispose(reqRow);
             updatedContainerRow.ContainedRows.SortedInsert(reqRow, ChildRowComparer);
             this.requirementContainerGroupCache[req] = req.Group;
         }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParametricConstraintRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -14,7 +14,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -101,7 +100,7 @@ namespace CDP4Requirements.ViewModels
             this.ModifiedOn = this.Thing.ModifiedOn;
             var topExpressions = this.GetTopExpressions();
 
-            this.ContainedRows.DisposeAndClear();
+            this.ContainedRows.ClearAndDispose();
 
             foreach (var expression in topExpressions)
             {

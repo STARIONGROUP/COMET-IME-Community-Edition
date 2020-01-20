@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -136,21 +136,21 @@ namespace CDP4ProductTree.ViewModels
             var newContainer = parameterBase.Group;
             var associatedRow = this.parameterCache[parameter];
 
-            if (newContainer != null && oldContainer == null)
+            if ((newContainer != null) && (oldContainer == null))
             {
-                this.ContainedRows.Remove(associatedRow);
+                this.ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                 this.parameterContainerMap[parameter] = newContainer;
             }
-            else if (newContainer == null && oldContainer != null)
+            else if ((newContainer == null) && (oldContainer != null))
             {
-                this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
                 this.parameterContainerMap[parameter] = null;
             }
-            else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
+            else if ((newContainer != null) && (oldContainer != null) && (newContainer != oldContainer))
             {
-                this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                 this.parameterContainerMap[parameter] = newContainer;
             }
@@ -166,21 +166,21 @@ namespace CDP4ProductTree.ViewModels
             var newContainer = parameterGroup.ContainingGroup;
             var associatedRow = this.parameterGroupCache[parameterGroup];
 
-            if (newContainer != null && oldContainer == null)
+            if ((newContainer != null) && (oldContainer == null))
             {
-                this.ContainedRows.Remove(associatedRow);
+                this.ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                 this.parameterGroupContainment[parameterGroup] = newContainer;
             }
-            else if (newContainer == null && oldContainer != null)
+            else if ((newContainer == null) && (oldContainer != null))
             {
-                this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
                 this.parameterGroupContainment[parameterGroup] = null;
             }
-            else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
+            else if ((newContainer != null) && (oldContainer != null) && (newContainer != oldContainer))
             {
-                this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                 this.parameterGroupContainment[parameterGroup] = newContainer;
             }
@@ -380,11 +380,11 @@ namespace CDP4ProductTree.ViewModels
             {
                 if (group.ContainingGroup == null)
                 {
-                    this.ContainedRows.Remove(this.parameterGroupCache[group]);
+                    this.ContainedRows.RemoveWithoutDispose(this.parameterGroupCache[group]);
                 }
                 else
                 {
-                    this.parameterGroupCache[group.ContainingGroup].ContainedRows.Remove(this.parameterGroupCache[group]);
+                    this.parameterGroupCache[group.ContainingGroup].ContainedRows.RemoveWithoutDispose(this.parameterGroupCache[group]);
                 }
 
                 this.parameterGroupCache[group].Dispose();
@@ -431,11 +431,11 @@ namespace CDP4ProductTree.ViewModels
             {
                 if (parameter.Group == null)
                 {
-                    this.ContainedRows.Remove(this.parameterCache[parameter]);
+                    this.ContainedRows.RemoveWithoutDispose(this.parameterCache[parameter]);
                 }
                 else
                 {
-                    this.parameterGroupCache[parameter.Group].ContainedRows.Remove(this.parameterCache[parameter]);
+                    this.parameterGroupCache[parameter.Group].ContainedRows.RemoveWithoutDispose(this.parameterCache[parameter]);
                 }
 
                 this.parameterCache[parameter].Dispose();
@@ -541,8 +541,7 @@ namespace CDP4ProductTree.ViewModels
 
             if (row != null)
             {
-                row.Dispose();
-                this.ContainedRows.Remove(row);
+                this.ContainedRows.RemoveAndDispose(row);
             }
 
             this.elementUsageListenerCache.Remove(elementUsage);
@@ -560,8 +559,7 @@ namespace CDP4ProductTree.ViewModels
 
                 if (row != null)
                 {
-                    row.Dispose();
-                    this.ContainedRows.Remove(row);
+                    this.ContainedRows.RemoveAndDispose(row);
                 }
 
                 return;

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="BooleanExpressionExtensionsTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -18,6 +18,7 @@ namespace CDP4Requirements.Tests.Extensions
     using CDP4Common.Types;
 
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
 
     using CDP4Dal;
 
@@ -79,18 +80,18 @@ namespace CDP4Requirements.Tests.Extensions
 
             this.andRelationalExpression1 = new RelationalExpression();
             this.andRelationalExpression1ViewModel = new Mock<IRowViewModelBase<RelationalExpression>>();
-            this.andRelationalExpression1ViewModel.SetupGet(x => x.ContainedRows).Returns(new ReactiveList<IRowViewModelBase<Thing>>());
+            this.andRelationalExpression1ViewModel.SetupGet(x => x.ContainedRows).Returns(new DisposableReactiveList<IRowViewModelBase<Thing>>());
             this.andRelationalExpression1ViewModel.SetupGet(x => x.Thing).Returns(this.andRelationalExpression1);
             this.andRelationalExpression1ViewModel.SetupGet(x => x.ContainerViewModel).Returns(this.andExpressionViewModel.Object);
 
             this.andRelationalExpression2 = new RelationalExpression();
             this.andRelationalExpression2ViewModel = new Mock<IRowViewModelBase<RelationalExpression>>();
-            this.andRelationalExpression2ViewModel.SetupGet(x => x.ContainedRows).Returns(new ReactiveList<IRowViewModelBase<Thing>>());
+            this.andRelationalExpression2ViewModel.SetupGet(x => x.ContainedRows).Returns(new DisposableReactiveList<IRowViewModelBase<Thing>>());
             this.andRelationalExpression2ViewModel.SetupGet(x => x.Thing).Returns(this.andRelationalExpression2);
             this.andRelationalExpression2ViewModel.SetupGet(x => x.ContainerViewModel).Returns(this.andExpressionViewModel.Object);
 
             this.andExpressionViewModel.SetupGet(x => x.ContainedRows).Returns(
-                new ReactiveList<IRowViewModelBase<Thing>>
+                new DisposableReactiveList<IRowViewModelBase<Thing>>
                 {
                     this.andRelationalExpression1ViewModel.Object,
                     this.andRelationalExpression2ViewModel.Object
@@ -103,18 +104,18 @@ namespace CDP4Requirements.Tests.Extensions
 
             this.orRelationalExpression1 = new RelationalExpression();
             this.orRelationalExpression1ViewModel = new Mock<IRowViewModelBase<RelationalExpression>>();
-            this.orRelationalExpression1ViewModel.SetupGet(x => x.ContainedRows).Returns(new ReactiveList<IRowViewModelBase<Thing>>());
+            this.orRelationalExpression1ViewModel.SetupGet(x => x.ContainedRows).Returns(new DisposableReactiveList<IRowViewModelBase<Thing>>());
             this.orRelationalExpression1ViewModel.SetupGet(x => x.Thing).Returns(this.orRelationalExpression1);
             this.orRelationalExpression1ViewModel.SetupGet(x => x.ContainerViewModel).Returns(this.orExpressionViewModel.Object);
 
             this.orRelationalExpression2 = new RelationalExpression();
             this.orRelationalExpression2ViewModel = new Mock<IRowViewModelBase<RelationalExpression>>();
-            this.orRelationalExpression2ViewModel.SetupGet(x => x.ContainedRows).Returns(new ReactiveList<IRowViewModelBase<Thing>>());
+            this.orRelationalExpression2ViewModel.SetupGet(x => x.ContainedRows).Returns(new DisposableReactiveList<IRowViewModelBase<Thing>>());
             this.orRelationalExpression2ViewModel.SetupGet(x => x.Thing).Returns(this.orRelationalExpression2);
             this.orRelationalExpression2ViewModel.SetupGet(x => x.ContainerViewModel).Returns(this.orExpressionViewModel.Object);
 
             this.orExpressionViewModel.SetupGet(x => x.ContainedRows).Returns(
-                new ReactiveList<IRowViewModelBase<Thing>>
+                new DisposableReactiveList<IRowViewModelBase<Thing>>
                 {
                     this.orRelationalExpression1ViewModel.Object,
                     this.orRelationalExpression2ViewModel.Object
@@ -126,7 +127,7 @@ namespace CDP4Requirements.Tests.Extensions
             this.exclusiveOrExpressionViewModel.SetupGet(x => x.Thing).Returns(this.exclusiveOrExpression);
 
             this.exclusiveOrExpressionViewModel.SetupGet(x => x.ContainedRows).Returns(
-                new ReactiveList<IRowViewModelBase<Thing>>
+                new DisposableReactiveList<IRowViewModelBase<Thing>>
                 {
                     this.orExpressionViewModel.Object,
                     this.andExpressionViewModel.Object,
@@ -138,7 +139,7 @@ namespace CDP4Requirements.Tests.Extensions
             this.notExpressionViewModel.SetupGet(x => x.Thing).Returns(this.notExpression);
 
             this.notExpressionViewModel.SetupGet(x => x.ContainedRows).Returns(
-                new ReactiveList<IRowViewModelBase<Thing>>
+                new DisposableReactiveList<IRowViewModelBase<Thing>>
                 {
                     this.exclusiveOrExpressionViewModel.Object
                 });
@@ -146,7 +147,7 @@ namespace CDP4Requirements.Tests.Extensions
             this.freeRelationalExpression = new RelationalExpression();
             this.freeRelationalExpressionViewModel = new Mock<IRowViewModelBase<RelationalExpression>>();
             this.freeRelationalExpressionViewModel.SetupGet(x => x.Thing).Returns(this.freeRelationalExpression);
-            this.freeRelationalExpressionViewModel.SetupGet(x => x.ContainedRows).Returns(new ReactiveList<IRowViewModelBase<Thing>>());
+            this.freeRelationalExpressionViewModel.SetupGet(x => x.ContainedRows).Returns(new DisposableReactiveList<IRowViewModelBase<Thing>>());
 
             this.FillRelationalExpression(this.andRelationalExpression1, "length", 180);
             this.FillRelationalExpression(this.andRelationalExpression2, "width", 40);
@@ -165,7 +166,7 @@ namespace CDP4Requirements.Tests.Extensions
             this.parametricConstraintViewModel.SetupGet(x => x.Thing).Returns(this.parametricConstraint);
 
             this.parametricConstraintViewModel.SetupGet(x => x.ContainedRows).Returns(
-                new ReactiveList<IRowViewModelBase<Thing>>
+                new DisposableReactiveList<IRowViewModelBase<Thing>>
                 {
                     this.notExpressionViewModel.Object,
                     this.freeRelationalExpressionViewModel.Object
