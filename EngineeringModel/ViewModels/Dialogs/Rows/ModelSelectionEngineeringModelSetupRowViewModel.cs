@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ModelSelectionEngineeringModelSetupRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -9,8 +9,11 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Linq;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4CommonView;
+
+    using CDP4Composition.Mvvm.Types;
+
     using CDP4Dal;
-    using ReactiveUI;
 
     /// <summary>
     /// The Row-view-model representing a <see cref="EngineeringModelSetup"/>
@@ -29,14 +32,14 @@ namespace CDP4EngineeringModel.ViewModels
         public ModelSelectionEngineeringModelSetupRowViewModel(EngineeringModelSetup engineeringModelSetup, ISession session)
             : base(engineeringModelSetup, session, null)
         {
-            this.IterationSetupRowViewModels = new ReactiveList<ModelSelectionIterationSetupRowViewModel>();
+            this.IterationSetupRowViewModels = new DisposableReactiveList<ModelSelectionIterationSetupRowViewModel>();
             this.InitializeContainers();
         }
 
         /// <summary>
         /// Gets the <see cref="IterationSetupRowViewModel"/> that are contained by the row-view-model
         /// </summary>
-        public ReactiveList<ModelSelectionIterationSetupRowViewModel> IterationSetupRowViewModels { get; private set; }
+        public DisposableReactiveList<ModelSelectionIterationSetupRowViewModel> IterationSetupRowViewModels { get; private set; }
 
         /// <summary>
         /// Initializes containers

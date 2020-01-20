@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ObjectBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ namespace CDP4ObjectBrowser
     using System.ComponentModel.Composition;
     using System.Reactive.Linq;
     using CDP4Composition;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Dal;
@@ -44,7 +45,7 @@ namespace CDP4ObjectBrowser
             this.session = session;
             this.Disposables = new List<IDisposable>();
             
-            this.Sessions = new ReactiveList<SessionRowViewModel>();
+            this.Sessions = new DisposableReactiveList<SessionRowViewModel>();
             this.AddSession();
 
             var activePerson = this.session.ActivePerson;
@@ -109,7 +110,7 @@ namespace CDP4ObjectBrowser
         /// <summary>
         /// Gets the <see cref="SessionRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<SessionRowViewModel> Sessions { get; private set; }
+        public DisposableReactiveList<SessionRowViewModel> Sessions { get; private set; }
 
         /// <summary>
         /// Gets the list of <see cref="IDisposable"/> objects that are referenced by this class

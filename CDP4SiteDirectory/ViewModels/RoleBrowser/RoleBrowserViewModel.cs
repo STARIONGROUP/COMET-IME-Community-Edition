@@ -13,6 +13,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -71,7 +72,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="FolderRowViewModel"/> that are displayed by the TreeListControl
         /// </summary>
-        public ReactiveList<FolderRowViewModel> Roles { get; private set; }
+        public DisposableReactiveList<FolderRowViewModel> Roles { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="ISession.ActivePerson"/> can create <see cref="PersonRole"/>s.
@@ -109,7 +110,7 @@ namespace CDP4SiteDirectory.ViewModels
             base.Initialize();
             this.participantRoleRow = new FolderRowViewModel("", "Participant Role", this.Session, this);
             this.personRoleRow = new FolderRowViewModel("", "Person Role", this.Session, this);
-            this.Roles = new ReactiveList<FolderRowViewModel> { this.personRoleRow, this.participantRoleRow };
+            this.Roles = new DisposableReactiveList<FolderRowViewModel> { this.personRoleRow, this.participantRoleRow };
             this.PopulateParticipantRoles();
             this.PopulatePersonRoles();
         }

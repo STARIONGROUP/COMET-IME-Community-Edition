@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ActualFiniteStateListDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -17,6 +17,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -28,7 +29,6 @@ namespace CDP4EngineeringModel.ViewModels
     [ThingDialogViewModelExport(ClassKind.ActualFiniteStateList)]
     public class ActualFiniteStateListDialogViewModel : CDP4CommonView.ActualFiniteStateListDialogViewModel, IThingDialogViewModel
     {
-        #region Fields
         /// <summary>
         /// The list that caches the used <see cref="PossibleFiniteStateListRow"/>s
         /// </summary>
@@ -48,9 +48,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="ExcludeOption"/>s
         /// </summary>
         private ReactiveList<Option> includeOption;
-        #endregion
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ActualFiniteStateListDialogViewModel"/> class.
         /// </summary>
@@ -95,9 +93,7 @@ namespace CDP4EngineeringModel.ViewModels
                 .Subscribe(
                     _ => this.ExcludeOption = new ReactiveList<Option>(this.PossibleExcludeOption.Except(this.IncludeOption)));
         }
-        #endregion
 
-        #region properties
         /// <summary>
         /// Gets or sets a value indicating whether it is possible to add a <see cref="PossibleFiniteStateListRow"/>
         /// </summary>
@@ -119,7 +115,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the rows that represents the <see cref="PossibleFiniteStateListRow"/>
         /// </summary>
-        public ReactiveList<Dialogs.PossibleFiniteStateListRowViewModel> PossibleFiniteStateListRow { get; private set; }
+        public DisposableReactiveList<Dialogs.PossibleFiniteStateListRowViewModel> PossibleFiniteStateListRow { get; private set; }
 
         /// <summary>
         /// Gets or sets the list of selected <see cref="Option"/>s
@@ -149,7 +145,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to move down a <see cref="PossibleFiniteStateListRow"/>
         /// </summary>
         public ReactiveCommand<object> MoveDownPossibleFiniteStateListCommand { get; private set; } 
-        #endregion
 
         /// <summary>
         /// Refresh the <see cref="PossibleFiniteStateListRow"/> rows
@@ -178,15 +173,13 @@ namespace CDP4EngineeringModel.ViewModels
             this.PossibleFiniteStateList = new ReactiveList<PossibleFiniteStateList>(this.PossibleFiniteStateListRow.Select(x => x.PossibleFiniteStateList));
         }
 
-        #region DialogBase Methods
-
         /// <summary>
         /// Initializes this dialog view-model
         /// </summary>
         protected override void Initialize()
         {
             base.Initialize();
-            this.PossibleFiniteStateListRow = new ReactiveList<Dialogs.PossibleFiniteStateListRowViewModel>();
+            this.PossibleFiniteStateListRow = new DisposableReactiveList<Dialogs.PossibleFiniteStateListRowViewModel>();
             this.usedPossibleStateList.ChangeTrackingEnabled = true;
         }
 
@@ -212,7 +205,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.RemovePossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteCommand);
             this.RemovePossibleFiniteStateListCommand.Subscribe(_ =>
             {
-                this.PossibleFiniteStateListRow.Remove(this.SelectedPossibleFiniteStateList);
+                this.PossibleFiniteStateListRow.RemoveAndDispose(this.SelectedPossibleFiniteStateList);
                 this.RefreshPossibleFiniteStateListRows();
             });
 
@@ -312,7 +305,6 @@ namespace CDP4EngineeringModel.ViewModels
             base.UpdateOkCanExecute();
             this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null && this.PossibleFiniteStateListRow.Count > 0;
         }
-        #endregion
 
         /// <summary>
         /// Populate the <see cref="PossibleFiniteStateListRow"/> when the dialog is first created

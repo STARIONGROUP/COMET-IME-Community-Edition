@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsContainerParameterValueDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -15,8 +15,8 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    using CDP4CommonView;
     using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -92,7 +92,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the <see cref="Dialogs.SimpleParameterValueRowViewModel"/>
         /// </summary>
-        public ReactiveList<Dialogs.RequirementsContainerParameterValueRowViewModel> Values { get; private set; }
+        public DisposableReactiveList<Dialogs.RequirementsContainerParameterValueRowViewModel> Values { get; private set; }
 
         /// <summary>
         /// Initializes the dialogs
@@ -100,7 +100,7 @@ namespace CDP4Requirements.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.Values = new ReactiveList<Dialogs.RequirementsContainerParameterValueRowViewModel>();
+            this.Values = new DisposableReactiveList<Dialogs.RequirementsContainerParameterValueRowViewModel>();
         }
 
         /// <summary>

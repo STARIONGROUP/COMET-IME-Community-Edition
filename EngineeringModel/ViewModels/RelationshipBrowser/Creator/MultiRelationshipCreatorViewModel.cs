@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MultiRelationshipCreatorViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,6 +17,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Mvvm.Types;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -61,7 +63,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.iteration = iteration;
             this.PossibleCategories = new ReactiveList<Category>();
-            this.RelatedThings = new ReactiveList<RelatedThingRowViewModel>();
+            this.RelatedThings = new DisposableReactiveList<RelatedThingRowViewModel>();
             this.RelatedThings.ChangeTrackingEnabled = true;
             this.PossibleCategories = new ReactiveList<Category>();
 
@@ -106,7 +108,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the rows that represents the <see cref="MultiRelationship.RelatedThing"/>
         /// </summary>
-        public ReactiveList<RelatedThingRowViewModel> RelatedThings { get; private set; }
+        public DisposableReactiveList<RelatedThingRowViewModel> RelatedThings { get; private set; }
 
         /// <summary>
         /// Gets the type of the <see cref="Relationship"/> to create
@@ -121,7 +123,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public void ReInitializeControl()
         {
-            this.RelatedThings.Clear();
+            this.RelatedThings.ClearAndDispose();
         }
 
         /// <summary>
@@ -225,17 +227,13 @@ namespace CDP4EngineeringModel.ViewModels
             this.PossibleCategories.AddRange(this.requiredRdl.AggregatedReferenceDataLibrary.SelectMany(x => x.DefinedCategory).Where(x => x.PermissibleClass.Contains(ClassKind.MultiRelationship)).OrderBy(x => x.Name));
         }
 
-
         /// <summary>
         /// Removes the <paramref name="relatedThingRow"/> from the <see cref="RelatedThings"/> property
         /// </summary>
         /// <param name="relatedThingRow">The <see cref="RelatedThingRowViewModel"/> to remove</param>
         private void RemoveRelatedThing(RelatedThingRowViewModel relatedThingRow)
         {
-            if (this.RelatedThings.Remove(relatedThingRow))
-            {
-                relatedThingRow.Dispose();
-            }
+            this.RelatedThings.RemoveAndDispose(relatedThingRow);
         }
     }
 }

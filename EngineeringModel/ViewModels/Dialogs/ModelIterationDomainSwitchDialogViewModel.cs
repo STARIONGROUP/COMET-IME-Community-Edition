@@ -1,6 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // <copyright file="ModelIterationDomainSwitchDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -15,9 +15,9 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
     using CDP4CommonView;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using ReactiveUI;
@@ -35,7 +35,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         public ModelIterationDomainSwitchDialogViewModel(IEnumerable<ISession> sessionAvailable)
         {
-            this.SessionsAvailable = new ReactiveList<ModelSelectionSessionRowViewModel>();
+            this.SessionsAvailable = new DisposableReactiveList<ModelSelectionSessionRowViewModel>();
             this.InitializeReactiveCommands();
 
             this.PopulateSessionsRowViewModel(sessionAvailable);
@@ -49,7 +49,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the list of <see cref="BaseRowViewModel"/> available
         /// </summary>
-        public ReactiveList<ModelSelectionSessionRowViewModel> SessionsAvailable { get; private set; }
+        public DisposableReactiveList<ModelSelectionSessionRowViewModel> SessionsAvailable { get; private set; }
 
         /// <summary>
         /// Gets the list of <see cref="IterationSetup"/> selected
@@ -152,13 +152,12 @@ namespace CDP4EngineeringModel.ViewModels
 
                     foreach (var modelSelectionIterationSetupRowViewModel in rowToRemove)
                     {
-                        modelSelectionIterationSetupRowViewModel.Dispose();
-                        model.IterationSetupRowViewModels.Remove(modelSelectionIterationSetupRowViewModel);
+                        model.IterationSetupRowViewModels.RemoveAndDispose(modelSelectionIterationSetupRowViewModel);
                     }
                 }
 
                 // remove model rows that don't have any open iteration
-                availableSession.EngineeringModelSetupRowViewModels.RemoveAll(availableSession.EngineeringModelSetupRowViewModels.ToList().Where(x => !x.IterationSetupRowViewModels.Any()));
+                availableSession.EngineeringModelSetupRowViewModels.RemoveAllAndDispose(availableSession.EngineeringModelSetupRowViewModels.ToList().Where(x => !x.IterationSetupRowViewModels.Any()));
             }
         }
 

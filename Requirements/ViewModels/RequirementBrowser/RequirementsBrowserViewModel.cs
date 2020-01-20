@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -20,6 +20,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -130,7 +131,7 @@ namespace CDP4Requirements.ViewModels
             this.ToolTip =
                 $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
-            this.ReqSpecificationRows = new ReactiveList<RequirementsSpecificationRowViewModel>();
+            this.ReqSpecificationRows = new DisposableReactiveList<RequirementsSpecificationRowViewModel>();
             var model = (EngineeringModel) this.Thing.Container;
             this.ActiveParticipant = model.GetActiveParticipant(this.Session.ActivePerson);
 
@@ -176,7 +177,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the <see cref="RequirementsSpecificationRowViewModel"/> rows
         /// </summary>
-        public ReactiveList<RequirementsSpecificationRowViewModel> ReqSpecificationRows { get; private set; }
+        public DisposableReactiveList<RequirementsSpecificationRowViewModel> ReqSpecificationRows { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="BinaryRelationship"/>
@@ -384,8 +385,7 @@ namespace CDP4Requirements.ViewModels
 
             if (row != null)
             {
-                this.ReqSpecificationRows.Remove(row);
-                row.Dispose();
+                this.ReqSpecificationRows.RemoveAndDispose(row);
             }
         }
 
@@ -402,7 +402,7 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            this.ReqSpecificationRows.Remove(row);
+            this.ReqSpecificationRows.RemoveWithoutDispose(row);
             this.ReqSpecificationRows.SortedInsert(row, SpecComparer);
         }
 

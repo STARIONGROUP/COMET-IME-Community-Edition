@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypesBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
 //
@@ -36,6 +36,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -80,8 +81,8 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Backing field for the <see cref="ParameterTypes"/> property
         /// </summary>
-        private readonly ReactiveList<ParameterTypeRowViewModel> parameterTypes =
-            new ReactiveList<ParameterTypeRowViewModel>();
+        private readonly DisposableReactiveList<ParameterTypeRowViewModel> parameterTypes =
+            new DisposableReactiveList<ParameterTypeRowViewModel>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypesBrowserViewModel"/> class.
@@ -118,7 +119,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ParameterTypeRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<ParameterTypeRowViewModel> ParameterTypes
+        public DisposableReactiveList<ParameterTypeRowViewModel> ParameterTypes
         {
             get { return this.parameterTypes; }
         }
@@ -425,8 +426,7 @@ namespace BasicRdl.ViewModels
             var row = this.ParameterTypes.SingleOrDefault(rowViewModel => rowViewModel.Thing == parameterType);
             if (row != null)
             {
-                this.ParameterTypes.Remove(row);
-                row.Dispose();
+                this.ParameterTypes.RemoveAndDispose(row);
             }
         }
 

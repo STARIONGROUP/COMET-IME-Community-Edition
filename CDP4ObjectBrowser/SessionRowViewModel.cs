@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SessionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,8 @@ namespace CDP4ObjectBrowser
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using ReactiveUI;
@@ -58,7 +60,7 @@ namespace CDP4ObjectBrowser
             this.SiteDirectoryRowViewModel = new SiteDirectoryRowViewModel(siteDirectory, this.Session, this);
             this.ContainedRows.Add(this.SiteDirectoryRowViewModel);
 
-            this.EngineeringModelRowViewModels = new ReactiveList<EngineeringModelRowViewModel>();
+            this.EngineeringModelRowViewModels = new DisposableReactiveList<EngineeringModelRowViewModel>();
 
             this.Uri = session.DataSourceUri;
         }
@@ -93,7 +95,7 @@ namespace CDP4ObjectBrowser
         /// <summary>
         /// Gets the <see cref="EngineeringModelRowViewModel"/>s that are contained by the current row-view-model
         /// </summary>
-        public ReactiveList<EngineeringModelRowViewModel> EngineeringModelRowViewModels { get; private set; }
+        public DisposableReactiveList<EngineeringModelRowViewModel> EngineeringModelRowViewModels { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="SiteDirectoryRowViewModel"/> that is contained by the current row-view-model
@@ -124,7 +126,7 @@ namespace CDP4ObjectBrowser
             var row = this.EngineeringModelRowViewModels.SingleOrDefault(x => x.Thing == engineeringModel);
             if (row != null)
             {
-                this.EngineeringModelRowViewModels.Remove(row);
+                this.EngineeringModelRowViewModels.RemoveWithoutDispose(row);
                 this.ContainedRows.RemoveAndDispose(row);
             }
         }

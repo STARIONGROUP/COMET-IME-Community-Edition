@@ -1,6 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // <copyright file="ModelOpeningDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,11 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4CommonView;
+
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using NLog;
@@ -28,16 +32,11 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ModelOpeningDialogViewModel : DialogViewModelBase
     {
-        #region Fields
-
         /// <summary>
         /// The logger for the current class
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelOpeningDialogViewModel"/> class. 
         /// </summary>
@@ -46,7 +45,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         public ModelOpeningDialogViewModel(IEnumerable<ISession> sessionAvailable)
         {
-            this.SessionsAvailable = new ReactiveList<ModelSelectionSessionRowViewModel>();
+            this.SessionsAvailable = new DisposableReactiveList<ModelSelectionSessionRowViewModel>();
             this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>>();
             this.SelectedIterations.ChangeTrackingEnabled = true;
             this.IsBusy = false;
@@ -67,9 +66,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.PopulateSessionsRowViewModel(sessionAvailable);
         }
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Gets the dialog box title
         /// </summary>
@@ -81,7 +78,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the list of <see cref="BaseRowViewModel"/> available
         /// </summary>
-        public ReactiveList<ModelSelectionSessionRowViewModel> SessionsAvailable { get; private set; }
+        public DisposableReactiveList<ModelSelectionSessionRowViewModel> SessionsAvailable { get; private set; }
 
         /// <summary>
         /// Gets the list of <see cref="IterationSetup"/> selected
@@ -97,7 +94,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the Cancel <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> CancelCommand { get; private set; }
-        #endregion
 
         /// <summary>
         /// Executes the Select command

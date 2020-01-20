@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -18,12 +18,16 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using CDP4EngineeringModel.Views;
+
     using Microsoft.Practices.ServiceLocation;
     using NLog;
     using ReactiveUI;
@@ -184,7 +188,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the rows representing the <see cref="RuleVerificationList"/> that are contained by the <see cref="Iteration"/>
         /// that is represented by the current view-model.
         /// </summary>
-        public ReactiveList<RuleVerificationListRowViewModel> RuleVerificationListRowViewModels { get; private set; }
+        public DisposableReactiveList<RuleVerificationListRowViewModel> RuleVerificationListRowViewModels { get; private set; }
 
         /// <summary>
         /// Initializes the browser
@@ -192,7 +196,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.RuleVerificationListRowViewModels = new ReactiveList<RuleVerificationListRowViewModel>();
+            this.RuleVerificationListRowViewModels = new DisposableReactiveList<RuleVerificationListRowViewModel>();
         }
 
         /// <summary>
@@ -309,7 +313,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = this.RuleVerificationListRowViewModels.SingleOrDefault(x => x.Thing == ruleVerificationList);
                 if (row != null)
                 {
-                    this.RuleVerificationListRowViewModels.Remove(row);
+                    this.RuleVerificationListRowViewModels.RemoveAndDispose(row);
                 }
             }
 

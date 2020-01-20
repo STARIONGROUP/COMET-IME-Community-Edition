@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GlossaryBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,6 +15,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -77,7 +78,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="GlossaryRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<GlossaryRowViewModel> Glossaries { get; private set; }
+        public DisposableReactiveList<GlossaryRowViewModel> Glossaries { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether a <see cref="Term"/> can be created
@@ -164,8 +165,7 @@ namespace BasicRdl.ViewModels
             var row = this.Glossaries.SingleOrDefault(x => x.Thing == glossary);
             if (row != null)
             {
-                this.Glossaries.Remove(row);
-                row.Dispose();
+                this.Glossaries.RemoveAndDispose(row);
             }
         }
 
@@ -197,7 +197,7 @@ namespace BasicRdl.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.Glossaries = new ReactiveList<GlossaryRowViewModel>();
+            this.Glossaries = new DisposableReactiveList<GlossaryRowViewModel>();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()

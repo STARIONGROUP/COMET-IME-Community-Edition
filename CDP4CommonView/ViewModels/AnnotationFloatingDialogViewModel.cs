@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="AnnotationFloatingDialogViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015 RHEA S.A.
+//   Copyright (c) 2015-2020 RHEA S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -19,6 +19,7 @@ namespace CDP4CommonView.ViewModels
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -31,7 +32,6 @@ namespace CDP4CommonView.ViewModels
     /// </summary>
     public class AnnotationFloatingDialogViewModel : FloatingDialogViewModelBase<ModellingAnnotationItem>
     {
-        #region Private Fields
         /// <summary>
         /// Backing field for <see cref="Title"/>
         /// </summary>
@@ -67,9 +67,6 @@ namespace CDP4CommonView.ViewModels
         /// </summary>
         private string content;
 
-        #endregion
-
-        #region Constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="AnnotationFloatingDialogViewModel"/> class
         /// </summary>
@@ -78,10 +75,9 @@ namespace CDP4CommonView.ViewModels
         public AnnotationFloatingDialogViewModel(ModellingAnnotationItem annotation, ISession session)
             : base(annotation, session)
         {
-            this.DiscussionRows = new ReactiveList<DiscussionItemViewModel>();
+            this.DiscussionRows = new DisposableReactiveList<DiscussionItemViewModel>();
 
-            var model = annotation.Container as EngineeringModel;
-            if (model == null)
+            if (!(annotation.Container is EngineeringModel model))
             {
                 throw new InvalidOperationException("This floating dialog shall only be used for modelling item annotations.");
             }
@@ -90,13 +86,11 @@ namespace CDP4CommonView.ViewModels
             this.currentParticipant = model.GetActiveParticipant(this.Session.ActivePerson);
             this.UpdateProperties();
         }
-        #endregion
 
-        #region Public Properties
         /// <summary>
         /// Gets the list of <see cref="DiscussionItemViewModel"/>
         /// </summary>
-        public ReactiveList<DiscussionItemViewModel> DiscussionRows { get; private set; }
+        public DisposableReactiveList<DiscussionItemViewModel> DiscussionRows { get; private set; }
 
         /// <summary>
         /// Gets the title
@@ -156,7 +150,6 @@ namespace CDP4CommonView.ViewModels
         /// Gets the <see cref="ICommand"/> to post a <see cref="DiscussionItem"/>
         /// </summary>
         public ReactiveCommand<Unit> PostDiscussionItemCommand { get; private set; }
-        #endregion
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
@@ -243,8 +236,7 @@ namespace CDP4CommonView.ViewModels
             var vm = this.DiscussionRows.SingleOrDefault(x => x.Thing == discussionItem);
             if (vm != null)
             {
-                this.DiscussionRows.Remove(vm);
-                vm.Dispose();
+                this.DiscussionRows.RemoveAndDispose(vm);
             }
         }
 

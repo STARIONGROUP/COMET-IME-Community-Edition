@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -23,6 +23,8 @@ namespace CDP4Requirements.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using CDP4CommonView.ViewModels;
+
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Utilities;
 
     /// <summary>
@@ -115,12 +117,12 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets or sets the list of <see cref="SimpleParameterValue"/>
         /// </summary>
-        public ReactiveList<SimpleParameterValueRowViewModel> SimpleParameterValue { get; set; }
+        public DisposableReactiveList<SimpleParameterValueRowViewModel> SimpleParameterValue { get; set; }
 
         /// <summary>
         /// Gets or sets the list of <see cref="ParametricConstraint"/>
         /// </summary>
-        public ReactiveList<IRowViewModelBase<BooleanExpression>> ParametricConstraintExpression { get; protected set; }
+        public DisposableReactiveList<IRowViewModelBase<BooleanExpression>> ParametricConstraintExpression { get; protected set; }
 
         /// <summary>
         /// Gets or sets the <see cref="LanguageCodeUsage"/>
@@ -202,8 +204,8 @@ namespace CDP4Requirements.ViewModels
             var iteration = (Iteration)this.Container.Container ?? this.ChainOfContainer.OfType<Iteration>().Single();
             var model = (EngineeringModel)iteration.Container;
             this.mRdl = model.EngineeringModelSetup.RequiredRdl.Single();
-            this.SimpleParameterValue = new ReactiveList<SimpleParameterValueRowViewModel>();
-            this.ParametricConstraintExpression = new ReactiveList<IRowViewModelBase<BooleanExpression>>();
+            this.SimpleParameterValue = new DisposableReactiveList<SimpleParameterValueRowViewModel>();
+            this.ParametricConstraintExpression = new DisposableReactiveList<IRowViewModelBase<BooleanExpression>>();
             this.PossibleLanguageCode = new ReactiveList<LanguageCodeUsage>();
             this.PopulateSimpleParameterValues();
             this.PopulateParametricConstraint();
@@ -318,7 +320,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         protected void PopulateSimpleParameterValues()
         {
-            this.SimpleParameterValue.Clear();
+            this.SimpleParameterValue.ClearAndDispose();
             foreach (var thing in this.Thing.ParameterValue.Where(t => t.ChangeKind != ChangeKind.Delete))
             {
                 var row = new SimpleParameterValueRowViewModel(thing, this.Session, this);

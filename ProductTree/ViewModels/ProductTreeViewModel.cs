@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -19,6 +19,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -108,7 +109,7 @@ namespace CDP4ProductTree.ViewModels
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
 
-            this.TopElement = new ReactiveList<ElementDefinitionRowViewModel>();
+            this.TopElement = new DisposableReactiveList<ElementDefinitionRowViewModel>();
             var model = (EngineeringModel)this.Thing.TopContainer;
             this.modelSetup = model.EngineeringModelSetup;
 
@@ -238,7 +239,7 @@ namespace CDP4ProductTree.ViewModels
         /// <remarks>
         /// This has to be a list in order to display the tree
         /// </remarks>
-        public ReactiveList<ElementDefinitionRowViewModel> TopElement { get; private set; }
+        public DisposableReactiveList<ElementDefinitionRowViewModel> TopElement { get; private set; }
 
         /// <summary>
         /// Updates the current drag state.
@@ -335,7 +336,7 @@ namespace CDP4ProductTree.ViewModels
         protected override void UpdateDomain(DomainChangedEvent domainChangeEvent)
         {
             base.UpdateDomain(domainChangeEvent);
-            this.TopElement.Clear();
+            this.TopElement.ClearAndDispose();
             this.SetTopElement(this.Thing.Container as Iteration);
         }
 
@@ -474,23 +475,21 @@ namespace CDP4ProductTree.ViewModels
         {
             if (iteration == null)
             {
-                throw new ArgumentNullException("iteration");
+                throw new ArgumentNullException(nameof(iteration));
             }
 
             var existingTopElement = this.TopElement.SingleOrDefault();
             var topElement = iteration.TopElement;
 
-            if (topElement == null && existingTopElement != null)
+            if ((topElement == null) && (existingTopElement != null))
             {
-                existingTopElement.Dispose();
-                this.TopElement.Clear();
+                this.TopElement.ClearAndDispose();
             }
-            else if (topElement != null && (existingTopElement == null || existingTopElement.Thing != topElement))
+            else if ((topElement != null) && ((existingTopElement == null) || (existingTopElement.Thing != topElement)))
             {
                 if (existingTopElement != null)
                 {
-                    existingTopElement.Dispose();
-                    this.TopElement.Clear();
+                    this.TopElement.ClearAndDispose();
                 }
 
                 var row = new ElementDefinitionRowViewModel(iteration.TopElement, this.Thing, this.Session, this);

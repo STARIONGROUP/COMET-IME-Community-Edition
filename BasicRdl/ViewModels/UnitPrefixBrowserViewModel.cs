@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="UnitPrefixBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@ namespace BasicRdl.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -60,7 +61,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="UnitPrefixRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<UnitPrefixRowViewModel> UnitPrefixes { get; private set; }
+        public DisposableReactiveList<UnitPrefixRowViewModel> UnitPrefixes { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether a RDL element may be created
@@ -107,7 +108,7 @@ namespace BasicRdl.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.UnitPrefixes = new ReactiveList<UnitPrefixRowViewModel>();
+            this.UnitPrefixes = new DisposableReactiveList<UnitPrefixRowViewModel>();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(x => x.Iid);
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
@@ -194,8 +195,7 @@ namespace BasicRdl.ViewModels
             var row = this.UnitPrefixes.SingleOrDefault(rowViewModel => rowViewModel.Thing == unitPrefix);
             if (row != null)
             {
-                this.UnitPrefixes.Remove(row);
-                row.Dispose();
+                this.UnitPrefixes.RemoveAndDispose(row);
             }
         }
 

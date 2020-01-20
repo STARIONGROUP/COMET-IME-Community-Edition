@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="TeamCompositionBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -12,6 +12,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -33,7 +34,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Backing field for the <see cref="Participants"/> property.
         /// </summary>
-        private readonly ReactiveList<TeamCompositionCardViewModel> participants = new ReactiveList<TeamCompositionCardViewModel>();
+        private readonly DisposableReactiveList<TeamCompositionCardViewModel> participants = new DisposableReactiveList<TeamCompositionCardViewModel>();
 
         /// <summary>
         /// Backing field for <see cref="CanCreateParticipant"/>
@@ -89,7 +90,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="TeamCompositionCardViewModel"/>s that represent the <see cref="Participant"/>s that are contained by the <see cref="EngineeringModelSetup"/>.
         /// </summary>
-        public ReactiveList<TeamCompositionCardViewModel> Participants
+        public DisposableReactiveList<TeamCompositionCardViewModel> Participants
         {
             get
             {
@@ -209,7 +210,7 @@ namespace CDP4SiteDirectory.ViewModels
             var rowViewModel = this.participants.SingleOrDefault(x => x.Thing == participant);
             if (rowViewModel != null)
             {
-                this.participants.Remove(rowViewModel);
+                this.participants.RemoveAndDispose(rowViewModel);
             }
         }
 

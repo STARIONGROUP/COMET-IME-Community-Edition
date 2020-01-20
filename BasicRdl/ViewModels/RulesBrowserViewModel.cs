@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RulesBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@ namespace BasicRdl.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -33,7 +34,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Backing field for the <see cref="Rules"/> property.
         /// </summary>
-        private readonly ReactiveList<RuleRowViewModel> rules = new ReactiveList<RuleRowViewModel>();
+        private readonly DisposableReactiveList<RuleRowViewModel> rules = new DisposableReactiveList<RuleRowViewModel>();
 
         /// <summary>
         /// Backing field for <see cref="CanCreateRdlElement"/>
@@ -65,7 +66,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="RuleRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public ReactiveList<RuleRowViewModel> Rules
+        public DisposableReactiveList<RuleRowViewModel> Rules
         {
             get
             {
@@ -160,8 +161,7 @@ namespace BasicRdl.ViewModels
             var row = this.Rules.SingleOrDefault(rowViewModel => rowViewModel.Thing == rule);
             if (row != null)
             {
-                this.Rules.Remove(row);
-                row.Dispose();
+                this.Rules.RemoveAndDispose(row);
             }
         }
 

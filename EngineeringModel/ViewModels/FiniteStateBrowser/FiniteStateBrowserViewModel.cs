@@ -25,6 +25,11 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Events;
     using ReactiveUI;
     using System.Threading.Tasks;
+    using System.Windows.Controls;
+
+    using CDP4Composition.Mvvm.Types;
+
+    using CDP4EngineeringModel.Views;
 
     /// <summary>
     /// The view-model for the <see cref="FiniteStateBrowser"/> view
@@ -138,7 +143,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the rows containing the finite state lists
         /// </summary>
-        public ReactiveList<CDP4Composition.FolderRowViewModel> FiniteStateList { get; private set; }
+        public DisposableReactiveList<CDP4Composition.FolderRowViewModel> FiniteStateList { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="CreatePossibleFiniteStateListCommand"/> can be executed
@@ -202,7 +207,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.FiniteStateList = new ReactiveList<CDP4Composition.FolderRowViewModel>();
+            this.FiniteStateList = new DisposableReactiveList<CDP4Composition.FolderRowViewModel>();
             this.possibleFiniteStateListFolder = new CDP4Composition.FolderRowViewModel("Possible List", "Possible Finite State List", this.Session, this);
             this.actualFiniteStateListFolder = new CDP4Composition.FolderRowViewModel("Actual List", "Actual Finite State List", this.Session, this);
             this.FiniteStateList.Add(this.possibleFiniteStateListFolder);

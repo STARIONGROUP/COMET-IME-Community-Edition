@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsSpecificationEditorViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -10,13 +10,12 @@ namespace CDP4Requirements.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -85,7 +84,7 @@ namespace CDP4Requirements.ViewModels
             var iteration = (Iteration)thing.Container;
             this.iterationSetup = iteration.IterationSetup;
             
-            this.ContainedRows = new ReactiveList<IRowViewModelBase<Thing>>();
+            this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
 
             this.AddRequirementsSpecificationRow(thing);
             this.UpdateRequirementGroupRows();
@@ -125,7 +124,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets or sets the Contained <see cref="IRowViewModelBase{T}"/>
         /// </summary>
-        public ReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
+        public DisposableReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
         
         /// <summary>
         /// Add the necessary subscriptions for this view model.
@@ -296,8 +295,7 @@ namespace CDP4Requirements.ViewModels
             var row = this.ContainedRows.SingleOrDefault(x => x.Thing == requirementsGroup);
             if (row != null)
             {
-                this.ContainedRows.Remove(row);
-                row.Dispose();
+                this.ContainedRows.RemoveAndDispose(row);
             }
         }
 
@@ -324,8 +322,7 @@ namespace CDP4Requirements.ViewModels
             var row = this.ContainedRows.SingleOrDefault(x => x.Thing == requirement);
             if (row != null)
             {
-                this.ContainedRows.Remove(row);
-                row.Dispose();
+                this.ContainedRows.RemoveAndDispose(row);
             }
         }
     }

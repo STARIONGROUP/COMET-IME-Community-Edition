@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelSelectionSessionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,8 +10,10 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Common.SiteDirectoryData;
     using CDP4CommonView;
+
+    using CDP4Composition.Mvvm.Types;
+
     using CDP4Dal;
-    using ReactiveUI;
 
     /// <summary>
     /// The purpose of the <see cref="SessionRowViewModel"/> is to represent a <see cref="Session"/> and its <see cref="SiteDirectory"/>
@@ -30,7 +32,7 @@ namespace CDP4EngineeringModel.ViewModels
         public ModelSelectionSessionRowViewModel(SiteDirectory siteDirectory, ISession session)
             : base(siteDirectory, session, null)
         {
-            this.EngineeringModelSetupRowViewModels = new ReactiveList<ModelSelectionEngineeringModelSetupRowViewModel>();
+            this.EngineeringModelSetupRowViewModels = new DisposableReactiveList<ModelSelectionEngineeringModelSetupRowViewModel>();
             foreach (var model in this.Thing.Model.OrderBy(m => m.Name))
             {
                 var isParticipant = model.Participant.Any(x => x.Person == this.Session.ActivePerson);
@@ -46,7 +48,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="EngineeringModelSetupRowViewModel"/> that are contained by the row-view-model
         /// </summary>
-        public ReactiveList<ModelSelectionEngineeringModelSetupRowViewModel> EngineeringModelSetupRowViewModels { get; private set; }
+        public DisposableReactiveList<ModelSelectionEngineeringModelSetupRowViewModel> EngineeringModelSetupRowViewModels { get; private set; }
         
         /// <summary>
         /// Add a <see cref="EngineeringModelSetupRowViewModel"/> to the list of <see cref="EngineeringModelSetup"/>s

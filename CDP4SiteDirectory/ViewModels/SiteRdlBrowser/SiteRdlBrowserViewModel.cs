@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="SiteRdlBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -12,6 +12,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -60,14 +61,14 @@ namespace CDP4SiteDirectory.ViewModels
             this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
                 this.Session.ActivePerson.Name);
 
-            this.SiteRdls = new ReactiveList<SiteRdlRowViewModel>();
+            this.SiteRdls = new DisposableReactiveList<SiteRdlRowViewModel>();
             this.ComputeSiteRdlRows();
         }
 
         /// <summary>
         /// Gets the List of <see cref="SiteRdlRowViewModel"/>
         /// </summary>
-        public ReactiveList<SiteRdlRowViewModel> SiteRdls { get; private set; }
+        public DisposableReactiveList<SiteRdlRowViewModel> SiteRdls { get; private set; }
 
         /// <summary>
         /// Gest a value indicating whether the create command is enabled
@@ -176,8 +177,7 @@ namespace CDP4SiteDirectory.ViewModels
             var row = this.SiteRdls.SingleOrDefault(x => x.Thing == siteRdl);
             if (row != null)
             {
-                this.SiteRdls.Remove(row);
-                row.Dispose();
+                this.SiteRdls.RemoveAndDispose(row);
             }
         }
     }

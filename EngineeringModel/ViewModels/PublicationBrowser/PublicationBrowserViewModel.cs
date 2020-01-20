@@ -17,6 +17,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -117,12 +118,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the rows representing <see cref="Publication"/>s
         /// </summary>
-        public ReactiveList<PublicationRowViewModel> Publications { get; private set; }
+        public DisposableReactiveList<PublicationRowViewModel> Publications { get; private set; }
         
         /// <summary>
         /// Gets the rows representing <see cref="DomainOfExpertise"/>s
         /// </summary>
-        public ReactiveList<PublicationDomainOfExpertiseRowViewModel> Domains { get; private set; }
+        public DisposableReactiveList<PublicationDomainOfExpertiseRowViewModel> Domains { get; private set; }
 
         /// <summary>
         /// Gets all parameter rows.
@@ -141,8 +142,8 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.Publications = new ReactiveList<PublicationRowViewModel>();
-            this.Domains = new ReactiveList<PublicationDomainOfExpertiseRowViewModel>();
+            this.Publications = new DisposableReactiveList<PublicationRowViewModel>();
+            this.Domains = new DisposableReactiveList<PublicationDomainOfExpertiseRowViewModel>();
         }
 
         /// <summary>
@@ -480,8 +481,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = this.Publications.SingleOrDefault(x => x.Thing == publication);
                 if (row != null)
                 {
-                    this.Publications.Remove(row);
-                    row.Dispose();
+                    this.Publications.RemoveAndDispose(row);
                 }
             }
 
@@ -506,8 +506,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = this.Domains.SingleOrDefault(x => x.Thing == domain);
                 if (row != null)
                 {
-                    this.Domains.Remove(row);
-                    row.Dispose();
+                    this.Domains.RemoveAndDispose(row);
                 }
             }
 
@@ -568,8 +567,7 @@ namespace CDP4EngineeringModel.ViewModels
             
             if (domainRow != null )
             {
-                domainRow.Dispose();
-                this.Domains.Remove(domainRow);
+                this.Domains.RemoveAndDispose(domainRow);
             }
         }
 

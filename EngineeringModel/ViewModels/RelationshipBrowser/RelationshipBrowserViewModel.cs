@@ -14,6 +14,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -81,7 +82,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the folder rows representing relationship types
         /// </summary>
-        public ReactiveList<CDP4Composition.FolderRowViewModel> RelationshipTypes { get; private set; }
+        public DisposableReactiveList<CDP4Composition.FolderRowViewModel> RelationshipTypes { get; private set; }
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -246,7 +247,7 @@ namespace CDP4EngineeringModel.ViewModels
                                         : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
             }
 
-            this.RelationshipTypes = new ReactiveList<CDP4Composition.FolderRowViewModel>();
+            this.RelationshipTypes = new DisposableReactiveList<CDP4Composition.FolderRowViewModel>();
             this.binaryRelationshipsFolder = new CDP4Composition.FolderRowViewModel("Binary Relationships", "Binary Relationships", this.Session, this);
             this.multiRelationshipsFolder = new CDP4Composition.FolderRowViewModel("Multi Relationships", "Multi Relationships", this.Session, this);
             this.RelationshipTypes.Add(this.binaryRelationshipsFolder);

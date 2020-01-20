@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FileTypeBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -73,7 +74,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="FileTypes"/> rows that are contained by this view-model
         /// </summary>
-        public ReactiveList<FileTypeRowViewModel> FileTypes { get; private set; }
+        public DisposableReactiveList<FileTypeRowViewModel> FileTypes { get; private set; }
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.
@@ -136,8 +137,7 @@ namespace BasicRdl.ViewModels
             var row = this.FileTypes.SingleOrDefault(rowViewModel => rowViewModel.Thing == filetype);
             if (row != null)
             {
-                this.FileTypes.Remove(row);
-                row.Dispose();
+                this.FileTypes.RemoveAndDispose(row);
             }
         }
 
@@ -169,7 +169,7 @@ namespace BasicRdl.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.FileTypes = new ReactiveList<FileTypeRowViewModel>();
+            this.FileTypes = new DisposableReactiveList<FileTypeRowViewModel>();
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
                 .Where(x => openDataLibrariesIids.Contains(x.Iid)))

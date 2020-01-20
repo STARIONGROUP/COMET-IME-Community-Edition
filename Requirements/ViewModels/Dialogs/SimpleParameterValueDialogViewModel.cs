@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="SimpleParameterValueDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
@@ -90,7 +91,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the <see cref="Dialogs.SimpleParameterValueRowViewModel"/>
         /// </summary>
-        public ReactiveList<Dialogs.SimpleParameterValueRowViewModel> Values { get; private set; }
+        public DisposableReactiveList<Dialogs.SimpleParameterValueRowViewModel> Values { get; private set; }
 
         /// <summary>
         /// Initializes the dialogs
@@ -98,7 +99,7 @@ namespace CDP4Requirements.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.Values = new ReactiveList<Dialogs.SimpleParameterValueRowViewModel>();
+            this.Values = new DisposableReactiveList<Dialogs.SimpleParameterValueRowViewModel>();
         }
 
         /// <summary>
@@ -179,7 +180,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void PopulateValues()
         {
-            this.Values.Clear();
+            this.Values.ClearAndDispose();
             var cptPt = this.SelectedParameterType as CompoundParameterType;
             if (this.SelectedParameterType == null)
             {
