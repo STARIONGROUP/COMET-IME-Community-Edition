@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,6 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
@@ -318,7 +317,7 @@ namespace CDP4ProductTree.ViewModels
             this.Name = this.Thing.ParameterType.Name;
             this.IsPublishable = false; // reset the status
 
-            this.ContainedRows.DisposeAndClear();
+            this.ContainedRows.ClearAndDispose();
 
             this.UpdateValueSetListeners();
 
@@ -399,8 +398,7 @@ namespace CDP4ProductTree.ViewModels
             {
                 if (existingRow != null)
                 {
-                    existingRow.Dispose();
-                    this.ContainedRows.Remove(existingRow);
+                    this.ContainedRows.RemoveAndDispose(existingRow);
                 }
 
                 return;

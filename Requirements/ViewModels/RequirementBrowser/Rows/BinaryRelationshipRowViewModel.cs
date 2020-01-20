@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BinaryRelationshipRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -211,8 +211,7 @@ namespace CDP4Requirements.ViewModels
             var row = this.simpleParameters.ContainedRows.SingleOrDefault(x => x.Thing == value);
             if (row != null)
             {
-                this.simpleParameters.ContainedRows.Remove(row);
-                row.Dispose();
+                this.simpleParameters.ContainedRows.RemoveAndDispose(row);
             }
         }
     }

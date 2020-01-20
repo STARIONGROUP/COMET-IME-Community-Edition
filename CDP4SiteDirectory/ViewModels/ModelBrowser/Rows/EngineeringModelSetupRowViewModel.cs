@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelSetupRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -159,7 +159,7 @@ namespace CDP4SiteDirectory.ViewModels
             }
 
             var orderedCollection = this.activeDomainFolderRow.ContainedRows.OfType<DomainOfExpertiseRowViewModel>().OrderBy(x => x.Name).ToArray();
-            this.activeDomainFolderRow.ContainedRows.Clear();
+            this.activeDomainFolderRow.ContainedRows.ClearWithoutDispose();
             this.activeDomainFolderRow.ContainedRows.AddRange(orderedCollection);
         }
 
@@ -174,8 +174,7 @@ namespace CDP4SiteDirectory.ViewModels
             var row = this.participantFolderRow.ContainedRows.SingleOrDefault(r => r.Thing == participant);
             if (row != null)
             {
-                this.participantFolderRow.ContainedRows.Remove(row);
-                row.Dispose();
+                this.participantFolderRow.ContainedRows.RemoveAndDispose(row);
             }
         }
 
@@ -202,8 +201,7 @@ namespace CDP4SiteDirectory.ViewModels
             var row = this.iterationSetupFolderRow.ContainedRows.SingleOrDefault(r => r.Thing == iteration);
             if (row != null)
             {
-                this.iterationSetupFolderRow.ContainedRows.Remove(row);
-                row.Dispose();
+                this.iterationSetupFolderRow.ContainedRows.RemoveAndDispose(row);
             }
         }
 
@@ -230,8 +228,7 @@ namespace CDP4SiteDirectory.ViewModels
             var row = this.activeDomainFolderRow.ContainedRows.SingleOrDefault(r => r.Thing == domain);
             if (row != null)
             {
-                this.activeDomainFolderRow.ContainedRows.Remove(row);
-                row.Dispose();
+                this.activeDomainFolderRow.ContainedRows.RemoveAndDispose(row);
             }
         }
 

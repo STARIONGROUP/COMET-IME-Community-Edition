@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PersonRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -145,7 +145,7 @@ namespace CDP4SiteDirectory.ViewModels
                 var row = this.ContainedRows.SingleOrDefault(x => x.Thing == removedParticipant);
                 if (row != null)
                 {
-                    this.ContainedRows.Remove(row);
+                    this.ContainedRows.RemoveAndDispose(row);
                 }
             }
         }

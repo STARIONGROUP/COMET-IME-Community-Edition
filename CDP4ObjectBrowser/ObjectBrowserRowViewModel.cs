@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ObjectBrowserRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -106,8 +106,7 @@ namespace CDP4ObjectBrowser
                 var row = folderRow.ContainedRows.SingleOrDefault(rowViewModel => rowViewModel.Thing == thing);
                 if (row != null)
                 {
-                    folderRow.ContainedRows.Remove(row);
-                    row.Dispose();
+                    folderRow.ContainedRows.RemoveAndDispose(row);
                 }
             }
 

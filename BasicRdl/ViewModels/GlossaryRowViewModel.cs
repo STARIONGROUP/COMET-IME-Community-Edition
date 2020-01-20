@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GlossaryRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -220,8 +220,7 @@ namespace BasicRdl.ViewModels
             var row = this.ContainedRows.SingleOrDefault(x => x.Thing == term);
             if (row != null)
             {
-                this.ContainedRows.Remove(row);
-                row.Dispose();
+                this.ContainedRows.RemoveAndDispose(row);
             }
         }
     }

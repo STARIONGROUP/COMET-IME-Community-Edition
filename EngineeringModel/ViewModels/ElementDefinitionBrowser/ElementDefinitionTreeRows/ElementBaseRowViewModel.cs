@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -11,7 +11,6 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using System.Windows;
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -160,21 +159,21 @@ namespace CDP4EngineeringModel.ViewModels
                 var newContainer = parameterBase.Group;
                 var associatedRow = this.parameterBaseCache[parameterBase];
 
-                if (newContainer != null && oldContainer == null)
+                if ((newContainer != null) && (oldContainer == null))
                 {
-                    this.ContainedRows.Remove(associatedRow);
+                    this.ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                     this.parameterBaseContainerMap[parameterBase] = newContainer;
                 }
-                else if (newContainer == null && oldContainer != null)
+                else if ((newContainer == null) && (oldContainer != null))
                 {
-                    this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                    this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
                     this.parameterBaseContainerMap[parameterBase] = null;
                 }
-                else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
+                else if ((newContainer != null) && (oldContainer != null) && (newContainer != oldContainer))
                 {
-                    this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                    this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                     this.parameterBaseContainerMap[parameterBase] = newContainer;
                 }
@@ -199,19 +198,19 @@ namespace CDP4EngineeringModel.ViewModels
 
                 if (newContainer != null && oldContainer == null)
                 {
-                    this.ContainedRows.Remove(associatedRow);
+                    this.ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                     this.parameterGroupContainment[parameterGroup] = newContainer;
                 }
                 else if (newContainer == null && oldContainer != null)
                 {
-                    this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                    this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
                     this.parameterGroupContainment[parameterGroup] = null;
                 }
                 else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
                 {
-                    this.parameterGroupCache[oldContainer].ContainedRows.Remove(associatedRow);
+                    this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                     this.parameterGroupContainment[parameterGroup] = newContainer;
                 }
@@ -289,11 +288,11 @@ namespace CDP4EngineeringModel.ViewModels
                 {
                     if (group.ContainingGroup == null)
                     {
-                        this.ContainedRows.Remove(this.parameterGroupCache[group]);
+                        this.ContainedRows.RemoveWithoutDispose(this.parameterGroupCache[group]);
                     }
                     else
                     {
-                        this.parameterGroupCache[group.ContainingGroup].ContainedRows.Remove(this.parameterGroupCache[group]);
+                        this.parameterGroupCache[group.ContainingGroup].ContainedRows.RemoveWithoutDispose(this.parameterGroupCache[group]);
                     }
 
                     this.parameterGroupCache[group].Dispose();
@@ -363,11 +362,11 @@ namespace CDP4EngineeringModel.ViewModels
                     var group = this.parameterBaseContainerMap[parameter];
                     if (group == null)
                     {
-                        this.ContainedRows.Remove(row);
+                        this.ContainedRows.RemoveWithoutDispose(row);
                     }
                     else
                     {
-                        this.parameterGroupCache[group].ContainedRows.Remove(row);
+                        this.parameterGroupCache[group].ContainedRows.RemoveWithoutDispose(row);
                     }
 
                     row.Dispose();

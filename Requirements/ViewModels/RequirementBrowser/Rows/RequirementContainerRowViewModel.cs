@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementContainerRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -209,7 +209,7 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            this.ContainedRows.Remove(groupRow);
+            this.ContainedRows.RemoveWithoutDispose(groupRow);
             this.ContainedRows.SortedInsert(groupRow, ChildRowComparer);
         }
 
@@ -246,8 +246,7 @@ namespace CDP4Requirements.ViewModels
             if (row != null)
             {
                 this.TopParentRow.GroupCache.Remove(group);
-                this.ContainedRows.Remove(row);
-                row.Dispose();
+                this.ContainedRows.RemoveAndDispose(row);
             }
         }
 
@@ -293,8 +292,7 @@ namespace CDP4Requirements.ViewModels
 
             if (row != null)
             {
-                this.simpleParameters.ContainedRows.Remove(row);
-                row.Dispose();
+                this.simpleParameters.ContainedRows.RemoveAndDispose(row);
             }
         }
 
@@ -345,7 +343,7 @@ namespace CDP4Requirements.ViewModels
             {
                 if (this.ContainedRows.Contains(this.simpleParameters))
                 {
-                    this.ContainedRows.Remove(this.simpleParameters);
+                    this.ContainedRows.RemoveWithoutDispose(this.simpleParameters);
                 }
             }
         }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="DomainFileStoreRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -79,12 +79,10 @@ namespace CDP4EngineeringModel.ViewModels
 
             foreach (var removedFolder in removedFolders)
             {
-                FolderRowViewModel row;
-                if (this.folderCache.TryGetValue(removedFolder, out row))
+                if (this.folderCache.TryGetValue(removedFolder, out var row))
                 {
-                    row.Dispose();
                     this.folderCache.Remove(removedFolder);
-                    ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.Remove(row);
+                    ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.RemoveAndDispose(row);
                 }
             }
 
@@ -122,12 +120,10 @@ namespace CDP4EngineeringModel.ViewModels
 
             foreach (var removedFile in removedFiles)
             {
-                FileRowViewModel row;
-                if (this.fileCache.TryGetValue(removedFile, out row))
+                if (this.fileCache.TryGetValue(removedFile, out var row))
                 {
-                    row.Dispose();
                     this.fileCache.Remove(removedFile);
-                    ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.Remove(row);
+                    ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.RemoveAndDispose(row);
                 }
             }
 
@@ -163,14 +159,14 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 if (row.ContainerViewModel != this)
                 {
-                    ((FolderRowViewModel)row.ContainerViewModel).ContainedRows.Remove(row);
+                    ((FolderRowViewModel)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
                     this.ContainedRows.Add(row);
                     row.UpdateContainerViewModel(this);
                 }
             }
             else if (updatedFolder.ContainingFolder != row.ContainerViewModel.Thing)
             {
-                ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.Remove(row);
+                ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
                 var containerViewModel = this.folderCache[updatedFolder.ContainingFolder];
                 containerViewModel.ContainedRows.Add(row);
                 row.UpdateContainerViewModel(containerViewModel);
@@ -192,14 +188,14 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 if (row.ContainerViewModel != this)
                 {
-                    ((FolderRowViewModel)row.ContainerViewModel).ContainedRows.Remove(row);
+                    ((FolderRowViewModel)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
                     this.ContainedRows.Add(row);
                     row.UpdateContainerViewModel(this);
                 }
             }
             else if (fileRevision.ContainingFolder != row.ContainerViewModel.Thing)
             {
-                ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.Remove(row);
+                ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
                 var containerViewModel = this.folderCache[fileRevision.ContainingFolder];
                 containerViewModel.ContainedRows.Add(row);
                 row.UpdateContainerViewModel(containerViewModel);

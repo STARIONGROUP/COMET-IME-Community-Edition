@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RoleBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -198,7 +198,7 @@ namespace CDP4SiteDirectory.ViewModels
             foreach (var personRole in oldRole)
             {
                 var row = this.personRoleRow.ContainedRows.Single(x => x.Thing == personRole);
-                this.personRoleRow.ContainedRows.Remove(row);
+                this.personRoleRow.ContainedRows.RemoveAndDispose(row);
             }
 
             foreach (var personRole in newRole)
@@ -208,7 +208,7 @@ namespace CDP4SiteDirectory.ViewModels
             }
 
             var orderedCollection = this.personRoleRow.ContainedRows.OfType<PersonRoleRowViewModel>().OrderBy(x => x.Thing.Name).ToArray();
-            this.personRoleRow.ContainedRows.Clear();
+            this.personRoleRow.ContainedRows.ClearWithoutDispose();
             this.personRoleRow.ContainedRows.AddRange(orderedCollection);
         }
 
@@ -226,7 +226,7 @@ namespace CDP4SiteDirectory.ViewModels
             foreach (var role in oldRole)
             {
                 var row = this.participantRoleRow.ContainedRows.Single(x => x.Thing == role);
-                this.participantRoleRow.ContainedRows.Remove(row);
+                this.participantRoleRow.ContainedRows.RemoveAndDispose(row);
             }
 
             foreach (var role in newRole)
@@ -236,7 +236,7 @@ namespace CDP4SiteDirectory.ViewModels
             }
 
             var orderedCollection = this.participantRoleRow.ContainedRows.OfType<ParticipantRoleRowViewModel>().OrderBy(x => x.Thing.Name).ToArray();
-            this.participantRoleRow.ContainedRows.Clear();
+            this.participantRoleRow.ContainedRows.ClearWithoutDispose();
             this.participantRoleRow.ContainedRows.AddRange(orderedCollection);
         }
     }

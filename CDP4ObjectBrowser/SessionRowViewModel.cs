@@ -125,7 +125,7 @@ namespace CDP4ObjectBrowser
             if (row != null)
             {
                 this.EngineeringModelRowViewModels.Remove(row);
-                this.ContainedRows.Remove(row);
+                this.ContainedRows.RemoveAndDispose(row);
             }
         }
     }

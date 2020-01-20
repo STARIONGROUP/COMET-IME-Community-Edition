@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IRowViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,8 +8,12 @@ namespace CDP4Composition.Mvvm
 {
     using System.ComponentModel;
     using CDP4Common.CommonData;
+    using CDP4Common.Types;
+
     using CDP4Composition.DragDrop;
-    using ReactiveUI;
+    using CDP4Composition.Mvvm.Types;
+
+    using CDP4Dal.Permission;
 
     /// <summary>
     /// The interface for the row-view-model
@@ -28,7 +32,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the Contained <see cref="IRowViewModelBase{T}"/>
         /// </summary>
-        ReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; }
+        DisposableReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; }
 
         /// <summary>
         /// Gets the top container <see cref="IViewModelBase{T}"/>

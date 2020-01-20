@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -164,7 +164,7 @@ namespace CDP4Requirements.ViewModels
             {
                 if (this.ContainedRows.Contains(this.parametricConstraints))
                 {
-                    this.ContainedRows.Remove(this.parametricConstraints);
+                    this.ContainedRows.RemoveWithoutDispose(this.parametricConstraints);
                 }
             }
 
@@ -179,7 +179,7 @@ namespace CDP4Requirements.ViewModels
             {
                 if (this.ContainedRows.Contains(this.simpleParameters))
                 {
-                    this.ContainedRows.Remove(this.simpleParameters);
+                    this.ContainedRows.RemoveWithoutDispose(this.simpleParameters);
                 }
             }
         }
@@ -548,8 +548,7 @@ namespace CDP4Requirements.ViewModels
 
             if (row != null)
             {
-                this.simpleParameters.ContainedRows.Remove(row);
-                row.Dispose();
+                this.simpleParameters.ContainedRows.RemoveAndDispose(row);
             }
 
             this.definitionSubscription?.Dispose();
@@ -575,8 +574,7 @@ namespace CDP4Requirements.ViewModels
 
             if (row != null)
             {
-                this.parametricConstraints.ContainedRows.Remove(row);
-                row.Dispose();
+                this.parametricConstraints.ContainedRows.RemoveAndDispose(row);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -198,8 +198,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (row != null)
             {
-                row.Dispose();
-                this.binaryRelationshipsFolder.ContainedRows.Remove(row);
+                this.binaryRelationshipsFolder.ContainedRows.RemoveAndDispose(row);
             }
         }
 
@@ -213,8 +212,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (row != null)
             {
-                row.Dispose();
-                this.multiRelationshipsFolder.ContainedRows.Remove(row);
+                this.multiRelationshipsFolder.ContainedRows.RemoveAndDispose(row);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PublicationBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-208 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -299,8 +299,7 @@ namespace CDP4EngineeringModel.ViewModels
             var parameterRow = domainRow.ContainedRows.FirstOrDefault(pr => pr.Thing == parameter);
             if (parameterRow != null)
             {
-                parameterRow.Dispose();
-                domainRow.ContainedRows.Remove(parameterRow);
+                domainRow.ContainedRows.RemoveAndDispose(parameterRow);
             }
         }
 
@@ -317,8 +316,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = owner.ContainedRows.FirstOrDefault(pr => pr.Thing == parameterOrOverrideBase);
                 if (row != null)
                 {
-                    owner.ContainedRows.Remove(row);
-                    row.Dispose();
+                    owner.ContainedRows.RemoveAndDispose(row);
                 }
             }
 

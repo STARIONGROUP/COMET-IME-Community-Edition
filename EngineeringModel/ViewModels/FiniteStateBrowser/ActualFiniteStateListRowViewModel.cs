@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ActualFiniteStateListRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -13,7 +13,6 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -94,7 +93,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void PopulateFiniteState()
         {
-            this.ContainedRows.DisposeAndClear();
+            this.ContainedRows.ClearAndDispose();
             foreach (var state in this.GetOrderedActualFiniteStates())
             {
                 var row = new ActualFiniteStateRowViewModel(state, this.Session, this) { IsDefault = state.IsDefault };

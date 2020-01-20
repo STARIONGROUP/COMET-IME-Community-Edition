@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="PossibleFiniteStateListRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -82,12 +82,12 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = this.ContainedRows.SingleOrDefault(x => x.Thing == statelist);
                 if (row != null)
                 {
-                    this.ContainedRows.Remove(row);
+                    this.ContainedRows.RemoveAndDispose(row);
                 }
             }
 
             var rowsToUpdate = this.ContainedRows.Where(x => this.Thing.PossibleState.Contains(x.Thing)).ToList();
-            foreach (PossibleFiniteStateRowViewModel row in rowsToUpdate)
+            foreach (var row in rowsToUpdate.OfType<PossibleFiniteStateRowViewModel>())
             {
                 row.IsDefault = row.Thing.IsDefault;
             }
