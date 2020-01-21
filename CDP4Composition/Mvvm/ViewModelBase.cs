@@ -165,7 +165,6 @@ namespace CDP4Composition.Mvvm
         public void Dispose()
         {
             this.Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>

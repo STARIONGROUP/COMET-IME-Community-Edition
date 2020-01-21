@@ -21,11 +21,12 @@ namespace CDP4Composition.Mvvm.Types
         /// <summary>
         /// Overrides the method implementation in <see cref="ReactiveList{T}"/> and adds an <see cref="ObsoleteAttribute"/>
         /// so the code doesn't compile anymore when the method is unexpectedly being used.
+        /// <see href="https://github.com/RHEAGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt"/>
         /// </summary>
         [Obsolete("Clear is deprecated, please use Clear(bool dispose) instead.", true)]
         public new void Clear()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace CDP4Composition.Mvvm.Types
         [Obsolete("RemoveAll(IEnumerable<T> items) is deprecated, please use RemoveAll(IEnumerable<T> items, bool dispose) instead.", true)]
         public new void RemoveAll(IEnumerable<T> items)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -114,7 +115,7 @@ namespace CDP4Composition.Mvvm.Types
         [Obsolete("RemoveAt(int index) is deprecated, please use RemoveAt(int index, bool dispose) instead.", true)]
         public new void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -166,7 +167,7 @@ namespace CDP4Composition.Mvvm.Types
         [Obsolete("Remove(T item) is deprecated, please use  Remove(T item, bool dispose) instead.", true)]
         public new bool Remove(T item)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -208,7 +209,7 @@ namespace CDP4Composition.Mvvm.Types
         [Obsolete("RemoveRange(int index, int count) is deprecated, please use  RemoveRange(int index, int count, bool dispose) instead.", true)]
         public new void RemoveRange(int index, int count)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
