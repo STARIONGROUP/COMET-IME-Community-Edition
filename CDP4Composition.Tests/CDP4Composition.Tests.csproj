@@ -215,6 +215,7 @@
     <Compile Include="Mvvm\MenuItems\RibbonButtonOptionDependentViewModelTestFixture.cs" />
     <Compile Include="Mvvm\OpenSessionViewModelTestFixture.cs" />
     <Compile Include="Mvvm\ReactiveListExtensionTestFixture.cs" />
+    <Compile Include="Mvvm\Types\DisposableReactiveListTestFixture.cs" />
     <Compile Include="Mvvm\ViewModelBaseTestFixture.cs" />
     <Compile Include="Navigation\DialogNavigationServiceTestFixture.cs" />
     <Compile Include="Navigation\PanelNavigationServiceTestFixture.cs" />
