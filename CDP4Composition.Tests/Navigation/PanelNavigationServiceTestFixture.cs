@@ -61,6 +61,7 @@ namespace CDP4Composition.Tests.Navigation
         private Mock<IRegionManager> regionManager;
         private Mock<IRegion> region;
         private Mock<IViewsCollection> viewsCollection;
+        private Mock<IRegionCollectionSearcher> regionCollectionSearcher;
 
         private IPanelView panelView;
 
@@ -97,6 +98,8 @@ namespace CDP4Composition.Tests.Navigation
             this.describeMetaData = new Mock<INameMetaData>();
             this.describeMetaData.Setup(x => x.Name).Returns("MockedPanelDecorated");
 
+            this.regionCollectionSearcher = new Mock<IRegionCollectionSearcher>();
+            this.regionCollectionSearcher.Setup(x => x.RegionsForView(It.IsAny<IRegionCollection>(), It.IsAny<IPanelView>())).Returns(new [] { this.region.Object });
             this.regionManager.Setup(x => x.Regions[It.IsAny<string>()]).Returns(this.region.Object);
             this.region.Setup(x => x.Views).Returns(this.viewsCollection.Object);
 
@@ -115,7 +118,7 @@ namespace CDP4Composition.Tests.Navigation
             this.viewModelList.Add(this.panelViewModel);
             this.viewModelList.Add(new PropertyGridViewModel());
 
-            this.NavigationService = new PanelNavigationService(this.viewList, this.viewModelList, this.regionManager.Object, this.viewModelDecoratedList, this.filterStringService.Object);
+            this.NavigationService = new PanelNavigationService(this.viewList, this.viewModelList, this.regionManager.Object, this.viewModelDecoratedList, this.filterStringService.Object, this.regionCollectionSearcher.Object);
 
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -204,7 +207,7 @@ namespace CDP4Composition.Tests.Navigation
         public void VerifyThatNavigationServiceDoesNotThrowWhenPropertyGridNotFound()
         {
             this.NavigationService = new PanelNavigationService(new List<Lazy<IPanelView, IRegionMetaData>>(), new List<IPanelViewModel>(),
-                regionManager.Object, new List<Lazy<IPanelViewModel, INameMetaData>>(), this.filterStringService.Object);
+                this.regionManager.Object, new List<Lazy<IPanelViewModel, INameMetaData>>(), this.filterStringService.Object, this.regionCollectionSearcher.Object);
 
             Assert.DoesNotThrow(() => this.NavigationService.Open(new Person(Guid.NewGuid(), null, null), this.session.Object));
         }
