@@ -99,7 +99,7 @@ namespace CDP4Composition.Tests.Navigation
             this.describeMetaData.Setup(x => x.Name).Returns("MockedPanelDecorated");
 
             this.regionCollectionSearcher = new Mock<IRegionCollectionSearcher>();
-            this.regionCollectionSearcher.Setup(x => x.RegionsForView(It.IsAny<IRegionCollection>(), It.IsAny<IPanelView>())).Returns(new [] { this.region.Object });
+            this.regionCollectionSearcher.Setup(x => x.GetRegionsByView(It.IsAny<IRegionCollection>(), It.IsAny<IPanelView>())).Returns(new [] { this.region.Object });
             this.regionManager.Setup(x => x.Regions[It.IsAny<string>()]).Returns(this.region.Object);
             this.region.Setup(x => x.Views).Returns(this.viewsCollection.Object);
 

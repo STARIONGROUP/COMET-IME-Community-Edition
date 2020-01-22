@@ -343,7 +343,7 @@ namespace CDP4Composition.Navigation
 
             if (this.ViewModelViewPairs.TryGetValue(viewModel, out var view))
             {
-                var regions = this.regionCollectionSearcher.RegionsForView(this.regionManager.Regions, view);
+                var regions = this.regionCollectionSearcher.GetRegionsByView(this.regionManager.Regions, view);
 
                 foreach (var region in regions)
                 {
