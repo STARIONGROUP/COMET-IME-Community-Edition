@@ -31,12 +31,21 @@ namespace CDP4Composition
 
     using Microsoft.Practices.Prism.Regions;
 
+    /// <summary>
+    /// Helper class for searching views in a <see cref="IRegionCollection"/>
+    /// </summary>
     [Export(typeof(IRegionCollectionSearcher))]
     public class RegionCollectionSearcher : IRegionCollectionSearcher
     {
-        public IEnumerable<IRegion> RegionsForView(IRegionCollection regionManagerRegions, IPanelView view)
+        /// <summary>
+        /// Search a <see cref="IRegionCollection"/> for <see cref="IRegion"/>s that contain a specific <see cref="IPanelView"/>
+        /// </summary>
+        /// <param name="regionCollection">The <see cref="IRegionCollection"/> to search</param>
+        /// <param name="view">The <see cref="IPanelView"/> to search for</param>
+        /// <returns>List of <see cref="IRegion"/>s</returns>
+        public IEnumerable<IRegion> GetRegionsByView(IRegionCollection regionCollection, IPanelView view)
         {
-            return regionManagerRegions.Where(x => x.Views.Contains(view));
+            return regionCollection.Where(x => x.Views.Contains(view));
         }
     }
 }
