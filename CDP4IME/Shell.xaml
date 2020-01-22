@@ -281,22 +281,20 @@
                                 Grid.Row="1"
                                 ClosingBehavior="ImmediatelyRemove"
                                 FloatingMode="Desktop">
-            <dxdo:LayoutGroup DestroyOnClosingChildren="False" Orientation="Horizontal">
-
-                <dxdo:LayoutGroup ItemHeight="0.7*" Orientation="Horizontal">
-                    <dxdo:TabbedGroup Name="LeftGroup"
-                                      DestroyOnClosingChildren="False"
-                                      ItemWidth="0.2*"
-                                      regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.LeftPanel}" />
-                    <dxdo:DocumentGroup Name="DocumentContainer"
-                                        DestroyOnClosingChildren="False"
-                                        ItemWidth="0.6*"
-                                        regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.EditorPanel}" />
-                    <dxdo:TabbedGroup Name="rightGroup"
-                                      DestroyOnClosingChildren="False"
-                                      ItemWidth="0.2*"
-                                      regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.RightPanel}" />
-                </dxdo:LayoutGroup>
+            <dxdo:LayoutGroup ItemHeight="0.7*" DestroyOnClosingChildren="False" Orientation="Horizontal">
+                <dxdo:TabbedGroup Name="LeftGroup"
+                                  DestroyOnClosingChildren="False"
+                                  ItemWidth="0.2*"
+                                  regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.LeftPanel}" />
+                <dxdo:DocumentGroup Name="DocumentContainer"
+                                    ClosePageButtonShowMode="InAllTabPagesAndTabControlHeader"
+                                    DestroyOnClosingChildren="False"
+                                    ItemWidth="0.6*"
+                                    regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.EditorPanel}" />
+                <dxdo:TabbedGroup Name="RightGroup"
+                                  DestroyOnClosingChildren="False"
+                                  ItemWidth="0.2*"
+                                  regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.RightPanel}" />
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>
         <dxr:RibbonStatusBarControl Grid.Row="2" Height="20">

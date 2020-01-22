@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PanelNavigationService.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
 //
@@ -64,6 +64,11 @@ namespace CDP4Composition.Navigation
         private readonly IFilterStringService filterStringService;
 
         /// <summary>
+        /// The (injected) <see cref="IRegionCollectionSearcher"/>
+        /// </summary>
+        private readonly IRegionCollectionSearcher regionCollectionSearcher;
+
+        /// <summary>
         /// The logger for the current class
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
@@ -83,11 +88,13 @@ namespace CDP4Composition.Navigation
         /// <param name="panelViewModelDecorated">
         /// The MEF injected <see cref="IPanelViewModel"/> which are decorated with <see cref="INameMetaData"/> and can be navigated to.
         /// </param>
+        /// <param name="filterStringService">The MEF injected <see cref="IFilterStringService"/></param>
+        /// <param name="regionCollectionSearcher">The MEF injected <see cref="IRegionCollectionSearcher"/></param>
         [ImportingConstructor]
         public PanelNavigationService([ImportMany] IEnumerable<Lazy<IPanelView, IRegionMetaData>> panelViewKinds,
             [ImportMany] IEnumerable<IPanelViewModel> panelViewModelKinds, IRegionManager regionManager,
             [ImportMany] IEnumerable<Lazy<IPanelViewModel, INameMetaData>> panelViewModelDecorated,
-            IFilterStringService filterStringService)
+            IFilterStringService filterStringService, IRegionCollectionSearcher regionCollectionSearcher)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -95,6 +102,7 @@ namespace CDP4Composition.Navigation
 
             this.regionManager = regionManager;
             this.filterStringService = filterStringService;
+            this.regionCollectionSearcher = regionCollectionSearcher;
             this.PanelViewKinds = new Dictionary<string, Lazy<IPanelView, IRegionMetaData>>();
 
             // TODO T2428 : PanelViewModelKinds seems to be always empty and is used only one time in the Open(Thing thing, ISession session) method. We should probably refactor this part of the code.
@@ -335,9 +343,12 @@ namespace CDP4Composition.Navigation
 
             if (this.ViewModelViewPairs.TryGetValue(viewModel, out var view))
             {
-                var viewRegion = this.GetViewType(viewModel).Metadata.Region;
-                var region = this.regionManager.Regions[viewRegion];
-                region.Remove(view);
+                var regions = this.regionCollectionSearcher.RegionsForView(this.regionManager.Regions, view);
+
+                foreach (var region in regions)
+                {
+                    region.Remove(view);
+                }
 
                 logger.Debug("Closed view-model {0} of type {1}", viewModel.Caption, viewModel);
             }
@@ -392,12 +403,11 @@ namespace CDP4Composition.Navigation
         /// <param name="viewModelType">The <see cref="Type"/> of the <see cref="IPanelViewModel"/> to close</param>
         public void Close(Type viewModelType)
         {
-            var panelToClose = this.ViewModelViewPairs.Keys.Where(vm => vm.GetType() == viewModelType).ToList();
-            foreach (var panel in panelToClose)
+            var panelsToClose = this.ViewModelViewPairs.Keys.Where(vm => vm.GetType() == viewModelType).ToList();
+
+            foreach (var panel in panelsToClose)
             {
-                var viewRegion = this.GetViewType(panel).Metadata.Region;
-                var region = this.regionManager.Regions[viewRegion];
-                region.Remove(this.ViewModelViewPairs[panel]);
+                this.Close(panel);
             }
         }
 
