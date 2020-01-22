@@ -9,7 +9,8 @@
                                 Name="FileStoreRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="70"
-                                ShowCaptionButton="False">
+                                ShowCaptionButton="False"
+                                IsVisible="False">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
