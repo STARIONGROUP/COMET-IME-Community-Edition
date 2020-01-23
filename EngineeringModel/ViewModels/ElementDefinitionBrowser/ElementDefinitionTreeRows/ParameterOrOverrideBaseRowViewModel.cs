@@ -259,7 +259,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         private void SetProperties(ParameterValueSetBase valueSet)
         {
-            this.Value = valueSet.ActualValue.Any() ? valueSet.ActualValue.First() : "-";
+            this.Value = this.GetDisplayValueFromValueSet(valueSet.ActualValue);
 
             if (this.ContainedRows.Count == 0)
             {
@@ -267,20 +267,40 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.Switch = valueSet.ValueSwitch;
-            this.Formula = valueSet.Formula.Any() ? valueSet.Formula.First() : "-";
-            this.Computed = valueSet.Computed.Any() ? valueSet.Computed.First() : "-";
+            this.Formula = this.GetDisplayValueFromValueSet(valueSet.Formula);
+            this.Computed = this.GetDisplayValueFromValueSet(valueSet.Computed);
 
             this.Manual = valueSet.Manual.Any()
-                ? valueSet.Manual.First().ToValueSetObject(this.ParameterType)
+                ? this.GetDisplayValueFromValueSet(valueSet.Manual).ToValueSetObject(this.ParameterType)
                 : ValueSetConverter.DefaultObject(this.ParameterType);
 
             this.Reference = valueSet.Reference.Any()
-                ? valueSet.Reference.First().ToValueSetObject(this.ParameterType)
+                ? this.GetDisplayValueFromValueSet(valueSet.Reference).ToValueSetObject(this.ParameterType)
                 : ValueSetConverter.DefaultObject(this.ParameterType);
 
             this.State = valueSet.ActualState == null ? "-" : valueSet.ActualState.ShortName;
             this.Option = valueSet.ActualOption;
-            this.Published = valueSet.Published.Any() ? valueSet.Published.First() : "-";
+            this.Published = this.GetDisplayValueFromValueSet(valueSet.Published);
+        }
+
+        /// <summary>
+        /// Returns a value from a valueset that is usefull to display in the UI
+        /// </summary>
+        /// <param name="valueArray">The <see cref="ValueArray{string}"/></param>
+        /// <returns>Display friendly <see cref="string"/></returns>
+        private string GetDisplayValueFromValueSet(ValueArray<string> valueArray)
+        {
+            if (valueArray.Count > 1)
+            {
+                return null;
+            }
+
+            if (valueArray.Count == 1)
+            {
+                return valueArray.First();
+            }
+
+            return "-";
         }
 
         /// <summary>
