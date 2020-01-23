@@ -12,6 +12,8 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
@@ -166,6 +168,11 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to Copy Model Code to clipboard <see cref="ParameterRowViewModel"/>
+        /// </summary>
+        public ReactiveCommand<object> CopyModelCodeToClipboardCommand { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to show the usages of specified element definition
         /// </summary>
         public ReactiveCommand<object> HighlightElementUsagesCommand { get; private set; }
@@ -236,7 +243,7 @@ namespace CDP4EngineeringModel.ViewModels
                     }
                     else
                     {
-                        dropInfo.Effects = (elementDefinition.TopContainer == this.Thing.TopContainer)
+                        dropInfo.Effects = elementDefinition.TopContainer == this.Thing.TopContainer
                             ? DragDropEffects.None
                             : DragDropEffects.Copy;
                         return;
@@ -354,6 +361,9 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.HighlightElementUsagesCommand = ReactiveCommand.Create();
             this.HighlightElementUsagesCommand.Subscribe(_ => this.ExecuteHighlightElementUsagesCommand());
+
+            this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create();
+            this.CopyModelCodeToClipboardCommand.Subscribe(_ => this.ExecuteCopyModelCodeToClipboardCommand());
         }
 
         /// <summary>
@@ -373,25 +383,31 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
 
             var parameter = parameterRow.Thing as Parameter;
             if (parameter != null)
             {
-                this.CanCreateOverride = (this.SelectedThing.ContainerViewModel is ElementUsageRowViewModel)
-                         && (parameter.Owner == tuple.Item1 || parameter.AllowDifferentOwnerOfOverride)
-                         && this.PermissionService.CanWrite(ClassKind.ParameterOverride, this.SelectedThing.ContainerViewModel.Thing);
+                if (tuple != null)
+                {
+                    this.CanCreateOverride = this.SelectedThing.ContainerViewModel is ElementUsageRowViewModel
+                                             && ((parameter.Owner == tuple.Item1) || parameter.AllowDifferentOwnerOfOverride)
+                                             && this.PermissionService.CanWrite(ClassKind.ParameterOverride, this.SelectedThing.ContainerViewModel.Thing);
 
-                this.CanCreateSubscription = (this.SelectedThing.ContainerViewModel is ElementDefinitionRowViewModel)
-                                             && parameter.Owner != tuple.Item1
-                                             && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.SelectedThing.Thing);
+                    this.CanCreateSubscription = this.SelectedThing.ContainerViewModel is ElementDefinitionRowViewModel
+                                                 && (parameter.Owner != tuple.Item1)
+                                                 && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.SelectedThing.Thing);
+                }
+
                 return;
             }
 
-            this.CanCreateSubscription = (this.SelectedThing.ContainerViewModel is ElementUsageRowViewModel)
-                             && ((ParameterOverride)parameterRow.Thing).Owner != tuple.Item1
-                             && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.SelectedThing.Thing);
+            if (tuple != null)
+            {
+                this.CanCreateSubscription = this.SelectedThing.ContainerViewModel is ElementUsageRowViewModel
+                                             && (((ParameterOverride)parameterRow.Thing).Owner != tuple.Item1)
+                                             && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.SelectedThing.Thing);
+            }
         }
 
         /// <summary>
@@ -411,6 +427,11 @@ namespace CDP4EngineeringModel.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
+
+            if (this.SelectedThing is IModelCodeRowViewModel)
+            {
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
+            }
 
             var elementDefRow = this.SelectedThing as ElementDefinitionRowViewModel;
             if (elementDefRow != null)
@@ -458,6 +479,11 @@ namespace CDP4EngineeringModel.ViewModels
                         new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
                 }
 
+                if (this.SelectedThing is IModelCodeRowViewModel)
+                {
+                    this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
+                }
+
                 return;
             }
 
@@ -484,6 +510,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var overrideRow = this.SelectedThing as ParameterOverrideRowViewModel;
+
             if (overrideRow != null)
             {
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Subscribe to this Override", "", this.CreateSubscriptionCommand, MenuItemKind.Create, ClassKind.ParameterSubscription));
@@ -542,6 +569,22 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Execute the <see cref="CopyModelCodeToClipboardCommand"/>
+        /// </summary>
+        private void ExecuteCopyModelCodeToClipboardCommand()
+        {
+            if (this.SelectedThing == null)
+            {
+                return;
+            }
+
+            if (this.SelectedThing is IModelCodeRowViewModel)
+            {
+                Clipboard.SetText(((IModelCodeRowViewModel)this.SelectedThing).ModelCode);
+            }
+        }
+
+        /// <summary>
         /// Executes the <see cref="OpenAnnotationWindowCommand"/>
         /// </summary>
         /// <param name="annotation">The associated <see cref="ModellingAnnotationItem"/></param>
@@ -550,7 +593,7 @@ namespace CDP4EngineeringModel.ViewModels
             var vm = new AnnotationFloatingDialogViewModel(annotation, this.Session);
             this.DialogNavigationService.NavigateFloating(vm);
         }
-        
+
         /// <summary>
         /// Update the rows to display
         /// </summary>
@@ -588,8 +631,8 @@ namespace CDP4EngineeringModel.ViewModels
                 topElementDefinitionNew.IsTopElement = true;
 
                 // clear old top element.
-                if (topElementDefinitionOld != null &&
-                    topElementDefinitionOld != topElementDefinitionNew)
+                if ((topElementDefinitionOld != null) &&
+                    (topElementDefinitionOld != topElementDefinitionNew))
                 {
                     ((ElementDefinitionRowViewModel)topElementDefinitionOld).IsTopElement = false;
                 }
@@ -614,11 +657,13 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="elementDef">The <see cref="ElementDefinition"/> to add</param>
         private void AddElementDefinitionRow(ElementDefinition elementDef)
         {
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
 
-            var row = new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this);
-            this.ElementDefinitionRowViewModels.SortedInsert(row, rowComparer);
+            if (tuple != null)
+            {
+                var row = new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this);
+                this.ElementDefinitionRowViewModels.SortedInsert(row, rowComparer);
+            }
         }
 
         /// <summary>
@@ -663,20 +708,23 @@ namespace CDP4EngineeringModel.ViewModels
             Tuple<DomainOfExpertise, Participant> tuple;
             this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
 
-            var subscription = new ParameterSubscription
+            if (tuple != null)
             {
-                Owner = tuple.Item1
-            };
+                var subscription = new ParameterSubscription
+                {
+                    Owner = tuple.Item1
+                };
 
-            var transactionContext = TransactionContextResolver.ResolveContext(parameterOrOverride);
-            var transaction = new ThingTransaction(transactionContext);
+                var transactionContext = TransactionContextResolver.ResolveContext(parameterOrOverride);
+                var transaction = new ThingTransaction(transactionContext);
 
-            var clone = parameterOrOverride.Clone(false);
-            transaction.Create(subscription);
-            transaction.CreateOrUpdate(clone);
-            clone.ParameterSubscription.Add(subscription);
+                var clone = parameterOrOverride.Clone(false);
+                transaction.Create(subscription);
+                transaction.CreateOrUpdate(clone);
+                clone.ParameterSubscription.Add(subscription);
 
-            await this.DalWrite(transaction);
+                await this.DalWrite(transaction);
+            }
         }
 
         /// <summary>
@@ -701,25 +749,27 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
 
-            var parameterOverride = new ParameterOverride
+            if (tuple != null)
             {
-                Parameter = parameter,
-                Owner = tuple.Item1
-            };
+                var parameterOverride = new ParameterOverride
+                {
+                    Parameter = parameter,
+                    Owner = tuple.Item1
+                };
 
-            var transactionContext = TransactionContextResolver.ResolveContext(elementUsage);
-            var transaction = new ThingTransaction(transactionContext);
+                var transactionContext = TransactionContextResolver.ResolveContext(elementUsage);
+                var transaction = new ThingTransaction(transactionContext);
 
-            transaction.Create(parameterOverride);
+                transaction.Create(parameterOverride);
 
-            var elementUsageClone = elementUsage.Clone(false);
-            transaction.CreateOrUpdate(elementUsageClone);
-            elementUsageClone.ParameterOverride.Add(parameterOverride);
-            
-            await this.DalWrite(transaction);
+                var elementUsageClone = elementUsage.Clone(false);
+                transaction.CreateOrUpdate(elementUsageClone);
+                elementUsageClone.ParameterOverride.Add(parameterOverride);
+
+                await this.DalWrite(transaction);
+            }
         }
 
         /// <summary>
@@ -730,7 +780,7 @@ namespace CDP4EngineeringModel.ViewModels
             var elementDef = this.SelectedThing.Thing as ElementDefinition;
             var copyUsage = true;
 
-            if (elementDef != null && elementDef.ContainedElement.Any())
+            if ((elementDef != null) && elementDef.ContainedElement.Any())
             {
                 var yesNoDialogViewModel = new YesNoDialogViewModel("Confirmation", "Would you like to copy the Element Usages?");
                 var result = this.DialogNavigationService.NavigateModal(yesNoDialogViewModel);
@@ -742,7 +792,7 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.IsBusy = true;
                 var copyCreator = new CopyElementDefinitionCreator(this.Session);
-                await copyCreator.Copy((ElementDefinition) this.SelectedThing.Thing, copyUsage);
+                await copyCreator.Copy((ElementDefinition)this.SelectedThing.Thing, copyUsage);
             }
             catch (Exception exception)
             {
@@ -760,19 +810,19 @@ namespace CDP4EngineeringModel.ViewModels
         private void AddSubscriptions()
         {
             var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(engineeringModelSetupSubscription);
 
             var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(domainOfExpertiseSubscription);
 
             var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(iterationSetupSubscription);
@@ -804,7 +854,7 @@ namespace CDP4EngineeringModel.ViewModels
                 return null;
             }
 
-            return (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null) ? null : iterationDomainPair.Value.Item1;
+            return (iterationDomainPair.Value == null) || (iterationDomainPair.Value.Item1 == null) ? null : iterationDomainPair.Value.Item1;
         }
 
         /// <summary>
