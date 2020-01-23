@@ -106,8 +106,7 @@ namespace CDP4Budget.Config
                     ElementCategories = x.ElementCategories.Select(ec => ec.Iid).ToList()
                 }).ToList();
 
-            var massConfig = this.BudgetParameterConfig as MassBudgetParameterConfig;
-            if (massConfig != null)
+            if (this.BudgetParameterConfig is MassBudgetParameterConfig massConfig)
             {
                 var parameterConfigDto = new MassParameterConfigDto();
                 parameterConfigDto.ParameterType = massConfig.DryMassTuple.MainParameterType.Iid;
@@ -122,9 +121,7 @@ namespace CDP4Budget.Config
 
                 dto.ParameterConfig = parameterConfigDto;
             }
-
-            var genericConfig = this.BudgetParameterConfig as GenericBudgetParameterConfig;
-            if (genericConfig != null)
+            else if (this.BudgetParameterConfig is GenericBudgetParameterConfig genericConfig)
             {
                 var parameterConfigDto = new GenericParameterConfigDto();
                 parameterConfigDto.ParameterType = genericConfig.GenericTuple.MainParameterType.Iid;
@@ -134,7 +131,7 @@ namespace CDP4Budget.Config
             }
             else
             {
-                throw new NotImplementedException("only mass budget has been implemented");
+                throw new NotImplementedException("Only Mass and Generic budgets have been implemented.");
             }
 
             return dto;
