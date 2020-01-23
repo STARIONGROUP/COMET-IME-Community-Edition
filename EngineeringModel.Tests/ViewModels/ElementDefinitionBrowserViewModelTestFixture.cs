@@ -565,11 +565,11 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = defRow;
             vm.PopulateContextMenu();
-            Assert.AreEqual(13, vm.ContextMenu.Count);
+            Assert.AreEqual(14, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[0];
             vm.PopulateContextMenu();
-            Assert.AreEqual(9, vm.ContextMenu.Count);
+            Assert.AreEqual(10, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[1];
             vm.PopulateContextMenu();
@@ -580,15 +580,15 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = usageRow;
             vm.PopulateContextMenu();
-            Assert.AreEqual(7, vm.ContextMenu.Count);
+            Assert.AreEqual(8, vm.ContextMenu.Count);
 
             vm.SelectedThing = usageRow.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(9, vm.ContextMenu.Count);
+            Assert.AreEqual(10, vm.ContextMenu.Count);
 
             vm.SelectedThing = usage2Row.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(9, vm.ContextMenu.Count);
+            Assert.AreEqual(10, vm.ContextMenu.Count);
 
             vm.Dispose();
         }
