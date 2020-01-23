@@ -63,7 +63,8 @@
         </dxb:ToolBarControl>
 
         <Grid Grid.Row="1" >
-            <dxdo:DockLayoutManager >
+
+            <dxdo:DockLayoutManager x:Name="ScriptingDockManager" FloatingMode="Window">
                 <dxdo:LayoutGroup Orientation="Vertical">
 
                     <dxdo:LayoutGroup Orientation="Horizontal" ItemHeight="2*">
