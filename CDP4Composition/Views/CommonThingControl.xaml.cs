@@ -31,7 +31,7 @@ namespace CDP4Composition.Views
         private readonly static DependencyProperty IsFavoriteToggleVisibleProperty = DependencyProperty.Register("IsFavoriteToggleVisible", typeof(bool), typeof(CommonThingControl));
 
         /// <summary>
-        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="IsFavoriteToggleVisible"/> setter method.
+        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="IsDetailsToggleVisible"/> setter method.
         /// </summary>
         private readonly static DependencyProperty IsDetailsToggleVisibleProperty = DependencyProperty.Register("IsDetailsToggleVisible", typeof(bool), typeof(CommonThingControl));
 
@@ -42,6 +42,7 @@ namespace CDP4Composition.Views
         {
             this.InitializeComponent();
             this.IsFavoriteToggleVisible = false;
+            this.IsDetailsToggleVisible = false;
         }
 
         /// <summary>
