@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CDPTextBox.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -9,6 +9,7 @@ namespace CDP4CommonView.UserControls
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Controls;
@@ -16,7 +17,6 @@ namespace CDP4CommonView.UserControls
     using System.Windows.Media;
     using CDP4Common.CommonData;
     using CDP4Composition;
-    using DevExpress.XtraPrinting.Native;
     using Microsoft.Practices.ServiceLocation;
     using NLog;
 
@@ -194,7 +194,7 @@ namespace CDP4CommonView.UserControls
         /// </param>
         private void CDPTextBox_OnMouseMove(object sender, MouseEventArgs e)
         {
-            if (this.termsService.TermsList.IsEmpty())
+            if (!this.termsService.TermsList.Any())
             {
                 return;
             }

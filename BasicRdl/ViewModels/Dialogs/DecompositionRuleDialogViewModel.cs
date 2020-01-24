@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="DecompositionRuleDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2016 RHEA System S.A.
+//   Copyright (c) 2016-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -21,8 +21,6 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Navigation.Interfaces;
 
     using CDP4Dal;
-
-    using DevExpress.XtraPrinting.Native;
 
     using ReactiveUI;
 
@@ -119,10 +117,9 @@ namespace BasicRdl.ViewModels
             {
                 if (columnName == "MaxContainedString")
                 {
-                    if (this.MaxContainedString != null && !this.MaxContainedString.IsEmpty())
+                    if (!string.IsNullOrWhiteSpace(this.MaxContainedString))
                     {
-                        int result;
-                        if (int.TryParse(this.MaxContainedString, out result))
+                        if (int.TryParse(this.MaxContainedString, out var result))
                         {
                             if (result < this.MinContained)
                             {
@@ -210,12 +207,11 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private void UpdateMaxContained()
         {
-            int result;
-            if (this.MaxContainedString == null || this.MaxContainedString.IsEmpty())
+            if (!string.IsNullOrWhiteSpace(this.MaxContainedString))
             {
                 this.MaxContained = null;
             }
-            else if (int.TryParse(this.MaxContainedString, out result) || result > 0)
+            else if (int.TryParse(this.MaxContainedString, out var result) || result > 0)
             {
                 this.MaxContained = result;
             }
@@ -228,7 +224,7 @@ namespace BasicRdl.ViewModels
         {
             base.UpdateOkCanExecute();
             this.OkCanExecute = this.OkCanExecute && this.SelectedContainingCategory != null &&
-                                this.ContainedCategory.Count > 0 && this["MaxContainedString"].IsEmpty();
+                                this.ContainedCategory.Count > 0 && string.IsNullOrWhiteSpace(this["MaxContainedString"]);
         }
 
         /// <summary>

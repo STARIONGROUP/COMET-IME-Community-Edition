@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="MultiRelationshipDiagramConnector.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ namespace CDP4RelationshipEditor.Controls
             this.BeginItem = this.Source;
             this.EndItem = this.Target;
             
-            this.Text = string.Join(", ", this.GetAppliedMultiRelationshipRules().Select(b => b.Name));
+            this.Content = string.Join(", ", this.GetAppliedMultiRelationshipRules().Select(b => b.Name));
         }
 
         /// <summary>

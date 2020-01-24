@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="BinaryRelationshipDiagramConnector.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ namespace CDP4RelationshipEditor.Controls
 
             if (relationship != null)
             {
-                this.Text = string.Join(", ", relationship.AppliedBinaryRelationshipRules.Select(b => b.Name)).PadLeft(1).PadRight(1);
+                this.Content = string.Join(", ", relationship.AppliedBinaryRelationshipRules.Select(b => b.Name)).PadLeft(1).PadRight(1);
             }
         }
 

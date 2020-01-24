@@ -17,8 +17,6 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using DevExpress.XtraPrinting.Native;
-
     using ReactiveUI;
 
     /// <summary>
@@ -37,8 +35,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateProperties();
         }
-
-        #region RowBase
 
         /// <summary>
         /// Initializes the subscriptions
@@ -71,8 +67,6 @@ namespace CDP4EngineeringModel.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-
-        #endregion
 
         /// <summary>
         /// Update the row's properties on update of the current <see cref="Thing"/>
