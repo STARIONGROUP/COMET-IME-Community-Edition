@@ -56,6 +56,11 @@ namespace CDP4Requirements.ViewModels
         private static RequirementsSpecificationComparer SpecComparer = new RequirementsSpecificationComparer();
 
         /// <summary>
+        /// Backing field for <see cref="ShowDetailsPanel"/>
+        /// </summary>
+        private bool showDetailsPanel;
+
+        /// <summary>
         /// Backing field for <see cref="CanCreateReqSpec"/>
         /// </summary>
         private bool canCreateReqSpec;
@@ -129,10 +134,10 @@ namespace CDP4Requirements.ViewModels
         {
             this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
             this.ToolTip =
-                $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+                $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.ReqSpecificationRows = new DisposableReactiveList<RequirementsSpecificationRowViewModel>();
-            var model = (EngineeringModel) this.Thing.Container;
+            var model = (EngineeringModel)this.Thing.Container;
             this.ActiveParticipant = model.GetActiveParticipant(this.Session.ActivePerson);
 
             this.ComputeUserDependentPermission();
@@ -143,6 +148,15 @@ namespace CDP4Requirements.ViewModels
             this.UpdateProperties();
 
             this.openRequirementsSpecificationEditorViewModels = new List<RequirementsSpecificationEditorViewModel>();
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to display details pane for selected item.
+        /// </summary>
+        public bool ShowDetailsPanel
+        {
+            get { return this.showDetailsPanel; }
+            set { this.RaiseAndSetIfChanged(ref this.showDetailsPanel, value); }
         }
 
         /// <summary>
@@ -356,7 +370,7 @@ namespace CDP4Requirements.ViewModels
                 var row = new RequirementsSpecificationRowViewModel(spec, this.Session, this);
                 this.ReqSpecificationRows.SortedInsert(row, SpecComparer);
 
-                var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel) this.Thing.TopContainer);
+                var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
 
                 if (orderPt != null)
                 {
@@ -364,11 +378,11 @@ namespace CDP4Requirements.ViewModels
                             CDPMessageBus.Current.Listen<ObjectChangedEvent>(
                                 typeof(RequirementsContainerParameterValue)),
                             objectChange =>
-                                (((RequirementsContainerParameterValue) objectChange.ChangedThing).ParameterType ==
+                                (((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType ==
                                  orderPt) && spec.ParameterValue.Contains(objectChange.ChangedThing))
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(
-                            x => this.UpdateSpecRowPosition((RequirementsSpecification) x.ChangedThing.Container));
+                            x => this.UpdateSpecRowPosition((RequirementsSpecification)x.ChangedThing.Container));
 
                     this.Disposables.Add(orderListener);
                 }
@@ -503,6 +517,8 @@ namespace CDP4Requirements.ViewModels
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
+
+            this.ShowDetailsPanel = true;
 
             this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateReqSpec));
             this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<RequirementsSpecification>(this.Thing));
@@ -657,7 +673,7 @@ namespace CDP4Requirements.ViewModels
 
                     foreach (var relationship in binaryRelationships)
                     {
-                        var parameter = (ParameterOrOverrideBase) ((BinaryRelationship) relationship).Source;
+                        var parameter = (ParameterOrOverrideBase)((BinaryRelationship)relationship).Source;
                         var suffix = parameter is ParameterOverride ? " (Override)" : "";
 
                         relationshipMenu.SubMenu.Add(new ContextMenuItemViewModel(
@@ -680,7 +696,7 @@ namespace CDP4Requirements.ViewModels
                 this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Waiver", "",
                 this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Verify Requirements", "", 
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Verify Requirements", "",
                 this.VerifyRequirementsCommand, MenuItemKind.Refresh, ClassKind.Requirement));
         }
 

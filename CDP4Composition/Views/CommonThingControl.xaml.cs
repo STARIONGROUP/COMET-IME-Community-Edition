@@ -31,6 +31,11 @@ namespace CDP4Composition.Views
         private readonly static DependencyProperty IsFavoriteToggleVisibleProperty = DependencyProperty.Register("IsFavoriteToggleVisible", typeof(bool), typeof(CommonThingControl));
 
         /// <summary>
+        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="IsFavoriteToggleVisible"/> setter method.
+        /// </summary>
+        private readonly static DependencyProperty IsDetailsToggleVisibleProperty = DependencyProperty.Register("IsDetailsToggleVisible", typeof(bool), typeof(CommonThingControl));
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CommonThingControl"/> class.
         /// </summary>
         public CommonThingControl()
@@ -46,6 +51,15 @@ namespace CDP4Composition.Views
         {
             get { return this.GetValue(GridViewProperty) as GridDataViewBase; }
             set { this.SetValue(GridViewProperty, value); }
+        }
+
+        /// <summary>
+        /// The boolean that enables or disables the visibility of the Details toggle buttons.
+        /// </summary>
+        public bool IsDetailsToggleVisible
+        {
+            get { return this.GetValue(IsDetailsToggleVisibleProperty) is bool ? (bool)this.GetValue(IsDetailsToggleVisibleProperty) : false; }
+            set { this.SetValue(IsDetailsToggleVisibleProperty, value); }
         }
 
         /// <summary>
