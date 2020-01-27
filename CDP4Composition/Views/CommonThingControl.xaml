@@ -80,15 +80,6 @@
                           Glyph="{dx:DXImage Image=NewContact_16x16.png}"
                           Hint="Toggle filtering on favorite items."
                           IsEnabled="{Binding HasSession, UpdateSourceTrigger=PropertyChanged}"/>
-
-        <dxb:BarCheckItem 
-            IsChecked="{Binding ShowDetailsPanel}"
-            IsVisible="{Binding IsDetailsToggleVisible, ElementName=Toolbar}"
-            Content="Switching on details panel"
-            Description="Toggle on showing details of the selected item."
-            Glyph="{dx:DXImage Image=Fill_16x16.png}"
-            Hint="Toggle on showing details of the selected item."
-            IsEnabled="{Binding HasSession, UpdateSourceTrigger=PropertyChanged}"/>
         <dxb:BarSplitButtonItem />
     </dxb:ToolBarControl>
 </UserControl>

@@ -56,11 +56,6 @@ namespace CDP4Requirements.ViewModels
         private static RequirementsSpecificationComparer SpecComparer = new RequirementsSpecificationComparer();
 
         /// <summary>
-        /// Backing field for <see cref="ShowDetailsPanel"/>
-        /// </summary>
-        private bool showDetailsPanel;
-
-        /// <summary>
         /// Backing field for <see cref="CanCreateReqSpec"/>
         /// </summary>
         private bool canCreateReqSpec;
@@ -148,15 +143,6 @@ namespace CDP4Requirements.ViewModels
             this.UpdateProperties();
 
             this.openRequirementsSpecificationEditorViewModels = new List<RequirementsSpecificationEditorViewModel>();
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to display details pane for selected item.
-        /// </summary>
-        public bool ShowDetailsPanel
-        {
-            get { return this.showDetailsPanel; }
-            set { this.RaiseAndSetIfChanged(ref this.showDetailsPanel, value); }
         }
 
         /// <summary>
@@ -517,8 +503,6 @@ namespace CDP4Requirements.ViewModels
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-
-            this.ShowDetailsPanel = true;
 
             this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateReqSpec));
             this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<RequirementsSpecification>(this.Thing));

@@ -315,7 +315,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <views:CommonThingControl GridView="{Binding ElementName=View}" IsDetailsToggleVisible="True" />
+            <views:CommonThingControl GridView="{Binding ElementName=View}" />
 
             <views:BrowserHeader Grid.Row="1" />
 
@@ -382,8 +382,7 @@
                               VerticalAlignment="Stretch"
                               IsCollapsible="True"
                               Orientation="Vertical"
-                              GroupBoxDisplayMode="Normal"
-                              Visibility="{Binding ShowDetailsPanel, Converter={dx:BooleanToVisibilityConverter}}">
+                              GroupBoxDisplayMode="Normal">
                 <dxlc:LayoutItem VerticalAlignment="Stretch">
                     <dxe:TextEdit EditValue="{Binding Path=SelectedThing.Tooltip, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                   VerticalScrollBarVisibility="Auto"
