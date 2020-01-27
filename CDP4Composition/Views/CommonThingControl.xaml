@@ -80,7 +80,6 @@
                           Glyph="{dx:DXImage Image=NewContact_16x16.png}"
                           Hint="Toggle filtering on favorite items."
                           IsEnabled="{Binding HasSession, UpdateSourceTrigger=PropertyChanged}"/>
-
         <dxb:BarSplitButtonItem />
     </dxb:ToolBarControl>
 </UserControl>
