@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -259,28 +259,44 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         private void SetProperties(ParameterValueSetBase valueSet)
         {
-            this.Value = valueSet.ActualValue.Any() ? valueSet.ActualValue.First() : "-";
-
             if (this.ContainedRows.Count == 0)
             {
                 this.ScaleShortName = this.Thing.Scale == null ? "-" : this.Thing.Scale.ShortName;
             }
 
+            this.Value = this.GetDisplayValueFromValueSet(valueSet.ActualValue);
+            this.Formula = this.GetDisplayValueFromValueSet(valueSet.Formula, false);
+            this.Computed = this.GetDisplayValueFromValueSet(valueSet.Computed);
+            this.Manual = this.GetDisplayValueFromValueSet(valueSet.Manual);
+            this.Reference = this.GetDisplayValueFromValueSet(valueSet.Reference);
+            this.Published = this.GetDisplayValueFromValueSet(valueSet.Published);
+
             this.Switch = valueSet.ValueSwitch;
-            this.Formula = valueSet.Formula.Any() ? valueSet.Formula.First() : "-";
-            this.Computed = valueSet.Computed.Any() ? valueSet.Computed.First() : "-";
-
-            this.Manual = valueSet.Manual.Any()
-                ? valueSet.Manual.First().ToValueSetObject(this.ParameterType)
-                : ValueSetConverter.DefaultObject(this.ParameterType);
-
-            this.Reference = valueSet.Reference.Any()
-                ? valueSet.Reference.First().ToValueSetObject(this.ParameterType)
-                : ValueSetConverter.DefaultObject(this.ParameterType);
-
             this.State = valueSet.ActualState == null ? "-" : valueSet.ActualState.ShortName;
             this.Option = valueSet.ActualOption;
-            this.Published = valueSet.Published.Any() ? valueSet.Published.First() : "-";
+        }
+
+        /// <summary>
+        /// Returns a value from a valueset that is usefull to display in the UI
+        /// </summary>
+        /// <param name="valueArray">The <see cref="ValueArray{string}"/></param>
+        /// <param name="valueConformsToParameterType">States that the value must be compliant with the <see cref="ParameterType"/> value format.</param>
+        /// <returns>Display friendly <see cref="string"/></returns>
+        private string GetDisplayValueFromValueSet(ValueArray<string> valueArray, bool valueConformsToParameterType = true)
+        {
+            if (valueArray.Count > 1)
+            {
+                return string.Empty;
+            }
+
+            if (valueArray.Count == 1)
+            {
+                var value = valueArray.First();
+
+                return valueConformsToParameterType ? value.ToValueSetObject(this.ParameterType)?.ToString() : value;
+            }
+
+            return ValueSetConverter.DefaultObject(this.ParameterType)?.ToString();
         }
 
         /// <summary>
