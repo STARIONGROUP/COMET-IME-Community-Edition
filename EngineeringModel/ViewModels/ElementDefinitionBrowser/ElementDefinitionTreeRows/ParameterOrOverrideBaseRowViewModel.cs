@@ -269,18 +269,12 @@ namespace CDP4EngineeringModel.ViewModels
             this.Switch = valueSet.ValueSwitch;
             this.Formula = this.GetDisplayValueFromValueSet(valueSet.Formula);
             this.Computed = this.GetDisplayValueFromValueSet(valueSet.Computed);
-
-            this.Manual = valueSet.Manual.Any()
-                ? this.GetDisplayValueFromValueSet(valueSet.Manual).ToValueSetObject(this.ParameterType)
-                : ValueSetConverter.DefaultObject(this.ParameterType);
-
-            this.Reference = valueSet.Reference.Any()
-                ? this.GetDisplayValueFromValueSet(valueSet.Reference).ToValueSetObject(this.ParameterType)
-                : ValueSetConverter.DefaultObject(this.ParameterType);
+            this.Manual = this.GetDisplayValueFromValueSet(valueSet.Manual);
+            this.Reference = this.GetDisplayValueFromValueSet(valueSet.Reference);
+            this.Published = this.GetDisplayValueFromValueSet(valueSet.Published);
 
             this.State = valueSet.ActualState == null ? "-" : valueSet.ActualState.ShortName;
             this.Option = valueSet.ActualOption;
-            this.Published = this.GetDisplayValueFromValueSet(valueSet.Published);
         }
 
         /// <summary>
@@ -290,17 +284,20 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>Display friendly <see cref="string"/></returns>
         private string GetDisplayValueFromValueSet(ValueArray<string> valueArray)
         {
-            if (valueArray.Count > 1)
+            if (valueArray.Any())
             {
-                return null;
+                if (valueArray.Count > 1)
+                {
+                    return string.Empty;
+                }
+
+                if (valueArray.Count == 1)
+                {
+                    return valueArray.First().ToValueSetObject(this.ParameterType)?.ToString();
+                }
             }
 
-            if (valueArray.Count == 1)
-            {
-                return valueArray.First();
-            }
-
-            return "-";
+            return ValueSetConverter.DefaultObject(this.ParameterType)?.ToString();
         }
 
         /// <summary>
