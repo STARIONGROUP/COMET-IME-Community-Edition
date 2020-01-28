@@ -192,8 +192,17 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.iteration.ActualFiniteStateList.Add(actualList);
 
             var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
-            
-            // no row selected
+            viewmodel.FiniteStateList.Add(new CDP4Composition.FolderRowViewModel("Actual List", "Possible Finite State List", viewmodel.Session, viewmodel));
+            viewmodel.FiniteStateList.Add(new CDP4Composition.FolderRowViewModel("Possible List", "Actual Finite State List", viewmodel.Session, viewmodel));
+
+            //selected row Actual List
+            viewmodel.SelectedThing = viewmodel.FiniteStateList[0];
+            viewmodel.ComputePermission();
+            viewmodel.PopulateContextMenu();
+            Assert.AreEqual(2, viewmodel.ContextMenu.Count);
+
+            //selected row Possible List
+            viewmodel.SelectedThing = viewmodel.FiniteStateList[1];
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
             Assert.AreEqual(2, viewmodel.ContextMenu.Count);
@@ -204,7 +213,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             viewmodel.SelectedThing = psRow;
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
-            Assert.AreEqual(7, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(5, viewmodel.ContextMenu.Count);
 
             // execute set default
             Assert.IsTrue(viewmodel.CanSetAsDefault);
