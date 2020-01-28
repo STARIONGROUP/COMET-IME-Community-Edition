@@ -17,6 +17,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    using CDP4Common.Validation;
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
@@ -264,16 +265,52 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ScaleShortName = this.Thing.Scale == null ? "-" : this.Thing.Scale.ShortName;
             }
 
-            this.Value = this.GetDisplayValueFromValueSet(valueSet.ActualValue);
-            this.Formula = this.GetDisplayValueFromValueSet(valueSet.Formula, false);
-            this.Computed = this.GetDisplayValueFromValueSet(valueSet.Computed);
-            this.Manual = this.GetDisplayValueFromValueSet(valueSet.Manual);
-            this.Reference = this.GetDisplayValueFromValueSet(valueSet.Reference);
-            this.Published = this.GetDisplayValueFromValueSet(valueSet.Published);
+            if (this.Thing.ValueSets.Count() > 1)
+            {
+                this.Value = string.Empty;
+                this.Formula = string.Empty;
+                this.Computed = string.Empty;
+                this.Manual = string.Empty;
+                this.Reference = string.Empty;
+                this.Published = string.Empty;
 
-            this.Switch = valueSet.ValueSwitch;
-            this.State = valueSet.ActualState == null ? "-" : valueSet.ActualState.ShortName;
-            this.Option = valueSet.ActualOption;
+                this.Switch = null;
+                this.State = string.Empty;
+                this.Option = null;
+            }
+            else
+            {
+                this.Value = this.GetStringDisplayFromValueSet(valueSet.ActualValue, true);
+                this.Formula = this.GetStringDisplayFromValueSet(valueSet.Formula, false);
+                this.Computed = this.GetStringDisplayFromValueSet(valueSet.Computed, true);
+                this.Manual = this.GetObjectDisplayFromValueSet(valueSet.Manual);
+                this.Reference = this.GetObjectDisplayFromValueSet(valueSet.Reference);
+                this.Published = this.GetStringDisplayFromValueSet(valueSet.Published, true);
+
+                this.Switch = valueSet.ValueSwitch;
+                this.State = valueSet.ActualState == null ? "-" : valueSet.ActualState.ShortName;
+                this.Option = valueSet.ActualOption;
+            }
+        }
+
+        /// <summary>
+        /// Returns a value from a valueset that is usefull for edittable values
+        /// </summary>
+        /// <param name="valueArray">The <see cref="ValueArray{string}"/></param>
+        /// <returns>ValueSet value as an object, corresponding to the correct <see cref="ParameterType"/>, which is handled by a template selector</returns>
+        private object GetObjectDisplayFromValueSet(ValueArray<string> valueArray)
+        {
+            if (valueArray.Count > 1)
+            {
+                return null;
+            }
+
+            if (valueArray.Count == 1)
+            {
+                return valueArray.First().ToValueSetObject(this.ParameterType);
+            }
+
+            return ValueSetConverter.DefaultObject(this.ParameterType);
         }
 
         /// <summary>
@@ -281,8 +318,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         /// <param name="valueArray">The <see cref="ValueArray{string}"/></param>
         /// <param name="valueConformsToParameterType">States that the value must be compliant with the <see cref="ParameterType"/> value format.</param>
-        /// <returns>Display friendly <see cref="string"/></returns>
-        private string GetDisplayValueFromValueSet(ValueArray<string> valueArray, bool valueConformsToParameterType = true)
+        /// <returns>ValueSet value as a string, corresponding to the correct <see cref="ParameterType"/></returns>
+        private string GetStringDisplayFromValueSet(ValueArray<string> valueArray, bool valueConformsToParameterType)
         {
             if (valueArray.Count > 1)
             {
@@ -293,10 +330,15 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var value = valueArray.First();
 
-                return valueConformsToParameterType ? value.ToValueSetObject(this.ParameterType)?.ToString() : value;
+                if (valueConformsToParameterType)
+                {
+                    return value.ToValueSetString(this.ParameterType);
+                }
+
+                return value;
             }
 
-            return ValueSetConverter.DefaultObject(this.ParameterType)?.ToString();
+            return ValueValidator.DefaultValue;
         }
 
         /// <summary>
