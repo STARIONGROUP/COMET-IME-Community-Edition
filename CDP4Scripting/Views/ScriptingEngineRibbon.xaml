@@ -1,0 +1,61 @@
+﻿<ribbon:ExtendedRibbonPage x:Class="CDP4Scripting.Views.ScriptingEngineRibbon"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                           xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+                           xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+                           Name="Scripting"
+                           Caption="Scripting"
+                           CustomPageCategoryName="default"
+                           IsInDefaultPageCategory="True"
+                           MergeOrder="13000"
+                           mc:Ignorable="d">
+    <dxr:RibbonPageGroup Name="ScriptingRibbonPageGroup"
+                         Caption="Scripting"
+                         ShowCaptionButton="True">
+        <dxb:BarSplitButtonItem Content="New Script" Command="{Binding NewTextScriptCommand}"
+                                Glyph="{dx:DXImage Image=Example_16x16.png}"
+                                LargeGlyph="{dx:DXImage Image=Example_32x32.png}"
+                                RibbonStyle="Large">
+            <dxb:PopupMenu>
+                <dxb:BarButtonItem Name="NewLuaTab"
+                                   Content="Lua"
+                                   Glyph="{dx:DXImage Image=AddItem_16x16.png}"
+                                   Command="{Binding NewLuaScriptCommand}"
+                                   RibbonStyle="Large" />
+
+                <dxb:BarButtonItem Name="CreateNewPythonTab"
+                                   Content="Python"
+                                   Glyph="{dx:DXImage Image=AddItem_16x16.png}"
+                                   Command="{Binding NewPythonScriptCommand}"
+                                   RibbonStyle="Large" />
+
+                <dxb:BarButtonItem Name="CreateNewTextTab"
+                                   Content="Text"
+                                   Glyph="{dx:DXImage Image=AddItem_16x16.png}"
+                                   Command="{Binding NewTextScriptCommand}"
+                                   RibbonStyle="Large" />
+            </dxb:PopupMenu>
+        </dxb:BarSplitButtonItem>
+        <dxb:BarButtonItem
+            Name="OpenScript"
+            Content="Open"
+            Glyph="{dx:DXImage Image=BOFolder_16x16.png}"
+            LargeGlyph="{dx:DXImage Image=BOFolder_32x32.png}"
+            Hint="Open Script File"
+            RibbonStyle="Large"
+            Command="{Binding OpenScriptCommand}" />
+        <dxb:BarButtonItem
+            Name="SaveAllScripts"
+            Content="Save All"
+            Glyph="{dx:DXImage Image=SaveAll_16x16.png}"
+            LargeGlyph="{dx:DXImage Image=SaveAll_32x32.png}"
+            Hint="Save All Open Scripts"
+            RibbonStyle="Large"
+            Command="{Binding SaveAllCommand}" />
+    </dxr:RibbonPageGroup>
+</ribbon:ExtendedRibbonPage>

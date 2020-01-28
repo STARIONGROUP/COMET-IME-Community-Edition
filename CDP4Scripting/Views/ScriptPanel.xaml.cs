@@ -7,6 +7,7 @@
 namespace CDP4Scripting.Views
 {
     using System.Windows.Controls;
+
     using CDP4Composition;
     using CDP4Composition.Attributes;
 
@@ -18,10 +19,10 @@ namespace CDP4Scripting.Views
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptPanel"/> class
-        /// </summary>        
+        /// </summary>
         public ScriptPanel()
         {
-            this.InitializeComponent();            
+            this.InitializeComponent();
         }
 
         /// <summary>

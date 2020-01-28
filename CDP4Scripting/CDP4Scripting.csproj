@@ -262,8 +262,8 @@
     <Compile Include="Views\ScriptPanel.xaml.cs">
       <DependentUpon>ScriptPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ScriptingEngineRibbonPageGroup.xaml.cs">
-      <DependentUpon>ScriptingEngineRibbonPageGroup.xaml</DependentUpon>
+    <Compile Include="Views\ScriptingEngineRibbon.xaml.cs">
+      <DependentUpon>ScriptingEngineRibbon.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TextScriptPanel.cs" />
   </ItemGroup>
@@ -291,7 +291,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ScriptingEngineRibbonPageGroup.xaml">
+    <Page Include="Views\ScriptingEngineRibbon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
