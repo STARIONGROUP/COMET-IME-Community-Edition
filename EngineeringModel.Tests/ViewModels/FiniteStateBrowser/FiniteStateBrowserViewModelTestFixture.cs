@@ -192,8 +192,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.iteration.ActualFiniteStateList.Add(actualList);
 
             var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
-            viewmodel.FiniteStateList.Add(new CDP4Composition.FolderRowViewModel("Actual List", "Possible Finite State List", viewmodel.Session, viewmodel));
-            viewmodel.FiniteStateList.Add(new CDP4Composition.FolderRowViewModel("Possible List", "Actual Finite State List", viewmodel.Session, viewmodel));
 
             //selected row Possible List
             viewmodel.SelectedThing = viewmodel.FiniteStateList[0];
