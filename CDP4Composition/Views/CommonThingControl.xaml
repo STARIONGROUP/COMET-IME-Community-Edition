@@ -48,22 +48,25 @@
             Converter={dx:FormatStringConverter FormatString={}Inspect {0}}}" />
 
         <dxb:BarButtonItem Command="{Binding RefreshCommand}"
+                           IsVisible="False"
                                Glyph="{dx:DXImage Image=Refresh2_16x16.png}"
                                Hint="{Binding SelectedThingClassKindString,
             Converter={dx:FormatStringConverter FormatString={}Refresh {0}}}" />
 
         <dxb:BarButtonItem Command="{Binding ExportCommand}"
+                           IsVisible="False"
                                Glyph="{dx:DXImage Image=Export_16x16.png}"
                                Hint="{Binding SelectedThingClassKindString,
             Converter={dx:FormatStringConverter FormatString={}Export {0}}}" />
 
-        <dxb:BarSplitButtonItem />
+        <dxb:BarSplitButtonItem IsVisible="False"/>
 
         <dxb:BarButtonItem Command="{Binding HelpCommand}"
+                           IsVisible="False"
                            Glyph="{dx:DXImage Image=Info_16x16.png}"
                            Hint="Show Help" />
 
-        <dxb:BarSplitButtonItem />
+        <dxb:BarSplitButtonItem IsVisible="False"/>
 
         <dxb:BarButtonItem ItemClick="ButtonBase_OnClick"
                            Glyph="{dx:DXImage Image=Zoom_16x16.png}"
@@ -77,7 +80,6 @@
                           Glyph="{dx:DXImage Image=NewContact_16x16.png}"
                           Hint="Toggle filtering on favorite items."
                           IsEnabled="{Binding HasSession, UpdateSourceTrigger=PropertyChanged}"/>
-
         <dxb:BarSplitButtonItem />
     </dxb:ToolBarControl>
 </UserControl>
