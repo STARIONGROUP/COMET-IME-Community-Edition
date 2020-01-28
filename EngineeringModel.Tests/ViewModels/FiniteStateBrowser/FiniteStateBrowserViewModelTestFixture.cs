@@ -193,6 +193,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
+            //no row selected. SelectedThing is null
+            Assert.AreEqual(0, viewmodel.ContextMenu.Count);
+
             //selected row Possible List
             viewmodel.SelectedThing = viewmodel.FiniteStateList[0];
             viewmodel.ComputePermission();
