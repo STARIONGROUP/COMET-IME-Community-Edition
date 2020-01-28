@@ -69,7 +69,7 @@ namespace CDP4Scripting
         /// </summary>
         public void Initialize()
         {
-            this.RegionManager.RegisterViewWithRegion(CDP4Composition.RegionNames.RibbonRegion, typeof(ScriptingEngineRibbonPageGroup));
+            this.RegionManager.RegisterViewWithRegion(CDP4Composition.RegionNames.RibbonRegion, typeof(ScriptingEngineRibbon));
         }
     }
 }

@@ -16,14 +16,15 @@ namespace CDP4Scripting.Views
     /// <summary>
     /// Interaction logic for ScriptingEngineRibbonPageGroup.xaml
     /// </summary>
-    [Export(typeof(ScriptingEngineRibbonPageGroup))]
-    public partial class ScriptingEngineRibbonPageGroup : ExtendedRibbonPageGroup, IView
+    [Export(typeof(ScriptingEngineRibbon))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public partial class ScriptingEngineRibbon : ExtendedRibbonPage, IView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptingEngineRibbonPageGroup"/> class
         /// </summary>       
         [ImportingConstructor]
-        public ScriptingEngineRibbonPageGroup(IPanelNavigationService panelNavigationService, IOpenSaveFileDialogService fileDialogService, IScriptingProxy scriptingProxy)
+        public ScriptingEngineRibbon(IPanelNavigationService panelNavigationService, IOpenSaveFileDialogService fileDialogService, IScriptingProxy scriptingProxy)
         {
             this.InitializeComponent();
             this.DataContext = new ScriptingEngineRibbonPageGroupViewModel(panelNavigationService, fileDialogService, scriptingProxy);
