@@ -195,17 +195,23 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             viewmodel.FiniteStateList.Add(new CDP4Composition.FolderRowViewModel("Actual List", "Possible Finite State List", viewmodel.Session, viewmodel));
             viewmodel.FiniteStateList.Add(new CDP4Composition.FolderRowViewModel("Possible List", "Actual Finite State List", viewmodel.Session, viewmodel));
 
-            //selected row Actual List
+            //selected row Possible List
             viewmodel.SelectedThing = viewmodel.FiniteStateList[0];
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
             Assert.AreEqual(2, viewmodel.ContextMenu.Count);
 
-            //selected row Possible List
+            var menuKindPossible = viewmodel.ContextMenu[1].thingKind;
+            Assert.True(menuKindPossible.ToString() == "PossibleFiniteStateList");
+
+            //selected row Actual List
             viewmodel.SelectedThing = viewmodel.FiniteStateList[1];
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
             Assert.AreEqual(2, viewmodel.ContextMenu.Count);
+
+            var menuKindActual = viewmodel.ContextMenu[1].thingKind;
+            Assert.True (menuKindActual.ToString() == "ActualFiniteStateList");
 
             // posible state row selected
             var pslFolder = viewmodel.FiniteStateList.First();
