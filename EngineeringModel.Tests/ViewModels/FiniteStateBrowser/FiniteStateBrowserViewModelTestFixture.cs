@@ -192,11 +192,27 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.iteration.ActualFiniteStateList.Add(actualList);
 
             var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
-            
-            // no row selected
+
+            //no row selected. SelectedThing is null
+            Assert.AreEqual(0, viewmodel.ContextMenu.Count);
+
+            //selected row Possible List
+            viewmodel.SelectedThing = viewmodel.FiniteStateList[0];
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
             Assert.AreEqual(2, viewmodel.ContextMenu.Count);
+
+            var menuKindPossible = viewmodel.ContextMenu[1].thingKind;
+            Assert.True(menuKindPossible.ToString() == "PossibleFiniteStateList");
+
+            //selected row Actual List
+            viewmodel.SelectedThing = viewmodel.FiniteStateList[1];
+            viewmodel.ComputePermission();
+            viewmodel.PopulateContextMenu();
+            Assert.AreEqual(2, viewmodel.ContextMenu.Count);
+
+            var menuKindActual = viewmodel.ContextMenu[1].thingKind;
+            Assert.True (menuKindActual.ToString() == "ActualFiniteStateList");
 
             // posible state row selected
             var pslFolder = viewmodel.FiniteStateList.First();
@@ -204,7 +220,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             viewmodel.SelectedThing = psRow;
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
-            Assert.AreEqual(7, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(5, viewmodel.ContextMenu.Count);
 
             // execute set default
             Assert.IsTrue(viewmodel.CanSetAsDefault);

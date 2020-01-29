@@ -66,7 +66,7 @@ namespace CDP4ProductTree.ViewModels
         /// The container <see cref="iterationSetup"/> that is referenced by the container <see cref="Iteration"/> of the current <see cref="Option"/>.
         /// </summary>
         private readonly IterationSetup iterationSetup;
-
+        
         /// <summary>
         /// Backing field for <see cref="CanCreateSubscription"/>
         /// </summary>
@@ -106,8 +106,8 @@ namespace CDP4ProductTree.ViewModels
         public ProductTreeViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, {this.Thing.Name}";
+            this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.TopElement = new DisposableReactiveList<ElementDefinitionRowViewModel>();
             var model = (EngineeringModel)this.Thing.TopContainer;
@@ -121,8 +121,8 @@ namespace CDP4ProductTree.ViewModels
             var iterationSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(iteration)
                 .Where(
                     objectChange =>
-                        objectChange.EventKind == EventKind.Updated &&
-                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                        (objectChange.EventKind == EventKind.Updated) &&
+                        (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                 .Select(x => x.ChangedThing as Iteration)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.SetTopElement);
@@ -189,9 +189,8 @@ namespace CDP4ProductTree.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.isDisplayShortNamesOn, value); }
         }
 
-
         /// <summary>
-        /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterSubscription"/>
+        /// Gets the <see cref="ReactiveCommand"/> to create a <see cref="ParameterSubscription"/>
         /// </summary>
         public ReactiveCommand<object> CreateSubscriptionCommand { get; private set; }
 
@@ -205,12 +204,17 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="ICommand"/> to delete a <see cref="ParameterSubscription"/>
+        /// Gets the <see cref="ReactiveCommand"/> to Copy Model Code to clipboard <see cref="ParameterRowViewModel"/>
+        /// </summary>
+        public ReactiveCommand<object> CopyModelCodeToClipboardCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to delete a <see cref="ParameterSubscription"/>
         /// </summary>
         public ReactiveCommand<object> DeleteSubscriptionCommand { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="ICommand"/> to toggle <see cref="ElementUsage"/>s between Name and ShortName
+        /// Gets the <see cref="ReactiveCommand"/> to toggle <see cref="ElementUsage"/>s between Name and ShortName
         /// </summary>
         public ReactiveCommand<object> ToggleUsageNamesCommand { get; private set; }
 
@@ -229,7 +233,7 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterOverride"/>
+        /// Gets the <see cref="ReactiveCommand"/> to create a <see cref="ParameterOverride"/>
         /// </summary>
         public ReactiveCommand<object> CreateOverrideCommand { get; private set; }
 
@@ -302,7 +306,7 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
-        /// Initialize the <see cref="ICommand"/>
+        /// Initialize the <see cref="ReactiveCommand"/>
         /// </summary>
         protected override void InitializeCommands()
         {
@@ -310,14 +314,17 @@ namespace CDP4ProductTree.ViewModels
             this.CreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSubscription));
             this.CreateSubscriptionCommand.Subscribe(_ => this.ExecuteCreateSubscriptionCommand());
 
+            this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create();
+            this.CopyModelCodeToClipboardCommand.Subscribe(_ => this.ExecuteCopyModelCodeToClipboardCommand());
+
             this.DeleteSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDeleteSubscription));
 
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
 
-            this.DeleteSubscriptionCommand.Subscribe(_ => this.ExecuteDeleteCommand(
+            this.DeleteSubscriptionCommand.Subscribe(
+                _ => this.ExecuteDeleteCommand(
                 ((ParameterOrOverrideBase)this.SelectedThing.Thing).ParameterSubscription
-                .Single(s => s.Owner.Equals(tuple.Item1))));
+                .Single(s => (tuple != null) && s.Owner.Equals(tuple.Item1))));
 
             this.CreateParameterGroup = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
             this.CreateParameterGroup.Subscribe(_ => this.ExecuteCreateCommand<ParameterGroup>(this.SelectedThing.Thing.GetContainerOfType<ElementDefinition>()));
@@ -368,20 +375,22 @@ namespace CDP4ProductTree.ViewModels
                 return;
             }
 
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
 
-            var activeDomain = tuple.Item1;
+            if (tuple != null)
+            {
+                var activeDomain = tuple.Item1;
 
-            this.CanCreateSubscription = parameterOrOverrideRow.Thing.ParameterSubscription.All(ps => ps.Owner != activeDomain)
-                                         && parameterOrOverrideRow.Thing.Owner != activeDomain
-                                         && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, parameterOrOverrideRow.Thing);
-            this.CanDeleteSubscription = parameterOrOverrideRow.Thing.ParameterSubscription.Any(ps => ps.Owner == activeDomain)
-                                         && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, parameterOrOverrideRow.Thing);
+                this.CanCreateSubscription = parameterOrOverrideRow.Thing.ParameterSubscription.All(ps => ps.Owner != activeDomain)
+                                             && (parameterOrOverrideRow.Thing.Owner != activeDomain)
+                                             && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, parameterOrOverrideRow.Thing);
+                this.CanDeleteSubscription = parameterOrOverrideRow.Thing.ParameterSubscription.Any(ps => ps.Owner == activeDomain)
+                                             && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, parameterOrOverrideRow.Thing);
 
-            this.CanCreateOverride = parameterOrOverrideRow.Thing is Parameter
-                                    && (parameterOrOverrideRow.Thing.Owner == activeDomain || ((Parameter)parameterOrOverrideRow.Thing).AllowDifferentOwnerOfOverride)
-                                    && this.PermissionService.CanWrite(ClassKind.ParameterOverride, this.SelectedThing.ContainerViewModel.Thing);
+                this.CanCreateOverride = parameterOrOverrideRow.Thing is Parameter
+                                         && ((parameterOrOverrideRow.Thing.Owner == activeDomain) || ((Parameter)parameterOrOverrideRow.Thing).AllowDifferentOwnerOfOverride)
+                                         && this.PermissionService.CanWrite(ClassKind.ParameterOverride, this.SelectedThing.ContainerViewModel.Thing);
+            }
         }
 
         /// <summary>
@@ -401,6 +410,11 @@ namespace CDP4ProductTree.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
             }
 
+            if (this.SelectedThing is IModelCodeRowViewModel)
+            {
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
+            }
+
             var parameterOrOverrideRow = this.SelectedThing as ParameterOrOverrideBaseRowViewModel;
             if (parameterOrOverrideRow == null)
             {
@@ -409,13 +423,16 @@ namespace CDP4ProductTree.ViewModels
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Subscription", "", this.CreateSubscriptionCommand, MenuItemKind.Create, ClassKind.ParameterSubscription));
 
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
-            var owner = tuple.Item1;
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
 
-            if (parameterOrOverrideRow.Thing.ParameterSubscription.Any(s => s.Owner.Equals(owner)))
+            if (tuple != null)
             {
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Delete Subscription", "", this.DeleteSubscriptionCommand, MenuItemKind.Delete, ClassKind.ParameterSubscription));
+                var owner = tuple.Item1;
+
+                if (parameterOrOverrideRow.Thing.ParameterSubscription.Any(s => s.Owner.Equals(owner)))
+                {
+                    this.ContextMenu.Add(new ContextMenuItemViewModel("Delete Subscription", "", this.DeleteSubscriptionCommand, MenuItemKind.Delete, ClassKind.ParameterSubscription));
+                }
             }
 
             var parameter = parameterOrOverrideRow.Thing as Parameter;
@@ -449,19 +466,19 @@ namespace CDP4ProductTree.ViewModels
         private void AddSubscriptions()
         {
             var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.modelSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(engineeringModelSetupSubscription);
 
             var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(domainOfExpertiseSubscription);
 
             var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(iterationSetupSubscription);
@@ -513,9 +530,25 @@ namespace CDP4ProductTree.ViewModels
             }
             else
             {
-                this.DomainOfExpertise = (iterationDomainPair.Value.Item1 == null)
+                this.DomainOfExpertise = iterationDomainPair.Value.Item1 == null
                                         ? "None"
                                         : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
+            }
+        }
+
+        /// <summary>
+        /// Execute the <see cref="CopyModelCodeToClipboardCommand"/>
+        /// </summary>
+        private void ExecuteCopyModelCodeToClipboardCommand()
+        {
+            if (this.SelectedThing == null)
+            {
+                return;
+            }
+
+            if (this.SelectedThing is IModelCodeRowViewModel)
+            {
+                Clipboard.SetText(((IModelCodeRowViewModel)this.SelectedThing).ModelCode);
             }
         }
 
@@ -535,27 +568,29 @@ namespace CDP4ProductTree.ViewModels
                 return;
             }
 
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
 
-            var subscription = new ParameterSubscription
+            if (tuple != null)
             {
-                Owner = tuple.Item1
-            };
+                var subscription = new ParameterSubscription
+                {
+                    Owner = tuple.Item1
+                };
 
-            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
-            var transaction = new ThingTransaction(transactionContext);
+                var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
+                var transaction = new ThingTransaction(transactionContext);
 
-            var clone = parameterOrOverrideRow.Thing.Clone(false);
-            transaction.Create(subscription);
-            transaction.CreateOrUpdate(clone);
-            clone.ParameterSubscription.Add(subscription);
+                var clone = parameterOrOverrideRow.Thing.Clone(false);
+                transaction.Create(subscription);
+                transaction.CreateOrUpdate(clone);
+                clone.ParameterSubscription.Add(subscription);
 
-            await this.DalWrite(transaction);
+                await this.DalWrite(transaction);
+            }
         }
 
         /// <summary>
-        /// Execute the <see cref="CreateCommand"/>
+        /// Execute the <see cref="CreateOverrideCommand"/>
         /// </summary>
         private async Task ExecuteCreateParameterOverride()
         {
@@ -576,26 +611,27 @@ namespace CDP4ProductTree.ViewModels
                 return;
             }
 
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
 
-            var parameterOverride = new ParameterOverride
+            if (tuple != null)
             {
-                Parameter = parameter,
-                Owner = tuple.Item1
-            };
+                var parameterOverride = new ParameterOverride
+                {
+                    Parameter = parameter,
+                    Owner = tuple.Item1
+                };
 
+                var transactionContext = TransactionContextResolver.ResolveContext(elementUsage);
+                var transaction = new ThingTransaction(transactionContext);
 
-            var transactionContext = TransactionContextResolver.ResolveContext(elementUsage);
-            var transaction = new ThingTransaction(transactionContext);
+                transaction.Create(parameterOverride);
 
-            transaction.Create(parameterOverride);
+                var clone = elementUsage.Clone(false);
+                transaction.CreateOrUpdate(clone);
+                clone.ParameterOverride.Add(parameterOverride);
 
-            var clone = elementUsage.Clone(false);
-            transaction.CreateOrUpdate(clone);
-            clone.ParameterOverride.Add(parameterOverride);
-
-            await this.DalWrite(transaction);
+                await this.DalWrite(transaction);
+            }
         }
 
         /// <summary>

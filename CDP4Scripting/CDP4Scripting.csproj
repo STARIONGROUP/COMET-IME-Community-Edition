@@ -48,8 +48,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=5.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.5.0.2-2020.1.8.1\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.5.1.0\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4Dal, Version=5.1.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -278,8 +278,8 @@
     <Compile Include="Views\ScriptPanel.xaml.cs">
       <DependentUpon>ScriptPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ScriptingEngineRibbonPageGroup.xaml.cs">
-      <DependentUpon>ScriptingEngineRibbonPageGroup.xaml</DependentUpon>
+    <Compile Include="Views\ScriptingEngineRibbon.xaml.cs">
+      <DependentUpon>ScriptingEngineRibbon.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TextScriptPanel.cs" />
   </ItemGroup>
@@ -307,7 +307,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ScriptingEngineRibbonPageGroup.xaml">
+    <Page Include="Views\ScriptingEngineRibbon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

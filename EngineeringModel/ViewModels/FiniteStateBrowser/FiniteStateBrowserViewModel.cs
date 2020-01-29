@@ -42,6 +42,16 @@ namespace CDP4EngineeringModel.ViewModels
         private const string PanelCaption = "Finite States";
 
         /// <summary>
+        /// The Actual List Short Name
+        /// </summary>
+        private const string ActualListShortName = "Actual List";
+
+        /// <summary>
+        /// The Possible List Short Name
+        /// </summary>
+        private const string PossibleListShortName = "Possible List";
+
+        /// <summary>
         /// The intermediate folder containing <see cref="PossibleFiniteStateList"/>
         /// </summary>
         private CDP4Composition.FolderRowViewModel possibleFiniteStateListFolder;
@@ -208,8 +218,8 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.Initialize();
             this.FiniteStateList = new DisposableReactiveList<CDP4Composition.FolderRowViewModel>();
-            this.possibleFiniteStateListFolder = new CDP4Composition.FolderRowViewModel("Possible List", "Possible Finite State List", this.Session, this);
-            this.actualFiniteStateListFolder = new CDP4Composition.FolderRowViewModel("Actual List", "Actual Finite State List", this.Session, this);
+            this.possibleFiniteStateListFolder = new CDP4Composition.FolderRowViewModel(PossibleListShortName, "Possible Finite State List", this.Session, this);
+            this.actualFiniteStateListFolder = new CDP4Composition.FolderRowViewModel(ActualListShortName, "Actual Finite State List", this.Session, this);
             this.FiniteStateList.Add(this.possibleFiniteStateListFolder);
             this.FiniteStateList.Add(this.actualFiniteStateListFolder);
         }
@@ -283,8 +293,18 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulateContextMenu();
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Possible Finite State List", "", this.CreatePossibleFiniteStateListCommand, MenuItemKind.Create, ClassKind.PossibleFiniteStateList));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Actual Finite State List", "", this.CreateActualFiniteStateListCommand, MenuItemKind.Create, ClassKind.ActualFiniteStateList));
+            if (this.SelectedThing is CDP4Composition.FolderRowViewModel finiteRow)
+            {
+                switch (finiteRow.ShortName)
+                {
+                    case PossibleListShortName:
+                        this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Possible Finite State List", "", this.CreatePossibleFiniteStateListCommand, MenuItemKind.Create, ClassKind.PossibleFiniteStateList));
+                        break;
+                    case ActualListShortName:
+                        this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Actual Finite State List", "", this.CreateActualFiniteStateListCommand, MenuItemKind.Create, ClassKind.ActualFiniteStateList));
+                        break;
+                }
+            }
 
             var possibleStateRow = this.SelectedThing as PossibleFiniteStateRowViewModel;
             if (possibleStateRow != null)

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -17,6 +17,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    using CDP4Common.Validation;
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
@@ -259,28 +260,85 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         private void SetProperties(ParameterValueSetBase valueSet)
         {
-            this.Value = valueSet.ActualValue.Any() ? valueSet.ActualValue.First() : "-";
-
             if (this.ContainedRows.Count == 0)
             {
                 this.ScaleShortName = this.Thing.Scale == null ? "-" : this.Thing.Scale.ShortName;
             }
 
-            this.Switch = valueSet.ValueSwitch;
-            this.Formula = valueSet.Formula.Any() ? valueSet.Formula.First() : "-";
-            this.Computed = valueSet.Computed.Any() ? valueSet.Computed.First() : "-";
+            if (this.Thing.ValueSets.Count() > 1)
+            {
+                this.Value = string.Empty;
+                this.Formula = string.Empty;
+                this.Computed = string.Empty;
+                this.Manual = string.Empty;
+                this.Reference = string.Empty;
+                this.Published = string.Empty;
 
-            this.Manual = valueSet.Manual.Any()
-                ? valueSet.Manual.First().ToValueSetObject(this.ParameterType)
-                : ValueSetConverter.DefaultObject(this.ParameterType);
+                this.Switch = null;
+                this.State = string.Empty;
+                this.Option = null;
+            }
+            else
+            {
+                this.Value = this.GetStringDisplayFromValueSet(valueSet.ActualValue, true);
+                this.Formula = this.GetStringDisplayFromValueSet(valueSet.Formula, false);
+                this.Computed = this.GetStringDisplayFromValueSet(valueSet.Computed, true);
+                this.Manual = this.GetObjectDisplayFromValueSet(valueSet.Manual);
+                this.Reference = this.GetObjectDisplayFromValueSet(valueSet.Reference);
+                this.Published = this.GetStringDisplayFromValueSet(valueSet.Published, true);
 
-            this.Reference = valueSet.Reference.Any()
-                ? valueSet.Reference.First().ToValueSetObject(this.ParameterType)
-                : ValueSetConverter.DefaultObject(this.ParameterType);
+                this.Switch = valueSet.ValueSwitch;
+                this.State = valueSet.ActualState == null ? "-" : valueSet.ActualState.ShortName;
+                this.Option = valueSet.ActualOption;
+            }
+        }
 
-            this.State = valueSet.ActualState == null ? "-" : valueSet.ActualState.ShortName;
-            this.Option = valueSet.ActualOption;
-            this.Published = valueSet.Published.Any() ? valueSet.Published.First() : "-";
+        /// <summary>
+        /// Returns a value from a valueset that is usefull for edittable values
+        /// </summary>
+        /// <param name="valueArray">The <see cref="ValueArray{string}"/></param>
+        /// <returns>ValueSet value as an object, corresponding to the correct <see cref="ParameterType"/>, which is handled by a template selector</returns>
+        private object GetObjectDisplayFromValueSet(ValueArray<string> valueArray)
+        {
+            if (valueArray.Count > 1)
+            {
+                return null;
+            }
+
+            if (valueArray.Count == 1)
+            {
+                return valueArray.First().ToValueSetObject(this.ParameterType);
+            }
+
+            return ValueSetConverter.DefaultObject(this.ParameterType);
+        }
+
+        /// <summary>
+        /// Returns a value from a valueset that is usefull to display in the UI
+        /// </summary>
+        /// <param name="valueArray">The <see cref="ValueArray{string}"/></param>
+        /// <param name="valueConformsToParameterType">States that the value must be compliant with the <see cref="ParameterType"/> value format.</param>
+        /// <returns>ValueSet value as a string, corresponding to the correct <see cref="ParameterType"/></returns>
+        private string GetStringDisplayFromValueSet(ValueArray<string> valueArray, bool valueConformsToParameterType)
+        {
+            if (valueArray.Count > 1)
+            {
+                return string.Empty;
+            }
+
+            if (valueArray.Count == 1)
+            {
+                var value = valueArray.First();
+
+                if (valueConformsToParameterType)
+                {
+                    return value.ToValueSetString(this.ParameterType);
+                }
+
+                return value;
+            }
+
+            return ValueValidator.DefaultValue;
         }
 
         /// <summary>

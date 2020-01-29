@@ -236,6 +236,53 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
+        public void VerifyThatPropertyValuesAreSetWhenMultipleValueSets()
+        {
+            // Test input
+            var valueSet1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var valueSet2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            this.SetScalarValueSet(valueSet1);
+            this.SetScalarValueSet(valueSet2);
+
+            this.parameter1.ValueSet.Add(valueSet1);
+            this.parameter1.ValueSet.Add(valueSet2);
+            // *******************
+
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+
+            Assert.AreEqual("PTName", row.Name);
+            Assert.AreEqual("active", row.OwnerName);
+            Assert.AreEqual(string.Empty, row.Manual);
+            Assert.AreEqual(string.Empty, row.Computed);
+            Assert.AreEqual(string.Empty, row.Reference);
+            Assert.AreEqual(string.Empty, row.Formula);
+            Assert.That(row.ScaleName, Is.Null.Or.Empty);
+        }
+
+        [Test]
+        public void VerifyThatPropertyValuesAreSetForCompoundValueSet()
+        {
+            // Test input
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            this.SetCompoundValueSet(valueSet);
+
+            this.parameter1.ValueSet.Add(valueSet);
+            // *******************
+
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+
+            Assert.AreEqual("PTName", row.Name);
+            Assert.AreEqual("active", row.OwnerName);
+            Assert.AreEqual(null, row.Manual);
+            Assert.AreEqual(string.Empty, row.Computed);
+            Assert.AreEqual(null, row.Reference);
+            Assert.AreEqual(string.Empty, row.Formula);
+            Assert.That(row.ScaleName, Is.Null.Or.Empty);
+        }
+
+        [Test]
         public void VerifyThatNoOptionNoStateParameterIsSet()
         {
             // Test input

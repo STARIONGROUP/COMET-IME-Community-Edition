@@ -7,6 +7,8 @@
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:viewModels="clr-namespace:CDP4Requirements.ViewModels"
@@ -310,9 +312,10 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <views:CommonThingControl GridView="{Binding ElementName=View}"/>
+            <views:CommonThingControl GridView="{Binding ElementName=View}" />
 
             <views:BrowserHeader Grid.Row="1" />
 
@@ -360,7 +363,7 @@
                         <dxg:TreeListView.FocusedRow>
                             <dynamic:ExpandoObject />
                         </dxg:TreeListView.FocusedRow>
-                        
+
                         <dxg:TreeListView.ContextMenu>
                             <ContextMenu Name="RowContextMenu" />
                         </dxg:TreeListView.ContextMenu>
@@ -371,7 +374,25 @@
                     <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
                 </dxg:TreeListControl.InputBindings>
             </dxg:TreeListControl>
-            <StackPanel Grid.Row="3" Orientation="Horizontal" >
+            <dxlc:LayoutGroup Grid.Row="3"
+                              MinHeight="120"
+                              Header="Requirement Details"
+                              View="GroupBox"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              IsCollapsible="True"
+                              Orientation="Vertical"
+                              GroupBoxDisplayMode="Normal">
+                <dxlc:LayoutItem VerticalAlignment="Stretch">
+                    <dxe:TextEdit EditValue="{Binding Path=SelectedThing.Tooltip, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                  VerticalScrollBarVisibility="Auto"
+                                  VerticalContentAlignment="Top"
+                                  TextWrapping="Wrap"
+                                  Height="Auto"
+                                  IsReadOnly="True"/>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+            <StackPanel Grid.Row="4" Orientation="Horizontal" >
                 <CheckBox Name="ShowSimpleParameterValues" Margin="4,0,0,0" VerticalAlignment="Center" FontSize="10"
                           Content="Show Simple Parameter Values"  IsChecked="{Binding IsSimpleParameterValuesDisplayed,
                                                                     Mode=TwoWay,
