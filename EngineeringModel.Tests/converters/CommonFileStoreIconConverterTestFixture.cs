@@ -64,7 +64,7 @@ namespace CDP4EngineeringModel.Tests.converters
         {
             var result = (System.Windows.Media.Imaging.BitmapImage)this.commonFileStoreIconConverter.Convert(new object[] { new CDP4Common.EngineeringModelData.File() }, null, null, null);
 
-            var expectedUri = "pack://application:,,,/DevExpress.Images.v15.2;component/Images/Business Objects/BOFileAttachment_16x16.png";
+            var expectedUri = "pack://application:,,,/DevExpress.Images.v19.2;component/Images/Business Objects/BOFileAttachment_16x16.png";
 
             Assert.AreEqual(expectedUri, result.UriSource.ToString());
         }

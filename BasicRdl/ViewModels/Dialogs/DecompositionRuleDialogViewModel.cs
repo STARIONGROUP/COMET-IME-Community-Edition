@@ -207,7 +207,7 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private void UpdateMaxContained()
         {
-            if (!string.IsNullOrWhiteSpace(this.MaxContainedString))
+            if (string.IsNullOrWhiteSpace(this.MaxContainedString))
             {
                 this.MaxContained = null;
             }
