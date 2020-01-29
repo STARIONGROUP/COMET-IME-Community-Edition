@@ -12,16 +12,20 @@ namespace CDP4Composition.Mvvm.Behaviours
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
+
     using Diagram;
+
     using DragDrop;
+
     using IDiagramContainer = Diagram.IDiagramContainer;
 
     /// <summary>
     /// Allows proper callbacks on the 
     /// </summary>
-    public class ExtendedDiagramOrgChartBehavior: DiagramOrgChartBehavior, IExtendedDiagramOrgChartBehavior
+    public class ExtendedDiagramOrgChartBehavior : DiagramOrgChartBehavior, IExtendedDiagramOrgChartBehavior
     {
         /// <summary>
         /// The name of the data format used for drag-n-drop operations
@@ -48,106 +52,6 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// </summary>
         static ExtendedDiagramOrgChartBehavior()
         {
-            ItemsSourceProperty.OverrideMetadata(typeof(ExtendedDiagramOrgChartBehavior), new FrameworkPropertyMetadata(null, (d, e) => ((ExtendedDiagramOrgChartBehavior)d).OnItemsSourceChanged(e.OldValue, e.NewValue)));
-        }
-
-        /// <summary>
-        /// Handles the callback for the ItemsSource changing.
-        /// </summary>
-        /// <param name="oldValue">The old value.</param>
-        /// <param name="newValue">The new value.</param>
-        private void OnItemsSourceChanged(object oldValue, object newValue) 
-        {
-            var oldList = oldValue as INotifyCollectionChanged;
-            var newList = newValue as INotifyCollectionChanged;
-            if(newList != null)
-            {
-                newList.CollectionChanged += this.OnCollectionChanged;
-            }
-
-            if(oldList != null)
-            {
-                oldList.CollectionChanged -= this.OnCollectionChanged;
-            }
-        }
-
-        /// <summary>
-        /// Reinitializes the control's collection when the view model changes.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">The arguments</param>
-        public void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) 
-        {
-            if (e.NewItems != null)
-            {
-                // what happens when collection changes
-                foreach (var item in e.NewItems)
-                {
-                    this.AssociatedObject.Items.Add((DiagramItem)item);
-
-                    // perform reposition
-                    var diagramContentItem = item as ThingDiagramContentItem;
-
-                    if (diagramContentItem != null)
-                    {
-                        CorrectDiagramContentItemPosition(diagramContentItem);
-                    }
-                } 
-            }
-        }
-
-        /// <summary>
-        /// Does a correction for the diagram item center to correct for the size of the element.
-        /// TODO: This does not work! The control for some reason doesnt know its dimensions. To be investigated.
-        /// </summary>
-        /// <param name="diagramItem">The added <see cref="ThingDiagramContentItem"/>.</param>
-        private static void CorrectDiagramContentItemPosition(ThingDiagramContentItem diagramItem)
-        {
-            var horOffset = diagramItem.ActualWidth / 2;
-            var vertOffset = diagramItem.ActualHeight / 2;
-
-            var newCenter = new Point(diagramItem.Position.X - horOffset, diagramItem.Position.Y - vertOffset);
-            diagramItem.Position = newCenter;
-        }
-
-        /// <summary>
-        /// Reinitializes the viewmodel collection when the control collection changed.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">The arguments</param>
-        public void OnControlCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.OldItems != null)
-            {
-                var diagramViewModel = this.AssociatedObject.DataContext as IDiagramContainer;
-
-                if (diagramViewModel != null)
-                {
-                    diagramViewModel.RemoveItems(e.OldItems);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Reinitializes the viewmodel selection collection when the control collection changed.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">The arguments.</param>
-        public void OnControlSelectionChanged(object sender, EventArgs e)
-        {
-            var vm = this.AssociatedObject.DataContext as IDiagramContainer;
-            var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
-
-            if (vm != null)
-            {
-                vm.SelectedItems.Clear();
-                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
-                
-                foreach (var controlSelectedItem in controlSelectedItems)
-                {
-                    vm.SelectedItems.Add(controlSelectedItem);
-                }
-            }
         }
 
         /// <summary>
@@ -156,9 +60,6 @@ namespace CDP4Composition.Mvvm.Behaviours
         protected override void OnAttached()
         {
             base.OnAttached();
-
-            this.AssociatedObject.Items.CollectionChanged += this.OnControlCollectionChanged;
-            this.AssociatedObject.SelectionChanged += this.OnControlSelectionChanged;
 
             this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
 
@@ -196,9 +97,6 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// </summary>
         protected override void OnDetaching()
         {
-            this.AssociatedObject.Items.CollectionChanged -= this.OnControlCollectionChanged;
-            this.AssociatedObject.SelectionChanged -= this.OnControlSelectionChanged;
-
             this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
 
             this.AssociatedObject.PreviewMouseLeftButtonDown -= this.PreviewMouseLeftButtonDown;
@@ -270,6 +168,7 @@ namespace CDP4Composition.Mvvm.Behaviours
                     || Math.Abs(position.Y - dragStart.Y) > SystemParameters.MinimumVerticalDragDistance)
                 {
                     var dragSource = this.AssociatedObject.DataContext as IDragSource;
+
                     if (dragSource != null)
                     {
                         dragSource.StartDrag(this.dragInfo);
@@ -277,6 +176,7 @@ namespace CDP4Composition.Mvvm.Behaviours
                         if (this.dragInfo.Effects != DragDropEffects.None && this.dragInfo.Payload != null)
                         {
                             var data = new DataObject(DataFormat.Name, this.dragInfo.Payload);
+
                             try
                             {
                                 this.dragInProgress = true;
@@ -318,6 +218,7 @@ namespace CDP4Composition.Mvvm.Behaviours
             this.dropInfo = new DropInfo(sender, e);
 
             var dropTarget = this.AssociatedObject.DataContext as IDropTarget;
+
             if (dropTarget != null)
             {
                 dropTarget.DragOver(this.dropInfo);
@@ -327,6 +228,7 @@ namespace CDP4Composition.Mvvm.Behaviours
             }
 
             var dependencyObject = sender as DependencyObject;
+
             if (dependencyObject != null)
             {
                 this.Scroll(dependencyObject, e);
@@ -402,6 +304,7 @@ namespace CDP4Composition.Mvvm.Behaviours
             this.dropInfo = new DropInfo(sender, e);
 
             var dropTarget = this.AssociatedObject.DataContext as IDropTarget;
+
             if (dropTarget != null)
             {
                 dropTarget.Drop(this.dropInfo);

@@ -18,27 +18,6 @@ namespace CDP4Composition.Mvvm.Behaviours
     public interface IExtendedDiagramOrgChartBehavior
     {
         /// <summary>
-        /// Reinitializes the control's collection when the view model changes.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">The arguments</param>
-        void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
-
-        /// <summary>
-        /// Reinitializes the viewmodel collection when the control collection changed.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">The arguments</param>
-        void OnControlCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
-
-        /// <summary>
-        /// Reinitializes the viewmodel selection collection when the control collection changed.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">The arguments.</param>
-        void OnControlSelectionChanged(object sender, EventArgs e);
-
-        /// <summary>
         /// Converts control coordinates into document coordinates.
         /// </summary>
         /// <param name="dropPosition">The control <see cref="Point"/> where the drop occurs.</param>

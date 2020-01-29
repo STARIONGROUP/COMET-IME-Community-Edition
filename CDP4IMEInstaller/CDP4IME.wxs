@@ -206,7 +206,66 @@
       <Component Id="_3604FE92166F" Guid="{995D6C5B-0792-4EBC-A6DD-3604FE92166F}" Win64="$(var.Win64)">
         <File Id="_995D6C5B" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.PropertyGrid.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
-      
+
+      <Component Id="_BF4FBB271E0D" Guid="{C3BD8574-1870-4780-B7D9-BF4FBB271E0D}" Win64="$(var.Win64)">
+        <File Id="_C3BD8574" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraCharts.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_2EF9917B0552" Guid="{87A32AB6-698F-4220-8D11-2EF9917B0552}" Win64="$(var.Win64)">
+        <File Id="_87A32AB6" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraEditors.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_603C4C81ECC9" Guid="{939F9678-5859-4EC9-A15B-603C4C81ECC9}" Win64="$(var.Win64)">
+        <File Id="_939F9678" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraGauges.v19.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_E3E933C54F65" Guid="{5B4EB91D-E1CE-485E-8BDB-E3E933C54F65}" Win64="$(var.Win64)">
+        <File Id="_5B4EB91D" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraReports.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_67ECC163ED88" Guid="{D863A940-E075-4B14-B491-67ECC163ED88}" Win64="$(var.Win64)">
+        <File Id="_D863A940" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraReports.v19.2.Service.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_7022D5D88555" Guid="{C02CAE1D-68F8-4826-A781-7022D5D88555}" Win64="$(var.Win64)">
+        <File Id="_C02CAE1D" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Charts.v19.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_C5E614A3A683" Guid="{71D12292-68AC-4BBF-9DF5-C5E614A3A683}" Win64="$(var.Win64)">
+        <File Id="_71D12292" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.CodeParser.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_2992F34AA343" Guid="{A159A34F-C2BC-4E62-AB7A-2992F34AA343}" Win64="$(var.Win64)">
+        <File Id="_A159A34F" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.DataAccess.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_1C2754BDEF90" Guid="{BE68B644-1558-4082-A5A7-1C2754BDEF90}" Win64="$(var.Win64)">
+        <File Id="_BE68B644" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Pdf.v19.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_4A9CA28498D7" Guid="{3826E4B8-F154-4B0A-84F2-4A9CA28498D7}" Win64="$(var.Win64)">
+        <File Id="_3826E4B8" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.PivotGrid.v19.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_8F6CBB324D48" Guid="{6215A1C8-B0AC-48C1-8D2A-8F6CBB324D48}" Win64="$(var.Win64)">
+        <File Id="_6215A1C8" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.RichEdit.v19.2.Export.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_52604A2B655A" Guid="{40E62069-BCCC-406F-95A0-52604A2B655A}" Win64="$(var.Win64)">
+        <File Id="_40E62069" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Sparkline.v19.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_F668F0AA6236" Guid="{9071C230-2BF6-42BB-A935-F668F0AA6236}" Win64="$(var.Win64)">
+        <File Id="_9071C230" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Utils.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_B1F873E71FA5" Guid="{C5377FD4-C05C-40C4-8951-B1F873E71FA5}" Win64="$(var.Win64)">
+        <File Id="_C5377FD4" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.CodeView.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_B485AC75052B" Guid="{D695D0A9-3115-49ED-82A5-B485AC75052B}" Win64="$(var.Win64)">
+        <File Id="_D695D0A9" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Controls.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
     </ComponentGroup>
   </Fragment>
 </Wix>
