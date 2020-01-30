@@ -20,33 +20,13 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
-            <Style TargetType="diagram:NamedThingDiagramContentItem">
+            <Style TargetType="dxdiag:DiagramContentItem">
                 <Setter Property="CanMove" Value="True" />
-                <Setter Property="CanDelete" Value="True" />
+                <Setter Property="CanDelete" Value="False" />
                 <Setter Property="CanResize" Value="False" />
                 <Setter Property="CanRotate" Value="False" />
                 <Setter Property="ForegroundId" Value="Dark_5"/>
                 <Setter Property="BackgroundId" Value="White_2"/>
-                <Setter Property="Padding" Value="20"/>
-                <Setter Property="FontSize" Value="12"/>
-                <Setter>
-                    <Setter.Property>ContentTemplate</Setter.Property>
-                    <Setter.Value>
-                        <DataTemplate>
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                <Image Style="{StaticResource ThingIcon}" Margin="10">
-                                    <Image.Source>
-                                        <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
-                                            <Binding />
-                                        </MultiBinding>
-                                    </Image.Source>
-                                </Image>
-                                <TextBlock Text="{Binding ShortName}" Margin="10,0,10,10"></TextBlock>
-                                <TextBlock Text="{Binding Name}" Margin="10,0,10,10"></TextBlock>
-                            </StackPanel>
-                        </DataTemplate>
-                    </Setter.Value>
-                </Setter>
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -61,37 +41,33 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <views:BrowserHeader Grid.Row="0" />
-            <dxdiag:DiagramControl x:Name="diagramControl" Grid.Column="0" Grid.Row="1">
+            <dxdiag:DiagramControl ShowPageBreaks="True" IsManipulationEnabled="True" AllowRotateItems="False" AllowResizeItems="False" AllowApplyAutomaticLayoutForSubordinates="False" AllowApplyAutomaticLayout="False" x:Name="diagramControl" Grid.Column="0" Grid.Row="1">
                 <dxmvvm:Interaction.Behaviors>
                     <behaviours:ExtendedDiagramOrgChartBehavior ParentMember="ParentId" KeyMember="Id" x:Name="orgChartBehavior" PageMargin="45" ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}" >
-                        <dxdiag:DiagramOrgChartBehavior.ItemTemplate>
+                        <behaviours:ExtendedDiagramOrgChartBehavior.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Name}" FontSize="50" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <Image Style="{StaticResource ThingIcon}" Margin="10">
+                                        <Image.Source>
+                                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                                <Binding Path="Content"/>
+                                            </MultiBinding>
+                                        </Image.Source>
+                                    </Image>
+                                    <TextBlock Text="{Binding FullName}" FontWeight="Bold" FontSize="14" Margin="10,0,10,10"></TextBlock>
+                                    <TextBlock Text="{Binding ShortName}" FontStyle="Italic" FontSize="11" Margin="10,0,10,10"></TextBlock>
+                                    
+                                </StackPanel>
                             </DataTemplate>
-                        </dxdiag:DiagramOrgChartBehavior.ItemTemplate>
+                        </behaviours:ExtendedDiagramOrgChartBehavior.ItemTemplate>
                     </behaviours:ExtendedDiagramOrgChartBehavior>
                 </dxmvvm:Interaction.Behaviors>
             </dxdiag:DiagramControl>
         </Grid>
         <Grid Grid.Column="1" >
             <Grid.RowDefinitions>
-                <!--<RowDefinition Height="30"/>-->
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <!--<dxb:ToolBarControl Height="30" Grid.Row="0">
-                <dxb:BarCheckItem Glyph="{dx:DXImage Image=CrossDataSourceFiltering _16x16.png}" 
-                                Hint="Display All" LargeGlyph="{dx:DXImage}" IsChecked="{Binding DisplayAll, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    
-                </dxb:BarCheckItem>
-                <dxb:BarCheckItem Glyph="{dx:DXImage Image=LineItem_16x16.png}" 
-                                Hint="Display Binary Relationship Rules" LargeGlyph="{dx:DXImage}" IsChecked="{Binding DisplayBinaryRelationshipRules, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-
-                </dxb:BarCheckItem>
-                <dxb:BarCheckItem Glyph="{dx:DXImage Image=DocumentMap_16x16.png}" 
-                                Hint="Show All" LargeGlyph="{dx:DXImage}" IsChecked="{Binding DisplayMultiRelationshipRules, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-
-                </dxb:BarCheckItem>
-            </dxb:ToolBarControl>-->
                 <dxn:NavBarControl dx:ThemeManager.ThemeName="Seven" Margin="0,0,0,0" Background="Bisque" Compact="False">
                 <dxn:NavBarControl.View>
                     <dxn:ExplorerBarView/>

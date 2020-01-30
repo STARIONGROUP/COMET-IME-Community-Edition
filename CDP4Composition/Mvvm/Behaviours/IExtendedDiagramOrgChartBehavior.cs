@@ -1,14 +1,14 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IExtendedDiagramOrgChartBehavior.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Mvvm.Behaviours
 {
-    using System;
-    using System.Collections.Specialized;
+    using System.Collections.Generic;
     using System.Windows;
+
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
 
@@ -17,6 +17,11 @@ namespace CDP4Composition.Mvvm.Behaviours
     /// </summary>
     public interface IExtendedDiagramOrgChartBehavior
     {
+        /// <summary>
+        /// Gets a dictionary of saved diagram item positions.
+        /// </summary>
+        Dictionary<object, Point> ItemPositions { get; }
+
         /// <summary>
         /// Converts control coordinates into document coordinates.
         /// </summary>
@@ -39,5 +44,11 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// </summary>
         /// <param name="item">The <see cref="DiagramItem"/> to remove.</param>
         void RemoveItem(DiagramItem item);
+
+        /// <summary>
+        /// Adds a connector to the <see cref="DiagramControl"/> item collection.
+        /// </summary>
+        /// <param name="connector">The connector to add</param>
+        void AddConnector(DiagramConnector connector);
     }
 }

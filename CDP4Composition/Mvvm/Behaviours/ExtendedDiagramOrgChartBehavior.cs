@@ -1,17 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ExtendedDiagramOrgChartBehavior.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Mvvm.Behaviours
 {
     using System;
-    using System.Collections.Specialized;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+
+    using CDP4Common.CommonData;
+    using CDP4Common.SiteDirectoryData;
 
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
@@ -23,7 +26,7 @@ namespace CDP4Composition.Mvvm.Behaviours
     using IDiagramContainer = Diagram.IDiagramContainer;
 
     /// <summary>
-    /// Allows proper callbacks on the 
+    /// Allows proper callbacks on the diagramming tool
     /// </summary>
     public class ExtendedDiagramOrgChartBehavior : DiagramOrgChartBehavior, IExtendedDiagramOrgChartBehavior
     {
@@ -55,6 +58,11 @@ namespace CDP4Composition.Mvvm.Behaviours
         }
 
         /// <summary>
+        /// Gets a dictionary of saved diagram item positions.
+        /// </summary>
+        public Dictionary<object, Point> ItemPositions { get; } = new Dictionary<object, Point>();
+
+        /// <summary>
         /// The on attached event handler
         /// </summary>
         protected override void OnAttached()
@@ -62,16 +70,72 @@ namespace CDP4Composition.Mvvm.Behaviours
             base.OnAttached();
 
             this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
+            this.AssociatedObject.SelectionChanged += this.OnControlSelectionChanged;
+
+            this.CustomLayoutItems += this.OnCustomLayoutItems;
 
             this.AssociatedObject.PreviewMouseLeftButtonDown += this.PreviewMouseLeftButtonDown;
             this.AssociatedObject.PreviewMouseLeftButtonUp += this.PreviewMouseLeftButtonUp;
             this.AssociatedObject.PreviewMouseMove += this.PreviewMouseMove;
 
             this.AssociatedObject.AllowDrop = true;
+            this.AssociatedObject.AllowApplyAutomaticLayout = false;
+
             this.AssociatedObject.PreviewDragEnter += this.PreviewDragEnter;
             this.AssociatedObject.PreviewDragOver += this.PreviewDragOver;
             this.AssociatedObject.PreviewDragLeave += this.PreviewDragLeave;
             this.AssociatedObject.PreviewDrop += this.PreviewDrop;
+        }
+
+        /// <summary>
+        /// Reinitializes the viewmodel selection collection when the control collection changed.
+        /// </summary>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">The arguments.</param>
+        public void OnControlSelectionChanged(object sender, EventArgs e)
+        {
+            var vm = this.AssociatedObject.DataContext as IDiagramContainer;
+            var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
+
+            if (vm != null)
+            {
+                vm.SelectedItems.Clear();
+                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
+
+                foreach (var controlSelectedItem in controlSelectedItems)
+                {
+                    vm.SelectedItems.Add(controlSelectedItem);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Overrides the automatic layout behavior of the org chart diagramming control.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The arguments.</param>
+        private void OnCustomLayoutItems(object sender, DiagramCustomLayoutItemsEventArgs e)
+        {
+            if (this.ItemPositions.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var item in e.Items)
+            {
+                if (((DiagramContentItem)item).Content is NamedThingDiagramContentItem namedThingDiagramContentItem)
+                {
+                    if (this.ItemPositions.TryGetValue(namedThingDiagramContentItem, out var itemPosition))
+                    {
+                        item.Position = itemPosition;
+
+                        // remove from collection as it is not useful anymore.
+                        this.ItemPositions.Remove(namedThingDiagramContentItem);
+                    }
+                }
+            }
+
+            e.Handled = true;
         }
 
         /// <summary>
@@ -98,6 +162,9 @@ namespace CDP4Composition.Mvvm.Behaviours
         protected override void OnDetaching()
         {
             this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
+            this.AssociatedObject.SelectionChanged -= this.OnControlSelectionChanged;
+
+            this.CustomLayoutItems -= this.OnCustomLayoutItems;
 
             this.AssociatedObject.PreviewMouseLeftButtonDown -= this.PreviewMouseLeftButtonDown;
             this.AssociatedObject.PreviewMouseLeftButtonUp -= this.PreviewMouseLeftButtonUp;
@@ -107,6 +174,7 @@ namespace CDP4Composition.Mvvm.Behaviours
             this.AssociatedObject.PreviewDragOver -= this.PreviewDragOver;
             this.AssociatedObject.PreviewDragLeave -= this.PreviewDragLeave;
             this.AssociatedObject.PreviewDrop -= this.PreviewDrop;
+
 
             base.OnDetaching();
         }
@@ -121,6 +189,11 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
         private void PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (!(e.Source is Thing))
+            {
+                return;
+            }
+
             if (e.ClickCount != 1 || VisualTreeExtensions.HitTestScrollBar(sender, e)
                                   || VisualTreeExtensions.HitTestGridColumnHeader(sender, e))
             {
@@ -141,6 +214,11 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
         private void PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if (!(e.Source is Thing))
+            {
+                return;
+            }
+
             this.dragInfo = null;
         }
 
@@ -161,6 +239,11 @@ namespace CDP4Composition.Mvvm.Behaviours
 
             if (this.dragInfo != null && !this.dragInProgress)
             {
+                if (!(e.Source is Thing))
+                {
+                    return;
+                }
+
                 var dragStart = this.dragInfo.DragStartPosition;
                 var position = e.GetPosition(null);
 
@@ -216,6 +299,11 @@ namespace CDP4Composition.Mvvm.Behaviours
         private void PreviewDragOver(object sender, DragEventArgs e)
         {
             this.dropInfo = new DropInfo(sender, e);
+
+            if (!(e.Source is Thing || this.dropInfo.Payload is Thing || this.dropInfo.Payload is Tuple<ParameterType, MeasurementScale>))
+            {
+                return;
+            }
 
             var dropTarget = this.AssociatedObject.DataContext as IDropTarget;
 
@@ -287,6 +375,11 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// </remarks>
         private void PreviewDragLeave(object sender, DragEventArgs e)
         {
+            if (!(e.Source is Thing))
+            {
+                return;
+            }
+
             this.dropInfo = null;
             e.Handled = true;
         }
@@ -302,6 +395,11 @@ namespace CDP4Composition.Mvvm.Behaviours
         private void PreviewDrop(object sender, DragEventArgs e)
         {
             this.dropInfo = new DropInfo(sender, e);
+
+            if (!(e.Source is Thing || this.dropInfo.Payload is Thing || this.dropInfo.Payload is Tuple<ParameterType, MeasurementScale>))
+            {
+                return;
+            }
 
             var dropTarget = this.AssociatedObject.DataContext as IDropTarget;
 
@@ -345,6 +443,15 @@ namespace CDP4Composition.Mvvm.Behaviours
         public void RemoveItem(DiagramItem item)
         {
             this.AssociatedObject.Items.Remove(item);
+        }
+
+        /// <summary>
+        /// Adds a connector to the <see cref="DiagramControl"/> item collection.
+        /// </summary>
+        /// <param name="connector">The connector to add</param>
+        public void AddConnector(DiagramConnector connector)
+        {
+            this.AssociatedObject.Items.Add(connector);
         }
     }
 }

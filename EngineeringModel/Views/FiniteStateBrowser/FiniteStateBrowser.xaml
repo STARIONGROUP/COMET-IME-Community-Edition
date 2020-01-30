@@ -137,7 +137,6 @@
         <views:BrowserHeader Grid.Row="1" />
 
         <dxg:TreeListControl Grid.Row="2"
-                             MaxHeight="1080"
                              ItemsSource="{Binding FiniteStateList}"
                              SelectedItem="{Binding SelectedThing}"
                              SelectionMode="Row"
@@ -151,7 +150,6 @@
             </dxmvvm:Interaction.Behaviors>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView x:Name="FiniteStateView"
-                                  MaxHeight="1080"
                                   AllowEditing="False"
                                   AutoWidth="False"
                                   ExpandCollapseNodesOnNavigation="True"

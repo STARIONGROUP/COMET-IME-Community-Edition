@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="NamedThingDiagramContentItemTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -38,12 +38,6 @@ namespace CDP4Composition.Tests.Diagram
 
             Assert.AreEqual(this.domainOfExpertise, namedThingDiagramContentItem.Thing);
             Assert.AreEqual(this.domainOfExpertise, namedThingDiagramContentItem.Content);
-        }
-
-        [Test]
-        public void VerifyThatWithNotNameThingArgumentExceptionIsThrown()
-        {
-            Assert.Throws<ArgumentException>(() => new NamedThingDiagramContentItem(this.iteration));
         }
     }
 }
