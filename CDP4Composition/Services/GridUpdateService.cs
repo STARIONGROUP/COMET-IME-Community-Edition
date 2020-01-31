@@ -24,7 +24,7 @@ namespace CDP4Composition.Services
         /// <summary>
         /// The <see cref="DependencyProperty"/> used to lock the update in a grid
         /// </summary>
-        public static readonly DependencyProperty UpdateStartedProperty = DependencyProperty.RegisterAttached("UpdateStarted", typeof(bool?), typeof(GridUpdateService), new FrameworkPropertyMetadata(null, UpdateStartedPropertyChanged));
+        public static readonly DependencyProperty UpdateStartedProperty = DependencyProperty.RegisterAttached("UpdateStarted", typeof(bool?), typeof(GridUpdateService), new FrameworkPropertyMetadata(false, UpdateStartedPropertyChanged));
 
         /// <summary>
         /// Sets the <see cref="UpdateStartedProperty"/> property
