@@ -7,7 +7,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
-    using System.Threading.Tasks;
+    using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
@@ -39,10 +39,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void ToBePublishedChanged()
         {
-            Parallel.ForEach(this.ContainedRows, row =>
+            foreach(var row in this.ContainedRows.OfType<IPublishableRow>())
             {
-                ((IPublishableRow)row).ToBePublished = this.ToBePublished;
-            });
+                row.ToBePublished = this.ToBePublished;
+            }
         }
 
         /// <summary>
