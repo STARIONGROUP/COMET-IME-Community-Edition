@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AssemblyInfo.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
 //
@@ -15,8 +15,8 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -57,6 +57,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("5.1.0.0")]
-[assembly: AssemblyFileVersion("5.1.0.0")]
+[assembly: AssemblyVersion("5.1.1.0")]
+[assembly: AssemblyFileVersion("5.1.1.0")]
 [assembly: InternalsVisibleTo("CDP4Budget.Tests")]
