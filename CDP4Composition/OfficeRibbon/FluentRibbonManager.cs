@@ -82,7 +82,7 @@ namespace CDP4Composition
             sb.Append("<customUI xmlns=\"http://schemas.microsoft.com/office/2006/01/customui\" onLoad=\"CustomUI_OnLoad\" >");
             sb.Append("<ribbon>");
             sb.Append("<tabs>");
-            sb.Append("<tab id=\"CDP4-CE\" label=\"CDP4-CE\">");
+            sb.Append("<tab id=\"CDP4\" label=\"CDP4\">");
 
             foreach (var ribbonPart in this.ribbonParts.OrderBy(x => x.Order))
             {
