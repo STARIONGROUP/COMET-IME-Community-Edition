@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParticipantDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,6 @@ namespace CDP4SiteDirectory.ViewModels
     [ThingDialogViewModelExport(ClassKind.Participant)]
     public class ParticipantDialogViewModel : CDP4CommonView.ParticipantDialogViewModel, IThingDialogViewModel
     {
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ParticipantDialogViewModel"/> class.
         /// </summary>
@@ -36,6 +35,11 @@ namespace CDP4SiteDirectory.ViewModels
         public ParticipantDialogViewModel()
         {
         }
+
+        /// <summary>
+        /// Holds a reference to the <see cref="IDisposable"/> subscription that belongs to the current <see cref="ReactiveList{DomainOfExpertise}"/> instance in <see cref="ParticipantDialogViewModel.Domain"/>
+        /// </summary>
+        private IDisposable domainSubScription = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParticipantDialogViewModel"/> class
@@ -89,9 +93,14 @@ namespace CDP4SiteDirectory.ViewModels
 
             this.WhenAnyValue(vm => vm.SelectedRole).Subscribe(_ => this.UpdateOkCanExecute());
             this.WhenAnyValue(vm => vm.SelectedSelectedDomain).Subscribe(_ => this.UpdateOkCanExecute());
-            this.WhenAnyValue(vm => vm.Domain).Subscribe(_ => this.SetSelectedDomain());
+
+            this.WhenAnyValue(vm => vm.Domain).Subscribe(_ =>
+            {
+                this.domainSubScription?.Dispose();
+                this.domainSubScription = this.Domain?.Changed.Subscribe(x => this.SetSelectedDomain());
+                this.SetSelectedDomain();
+            });
         }
-        #endregion
 
         /// <summary>
         /// Initializes the lists and subscription
@@ -169,7 +178,7 @@ namespace CDP4SiteDirectory.ViewModels
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
-            this.OkCanExecute = this.OkCanExecute && this.SelectedPerson != null && this.SelectedRole != null;
+            this.OkCanExecute = this.OkCanExecute && this.SelectedPerson != null && this.SelectedRole != null && !this.Domain.IsEmpty && this.SelectedSelectedDomain != null && this.Domain.Any(x => x.Iid == this.SelectedSelectedDomain?.Iid);
         }
 
         /// <summary>
@@ -180,7 +189,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// </remarks>
         private void SetSelectedDomain()
         {
-            this.SelectedSelectedDomain = this.SelectedSelectedDomain ?? this.Domain.FirstOrDefault();
+            if (this.Domain.All(x => x.Iid != this.SelectedSelectedDomain?.Iid))
+            {
+                this.SelectedSelectedDomain = this.Domain.FirstOrDefault();
+            }
+
+            this.UpdateOkCanExecute();
         }
     }
 }

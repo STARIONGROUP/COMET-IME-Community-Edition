@@ -8,6 +8,8 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.Types;
@@ -42,6 +44,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.uri = new Uri("http://www.rheagroup.com");
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
@@ -135,6 +138,41 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             dialog = new ParticipantDialogViewModel(participant, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.clone);
 
             Assert.AreEqual(1, dialog.PossiblePerson.Count);
+        }
+
+        [Test]
+        public void VerifyOkCanExecute()
+        {
+            var participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
+
+            var dialog = new ParticipantDialogViewModel(participant, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
+
+            Assert.IsFalse(dialog.OkCanExecute);
+
+            dialog.SelectedPerson = this.person;
+            Assert.IsFalse(dialog.OkCanExecute);
+
+            dialog.SelectedRole = this.role;
+            Assert.IsTrue(dialog.OkCanExecute);
+
+            dialog.Domain = new ReactiveList<DomainOfExpertise> { this.domain };
+            Assert.IsTrue(dialog.OkCanExecute);
+
+            dialog.Domain.Clear();
+            Assert.IsFalse(dialog.OkCanExecute);
+
+            dialog.Domain = new ReactiveList<DomainOfExpertise> { this.domain };
+            Assert.IsTrue(dialog.OkCanExecute);
+
+            dialog.SelectedSelectedDomain = null;
+            Assert.IsFalse(dialog.OkCanExecute);
+
+            dialog.SelectedSelectedDomain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
+            Assert.IsFalse(dialog.OkCanExecute);
+
+            dialog.Domain.Add(dialog.SelectedSelectedDomain);
+            Assert.IsTrue(dialog.OkCanExecute);
         }
     }
 }
