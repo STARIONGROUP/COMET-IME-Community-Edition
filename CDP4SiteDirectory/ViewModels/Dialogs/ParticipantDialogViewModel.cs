@@ -178,7 +178,14 @@ namespace CDP4SiteDirectory.ViewModels
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
-            this.OkCanExecute = this.OkCanExecute && this.SelectedPerson != null && this.SelectedRole != null && !this.Domain.IsEmpty && this.SelectedSelectedDomain != null && this.Domain.Any(x => x.Iid == this.SelectedSelectedDomain?.Iid);
+
+            this.OkCanExecute = 
+                this.OkCanExecute && 
+                this.SelectedPerson != null && 
+                this.SelectedRole != null && 
+                !this.Domain.IsEmpty && 
+                this.SelectedSelectedDomain != null && 
+                this.Domain.Any(x => x.Iid == this.SelectedSelectedDomain?.Iid);
         }
 
         /// <summary>
@@ -195,6 +202,12 @@ namespace CDP4SiteDirectory.ViewModels
             }
 
             this.UpdateOkCanExecute();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            this.domainSubScription?.Dispose();
         }
     }
 }
