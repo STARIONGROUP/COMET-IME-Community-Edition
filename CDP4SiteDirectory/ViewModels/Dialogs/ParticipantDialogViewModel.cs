@@ -204,6 +204,12 @@ namespace CDP4SiteDirectory.ViewModels
             this.UpdateOkCanExecute();
         }
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// a value indicating whether the class is being disposed of
+        /// </param>
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
