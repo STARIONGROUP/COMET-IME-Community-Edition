@@ -1,13 +1,16 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="NamedThingDiagramContentItem.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Diagram
 {
     using System;
+
+    using CDP4Common;
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
 
     /// <summary>
     /// Represents a <see cref="ThingDiagramContentItem"/> with a name.
@@ -23,12 +26,32 @@ namespace CDP4Composition.Diagram
         public NamedThingDiagramContentItem(Thing thing) 
             : base(thing)
         {
-            var namedThing = thing as INamedThing;
-
-            if (namedThing == null)
+            if (thing is INamedThing namedThing)
             {
-                throw new ArgumentException(string.Format("The provided Thing with IId {0} is not a NamedThing.", thing.Iid), "thing");
+                this.FullName = namedThing.Name;
+            }
+
+            if (thing is IShortNamedThing shortNamedThing)
+            {
+                this.ShortName = shortNamedThing.ShortName;
+            }
+
+            // special cases
+            if (thing is ParameterBase parameterBaseThing)
+            {
+                this.FullName = parameterBaseThing.UserFriendlyName;
+                this.ShortName = parameterBaseThing.UserFriendlyShortName;
             }
         }
+
+        /// <summary>
+        /// Gets or sets the name of the <see cref="NamedThingDiagramContentItem"/>
+        /// </summary>
+        public string FullName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the shortname of the <see cref="NamedThingDiagramContentItem"/>
+        /// </summary>
+        public string ShortName { get; set; } = string.Empty;
     }
 }

@@ -9,6 +9,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
@@ -22,6 +24,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4EngineeringModel.ViewModels;
     using Moq;
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     [TestFixture]
     internal class ActualFiniteStateListDialogViewModelTestFixture
@@ -54,6 +58,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
             this.session = new Mock<ISession>();            
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
 

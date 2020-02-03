@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ScriptingEngineRibbonPageGroupViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2017 RHEA System S.A.
+//   Copyright (c) 2017-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,6 @@ namespace CDP4Scripting.ViewModels
     using CDP4Composition.Navigation.Events;
     using CDP4Dal;
     using CDP4Dal.Events;
-    using DevExpress.XtraPrinting.Native;
     using Events;
     using Helpers;
     using Interfaces;
@@ -228,7 +227,7 @@ namespace CDP4Scripting.ViewModels
         {
             // Open the dialog to open a file
             var filePaths = this.fileDialogService.GetOpenFileDialog(false, false, true, DialogFilters, "*.*", this.initialDialogPath, 4);
-            if (filePaths == null || filePaths.IsEmpty())
+            if (filePaths == null || !filePaths.Any())
             {
                 return;
             }

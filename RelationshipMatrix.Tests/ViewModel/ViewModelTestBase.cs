@@ -27,6 +27,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Reactive.Concurrency;
     using System.Reflection;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -40,6 +41,9 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using CDP4Dal.Permission;
     using Microsoft.Practices.ServiceLocation;
     using Moq;
+
+    using ReactiveUI;
+
     using ViewModels;
     using ViewModels.DialogResult;
 
@@ -87,6 +91,8 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
         public virtual void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.filterStringService = new Mock<IFilterStringService>();

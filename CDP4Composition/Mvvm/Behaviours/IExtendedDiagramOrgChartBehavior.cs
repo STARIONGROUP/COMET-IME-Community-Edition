@@ -1,14 +1,14 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IExtendedDiagramOrgChartBehavior.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Mvvm.Behaviours
 {
-    using System;
-    using System.Collections.Specialized;
+    using System.Collections.Generic;
     using System.Windows;
+
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
 
@@ -18,25 +18,9 @@ namespace CDP4Composition.Mvvm.Behaviours
     public interface IExtendedDiagramOrgChartBehavior
     {
         /// <summary>
-        /// Reinitializes the control's collection when the view model changes.
+        /// Gets a dictionary of saved diagram item positions.
         /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">The arguments</param>
-        void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
-
-        /// <summary>
-        /// Reinitializes the viewmodel collection when the control collection changed.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">The arguments</param>
-        void OnControlCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
-
-        /// <summary>
-        /// Reinitializes the viewmodel selection collection when the control collection changed.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">The arguments.</param>
-        void OnControlSelectionChanged(object sender, EventArgs e);
+        Dictionary<object, Point> ItemPositions { get; }
 
         /// <summary>
         /// Converts control coordinates into document coordinates.
@@ -60,5 +44,11 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// </summary>
         /// <param name="item">The <see cref="DiagramItem"/> to remove.</param>
         void RemoveItem(DiagramItem item);
+
+        /// <summary>
+        /// Adds a connector to the <see cref="DiagramControl"/> item collection.
+        /// </summary>
+        /// <param name="connector">The connector to add</param>
+        void AddConnector(DiagramConnector connector);
     }
 }

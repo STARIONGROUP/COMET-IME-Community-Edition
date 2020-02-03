@@ -9,6 +9,8 @@ namespace CDP4RelationshipMatrix.Tests.Ribbon
 {
     using System;
     using System.Linq;
+    using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -20,6 +22,9 @@ namespace CDP4RelationshipMatrix.Tests.Ribbon
     using Microsoft.Practices.ServiceLocation;
     using Moq;
     using NUnit.Framework;
+
+    using ReactiveUI;
+
     using ViewModels;
 
     [TestFixture]
@@ -39,6 +44,8 @@ namespace CDP4RelationshipMatrix.Tests.Ribbon
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
             this.uri = new Uri("http://test.com");
             this.assembler = new Assembler(this.uri);
 

@@ -12,6 +12,8 @@ namespace CDP4Composition.Tests.Mvvm
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
@@ -49,6 +51,8 @@ namespace CDP4Composition.Tests.Mvvm
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
             this.uri = new Uri("http://www.rheagroup.com");
             this.session = new Mock<ISession>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();

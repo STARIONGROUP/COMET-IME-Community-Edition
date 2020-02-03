@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RibbonAdapter.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -133,7 +133,7 @@ namespace CDP4Composition.Adapters
                     var containerRegionName = ribbonPageGroup.ContainerRegionName;
 
                     ExtendedRibbonPage ribbonPage = null;
-                    foreach (var category in this.regionTarget.Categories)
+                    foreach (var category in this.regionTarget.SelfCategories)
                     {
                         ribbonPage =
                             category.Pages.OfType<ExtendedRibbonPage>()
@@ -166,7 +166,7 @@ namespace CDP4Composition.Adapters
                 {
                     if (ribbonPage.IsInDefaultPageCategory)
                     {
-                        var defaultCategory = this.regionTarget.Categories.OfType<RibbonDefaultPageCategory>().SingleOrDefault();
+                        var defaultCategory = this.regionTarget.SelfCategories.OfType<RibbonDefaultPageCategory>().SingleOrDefault();
                         if (defaultCategory != null)
                         {
                             var insertPosition = this.GetPositionForRibbonPage(defaultCategory.Pages, ribbonPage);
@@ -182,7 +182,7 @@ namespace CDP4Composition.Adapters
                     {
                         var categoryName = ribbonPage.CustomPageCategoryName;
                         var customPageCategory =
-                            this.regionTarget.Categories.OfType<RibbonPageCategory>()
+                            this.regionTarget.SelfCategories.OfType<RibbonPageCategory>()
                                 .SingleOrDefault(x => x.Name == categoryName);
 
                         if (customPageCategory != null)

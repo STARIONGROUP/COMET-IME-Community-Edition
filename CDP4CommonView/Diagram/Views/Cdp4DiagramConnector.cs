@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="Cdp4DiagramConnector.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -193,7 +193,7 @@ namespace CDP4CommonView.Diagram
             BindingOperations.SetBinding(this, TargetProperty, targetBinding);
 
             var textBinding = ViewUtils.CreateBinding(this.DataContext, "DisplayedText", BindingMode.OneWay);
-            BindingOperations.SetBinding(this, TextProperty, textBinding);
+            BindingOperations.SetBinding(this, ContentProperty, textBinding);
 
             var connectingPointsBinding = ViewUtils.CreateBinding(this.DataContext, "ConnectingPoints");
             BindingOperations.SetBinding(this, ConnectionPointsProperty, connectingPointsBinding);
