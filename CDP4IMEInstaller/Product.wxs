@@ -22,7 +22,7 @@
 
     <UIRef Id="WixUI_Mondo" />
 
-    <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.CDP4IME-CE.ProjectDir)license.rtf" />
     <WixVariable Id="WixUIDialogBmp" Value="background.bmp" />
     <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
     
