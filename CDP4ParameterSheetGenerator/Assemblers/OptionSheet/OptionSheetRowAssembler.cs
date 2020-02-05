@@ -106,11 +106,11 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
                 var nestedElementTreeGenerator = new NestedElementTreeGenerator();
                 nestedElements = nestedElementTreeGenerator.Generate(this.option, this.owner, false);
             }
-            
+
             // Order the nestedElements by shortname. The Shortname of an NestedElement 
             // is related to the path of a NestedElement
             nestedElements = nestedElements.OrderBy(ne => ne.ShortName);
-            
+
             foreach (var nestedElement in nestedElements)
             {
                 var nestedElementExcelRow = new NestedElementExcelRow(nestedElement, this.owner);
@@ -120,6 +120,29 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             foreach (var nestedElementExcelRow in nestedElementExcelRows)
             {
                 var deeprows = nestedElementExcelRow.GetContainedRowsDeep();
+
+                foreach (var itm in deeprows)
+                {
+                    var splitlevel = itm.ModelCode.Split('\\')[0].Split('.').Length;
+
+                    if (itm.Categories == null)
+                    {
+                        splitlevel += 1;
+                    }
+
+                    var spaces = new string(' ', 3 * Math.Abs(splitlevel - 1));
+
+                    switch (itm)
+                    {
+                        case NestedElementExcelRow row:
+                            row.Name = $"{spaces}{itm.Name}";
+                            break;
+                        case NestedParameterExcelRow row:
+                            row.Name = $"{spaces}{itm.Name}";
+                            break;
+                    }
+                }
+
                 this.excelRows.AddRange(deeprows);
             }
         }
