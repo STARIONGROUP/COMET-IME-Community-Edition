@@ -124,6 +124,50 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
         }
 
         [Test]
+        public void VerifyThatNestedElementExcelRowNameSpacesAreSetForOption()
+        {
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.length,
+                Owner = this.systemEngineering,
+                Scale = this.meter
+            };
+
+            var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Manual = new ValueArray<string>(new List<string> { "A" }),
+                Computed = new ValueArray<string>(new List<string> { "B" }),
+                Formula = new ValueArray<string>(new List<string> { "C" }),
+                ValueSwitch = ParameterSwitchKind.MANUAL
+            };
+            parameter.ValueSet.Add(parameterValueSet);
+            this.satellite.Parameter.Add(parameter);
+
+            var nestedElementTreeGenerator = new NestedElementTreeGenerator();
+            var nestedElements = nestedElementTreeGenerator.Generate(this.option, this.systemEngineering);
+
+            var elementList = nestedElements.ToList();
+            var rootnode = elementList.Single(ne => ne.ElementUsage.Count > 0);
+
+            if (rootnode != null)
+            {
+                var rootNodeParameter = elementList.Single(ne => ne.ShortName == "SAT");
+                var nestedParameter = rootNodeParameter.NestedParameter.Single();
+                rootnode.NestedParameter.Add(nestedParameter);
+
+                var nestedElementExcelRow = new NestedElementExcelRow(rootnode, this.systemEngineering);
+                var nestedParameterExcelRow = nestedElementExcelRow.GetContainedRows().ToList()[0];
+
+                var spacesElement = new string(' ', 3 * Math.Abs(rootnode.ElementUsage.Count));
+                Assert.True(nestedElementExcelRow.Name.StartsWith(spacesElement));
+
+                var spacesParameter = new string(' ', 3 * Math.Abs(nestedParameterExcelRow.Level));
+                Assert.AreEqual(nestedElementExcelRow.Level + 1, nestedParameterExcelRow.Level);
+                Assert.True(nestedParameterExcelRow.Name.StartsWith(spacesParameter));
+            }
+        }
+
+        [Test]
         public void VerifyThatNestedParameterExcelRowPropertiesAreSetForParameter()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
