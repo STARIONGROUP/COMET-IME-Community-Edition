@@ -6,6 +6,7 @@
 
 namespace CDP4ParameterSheetGenerator.OptionSheet
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using CDP4Common.EngineeringModelData;
@@ -43,7 +44,11 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         private void UpdateProperties()
         {
             this.Id = this.Thing.Iid.ToString();
-            this.Name = this.Thing.Name;
+            this.Level = this.Thing.ElementUsage.Count;
+
+            var spaces = new string(' ', 3 * Math.Abs(this.Level));
+            this.Name = $"{spaces}{this.Thing.Name}";
+
             this.ShortName = this.Thing.ShortName;
             this.Type = OptionSheetConstants.NE;
             this.Owner = this.Thing.Owner.ShortName;
@@ -90,7 +95,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
                         continue;
                     }
 
-                    var nestedParameterExcelRow = new NestedParameterExcelRow(nestedParameter);
+                    var nestedParameterExcelRow = new NestedParameterExcelRow(nestedParameter, this.Level);
                     this.ContainedRows.Add(nestedParameterExcelRow);
                 }
             }
