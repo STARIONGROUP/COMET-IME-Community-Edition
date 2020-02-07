@@ -147,18 +147,24 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             var nestedElements = nestedElementTreeGenerator.Generate(this.option, this.systemEngineering);
 
             var elementList = nestedElements.ToList();
-            var rootnode = elementList.Single(ne => ne.ElementUsage.Count > 0);
 
-            if (rootnode != null)
+            var rootnode = elementList.Single(ne => ne.ElementUsage.Count == 0);
+            var rootElementExcelRow = new NestedElementExcelRow(rootnode, this.systemEngineering);
+            var spacesRoot = new string(' ', 3);
+            Assert.False(rootElementExcelRow.Name.StartsWith(spacesRoot));
+
+            using (var nodeelement = elementList.Single(ne => ne.ElementUsage.Count > 0))
             {
+                Assert.False(nodeelement is null);
+
                 var rootNodeParameter = elementList.Single(ne => ne.ShortName == "SAT");
                 var nestedParameter = rootNodeParameter.NestedParameter.Single();
-                rootnode.NestedParameter.Add(nestedParameter);
+                nodeelement.NestedParameter.Add(nestedParameter);
 
-                var nestedElementExcelRow = new NestedElementExcelRow(rootnode, this.systemEngineering);
+                var nestedElementExcelRow = new NestedElementExcelRow(nodeelement, this.systemEngineering);
                 var nestedParameterExcelRow = nestedElementExcelRow.GetContainedRows().ToList()[0];
 
-                var spacesElement = new string(' ', 3 * Math.Abs(rootnode.ElementUsage.Count));
+                var spacesElement = new string(' ', 3 * Math.Abs(nestedElementExcelRow.Level));
                 Assert.True(nestedElementExcelRow.Name.StartsWith(spacesElement));
 
                 var spacesParameter = new string(' ', 3 * Math.Abs(nestedParameterExcelRow.Level));
