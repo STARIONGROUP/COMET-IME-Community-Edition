@@ -25,10 +25,25 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         /// <param name="nestedParameter">
         /// The <see cref="NestedParameter"/> that is represented by the current row view-model
         /// </param>
-        public NestedParameterExcelRow(NestedParameter nestedParameter)
+        /// <param name="levelOffset">
+        /// Integer that refers to the leveloffset
+        /// </param>
+        public NestedParameterExcelRow(NestedParameter nestedParameter, int levelOffset = -1)
             : base(nestedParameter)
         {
+            this.SetLevel(levelOffset);
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// The <see cref="levelOffset"/> that is represented by the current row view-model
+        /// </summary>
+        /// <param name="levelOffset">
+        /// Integer that refers to the leveloffset
+        /// </param>
+        private void SetLevel(int levelOffset)
+        {
+            this.Level = levelOffset + 1;
         }
 
         /// <summary>
@@ -36,19 +51,12 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         /// </summary>
         private void UpdateProperties()
         {
-            var element = this.Thing.Container as NestedElement;
-
             this.Id = this.Thing.Iid.ToString();
 
-            if (element != null)
-            {
-                this.Level = element.ElementUsage.Count + 1;
-            }
-            
             var spaces = new string(' ', 3 * Math.Abs(this.Level));
             this.Name = $"{spaces}{this.Thing.AssociatedParameter.ParameterType.Name}";
 
-            this.ShortName = this.QueryParameterTypeShortname(false);            
+            this.ShortName = this.QueryParameterTypeShortname(false);
             this.ActualValue = this.Thing.ActualValue;
             this.Type = this.QueryRowType(this.Thing.AssociatedParameter);
             this.Owner = this.QueryOwner(this.Thing);
@@ -56,7 +64,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             this.ParameterType = this.Thing.AssociatedParameter.ParameterType;
             this.ParameterTypeShortName = this.QueryParameterTypeShortname(true);
         }
-        
+
         /// <summary>
         /// Queries the shortname of the <see cref="ParameterType"/> of the associated <see cref="Parameter"/>
         /// that is represented by the current <see cref="NestedParameter"/>.

@@ -95,7 +95,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
                         continue;
                     }
 
-                    var nestedParameterExcelRow = new NestedParameterExcelRow(nestedParameter);
+                    var nestedParameterExcelRow = new NestedParameterExcelRow(nestedParameter, this.Level);
                     this.ContainedRows.Add(nestedParameterExcelRow);
                 }
             }

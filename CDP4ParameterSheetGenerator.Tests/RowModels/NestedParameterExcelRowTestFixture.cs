@@ -148,14 +148,15 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var elementList = nestedElements.ToList();
 
-            var rootnode = elementList.Single(ne => ne.ElementUsage.Count == 0);
+            var rootnode = elementList.SingleOrDefault(ne => ne.ElementUsage.Count == 0);
+            Assert.IsNotNull(rootnode);
             var rootElementExcelRow = new NestedElementExcelRow(rootnode, this.systemEngineering);
             var spacesRoot = new string(' ', 3);
             Assert.False(rootElementExcelRow.Name.StartsWith(spacesRoot));
 
-            using (var nodeelement = elementList.Single(ne => ne.ElementUsage.Count > 0))
+            using (var nodeelement = elementList.SingleOrDefault(ne => ne.ElementUsage.Count > 0))
             {
-                Assert.False(nodeelement is null);
+                Assert.IsNotNull(nodeelement);
 
                 var rootNodeParameter = elementList.Single(ne => ne.ShortName == "SAT");
                 var nestedParameter = rootNodeParameter.NestedParameter.Single();

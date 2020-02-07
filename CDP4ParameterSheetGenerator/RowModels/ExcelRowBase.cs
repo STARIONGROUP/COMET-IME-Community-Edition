@@ -83,7 +83,7 @@ namespace CDP4ParameterSheetGenerator.RowModels
         /// </returns>
         public IEnumerable<IExcelRow<Thing>> GetContainedRows()
         {
-            return this.ContainedRows;         
+            return this.ContainedRows;
         }
 
         /// <summary>
