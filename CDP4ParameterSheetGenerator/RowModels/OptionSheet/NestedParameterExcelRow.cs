@@ -11,6 +11,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
     using CDP4Common.Exceptions;
     using CDP4Common.SiteDirectoryData;
     using CDP4ParameterSheetGenerator.RowModels;
+    using System;
 
     /// <summary>
     /// The purpose of the <see cref="NestedParameterExcelRow"/> is to represent <see cref="NestedParameter"/>s in the 
@@ -35,8 +36,18 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         /// </summary>
         private void UpdateProperties()
         {
+            var element = this.Thing.Container as NestedElement;
+
             this.Id = this.Thing.Iid.ToString();
-            this.Name = this.Thing.AssociatedParameter.ParameterType.Name;
+
+            if (element != null)
+            {
+                this.Level = element.ElementUsage.Count + 1;
+            }
+            
+            var spaces = new string(' ', 3 * Math.Abs(this.Level));
+            this.Name = $"{spaces}{this.Thing.AssociatedParameter.ParameterType.Name}";
+
             this.ShortName = this.QueryParameterTypeShortname(false);            
             this.ActualValue = this.Thing.ActualValue;
             this.Type = this.QueryRowType(this.Thing.AssociatedParameter);

@@ -46,15 +46,8 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             this.Id = this.Thing.Iid.ToString();
             this.Level = this.Thing.ElementUsage.Count;
 
-            if (this.Level > 0)
-            {
-                var spaces = new string(' ', 3 * Math.Abs(this.Level));
-                this.Name = $"{spaces}{this.Thing.Name}";
-            }
-            else
-            {
-                this.Name = this.Thing.Name;
-            }
+            var spaces = new string(' ', 3 * Math.Abs(this.Level));
+            this.Name = $"{spaces}{this.Thing.Name}";
 
             this.ShortName = this.Thing.ShortName;
             this.Type = OptionSheetConstants.NE;
@@ -103,9 +96,6 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
                     }
 
                     var nestedParameterExcelRow = new NestedParameterExcelRow(nestedParameter);
-                    nestedParameterExcelRow.Level = this.Level + 1;
-                    var spaces = new string(' ', 3 * Math.Abs(nestedParameterExcelRow.Level));
-                    nestedParameterExcelRow.Name = $"{spaces}{nestedParameterExcelRow.Name}";
                     this.ContainedRows.Add(nestedParameterExcelRow);
                 }
             }
