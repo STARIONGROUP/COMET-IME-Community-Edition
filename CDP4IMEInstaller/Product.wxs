@@ -10,7 +10,7 @@
 		         Compressed="yes" 
 		         InstallScope="perMachine" 
 		         Manufacturer="RHEA" 
-		         Description="Install the CDP4 Commnity Edition" SummaryCodepage="1252" Platform="$(sys.BUILDARCH)" />
+		         Description="Install the CDP4 Community Edition" SummaryCodepage="1252" Platform="$(sys.BUILDARCH)" />
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes"/>
