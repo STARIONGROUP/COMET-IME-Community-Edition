@@ -104,7 +104,6 @@
             <views:BrowserHeader Grid.Row="1" />
 
             <dxg:TreeListControl Grid.Row="2"
-                             MaxHeight="1080"
                              ItemsSource="{Binding RuleVerificationListRowViewModels}"
                              SelectedItem="{Binding SelectedThing,
                                                     Mode=TwoWay,
@@ -120,7 +119,6 @@
                 </dxmvvm:Interaction.Behaviors>
                 <dxg:TreeListControl.View>
                     <dxg:TreeListView Name="View"
-                                  MaxHeight="1080"
                                   AllowEditing="False"
                                   AutoWidth="true"
                                   ExpandStateFieldName="IsExpanded"
