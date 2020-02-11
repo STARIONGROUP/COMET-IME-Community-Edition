@@ -70,7 +70,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// The Panel Caption
         /// </summary>
-        private const string PanelCaption = "Rule verification lists";
+        private const string PanelCaption = "Rule Verification Lists";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuleVerificationListBrowserViewModel"/> class.
