@@ -166,7 +166,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.AreEqual(1, viewmodel.Publications.Count);
-            Assert.AreEqual(3, viewmodel.Publications[0].ContainedRows.Count);
+            Assert.AreEqual(4, viewmodel.Publications[0].ContainedRows.Count);
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.DataSource, Is.Not.Null.Or.Empty);
