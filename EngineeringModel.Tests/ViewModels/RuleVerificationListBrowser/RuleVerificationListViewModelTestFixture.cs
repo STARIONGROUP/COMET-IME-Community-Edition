@@ -156,7 +156,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             });
 
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
-            Assert.AreEqual("Rule verification lists, iteration_0", viewmodel.Caption);
+            Assert.AreEqual("Rule Verification Lists, iteration_0", viewmodel.Caption);
             Assert.AreEqual("model\nhttp://test.com/\n ", viewmodel.ToolTip);
             Assert.AreEqual("model", viewmodel.CurrentModel);
             Assert.AreEqual("domain []", viewmodel.DomainOfExpertise);

@@ -46,6 +46,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private Publication publication;
         private Parameter parameter1;
         private Parameter parameter2;
+        private Parameter parameter3;
         private ParameterOverride parameterOverride1;
         private DomainOfExpertise domain;
         private DomainOfExpertise otherDomain;
@@ -67,11 +68,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
             this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain", ShortName = "DMN"};
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain", ShortName = "DMN" };
             this.otherDomain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "otherDomain", ShortName = "ODMN" };
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person, SelectedDomain = this.domain };
 
-            this.modelsetup.ActiveDomain = new List<DomainOfExpertise>() {this.domain,this.otherDomain};
+            this.modelsetup.ActiveDomain = new List<DomainOfExpertise>() { this.domain, this.otherDomain };
 
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
 
@@ -87,9 +88,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.iteration.Element.Add(this.elementDefinition);
             this.publication = new Publication(Guid.NewGuid(), this.cache, this.uri);
 
-            this.parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri){ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtype1", ShortName = "pat1" }, Owner = this.domain };
+            this.parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtype1", ShortName = "pat1" }, Owner = this.domain };
             this.parameter2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtype2", ShortName = "pat2" }, Owner = this.domain };
-            
+            this.parameter3= new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtypeadd", ShortName = "padd" }, Owner = this.domain };
+
             var parameterforoverride = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtype3", ShortName = "pat3" } };
 
             // Test input
@@ -98,12 +100,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.SetScalarValueSet(valueSet);
             parameterforoverride.ValueSet.Add(valueSet);
 
-            parameter1.ValueSet.Add(valueSet.Clone(false));
+            this.parameter1.ValueSet.Add(valueSet.Clone(false));
+            this.parameter3.ValueSet.Add(valueSet.Clone(false));
 
-            this.parameterOverride1 = new ParameterOverride(Guid.NewGuid(), this.cache, this.uri) { Parameter = parameterforoverride};
+            this.parameterOverride1 = new ParameterOverride(Guid.NewGuid(), this.cache, this.uri) { Parameter = parameterforoverride };
 
             this.elementDefinition.Parameter.Add(this.parameter1);
             this.elementDefinition.Parameter.Add(this.parameter2);
+            this.elementDefinition.Parameter.Add(this.parameter3);
             this.elementDefinition.Parameter.Add(parameterforoverride);
 
             var elementusage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri);
@@ -113,6 +117,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.publication.PublishedParameter.Add(this.parameter1);
             this.publication.PublishedParameter.Add(this.parameter2);
+            this.publication.PublishedParameter.Add(this.parameter3);
             this.publication.PublishedParameter.Add(this.parameterOverride1);
 
             this.publication.CreatedOn = DateTime.Now;
@@ -161,7 +166,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             Assert.AreEqual(1, viewmodel.Publications.Count);
-            Assert.AreEqual(3, viewmodel.Publications[0].ContainedRows.Count);            
+            Assert.AreEqual(4, viewmodel.Publications[0].ContainedRows.Count);
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.DataSource, Is.Not.Null.Or.Empty);
@@ -218,6 +223,17 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         {
             var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
+            this.parameter3.ValueSet.First().Published = new ValueArray<string>(new List<string>() { "-" },
+                this.parameter3.ValueSet.First());
+            this.parameter3.ValueSet.First().ValueSwitch = ParameterSwitchKind.REFERENCE;
+            this.parameter3.ValueSet.First().Reference = new ValueArray<string>(new List<string>() { "20" },
+                this.parameter3.ValueSet.First());
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter3, EventKind.Added);
+
+            Assert.AreEqual(2, viewmodel.Domains.Count);
+            Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
+
             this.parameter1.ValueSet.First().Published = new ValueArray<string>(new List<string>() { "-" },
                 this.parameter1.ValueSet.First());
             this.parameter1.ValueSet.First().ValueSwitch = ParameterSwitchKind.MANUAL;
@@ -227,23 +243,23 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
 
             Assert.AreEqual(2, viewmodel.Domains.Count);
-            Assert.AreEqual(0, viewmodel.Domains[0].ContainedRows.Count);
+            Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
 
             this.parameter1.ValueSet.First().Manual = new ValueArray<string>(new List<string> { "134" });
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1.ValueSet.First(), EventKind.Updated);
-            Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
+            Assert.AreEqual(2, viewmodel.Domains[0].ContainedRows.Count);
 
             // verify that same row is updated
             this.parameter1.ValueSet.First().Manual = new ValueArray<string>(new List<string>() { "213" });
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
-            Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
+            Assert.AreEqual(2, viewmodel.Domains[0].ContainedRows.Count);
 
             // verify that ownership of the parameter is changed
             this.parameter1.Owner = otherDomain;
             CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
-            Assert.AreEqual(0, viewmodel.Domains[0].ContainedRows.Count);
+            Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
             Assert.AreEqual(1, viewmodel.Domains[1].ContainedRows.Count);
 
             // verify that value is removed
@@ -278,10 +294,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
 
             viewmodel.Domains[0].ToBePublished = true;
-            ((PublicationParameterOrOverrideRowViewModel) viewmodel.Domains[0].ContainedRows[0]).ToBePublished = true;
+            ((PublicationParameterOrOverrideRowViewModel)viewmodel.Domains[0].ContainedRows[0]).ToBePublished = true;
 
             Assert.IsTrue(viewmodel.Domains.Any(x => x.ToBePublished));
-            
+
             Assert.DoesNotThrowAsync(async () => viewmodel.ExecutePublishCommand());
 
             Assert.IsFalse(viewmodel.Domains.Any(x => x.ToBePublished));
