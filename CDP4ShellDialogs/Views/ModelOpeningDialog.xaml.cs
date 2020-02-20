@@ -4,13 +4,13 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.Views
+namespace CDP4ShellDialogs.Views
 {
     using System.Windows;
     using System.Windows.Controls;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4EngineeringModel.ViewModels;
+    using CDP4ShellDialogs.ViewModels;
     using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Grid;
 
@@ -52,10 +52,13 @@ namespace CDP4EngineeringModel.Views
             var containerElement = (FrameworkElement)container;
             var cellData = (GridCellData)item;
 
-            var rowObject = cellData.RowData.Row;
-            if (rowObject is ModelSelectionIterationSetupRowViewModel)
+            if (cellData != null)
             {
-                return (DataTemplate)containerElement.FindResource("iterationSetupDomainOfExpertiseTemplate");
+                var rowObject = cellData.RowData.Row;
+                if (rowObject is ModelSelectionIterationSetupRowViewModel)
+                {
+                    return (DataTemplate)containerElement.FindResource("iterationSetupDomainOfExpertiseTemplate");
+                }
             }
 
             return base.SelectTemplate(item, container);

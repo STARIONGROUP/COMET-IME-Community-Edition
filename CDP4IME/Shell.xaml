@@ -119,7 +119,7 @@
                                 </dxb:PopupMenu>
                             </dxb:BarSplitButtonItem.PopupControl>
                         </dxb:BarSplitButtonItem>
-                      
+
                         <dxb:BarItemLinkSeparator />
 
                         <dxb:BarSplitButtonItem Name="sbSave"
@@ -215,6 +215,34 @@
 
                     </dxr:RibbonPageGroup>
 
+                    <dxr:RibbonPageGroup Name="pgDataModels"
+                                         Caption="Models"
+                                         MergeOrder="0"
+                                         ShowCaptionButton="True">
+                        <dxb:BarButtonItem Name="bDataSelectIterations"
+                                           Command="{Binding OpenSelectIterationsCommand}"
+                                           Content="Open"
+                                           Description="Opens Engineering Model Iterations."
+                                           Glyph="{dxc:DXImage Image=LoadPageSetup_16x16.png}"
+                                           Hint="Opens Engineering Model Iterations"
+                                           LargeGlyph="{dxc:DXImage Image=LoadPageSetup_32x32.png}"
+                                           RibbonStyle="large" />
+                        <dxb:BarButtonItem Name="bDataSwitchDomain"
+                                           Command="{Binding OpenDomainSwitchDialogCommand}"
+                                           Content="Switch Domain"
+                                           Description="Switch domain of expertise"
+                                           Hint="Switch domain of expertise"
+                                           LargeGlyph="pack://application:,,,/CDP4Composition;component/Resources/Images/domain_switch.png"
+                                           RibbonStyle="large" />
+                        <dxb:BarButtonItem Name="bDataCloseModel"
+                                           Content="Close"
+                                           Command="{Binding CloseIterationsCommand}"
+                                           Glyph="{dxc:DXImage Image=Close_16x16.png}"
+                                           Hint="Close Iterations."
+                                           LargeGlyph="{dxc:DXImage Image=Close_32x32.png}"
+                                           RibbonStyle="Large"/>
+                    </dxr:RibbonPageGroup>
+
                     <dxr:RibbonPageGroup Name="ConfigGroup"
                                          Caption="Config"
                                          MergeOrder="8000"
@@ -264,6 +292,7 @@
                                            RibbonStyle="Large" />
                     </dxr:RibbonPageGroup>
                 </ribbon:ExtendedRibbonPage>
+
 
                 <ribbon:ExtendedRibbonPage Name="ViewRibbonPage"
                                            Caption="View"

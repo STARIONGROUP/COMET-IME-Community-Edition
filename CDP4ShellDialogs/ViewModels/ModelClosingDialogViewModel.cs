@@ -1,10 +1,10 @@
 // -------------------------------------------------------------------------------------------------
-// <copyright file="ModelIterationDomainSwitchDialogViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ModelClosingDialogViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.ViewModels
+namespace CDP4ShellDialogs.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -15,6 +15,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4CommonView;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
@@ -25,7 +26,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// The ViewModel for the <see cref="ModelSelection"/> Dialog
     /// </summary>
-    public class ModelIterationDomainSwitchDialogViewModel : DialogViewModelBase
+    public class ModelClosingDialogViewModel : DialogViewModelBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelClosingDialogViewModel"/> class. 
@@ -33,7 +34,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="sessionAvailable">
         /// The session Available.
         /// </param>
-        public ModelIterationDomainSwitchDialogViewModel(IEnumerable<ISession> sessionAvailable)
+        public ModelClosingDialogViewModel(IEnumerable<ISession> sessionAvailable)
         {
             this.SessionsAvailable = new DisposableReactiveList<ModelSelectionSessionRowViewModel>();
             this.InitializeReactiveCommands();
@@ -44,7 +45,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the dialog box title
         /// </summary>
-        public string DialogTitle => "Switch Domain";
+        public string DialogTitle
+        {
+            get { return "Iteration Selection"; }
+        }
 
         /// <summary>
         /// Gets the list of <see cref="BaseRowViewModel"/> available
@@ -59,7 +63,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<Unit> switchCommand { get; private set; }
+        public ReactiveCommand<Unit> CloseCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ICommand"/>
@@ -74,8 +78,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>> { ChangeTrackingEnabled = true };
             this.IsBusy = false;
             var canOk = this.WhenAnyValue(x => x.SelectedIterations.Count, count => count != 0);
-            this.switchCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteDomainSwitch(), RxApp.MainThreadScheduler);
-            this.switchCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
+            this.CloseCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteClose(), RxApp.MainThreadScheduler);
+            this.CloseCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
             {
                 this.ErrorMessage = x.Message;
                 this.IsBusy = false;
@@ -94,7 +98,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task ExecuteDomainSwitch()
+        private async Task ExecuteClose()
         {
             this.IsBusy = true;
             this.LoadingMessage = "Closing...";
@@ -104,16 +108,24 @@ namespace CDP4EngineeringModel.ViewModels
                 var modelrow = (ModelSelectionIterationSetupRowViewModel)iteration;
                 var session = modelrow.Session;
 
-                var openIteration = session.OpenIterations.Keys.FirstOrDefault(x => x.Iid == modelrow.IterationIid);
-                if (openIteration != null)
+                Lazy<Thing> cachedIteration;
+                if (session.Assembler.Cache.TryGetValue(new CacheKey(iteration.Thing.Iid, null),
+                    out cachedIteration))
                 {
-                    session.SwitchDomain(modelrow.IterationIid, modelrow.SelectedDomain);
+                    var modelSetup = (EngineeringModelSetup) modelrow.Thing.Container;
+                    await session.CloseIterationSetup((IterationSetup) iteration.Thing);
+
+                    if (session.OpenIterations.Keys.Count(it => it.IterationSetup.Container == modelSetup) == 1)
+                    {
+                        var modelRdl = modelSetup.RequiredRdl.Single();
+                        await session.CloseModelRdl(modelRdl);
+                    }
                 }
             }
 
             // In order to give the user the idea something is happening we delay here such that
-            // the close window stays visible for 1 seconds after the iteration has been removed.
-            await Task.Delay(1000);
+            // the close window stays visible for 2 seconds after the iteration has been removed.
+            await Task.Delay(2000);
 
             this.IsBusy = false;
             this.DialogResult = new BaseDialogResult(true);

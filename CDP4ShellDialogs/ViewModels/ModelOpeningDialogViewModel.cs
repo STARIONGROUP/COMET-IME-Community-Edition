@@ -4,7 +4,7 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.ViewModels
+namespace CDP4ShellDialogs.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace CDP4EngineeringModel.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// The ViewModel for the <see cref="ModelSelection"/> Dialog
+    /// The ViewModel for the <see cref="DialogViewModelBase"/> Dialog
     /// </summary>
     public class ModelOpeningDialogViewModel : DialogViewModelBase
     {

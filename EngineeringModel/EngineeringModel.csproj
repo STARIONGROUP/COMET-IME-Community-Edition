@@ -243,9 +243,6 @@
     <Compile Include="ViewModels\Dialogs\ElementUsageDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ElementDefinitionDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ActualFiniteStateListDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ModelIterationDomainSwitchDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ModelClosingDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ModelOpeningDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ParameterSubscriptionDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PossibleFiniteStateListDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\PossibleFiniteStateDialogViewModel.cs" />
@@ -258,9 +255,6 @@
     <Compile Include="ViewModels\Dialogs\Rows\DomainOfExpertiseRowViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\Rows\GroupSelectionViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\Rows\IDialogValueSetRow.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ModelSelectionIterationSetupRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ModelSelectionEngineeringModelSetupRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ModelSelectionSessionRowViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\Rows\ParameterBaseRowViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\Rows\ParameterComponentValueRowViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\Rows\ParameterOptionRowViewModel.cs" />
@@ -327,7 +321,6 @@
     <Compile Include="ViewModels\RelationshipBrowser\RelationshipBrowserRibbonViewModel.cs" />
     <Compile Include="ViewModels\RelationshipBrowser\RelationshipBrowserViewModel.cs" />
     <Compile Include="ViewModels\RelationshipBrowser\BinaryRelationshipRowViewModel.cs" />
-    <Compile Include="ViewModels\Ribbon Controls\ModelHomeRibbonViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\Ribbon Controls\ElementDefinitionRibbonViewModel.cs" />
     <Compile Include="ViewModels\OptionBrowser\OptionBrowserRibbonViewModel.cs" />
@@ -415,18 +408,6 @@
     </Compile>
     <Compile Include="Views\Items\ParameterValueSetLayoutItem.xaml.cs">
       <DependentUpon>ParameterValueSetLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ModelIterationDomainSwitchDialog.xaml.cs">
-      <DependentUpon>ModelIterationDomainSwitchDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ModelClosingDialog.xaml.cs">
-      <DependentUpon>ModelClosingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ModelOpeningDialog.xaml.cs">
-      <DependentUpon>ModelOpeningDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ModelHomeRibbon.xaml.cs">
-      <DependentUpon>ModelHomeRibbon.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\OptionBrowser\OptionBrowser.xaml.cs">
       <DependentUpon>OptionBrowser.xaml</DependentUpon>
@@ -562,22 +543,6 @@
     <Page Include="Views\Items\ParameterValueSetLayoutItem.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ModelIterationDomainSwitchDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ModelClosingDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ModelOpeningDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ModelHomeRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\OptionBrowser\OptionBrowser.xaml">
       <SubType>Designer</SubType>

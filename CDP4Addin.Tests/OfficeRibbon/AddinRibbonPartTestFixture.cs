@@ -80,7 +80,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.serviceLocator = new Mock<IServiceLocator>();
 
-            this.amountOfRibbonControls = 4;
+            this.amountOfRibbonControls = 7;
             this.order = 1;
 
             this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, null, null);
@@ -136,6 +136,8 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Close"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_ProxySettings"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToOpen"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(openSessionEvent);
@@ -143,6 +145,8 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Close"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_ProxySettings"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_SelectModelToOpen"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
             CDPMessageBus.Current.SendMessage(closeSessionEvent);
@@ -150,6 +154,16 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Close"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_ProxySettings"));
+        }
+
+        [Test]
+        public async Task VerifyThatOnActionSelectModelToCloseOpenDialog()
+        {
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_SelectModelToClose");
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
         }
 
         [Test]

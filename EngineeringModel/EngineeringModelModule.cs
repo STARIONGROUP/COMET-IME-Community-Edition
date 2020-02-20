@@ -118,7 +118,6 @@ namespace CDP4EngineeringModel
         /// </summary>
         private void RegisterRegions()
         {
-            this.regionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(ModelHomeRibbon));
             this.regionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(ElementDefinitionRibbon));
             this.regionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(OptionBrowserRibbon));
             this.regionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(PublicationBrowserRibbon));

@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.Tests.RibbonControls
+namespace CDP4ShellDialogs.Tests.RibbonControls
 {
     using System;
     using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace CDP4EngineeringModel.Tests.RibbonControls
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-    using CDP4EngineeringModel.ViewModels;
+    using CDP4ShellDialogs.ViewModels;
     using Microsoft.Practices.ServiceLocation;
     using Moq;
     using NUnit.Framework;
@@ -88,28 +88,6 @@ namespace CDP4EngineeringModel.Tests.RibbonControls
         public void TearDown()
         {
             CDPMessageBus.Current.ClearSubscriptions();
-        }
-
-        [Test]
-        public void VerifyThatOpenModelSelectionOpensDialog()
-        {
-            var viewmodel = new ModelHomeRibbonViewModel();
-            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
-            viewmodel.OpenSelectIterationsCommand.Execute(null);
-
-            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
-        }
-
-        [Test]
-        public void VerifyThatSessionArePopulated()
-        {
-            var viewmodel = new ModelHomeRibbonViewModel();
-            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
-
-            Assert.AreEqual(1, viewmodel.OpenSessions.Count);
-
-            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Closed));
-            Assert.AreEqual(0, viewmodel.OpenSessions.Count);
         }
     }
 }
