@@ -4,13 +4,13 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.Views
+namespace CDP4ShellDialogs.Views
 {
     using System.Windows;
     using System.Windows.Controls;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4EngineeringModel.ViewModels;
+    using CDP4ShellDialogs.ViewModels;
     using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Grid;
 

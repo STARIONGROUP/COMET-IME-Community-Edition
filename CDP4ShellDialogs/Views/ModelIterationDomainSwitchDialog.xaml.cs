@@ -4,7 +4,7 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.Views
+namespace CDP4ShellDialogs.Views
 {
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;

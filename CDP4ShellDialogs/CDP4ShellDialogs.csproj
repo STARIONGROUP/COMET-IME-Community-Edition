@@ -189,11 +189,26 @@
     <Compile Include="Utils.cs" />
     <Compile Include="ViewModels\DataSourceSelectionViewModel.cs" />
     <Compile Include="ViewModels\DialogResult\DataSourceSelectionResult.cs" />
+    <Compile Include="ViewModels\ModelClosingDialogViewModel.cs" />
+    <Compile Include="ViewModels\ModelIterationDomainSwitchDialogViewModel.cs" />
+    <Compile Include="ViewModels\ModelOpeningDialogViewModel.cs" />
+    <Compile Include="ViewModels\ModelSelectionEngineeringModelSetupRowViewModel.cs" />
+    <Compile Include="ViewModels\ModelSelectionIterationSetupRowViewModel.cs" />
+    <Compile Include="ViewModels\ModelSelectionSessionRowViewModel.cs" />
     <Compile Include="ViewModels\ProxyServerViewModel.cs" />
     <Compile Include="ViewModels\UriManagerViewModel.cs" />
     <Compile Include="ViewModels\UriRowViewModel.cs" />
     <Compile Include="Views\DataSourceSelection.xaml.cs">
       <DependentUpon>DataSourceSelection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ModelClosingDialog.xaml.cs">
+      <DependentUpon>ModelClosingDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ModelIterationDomainSwitchDialog.xaml.cs">
+      <DependentUpon>ModelIterationDomainSwitchDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ModelOpeningDialog.xaml.cs">
+      <DependentUpon>ModelOpeningDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProxyServer.xaml.cs">
       <DependentUpon>ProxyServer.xaml</DependentUpon>
@@ -206,6 +221,10 @@
     <Resource Include="Resources\cdp4logo_brand_textonly.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
+      <Project>{5e0e5c30-df40-4708-abae-4da03ec9b881}</Project>
+      <Name>CDP4CommonView</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>
       <Name>CDP4Composition</Name>
@@ -217,6 +236,18 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\DataSourceSelection.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ModelClosingDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ModelIterationDomainSwitchDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ModelOpeningDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -100,7 +100,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
-            this.amountOfRibbonControls = 7;
+            this.amountOfRibbonControls = 5;
             this.order = 1;
 
             // Setup negative dialog result - selection of iterationsetup
@@ -375,23 +375,6 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             {
                 Console.WriteLine(ex);
             }
-        }
-
-        [Test]
-        public async Task VerifyThatOnActionSelectModelToCloseOpenDialog()
-        {
-            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null);
-
-            var fluentRibbonManager = new FluentRibbonManager();
-            fluentRibbonManager.IsActive = true;
-            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
-
-            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
-
-            await this.ribbonPart.OnAction("CDP4_SelectModelToClose");
-
-            this.positiveDialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
         }
     }
 }

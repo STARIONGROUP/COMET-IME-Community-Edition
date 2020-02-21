@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.ViewModels
+namespace CDP4ShellDialogs.ViewModels
 {
     using System.Linq;
 

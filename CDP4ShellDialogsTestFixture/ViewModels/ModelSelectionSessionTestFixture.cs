@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.Tests.RowViewModels
+namespace CDP4ShellDialogs.Tests.RowViewModels
 {
     using System;
     using System.Globalization;
@@ -12,7 +12,7 @@ namespace CDP4EngineeringModel.Tests.RowViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Permission;
-    using CDP4EngineeringModel.ViewModels;
+    using CDP4ShellDialogs.ViewModels;
     using Moq;
     using NUnit.Framework;
 

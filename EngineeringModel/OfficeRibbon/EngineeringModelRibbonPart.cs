@@ -96,7 +96,7 @@ namespace CDP4EngineeringModel
         /// <summary>
         /// Gets a List of <see cref="Iteration"/> that are opened
         /// </summary>
-        public List<Iteration> Iterations { get; private set; } 
+        public List<Iteration> Iterations { get; private set; }
 
         /// <summary>
         /// Invokes the action as a result of a ribbon control being clicked, selected, etc.
@@ -113,18 +113,6 @@ namespace CDP4EngineeringModel
 
             if (this.Session == null)
             {
-                return;
-            }
-
-            if (ribbonControlId == "CDP4_SelectModelToOpen")
-            {
-                this.OpenIterationInEngineeringModel();
-                return;
-            }
-
-            if (ribbonControlId == "CDP4_SelectModelToClose")
-            {
-                this.OpenClosingIterationDialog();
                 return;
             }
 
@@ -228,14 +216,14 @@ namespace CDP4EngineeringModel
 
                 foreach (var iteration in this.Iterations)
                 {
-                    var engineeringModel = (EngineeringModel) iteration.Container;
+                    var engineeringModel = (EngineeringModel)iteration.Container;
 
                     Tuple<DomainOfExpertise, Participant> tuple;
                     this.Session.OpenIterations.TryGetValue(iteration, out tuple);
 
                     var label = string.Format("{0} - {1} : [{2}]", engineeringModel.EngineeringModelSetup.ShortName,
-                        iteration.IterationSetup.IterationNumber, tuple.Item1 == null? String.Empty : tuple.Item1.ShortName);
-                    
+                        iteration.IterationSetup.IterationNumber, tuple.Item1 == null ? String.Empty : tuple.Item1.ShortName);
+
                     var menuContent =
                         string.Format(
                             "<button id=\"ShowElementDefinitionsBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
@@ -325,7 +313,7 @@ namespace CDP4EngineeringModel
                 menuxml = sb.ToString();
             }
 
-            this.UpdateControlIdentiefers(menuxml);      
+            this.UpdateControlIdentiefers(menuxml);
             return menuxml;
         }
 
@@ -448,28 +436,6 @@ namespace CDP4EngineeringModel
         }
 
         /// <summary>
-        /// Open an <see cref="Iteration"/> of an <see cref="EngineeringModel"/>
-        /// </summary>
-        private async void OpenIterationInEngineeringModel()
-        {
-            var sessions = new List<ISession> { this.Session };
-
-            var viewmodel = new ModelOpeningDialogViewModel(sessions);
-
-            this.DialogNavigationService.NavigateModal(viewmodel);
-        }
-
-        /// <summary>
-        /// Open the <see cref="ModelClosingDialogViewModel"/>
-        /// </summary>
-        private async void OpenClosingIterationDialog()
-        {
-            var sessions = new List<ISession> { this.Session };
-            var closingDialog = new ModelClosingDialogViewModel(sessions);
-            this.DialogNavigationService.NavigateModal(closingDialog);
-        }
-
-        /// <summary>
         /// Show or close the <see cref="ElementDefinitionsBrowserViewModel"/>
         /// </summary>
         /// <param name="iterationId">
@@ -493,7 +459,7 @@ namespace CDP4EngineeringModel
                 return;
             }
 
-            var model = (EngineeringModel) iteration.Container;
+            var model = (EngineeringModel)iteration.Container;
             if (model == null)
             {
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");

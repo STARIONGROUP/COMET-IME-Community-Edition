@@ -163,6 +163,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxy\ProxyServerConfigurationManagerTestFixture.cs" />
     <Compile Include="UtilsTestFixture.cs" />
+    <Compile Include="ViewModels\ModelClosingDialogViewModelTestFixture.cs" />
+    <Compile Include="ViewModels\ModelOpeningDialogViewModelTestFixture.cs" />
+    <Compile Include="ViewModels\ModelSelectionSessionTestFixture.cs" />
     <Compile Include="ViewModels\ProxyServerViewModelTestFixture.cs" />
     <Compile Include="ViewModels\UriManagerViewModelTestFixture.cs" />
     <Compile Include="ViewModels\DataSourceSelectionViewModelTestFixture.cs" />
@@ -175,6 +178,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
+      <Project>{5e0e5c30-df40-4708-abae-4da03ec9b881}</Project>
+      <Name>CDP4CommonView</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>
       <Name>CDP4Composition</Name>

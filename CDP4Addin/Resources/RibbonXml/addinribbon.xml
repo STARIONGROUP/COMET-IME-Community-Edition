@@ -4,4 +4,8 @@
     <button id="CDP4_Close" label="Close" screentip="Close the data-source" imageMso="FileDropSqlDatabase" onAction="OnAction" getEnabled="GetEnabled"/>
     <button id="CDP4_ProxySettings" label="Web Proxy" screentip="Open the Web-proxy server settings" imageMso="DatabaseMoveToSharePoint" onAction="OnAction" getEnabled="GetEnabled"/>
   </group>
+  <group id="CDP4models" label="Models">
+    <button id="CDP4_SelectModelToOpen" label="Open" screentip="Select an Engineering Model to open" imageMso="ServerConnection" onAction="OnAction" getEnabled="GetEnabled" />
+    <button id="CDP4_SelectModelToClose" label="Close" screentip="Select an Engineering Model to close" imageMso="FileDropSqlDatabase" onAction="OnAction" getEnabled="GetEnabled" />
+  </group>
 </ribbonxml>

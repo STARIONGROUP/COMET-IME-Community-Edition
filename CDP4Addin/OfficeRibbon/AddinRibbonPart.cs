@@ -26,6 +26,8 @@
 namespace CDP4AddinCE
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
     using CDP4Composition;
@@ -71,7 +73,7 @@ namespace CDP4AddinCE
         public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);            
+            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
         }
 
         /// <summary>
@@ -102,6 +104,18 @@ namespace CDP4AddinCE
                     var proxyServerViewModel = new ProxyServerViewModel();
                     var proxyServerViewModelResult = dialogService.NavigateModal(proxyServerViewModel) as DataSourceSelectionResult;
                     break;
+                case "CDP4_SelectModelToOpen":
+                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+                    var sessionsOpening = new List<ISession> { this.session };
+                    var modelOpeningDialogViewModel = new ModelOpeningDialogViewModel(sessionsOpening);
+                    var modelOpeningDialogViewModelResult = dialogService.NavigateModal(modelOpeningDialogViewModel) as DataSourceSelectionResult;
+                    break;
+                case "CDP4_SelectModelToClose":
+                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+                    var sessionsClosing = new List<ISession> { this.session };
+                    var modelClosingDialogViewModel = new ModelClosingDialogViewModel(sessionsClosing);
+                    var modelClosingDialogViewModelResult = dialogService.NavigateModal(modelClosingDialogViewModel) as DataSourceSelectionResult;
+                    break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
                     break;
@@ -130,6 +144,10 @@ namespace CDP4AddinCE
                     return this.session != null;
                 case "CDP4_ProxySettings":
                     return this.session == null;
+                case "CDP4_SelectModelToOpen":
+                    return this.session != null;
+                case "CDP4_SelectModelToClose":
+                    return (this.session != null) && (this.session.OpenIterations.Count > 0);
                 default:
                     return false;
             }

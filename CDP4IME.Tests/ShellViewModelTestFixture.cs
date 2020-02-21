@@ -20,6 +20,12 @@ namespace CDP4IME.Tests
     using NLog.Config;
     using NUnit.Framework;
     using System;
+    using CDP4Dal.Events;
+    using CDP4Composition.Navigation.Interfaces;
+
+    using ReactiveUI;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.EngineeringModelData;
 
     /// <summary>
     /// TestFixture for the <see cref="ShellViewModel"/>
@@ -49,6 +55,25 @@ namespace CDP4IME.Tests
         /// </summary>
         private Mock<IServiceLocator> serviceLocator;
 
+        /// <summary>
+        /// mocked <see cref="ISession"/>
+        /// </summary>
+        private Mock<ISession> session;
+
+        /// <summary>
+        /// mocked <see cref="Iteration"/>
+        /// </summary>
+        private Iteration iteration;
+
+        /// <summary>
+        /// mocked <see cref="DomainOfExpertise"/>
+        /// </summary>
+        private DomainOfExpertise domain;
+
+        private Uri uri = new Uri("http://www.rheagroup.com");
+
+        private IterationSetup iterationSetup;
+
         [SetUp]
         public void SetUp()
         {
@@ -56,6 +81,15 @@ namespace CDP4IME.Tests
 
             this.navigationService = new Mock<IDialogNavigationService>();
 
+            this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
+
+            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri) { IterationSetup = this.iterationSetup };
+
+            this.session = new Mock<ISession>();
+            this.session.Setup(x=>x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
+            {
+                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+            });
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
@@ -171,7 +205,7 @@ namespace CDP4IME.Tests
         public void VerifThatSaveSessionCommandNavigatesToDataSourceExportViewModel()
         {
             this.viewModel.SaveSessionCommand.Execute(null);
-            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<DataSourceExportViewModel>()));            
+            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<DataSourceExportViewModel>()));
         }
 
         [Test]
@@ -180,7 +214,29 @@ namespace CDP4IME.Tests
             Assert.IsTrue(this.viewModel.OpenUriManagerCommand.CanExecute(null));
 
             this.viewModel.OpenUriManagerCommand.Execute(null);
-            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<UriManagerViewModel>()));            
+            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<UriManagerViewModel>()));
         }
+
+        [Test]
+        public void VerifyThatOpenModelSelectionOpensDialog()
+        {
+            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
+
+            this.navigationService.Setup(x => x.NavigateModal(It.IsAny<ModelOpeningDialogViewModel>())).Returns(null as IDialogResult);
+
+            this.viewModel.OpenSelectIterationsCommand.Execute(null);
+        }
+
+        [Test]
+        public void VerifyThatSessionArePopulated()
+        {
+            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
+
+            Assert.AreEqual(1, this.viewModel.OpenSessions.Count);
+
+            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Closed));
+            Assert.AreEqual(0, this.viewModel.OpenSessions.Count);
+        }
+
     }
 }
