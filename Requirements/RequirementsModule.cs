@@ -139,7 +139,7 @@ namespace CDP4Requirements
                 var settings = this.PluginSettingsService.Read<RequirementsModuleSettings>();
                 PluginSettings = settings;
             }
-            catch (PluginSettingsException pluginSettingsException)
+            catch (SettingsException pluginSettingsException)
             {
                 var relationshipMatrixPluginSettings = new RequirementsModuleSettings();
                 this.PluginSettingsService.Write(relationshipMatrixPluginSettings);

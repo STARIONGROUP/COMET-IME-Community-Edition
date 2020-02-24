@@ -38,6 +38,7 @@ namespace CDP4RelationshipMatrix
     using Microsoft.Practices.Prism.Regions;
     using NLog;
     using Views;
+    using CDP4Composition.Services;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="RelationshipMatrixModule"/> Component
@@ -154,7 +155,7 @@ namespace CDP4RelationshipMatrix
                     this.PluginSettingService.Write(settings);
                 }
             }
-            catch (PluginSettingsException pluginSettingsException)
+            catch (SettingsException pluginSettingsException)
             {
                 var relationshipMatrixPluginSettings = new RelationshipMatrixPluginSettings(true);
 

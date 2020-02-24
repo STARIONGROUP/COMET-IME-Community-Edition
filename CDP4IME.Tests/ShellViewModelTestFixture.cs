@@ -97,7 +97,7 @@ namespace CDP4IME.Tests
             var availableDals = new AvailableDals(dals);
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>()).Returns(availableDals);
 
-            this.viewModel = new ShellViewModel(this.navigationService.Object);
+            this.viewModel = new ShellViewModel(this.navigationService.Object,null);
         }
 
         [TearDown]
@@ -111,7 +111,7 @@ namespace CDP4IME.Tests
         [Test]
         public void VerifyThatArgumentNullExceptionIsThrown()
         {
-            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null));
+            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null,null));
         }
 
         [Test]

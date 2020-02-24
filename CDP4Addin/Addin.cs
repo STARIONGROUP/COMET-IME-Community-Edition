@@ -34,13 +34,15 @@ namespace CDP4AddinCE
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Windows;
-
+    using CDP4AddinCE.Settings;
     using CDP4AddinCE.Utils;
     using CDP4Composition;
+    using CDP4Composition.Exceptions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services.AppSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4OfficeInfrastructure;
@@ -50,7 +52,7 @@ namespace CDP4AddinCE
     using NetOffice.ExcelApi.Tools;
     using NetOffice.Tools;
     using NLog;
-    using ReactiveUI;  
+    using ReactiveUI;
     using MessageBox = System.Windows.Forms.MessageBox;
 
     /// <summary>
@@ -81,7 +83,7 @@ namespace CDP4AddinCE
         /// Excel application instance
         /// </summary>
         private NetOffice.ExcelApi.Application excelApplication;
-        
+
         /// <summary>
         /// The list of current loaded custom task panes
         /// </summary>
@@ -109,17 +111,46 @@ namespace CDP4AddinCE
         {
             logger.Debug("starting CDP4-CE addin");
 
+            var appSettings = new AppSettingsService();
+            this.ReadAppSettings(appSettings);
+
             this.PreloadAssemblies();
             this.RedirectAssemblies();
             this.SetupIdtExtensibility2Events();
             this.SetupEventListeners();
 
             // Set the Theme of the application
-            DevExpress.Xpf.Core.ThemeManager.ApplicationThemeName = DevExpress.Xpf.Core.Theme.SevenName;
+            ThemeManager.ApplicationThemeName = Theme.SevenName;
 
             logger.Debug("CDP4-CE addin started");
         }
-        
+
+        /// <summary>
+        /// Reads the app settings from disk
+        /// </summary>
+        internal AddinSettings ReadAppSettings(IAppSettingsService appSettingService)
+        {
+            try
+            {
+                return appSettingService.Read<AddinSettings>();
+            }
+            catch (SettingsException appSettingsException)
+            {
+                var addinSettings = new AddinSettings(true);
+
+                appSettingService.Write(addinSettings);
+
+                logger.Error(appSettingsException);
+
+                return addinSettings;
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal(ex);
+                throw;
+            }
+        }
+
         /// <summary>
         /// Error handler for the Registration methods
         /// </summary>
@@ -152,7 +183,7 @@ namespace CDP4AddinCE
             return ribbonXml;
         }
 
-        
+
         /// <summary>
         /// Executes the OnAction callback that is invoked from the <see cref="Office.IRibbonControl"/>
         /// </summary>

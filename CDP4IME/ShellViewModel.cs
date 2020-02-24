@@ -12,10 +12,16 @@ namespace CDP4IME
     using System.Reactive.Linq;
     using System.Reflection;
     using CDP4Composition.Events;
+    using CDP4Composition.Exceptions;
     using CDP4Composition.Log;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services.AppSettingService;
+    //using CDP4Composition.Services.AppSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using CDP4IME.Settings;
+
     using CDP4ShellDialogs.ViewModels;
     using Microsoft.Practices.ServiceLocation;
     using NLog;
@@ -31,7 +37,7 @@ namespace CDP4IME
         /// The NLog logger
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        
+
         /// <summary>
         /// Out property for the <see cref="IsSessionSelected"/> property
         /// </summary>
@@ -92,17 +98,28 @@ namespace CDP4IME
         private IDisposable subscription;
 
         /// <summary>
+        /// Gets the <see cref="IAppSettingsService"/> that is used to read app settings
+        /// </summary>
+        private readonly IAppSettingsService appSettingService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ShellViewModel"/> class.
         /// </summary>
         /// <param name="dialogNavigationService">
         /// The <see cref="IDialogNavigationService"/> that is used to show modal dialogs to the user
         /// </param>
-        public ShellViewModel(IDialogNavigationService dialogNavigationService)
+        /// <param name="appSettingService">
+        /// The (MEF injected) instance of <see cref="IAppSettingsService"/>
+        /// appSettingService
+        /// </param>
+        public ShellViewModel(IDialogNavigationService dialogNavigationService, IAppSettingsService appSettingService)
         {
             if (dialogNavigationService == null)
             {
                 throw new ArgumentNullException("dialogNavigationService", "The dialogNavigationService may not be null");
             }
+
+            this.appSettingService = appSettingService;
 
             this.OpenSessions = new ReactiveList<ISession>();
             this.OpenSessions.ChangeTrackingEnabled = true;
@@ -168,7 +185,8 @@ namespace CDP4IME
 
             this.subscription = CDPMessageBus.Current.Listen<IsBusyEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => {
+                .Subscribe(x =>
+                {
                     this.IsBusy = x.IsBusy;
                     this.LoadingMessage = x.Message;
                 });

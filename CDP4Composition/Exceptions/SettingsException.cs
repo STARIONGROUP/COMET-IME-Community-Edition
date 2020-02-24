@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="PluginSettingsException.cs" company="RHEA System S.A.">
-//   Copyright (c) 2019 RHEA System S.A.
+// <copyright file="SettingsException.cs" company="RHEA System S.A.">
+//   Copyright (c) 2018-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -10,30 +10,30 @@ namespace CDP4Composition.Exceptions
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// An <see cref="PluginSettingsException"/> is thrown when <see cref="PluginSettings"/> cannot be loaded or written
+    /// An <see cref="SettingsException"/> is thrown when <see cref="GeneralSettings"/> cannot be loaded or written
     /// </summary>
-    public class PluginSettingsException : Exception
+    public class SettingsException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PluginSettingsException"/> class.
+        /// Initializes a new instance of the <see cref="SettingsException"/> class.
         /// </summary>
-        public PluginSettingsException()
+        public SettingsException()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PluginSettingsException"/> class.
+        /// Initializes a new instance of the <see cref="SettingsException"/> class.
         /// </summary>
         /// <param name="message">
         /// The exception message
         /// </param>
-        public PluginSettingsException(string message)
+        public SettingsException(string message)
             : base(message)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PluginSettingsException"/> class.
+        /// Initializes a new instance of the <see cref="SettingsException"/> class.
         /// </summary>
         /// <param name="message">
         /// The exception message
@@ -41,13 +41,13 @@ namespace CDP4Composition.Exceptions
         /// <param name="innerException">
         /// A reference to the inner <see cref="Exception"/>
         /// </param>
-        public PluginSettingsException(string message, Exception innerException)
+        public SettingsException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PluginSettingsException"/> class.
+        /// Initializes a new instance of the <see cref="SettingsException"/> class.
         /// </summary>
         /// <param name="info">
         /// The serialization data
@@ -55,7 +55,7 @@ namespace CDP4Composition.Exceptions
         /// <param name="context">
         /// The <see cref="StreamingContext"/>
         /// </param>
-        protected PluginSettingsException(SerializationInfo info, StreamingContext context)
+        protected SettingsException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
