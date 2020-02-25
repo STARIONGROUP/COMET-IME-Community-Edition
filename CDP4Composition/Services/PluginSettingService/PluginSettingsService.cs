@@ -16,6 +16,9 @@ namespace CDP4Composition.PluginSettingService
     using Newtonsoft.Json.Serialization;
     using NLog;
 
+    /// <summary>
+    /// The service used to read and write the plugin configuration file
+    /// </summary>
     [Export(typeof(IPluginSettingsService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PluginSettingsService : IPluginSettingsService
@@ -50,7 +53,6 @@ namespace CDP4Composition.PluginSettingService
         /// </summary>
         public PluginSettingsService()
         {
-            //this.assemblyNamesCache = new Dictionary<IModule, string>();
             this.applicationUserPluginSettings = new Dictionary<string, PluginSettings>();
         }
         
@@ -106,7 +108,7 @@ namespace CDP4Composition.PluginSettingService
             {
                 logger.Error(ex, "The PluginSettings could not be read");
 
-                throw new SettingsException("The PluginSettings could not be read", ex);
+                throw new PluginSettingsException("The PluginSettings could not be read", ex);
             }
         }
 

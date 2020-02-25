@@ -15,20 +15,9 @@ namespace CDP4Composition.Services.AppSettingService
     public abstract class AppSettings
     {
         /// <summary>
-        /// Initializes a the list <see cref="Init"/> class
-        /// </summary>
-        public void Init(bool initializeDefaults)
-        {
-            if (initializeDefaults)
-            {
-                this.DisabledPlugins = new List<string>();
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the <see cref="DisabledPlugins"/>
         /// </summary>
         [JsonProperty]
-        public List<string> DisabledPlugins { get; set; }
+        public List<string> DisabledPlugins { get; set; } = new List<string>();
     }
 }

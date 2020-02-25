@@ -20,12 +20,18 @@ namespace CDP4IME.Tests
     using NLog.Config;
     using NUnit.Framework;
     using System;
+
+    using Castle.Components.DictionaryAdapter;
+
     using CDP4Dal.Events;
     using CDP4Composition.Navigation.Interfaces;
 
     using ReactiveUI;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.Services.AppSettingService;
+    using CDP4IME.Settings;
 
     /// <summary>
     /// TestFixture for the <see cref="ShellViewModel"/>
@@ -49,6 +55,8 @@ namespace CDP4IME.Tests
         /// mocked <see cref="IDialogNavigationService"/>
         /// </summary>
         private Mock<IDialogNavigationService> navigationService;
+
+        private Mock<AppSettings> appSettings;
 
         /// <summary>
         /// mocked <see cref="IServiceLocator"/>
@@ -81,6 +89,10 @@ namespace CDP4IME.Tests
 
             this.navigationService = new Mock<IDialogNavigationService>();
 
+            this.appSettings = new Mock<AppSettings>();
+            this.appSettings.Object.DisabledPlugins = new List<string>();
+            this.appSettings.Object.DisabledPlugins.Add("CDP4RelationshipMatrix");
+
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
 
             this.iteration = new Iteration(Guid.NewGuid(), null, this.uri) { IterationSetup = this.iterationSetup };
@@ -96,8 +108,6 @@ namespace CDP4IME.Tests
             var dals = new List<Lazy<IDal, IDalMetaData>>();
             var availableDals = new AvailableDals(dals);
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>()).Returns(availableDals);
-
-            this.viewModel = new ShellViewModel(this.navigationService.Object,null);
         }
 
         [TearDown]
@@ -111,7 +121,7 @@ namespace CDP4IME.Tests
         [Test]
         public void VerifyThatArgumentNullExceptionIsThrown()
         {
-            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null,null));
+            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null));
         }
 
         [Test]
