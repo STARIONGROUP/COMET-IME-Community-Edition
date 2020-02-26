@@ -10,7 +10,7 @@ namespace CDP4Composition.Exceptions
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// An <see cref="SettingsException"/> is thrown when <see cref="GeneralSettings"/> cannot be loaded or written
+    /// An <see cref="SettingsException"/> is thrown when <see cref="Exception"/> cannot be loaded or written
     /// </summary>
     public class SettingsException : Exception
     {
