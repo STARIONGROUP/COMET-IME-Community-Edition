@@ -17,7 +17,7 @@ namespace CDP4Composition.Services.AppSettingService
     using NLog;
 
     /// <summary>
-    /// The service used to read and write the application configuration file
+    /// Class service <see cref="AppSettingsService{T}"/> used to read and write the application configuration file
     /// </summary>
     [Export(typeof(IAppSettingsService<>))]
     [PartCreationPolicy(CreationPolicy.Shared)]
