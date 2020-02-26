@@ -241,6 +241,8 @@
     <Compile Include="Events\HighlightEvent.cs" />
     <Compile Include="Events\ToggleDeprecatedThingEvent.cs" />
     <Compile Include="Events\TaskbarNotificationEvent.cs" />
+    <Compile Include="Exceptions\AppSettingsException.cs" />
+    <Compile Include="Exceptions\PluginSettingsException.cs" />
     <Compile Include="Exceptions\SettingsException.cs" />
     <Compile Include="Mvvm\Types\DisposableReactiveList.cs" />
     <Compile Include="FolderRowViewModel.cs" />

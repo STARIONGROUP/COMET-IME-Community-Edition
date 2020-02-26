@@ -50,7 +50,6 @@ namespace CDP4Composition.PluginSettingService
         /// </summary>
         public PluginSettingsService()
         {
-            //this.assemblyNamesCache = new Dictionary<IModule, string>();
             this.applicationUserPluginSettings = new Dictionary<string, PluginSettings>();
         }
         

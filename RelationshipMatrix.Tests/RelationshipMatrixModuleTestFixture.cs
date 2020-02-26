@@ -67,7 +67,7 @@ namespace CDP4RelationshipMatrix.Tests
         {
             this.pluginSettingsService
                 .Setup(x => x.Read<RelationshipMatrixPluginSettings>())
-                .Throws<SettingsException>();
+                .Throws<PluginSettingsException>();
             
             Assert.DoesNotThrow(() => this.relationshipMatrixModule.ReadPluginSettings());
 

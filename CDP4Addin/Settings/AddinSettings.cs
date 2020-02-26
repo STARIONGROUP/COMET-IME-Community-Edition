@@ -4,19 +4,19 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-using System.Collections.Generic;
-using CDP4Composition.Services.AppSettingService;
-
 namespace CDP4AddinCE.Settings
 {
+    using CDP4Composition.Services.AppSettingService;
+    /// <summary>
+    /// Class used to hold the settings from application
+    /// </summary>
     public class AddinSettings : AppSettings
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AddinSettings"/> class
         /// </summary>
-        public AddinSettings(bool initializeDefaults = false)
+        public AddinSettings()
         {
-            this.Init(initializeDefaults);
         }
     }
 }

@@ -95,6 +95,11 @@ namespace CDP4AddinCE
         private IOfficeApplicationWrapper officeApplicationWrapper;
 
         /// <summary>
+        /// Gets or sets the instance of the <see cref="AppSettingsService"/> used to get application settings.
+        /// </summary>
+        internal IAppSettingsService<AddinSettings> AppSettingsService { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Addin"/> class.
         /// </summary>
         /// <remarks>
@@ -111,9 +116,6 @@ namespace CDP4AddinCE
         {
             logger.Debug("starting CDP4-CE addin");
 
-            var appSettings = new AppSettingsService();
-            this.ReadAppSettings(appSettings);
-
             this.PreloadAssemblies();
             this.RedirectAssemblies();
             this.SetupIdtExtensibility2Events();
@@ -123,32 +125,6 @@ namespace CDP4AddinCE
             ThemeManager.ApplicationThemeName = Theme.SevenName;
 
             logger.Debug("CDP4-CE addin started");
-        }
-
-        /// <summary>
-        /// Reads the app settings from disk
-        /// </summary>
-        internal AddinSettings ReadAppSettings(IAppSettingsService appSettingService)
-        {
-            try
-            {
-                return appSettingService.Read<AddinSettings>();
-            }
-            catch (SettingsException appSettingsException)
-            {
-                var addinSettings = new AddinSettings(true);
-
-                appSettingService.Write(addinSettings);
-
-                logger.Error(appSettingsException);
-
-                return addinSettings;
-            }
-            catch (Exception ex)
-            {
-                logger.Fatal(ex);
-                throw;
-            }
         }
 
         /// <summary>

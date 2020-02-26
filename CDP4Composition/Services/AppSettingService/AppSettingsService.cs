@@ -16,9 +16,12 @@ namespace CDP4Composition.Services.AppSettingService
     using Newtonsoft.Json.Serialization;
     using NLog;
 
-    [Export(typeof(IAppSettingsService))]
+    /// <summary>
+    /// The service used to read and write the application configuration file
+    /// </summary>
+    [Export(typeof(IAppSettingsService<>))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class AppSettingsService : IAppSettingsService
+    public class AppSettingsService<T> : IAppSettingsService<T> where T : AppSettings, new()
     {
         /// <summary>
         /// The logger for the current class
@@ -39,20 +42,34 @@ namespace CDP4Composition.Services.AppSettingService
         /// The setting file extension
         /// </summary>
         public const string SettingFileExtension = ".settings.json";
-
+        
         /// <summary>
-        /// A dictionary used to store the user plugin-setting of the application
-        /// </summary>
-        private readonly Dictionary<string, AppSettings> applicationUserAppSettings;
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="AppSettingsService"/>
+        /// Initializes a new instance of <see cref="AppSettingsService{T}"/>
         /// </summary>
         public AppSettingsService()
         {
-            //this.assemblyNamesCache = new Dictionary<IModule, string>();
-            this.applicationUserAppSettings = new Dictionary<string, AppSettings>();
+            try
+            {
+                this.AppSettings = this.Read<T>();
+            }
+            catch (AppSettingsException appSettingsException)
+            {
+                var appSettings = new T();
+
+                this.Save();
+
+                logger.Error(appSettingsException);
+
+                this.AppSettings = appSettings;
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal(ex);
+                throw;
+            }
         }
+
+        public T AppSettings { get; }
 
         /// <summary>
         /// Configuration file Directory
@@ -69,14 +86,9 @@ namespace CDP4Composition.Services.AppSettingService
         /// <returns>
         /// An instance of <see cref="AppSettings"/>
         /// </returns>
-        public T Read<T>() where T : AppSettings
+        private T Read<T>() where T : AppSettings
         {
-            var assemblyName = this.QueryAssemblyTitle(typeof(T));
-
-            if (this.applicationUserAppSettings.TryGetValue(assemblyName, out var result))
-            {
-                return result as T;
-            }
+            var assemblyName = Assembly.GetEntryAssembly()?.GetName().Name ?? this.QueryAssemblyTitle(typeof(T));
 
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
@@ -87,43 +99,39 @@ namespace CDP4Composition.Services.AppSettingService
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
 
-            logger.Debug("Read pluggin settings for {0} from {1}", assemblyName, path);
+            logger.Debug("Read application settings for {0} from {1}", assemblyName, path);
 
             try
             {
                 using (var file = File.OpenText($"{path}{SettingFileExtension}"))
                 {
                     var serializer = new JsonSerializer();
-                    result = (T)serializer.Deserialize(file, typeof(T));
+                    var result = (T)serializer.Deserialize(file, typeof(T));
 
-                    // once the settings have been read from disk, add them to the cache for fast access
-                    this.applicationUserAppSettings.Add(assemblyName, result);
-
-                    return (T)result;
+                    return result;
                 }
             }
             catch (Exception ex)
             {
                 logger.Error(ex, "The AppSettings could not be read");
 
-                throw new SettingsException("The AppSettings could not be read", ex);
+                throw new AppSettingsException("The AppSettings could not be read", ex);
             }
         }
 
         /// <summary>
         /// Writes the <see cref="AppSettings"/> to disk
         /// </summary>
-        /// <param name="appSettings">
-        /// The <see cref="appSettings"/> that will be persisted
+        /// <param name="AppSettings">
         /// </param>
-        public void Write<T>(T appSettings) where T : AppSettings
+        public void Save()
         {
-            if (appSettings == null)
+            if (this.AppSettings == null)
             {
-                throw new ArgumentNullException(nameof(appSettings), "The AppSettings may not be null");
+                throw new ArgumentNullException(nameof(this.AppSettings), "The AppSettings may not be null");
             }
 
-            var assemblyName = this.QueryAssemblyTitle(appSettings.GetType());
+            var assemblyName = this.QueryAssemblyTitle(this.AppSettings.GetType());
 
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
@@ -144,16 +152,7 @@ namespace CDP4Composition.Services.AppSettingService
                     Formatting = Formatting.Indented
                 };
 
-                serializer.Serialize(streamWriter, appSettings);
-            }
-
-            if (this.applicationUserAppSettings.ContainsKey(assemblyName))
-            {
-                this.applicationUserAppSettings[assemblyName] = appSettings;
-            }
-            else
-            {
-                this.applicationUserAppSettings.Add(assemblyName, appSettings);
+                serializer.Serialize(streamWriter, this.AppSettings);
             }
         }
 
@@ -168,8 +167,7 @@ namespace CDP4Composition.Services.AppSettingService
         /// </returns>
         private string QueryAssemblyTitle(Type type)
         {
-            return ((AssemblyTitleAttribute)type.Assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute)))
-                .Title;
+            return ((AssemblyTitleAttribute)type.Assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
         }
     }
 }

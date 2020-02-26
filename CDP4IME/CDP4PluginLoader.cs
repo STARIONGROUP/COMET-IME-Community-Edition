@@ -6,9 +6,12 @@
 
 namespace CDP4IME
 {
+    using CDP4Composition.Services.AppSettingService;
+    using CDP4IME.Settings;
     using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 
     /// <summary>
@@ -24,7 +27,7 @@ namespace CDP4IME
         /// <summary>
         /// Initializes a new instance of the <see cref="CDP4PluginLoader"/> class.
         /// </summary>
-        public CDP4PluginLoader()
+        public CDP4PluginLoader(IAppSettingsService<ImeAppSettings> appSettingsService)
         {
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
 
@@ -37,7 +40,12 @@ namespace CDP4IME
             {
                 foreach (var dir in directoryInfo.EnumerateDirectories())
                 {
-                    this.LoadPlugins(dir.FullName);
+                    var fileName = Path.GetFileName(dir.FullName);
+
+                    if (!appSettingsService.AppSettings.DisabledPlugins.Select(x => x.ToUpper()).ToList().Contains(fileName.ToUpper()))
+                    {
+                        this.LoadPlugins(dir.FullName);
+                    }
                 }
             }
         }
