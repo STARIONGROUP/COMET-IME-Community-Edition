@@ -211,7 +211,6 @@
   <ItemGroup>
     <Compile Include="Addin.cs" />
     <Compile Include="CDP4AddinBootstrapper.cs" />
-    <Compile Include="Settings\AddinSettings.cs" />
     <Compile Include="Utils\IdentifiableCustomTaskPane.cs" />
     <Compile Include="OfficeRibbon\AddinRibbonPart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

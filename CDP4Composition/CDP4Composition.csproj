@@ -255,6 +255,7 @@
     <Compile Include="Navigation\Interfaces\IPanelFilterableDataGridView.cs" />
     <Compile Include="Navigation\Interfaces\IRegionCollectionSearcher.cs" />
     <Compile Include="Navigation\RegionCollectionSearcher.cs" />
+    <Compile Include="Plugins\Settings\AddinSettings.cs" />
     <Compile Include="Services\AppSettingService\AppSettingsService.cs" />
     <Compile Include="Services\AppSettingService\IAppSettingsService.cs" />
     <Compile Include="Services\AppSettingService\AppSettings.cs" />

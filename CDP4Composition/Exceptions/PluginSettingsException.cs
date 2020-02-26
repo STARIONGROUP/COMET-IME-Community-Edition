@@ -1,11 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// -------------------------------------------------------------------------------------------------
+// <copyright file="SettingsException.cs" company="RHEA System S.A.">
+//   Copyright (c) 2018-2020 RHEA System S.A.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Exceptions
 {
+    using System;
+    using CDP4Composition.PluginSettingService;
+
+    /// <summary>
+    /// An <see cref="PluginSettingsException"/> is thrown when <see cref="PluginSettings"/> cannot be loaded or written
+    /// </summary>
     public class PluginSettingsException: SettingsException
     {
         /// <summary>

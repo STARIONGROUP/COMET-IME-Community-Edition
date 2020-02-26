@@ -34,6 +34,9 @@ namespace CDP4AddinCE
     using System.Windows;
 
     using CDP4Composition;
+    using CDP4Composition.Plugins.Settings;
+    using CDP4Composition.Services.AppSettingService;
+
     using Microsoft.Practices.Prism.MefExtensions;
     using NLog;
 
@@ -71,10 +74,12 @@ namespace CDP4AddinCE
         protected override void InitializeShell()
         {
             base.InitializeShell();
-            
+
+            IAppSettingsService<AddinSettings> appSettingsService = new AppSettingsService<AddinSettings>();
+
             logger.Log(LogLevel.Debug, "Loading CDP4 Plugins");
 
-            var pluginLoader = new PluginLoader();
+            var pluginLoader = new PluginLoader(appSettingsService);
 
             foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
             {
@@ -102,7 +107,7 @@ namespace CDP4AddinCE
             var sw = new Stopwatch();
             sw.Start();
             logger.Debug("Loading CDP4 Catalogs");
-            
+
             var dllCatalog = new DirectoryCatalog(path: this.currentAssemblyPath, searchPattern: "CDP4*.dll");
             this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4AddinBootstrapper).Assembly));
             this.AggregateCatalog.Catalogs.Add(dllCatalog);

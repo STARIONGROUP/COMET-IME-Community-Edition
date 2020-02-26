@@ -11,6 +11,10 @@ namespace CDP4Composition
     using System.IO;
     using System.Reflection;
 
+    using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.Plugins.Settings;
+    using System.Linq;
+
     /// <summary>
     /// The purpose of the <see cref="PluginLoader"/> is to load the various
     /// CDP4 plugins that are located in the plugins folder.
@@ -25,7 +29,7 @@ namespace CDP4Composition
         /// <summary>
         /// Initializes a new instance of the <see cref="PluginLoader"/> class.
         /// </summary>
-        public PluginLoader()
+        public PluginLoader(IAppSettingsService<AddinSettings> appSettingsService)
         {
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
 
@@ -38,7 +42,12 @@ namespace CDP4Composition
             {
                 foreach (var dir in directoryInfo.EnumerateDirectories())
                 {
-                    this.LoadPlugins(dir.FullName);
+                    var fileName = Path.GetFileName(dir.FullName);
+
+                    if (!appSettingsService.AppSettings.DisabledPlugins.Select(x => x.ToUpper()).ToList().Contains(fileName.ToUpper()))
+                    {
+                        this.LoadPlugins(dir.FullName);
+                    }
                 }
             }
         }

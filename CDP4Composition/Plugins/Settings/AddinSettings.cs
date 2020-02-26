@@ -4,12 +4,12 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4AddinCE.Settings
+namespace CDP4Composition.Plugins.Settings
 {
     using CDP4Composition.Services.AppSettingService;
 
     /// <summary>
-    /// Class used to hold the settings from application
+    /// An <see cref="AddinSettings"/> hold the settings from application <see cref="AppSettings"/>
     /// </summary>
     public class AddinSettings : AppSettings
     {

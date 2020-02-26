@@ -34,7 +34,6 @@ namespace CDP4AddinCE
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Windows;
-    using CDP4AddinCE.Settings;
     using CDP4AddinCE.Utils;
     using CDP4Composition;
     using CDP4Composition.Exceptions;
@@ -93,11 +92,6 @@ namespace CDP4AddinCE
         /// A wrapper class that provides access to the different office application instances
         /// </summary>
         private IOfficeApplicationWrapper officeApplicationWrapper;
-
-        /// <summary>
-        /// Gets or sets the instance of the <see cref="AppSettingsService"/> used to get application settings.
-        /// </summary>
-        private IAppSettingsService<AddinSettings> AppSettingsService { get; } = new AppSettingsService<AddinSettings>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Addin"/> class.
