@@ -7,6 +7,7 @@
 namespace CDP4AddinCE.Settings
 {
     using CDP4Composition.Services.AppSettingService;
+
     /// <summary>
     /// Class used to hold the settings from application
     /// </summary>

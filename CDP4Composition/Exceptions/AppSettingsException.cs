@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CDP4Composition.Exceptions
+﻿namespace CDP4Composition.Exceptions
 {
+    using System;
+
     public class AppSettingsException: SettingsException
     {
         /// <summary>
@@ -14,6 +10,7 @@ namespace CDP4Composition.Exceptions
         public AppSettingsException()
         {
         }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SettingsException"/> class.
         /// </summary>

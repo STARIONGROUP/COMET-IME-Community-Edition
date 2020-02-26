@@ -147,7 +147,7 @@ namespace CDP4AddinCE
                 case "CDP4_SelectModelToOpen":
                     return this.session != null;
                 case "CDP4_SelectModelToClose":
-                    return (this.session?.OpenIterations != null) && (this.session.OpenIterations.Count > 0);
+                    return (this.session != null) && (this.session.OpenIterations.Count > 0);
                 default:
                     return false;
             }

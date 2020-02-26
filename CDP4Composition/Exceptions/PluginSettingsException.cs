@@ -9,11 +9,12 @@ namespace CDP4Composition.Exceptions
     public class PluginSettingsException: SettingsException
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AppSettingsException"/> class.
+        /// Initializes a new instance of the <see cref="PluginSettingsException"/> class.
         /// </summary>
         public PluginSettingsException()
         {
         }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SettingsException"/> class.
         /// </summary>

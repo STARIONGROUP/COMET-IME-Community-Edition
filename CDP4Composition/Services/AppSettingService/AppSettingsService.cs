@@ -69,6 +69,9 @@ namespace CDP4Composition.Services.AppSettingService
             }
         }
 
+        /// <summary>
+        /// Holder of the application settings
+        /// </summary>
         public T AppSettings { get; }
 
         /// <summary>
@@ -122,8 +125,6 @@ namespace CDP4Composition.Services.AppSettingService
         /// <summary>
         /// Writes the <see cref="AppSettings"/> to disk
         /// </summary>
-        /// <param name="AppSettings">
-        /// </param>
         public void Save()
         {
             if (this.AppSettings == null)

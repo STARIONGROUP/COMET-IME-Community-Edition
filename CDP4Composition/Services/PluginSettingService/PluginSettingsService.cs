@@ -105,7 +105,7 @@ namespace CDP4Composition.PluginSettingService
             {
                 logger.Error(ex, "The PluginSettings could not be read");
 
-                throw new SettingsException("The PluginSettings could not be read", ex);
+                throw new PluginSettingsException("The PluginSettings could not be read", ex);
             }
         }
 

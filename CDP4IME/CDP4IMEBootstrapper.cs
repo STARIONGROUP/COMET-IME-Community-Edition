@@ -10,16 +10,13 @@ namespace CDP4IME
     using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
     using System.Windows;
 
     using CDP4Composition.Adapters;
-    using CDP4Composition.Exceptions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.AppSettingService;
     using CDP4IME.Settings;
-    //using CDP4Composition.Services.AppSettingService;
     using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;

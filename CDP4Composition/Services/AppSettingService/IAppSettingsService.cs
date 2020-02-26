@@ -11,6 +11,9 @@ namespace CDP4Composition.Services.AppSettingService
     /// </summary>
     public interface IAppSettingsService<T>
     {
+        /// <summary>
+        /// Holder of application settings
+        /// </summary>
         T AppSettings { get; }
 
         /// <summary>
