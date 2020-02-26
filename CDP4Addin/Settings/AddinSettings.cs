@@ -4,20 +4,19 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using CDP4Composition.Services.AppSettingService;
+
 namespace CDP4AddinCE.Settings
 {
-    using CDP4Composition.Services.AppSettingService;
-
-    /// <summary>
-    /// The class is used to searilize and hold the settings from the json settings file
-    /// </summary>
     public class AddinSettings : AppSettings
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AddinSettings"/> class.
+        /// Initializes a new instance of the <see cref="AddinSettings"/> class
         /// </summary>
-        public AddinSettings()
+        public AddinSettings(bool initializeDefaults = false)
         {
+            this.Init(initializeDefaults);
         }
     }
 }

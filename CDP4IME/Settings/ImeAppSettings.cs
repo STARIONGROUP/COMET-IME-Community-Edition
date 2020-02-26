@@ -4,20 +4,19 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
+using CDP4Composition.Services.AppSettingService;
+using System.Collections.Generic;
+
 namespace CDP4IME.Settings
 {
-    using CDP4Composition.Services.AppSettingService;
-
-    /// <summary>
-    /// The class is used to searilize and hold the settings from the json settings file
-    /// </summary>
     public class ImeAppSettings : AppSettings
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ImeAppSettings"/> class.
+        /// Initializes a new instance of <see cref="ImeAppSettings"/> class
         /// </summary>
-        public ImeAppSettings()
+        public ImeAppSettings(bool initializeDefaults = false)
         {
+            this.Init(initializeDefaults);
         }
     }
 }

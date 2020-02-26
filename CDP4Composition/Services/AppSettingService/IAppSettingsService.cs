@@ -6,16 +6,23 @@
 
 namespace CDP4Composition.Services.AppSettingService
 {
-    /// <summary>
-    /// Definition of the <see cref="IAppSettingsService{T}"/> used to load application specific settings
-    /// </summary>
-    public interface IAppSettingsService<T>
+    public interface IAppSettingsService
     {
-        T AppSettings { get; }
+        /// <summary>
+        /// Reads the <see cref="T"/>
+        /// </summary>
+        /// <typeparam name="T">A type of <see cref="AppSettings"/></typeparam>
+        /// <returns>
+        /// An instance of <see cref="AppSettings"/>
+        /// </returns>
+        T Read<T>() where T : AppSettings;
 
         /// <summary>
         /// Writes the <see cref="AppSettings"/> to disk
         /// </summary>
-        void Save();
+        /// <param name="appSettings">
+        /// The <see cref="AppSettings"/> that will be persisted
+        /// </param>
+        void Write<T>(T appSettings) where T : AppSettings;
     }
 }

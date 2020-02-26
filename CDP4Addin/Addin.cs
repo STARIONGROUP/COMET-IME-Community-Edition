@@ -80,11 +80,6 @@ namespace CDP4AddinCE
         internal IFluentRibbonManager FluentRibbonManager { get; set; }
 
         /// <summary>
-        /// Gets or sets the instance of the <see cref="AppSettingsService"/> used to get application settings.
-        /// </summary>
-        internal IAppSettingsService<AddinSettings> AppSettingsService { get; set; }
-
-        /// <summary>
         /// Excel application instance
         /// </summary>
         private NetOffice.ExcelApi.Application excelApplication;
@@ -116,6 +111,9 @@ namespace CDP4AddinCE
         {
             logger.Debug("starting CDP4-CE addin");
 
+            var appSettings = new AppSettingsService();
+            this.ReadAppSettings(appSettings);
+
             this.PreloadAssemblies();
             this.RedirectAssemblies();
             this.SetupIdtExtensibility2Events();
@@ -125,6 +123,32 @@ namespace CDP4AddinCE
             ThemeManager.ApplicationThemeName = Theme.SevenName;
 
             logger.Debug("CDP4-CE addin started");
+        }
+
+        /// <summary>
+        /// Reads the app settings from disk
+        /// </summary>
+        internal AddinSettings ReadAppSettings(IAppSettingsService appSettingService)
+        {
+            try
+            {
+                return appSettingService.Read<AddinSettings>();
+            }
+            catch (SettingsException appSettingsException)
+            {
+                var addinSettings = new AddinSettings(true);
+
+                appSettingService.Write(addinSettings);
+
+                logger.Error(appSettingsException);
+
+                return addinSettings;
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal(ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -551,7 +575,7 @@ namespace CDP4AddinCE
         /// </param>
         private void AddinOnConnection(object application, ext_ConnectMode connectMode, object addInInst, ref Array custom)
         {
-            this.Factory.Console.WriteLine("AddinOnConnection");
+            Factory.Console.WriteLine("AddinOnConnection");
             logger.Trace("AddinOnConnection");
 
             try
@@ -676,7 +700,6 @@ namespace CDP4AddinCE
             var thingDialogNavigationService = ServiceLocator.Current.GetInstance<IThingDialogNavigationService>();
             var dialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             var pluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
-            this.AppSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<AddinSettings>>();
 
             this.FluentRibbonManager.IsActive = true;
             var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService);
@@ -695,7 +718,7 @@ namespace CDP4AddinCE
         /// </param>
         private void AddinOnAddInsUpdate(ref Array custom)
         {
-            this.Factory.Console.WriteLine("AddinOnAddInsUpdate");
+            Factory.Console.WriteLine("AddinOnAddInsUpdate");
             logger.Trace("AddinOnAddInsUpdate");
         }
 
@@ -708,7 +731,7 @@ namespace CDP4AddinCE
         /// </param>
         private void AddinOnStartupComplete(ref Array custom)
         {
-            this.Factory.Console.WriteLine("AddinOnStartupComplete");
+            Factory.Console.WriteLine("AddinOnStartupComplete");
             logger.Trace("AddinOnStartupComplete");
         }
 
@@ -720,7 +743,7 @@ namespace CDP4AddinCE
         /// </param>
         private void AddinOnBeginShutdown(ref Array custom)
         {
-            this.Factory.Console.WriteLine("AddinOnBeginShutdown");
+            Factory.Console.WriteLine("AddinOnBeginShutdown");
             logger.Trace("AddinOnBeginShutdown");
         }
 
@@ -738,7 +761,7 @@ namespace CDP4AddinCE
         {
             this.DestructApplication();
 
-            this.Factory.Console.WriteLine("AddinOnDisconnection");
+            Factory.Console.WriteLine("AddinOnDisconnection");
             logger.Trace("AddinOnDisconnection");
         }
     }

@@ -7,6 +7,7 @@
 namespace CDP4Composition.Services.AppSettingService
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.IO;
     using System.Reflection;
@@ -15,12 +16,9 @@ namespace CDP4Composition.Services.AppSettingService
     using Newtonsoft.Json.Serialization;
     using NLog;
 
-    /// <summary>
-    /// The service used to read and write the application configuration file
-    /// </summary>
-    [Export(typeof(IAppSettingsService<>))]
+    [Export(typeof(IAppSettingsService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class AppSettingsService<T> : IAppSettingsService<T> where T : AppSettings, new()
+    public class AppSettingsService : IAppSettingsService
     {
         /// <summary>
         /// The logger for the current class
@@ -43,32 +41,18 @@ namespace CDP4Composition.Services.AppSettingService
         public const string SettingFileExtension = ".settings.json";
 
         /// <summary>
-        /// Initializes a new instance of <see cref="AppSettingsService{T}"/>
+        /// A dictionary used to store the user plugin-setting of the application
+        /// </summary>
+        private readonly Dictionary<string, AppSettings> applicationUserAppSettings;
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="AppSettingsService"/>
         /// </summary>
         public AppSettingsService()
         {
-            try
-            {
-                this.AppSettings = this.Read<T>();
-            }
-            catch (AppSettingsException appSettingsException)
-            {
-                var appSettings = new T();
-
-                this.Save();
-
-                logger.Error(appSettingsException);
-
-                this.AppSettings = appSettings;
-            }
-            catch (Exception ex)
-            {
-                logger.Fatal(ex);
-                throw;
-            }
+            //this.assemblyNamesCache = new Dictionary<IModule, string>();
+            this.applicationUserAppSettings = new Dictionary<string, AppSettings>();
         }
-
-        public T AppSettings { get; }
 
         /// <summary>
         /// Configuration file Directory
@@ -85,9 +69,14 @@ namespace CDP4Composition.Services.AppSettingService
         /// <returns>
         /// An instance of <see cref="AppSettings"/>
         /// </returns>
-        private T Read<T>() where T : AppSettings
+        public T Read<T>() where T : AppSettings
         {
-            var assemblyName = Assembly.GetEntryAssembly()?.GetName().Name ?? this.QueryAssemblyTitle(typeof(T));
+            var assemblyName = this.QueryAssemblyTitle(typeof(T));
+
+            if (this.applicationUserAppSettings.TryGetValue(assemblyName, out var result))
+            {
+                return result as T;
+            }
 
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
@@ -98,37 +87,43 @@ namespace CDP4Composition.Services.AppSettingService
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
 
-            logger.Debug("Read application settings for {0} from {1}", assemblyName, path);
+            logger.Debug("Read pluggin settings for {0} from {1}", assemblyName, path);
 
             try
             {
                 using (var file = File.OpenText($"{path}{SettingFileExtension}"))
                 {
                     var serializer = new JsonSerializer();
-                    var result = (T)serializer.Deserialize(file, typeof(T));
+                    result = (T)serializer.Deserialize(file, typeof(T));
 
-                    return result;
+                    // once the settings have been read from disk, add them to the cache for fast access
+                    this.applicationUserAppSettings.Add(assemblyName, result);
+
+                    return (T)result;
                 }
             }
             catch (Exception ex)
             {
                 logger.Error(ex, "The AppSettings could not be read");
 
-                throw new AppSettingsException("The AppSettings could not be read", ex);
+                throw new SettingsException("The AppSettings could not be read", ex);
             }
         }
 
         /// <summary>
         /// Writes the <see cref="AppSettings"/> to disk
         /// </summary>
-        public void Save()
+        /// <param name="appSettings">
+        /// The <see cref="appSettings"/> that will be persisted
+        /// </param>
+        public void Write<T>(T appSettings) where T : AppSettings
         {
-            if (this.AppSettings == null)
+            if (appSettings == null)
             {
-                throw new ArgumentNullException(nameof(this.AppSettings), "The AppSettings may not be null");
+                throw new ArgumentNullException(nameof(appSettings), "The AppSettings may not be null");
             }
 
-            var assemblyName = Assembly.GetEntryAssembly()?.GetName().Name ?? this.QueryAssemblyTitle(typeof(T));
+            var assemblyName = this.QueryAssemblyTitle(appSettings.GetType());
 
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
@@ -149,7 +144,16 @@ namespace CDP4Composition.Services.AppSettingService
                     Formatting = Formatting.Indented
                 };
 
-                serializer.Serialize(streamWriter, this.AppSettings);
+                serializer.Serialize(streamWriter, appSettings);
+            }
+
+            if (this.applicationUserAppSettings.ContainsKey(assemblyName))
+            {
+                this.applicationUserAppSettings[assemblyName] = appSettings;
+            }
+            else
+            {
+                this.applicationUserAppSettings.Add(assemblyName, appSettings);
             }
         }
 
@@ -164,7 +168,8 @@ namespace CDP4Composition.Services.AppSettingService
         /// </returns>
         private string QueryAssemblyTitle(Type type)
         {
-            return ((AssemblyTitleAttribute)type.Assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
+            return ((AssemblyTitleAttribute)type.Assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute)))
+                .Title;
         }
     }
 }

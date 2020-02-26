@@ -65,14 +65,21 @@ namespace CDP4IME
         /// </summary>
         protected override void InitializeShell()
         {
-            var appSettingsService = this.Container.GetExportedValue<IAppSettingsService<ImeAppSettings>>();
+            var appSettings = this.Container.GetExportedValue<IAppSettingsService>();
+            var appServiceSettings = this.ReadAppSettings(appSettings);
 
             this.UpdateBootstrapperState("Loading CDP4 Plugins");
-            var pluginCatalog = new CDP4PluginLoader(appSettingsService);
+            var pluginCatalog = new CDP4PluginLoader();
             foreach (var directoryCatalog in pluginCatalog.DirectoryCatalogues)
             {
-                this.AggregateCatalog.Catalogs.Add(directoryCatalog);
-                this.UpdateBootstrapperState($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
+                var fileName = Path.GetFileName(directoryCatalog.FullPath);
+
+                if ((fileName != null) && !appServiceSettings.DisabledPlugins.Select(x => x.ToUpper()).ToList().Contains(fileName.ToUpper()))
+                {
+                    this.AggregateCatalog.Catalogs.Add(directoryCatalog);
+
+                    this.UpdateBootstrapperState($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
+                }
             }
 
             this.UpdateBootstrapperState($"{pluginCatalog.DirectoryCatalogues.Count} CDP4 Plugins Loaded");
@@ -82,7 +89,7 @@ namespace CDP4IME
             var shell = (Shell)this.Shell;
             var dialogNavigationService = this.Container.GetExportedValue<IDialogNavigationService>();
 
-            shell.DataContext = new ShellViewModel(dialogNavigationService);
+            shell.DataContext = new ShellViewModel(dialogNavigationService, appSettings);
 
             this.UpdateBootstrapperState("Setting up Regions");
             var regionmanager = this.Container.GetExportedValue<IRegionManager>();
@@ -92,6 +99,32 @@ namespace CDP4IME
             }
 
             Application.Current.MainWindow = shell;
+        }
+
+        /// <summary>
+        /// Reads the app settings from disk
+        /// </summary>
+        internal ImeAppSettings ReadAppSettings(IAppSettingsService appSettingService)
+        {
+            try
+            {
+                return appSettingService.Read<ImeAppSettings>();
+            }
+            catch (SettingsException appSettingsException)
+            {
+                var imeAppSettings = new ImeAppSettings(true);
+
+                appSettingService.Write(imeAppSettings);
+
+                logger.Error(appSettingsException);
+
+                return imeAppSettings;
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal(ex);
+                throw;
+            }
         }
 
         /// <summary>

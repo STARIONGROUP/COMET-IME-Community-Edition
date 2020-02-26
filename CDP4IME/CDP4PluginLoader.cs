@@ -9,10 +9,7 @@ namespace CDP4IME
     using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
-    using CDP4Composition.Services.AppSettingService;
-    using CDP4IME.Settings;
 
     /// <summary>
     /// The CDP4 Plugin Module Catalog that loads the CDP4 Plugins
@@ -27,12 +24,12 @@ namespace CDP4IME
         /// <summary>
         /// Initializes a new instance of the <see cref="CDP4PluginLoader"/> class.
         /// </summary>
-        public CDP4PluginLoader(IAppSettingsService<ImeAppSettings> appSettingsService)
+        public CDP4PluginLoader()
         {
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
 
             var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
+            
             var path = Path.Combine(currentPath, PluginDirectoryName);
             var directoryInfo = new DirectoryInfo(path);
 
@@ -40,12 +37,7 @@ namespace CDP4IME
             {
                 foreach (var dir in directoryInfo.EnumerateDirectories())
                 {
-                    var fileName = Path.GetFileName(dir.FullName);
-
-                    if (!appSettingsService.AppSettings.DisabledPlugins.Select(x => x.ToUpper()).ToList().Contains(fileName.ToUpper()))
-                    {
-                        this.LoadPlugins(dir.FullName);
-                    }
+                    this.LoadPlugins(dir.FullName);
                 }
             }
         }
