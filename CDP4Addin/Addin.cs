@@ -97,7 +97,7 @@ namespace CDP4AddinCE
         /// <summary>
         /// Gets or sets the instance of the <see cref="AppSettingsService"/> used to get application settings.
         /// </summary>
-        internal IAppSettingsService<AddinSettings> AppSettingsService { get; set; }
+        private IAppSettingsService<AddinSettings> AppSettingsService { get; } = new AppSettingsService<AddinSettings>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Addin"/> class.
@@ -158,7 +158,6 @@ namespace CDP4AddinCE
 
             return ribbonXml;
         }
-
 
         /// <summary>
         /// Executes the OnAction callback that is invoked from the <see cref="Office.IRibbonControl"/>
