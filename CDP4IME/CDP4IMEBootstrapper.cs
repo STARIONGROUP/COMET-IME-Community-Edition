@@ -15,7 +15,8 @@ namespace CDP4IME
 
     using CDP4Composition.Adapters;
     using CDP4Composition.Navigation;
-
+    using CDP4Composition.Services.AppSettingService;
+    using CDP4IME.Settings;
     using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;
@@ -61,31 +62,34 @@ namespace CDP4IME
         /// </summary>
         protected override void InitializeShell()
         {
+            var appSettingsService = this.Container.GetExportedValue<IAppSettingsService<ImeAppSettings>>();
+
             this.UpdateBootstrapperState("Loading CDP4 Plugins");
-            var pluginCatalog = new CDP4PluginLoader();
+            var pluginCatalog = new CDP4PluginLoader(appSettingsService);
             foreach (var directoryCatalog in pluginCatalog.DirectoryCatalogues)
             {
                 this.AggregateCatalog.Catalogs.Add(directoryCatalog);
 
-                this.UpdateBootstrapperState(string.Format("DirectoryCatalogue {0} Loaded", directoryCatalog.FullPath));
+                this.UpdateBootstrapperState($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
 
-            this.UpdateBootstrapperState(string.Format("{0} CDP4 Plugins Loaded", pluginCatalog.DirectoryCatalogues.Count));
+            this.UpdateBootstrapperState($"{pluginCatalog.DirectoryCatalogues.Count} CDP4 Plugins Loaded");
 
             this.UpdateBootstrapperState("Initializing the Shell");
             base.InitializeShell();
             var shell = (Shell)this.Shell;
-            var dialogNavigationService = Container.GetExportedValue<IDialogNavigationService>();
+            var dialogNavigationService = this.Container.GetExportedValue<IDialogNavigationService>();
+
             shell.DataContext = new ShellViewModel(dialogNavigationService);
 
             this.UpdateBootstrapperState("Setting up Regions");
             var regionmanager = this.Container.GetExportedValue<IRegionManager>();
             foreach (var region in regionmanager.Regions)
             {
-                this.UpdateBootstrapperState(string.Format("Loaded Region: {0} ", region.Name));
+                this.UpdateBootstrapperState($"Loaded Region: {region.Name} ");
             }
 
-            Application.Current.MainWindow = shell;            
+            Application.Current.MainWindow = shell;
         }
 
         /// <summary>
@@ -111,11 +115,11 @@ namespace CDP4IME
             this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4IMEBootstrapper).Assembly));
             this.AggregateCatalog.Catalogs.Add(dllCatalog);
 
-            var message = string.Format("CDP4 Catalogs loaded in: {0} [ms]", sw.ElapsedMilliseconds);
+            var message = $"CDP4 Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]";
             this.UpdateBootstrapperState(message);
         }
 
-       /// <summary>
+        /// <summary>
         /// Register the custom Region Adapters
         /// </summary>
         /// <returns>

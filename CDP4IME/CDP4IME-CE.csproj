@@ -318,6 +318,8 @@
     <Compile Include="CDP4IMEBootstrapper.cs" />
     <Compile Include="CDP4PluginLoader.cs" />
     <Compile Include="DynamicDirectoryModuleCatalog.cs" />
+    <Compile Include="Settings\ImeAppSettingsService.cs" />
+    <Compile Include="Settings\ImeAppSettings.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\DataSourceExportViewModel.cs" />
     <Compile Include="ViewModels\LogDetailsViewModel.cs" />

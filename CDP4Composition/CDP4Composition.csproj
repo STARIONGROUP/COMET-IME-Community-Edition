@@ -37,7 +37,6 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -241,6 +240,9 @@
     <Compile Include="Events\HighlightEvent.cs" />
     <Compile Include="Events\ToggleDeprecatedThingEvent.cs" />
     <Compile Include="Events\TaskbarNotificationEvent.cs" />
+    <Compile Include="Exceptions\AppSettingsException.cs" />
+    <Compile Include="Exceptions\PluginSettingsException.cs" />
+    <Compile Include="Exceptions\SettingsException.cs" />
     <Compile Include="Mvvm\Types\DisposableReactiveList.cs" />
     <Compile Include="FolderRowViewModel.cs" />
     <Compile Include="Mvvm\Behaviours\ContextMenuBehavior.cs" />
@@ -253,6 +255,9 @@
     <Compile Include="Navigation\Interfaces\IPanelFilterableDataGridView.cs" />
     <Compile Include="Navigation\Interfaces\IRegionCollectionSearcher.cs" />
     <Compile Include="Navigation\RegionCollectionSearcher.cs" />
+    <Compile Include="Services\AppSettingService\AppSettingsService.cs" />
+    <Compile Include="Services\AppSettingService\IAppSettingsService.cs" />
+    <Compile Include="Services\AppSettingService\AppSettings.cs" />
     <Compile Include="Services\FavoritesService\FavoritesService.cs" />
     <Compile Include="Services\FavoritesService\IFavoritesService.cs" />
     <Compile Include="Mvvm\IHaveContainerViewModel.cs" />
@@ -301,7 +306,6 @@
     <Compile Include="Services\IThingCreator.cs" />
     <Compile Include="Services\PluginSettingService\IPluginSettingsService.cs" />
     <Compile Include="Services\PluginSettingService\PluginSettings.cs" />
-    <Compile Include="Services\PluginSettingService\PluginSettingsException.cs" />
     <Compile Include="Services\PluginSettingService\PluginSettingsService.cs" />
     <Compile Include="Services\RuleVerification\BuiltInRule.cs" />
     <Compile Include="Services\RuleVerification\BuiltInRuleMetaDataExportAttribute.cs" />
@@ -351,7 +355,6 @@
     <Compile Include="OfficeRibbon\IFluentRibbonManager.cs" />
     <Compile Include="OfficeRibbon\FluentRibbonManager.cs" />
     <Compile Include="OfficeRibbon\RibbonPart.cs" />
-    <Compile Include="Plugins\PluginLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegionNames.cs" />
     <Compile Include="Ribbon\ExtendedRibbonPage.cs" />

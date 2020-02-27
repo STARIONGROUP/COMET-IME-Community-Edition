@@ -1,21 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginLoader.cs" company="RHEA System S.A.">
+// <copyright file="AddinPluginLoader.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition
+namespace CDP4AddinCE
 {
     using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.IO;
     using System.Reflection;
 
+    using CDP4Composition.Services.AppSettingService;
+    using System.Linq;
+    using CDP4AddinCE.Settings;
+
     /// <summary>
-    /// The purpose of the <see cref="PluginLoader"/> is to load the various
+    /// The purpose of the <see cref="AddinPluginLoader"/> is to load the various
     /// CDP4 plugins that are located in the plugins folder.
     /// </summary>
-    public class PluginLoader
+    public class AddinPluginLoader
     {
         /// <summary>
         /// The name of the plugin directory
@@ -23,9 +27,9 @@ namespace CDP4Composition
         private const string PluginDirectoryName = "plugins";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PluginLoader"/> class.
+        /// Initializes a new instance of the <see cref="AddinPluginLoader"/> class.
         /// </summary>
-        public PluginLoader()
+        public AddinPluginLoader(IAppSettingsService<AddinAppSettings> appSettingsService)
         {
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
 
@@ -38,7 +42,12 @@ namespace CDP4Composition
             {
                 foreach (var dir in directoryInfo.EnumerateDirectories())
                 {
-                    this.LoadPlugins(dir.FullName);
+                    var fileName = Path.GetFileName(dir.FullName);
+
+                    if (!appSettingsService.AppSettings.DisabledPlugins.Select(x => x.ToUpper()).ToList().Contains(fileName.ToUpper()))
+                    {
+                        this.LoadPlugins(dir.FullName);
+                    }
                 }
             }
         }

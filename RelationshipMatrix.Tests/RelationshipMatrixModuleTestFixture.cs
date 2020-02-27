@@ -12,6 +12,7 @@ namespace CDP4RelationshipMatrix.Tests
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using DevExpress.Data.Filtering.Helpers;
     using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;

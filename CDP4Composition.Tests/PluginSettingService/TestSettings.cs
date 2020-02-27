@@ -8,6 +8,7 @@ namespace CDP4Composition.Tests.PluginSettingService
 {
     using System;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     /// <summary>
     /// A <see cref="PluginSettings"/> used for testing the <see cref="IPluginSettingsService"/>

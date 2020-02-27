@@ -9,6 +9,7 @@ namespace CDP4RelationshipMatrix
     using System.Collections.Generic;
     using CDP4Common.CommonData;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using Settings;

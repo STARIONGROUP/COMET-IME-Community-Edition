@@ -7,6 +7,7 @@
 namespace CDP4Requirements
 {
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     /// <summary>
     /// A setting class for the requirement module

@@ -7,15 +7,14 @@
 namespace CDP4IME
 {
     using System;
-    using System.Diagnostics;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Reflection;
     using CDP4Composition.Events;
     using CDP4Composition.Log;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4ShellDialogs.ViewModels;
     using Microsoft.Practices.ServiceLocation;
     using NLog;
@@ -31,7 +30,7 @@ namespace CDP4IME
         /// The NLog logger
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        
+
         /// <summary>
         /// Out property for the <see cref="IsSessionSelected"/> property
         /// </summary>
@@ -168,7 +167,8 @@ namespace CDP4IME
 
             this.subscription = CDPMessageBus.Current.Listen<IsBusyEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => {
+                .Subscribe(x =>
+                {
                     this.IsBusy = x.IsBusy;
                     this.LoadingMessage = x.Message;
                 });
