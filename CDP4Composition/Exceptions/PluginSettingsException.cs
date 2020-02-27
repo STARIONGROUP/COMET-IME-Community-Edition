@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="SettingsException.cs" company="RHEA System S.A.">
+// <copyright file="PluginSettingsException.cs" company="RHEA System S.A.">
 //   Copyright (c) 2018-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
@@ -10,9 +10,9 @@ namespace CDP4Composition.Exceptions
     using CDP4Composition.PluginSettingService;
 
     /// <summary>
-    /// An <see cref="PluginSettingsException"/> is thrown when <see cref="PluginSettings"/> cannot be loaded or written
+    /// An <see cref="PluginSettingsException"/> is thrown when <see cref="SettingsException"/> cannot be loaded or written
     /// </summary>
-    public class PluginSettingsException: SettingsException
+    public class PluginSettingsException : SettingsException
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PluginSettingsException"/> class.

@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="SettingsException.cs" company="RHEA System S.A.">
+// <copyright file="AppSettingsException.cs" company="RHEA System S.A.">
 //   Copyright (c) 2018-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
@@ -10,7 +10,7 @@ namespace CDP4Composition.Exceptions
     using CDP4Composition.Services.AppSettingService;
 
     /// <summary>
-    /// An <see cref="AppSettingsException"/> is thrown when <see cref="AppSettings"/> cannot be loaded or written
+    /// An <see cref="AppSettingsException"/> is thrown when <see cref="SettingsException"/> cannot be loaded or written
     /// </summary>
     public class AppSettingsException : SettingsException
     {
