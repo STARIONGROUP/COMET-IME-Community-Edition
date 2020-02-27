@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginLoader.cs" company="RHEA System S.A.">
+// <copyright file="AddinPluginLoader.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition
+namespace CDP4AddinCE
 {
     using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
@@ -12,14 +12,14 @@ namespace CDP4Composition
     using System.Reflection;
 
     using CDP4Composition.Services.AppSettingService;
-    using CDP4Composition.Plugins.Settings;
     using System.Linq;
+    using CDP4AddinCE.Settings;
 
     /// <summary>
-    /// The purpose of the <see cref="PluginLoader"/> is to load the various
+    /// The purpose of the <see cref="AddinPluginLoader"/> is to load the various
     /// CDP4 plugins that are located in the plugins folder.
     /// </summary>
-    public class PluginLoader
+    public class AddinPluginLoader
     {
         /// <summary>
         /// The name of the plugin directory
@@ -27,9 +27,9 @@ namespace CDP4Composition
         private const string PluginDirectoryName = "plugins";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PluginLoader"/> class.
+        /// Initializes a new instance of the <see cref="AddinPluginLoader"/> class.
         /// </summary>
-        public PluginLoader(IAppSettingsService<AddinSettings> appSettingsService)
+        public AddinPluginLoader(IAppSettingsService<AddinAppSettings> appSettingsService)
         {
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
 

@@ -19,9 +19,7 @@ namespace CDP4Composition.Services.AppSettingService
     /// <summary>
     /// Class service <see cref="AppSettingsService{T}"/> used to read and write the application configuration file
     /// </summary>
-    [Export(typeof(IAppSettingsService<>))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
-    public class AppSettingsService<T> : IAppSettingsService<T> where T : AppSettings, new()
+    public abstract class AppSettingsService<T> : IAppSettingsService<T> where T : AppSettings, new()
     {
         /// <summary>
         /// The logger for the current class

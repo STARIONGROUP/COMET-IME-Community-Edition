@@ -75,6 +75,8 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             this.assembler.Cache.GetOrAdd(new CacheKey(siteDirectory.Value.Iid, null), siteDirectory);
             this.session.Setup(x => x.DataSourceUri).Returns("test");
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            var iterationDictionary = new Dictionary<CDP4Common.EngineeringModelData.Iteration, Tuple<CDP4Common.SiteDirectoryData.DomainOfExpertise, CDP4Common.SiteDirectoryData.Participant>>();
+            this.session.Setup(x => x.OpenIterations).Returns(iterationDictionary);
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();

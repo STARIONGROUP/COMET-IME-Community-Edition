@@ -229,7 +229,7 @@
     <Reference Include="Microsoft.Practices.Prism.Interactivity">
       <HintPath>..\packages\Prism.Interactivity.5.0.0\lib\NET45\Microsoft.Practices.Prism.Interactivity.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.Prism.MefExtensions">
+    <Reference Include="Microsoft.Practices.Prism.MefExtensions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.MEFExtensions.5.0.0\lib\NET45\Microsoft.Practices.Prism.MefExtensions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.Prism.Mvvm">
@@ -318,6 +318,7 @@
     <Compile Include="CDP4IMEBootstrapper.cs" />
     <Compile Include="CDP4PluginLoader.cs" />
     <Compile Include="DynamicDirectoryModuleCatalog.cs" />
+    <Compile Include="Settings\ImeAppSettingsService.cs" />
     <Compile Include="Settings\ImeAppSettings.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\DataSourceExportViewModel.cs" />
