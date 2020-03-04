@@ -6,6 +6,7 @@
 
 namespace CDP4AddinCE
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.IO;
@@ -47,14 +48,11 @@ namespace CDP4AddinCE
             {
                 foreach (var dir in directoryInfo.EnumerateDirectories())
                 {
-                    var pluginName = dir.FullName.ToUpper();
-                    var locationInfo = new DirectoryInfo(pluginName);
-                    var pluginSettingsList = appSettingsService.AppSettings.Plugins.Where(x => (x.Key != null) && (x.Key.ToUpper() == locationInfo.Name)).ToList();
-                    var isNewPlugin = pluginSettingsList.Count == 0;
+                    var pluginSettings = appSettingsService.AppSettings.Plugins.FirstOrDefault(x => (x.Key != null) && (string.Equals(x.Key, dir.Name, StringComparison.CurrentCultureIgnoreCase)));
 
-                    if (isNewPlugin || pluginSettingsList.Single().IsEnabled)
+                    if ((pluginSettings == null) || pluginSettings.IsEnabled)
                     {
-                        this.LoadPlugins(dir.FullName, isNewPlugin);
+                        this.LoadPlugins(dir, pluginSettings);
                     }
                 }
             }
@@ -68,21 +66,20 @@ namespace CDP4AddinCE
         /// <summary>
         /// Load the plugins in the specified folder
         /// </summary>
-        /// <param name="folder">
-        /// the folder that contains the CDP4 plugin
+        /// <param name="dir">
+        /// the folder info that contains the CDP4 plugin
         /// </param>
-        /// <param name="isNewPlugin">
-        /// the flag telling is plugin is new to the settings
-        /// </param> 
-        private void LoadPlugins(string folder, bool isNewPlugin)
+        /// <param name="pluginSettings">
+        /// the plugin to be loaded if it is new
+        /// </param>
+        private void LoadPlugins(DirectoryInfo dir, PluginSettingsMetaData pluginSettings)
         {
-            var dllCatalog = new DirectoryCatalog(path: folder, searchPattern: "*.dll");
+            var dllCatalog = new DirectoryCatalog(path: dir.FullName, searchPattern: "*.dll");
             this.DirectoryCatalogues.Add(dllCatalog);
 
-            if (isNewPlugin)
+            if (pluginSettings == null)
             {
-                var locationInfo = new DirectoryInfo(folder);
-                this.NewPlugins.Add(locationInfo.Name.ToUpper());
+                this.NewPlugins.Add(dir.Name.ToUpper());
             }
         }
     }
