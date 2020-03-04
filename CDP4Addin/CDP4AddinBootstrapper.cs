@@ -125,11 +125,11 @@ namespace CDP4AddinCE
         /// </summary>
         private void SaveSettings(IAppSettingsService<AddinAppSettings> appSettingsService, ICollection<string> newPlugins)
         {
-            var modules = ServiceLocator.Current.GetAllInstances(typeof(IModule));
+            var modules = ServiceLocator.Current.GetAllInstances<IModule>();
 
             foreach (var module in modules)
             {
-                var pluginSettings = new PluginSettingsMetaData((IModule)module, newPlugins);
+                var pluginSettings = new PluginSettingsMetaData(module, newPlugins);
 
                 if (!string.IsNullOrEmpty(pluginSettings.Key))
                 {

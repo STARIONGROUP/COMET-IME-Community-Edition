@@ -388,7 +388,7 @@ namespace CDP4IME
         /// </summary>
         private void ExecuteOpenPluginManagerRequest()
         {
-            var appSettingsService = (IAppSettingsService<ImeAppSettings>)ServiceLocator.Current.GetInstance(typeof(IAppSettingsService<ImeAppSettings>));
+            var appSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<ImeAppSettings>>();
 
             var pluginManager = new PluginManagerViewModel<ImeAppSettings>(appSettingsService);
             this.dialogNavigationService.NavigateModal(pluginManager);
