@@ -8,6 +8,7 @@ namespace CDP4Composition.Services.AppSettingService
 {
     using Newtonsoft.Json;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Base class from which all <see cref="AppSettings"/> shall derive
@@ -15,9 +16,30 @@ namespace CDP4Composition.Services.AppSettingService
     public abstract class AppSettings
     {
         /// <summary>
-        /// Gets or sets the <see cref="DisabledPlugins"/>
+        /// Updating plugin settings
+        /// </summary>
+        /// <param name="pluginSettings">
+        ///The plugin settings to be updated
+        /// </param>
+        public void UpdatePlugin(PluginSettingsMetaData pluginSettings)
+        {
+            if (pluginSettings == null)
+            {
+                return;
+            }
+
+            var plugin = this.Plugins.FirstOrDefault(x => x.Key == pluginSettings.Key);
+
+            if (plugin != null)
+            {
+                plugin.IsEnabled = pluginSettings.IsEnabled;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Plugins"/>
         /// </summary>
         [JsonProperty]
-        public List<string> DisabledPlugins { get; set; } = new List<string>();
+        public List<PluginSettingsMetaData> Plugins { get; set; } = new List<PluginSettingsMetaData>();
     }
 }

@@ -4,11 +4,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.ViewModels
+namespace CDP4ShellDialogs.ViewModels
 {
-    using System;
-    using System.Reflection;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Services.AppSettingService;
     using Microsoft.Practices.Prism.Modularity;
     using ReactiveUI;
 
@@ -17,6 +15,11 @@ namespace CDP4IME.ViewModels
     /// </summary>
     public class PluginRowViewModel : ReactiveObject
     {
+        /// <summary>
+        /// The backing field for the <see cref="Key"/> property
+        /// </summary>
+        private string key;
+
         /// <summary>
         /// The backing field for the <see cref="AssemblyName"/> property
         /// </summary>
@@ -43,25 +46,59 @@ namespace CDP4IME.ViewModels
         private string company;
 
         /// <summary>
+        /// The backing field for the <see cref="IsPluginEnabled"/> property
+        /// </summary>
+        private bool isPluginEnabled;
+
+        /// <summary>
+        /// The backing field for the <see cref="IsRowEnabled"/> property
+        /// </summary>
+        private bool isRowEnabled;
+
+        /// <summary>
+        /// The backing field for the <see cref="IsMandatory"/> property
+        /// </summary>
+        private bool isMandatory;
+
+        /// <summary>
+        /// The backing field for the <see cref="IsRowDirty"/> property
+        /// </summary>
+        private bool isRowDirty;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PluginRowViewModel"/> class.
         /// </summary>
         /// <param name="module">
         /// The <see cref="IModule"/> to extract information from.
         /// </param>
-        public PluginRowViewModel(IModule module)
+        public PluginRowViewModel(PluginSettingsMetaData module)
         {
-            this.AssemblyName =
-                ((AssemblyTitleAttribute)module.GetType().Assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute)))
-                    .Title;
+            this.key = module.Key;
+            this.assemblyName = module.Assembly;
+            this.name = module.Name;
+            this.description = module.Description;
+            this.version = module.Version;
+            this.company = module.Company;
+            this.isPluginEnabled = module.IsEnabled;
+            this.isRowEnabled = !module.IsMandatory;
+            this.isMandatory = module.IsMandatory;
+            this.PropertyChanged += (s, e) => { this.IsRowDirty = true; };
+        }
 
-            var nameAttribute = (ModuleExportNameAttribute)Attribute.GetCustomAttribute(module.GetType(), typeof(ModuleExportNameAttribute));
+        /// <summary>
+        /// Gets or sets the key of the Plugin
+        /// </summary>
+        public string Key
+        {
+            get
+            {
+                return this.key;
+            }
 
-            this.Name = nameAttribute == null ? string.Empty : nameAttribute.Name;
-            this.Description =
-                ((AssemblyDescriptionAttribute)
-                    module.GetType().Assembly.GetCustomAttribute(typeof(AssemblyDescriptionAttribute))).Description;
-            this.Version = ((AssemblyFileVersionAttribute)module.GetType().Assembly.GetCustomAttribute(typeof(AssemblyFileVersionAttribute))).Version;
-            this.Company = ((AssemblyCompanyAttribute)module.GetType().Assembly.GetCustomAttribute(typeof(AssemblyCompanyAttribute))).Company;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.key, value);
+            }
         }
 
         /// <summary>
@@ -141,6 +178,70 @@ namespace CDP4IME.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref this.company, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the IsPluginEnabled
+        /// </summary>
+        public bool IsPluginEnabled
+        {
+            get
+            {
+                return this.isPluginEnabled;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.isPluginEnabled, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the IsRowEnabled (able to edit)
+        /// </summary>
+        public bool IsRowEnabled
+        {
+            get
+            {
+                return this.isRowEnabled;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.isRowEnabled, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the IsMandatory
+        /// </summary>
+        public bool IsMandatory
+        {
+            get
+            {
+                return this.isMandatory;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.isMandatory, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the IsRowDirty
+        /// </summary>
+        public bool IsRowDirty
+        {
+            get
+            {
+                return this.isRowDirty;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.isRowDirty, value);
             }
         }
     }

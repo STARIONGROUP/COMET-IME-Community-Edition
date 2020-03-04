@@ -1,11 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginManagerView.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="PluginManager.xaml.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Views
+namespace CDP4ShellDialogs.Views
 {
+    using System.Windows;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
     using DevExpress.Xpf.Core;
@@ -38,6 +40,11 @@ namespace CDP4IME.Views
             {
                 this.InitializeComponent();
             }
+        }
+
+        private void ToggleButton_OnChecked_(object sender, RoutedEventArgs e)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

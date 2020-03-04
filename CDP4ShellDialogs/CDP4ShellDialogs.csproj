@@ -83,6 +83,7 @@
     <Reference Include="DevExpress.Xpf.Grid.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Xpf.Layout.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Xpf.LayoutControl.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Themes.Seven.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Practices.Prism.Composition, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Composition.5.0.0\lib\NET45\Microsoft.Practices.Prism.Composition.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
@@ -195,6 +196,8 @@
     <Compile Include="ViewModels\ModelSelectionEngineeringModelSetupRowViewModel.cs" />
     <Compile Include="ViewModels\ModelSelectionIterationSetupRowViewModel.cs" />
     <Compile Include="ViewModels\ModelSelectionSessionRowViewModel.cs" />
+    <Compile Include="ViewModels\PluginManagerViewModel.cs" />
+    <Compile Include="ViewModels\PluginRowViewModel.cs" />
     <Compile Include="ViewModels\ProxyServerViewModel.cs" />
     <Compile Include="ViewModels\UriManagerViewModel.cs" />
     <Compile Include="ViewModels\UriRowViewModel.cs" />
@@ -209,6 +212,9 @@
     </Compile>
     <Compile Include="Views\ModelOpeningDialog.xaml.cs">
       <DependentUpon>ModelOpeningDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PluginManager.xaml.cs">
+      <DependentUpon>PluginManager.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProxyServer.xaml.cs">
       <DependentUpon>ProxyServer.xaml</DependentUpon>
@@ -232,6 +238,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -251,6 +258,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\PluginManager.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\ProxyServer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -260,6 +271,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

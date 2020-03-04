@@ -31,12 +31,16 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
+
+    using CDP4AddinCE.Settings;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services.AppSettingService;
     using CDP4Dal;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
@@ -55,12 +59,12 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
         private AddinRibbonPart ribbonPart;
         private int amountOfRibbonControls;
         private int order;
-        private string ribbonxmlname;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<ISession> session;
         private Assembler assembler;
+        private Mock<IAppSettingsService<AddinAppSettings>> appSettingService;
 
         [SetUp]
         public void SetUp()
@@ -78,14 +82,17 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             var iterationDictionary = new Dictionary<CDP4Common.EngineeringModelData.Iteration, Tuple<CDP4Common.SiteDirectoryData.DomainOfExpertise, CDP4Common.SiteDirectoryData.Participant>>();
             this.session.Setup(x => x.OpenIterations).Returns(iterationDictionary);
 
+            this.appSettingService =new Mock<IAppSettingsService<AddinAppSettings>>();
+            this.appSettingService.Setup(x => x.AppSettings).Returns(new AddinAppSettings());
+
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.serviceLocator = new Mock<IServiceLocator>();
 
-            this.amountOfRibbonControls = 7;
+            this.amountOfRibbonControls = 9;
             this.order = 1;
 
-            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, null, null);
+            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, null, null, this.appSettingService.Object);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IDialogNavigationService>())
@@ -140,6 +147,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_ProxySettings"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToOpen"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Plugins"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(openSessionEvent);
@@ -149,6 +157,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_ProxySettings"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_SelectModelToOpen"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Plugins"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
             CDPMessageBus.Current.SendMessage(closeSessionEvent);
@@ -165,6 +174,13 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             CDPMessageBus.Current.SendMessage(openSessionEvent);
 
             await this.ribbonPart.OnAction("CDP4_SelectModelToClose");
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
+        }
+
+        [Test]
+        public async Task VerifyThatOpenAPluginManagerCommandNavigatesToPluginWindow()
+        {
+            await this.ribbonPart.OnAction("CDP4_Plugins");
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
         }
 

@@ -215,7 +215,7 @@ namespace CDP4Composition.Navigation
             var fullyQualifiedName = viewModel.ToString().Replace(".ViewModels.", ".Views.");
 
             // remove "ViewModel" from the name to get the View Name
-            var viewName = System.Text.RegularExpressions.Regex.Replace(fullyQualifiedName, "ViewModel$", string.Empty);
+            var viewName = System.Text.RegularExpressions.Regex.Replace(fullyQualifiedName, @"ViewModel[`0-9\[\]\.a-zA-Z]*$", string.Empty);
 
             return viewName;
         }

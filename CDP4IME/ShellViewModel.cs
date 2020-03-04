@@ -12,9 +12,10 @@ namespace CDP4IME
     using CDP4Composition.Events;
     using CDP4Composition.Log;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services.AppSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
-
+    using CDP4IME.Settings;
     using CDP4ShellDialogs.ViewModels;
     using Microsoft.Practices.ServiceLocation;
     using NLog;
@@ -387,7 +388,9 @@ namespace CDP4IME
         /// </summary>
         private void ExecuteOpenPluginManagerRequest()
         {
-            var pluginManager = new PluginManagerViewModel();
+            var appSettingsService = (IAppSettingsService<ImeAppSettings>)ServiceLocator.Current.GetInstance(typeof(IAppSettingsService<ImeAppSettings>));
+
+            var pluginManager = new PluginManagerViewModel<ImeAppSettings>(appSettingsService);
             this.dialogNavigationService.NavigateModal(pluginManager);
         }
 

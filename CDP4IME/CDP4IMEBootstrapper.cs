@@ -7,6 +7,7 @@
 namespace CDP4IME
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics;
     using System.IO;
@@ -15,16 +16,19 @@ namespace CDP4IME
 
     using CDP4Composition.Adapters;
     using CDP4Composition.Navigation;
-    using CDP4Composition.Services.AppSettingService;
-    using CDP4IME.Settings;
+
     using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;
 
     using Microsoft.Practices.Prism.MefExtensions;
+    using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
+    using Microsoft.Practices.ServiceLocation;
 
     using NLog;
+    using CDP4Composition.Services.AppSettingService;
+    using CDP4IME.Settings;
 
     /// <summary>
     /// The Class that provides the bootstrapping sequence that registers all the 
@@ -72,6 +76,8 @@ namespace CDP4IME
 
                 this.UpdateBootstrapperState($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
+
+            this.SaveSettings(appSettingsService, pluginCatalog.NewPlugins);
 
             this.UpdateBootstrapperState($"{pluginCatalog.DirectoryCatalogues.Count} CDP4 Plugins Loaded");
 
@@ -152,6 +158,29 @@ namespace CDP4IME
             this.state = message;
             logger.Debug(this.state);
             DXSplashScreen.SetState(this.state);
+        }
+
+        /// <summary>
+        /// Save the application settings when new plugins are loaded
+        /// </summary>
+        private void SaveSettings(IAppSettingsService<ImeAppSettings> appSettingsService, ICollection<string> newPlugins)
+        {
+            var modules = ServiceLocator.Current.GetAllInstances(typeof(IModule));
+
+            foreach (var module in modules)
+            {
+                var pluginSettings = new PluginSettingsMetaData((IModule)module, newPlugins);
+
+                if (!string.IsNullOrEmpty(pluginSettings.Key))
+                {
+                    appSettingsService.AppSettings.Plugins.Add(pluginSettings);
+                }
+            }
+
+            if (appSettingsService.AppSettings.Plugins.Count > 0)
+            {
+                appSettingsService.Save();
+            }
         }
     }
 }

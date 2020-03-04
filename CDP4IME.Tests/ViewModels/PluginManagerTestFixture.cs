@@ -9,7 +9,13 @@ namespace CDP4IME.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using CDP4IME.ViewModels;
+
+    using CDP4Composition.Services.AppSettingService;
+
+    using CDP4IME.Settings;
+
+    using CDP4ShellDialogs.ViewModels;
+
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.ServiceLocation;
     using Moq;
@@ -18,50 +24,47 @@ namespace CDP4IME.Tests.ViewModels
     [TestFixture]
     public class PluginManagerTestFixture
     {
-        private Mock<IServiceLocator> serviceLocator;
-        private List<IModule> modules;
+        private Mock<IAppSettingsService<ImeAppSettings>> appSettingService;
+        private PluginManagerViewModel<ImeAppSettings> viewModel;
+        private ImeAppSettings appSettings;
 
         [SetUp]
         public void Setup()
         {
-            this.modules = new List<IModule>();
-            this.modules.Add(new TestModule());
 
-            this.serviceLocator = new Mock<IServiceLocator>();
-            ServiceLocator.SetLocatorProvider(new ServiceLocatorProvider(() => this.serviceLocator.Object));
-            this.serviceLocator.Setup(x => x.GetAllInstances(typeof(IModule))).Returns(this.modules);
+            this.appSettings = new ImeAppSettings();
+            this.appSettings.Plugins.Add(new PluginSettingsMetaData { Assembly = "Test Assembly", Company = "RHEA",Description= "Plugin Description",IsEnabled= true,IsMandatory= false, Name = "test", Key= "PluginFolder", Version= "5.1" });
+
+            this.appSettingService = new Mock<IAppSettingsService<ImeAppSettings>>();
+            this.appSettingService.Setup(x => x.AppSettings).Returns(this.appSettings);
+
+            this.viewModel = new PluginManagerViewModel<ImeAppSettings>(this.appSettingService.Object);
         }
 
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewmodel = new PluginManagerViewModel();
-
-            this.serviceLocator.Verify(x => x.GetAllInstances(typeof(IModule)));
-            Assert.AreEqual(1, viewmodel.Plugins.Count);
+            Assert.AreEqual(1, this.viewModel.Plugins.Count);
         }
 
         [Test]
         public void VerifyThatCloseUpdateNotification()
         {
-            var viewmodel = new PluginManagerViewModel();
-
-            viewmodel.CloseCommand.Execute(null);
-            Assert.IsFalse(viewmodel.DialogResult.Result.Value);
+            this.viewModel.CloseCommand.Execute(null);
+            var dialogResultResult = this.viewModel.DialogResult.Result;
+            Assert.IsFalse(dialogResultResult != null && dialogResultResult.Value);
         }
 
         [Test]
         public void VerifyThatSelectedPluginIsSet()
         {
-            var viewmodel = new PluginManagerViewModel();
-
-            viewmodel.SelectedPlugin = viewmodel.Plugins.First();
-            Assert.AreEqual(viewmodel.Plugins.First(), viewmodel.SelectedPlugin);
-            Assert.IsNotNull(viewmodel.SelectedPlugin.AssemblyName);
-            Assert.IsNotNull(viewmodel.SelectedPlugin.Name);
-            Assert.IsNotNull(viewmodel.SelectedPlugin.Description);
-            Assert.IsNotNull(viewmodel.SelectedPlugin.Company);
-            Assert.IsNotNull(viewmodel.SelectedPlugin.Version);
+            this.viewModel.SelectedPlugin = this.viewModel.Plugins.First();
+            Assert.AreEqual(this.viewModel.Plugins.First(), this.viewModel.SelectedPlugin);
+            Assert.IsNotNull(this.viewModel.SelectedPlugin.AssemblyName);
+            Assert.IsNotNull(this.viewModel.SelectedPlugin.Name);
+            Assert.IsNotNull(this.viewModel.SelectedPlugin.Description);
+            Assert.IsNotNull(this.viewModel.SelectedPlugin.Company);
+            Assert.IsNotNull(this.viewModel.SelectedPlugin.Version);
         }
 
         public class TestModule : IModule

@@ -258,6 +258,8 @@
     <Compile Include="Services\AppSettingService\AppSettingsService.cs" />
     <Compile Include="Services\AppSettingService\IAppSettingsService.cs" />
     <Compile Include="Services\AppSettingService\AppSettings.cs" />
+    <Compile Include="Services\AppSettingService\SettingsMetaData.cs" />
+    <Compile Include="Services\AppSettingService\PluginSettingsMetaData.cs" />
     <Compile Include="Services\FavoritesService\FavoritesService.cs" />
     <Compile Include="Services\FavoritesService\IFavoritesService.cs" />
     <Compile Include="Mvvm\IHaveContainerViewModel.cs" />
@@ -315,6 +317,7 @@
     <Compile Include="Services\RuleVerification\RuleVerificationService.cs" />
     <Compile Include="Services\ThingCreator.cs" />
     <Compile Include="Services\TooltipService.cs" />
+    <Compile Include="Settings\ShellAppSettings.cs" />
     <Compile Include="SpecialTerms\ISpecialTermsService.cs" />
     <Compile Include="SpecialTerms\SpecialTermsService.cs" />
     <Compile Include="SpellingChecker\SpellDictionaryService.cs" />
