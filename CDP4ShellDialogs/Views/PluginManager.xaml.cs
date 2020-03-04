@@ -41,10 +41,5 @@ namespace CDP4ShellDialogs.Views
                 this.InitializeComponent();
             }
         }
-
-        private void ToggleButton_OnChecked_(object sender, RoutedEventArgs e)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

@@ -41,7 +41,7 @@ namespace CDP4Composition.Attributes
         public string Name { get; private set; }
 
         /// <summary>
-        /// Gets or sets the plugin as manadatory or not or the <see cref="IModule"/>
+        /// Gets or sets the plugin as manadatory or not of the <see cref="IModule"/>
         /// </summary>
         public bool IsMandatory { get; set; }
     }
