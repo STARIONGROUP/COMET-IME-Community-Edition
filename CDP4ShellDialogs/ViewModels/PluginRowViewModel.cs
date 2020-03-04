@@ -82,7 +82,6 @@ namespace CDP4ShellDialogs.ViewModels
             this.isPluginEnabled = module.IsEnabled;
             this.isRowEnabled = !module.IsMandatory;
             this.isMandatory = module.IsMandatory;
-            this.PropertyChanged += (s, e) => { this.IsRowDirty = true; };
         }
 
         /// <summary>

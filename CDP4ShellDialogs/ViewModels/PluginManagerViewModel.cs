@@ -11,7 +11,7 @@ namespace CDP4ShellDialogs.ViewModels
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.AppSettingService;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -46,7 +46,12 @@ namespace CDP4ShellDialogs.ViewModels
             {
                 ChangeTrackingEnabled = true
             };
-            this.Plugins.ItemChanged.Subscribe(_ => { this.IsDirty = true; });
+            this.Plugins.ItemChanged.Subscribe(
+                x =>
+            {
+                x.Sender.IsRowDirty = true;
+                this.IsDirty = true;
+            });
 
             this.CloseCommand = ReactiveCommand.Create();
             this.CloseCommand.Subscribe(_ => this.ExecuteClose());
