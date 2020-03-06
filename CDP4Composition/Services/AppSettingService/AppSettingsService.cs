@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="AppSettingsService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2018-2020 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -12,6 +12,8 @@ namespace CDP4Composition.Services.AppSettingService
     using System.IO;
     using System.Reflection;
     using CDP4Composition.Exceptions;
+    using CDP4Composition.Settings;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
     using NLog;
@@ -40,7 +42,7 @@ namespace CDP4Composition.Services.AppSettingService
         /// The setting file extension
         /// </summary>
         public const string SettingFileExtension = ".settings.json";
-        
+
         /// <summary>
         /// Initializes a new instance of <see cref="AppSettingsService{T}"/>
         /// </summary>
@@ -104,7 +106,14 @@ namespace CDP4Composition.Services.AppSettingService
 
             try
             {
-                using (var file = File.OpenText($"{path}{SettingFileExtension}"))
+                var fileSettings = $"{path}{SettingFileExtension}";
+
+                if (!File.Exists(fileSettings))
+                {
+                    this.Save();
+                }
+
+                using (var file = File.OpenText(fileSettings))
                 {
                     var serializer = new JsonSerializer();
                     var result = (T)serializer.Deserialize(file, typeof(T));
@@ -125,12 +134,7 @@ namespace CDP4Composition.Services.AppSettingService
         /// </summary>
         public void Save()
         {
-            if (this.AppSettings == null)
-            {
-                throw new ArgumentNullException(nameof(this.AppSettings), "The AppSettings may not be null");
-            }
-
-            var assemblyName = this.QueryAssemblyTitle(this.AppSettings.GetType());
+            var assemblyName = Assembly.GetEntryAssembly()?.GetName().Name ?? this.QueryAssemblyTitle(typeof(T));
 
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
@@ -151,7 +155,14 @@ namespace CDP4Composition.Services.AppSettingService
                     Formatting = Formatting.Indented
                 };
 
-                serializer.Serialize(streamWriter, this.AppSettings);
+                if (this.AppSettings == null)
+                {
+                    serializer.Serialize(streamWriter, new ShellAppSettings());
+                }
+                else
+                {
+                    serializer.Serialize(streamWriter, this.AppSettings);
+                }
             }
         }
 

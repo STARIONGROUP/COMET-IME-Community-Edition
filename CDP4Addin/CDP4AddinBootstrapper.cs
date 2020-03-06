@@ -26,16 +26,22 @@
 namespace CDP4AddinCE
 {
     using System;
-    using System.ComponentModel.Composition;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using System.Windows;
-    using CDP4AddinCE.Settings;
+
+    using CDP4Composition.Attributes;
     using CDP4Composition.Services.AppSettingService;
+    using CDP4AddinCE.Settings;
+
+    using DevExpress.Utils;
 
     using Microsoft.Practices.Prism.MefExtensions;
+    using Microsoft.Practices.Prism.Modularity;
+    using Microsoft.Practices.ServiceLocation;
     using NLog;
 
     /// <summary>
@@ -86,6 +92,8 @@ namespace CDP4AddinCE
                 logger.Log(LogLevel.Debug, $"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
 
+            this.SaveSettings(appSettingsService, pluginLoader.NewPlugins);
+
             logger.Log(LogLevel.Debug, $"{pluginLoader.DirectoryCatalogues.Count} CDP4 Plugins Loaded");
         }
 
@@ -110,6 +118,29 @@ namespace CDP4AddinCE
             this.AggregateCatalog.Catalogs.Add(dllCatalog);
 
             logger.Debug("CDP4 Catalogs loaded in: {0} [ms]", sw.ElapsedMilliseconds);
+        }
+
+        /// <summary>
+        /// Save the application settings when new plugins are loaded
+        /// </summary>
+        private void SaveSettings(IAppSettingsService<AddinAppSettings> appSettingsService, ICollection<string> newPlugins)
+        {
+            var modules = ServiceLocator.Current.GetAllInstances<IModule>();
+
+            foreach (var module in modules)
+            {
+                var pluginSettings = new PluginSettingsMetaData(module, newPlugins);
+
+                if (!string.IsNullOrEmpty(pluginSettings.Key))
+                {
+                    appSettingsService.AppSettings.Plugins.Add(pluginSettings);
+                }
+            }
+
+            if (appSettingsService.AppSettings.Plugins.Count > 0)
+            {
+                appSettingsService.Save();
+            }
         }
     }
 }

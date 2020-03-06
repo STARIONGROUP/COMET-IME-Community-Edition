@@ -27,6 +27,8 @@ namespace CDP4IME.Tests
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4IME.Settings;
+
     /// <summary>
     /// TestFixture for the <see cref="ShellViewModel"/>
     /// </summary>
@@ -165,7 +167,7 @@ namespace CDP4IME.Tests
         public void VerifyThatOpenAPluginManagerCommandNavigatesToPluginWindow()
         {
             this.viewModel.OpenPluginManagerCommand.Execute(null);
-            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<PluginManagerViewModel>()));
+            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<PluginManagerViewModel<ImeAppSettings>>()));
         }
 
         [Test]

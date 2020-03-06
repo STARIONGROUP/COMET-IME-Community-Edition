@@ -30,10 +30,12 @@ namespace CDP4AddinCE
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
+    using CDP4AddinCE.Settings;
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services.AppSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4ShellDialogs.ViewModels;
@@ -70,10 +72,11 @@ namespace CDP4AddinCE
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IAppSettingsService<AddinAppSettings> appSettingService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.AppSettingService = appSettingService;
         }
 
         /// <summary>
@@ -116,6 +119,11 @@ namespace CDP4AddinCE
                     var modelClosingDialogViewModel = new ModelClosingDialogViewModel(sessionsClosing);
                     var modelClosingDialogViewModelResult = dialogService.NavigateModal(modelClosingDialogViewModel) as DataSourceSelectionResult;
                     break;
+                case "CDP4_Plugins":
+                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+                    var modelPluginDialogViewModel = new PluginManagerViewModel<AddinAppSettings>(this.AppSettingService);
+                    var modelPluginDialogResult = dialogService.NavigateModal(modelPluginDialogViewModel) as DataSourceSelectionResult;
+                    break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
                     break;
@@ -148,6 +156,8 @@ namespace CDP4AddinCE
                     return this.session != null;
                 case "CDP4_SelectModelToClose":
                     return (this.session != null) && (this.session.OpenIterations.Count > 0);
+                case "CDP4_Plugins":
+                    return true;
                 default:
                     return false;
             }
@@ -199,5 +209,10 @@ namespace CDP4AddinCE
                 this.session = null;
             }
         }
+
+        /// <summary>
+        /// Holds the application settings retrieved from json config file
+        /// </summary>
+        public IAppSettingsService<AddinAppSettings> AppSettingService { get; set; }
     }
 }

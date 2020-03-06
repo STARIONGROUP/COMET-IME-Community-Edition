@@ -34,6 +34,8 @@ namespace CDP4AddinCE
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Windows;
+
+    using CDP4AddinCE.Settings;
     using CDP4AddinCE.Utils;
     using CDP4Composition;
     using CDP4Composition.Exceptions;
@@ -671,7 +673,8 @@ namespace CDP4AddinCE
             var pluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
 
             this.FluentRibbonManager.IsActive = true;
-            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService);
+            var appSettingsService= ServiceLocator.Current.GetInstance<IAppSettingsService<AddinAppSettings>>();
+            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService);
             this.FluentRibbonManager.RegisterRibbonPart(ribbonpart);
             this.fluentRibbonXml = this.FluentRibbonManager.GetFluentXml();
 

@@ -318,14 +318,12 @@
     <Compile Include="CDP4IMEBootstrapper.cs" />
     <Compile Include="CDP4PluginLoader.cs" />
     <Compile Include="DynamicDirectoryModuleCatalog.cs" />
-    <Compile Include="Settings\ImeAppSettingsService.cs" />
     <Compile Include="Settings\ImeAppSettings.cs" />
+    <Compile Include="Settings\ImeAppSettingsService.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\DataSourceExportViewModel.cs" />
     <Compile Include="ViewModels\LogDetailsViewModel.cs" />
     <Compile Include="ViewModels\LogDetailsRowViewModel.cs" />
-    <Compile Include="ViewModels\PluginManagerViewModel.cs" />
-    <Compile Include="ViewModels\PluginRowViewModel.cs" />
     <Compile Include="ViewModels\SessionViewModel.cs" />
     <Compile Include="ShellViewModel.cs" />
     <Compile Include="Views\DataSourceExport.xaml.cs">
@@ -342,9 +340,6 @@
     </Compile>
     <Compile Include="Views\LogDetails.xaml.cs">
       <DependentUpon>LogDetails.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\PluginManager.xaml.cs">
-      <DependentUpon>PluginManager.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TextDataProvider.cs" />
     <Page Include="Shell.xaml">
@@ -376,10 +371,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\LogDetails.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\PluginManager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

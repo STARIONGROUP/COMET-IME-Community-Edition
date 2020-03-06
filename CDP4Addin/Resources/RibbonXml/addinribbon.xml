@@ -1,4 +1,4 @@
-﻿<ribbonxml> 
+﻿<ribbonxml>
   <group id="CDP4login" label="Data Source">
     <button id="CDP4_Open" label="Open" screentip="Select a data-source to open" imageMso="ServerConnection" onAction="OnAction" getEnabled="GetEnabled"/>
     <button id="CDP4_Close" label="Close" screentip="Close the data-source" imageMso="FileDropSqlDatabase" onAction="OnAction" getEnabled="GetEnabled"/>
@@ -7,5 +7,8 @@
   <group id="CDP4models" label="Models">
     <button id="CDP4_SelectModelToOpen" label="Open" screentip="Select an Engineering Model to open" imageMso="ServerConnection" onAction="OnAction" getEnabled="GetEnabled" />
     <button id="CDP4_SelectModelToClose" label="Close" screentip="Select an Engineering Model to close" imageMso="FileDropSqlDatabase" onAction="OnAction" getEnabled="GetEnabled" />
+  </group>
+  <group id="CDP4info" label="Info">
+    <button id="CDP4_Plugins" label="Plugins" screentip="Select Plugins" imageMso="DatabaseAnalyzeTable" onAction="OnAction" getEnabled="GetEnabled" />
   </group>
 </ribbonxml>
