@@ -73,16 +73,6 @@ namespace CDP4Requirements.Extensions
         /// <param name="requirementStateOfComplianceChangedEvent">The <see cref="RequirementStateOfComplianceChangedEvent"/></param>
         private static void SetRequirementStateOfCompliance(IHaveWritableRequirementStateOfCompliance requirementStateOfComplianceObject, RequirementStateOfComplianceChangedEvent requirementStateOfComplianceChangedEvent)
         {
-            if (requirementStateOfComplianceObject.RequirementStateOfCompliance == RequirementStateOfCompliance.Calculating)
-            {
-                if (requirementStateOfComplianceChangedEvent.RequirementStateOfCompliance != RequirementStateOfCompliance.Calculating)
-                {
-                    Task.Delay(500).ContinueWith(_ => requirementStateOfComplianceObject.RequirementStateOfCompliance = requirementStateOfComplianceChangedEvent.RequirementStateOfCompliance);
-
-                    return;
-                }
-            }
-
             requirementStateOfComplianceObject.RequirementStateOfCompliance = requirementStateOfComplianceChangedEvent.RequirementStateOfCompliance;
         }
     }
