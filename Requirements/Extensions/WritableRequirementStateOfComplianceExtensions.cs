@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="WritableRequirementStateOfComplianceMethods.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -----------------------------------------------------------------------------------------------
 
@@ -9,7 +9,6 @@ namespace CDP4Requirements.Extensions
     using System;
     using System.Collections.Generic;
     using System.Reactive.Linq;
-    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -73,16 +72,6 @@ namespace CDP4Requirements.Extensions
         /// <param name="requirementStateOfComplianceChangedEvent">The <see cref="RequirementStateOfComplianceChangedEvent"/></param>
         private static void SetRequirementStateOfCompliance(IHaveWritableRequirementStateOfCompliance requirementStateOfComplianceObject, RequirementStateOfComplianceChangedEvent requirementStateOfComplianceChangedEvent)
         {
-            if (requirementStateOfComplianceObject.RequirementStateOfCompliance == RequirementStateOfCompliance.Calculating)
-            {
-                if (requirementStateOfComplianceChangedEvent.RequirementStateOfCompliance != RequirementStateOfCompliance.Calculating)
-                {
-                    Task.Delay(500).ContinueWith(_ => requirementStateOfComplianceObject.RequirementStateOfCompliance = requirementStateOfComplianceChangedEvent.RequirementStateOfCompliance);
-
-                    return;
-                }
-            }
-
             requirementStateOfComplianceObject.RequirementStateOfCompliance = requirementStateOfComplianceChangedEvent.RequirementStateOfCompliance;
         }
     }
