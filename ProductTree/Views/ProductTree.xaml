@@ -285,6 +285,12 @@
                                 <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
                                     <Setter Property="Background" Value="Yellow"/>
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                    <Setter Property="FontWeight" Value="Normal" />
+                                </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
                         </Style>

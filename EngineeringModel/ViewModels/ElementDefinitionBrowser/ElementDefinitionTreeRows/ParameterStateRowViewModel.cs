@@ -23,8 +23,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Backing field for <see cref="IsDefault"/>
         /// </summary>
-        
         private bool isDefault;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterStateRowViewModel"/> class
         /// </summary>

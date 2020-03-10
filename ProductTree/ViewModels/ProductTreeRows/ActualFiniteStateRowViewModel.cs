@@ -37,6 +37,11 @@ namespace CDP4ProductTree.ViewModels
         private bool isPublishable;
 
         /// <summary>
+        /// Backing field for <see cref="IsDefault"/>
+        /// </summary>
+        private bool isDefault;
+
+        /// <summary>
         /// Backing field for the <see cref="OwnerShortName"/> property.
         /// </summary>
         private string ownerShortName;
@@ -56,6 +61,7 @@ namespace CDP4ProductTree.ViewModels
             : base(actualFiniteState, session, containerViewModel)
         {
             this.IsPublishable = false;
+            this.IsDefault = actualFiniteState.IsDefault;
 
             var parameterOrOverrideBaseRowViewModel = containerViewModel as ParameterOrOverrideBaseRowViewModel;
             if (parameterOrOverrideBaseRowViewModel != null)
@@ -82,6 +88,14 @@ namespace CDP4ProductTree.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.isPublishable, value); }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="PossibleFiniteState"/> is the default value of the <see cref="PossibleFiniteStateList"/>
+        /// </summary>
+        public bool IsDefault
+        {
+            get { return this.isDefault; }
+            set { this.RaiseAndSetIfChanged(ref this.isDefault, value); }
+        }
         /// <summary>
         /// Gets or sets the <see cref="ParameterSwitchKind"/>
         /// </summary>
