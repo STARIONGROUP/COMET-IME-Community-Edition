@@ -205,7 +205,6 @@
             <views:BrowserHeader Grid.Row="1" />
 
             <dxg:TreeListControl Grid.Row="2"
-                                 
                                  ItemsSource="{Binding ElementDefinitionRowViewModels}"
                                  SelectedItem="{Binding SelectedThing}"
                                  CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
