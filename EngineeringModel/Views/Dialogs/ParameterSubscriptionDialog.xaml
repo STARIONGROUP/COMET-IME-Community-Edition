@@ -54,7 +54,6 @@
                 <lc:LayoutItem Label="Model Code: ">
                     <dxe:TextEdit Name="ModelCode" 
                                   Text="{Binding Path=ModelCode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                  FontWeight="Bold"
                                   IsReadOnly="True"/>
                 </lc:LayoutItem>
                 <views:ParameterValueSetLayoutItem/>
