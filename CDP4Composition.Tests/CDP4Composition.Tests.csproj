@@ -202,7 +202,7 @@
     <Compile Include="DragDrop\DragDropKeyStatesExtensionsTestFixture.cs" />
     <Compile Include="DragDrop\SelectionHelperTestFixture.cs" />
     <Compile Include="Events\TaskbarNotificationEventTestFixture.cs" />
-    <Compile Include="IconCacheService\IconCachServiceIconCachServiceTestFixture.cs" />
+    <Compile Include="IconCacheService\IconCacheServiceIconCachServiceTestFixture.cs" />
     <Compile Include="Mvvm\Behaviours\ContextMenuBehaviorTestFixture.cs" />
     <Compile Include="Mvvm\Behaviours\TreeCellEditBehaviorTestFixture.cs" />
     <Compile Include="Mvvm\Behaviours\CellEditBehaviorTestFixture.cs" />
