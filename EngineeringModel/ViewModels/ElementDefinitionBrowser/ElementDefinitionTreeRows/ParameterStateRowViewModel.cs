@@ -53,7 +53,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="ActualFiniteState"/> is the default value of the <see cref="PossibleFiniteStateList"/>
+        /// Gets or sets a value indicating whether the <see cref="ActualFiniteState"/> associated with this row is the default value of the <see cref="PossibleFiniteStateList"/>
         /// </summary>
         public bool IsDefault
         {
