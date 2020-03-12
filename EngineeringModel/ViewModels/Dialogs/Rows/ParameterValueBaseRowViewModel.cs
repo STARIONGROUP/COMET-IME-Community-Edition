@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterValueBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -63,6 +63,11 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         private bool isValueSetListenerInitialized;
 
         /// <summary>
+        /// Backing field for <see cref="IsDefault"/>
+        /// </summary>
+        private bool isDefault;
+
+        /// <summary>
         /// The row code
         /// </summary>
         /// <remarks>
@@ -107,7 +112,6 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         {
             this.ActualOption = actualOption;
             this.ActualState = actualState;
-
             this.ValueIndex = valueIndex;
             this.ParameterTypeClassKind = this.ParameterType.ClassKind;
             
@@ -177,6 +181,15 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
 
                 return enumPt.AllowMultiSelect;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="ActualFiniteState"/> associated with this row is the default value of the <see cref="PossibleFiniteStateList"/>
+        /// </summary>
+        public bool IsDefault
+        {
+            get { return this.isDefault; }
+            set { this.RaiseAndSetIfChanged(ref this.isDefault, value); }
         }
 
         /// <summary>
@@ -469,6 +482,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             this.Option = valueSet.ActualOption;
             this.Switch = valueSet.ValueSwitch;
             this.Published = valueSet.Published.Count() > this.ValueIndex ? valueSet.Published[this.ValueIndex] : "-";
+            this.IsDefault = valueSet.ActualState?.IsDefault ?? false;
             if (valueSet.Published.Count() <= this.ValueIndex)
             {
                 this.Error = "No ValueSet found for this component";

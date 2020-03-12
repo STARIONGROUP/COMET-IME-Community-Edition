@@ -205,7 +205,6 @@
             <views:BrowserHeader Grid.Row="1" />
 
             <dxg:TreeListControl Grid.Row="2"
-                                 
                                  ItemsSource="{Binding ElementDefinitionRowViewModels}"
                                  SelectedItem="{Binding SelectedThing}"
                                  CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -245,6 +244,12 @@
                                     <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
                                         <Setter Property="Background" Value="Yellow"/>
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                        <Setter Property="FontWeight" Value="Normal" />
+                                    </DataTrigger>
                                 </Style.Triggers>
                                 <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
                             </Style>
@@ -267,10 +272,16 @@
                             <ControlTemplate>
                                 <TextBlock Margin="5,0,0,0"
                                            VerticalAlignment="Center"
-                                           FontWeight="{Binding Path=RowData.Row.IsTopElement,
-                                                                Converter={StaticResource BooleanToFontWeightConverter},
-                                                                UpdateSourceTrigger=PropertyChanged}"
                                            Text="{Binding Path=RowData.Row.Name}" />
+                                <ControlTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Path=RowData.Row.IsTopElement, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                        </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=RowData.Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        </DataTrigger>
+                                </ControlTemplate.Triggers>
+
                             </ControlTemplate>
                         </dxg:TreeListColumn.DisplayTemplate>
                     </dxg:TreeListColumn>

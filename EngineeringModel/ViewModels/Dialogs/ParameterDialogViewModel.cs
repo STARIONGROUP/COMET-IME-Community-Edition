@@ -194,7 +194,7 @@ namespace CDP4EngineeringModel.ViewModels
             get { return this.modelCode; }
             set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
         }
-        
+
         /// <summary>
         /// Initialize the dialog
         /// </summary>

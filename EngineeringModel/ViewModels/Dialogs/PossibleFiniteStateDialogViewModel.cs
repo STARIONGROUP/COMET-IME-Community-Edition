@@ -71,7 +71,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets the owner
+        /// Gets or sets a value indicating whether this <see cref="PossibleFiniteState"/> is the default value of the <see cref="PossibleFiniteStateList"/>
         /// </summary>
         public bool IsDefault
         {
