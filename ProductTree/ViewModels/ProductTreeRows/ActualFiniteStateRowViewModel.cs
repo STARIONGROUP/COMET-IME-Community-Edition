@@ -61,7 +61,7 @@ namespace CDP4ProductTree.ViewModels
             : base(actualFiniteState, session, containerViewModel)
         {
             this.IsPublishable = false;
-            this.IsDefault = actualFiniteState.IsDefault;
+            this.IsDefault = this.Thing.IsDefault;
 
             var parameterOrOverrideBaseRowViewModel = containerViewModel as ParameterOrOverrideBaseRowViewModel;
             if (parameterOrOverrideBaseRowViewModel != null)
