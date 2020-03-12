@@ -139,7 +139,6 @@
 
     <av:DataTemplate x:Key="ReferenceTextEditTemplate">
         <dxe:TextEdit Name="PART_Editor"
-                      FontWeight="Bold"
                       IsReadOnly="{Binding RowData.Row.IsReferenceReadOnly}"
                       ValidateOnTextInput="True"
                       Visibility="{Binding RowData.Row.IsValueSetEditorActive,
