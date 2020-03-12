@@ -89,7 +89,7 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="PossibleFiniteState"/> is the default value of the <see cref="PossibleFiniteStateList"/>
+        /// Gets or sets a value indicating whether this <see cref="ActualFiniteState"/> is the default value of the <see cref="PossibleFiniteStateList"/>
         /// </summary>
         public bool IsDefault
         {
