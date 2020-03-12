@@ -31,7 +31,7 @@ namespace CDP4Composition.Services
         private readonly Dictionary<Uri, BitmapSource> bitmapSources;
 
         /// <summary>
-        /// The cache of any oher than error overlay <see cref="BitmapSource"/>s
+        /// The cache of any other overlay icon than error overlay <see cref="BitmapSource"/>s
         /// </summary>
         private readonly Dictionary<(Uri, Uri, OverlayPositionKind), BitmapSource> bitmapWithOverlay;
 
@@ -58,6 +58,7 @@ namespace CDP4Composition.Services
         public BitmapImage QueryBitmapImage(Uri uri)
         {
             this.bitmapImages.TryGetValue(uri, out var bitmapImage);
+
             if (bitmapImage == null)
             {
                 bitmapImage = new BitmapImage(uri);
@@ -80,6 +81,7 @@ namespace CDP4Composition.Services
         public BitmapSource QueryErrorOverlayBitmapSource(Uri uri)
         {
             this.bitmapSources.TryGetValue(uri, out var bitmapSource);
+
             if (bitmapSource == null)
             {
                 bitmapSource = IconUtilities.WithErrorOverlay(uri);
@@ -107,6 +109,7 @@ namespace CDP4Composition.Services
         {
             var key = (uri, uri, overlayPosition);
             this.bitmapWithOverlay.TryGetValue(key, out var bitmapSource);
+
             if (bitmapSource == null)
             {
                 bitmapSource = IconUtilities.WithOverlay(uri, overlayUri, overlayPosition);

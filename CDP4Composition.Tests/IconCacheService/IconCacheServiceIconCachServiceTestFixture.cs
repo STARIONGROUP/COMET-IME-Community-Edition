@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IconCacheServiceIconCachServiceTestFixture.cs" company="RHEA System S.A.">
 //   Copyright (c) 2016-2020 RHEA System S.A. All rights reserved
 // </copyright>
@@ -66,29 +66,20 @@ namespace CDP4Composition.Tests.IconCacheService
         [Test]
         public void VerityThatOverlayIconGetCached()
         {
-            var stopWatchFirstFetch = new System.Diagnostics.Stopwatch();
-            var stopWatchSecondFetch = new System.Diagnostics.Stopwatch();
             const string naturalLanguageIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/naturallanguage.png";
             const string relationshipOverlayUri = "pack://application:,,,/CDP4Composition;component/Resources/Images/Log/linkgreen_16x16.png";
             
             var imageUri = new Uri(naturalLanguageIcon);
             var overlayUri = new Uri(relationshipOverlayUri);
 
-            stopWatchFirstFetch.Start();
             var firstBitmapSource = this.iconCacheService.QueryOverlayBitmapSource(imageUri, overlayUri);
-            stopWatchFirstFetch.Stop();
 
             Assert.IsInstanceOf<BitmapSource>(firstBitmapSource);
 
-            stopWatchSecondFetch.Start();
             var secondBitmapSource = this.iconCacheService.QueryOverlayBitmapSource(imageUri, overlayUri);
             Assert.IsInstanceOf<BitmapSource>(secondBitmapSource);
-            stopWatchSecondFetch.Stop();
 
             Assert.AreSame(firstBitmapSource, secondBitmapSource);
-
-            Assert.Greater(stopWatchFirstFetch.ElapsedMilliseconds, stopWatchSecondFetch.ElapsedMilliseconds);
         }
-
     }
 }
