@@ -165,7 +165,6 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.actualState2));
             this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.actualState3));
 
-
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), null, this.uri)
             {
                 Owner = this.activeDomain
@@ -239,7 +238,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
         [Test]
         public void VerifyThatRowBuiltCorrectly()
-         {
+        {
             var row = new ParameterRowViewModel(this.cptParameter, this.session.Object, null);
             var option1Row = row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
             var option2Row = row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option2);
