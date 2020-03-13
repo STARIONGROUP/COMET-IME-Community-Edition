@@ -396,33 +396,36 @@ namespace CDP4EngineeringModel.ViewModels
             var actualOption = valueSet.ActualOption;
             var actualState = valueSet.ActualState;
 
-            if (actualState.Kind == ActualFiniteStateKind.MANDATORY)
+            if (actualOption != null)
             {
-                if (actualOption != null)
-                {
-                    var optionRow = this.ContainedRows.Cast<ParameterOptionRowViewModel>().Single(x => x.ActualOption == actualOption);
+                var optionRow = this.ContainedRows.Cast<ParameterOptionRowViewModel>().Single(x => x.ActualOption == actualOption);
 
-                    if (actualState != null)
+                if (actualState != null)
+                {
+                    if (actualState.Kind != ActualFiniteStateKind.FORBIDDEN)
                     {
                         var actualStateRow = optionRow.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
                         this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
                     }
-                    else
-                    {
-                        this.UpdateScalarOrCompoundValueSet(valueSet, optionRow);
-                    }
                 }
                 else
                 {
-                    if (actualState != null)
+                    this.UpdateScalarOrCompoundValueSet(valueSet, optionRow);
+                }
+            }
+            else
+            {
+                if (actualState != null)
+                {
+                    if (actualState.Kind != ActualFiniteStateKind.FORBIDDEN)
                     {
                         var actualStateRow = this.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
                         this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
                     }
-                    else
-                    {
-                        this.UpdateScalarOrCompoundValueSet(valueSet);
-                    }
+                }
+                else
+                {
+                    this.UpdateScalarOrCompoundValueSet(valueSet);
                 }
             }
         }

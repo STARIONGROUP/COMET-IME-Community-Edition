@@ -306,7 +306,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// </remarks>
         public override string this[string columnName]
         {
-            get
+            get 
             {
                 if (columnName == ManualPropertyName)
                 {

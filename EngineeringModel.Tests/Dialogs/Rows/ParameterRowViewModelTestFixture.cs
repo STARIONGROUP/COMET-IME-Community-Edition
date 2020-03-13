@@ -55,8 +55,10 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private ActualFiniteStateList stateList;
         private ActualFiniteState actualState1;
         private ActualFiniteState actualState2;
+        private ActualFiniteState actualState3;
         private PossibleFiniteState state1;
         private PossibleFiniteState state2;
+        private PossibleFiniteState state3;
         private PossibleFiniteStateList posStateList;
 
         private Assembler assembler;
@@ -72,10 +74,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.stateList = new ActualFiniteStateList(Guid.NewGuid(), null, this.uri);
             this.state1 = new PossibleFiniteState(Guid.NewGuid(), null, this.uri) { Name = "state1" };
             this.state2 = new PossibleFiniteState(Guid.NewGuid(), null, this.uri) { Name = "state2" };
+            this.state3 = new PossibleFiniteState(Guid.NewGuid(), null, this.uri) { Name = "state3" };
 
             this.posStateList = new PossibleFiniteStateList(Guid.NewGuid(), null, this.uri);
             this.posStateList.PossibleState.Add(this.state1);
             this.posStateList.PossibleState.Add(this.state2);
+            this.posStateList.PossibleState.Add(this.state3);
             this.posStateList.DefaultState = this.state1;
 
             this.actualState1 = new ActualFiniteState(Guid.NewGuid(), null, this.uri)
@@ -90,8 +94,15 @@ namespace CDP4EngineeringModel.Tests.Dialogs
                 Kind = ActualFiniteStateKind.MANDATORY
             };
 
+            this.actualState3 = new ActualFiniteState(Guid.NewGuid(), null, this.uri)
+            {
+                PossibleState = new List<PossibleFiniteState> { this.state3 },
+                Kind = ActualFiniteStateKind.FORBIDDEN
+            };
+
             this.stateList.ActualState.Add(this.actualState1);
             this.stateList.ActualState.Add(this.actualState2);
+            this.stateList.ActualState.Add(this.actualState3);
 
             this.stateList.PossibleFiniteStateList.Add(this.posStateList);
 
@@ -132,7 +143,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "active", ShortName = "active" };
             this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "other", ShortName = "other" };
-
+             
             this.parameter = new Parameter(Guid.NewGuid(), null, this.uri)
             {
                 Owner = this.activeDomain,
@@ -148,9 +159,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             };
 
             this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.stateList.ActualState.First()));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.stateList.ActualState.Skip(1).First()));
             this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.stateList.ActualState.Last()));
             this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.First()));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.Skip(1).First()));
             this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.Last()));
+
 
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), null, this.uri)
             {
@@ -224,7 +238,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
         [Test]
         public void VerifyThatRowBuiltCorrectly()
-        {
+         {
             var row = new ParameterRowViewModel(this.cptParameter, this.session.Object, null);
             var option1Row = row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
             var option2Row = row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option2);
@@ -237,6 +251,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
                     .Single(x => x.ActualState == this.actualState1);
             var o2s2Row = option2Row.ContainedRows.OfType<ParameterStateRowViewModel>()
                     .Single(x => x.ActualState == this.actualState2);
+
 
             var o1s1c1Row = o1s1Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().First();
             var o1s1c2Row = o1s1Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().Last();
@@ -279,13 +294,17 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             var o1s1Set =this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option1 && x.ActualState == this.actualState1);
             var o1s2Set = this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option1 && x.ActualState == this.actualState2);
+            var o1s3Set = this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option1 && x.ActualState == this.actualState3);
             var o2s1Set = this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option2 && x.ActualState == this.actualState1);
             var o2s2Set = this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option2 && x.ActualState == this.actualState2);
+            var o2s3Set = this.cptParameter.ValueSet.Single(x => x.ActualOption == this.option2 && x.ActualState == this.actualState3);
 
             row.UpdateValueSets(o1s1Set);
             row.UpdateValueSets(o1s2Set);
+            row.UpdateValueSets(o1s3Set);
             row.UpdateValueSets(o2s1Set);
             row.UpdateValueSets(o2s2Set);
+            row.UpdateValueSets(o2s3Set);
 
             Assert.AreEqual(o1s1Set.ValueSwitch, o1s1c1Row.Switch);
             Assert.AreEqual(o1s2Set.ValueSwitch, o1s2c1Row.Switch);
