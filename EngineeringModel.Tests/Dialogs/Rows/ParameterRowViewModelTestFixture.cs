@@ -252,7 +252,6 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var o2s2Row = option2Row.ContainedRows.OfType<ParameterStateRowViewModel>()
                     .Single(x => x.ActualState == this.actualState2);
 
-
             var o1s1c1Row = o1s1Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().First();
             var o1s1c2Row = o1s1Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().Last();
             var o1s2c1Row = o1s2Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().First();
