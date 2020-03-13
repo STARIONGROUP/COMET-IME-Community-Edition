@@ -402,8 +402,11 @@ namespace CDP4EngineeringModel.ViewModels
 
                 if (actualState != null)
                 {
-                    var actualStateRow = optionRow.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
-                    this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    if (actualState.Kind != ActualFiniteStateKind.FORBIDDEN)
+                    {
+                        var actualStateRow = optionRow.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
+                        this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    }
                 }
                 else
                 {
@@ -414,8 +417,11 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 if (actualState != null)
                 {
-                    var actualStateRow = this.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
-                    this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    if (actualState.Kind != ActualFiniteStateKind.FORBIDDEN)
+                    {
+                        var actualStateRow = this.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
+                        this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    }
                 }
                 else
                 {

@@ -171,7 +171,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
                 ActualOption = this.option2,
                 ActualState = this.stateList.ActualState.Last()
             });
-
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.activeDomain

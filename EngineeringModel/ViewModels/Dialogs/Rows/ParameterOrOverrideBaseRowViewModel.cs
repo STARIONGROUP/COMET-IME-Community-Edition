@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -108,10 +108,14 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             if (actualOption != null)
             {
                 var optionRow = this.ContainedRows.Cast<ParameterOptionRowViewModel>().Single(x => x.ActualOption == actualOption);
+
                 if (actualState != null)
                 {
-                    var actualStateRow = optionRow.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
-                    this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    if (actualState.Kind != ActualFiniteStateKind.FORBIDDEN)
+                    {
+                        var actualStateRow = optionRow.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
+                        this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    }
                 }
                 else
                 {
@@ -122,8 +126,11 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             {
                 if (actualState != null)
                 {
-                    var actualStateRow = this.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
-                    this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    if (actualState.Kind != ActualFiniteStateKind.FORBIDDEN)
+                    {
+                        var actualStateRow = this.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
+                        this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
+                    }
                 }
                 else
                 {
