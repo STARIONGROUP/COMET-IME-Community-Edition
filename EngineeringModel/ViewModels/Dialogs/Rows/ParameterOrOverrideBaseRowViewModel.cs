@@ -108,6 +108,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             if (actualOption != null)
             {
                 var optionRow = this.ContainedRows.Cast<ParameterOptionRowViewModel>().Single(x => x.ActualOption == actualOption);
+
                 if (actualState != null)
                 {
                     if (actualState.Kind != ActualFiniteStateKind.FORBIDDEN)
