@@ -339,7 +339,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
-        public async Task VerifyThatRequirementVerificationStateOfComplianceIsSetForRequirementRow()
+        public void VerifyThatRequirementVerificationStateOfComplianceIsSetForRequirementRow()
         {
             var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
             var row = new RequirementRowViewModel(this.req, this.session.Object, containerRow);
@@ -348,13 +348,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             Assert.AreEqual(RequirementStateOfCompliance.Calculating, row.RequirementStateOfCompliance);
 
             CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), this.req);
-            Assert.AreEqual(RequirementStateOfCompliance.Calculating, row.RequirementStateOfCompliance);
-
-            await Task.Delay(1000).ContinueWith(_ => Assert.AreEqual(RequirementStateOfCompliance.Pass, row.RequirementStateOfCompliance));
+            Assert.AreEqual(RequirementStateOfCompliance.Pass, row.RequirementStateOfCompliance);
         }
 
         [Test]
-        public async Task VerifyThatRequirementVerificationStateOfComplianceIsSetForRequirementSpecificationRow()
+        public void VerifyThatRequirementVerificationStateOfComplianceIsSetForRequirementSpecificationRow()
         {
             var containerRow = new RequirementsSpecificationRowViewModel(this.reqSpec, this.session.Object, null);
 
@@ -362,9 +360,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             Assert.AreEqual(RequirementStateOfCompliance.Calculating, containerRow.RequirementStateOfCompliance);
 
             CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), this.reqSpec);
-            Assert.AreEqual(RequirementStateOfCompliance.Calculating, containerRow.RequirementStateOfCompliance);
-
-            await Task.Delay(1000).ContinueWith(_ => Assert.AreEqual(RequirementStateOfCompliance.Pass, containerRow.RequirementStateOfCompliance));
+            Assert.AreEqual(RequirementStateOfCompliance.Pass, containerRow.RequirementStateOfCompliance);
         }
     }
 }
