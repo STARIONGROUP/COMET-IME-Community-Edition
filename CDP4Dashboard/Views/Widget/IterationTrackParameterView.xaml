@@ -1,0 +1,199 @@
+﻿<UserControl x:Class="CDP4Dashboard.Views.Widget.IterationTrackParameterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dxch="http://schemas.devexpress.com/winfx/2008/xaml/charts"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             FontFamily="Segoe UI"
+             d:DesignHeight="220"
+             d:DesignWidth="220"
+             mc:Ignorable="d">
+    <UserControl.InputBindings>
+        <MouseBinding Gesture="LeftDoubleClick" Command="{Binding OnToggleChartVisibilityCommand}" />
+    </UserControl.InputBindings>
+    <Grid>
+        <Grid x:Name="innerGrid"
+          Margin="10"
+          ToolTip="{Binding ToolTip}"
+          Visibility="{Binding BlockVisible}">
+            <Border CornerRadius="10,10,10,10"
+                    Background="{Binding StatusIndicatorColor, Mode=TwoWay}">
+                <Grid>
+                <Grid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="{Binding OnRefreshCommand}"
+                              FontFamily="Segoe UI"
+                              Header="Refresh Data" />
+                    <MenuItem Command="{Binding OnToggleChartVisibilityCommand}"
+                              FontFamily="Segoe UI"
+                              Header="Show Chart" />
+                    <Separator />
+                    <MenuItem Command="{Binding OnCopyDataCommand}"
+                              FontFamily="Segoe UI"
+                              Header="Copy Data to Clipboard" />
+                    <Separator />
+                    <MenuItem Command="{Binding OnDeleteCommand}"
+                              FontFamily="Segoe UI"
+                              Header="Delete" />
+                </ContextMenu>
+            </Grid.ContextMenu>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="4*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.ColumnSpan="2"
+                       VerticalAlignment="Center"
+                       FontSize="10"
+                       Foreground="Black"
+                       Padding="5"
+                       Text="{Binding ModelCode}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap" />
+            <TextBlock Grid.Row="1"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="ExtraBold"
+                       Foreground="Black"
+                       Padding="5"
+                       Text="{Binding Title}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap" />
+            <TextBlock Grid.Row="2"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="20"
+                       FontWeight="ExtraBold"
+                       Foreground="Black"
+                       Padding="5"
+                       Text="{Binding CurrentValue}"
+                       TextWrapping="Wrap" />
+            <TextBlock Grid.Row="3"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="10"
+                       Foreground="Black"
+                       Padding="5"
+                       Text="{Binding PercentageChange}"
+                       TextAlignment="Center" />
+        </Grid>
+        </Border>
+    </Grid>
+        <dxch:ChartControl Name="chartControl"
+                           Grid.RowSpan="5"
+                           Grid.ColumnSpan="2"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           AnimationMode="OnDataChanged"
+                           Background="White"
+                           BorderBrush="{x:Null}"
+                           BorderThickness="0"
+                           FontFamily="Segoe UI"
+                           FontSize="10"
+                           OverridesDefaultStyle="False"
+                           Padding="10"
+                           Visibility="{Binding ChartVisible}">
+            <dxch:ChartControl.Titles>
+                <dxch:Title HorizontalAlignment="Center"
+                            Content="{Binding ModelCode}"
+                            FontSize="10" />
+                <dxch:Title HorizontalAlignment="Center"
+                            Content="{Binding Title}"
+                            FontSize="12" />
+                <dxch:Title VerticalAlignment="Center"
+                            Dock="Left"
+                            Content="{Binding AxisYTitle}"
+                            FontSize="10"
+                            MaxWidth="40"/>
+                <dxch:Title HorizontalAlignment="Center"
+                            Dock="Bottom"
+                            Content="{Binding AxisXTitle}"
+                            FontSize="10" />
+            </dxch:ChartControl.Titles>
+            <dxch:ChartControl.ContextMenu>
+                <ContextMenu FontFamily="Segoe UI" StaysOpen="False">
+                    <MenuItem Command="{Binding OnRefreshCommand}"
+                              FontFamily="Segoe UI"
+                              Header="Refresh Data" />
+                    <MenuItem Command="{Binding OnToggleChartVisibilityCommand}"
+                              FontFamily="Segoe UI"
+                              Header="Hide Chart" />
+                    <Separator />
+                    <MenuItem Command="{Binding OnCopyDataCommand}"
+                              FontFamily="Segoe UI"
+                              Header="Copy Data to Clipboard" />
+
+                    <MenuItem Command="{Binding SaveImageToFileCommand}"
+                              CommandParameter="{Binding Path=PlacementTarget,
+                                                         RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              FontFamily="Segoe UI"
+                              Header="Save Image" />
+                    <MenuItem Command="{Binding CopyImageToClipboardCommand}"
+                              CommandParameter="{Binding Path=PlacementTarget,
+                                                         RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              FontFamily="Segoe UI"
+                              Header="Copy Image to Clipboard" />
+                    <Separator />
+                    <MenuItem Name="menuItemDelete"
+                              Command="{Binding OnDeleteCommand}"
+                              FontFamily="Segoe UI"
+                              Header="Delete" />
+                </ContextMenu>
+            </dxch:ChartControl.ContextMenu>
+            <dxch:ChartControl.Palette>
+                <dxch:CustomPalette>
+                    <dxch:CustomPalette.Colors>
+                        <Color>#FF61A1DB</Color>
+                        <Color>#FFB36666</Color>
+                        <Color>#FF66B37B</Color>
+                        <Color>#FF784C86</Color>
+                        <Color>#FFF79B03</Color>
+                        <Color>#FF266B75</Color>
+                        <Color>#FF0D0E0E</Color>
+                        <Color>#FFA4A4A4</Color>
+                        <Color>#FF676767</Color>
+                        <Color>#FF45A5B3</Color>
+                    </dxch:CustomPalette.Colors>
+                </dxch:CustomPalette>
+            </dxch:ChartControl.Palette>
+            <dxch:ChartControl.Legend>
+                <dxch:Legend Name="chartControlLegend"
+                             FontFamily="Segoe UI"
+                             HorizontalPosition="RightOutside"
+                             Visibility="Collapsed" />
+            </dxch:ChartControl.Legend>
+            <dxch:XYDiagram2D SeriesItemsSource ="{Binding LineSeriesCollection}">
+                <dxch:XYDiagram2D.DefaultPane>
+                    <dxch:Pane>
+                        <dxch:Pane.AxisXScrollBarOptions>
+                            <dxch:ScrollBarOptions Visible="False" />
+                        </dxch:Pane.AxisXScrollBarOptions>
+                        <dxch:Pane.AxisYScrollBarOptions>
+                            <dxch:ScrollBarOptions Visible="False" />
+                        </dxch:Pane.AxisYScrollBarOptions>
+                    </dxch:Pane>
+                </dxch:XYDiagram2D.DefaultPane>
+                <dxch:XYDiagram2D.SeriesItemTemplate>
+                    <DataTemplate>
+                        <dxch:LineSeries2D DisplayName="{Binding LineName}"
+                                          DataSource="{Binding Lines}"
+                                          ArgumentDataMember="RevisionNumber"
+                                          ValueDataMember="Value"/>
+                    </DataTemplate>
+                </dxch:XYDiagram2D.SeriesItemTemplate>
+            </dxch:XYDiagram2D>
+        </dxch:ChartControl>
+    </Grid>
+</UserControl>

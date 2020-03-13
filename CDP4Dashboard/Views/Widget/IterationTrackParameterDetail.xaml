@@ -1,0 +1,48 @@
+﻿<dxc:DXWindow x:Class="CDP4Dashboard.Views.Widget.IterationTrackParameterDetail"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+              xmlns:dxc="http://schemas.devexpress.com/winfx/2008/xaml/core"
+              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+              Title="Iteration Track Parameter"
+              Width="550"
+              Height="155"
+              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+              ShowIcon="False">
+    <Grid Background="White">
+        <dxlc:LayoutControl x:Name="layoutControl1" Orientation="Vertical">
+            <dxlc:LayoutGroup x:Name="layoutGroupBI"
+                              Height="70"
+                              Header="Please set the tracked parameter's name"
+                              Orientation="Vertical"
+                              View="GroupBox">
+                <dxlc:LayoutItem x:Name="layoutItemTitle"
+                                 AddColonToLabel="True"
+                                 Label="Title">
+                    <dxe:TextEdit x:Name="textEditTitle" Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+            <dxlc:LayoutGroup>
+                <dxlc:LayoutItem x:Name="layoutItemOK">
+                    <Button x:Name="buttonOk"
+                            Width="80"
+                            Height="25"
+                            HorizontalAlignment="Right"
+                            Command="{Binding OnOKCommand}"
+                            Content="OK"
+                            IsDefault="True" />
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem x:Name="layoutItemCancel">
+                    <Button x:Name="buttonCancel"
+                            Width="80"
+                            Height="25"
+                            HorizontalAlignment="Left"
+                            Command="{Binding OnCancelCommand}"
+                            Content="Cancel"
+                            IsCancel="True" />
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+    </Grid>
+</dxc:DXWindow>

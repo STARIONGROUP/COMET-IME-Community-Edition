@@ -41,6 +41,10 @@
         <File Id="_0ACF100F" Vital="yes" Source="$(var.CDP4CommonView.TargetPath)" KeyPath="yes" />
       </Component>
 
+      <Component Id="-A50B23D361AB" Guid="{01D00026-4359-44BE-9B07-A50B23D361AB}" Location="local" Win64="$(var.Win64)">
+        <File Id="_01D00026" Vital="yes" Source="$(var.Requirements.TargetDir)CDP4RequirementsVerification.dll" KeyPath="yes" />
+      </Component>
+
       <!-- DevExpress Dependencies -->
 
       <Component Id="_A726CFBE26D5" Guid="{90BBA601-EC72-48D0-B370-A726CFBE26D5}" Win64="$(var.Win64)">

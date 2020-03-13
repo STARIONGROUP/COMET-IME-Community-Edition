@@ -1,0 +1,5 @@
+﻿<ribbonxml>
+  <group id="CDP4Dashboard" label="Dashboard">
+    <dynamicMenu id="ShowDashboard_" size="large" label="Browser" screentip="Show or Hide the dashboard"  imageMso="ServerConnection" getEnabled="GetEnabled" getContent="GetContent"/>
+  </group>
+</ribbonxml>
