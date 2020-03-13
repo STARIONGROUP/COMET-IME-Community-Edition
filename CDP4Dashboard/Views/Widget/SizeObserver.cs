@@ -1,4 +1,9 @@
-﻿
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SizeObserver.cs" company="RHEA System S.A.">
+// This is a Code Snippet found here: https://gist.github.com/jrgcubano/54ecbc61cbfaaa83b4dd14de03adf296
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4Dashboard.Views.Widget
 {
     using System.Windows;

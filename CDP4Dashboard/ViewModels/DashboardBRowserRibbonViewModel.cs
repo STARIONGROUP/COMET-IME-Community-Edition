@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="DashboardBrowserRibbonViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 

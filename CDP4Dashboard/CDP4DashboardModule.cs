@@ -107,7 +107,6 @@ namespace CDP4DashboardModule
         /// </summary>
         public void Initialize()
         {
-            //this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(DashboardRibbon));
             this.RegisterRegions();
         }
 
