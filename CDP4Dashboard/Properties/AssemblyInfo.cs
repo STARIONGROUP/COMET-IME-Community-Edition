@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 using DevExpress.DataAccess.ObjectBinding;
@@ -8,12 +7,12 @@ using DevExpress.DataAccess.ObjectBinding;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CDP4Dashboard")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("CDP4 Dashboard Plugin")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("HP Inc.")]
-[assembly: AssemblyProduct("CDP4Dashboard")]
-[assembly: AssemblyCopyright("Copyright © HP Inc. 2020")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("RHEA System S.A.")]
+[assembly: AssemblyProduct("Requirements")]
+[assembly: AssemblyCopyright("Copyright © RHEA System S.A.")]
+[assembly: AssemblyTrademark("CDP")]
 [assembly: AssemblyCulture("")]
 [assembly: HighlightedAssembly]
 // Setting ComVisible to false makes the types in this assembly not visible

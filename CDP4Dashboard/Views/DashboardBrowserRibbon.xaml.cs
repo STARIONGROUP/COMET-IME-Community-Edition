@@ -20,6 +20,9 @@ namespace CDP4Dashboard.Views
     [Export(typeof(DashboardBrowserRibbon))]
     public partial class DashboardBrowserRibbon : ExtendedRibbonPageGroup, IView
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DashboardBrowserRibbon"/> class.
+        /// </summary>
         [ImportingConstructor]
         public DashboardBrowserRibbon()
         {

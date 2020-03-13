@@ -96,7 +96,7 @@ namespace CDP4DashboardModule
         /// Gets the <see cref="IThingDialogNavigationService"/> that handles navigation to dialogs
         /// </summary>
         internal IThingDialogNavigationService ThingDialogNavigationService { get; private set; }
-        
+
         /// <summary>
         /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </summary>

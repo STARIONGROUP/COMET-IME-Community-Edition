@@ -17,11 +17,17 @@ namespace CDP4Dashboard.Views.Widget
     [DialogViewExport(nameof(IterationTrackParameterDetailViewModel), "The track parameter view")]
     public partial class IterationTrackParameterDetail : IDialogView
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IterationTrackParameterDetail"/> class.
+        /// </summary>
         public IterationTrackParameterDetail()
         {
             this.InitializeComponent();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IterationTrackParameterDetail"/> class.
+        /// </summary>
         public IterationTrackParameterDetail(bool initializeComponent)
         {
             if (initializeComponent)

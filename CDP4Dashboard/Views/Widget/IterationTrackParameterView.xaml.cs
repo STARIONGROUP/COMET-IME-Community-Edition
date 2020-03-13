@@ -13,6 +13,9 @@ namespace CDP4Dashboard.Views.Widget
     /// </summary>
     public partial class IterationTrackParameterView : UserControl
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IterationTrackParameterView"/> class.
+        /// </summary>
         public IterationTrackParameterView()
         {
             this.InitializeComponent();

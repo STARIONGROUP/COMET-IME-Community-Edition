@@ -1,12 +1,11 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DashboardRibbonViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DashboardBrowserRibbonViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Dashboard.ViewModels
 {
-    using System;
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Mvvm;
@@ -15,10 +14,6 @@ namespace CDP4Dashboard.ViewModels
     using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
-    using CDP4Dashboard.Reporting;
-    using CDP4Dashboard.Views;
-
-    using ReactiveUI;
 
     /// <summary>
     /// The view model for the ribbon control <see cref="RequirementBrowserRibbon"/>
@@ -33,13 +28,6 @@ namespace CDP4Dashboard.ViewModels
         {
         }
 
-        private static void DoOpenReportDesigner(Iteration iteration)
-        {
-            var designer = new ReportDesigner(iteration);
-            designer.DataContext = new ReportDesignerViewModel();
-            var result = designer.ShowDialog();
-        }
-
         /// <summary>
         /// Returns an instance of <see cref="DashboardBrowserViewModel"/>
         /// </summary>
@@ -51,9 +39,6 @@ namespace CDP4Dashboard.ViewModels
         /// <returns>An instance of <see cref="DashboardBrowserViewModel"/></returns>
         public static DashboardBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            //DoOpenReportDesigner(iteration);
-            //return null;
-
             return new DashboardBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }

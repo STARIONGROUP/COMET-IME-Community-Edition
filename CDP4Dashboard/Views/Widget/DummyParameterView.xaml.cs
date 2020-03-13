@@ -13,6 +13,9 @@ namespace CDP4Dashboard.Views.Widget
     /// </summary>
     public partial class DummyParameterView : UserControl
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DummyParameterView"/> class.
+        /// </summary>
         public DummyParameterView()
         {
             this.InitializeComponent();

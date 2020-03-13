@@ -69,11 +69,9 @@
     <Reference Include="DevExpress.Xpf.LayoutControl.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Xpf.ReportDesigner.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Xpf.Ribbon.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraReports.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="ExcelApi, Version=1.7.4.6, Culture=neutral, PublicKeyToken=9084b9221296229e, processorArchitecture=MSIL">
       <HintPath>..\packages\NetOfficeFw.Excel.1.7.4.6\lib\net40\ExcelApi.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -199,13 +197,6 @@
   <ItemGroup>
     <Compile Include="CDP4DashboardModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reporting\ReportDesigner.xaml.cs">
-      <DependentUpon>ReportDesigner.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Reporting\ReportDesignerViewModel.cs" />
-    <Compile Include="Reporting\XtraReport1.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ViewModels\Charts\IExportData.cs" />
     <Compile Include="ViewModels\DashboardBrowserRibbonViewModel.cs" />
     <Compile Include="ViewModels\DashboardBrowserViewModel.cs" />
@@ -249,10 +240,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Reporting\ReportDesigner.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\DashboardBrowserRibbon.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -279,7 +266,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Properties\Licenses.licx" />
     <EmbeddedResource Include="Resources\RibbonXml\DashboardBrowserRibbon.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>

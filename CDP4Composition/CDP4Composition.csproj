@@ -259,12 +259,6 @@
     <Compile Include="Navigation\Interfaces\IPanelFilterableDataGridView.cs" />
     <Compile Include="Navigation\Interfaces\IRegionCollectionSearcher.cs" />
     <Compile Include="Navigation\RegionCollectionSearcher.cs" />
-    <Compile Include="Reporting\CategoryHierarchy.cs" />
-    <Compile Include="Reporting\DefinitionUsage.cs" />
-    <Compile Include="Reporting\ICDP4ObjectDataSource.cs" />
-    <Compile Include="Reporting\IReportViewModel.cs" />
-    <Compile Include="Reporting\ParameterTypeShortNameAttribute.cs" />
-    <Compile Include="Reporting\TempStaticIterationClass.cs" />
     <Compile Include="Services\AppSettingService\AppSettingsService.cs" />
     <Compile Include="Services\AppSettingService\IAppSettingsService.cs" />
     <Compile Include="Services\AppSettingService\AppSettings.cs" />

@@ -10,8 +10,6 @@ namespace CDP4Dashboard.ViewModels.Charts
 
     using CDP4Common.EngineeringModelData;
 
-    //using DevExpress.Xpf.CodeView;
-
     /// <summary>
     /// A generic object that is used to show a collection of <see cref="Line"/> values in a chart
     /// </summary>
