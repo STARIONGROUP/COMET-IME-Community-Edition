@@ -143,7 +143,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "active", ShortName = "active" };
             this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "other", ShortName = "other" };
-             
+
             this.parameter = new Parameter(Guid.NewGuid(), null, this.uri)
             {
                 Owner = this.activeDomain,
@@ -158,12 +158,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
                 StateDependence = this.stateList
             };
 
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.stateList.ActualState.First()));
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.stateList.ActualState.Skip(1).First()));
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.stateList.ActualState.Last()));
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.First()));
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.Skip(1).First()));
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.Last()));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.actualState1));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.actualState2));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.actualState3));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.actualState1));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.actualState2));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.actualState3));
 
 
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), null, this.uri)

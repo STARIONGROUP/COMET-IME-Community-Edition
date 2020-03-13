@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -180,10 +180,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
                 StateDependence = this.stateList
             };
 
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.stateList.ActualState.First()));
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.stateList.ActualState.Last()));
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.First()));
-            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.stateList.ActualState.Last()));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.actualState1));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option1, this.actualState2));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.actualState1));
+            this.cptParameter.ValueSet.Add(this.GetNewParameterValueSet(this.option2, this.actualState2));
 
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
