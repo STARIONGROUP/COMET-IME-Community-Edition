@@ -60,6 +60,10 @@
       <ComponentGroupRef Id="CDP4ADDIN" />
     </Feature>
 
+    <Feature Id="CDP4DASHBOARDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Dashboard Plugin" Level="1" >
+      <ComponentGroupRef Id="CDP4DASHBOARD_CG" />
+    </Feature>
+
     <Feature Id="PARAMETERSHEETGENERATOR" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Parameter Sheet Generator Plugin" Level="1" >
       <ComponentGroupRef Id="PARAMETERSHEETGENERATOR_CG" />
     </Feature>

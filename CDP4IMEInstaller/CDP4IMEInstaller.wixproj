@@ -53,6 +53,7 @@
     <Compile Include="CDP4WspDalPlugin.wxs" />
     <Compile Include="CDP4JsonFileDalPlugin.wxs" />
     <Compile Include="CDP4ServicesDal.wxs" />
+    <Compile Include="CDP4Dashboard.wxs" />
     <Compile Include="Dependencies.wxs" />
     <Compile Include="EngineeringModelPlugin.wxs" />
     <Compile Include="CDP4BuiltInRules.wxs" />
@@ -159,6 +160,14 @@
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Name>CDP4Composition</Name>
       <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4Dashboard\CDP4Dashboard.csproj">
+      <Name>CDP4Dashboard</Name>
+      <Project>{89e91585-c793-4d90-ab8c-fd295590665b}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
