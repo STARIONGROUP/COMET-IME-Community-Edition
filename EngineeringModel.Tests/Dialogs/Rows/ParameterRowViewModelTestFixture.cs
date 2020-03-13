@@ -170,6 +170,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             {
                 Owner = this.activeDomain
             };
+
             this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), null, this.uri);
             this.elementUsage1 = new ElementUsage(Guid.NewGuid(), null, this.uri){ElementDefinition = this.elementDefinitionForUsage1};
 
