@@ -1,6 +1,6 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IconCachServiceIconCachServiceTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2016 RHEA System S.A. All rights reserved
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="IconCacheServiceIconCachServiceTestFixture.cs" company="RHEA System S.A.">
+//   Copyright (c) 2016-2020 RHEA System S.A. All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ namespace CDP4Composition.Tests.IconCacheService
     /// Suite of tests for the <see cref="IconCacheService"/> class
     /// </summary>
     [TestFixture, Apartment(ApartmentState.STA)]
-    public class IconCachServiceIconCachServiceTestFixture
+    public class IconCacheServiceIconCachServiceTestFixture
     {
         private IconCacheService iconCacheService;
         
@@ -31,8 +31,8 @@ namespace CDP4Composition.Tests.IconCacheService
         [Test]
         public void VerifyThatSameIconIsReturned()
         {
-            const string NaturalLanguageIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/naturallanguage.png";
-            var imageUri = new Uri(NaturalLanguageIcon);
+            const string naturalLanguageIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/naturallanguage.png";
+            var imageUri = new Uri(naturalLanguageIcon);
 
             var firstBitmapImage = this.iconCacheService.QueryBitmapImage(imageUri);
 
@@ -48,8 +48,8 @@ namespace CDP4Composition.Tests.IconCacheService
         [Test]
         public void VerityThatSameBitmapSourceIsReturned()
         {
-            const string NaturalLanguageIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/naturallanguage.png";
-            var imageUri = new Uri(NaturalLanguageIcon);
+            const string naturalLanguageIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/naturallanguage.png";
+            var imageUri = new Uri(naturalLanguageIcon);
 
             var firstBitmapSource = this.iconCacheService.QueryErrorOverlayBitmapSource(imageUri);
 
@@ -57,6 +57,26 @@ namespace CDP4Composition.Tests.IconCacheService
 
             var secondBitmapSource = this.iconCacheService.QueryErrorOverlayBitmapSource(imageUri);
 
+            Assert.IsInstanceOf<BitmapSource>(secondBitmapSource);
+
+            Assert.AreSame(firstBitmapSource, secondBitmapSource);
+        }
+
+
+        [Test]
+        public void VerityThatOverlayIconGetCached()
+        {
+            const string naturalLanguageIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/naturallanguage.png";
+            const string relationshipOverlayUri = "pack://application:,,,/CDP4Composition;component/Resources/Images/Log/linkgreen_16x16.png";
+            
+            var imageUri = new Uri(naturalLanguageIcon);
+            var overlayUri = new Uri(relationshipOverlayUri);
+
+            var firstBitmapSource = this.iconCacheService.QueryOverlayBitmapSource(imageUri, overlayUri);
+
+            Assert.IsInstanceOf<BitmapSource>(firstBitmapSource);
+
+            var secondBitmapSource = this.iconCacheService.QueryOverlayBitmapSource(imageUri, overlayUri);
             Assert.IsInstanceOf<BitmapSource>(secondBitmapSource);
 
             Assert.AreSame(firstBitmapSource, secondBitmapSource);

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IIconCacheService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2016 RHEA System S.A. All rights reserved
+//   Copyright (c) 2016-2020 RHEA System S.A. All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ThingToIconUriConverter.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -131,8 +131,7 @@ namespace CDP4Composition
         {
             Uri imageUri;
 
-            var convertedstring = IconUtilities.ImageUri(classKind, getsmallicon) as string;
-            if (convertedstring != null)
+            if (IconUtilities.ImageUri(classKind, getsmallicon) is string convertedstring)
             {
                 imageUri = new Uri(convertedstring);
                 var image = new BitmapImage(imageUri);
@@ -140,8 +139,7 @@ namespace CDP4Composition
                 return bitmap;
             }
 
-            var convertedDXImageExtension = IconUtilities.ImageUri(classKind, getsmallicon) as DXImageExtension;
-            if (convertedDXImageExtension != null)
+            if (IconUtilities.ImageUri(classKind, getsmallicon) is DXImageExtension convertedDXImageExtension)
             {
                 var image = new BitmapImage();
                 image.BeginInit();
@@ -171,24 +169,24 @@ namespace CDP4Composition
         {
             var compositionroot = "pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/";
             var imagesize = getsmallicon ? "_16x16" : "_32x32";
-            var imagename = string.Empty;
+            string imagename;
             var imageextension = ".png";
 
             switch (classKind)
             {
                 case ClassKind.Participant:
                     imagename = "grayscaleParticipant";
-                    return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
                 case ClassKind.Person:
                     imagename = "grayscalePerson";
-                    return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
                 case ClassKind.IterationSetup:
                     imagename = "grayscaleIterationSetup";
-                    return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
                  default:
                      // Iteration Setup for now used as default
                      imagename = "grayscaleIterationSetup";
-                     return string.Format("{0}{1}{2}{3}", compositionroot, imagename, imagesize, imageextension);
+                     return $"{compositionroot}{imagename}{imagesize}{imageextension}";
             }
         }
 
@@ -200,13 +198,7 @@ namespace CDP4Composition
         /// </returns>
         private IIconCacheService QueryIIconCacheService()
         {
-            if (this.iconCacheService == null)
-            {
-                this.iconCacheService = ServiceLocator.Current.GetInstance<IIconCacheService>();
-                
-            }
-
-            return this.iconCacheService;
+            return this.iconCacheService ?? (this.iconCacheService = ServiceLocator.Current.GetInstance<IIconCacheService>());
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IIconCacheService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2016 RHEA System S.A. All rights reserved
+//   Copyright (c) 2016-2020 RHEA System S.A. All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -23,12 +23,17 @@ namespace CDP4Composition.Services
         /// <summary>
         /// The cache of <see cref="BitmapImage"/>s
         /// </summary>
-        private Dictionary<Uri, BitmapImage> bitmapImages;
+        private readonly Dictionary<Uri, BitmapImage> bitmapImages;
 
         /// <summary>
         /// The cache of error overlay <see cref="BitmapSource"/>s
         /// </summary>
-        private Dictionary<Uri, BitmapSource> bitmapSources;
+        private readonly Dictionary<Uri, BitmapSource> bitmapSources;
+
+        /// <summary>
+        /// The cache of any other overlay icon than error overlay <see cref="BitmapSource"/>s
+        /// </summary>
+        private readonly Dictionary<(Uri, Uri, OverlayPositionKind), BitmapSource> bitmapWithOverlay;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IconCacheService"/> class.
@@ -36,8 +41,8 @@ namespace CDP4Composition.Services
         public IconCacheService()
         {
             this.bitmapImages = new Dictionary<Uri, BitmapImage>();
-
             this.bitmapSources = new Dictionary<Uri, BitmapSource>();
+            this.bitmapWithOverlay = new Dictionary<(Uri, Uri, OverlayPositionKind), BitmapSource>();
         }
 
         /// <summary>
@@ -52,8 +57,8 @@ namespace CDP4Composition.Services
         /// </returns>
         public BitmapImage QueryBitmapImage(Uri uri)
         {
-            BitmapImage bitmapImage;
-            this.bitmapImages.TryGetValue(uri, out bitmapImage);
+            this.bitmapImages.TryGetValue(uri, out var bitmapImage);
+
             if (bitmapImage == null)
             {
                 bitmapImage = new BitmapImage(uri);
@@ -75,8 +80,8 @@ namespace CDP4Composition.Services
         /// </returns>
         public BitmapSource QueryErrorOverlayBitmapSource(Uri uri)
         {
-            BitmapSource bitmapSource;
-            this.bitmapSources.TryGetValue(uri, out bitmapSource);
+            this.bitmapSources.TryGetValue(uri, out var bitmapSource);
+
             if (bitmapSource == null)
             {
                 bitmapSource = IconUtilities.WithErrorOverlay(uri);
@@ -102,7 +107,16 @@ namespace CDP4Composition.Services
         /// </returns>
         public BitmapSource QueryOverlayBitmapSource(Uri uri, Uri overlayUri, OverlayPositionKind overlayPosition = OverlayPositionKind.TopLeft)
         {
-            return IconUtilities.WithOverlay(uri, overlayUri, overlayPosition);
+            var key = (uri, uri, overlayPosition);
+            this.bitmapWithOverlay.TryGetValue(key, out var bitmapSource);
+
+            if (bitmapSource == null)
+            {
+                bitmapSource = IconUtilities.WithOverlay(uri, overlayUri, overlayPosition);
+                this.bitmapWithOverlay.Add(key, bitmapSource);
+            }
+
+            return bitmapSource;
         }
     }
 }
