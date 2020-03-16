@@ -66,6 +66,9 @@
     <Reference Include="CDP4JsonSerializer, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CDP4JsonSerializer-CE.4.0.1\lib\net452\CDP4JsonSerializer.dll</HintPath>
     </Reference>
+    <Reference Include="CDP4RequirementsVerification, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4RequirementsVerification-CE.0.1.1-2020.3.13.1\lib\net452\CDP4RequirementsVerification.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.Data.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Diagram.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Mvvm.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
@@ -237,6 +240,8 @@
     <Compile Include="SpellingChecker\DictionaryServiceTestFixture.cs" />
     <Compile Include="StaticPanelViewModelTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\RequirementStateOfComplianceExtensionsTestFixture.cs" />
+    <Compile Include="Utilities\CDP4ColorExtensionsTestFixture.cs" />
     <Compile Include="ViewModels\GenericConfirmationDialogViewModelTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>

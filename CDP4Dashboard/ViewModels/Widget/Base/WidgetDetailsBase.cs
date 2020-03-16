@@ -19,11 +19,24 @@ namespace CDP4Dashboard.ViewModels.Widget.Base
     public abstract class WidgetDetailsBase : ReactiveObject, IDialogViewModel
     {
         /// <summary>
-        /// The title.
+        /// Backing field for <see cref="Title"/>
         /// </summary>
         private string title;
 
+        /// <summary>
+        /// Backing field for <see cref="DialogResult"/>
+        /// </summary>
         private IDialogResult dialogResult;
+
+        /// <summary>
+        /// Backing field for <see cref="IsBusy"/>
+        /// </summary>
+        private bool isBusy;
+
+        /// <summary>
+        /// Backing field for <see cref="LoadingMessage"/>
+        /// </summary>
+        private string loadingMessage;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WidgetDetailsBase"/> class.
@@ -68,12 +81,20 @@ namespace CDP4Dashboard.ViewModels.Widget.Base
         /// <summary>
         /// Gets or sets the busy indicator
         /// </summary>
-        public bool IsBusy { get; set; }
+        public bool IsBusy
+        {
+            get => this.isBusy;
+            set => this.RaiseAndSetIfChanged(ref this.isBusy, value);
+        }
 
         /// <summary>
         /// Sets or gets the loading message
         /// </summary>
-        public string LoadingMessage { get; set; }
+        public string LoadingMessage
+        {
+            get => this.loadingMessage;
+            set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
+        }
 
         /// <summary>
         /// The OK command

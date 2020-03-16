@@ -10,14 +10,6 @@
         <File Id="fil_CDP4Dashboard"  Vital="yes" Source="$(var.CDP4Dashboard.TargetPath)" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_chartscore" Guid="{DDC8052B-365B-41D8-98CB-BCF0A2BC4EB8}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_chartscore" Vital="yes" Source="$(var.CDP4Dashboard.TargetDir)DevExpress.Charts.v19.2.Core.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_charts" Guid="{794F805A-F925-48E3-9495-E6E58CD0325B}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_charts" Vital="yes" Source="$(var.CDP4Dashboard.TargetDir)DevExpress.Xpf.Charts.v19.2.dll" KeyPath="yes" />
-      </Component>
-
     </ComponentGroup>
   </Fragment>
 </Wix>
