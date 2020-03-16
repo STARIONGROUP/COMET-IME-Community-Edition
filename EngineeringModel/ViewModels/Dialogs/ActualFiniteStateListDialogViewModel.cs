@@ -1,4 +1,4 @@
-﻿// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // <copyright file="ActualFiniteStateListDialogViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
@@ -48,6 +48,25 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="ExcludeOption"/>s
         /// </summary>
         private ReactiveList<Option> includeOption;
+        
+        /// <summary>
+        /// Backing field for <see cref="IsValueSetEditable"/>
+        /// </summary>
+        private bool isValueSetEditable;
+
+        /// <summary>
+        /// Gets a value indicating whether the value set may be edited
+        /// </summary>
+        /// <remarks>
+        /// The value shall be set to false when any change is made on the possible finite state list
+        /// </remarks>
+        public bool IsValueSetEditable
+        {
+            get => this.isValueSetEditable && base.IsNonEditableFieldReadOnly;
+            private set => this.RaiseAndSetIfChanged(ref this.isValueSetEditable, value);
+        }
+
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActualFiniteStateListDialogViewModel"/> class.
@@ -207,6 +226,7 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.PossibleFiniteStateListRow.RemoveAndDispose(this.SelectedPossibleFiniteStateList);
                 this.RefreshPossibleFiniteStateListRows();
+                this.IsValueSetEditable = false;
             });
 
             this.MoveUpPossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteCommand);
@@ -215,6 +235,7 @@ namespace CDP4EngineeringModel.ViewModels
                 {
                     this.ExecuteMoveUpCommand(this.PossibleFiniteStateListRow, this.SelectedPossibleFiniteStateList);
                     this.PossibleFiniteStateList = new ReactiveList<PossibleFiniteStateList>(this.PossibleFiniteStateListRow.Select(x => x.PossibleFiniteStateList));
+                    this.IsValueSetEditable = false;
                 });
 
             this.MoveDownPossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteCommand);
@@ -223,6 +244,7 @@ namespace CDP4EngineeringModel.ViewModels
                 {
                     this.ExecuteMoveDownCommand(this.PossibleFiniteStateListRow, this.SelectedPossibleFiniteStateList);
                     this.PossibleFiniteStateList = new ReactiveList<PossibleFiniteStateList>(this.PossibleFiniteStateListRow.Select(x => x.PossibleFiniteStateList));
+                    this.IsValueSetEditable = false;
                 });
         }
 
@@ -233,6 +255,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.UpdateProperties();
             this.PopulatePossibleFiniteStateList();
+            this.IsValueSetEditable = true;
         }
 
         /// <summary>
@@ -320,6 +343,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var possibleList = new List<PossibleFiniteStateList>(iteration.PossibleFiniteStateList.Except(this.usedPossibleStateList));
                 possibleList.Add(finiteStateList);
                 var row = new Dialogs.PossibleFiniteStateListRowViewModel(finiteStateList, this.Session, possibleList, this);
+                row.WhenAnyValue(r => r.PossibleFiniteStateList).Subscribe(_ => this.IsValueSetEditable = false);
                 this.PossibleFiniteStateListRow.Add(row);
             }
 
@@ -337,6 +361,7 @@ namespace CDP4EngineeringModel.ViewModels
             var row = new Dialogs.PossibleFiniteStateListRowViewModel(finiteStateList, this.Session, possibleList, this);
             this.PossibleFiniteStateListRow.Add(row);
             this.RefreshPossibleFiniteStateListRows();
+            this.IsValueSetEditable = false;
         }
     }
 }

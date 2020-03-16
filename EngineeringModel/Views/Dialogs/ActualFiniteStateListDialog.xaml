@@ -13,6 +13,7 @@
              xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:engineeringModelData="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
+             xmlns:xtraEditors="clr-namespace:DevExpress.XtraEditors;assembly=DevExpress.XtraEditors.v19.2"
              Height="700"
              MaxWidth="800"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -129,6 +130,7 @@
                                      SelectedItem="{Binding SelectedActualState,
                                                             Mode=TwoWay,
                                                             UpdateSourceTrigger=PropertyChanged}"
+                                     IsEnabled="{Binding IsValueSetEditable}"
                                      SelectionMode="Row">
                             <dxg:GridControl.View>
                                 <dxg:TableView Name="ActualFiniteStateView"
