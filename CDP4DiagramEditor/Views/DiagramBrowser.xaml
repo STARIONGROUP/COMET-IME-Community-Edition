@@ -1,0 +1,99 @@
+﻿<UserControl x:Class="CDP4DiagramEditor.Views.DiagramBrowser"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <views:CommonThingControl GridView="{Binding ElementName=View}" />
+
+        <views:BrowserHeader Grid.Row="1" />
+
+        <dxg:GridControl Grid.Row="2"
+                         AllowLiveDataShaping="False"
+                         Name="DiagramGridControl"
+                         ItemsSource="{Binding Diagrams}"
+                         SelectedItem="{Binding SelectedThing,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                         SelectionMode="Row"
+                         services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted,
+                                                                            Mode=OneWay,
+                                                                            UpdateSourceTrigger=PropertyChanged}">
+            <dxmvvm:Interaction.Behaviors>
+                <cdp4Composition:ContextMenuBehavior />
+            </dxmvvm:Interaction.Behaviors>
+            <i:Interaction.Behaviors>
+                <dragDrop:FrameworkElementDragBehavior />
+            </i:Interaction.Behaviors>
+            <dxg:GridControl.View>
+                <dxg:TableView Name="View"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               AllowColumnMoving="True"
+                               ShowFilterPanelMode="Never"
+                               AllowEditing="False"
+                               AllowGrouping="True"
+                               AutoWidth="true"
+                               IsDetailButtonVisibleBinding="{x:Null}"
+                               ShowGroupPanel="False">
+                    <dxg:TableView.FocusedRow>
+                        <dynamic:ExpandoObject />
+                    </dxg:TableView.FocusedRow>
+                    <dxg:TableView.ContextMenu>
+                        <ContextMenu Name="RowContextMenu" />
+                    </dxg:TableView.ContextMenu>
+                </dxg:TableView>
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn Width="18" MinWidth="18">
+                    <dxg:GridColumn.DisplayTemplate>
+                        <ControlTemplate>
+                            <Image Width="16" Height="16">
+                                <Image.Source>
+                                    <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                    </MultiBinding>
+                                </Image.Source>
+                            </Image>
+                        </ControlTemplate>
+                    </dxg:GridColumn.DisplayTemplate>
+                </dxg:GridColumn>
+                <dxg:GridColumn FieldName="Name" />
+                <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
+                <dxg:GridColumn FieldName="CreatedOn" Header="Created on" />
+            </dxg:GridControl.Columns>
+
+            <dxg:GridControl.InputBindings>
+                <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
+                <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
+            </dxg:GridControl.InputBindings>
+        </dxg:GridControl>
+    </Grid>
+</UserControl>

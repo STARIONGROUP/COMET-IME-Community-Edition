@@ -1,0 +1,41 @@
+﻿<ribbon:ExtendedRibbonPage x:Class="CDP4DiagramEditor.Views.CDP4DiagramEditorRibbon"
+                                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                                xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                                xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+                                xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+                                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                                xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
+                                Caption="Diagram editor"
+                                mc:Ignorable="d"
+                                MergeOrder="8000">
+    <dxr:RibbonPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/RibbonMenuItemTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </dxr:RibbonPage.Resources>
+    <dxr:RibbonPageGroup>
+        <dxb:BarSplitButtonItem Name="OpenModelDiagramBarButtonItem"
+                            ActAsDropDown="True"
+                            Content="Open"
+                            RibbonStyle="Large"
+                            IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
+                            LargeGlyph="{dx:DXImage Image=LabelsCenter_32x32.png}"
+                            Hint="Open the diagram editor">
+            <dxb:BarSplitButtonItem.PopupControl>
+                <dxr:GalleryDropDownPopupMenu>
+                    <dxr:GalleryDropDownPopupMenu.Gallery>
+                        <dxb:Gallery ColCount="1"
+                                 GroupTemplate="{StaticResource groupTemplate}"
+                                 GroupsSource="{Binding OpenModels}"
+                                 IsGroupCaptionVisible="True"
+                                 ItemCheckMode="Multiple" />
+                    </dxr:GalleryDropDownPopupMenu.Gallery>
+                </dxr:GalleryDropDownPopupMenu>
+            </dxb:BarSplitButtonItem.PopupControl>
+        </dxb:BarSplitButtonItem>
+    </dxr:RibbonPageGroup>
+</ribbon:ExtendedRibbonPage>

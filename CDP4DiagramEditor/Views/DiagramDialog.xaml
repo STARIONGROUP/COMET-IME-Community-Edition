@@ -1,0 +1,39 @@
+﻿<dx:DXWindow x:Class="CDP4DiagramEditor.Views.DiagramDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+             xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             Height="300"
+             d:DesignWidth="571"
+             navigation:DialogCloser.DialogResult="{Binding DialogResult}"
+             mc:Ignorable="d">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+    <lc:LayoutControl Margin="5"
+                      Orientation="Vertical"
+                      ScrollBars="None">
+        <lc:LayoutGroup Margin="-10,-7,-10,-5"
+                        Orientation="Vertical"
+                        View="Tabs"
+                        lc:LayoutControl.AllowHorizontalSizing="True">
+            <lc:LayoutGroup Header="Basic" Orientation="Vertical">
+                <items:ShortNameLayoutItem />
+                <items:NameLayoutItem />
+                <items:IsDeprecatedLayoutItem />
+            </lc:LayoutGroup>
+
+            <items:AliasLayoutGroup />
+            <items:DefinitionLayoutGroup />
+            <items:HyperLinkLayoutGroup />
+            <items:AdvancedLayoutGroup />
+        </lc:LayoutGroup>
+        <items:UserValidationButtonsLayoutGroup />
+        <items:ErrorMessageLayoutGroup />
+    </lc:LayoutControl>
+</dx:DXWindow>
