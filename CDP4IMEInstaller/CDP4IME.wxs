@@ -41,6 +41,10 @@
         <File Id="_0ACF100F" Vital="yes" Source="$(var.CDP4CommonView.TargetPath)" KeyPath="yes" />
       </Component>
 
+      <Component Id="_A50B23D361AB" Guid="{01D00026-4359-44BE-9B07-A50B23D361AB}" Location="local" Win64="$(var.Win64)">
+        <File Id="_01D00026" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)CDP4RequirementsVerification.dll" KeyPath="yes" />
+      </Component>
+
       <!-- DevExpress Dependencies -->
 
       <Component Id="_A726CFBE26D5" Guid="{90BBA601-EC72-48D0-B370-A726CFBE26D5}" Win64="$(var.Win64)">
@@ -266,6 +270,15 @@
       <Component Id="_B485AC75052B" Guid="{D695D0A9-3115-49ED-82A5-B485AC75052B}" Win64="$(var.Win64)">
         <File Id="_D695D0A9" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Controls.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
+
+      <Component Id="_BCF0A2BC4EB8" Guid="{DDC8052B-365B-41D8-98CB-BCF0A2BC4EB8}" Location="local" Win64="$(var.Win64)">
+        <File Id="_DDC8052B" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Charts.v19.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_E6E58CD0325B" Guid="{794F805A-F925-48E3-9495-E6E58CD0325B}" Location="local" Win64="$(var.Win64)">
+        <File Id="_794F805A" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Charts.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>

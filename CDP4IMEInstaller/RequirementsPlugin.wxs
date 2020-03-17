@@ -18,10 +18,6 @@
         <File Id="fil_DotLiquid" Vital="yes" Source="$(var.Requirements.TargetDir)DotLiquid.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="comp_requirementsverification" Guid="{01D00026-4359-44BE-9B07-A50B23D361AB}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_requirementsverification" Vital="yes" Source="$(var.Requirements.TargetDir)CDP4RequirementsVerification.dll" KeyPath="yes" />
-      </Component>
-
     </ComponentGroup>
   </Fragment>
 </Wix>

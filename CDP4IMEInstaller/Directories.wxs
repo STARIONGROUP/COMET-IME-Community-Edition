@@ -19,6 +19,7 @@
                 <Directory Id="OBJECTBROWSER" Name="CDP4ObjectBrowser"/>
                 <Directory Id="PROPERTYGRID" Name="CDP4PropertyGrid"/>
                 <Directory Id="REQUIREMENTS" Name="CDP4Requirements"/>
+                <Directory Id="DASHBOARD" Name="CDP4Dashboard"/>
                 <Directory Id="SITEDIRECTORY" Name="CDP4SiteDirectory"/>
                 <Directory Id="PRODUCTTREE" Name="CDP4ProductTree"/>                
                 <Directory Id="RELATIONSHIPEDITOR" Name="CDP4RelationshipEditor"/>

@@ -187,19 +187,18 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
-        public async Task VerifyThatRequirementVerificationWorks()
+        public void VerifyThatRequirementVerificationWorks()
         {
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
             var reqSpecRow = vm.ReqSpecificationRows.Single();
 
             Assert.IsTrue(vm.CanVerifyRequirements);
             vm.VerifyRequirementsCommand.Execute(null);
-            Assert.AreEqual(RequirementStateOfCompliance.Calculating, reqSpecRow.RequirementStateOfCompliance);
-            await Task.Delay(1000).ContinueWith(x => Assert.AreEqual(RequirementStateOfCompliance.Inconclusive, reqSpecRow.RequirementStateOfCompliance));
+            Assert.AreEqual(RequirementStateOfCompliance.Inconclusive, reqSpecRow.RequirementStateOfCompliance);
         }
 
         [Test]
-        public async Task VerifyThatDeprecatedRequirementSpecificationsAreNotVerified()
+        public void VerifyThatDeprecatedRequirementSpecificationsAreNotVerified()
         {
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
             var reqSpecRow = vm.ReqSpecificationRows.Single();
@@ -210,7 +209,6 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             vm.VerifyRequirementsCommand.Execute(null);
             Assert.AreEqual(RequirementStateOfCompliance.Unknown, reqSpecRow.RequirementStateOfCompliance);
-            await Task.Delay(1000).ContinueWith(x => Assert.AreEqual(RequirementStateOfCompliance.Unknown, reqSpecRow.RequirementStateOfCompliance));
         }
     }
 }

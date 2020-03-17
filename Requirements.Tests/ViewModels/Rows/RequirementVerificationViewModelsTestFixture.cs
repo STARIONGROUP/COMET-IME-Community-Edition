@@ -84,7 +84,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         [TestCase(typeof(NotExpression))]
         [TestCase(typeof(ExclusiveOrExpression))]
         [TestCase(typeof(AndExpression))]
-        public async Task VerifyThatRequirementVerificationStateOfComplianceIsSetForBooleanExpressionRowViewModels(Type thingType)
+        public void VerifyThatRequirementVerificationStateOfComplianceIsSetForBooleanExpressionRowViewModels(Type thingType)
         {
             var thing = Activator.CreateInstance(thingType);
             IHaveWritableRequirementStateOfCompliance row = null;
@@ -105,9 +105,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
             Assert.AreEqual(RequirementStateOfCompliance.Calculating, row.RequirementStateOfCompliance);
 
             CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), thing);
-            Assert.AreEqual(RequirementStateOfCompliance.Calculating, row.RequirementStateOfCompliance);
-
-            await Task.Delay(1000).ContinueWith(_ => Assert.AreEqual(RequirementStateOfCompliance.Pass, row.RequirementStateOfCompliance));
+            Assert.AreEqual(RequirementStateOfCompliance.Pass, row.RequirementStateOfCompliance);
 
             if (thingType == typeof(RelationalExpression) && row is IHaveContainerViewModel)
             {
@@ -118,15 +116,13 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         }
 
         [Test]
-        public async Task VerifyThatRequirementVerificationStateOfComplianceIsSetForParametricConstraintRowViewModel()
+        public void VerifyThatRequirementVerificationStateOfComplianceIsSetForParametricConstraintRowViewModel()
         {
             CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Calculating), this.parametricConstraint);
             Assert.AreEqual(RequirementStateOfCompliance.Calculating, this.parametricConstraintRowViewModel.RequirementStateOfCompliance);
 
             CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), this.parametricConstraint);
-            Assert.AreEqual(RequirementStateOfCompliance.Calculating, this.parametricConstraintRowViewModel.RequirementStateOfCompliance);
-
-            await Task.Delay(1000).ContinueWith(_ => Assert.AreEqual(RequirementStateOfCompliance.Pass, this.parametricConstraintRowViewModel.RequirementStateOfCompliance));
+            Assert.AreEqual(RequirementStateOfCompliance.Pass, this.parametricConstraintRowViewModel.RequirementStateOfCompliance);
         }
     }
 }

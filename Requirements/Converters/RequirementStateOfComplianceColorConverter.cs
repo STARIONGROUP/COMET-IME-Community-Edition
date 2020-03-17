@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementStateOfComplianceColorConverter.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // <summary>
 //   Defines the RequirementStateOfComplianceConverter type.
@@ -14,6 +14,8 @@ namespace CDP4Requirements.Converters
     using System.Windows.Data;
 
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.Utilities;
 
     using CDP4RequirementsVerification;
 
@@ -46,15 +48,15 @@ namespace CDP4Requirements.Converters
                 switch (relationalOperatorKind)
                 {
                     case RequirementStateOfCompliance.Failed:
-                        color = "#FFD9DA";
+                        color = CDP4Color.Failed.GetHexValue();
                         break;
 
                     case RequirementStateOfCompliance.Pass:
-                        color = "#C4FFBD";
+                        color = CDP4Color.Succeeded.GetHexValue();
                         break;
 
                     case RequirementStateOfCompliance.Inconclusive:
-                        color = "#FDFDBF";
+                        color = CDP4Color.Inconclusive.GetHexValue();
                         break;
                 }
             }

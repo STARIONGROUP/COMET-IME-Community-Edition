@@ -50,16 +50,20 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.5.1.0\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=5.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.5.1.1-2020.3.13.1\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=5.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.5.1.1\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=5.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.5.1.2-2020.3.13.1\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CDP4JsonSerializer-CE.4.0.1\lib\net452\CDP4JsonSerializer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CDP4RequirementsVerification, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4RequirementsVerification-CE.0.1.1-2020.3.13.1\lib\net452\CDP4RequirementsVerification.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
@@ -367,7 +371,10 @@
     <Compile Include="StaticPanelViewModel.cs" />
     <Compile Include="Mvvm\Types\ReactiveListExtension.cs" />
     <Compile Include="Attributes\DescribeExportAttribute.cs" />
+    <Compile Include="Utilities\CDP4Color.cs" />
     <Compile Include="Utilities\CultureInfoUtility.cs" />
+    <Compile Include="Utilities\CDP4ColorExtensions.cs" />
+    <Compile Include="Utilities\RequirementStateOfComplianceExtensions.cs" />
     <Compile Include="Utilities\UriConfig.cs" />
     <Compile Include="Utilities\IconUtilities.cs" />
     <Compile Include="Utilities\AppliedTheme.cs" />

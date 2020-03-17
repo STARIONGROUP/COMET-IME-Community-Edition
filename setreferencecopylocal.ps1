@@ -11,7 +11,7 @@ dir -Recurse *.csproj | `
 
             foreach($reference in $references.ChildNodes)
             {
-                if (($reference.Include -like '*CDP4Common*') -or ($reference.Include -like '*CDP4JsonSerializer*') -or ($reference.Include -like '*CDP4Dal*') -or ($reference.Include -like '*Microsoft.Practices.ServiceLocation*') -or ($reference.Include -like '*NLog*') -or ($reference.Include -like '*Newtonsoft.Json*'))
+                if (($reference.Include -like '*CDP4RequirementsVerification*') -or ($reference.Include -like '*CDP4Common*') -or ($reference.Include -like '*CDP4JsonSerializer*') -or ($reference.Include -like '*CDP4Dal*') -or ($reference.Include -like '*Microsoft.Practices.ServiceLocation*') -or ($reference.Include -like '*NLog*') -or ($reference.Include -like '*Newtonsoft.Json*'))
                 {
                     if($reference.Private -eq $null)
                     {
