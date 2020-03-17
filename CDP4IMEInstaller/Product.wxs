@@ -32,7 +32,7 @@
       <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_452_OR_LATER_INSTALLED]]>
     </Condition>
 
-    <Feature Id="CDP4IMEFeature" Absent="disallow" Title="CDP4 IME" Level="1" ConfigurableDirectory="BIN" InstallDefault="local" TypicalDefault="install">
+    <Feature Id="CDP4IMEFeature" Absent="disallow" Title="CDP4 IME" Level="1" ConfigurableDirectory="BIN" AllowAdvertise="no" InstallDefault="local" TypicalDefault="install">
       <ComponentGroupRef Id="PRISM" />
       <ComponentGroupRef Id="DEPENDENCIES" />
       <ComponentGroupRef Id="CDP4IME" />
@@ -44,79 +44,79 @@
       <ComponentRef Id="DesktopShortcutCDP4CE"/>
     </Feature>
 
-    <Feature Id="CDP4WSPDALPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Wsp Dal Plugin" Level="1" >
+    <Feature Id="CDP4WSPDALPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Wsp Dal Plugin" Level="1" >
       <ComponentGroupRef Id="WSPDAL_CG" />
     </Feature>
 
-    <Feature Id="CDP4SERVICESDAL" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Services Dal Plugin" Level="1" >
+    <Feature Id="CDP4SERVICESDAL" TypicalDefault="install" InstallDefault="local" Absent="disallow" AllowAdvertise="no" Title="CDP4 Services Dal Plugin" Level="1" >
       <ComponentGroupRef Id="CDP4SERVICESDAL_CG" />
     </Feature>
     
-    <Feature Id="CDP4JSONFILEDALPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Json File Dal Plugin" Level="1" >
+    <Feature Id="CDP4JSONFILEDALPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Json File Dal Plugin" Level="1" >
       <ComponentGroupRef Id="JSONFILEDAL_CG" />
     </Feature>
     
-    <Feature Id="CDP4ADDINPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Office Addin" Level="1" ConfigurableDirectory="BIN">
+    <Feature Id="CDP4ADDINPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Office Addin" Level="1" ConfigurableDirectory="BIN">
       <ComponentGroupRef Id="CDP4ADDIN" />
     </Feature>
 
-    <Feature Id="CDP4DASHBOARDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Dashboard Plugin" Level="1" >
+    <Feature Id="CDP4DASHBOARDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Dashboard Plugin" Level="1" >
       <ComponentGroupRef Id="CDP4DASHBOARD_CG" />
     </Feature>
 
-    <Feature Id="PARAMETERSHEETGENERATOR" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Parameter Sheet Generator Plugin" Level="1" >
+    <Feature Id="PARAMETERSHEETGENERATOR" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Parameter Sheet Generator Plugin" Level="1" >
       <ComponentGroupRef Id="PARAMETERSHEETGENERATOR_CG" />
     </Feature>
     
-    <Feature Id="SITEDIRECTORYPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Site Directory Plugin" Level="1" >
+    <Feature Id="SITEDIRECTORYPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Site Directory Plugin" Level="1" >
       <ComponentGroupRef Id="SITEDIRECTORY_CG" />
     </Feature>
 
-    <Feature Id="OBJECTBROWSERPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Object Browser Plugin" Level="1" >
+    <Feature Id="OBJECTBROWSERPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Object Browser Plugin" Level="1" >
       <ComponentGroupRef Id="OBJECTBROWSER_CG" />
     </Feature>
 
-    <Feature Id="BASICRDLPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Basic RDL Plugin" Level="1" >
+    <Feature Id="BASICRDLPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Basic RDL Plugin" Level="1" >
       <ComponentGroupRef Id="BASICRDL_CG" />
     </Feature>
 
-    <Feature Id="ENGINEERINGMODELPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Engineering Model Plugin" Level="1" >
+    <Feature Id="ENGINEERINGMODELPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Engineering Model Plugin" Level="1" >
       <ComponentGroupRef Id="ENGINEERINGMODEL_CG" />
     </Feature>
 
-    <Feature Id="PRODUCTTREEPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Product Tree Plugin" Level="1" >
+    <Feature Id="PRODUCTTREEPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Product Tree Plugin" Level="1" >
       <ComponentGroupRef Id="PRODUCTTREE_CG" />
     </Feature>
     
-    <Feature Id="REQUIREMENTSPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Requirements Engineering Plugin" Level="1" >
+    <Feature Id="REQUIREMENTSPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Requirements Engineering Plugin" Level="1" >
       <ComponentGroupRef Id="REQUIREMENTS_CG" />
     </Feature>
 
-    <Feature Id="PROPERTYGRIDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Property Grid Plugin" Level="1" >
+    <Feature Id="PROPERTYGRIDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="disallow" AllowAdvertise="no" Title="CDP4 Property Grid Plugin" Level="1" >
       <ComponentGroupRef Id="PROPERTYGRID_CG" />
     </Feature>
 
-    <Feature Id="LOGINFOPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Logging Info Plugin" Level="1" >
+    <Feature Id="LOGINFOPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Logging Info Plugin" Level="1" >
       <ComponentGroupRef Id="LOGINFO_CG" />
     </Feature>
 
-    <Feature Id="BUILTINRULESPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 BuiltIn Rules Plugin" Level="1" >
+    <Feature Id="BUILTINRULESPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 BuiltIn Rules Plugin" Level="1" >
       <ComponentGroupRef Id="BUILTINRULES_CG" />
     </Feature>
 
-    <Feature Id="RELATIONSHIPEDITORPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Relationship Editor Plugin" Level="1" >
+    <Feature Id="RELATIONSHIPEDITORPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Relationship Editor Plugin" Level="1" >
       <ComponentGroupRef Id="RELATIONSHIPEDITOR_CG" />
     </Feature>
 
-    <Feature Id="SCRIPTINGPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Scripting Plugin" Level="1">
+    <Feature Id="SCRIPTINGPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Scripting Plugin" Level="1">
       <ComponentGroupRef Id="SCRIPTING_CG" />
     </Feature>
 
-    <Feature Id="RELATIONMATRIXPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Relationship Matrix Plugin" Level="1">
+    <Feature Id="RELATIONMATRIXPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Relationship Matrix Plugin" Level="1">
       <ComponentGroupRef Id="RELATIONSHIPMATRIX_CG" />
     </Feature>
     
-    <Feature Id="BUDGETPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" Title="CDP4 Budget Plugin" Level="1">
+    <Feature Id="BUDGETPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Budget Plugin" Level="1">
       <ComponentGroupRef Id="BUDGET_CG" />
     </Feature>
 
