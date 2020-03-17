@@ -272,7 +272,7 @@
       </Component>
 
       <Component Id="_E6E58CD0325B" Guid="{794F805A-F925-48E3-9495-E6E58CD0325B}" Location="local" Win64="$(var.Win64)">
-        <File Id="_794F805A" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Charts.v19.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_794F805A" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Charts.v19.2.dll" KeyPath="yes"></File>
       </Component>
 
     </ComponentGroup>
