@@ -31,11 +31,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CDP4Common, Version=5.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.5.1.1-2020.3.13.1\lib\net452\CDP4Common.dll</HintPath>
+      <HintPath>..\packages\CDP4Common-CE.5.1.1-2020.3.18.1\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4Dal, Version=5.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.5.1.2-2020.3.13.1\lib\net452\CDP4Dal.dll</HintPath>
+      <HintPath>..\packages\CDP4Dal-CE.5.1.2-2020.3.18.1\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
