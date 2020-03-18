@@ -129,7 +129,7 @@
                                      SelectedItem="{Binding SelectedActualState,
                                                             Mode=TwoWay,
                                                             UpdateSourceTrigger=PropertyChanged}"
-                                     IsEnabled="{Binding IsValueSetEditable}"
+                                     IsEnabled="{Binding IsActualFiniteStatesListValid}"
                                      SelectionMode="Row">
                             <dxg:GridControl.View>
                                 <dxg:TableView Name="ActualFiniteStateView"
