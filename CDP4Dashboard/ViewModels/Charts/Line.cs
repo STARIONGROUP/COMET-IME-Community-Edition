@@ -45,7 +45,7 @@ namespace CDP4Dashboard.ViewModels.Charts
         {
             yield return new[]
             {
-                this.RevisionNumber.ToString(),
+                this.RevisionNumber,
                 this.Value
             };
         }
