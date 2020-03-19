@@ -27,19 +27,22 @@ namespace CDP4AddinCE
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
+
     using CDP4AddinCE.Settings;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.AppSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4ShellDialogs.ViewModels;
-    using Microsoft.Practices.ServiceLocation;
+
     using NLog;
 
     /// <summary>
@@ -59,6 +62,11 @@ namespace CDP4AddinCE
         private ISession session;
 
         /// <summary>
+        /// The <see cref="IAppSettingsService{AddinAppSettings}"/> used to load application settings for the Addin 
+        /// </summary>
+        private readonly IAppSettingsService<AddinAppSettings> appSettingService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AddinRibbonPart"/> class.
         /// </summary>
         /// <param name="order">
@@ -72,11 +80,14 @@ namespace CDP4AddinCE
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
+        /// <param name="appSettingService">
+        /// The <see cref="IAppSettingsService{AddinAppSettings}"/> used to load application settings for the Addin
+        /// </param>
         public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IAppSettingsService<AddinAppSettings> appSettingService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
-            this.AppSettingService = appSettingService;
+            this.appSettingService = appSettingService;
         }
 
         /// <summary>
@@ -90,39 +101,32 @@ namespace CDP4AddinCE
         /// </param>        
         public override async Task OnAction(string ribbonControlId, string ribbonControlTag = "")
         {
-            IDialogNavigationService dialogService;
-
             switch (ribbonControlId)
             {
                 case "CDP4_Open":
-                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
-                    var dataSelection = new DataSourceSelectionViewModel(dialogService);
-                    var dataSelectionResult = dialogService.NavigateModal(dataSelection) as DataSourceSelectionResult;
+                    var dataSelection = new DataSourceSelectionViewModel(this.DialogNavigationService);
+                    var dataSelectionResult = this.DialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
                     break;
                 case "CDP4_Close":
                     await this.session.Close();
                     break;
                 case "CDP4_ProxySettings":
-                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
                     var proxyServerViewModel = new ProxyServerViewModel();
-                    var proxyServerViewModelResult = dialogService.NavigateModal(proxyServerViewModel) as DataSourceSelectionResult;
+                    var proxyServerViewModelResult = this.DialogNavigationService.NavigateModal(proxyServerViewModel) as DataSourceSelectionResult;
                     break;
                 case "CDP4_SelectModelToOpen":
-                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
                     var sessionsOpening = new List<ISession> { this.session };
                     var modelOpeningDialogViewModel = new ModelOpeningDialogViewModel(sessionsOpening);
-                    var modelOpeningDialogViewModelResult = dialogService.NavigateModal(modelOpeningDialogViewModel) as DataSourceSelectionResult;
+                    var modelOpeningDialogViewModelResult = this.DialogNavigationService.NavigateModal(modelOpeningDialogViewModel) as DataSourceSelectionResult;
                     break;
                 case "CDP4_SelectModelToClose":
-                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
                     var sessionsClosing = new List<ISession> { this.session };
                     var modelClosingDialogViewModel = new ModelClosingDialogViewModel(sessionsClosing);
-                    var modelClosingDialogViewModelResult = dialogService.NavigateModal(modelClosingDialogViewModel) as DataSourceSelectionResult;
+                    var modelClosingDialogViewModelResult = this.DialogNavigationService.NavigateModal(modelClosingDialogViewModel) as DataSourceSelectionResult;
                     break;
                 case "CDP4_Plugins":
-                    dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
-                    var modelPluginDialogViewModel = new PluginManagerViewModel<AddinAppSettings>(this.AppSettingService);
-                    var modelPluginDialogResult = dialogService.NavigateModal(modelPluginDialogViewModel) as DataSourceSelectionResult;
+                    var modelPluginDialogViewModel = new PluginManagerViewModel<AddinAppSettings>(this.appSettingService);
+                    var modelPluginDialogResult = this.DialogNavigationService.NavigateModal(modelPluginDialogViewModel) as DataSourceSelectionResult;
                     break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
@@ -209,10 +213,5 @@ namespace CDP4AddinCE
                 this.session = null;
             }
         }
-
-        /// <summary>
-        /// Holds the application settings retrieved from json config file
-        /// </summary>
-        public IAppSettingsService<AddinAppSettings> AppSettingService { get; set; }
     }
 }

@@ -37,16 +37,21 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services.AppSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
     using CDP4Dal.Events;
+
     using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -65,6 +70,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
         private Mock<ISession> session;
         private Assembler assembler;
         private Mock<IAppSettingsService<AddinAppSettings>> appSettingService;
+        private SiteDirectory siteDirectory;
 
         [SetUp]
         public void SetUp()
@@ -73,10 +79,13 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
 
             this.uri = new Uri("http://www.rheageoup.com");
             this.assembler = new Assembler(this.uri);
+            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, new Uri("http://test.com"));
 
             this.session = new Mock<ISession>();
-            var siteDirectory = new Lazy<Thing>(() => new SiteDirectory(Guid.NewGuid(), null, new Uri("http://test.com")));
-            this.assembler.Cache.GetOrAdd(new CacheKey(siteDirectory.Value.Iid, null), siteDirectory);
+            var LazySiteDirectory = new Lazy<Thing>(() => this.siteDirectory);
+            this.assembler.Cache.GetOrAdd(new CacheKey(LazySiteDirectory.Value.Iid, null), LazySiteDirectory);
+
+            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
             this.session.Setup(x => x.DataSourceUri).Returns("test");
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             var iterationDictionary = new Dictionary<CDP4Common.EngineeringModelData.Iteration, Tuple<CDP4Common.SiteDirectoryData.DomainOfExpertise, CDP4Common.SiteDirectoryData.Participant>>();
@@ -89,18 +98,16 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.serviceLocator = new Mock<IServiceLocator>();
 
-            this.amountOfRibbonControls = 9;
-            this.order = 1;
-
-            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, null, null, this.appSettingService.Object);
-
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
-            this.serviceLocator.Setup(x => x.GetInstance<IDialogNavigationService>())
-                .Returns(this.dialogNavigationService.Object);
 
             var dals = new List<Lazy<IDal, IDalMetaData>>();
             var availableDals = new AvailableDals(dals);
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>()).Returns(availableDals);
+
+            this.amountOfRibbonControls = 9;
+            this.order = 1;
+
+            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, this.dialogNavigationService.Object, null, this.appSettingService.Object);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -201,6 +208,17 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
         public async Task Verify_that_when_proxyserver_on_action_dialogisnavigated()
         {
             await this.ribbonPart.OnAction("CDP4_ProxySettings");
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
+        }
+
+        [Test]
+        public async Task Verify_that_when_On_Action_CDP4_SelectModelToOpen_NavigatesTo_ModelOpeningDialogViewModel()
+        {
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
+
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
         }
     }

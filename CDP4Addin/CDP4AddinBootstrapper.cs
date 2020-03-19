@@ -26,22 +26,16 @@
 namespace CDP4AddinCE
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using System.Windows;
 
-    using CDP4Composition.Attributes;
-    using CDP4Composition.Services.AppSettingService;
-    using CDP4AddinCE.Settings;
-
-    using DevExpress.Utils;
+    using CDP4Composition.Modularity;
 
     using Microsoft.Practices.Prism.MefExtensions;
-    using Microsoft.Practices.Prism.Modularity;
-    using Microsoft.Practices.ServiceLocation;
+
     using NLog;
 
     /// <summary>
@@ -59,11 +53,6 @@ namespace CDP4AddinCE
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// the path if the running assembly
-        /// </summary>
-        private string currentAssemblyPath;
-
-        /// <summary>
         /// Creates the shell or main window of the application.
         /// </summary>
         /// <returns>null due to the fact there is no shell in the addin</returns>
@@ -77,13 +66,9 @@ namespace CDP4AddinCE
         /// </summary>
         protected override void InitializeShell()
         {
-            base.InitializeShell();
-
-            var appSettingsService = this.Container.GetExportedValue<IAppSettingsService<AddinAppSettings>>();
-
             logger.Log(LogLevel.Debug, "Loading CDP4 Plugins");
 
-            var pluginLoader = new AddinPluginLoader(appSettingsService);
+            var pluginLoader = new PluginLoader();
 
             foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
             {
@@ -92,9 +77,9 @@ namespace CDP4AddinCE
                 logger.Log(LogLevel.Debug, $"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
 
-            this.SaveSettings(appSettingsService, pluginLoader.NewPlugins);
-
             logger.Log(LogLevel.Debug, $"{pluginLoader.DirectoryCatalogues.Count} CDP4 Plugins Loaded");
+
+            base.InitializeShell();
         }
 
         /// <summary>
@@ -103,9 +88,9 @@ namespace CDP4AddinCE
         protected override void ConfigureAggregateCatalog()
         {
             base.ConfigureAggregateCatalog();
-            this.currentAssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var currentAssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            if (this.currentAssemblyPath == null)
+            if (currentAssemblyPath == null)
             {
                 throw new InvalidOperationException("Cannot find directory path for " + Assembly.GetExecutingAssembly().FullName);
             }
@@ -114,33 +99,10 @@ namespace CDP4AddinCE
             sw.Start();
             logger.Debug("Loading CDP4 Catalogs");
 
-            var dllCatalog = new DirectoryCatalog(path: this.currentAssemblyPath, searchPattern: "CDP4*.dll");
+            var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");
             this.AggregateCatalog.Catalogs.Add(dllCatalog);
 
             logger.Debug("CDP4 Catalogs loaded in: {0} [ms]", sw.ElapsedMilliseconds);
-        }
-
-        /// <summary>
-        /// Save the application settings when new plugins are loaded
-        /// </summary>
-        private void SaveSettings(IAppSettingsService<AddinAppSettings> appSettingsService, ICollection<string> newPlugins)
-        {
-            var modules = ServiceLocator.Current.GetAllInstances<IModule>();
-
-            foreach (var module in modules)
-            {
-                var pluginSettings = new PluginSettingsMetaData(module, newPlugins);
-
-                if (!string.IsNullOrEmpty(pluginSettings.Key))
-                {
-                    appSettingsService.AppSettings.Plugins.Add(pluginSettings);
-                }
-            }
-
-            if (appSettingsService.AppSettings.Plugins.Count > 0)
-            {
-                appSettingsService.Save();
-            }
         }
     }
 }

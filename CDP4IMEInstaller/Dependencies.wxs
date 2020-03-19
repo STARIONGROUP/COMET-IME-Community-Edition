@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
+  <!--Components are listed in alphabetical order using the name of the dll-->
+
   <?include variables.wxi ?>
 
 	<Fragment>
     <ComponentGroup Id="DEPENDENCIES" Directory="BIN">
 
+      <Component Id="comp_ExceptionReporter_WinForms" Guid="{DDBBAB53-5E15-4461-85BB-4B0456A090F6}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_ExceptionReporter_WinForms" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)ExceptionReporter.WinForms.dll" KeyPath="yes" />
+      </Component>
+
       <Component Id="comp_Hardcodet_Wpf_TaskbarNotification" Guid="{71968271-91D9-4BE8-9B53-0637495B0157}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_Hardcodet_Wpf_TaskbarNotification" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Hardcodet.Wpf.TaskbarNotification.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="comp_ExceptionReporter_WinForms" Guid="{DDBBAB53-5E15-4461-85BB-4B0456A090F6}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_ExceptionReporter_WinForms" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)ExceptionReporter.WinForms.dll" KeyPath="yes" />
+      <Component Id="_7D7C7995B7FC" Guid="{DE458569-7B72-45C5-A2A2-7D7C7995B7FC}" Location="local" Win64="$(var.Win64)">
+        <File Id="_DE458569"  Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Markdown.Xaml.dll" KeyPath="yes"></File>
       </Component>
 
       <Component Id="comp_Newtonsoft_Json" Guid="{92569C63-3D66-4F94-83CA-B81D0CB55958}" Location="local" Win64="$(var.Win64)">
@@ -46,17 +52,26 @@
         <File Id="fil_System_Reactive_PlatformServices" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Reactive.PlatformServices.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="comp_System_ValueTuple" Guid="{D1C5CC93-8E1F-491B-A6D7-BC80F14B238C}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_ValueTuple" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.ValueTuple.dll" KeyPath="yes" />
-      </Component>
-
       <Component Id="comp_System_Reactive_Windows_Threading" Guid="{EAC298A2-DFE1-4481-BE63-2250A767D399}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_System_Reactive_Windows_Threading" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Reactive.Windows.Threading.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_System_Runtime_CompilerServices_Unsafe" Guid="{69698B74-9B9D-455F-84DC-76CEAF803657}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_System_Runtime_CompilerServices_Unsafe" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_System_Threading_Tasks_Extensions" Guid="{4759486C-4B80-44FB-B814-EDF847F97634}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_System_Threading_Tasks_Extensions" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_System_ValueTuple" Guid="{D1C5CC93-8E1F-491B-A6D7-BC80F14B238C}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_System_ValueTuple" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.ValueTuple.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="comp_System_Windows_Interactivity" Guid="{D4434DAD-D0BF-46FF-BEAD-250FAD669AC6}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_System_Windows_Interactivity" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Windows.Interactivity.dll" KeyPath="yes" />
       </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>

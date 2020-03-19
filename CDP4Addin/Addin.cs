@@ -37,23 +37,30 @@ namespace CDP4AddinCE
 
     using CDP4AddinCE.Settings;
     using CDP4AddinCE.Utils;
+
     using CDP4Composition;
-    using CDP4Composition.Exceptions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.AppSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4OfficeInfrastructure;
+    
     using DevExpress.Xpf.Core;
+    
     using Microsoft.Practices.ServiceLocation;
 
     using NetOffice.ExcelApi.Tools;
     using NetOffice.Tools;
+    
     using NLog;
+    
     using ReactiveUI;
+    
     using MessageBox = System.Windows.Forms.MessageBox;
 
     /// <summary>
@@ -581,7 +588,7 @@ namespace CDP4AddinCE
             catch (Exception ex)
             {
                 logger.Fatal(ex, "Bootstrapper exception: ");
-                Utils.Dialog.ShowError(ex, "Unexpected state in CDP4-CE.Addin");
+                this.Utils.Dialog.ShowError(ex, "Unexpected state in CDP4-CE.Addin");
             }
         }
 
@@ -665,7 +672,6 @@ namespace CDP4AddinCE
         /// </summary>
         private void InitializeMefImports()
         {
-            // IFluentRibbonManager
             var panelNavigationService = ServiceLocator.Current.GetInstance<IPanelNavigationService>();
             this.FluentRibbonManager = ServiceLocator.Current.GetInstance<IFluentRibbonManager>();
             var thingDialogNavigationService = ServiceLocator.Current.GetInstance<IThingDialogNavigationService>();
@@ -678,7 +684,6 @@ namespace CDP4AddinCE
             this.FluentRibbonManager.RegisterRibbonPart(ribbonpart);
             this.fluentRibbonXml = this.FluentRibbonManager.GetFluentXml();
 
-            // IOfficeApplicationWrapper
             this.officeApplicationWrapper = ServiceLocator.Current.GetInstance<IOfficeApplicationWrapper>();
         }
 

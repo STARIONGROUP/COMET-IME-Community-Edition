@@ -55,6 +55,7 @@
     <Compile Include="CDP4ServicesDal.wxs" />
     <Compile Include="CDP4Dashboard.wxs" />
     <Compile Include="Dependencies.wxs" />
+    <Compile Include="DevExpress.wxs" />
     <Compile Include="EngineeringModelPlugin.wxs" />
     <Compile Include="CDP4BuiltInRules.wxs" />
     <Compile Include="ParameterSheetGeneratorPlugin.wxs" />

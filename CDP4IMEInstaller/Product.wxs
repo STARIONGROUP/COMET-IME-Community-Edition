@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
-  <Product Id="*" Name="CDP4-CE" Language="1033" Version="6.0.0.0" Manufacturer="RHEA System S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
+  <Product Id="*" Name="CDP4-CE" Language="1033" Version="6.0.0.2" Manufacturer="RHEA System S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
 
     <?include variables.wxi ?>
 
@@ -35,6 +35,7 @@
     <Feature Id="CDP4IMEFeature" Absent="disallow" Title="CDP4 IME" Level="1" ConfigurableDirectory="BIN" AllowAdvertise="no" InstallDefault="local" TypicalDefault="install">
       <ComponentGroupRef Id="PRISM" />
       <ComponentGroupRef Id="DEPENDENCIES" />
+      <ComponentGroupRef Id="DEVEXPRESS" />
       <ComponentGroupRef Id="CDP4IME" />
       <ComponentGroupRef Id="THIRDPARTYLICENSES" />
       <ComponentGroupRef Id="RESOURCEIMAGES" />

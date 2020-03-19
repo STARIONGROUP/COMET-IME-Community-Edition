@@ -5,9 +5,15 @@
 
   <Fragment>
     <ComponentGroup Id="RELATIONSHIPMATRIX_CG" Directory="RELATIONSHIPMATRIX">
+
       <Component Id="comp_RelationshipMatrix" Guid="{E64C24C8-615F-420A-B06A-FEABCF31A002}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_RelationshipMatrix"  Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetPath)" KeyPath="yes"></File>
       </Component>
+
+      <Component Id="comp_RelationshipMatrix_csvhelper" Guid="{27D4ACFF-E6FF-48C7-B7A0-6C3D4160AA13}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_RelationshipMatrix_csvhelper" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)CsvHelper.dll" KeyPath="yes" />
+      </Component>
+
     </ComponentGroup>
 	</Fragment>
 </Wix>

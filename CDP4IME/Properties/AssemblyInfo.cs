@@ -47,5 +47,5 @@ using System.Windows;
 [assembly: ComVisible(false)]
 
 
-[assembly: AssemblyVersion("6.0.0.0")]
-[assembly: AssemblyFileVersion("6.0.0.0")]
+[assembly: AssemblyVersion("6.0.0.2")]
+[assembly: AssemblyFileVersion("6.0.0.2")]

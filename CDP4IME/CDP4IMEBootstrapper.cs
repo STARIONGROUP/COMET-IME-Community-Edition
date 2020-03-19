@@ -1,13 +1,31 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CDP4IMEBootstrapper.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4IME
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics;
     using System.IO;
@@ -15,6 +33,7 @@ namespace CDP4IME
     using System.Windows;
 
     using CDP4Composition.Adapters;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
 
     using DevExpress.Xpf.Core;
@@ -22,13 +41,9 @@ namespace CDP4IME
     using DevExpress.Xpf.Ribbon;
 
     using Microsoft.Practices.Prism.MefExtensions;
-    using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
-    using Microsoft.Practices.ServiceLocation;
 
     using NLog;
-    using CDP4Composition.Services.AppSettingService;
-    using CDP4IME.Settings;
 
     /// <summary>
     /// The Class that provides the bootstrapping sequence that registers all the 
@@ -47,11 +62,6 @@ namespace CDP4IME
         private string state;
 
         /// <summary>
-        /// the path if the running assembly
-        /// </summary>
-        private string currentAssemblyPath;
-
-        /// <summary>
         /// Creates the shell or main window of the application.
         /// </summary>
         /// <returns>The shell of the application.</returns>
@@ -66,23 +76,23 @@ namespace CDP4IME
         /// </summary>
         protected override void InitializeShell()
         {
-            var appSettingsService = this.Container.GetExportedValue<IAppSettingsService<ImeAppSettings>>();
-
             this.UpdateBootstrapperState("Loading CDP4 Plugins");
-            var pluginCatalog = new CDP4PluginLoader(appSettingsService);
-            foreach (var directoryCatalog in pluginCatalog.DirectoryCatalogues)
+
+            var pluginLoader = new PluginLoader();
+
+            foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
             {
                 this.AggregateCatalog.Catalogs.Add(directoryCatalog);
 
                 this.UpdateBootstrapperState($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
 
-            this.SaveSettings(appSettingsService, pluginCatalog.NewPlugins);
-
-            this.UpdateBootstrapperState($"{pluginCatalog.DirectoryCatalogues.Count} CDP4 Plugins Loaded");
+            this.UpdateBootstrapperState($"{pluginLoader.DirectoryCatalogues.Count} CDP4 Plugins Loaded");
 
             this.UpdateBootstrapperState("Initializing the Shell");
+
             base.InitializeShell();
+            
             var shell = (Shell)this.Shell;
             var dialogNavigationService = this.Container.GetExportedValue<IDialogNavigationService>();
 
@@ -90,6 +100,7 @@ namespace CDP4IME
 
             this.UpdateBootstrapperState("Setting up Regions");
             var regionmanager = this.Container.GetExportedValue<IRegionManager>();
+
             foreach (var region in regionmanager.Regions)
             {
                 this.UpdateBootstrapperState($"Loaded Region: {region.Name} ");
@@ -106,9 +117,9 @@ namespace CDP4IME
             this.UpdateBootstrapperState("Configuring catalogs");
 
             base.ConfigureAggregateCatalog();
-            this.currentAssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var currentAssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            if (this.currentAssemblyPath == null)
+            if (currentAssemblyPath == null)
             {
                 throw new InvalidOperationException("Cannot find directory path for " + Assembly.GetExecutingAssembly().FullName);
             }
@@ -117,12 +128,11 @@ namespace CDP4IME
             sw.Start();
             this.UpdateBootstrapperState("Loading CDP4 Catalogs");
 
-            var dllCatalog = new DirectoryCatalog(path: this.currentAssemblyPath, searchPattern: "CDP4*.dll");
+            var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");
             this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4IMEBootstrapper).Assembly));
             this.AggregateCatalog.Catalogs.Add(dllCatalog);
 
-            var message = $"CDP4 Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]";
-            this.UpdateBootstrapperState(message);
+            this.UpdateBootstrapperState($"CDP4 Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
         }
 
         /// <summary>
@@ -158,29 +168,6 @@ namespace CDP4IME
             this.state = message;
             logger.Debug(this.state);
             DXSplashScreen.SetState(this.state);
-        }
-
-        /// <summary>
-        /// Save the application settings when new plugins are loaded
-        /// </summary>
-        private void SaveSettings(IAppSettingsService<ImeAppSettings> appSettingsService, ICollection<string> newPlugins)
-        {
-            var modules = ServiceLocator.Current.GetAllInstances(typeof(IModule));
-
-            foreach (var module in modules)
-            {
-                var pluginSettings = new PluginSettingsMetaData((IModule)module, newPlugins);
-
-                if (!string.IsNullOrEmpty(pluginSettings.Key))
-                {
-                    appSettingsService.AppSettings.Plugins.Add(pluginSettings);
-                }
-            }
-
-            if (appSettingsService.AppSettings.Plugins.Count > 0)
-            {
-                appSettingsService.Save();
-            }
         }
     }
 }
