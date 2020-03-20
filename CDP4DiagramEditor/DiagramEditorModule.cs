@@ -1,19 +1,24 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CDP4BuiltInRulesModule.cs" company="RHEA S.A.">
-//   Copyright (c) 2015 RHEA S.A.
+//   Copyright (c) 2015-2020 RHEA S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor
 {
     using System.ComponentModel.Composition;
+
+    using Microsoft.Practices.Prism.Modularity;
+    using Microsoft.Practices.Prism.Regions;
+
     using Views;
+
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using Microsoft.Practices.Prism.Modularity;
-    using Microsoft.Practices.Prism.Regions;
+
+    using CDP4DiagramEditor.Views.ContextualRibbonPages;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="CDP4DiagramEditorModule"/> Component
@@ -76,6 +81,8 @@ namespace CDP4DiagramEditor
         public void Initialize()
         {
             this.RegionManager.RegisterViewWithRegion(CDP4Composition.RegionNames.RibbonRegion, typeof(CDP4DiagramEditorRibbon));
+            this.RegionManager.RegisterViewWithRegion(CDP4Composition.RegionNames.RibbonRegion, typeof(DiagramToolsRibbonPage));
+            this.RegionManager.RegisterViewWithRegion(CDP4Composition.RegionNames.RibbonRegion, typeof(DiagramDesignRibbonPage));
         }
     }
 }

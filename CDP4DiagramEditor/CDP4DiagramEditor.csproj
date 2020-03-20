@@ -168,6 +168,12 @@
     <Compile Include="ViewModels\DiagramDialogViewModel.cs" />
     <Compile Include="ViewModels\DiagramEdgeViewModel.cs" />
     <Compile Include="ViewModels\DiagramObjectViewModel.cs" />
+    <Compile Include="Views\ContextualRibbonPages\DiagramDesignRibbonPage.xaml.cs">
+      <DependentUpon>DiagramDesignRibbonPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ContextualRibbonPages\DiagramToolsRibbonPage.xaml.cs">
+      <DependentUpon>DiagramToolsRibbonPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\DiagramDialog.xaml.cs">
       <DependentUpon>DiagramDialog.xaml</DependentUpon>
     </Compile>
@@ -182,6 +188,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\ContextualRibbonPages\DiagramDesignRibbonPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ContextualRibbonPages\DiagramToolsRibbonPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\DiagramDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -214,6 +228,7 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
