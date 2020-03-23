@@ -187,11 +187,11 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(this.elementDef.ContainedElement.First().ParameterOverride.First().Parameter);
 
-            Assert.AreEqual(0, vm.Widgets.Count);
+            Assert.AreEqual(1, vm.Widgets.Count);
 
             await vm.Drop(dropinfo.Object);
 
-            Assert.AreEqual(1, vm.Widgets.Count);
+            Assert.AreEqual(2, vm.Widgets.Count);
         }
 
         [Test]
