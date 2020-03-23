@@ -12,7 +12,6 @@ namespace CDP4Dashboard.ViewModels
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Threading;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -48,6 +47,11 @@ namespace CDP4Dashboard.ViewModels
         private const string PanelCaption = "Dashboard";
 
         /// <summary>
+        /// Used for lock() in <see cref="ResizeControlsInternal"/> so only 1 resize action is allowed at a time
+        /// </summary>
+        private object resizeLocker = new object();
+
+        /// <summary>
         /// The default widget width
         /// </summary>
         private const double widgetWidth = 250;
@@ -61,11 +65,6 @@ namespace CDP4Dashboard.ViewModels
         /// The default widget margin used for calculations
         /// </summary>
         private const double widgetMargin = 50;
-
-        /// <summary>
-        /// Holds a <see cref="DispatcherOperation"/> when one is pending
-        /// </summary>
-        private DispatcherOperation currentOperation;
 
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -156,7 +155,10 @@ namespace CDP4Dashboard.ViewModels
         /// <summary>
         /// Sets properties based on the current Main <see cref="Orientation"/>
         /// </summary>
-        private void OnOrientationChange(Orientation orientation) => this.MaximizedElementPosition = orientation == Orientation.Horizontal ? MaximizedElementPosition.Left : MaximizedElementPosition.Top;
+        private void OnOrientationChange(Orientation orientation)
+        {
+            this.MaximizedElementPosition = orientation == Orientation.Horizontal ? MaximizedElementPosition.Left : MaximizedElementPosition.Top;
+        }
 
         /// <summary>
         /// Adds a widget to the UI
@@ -188,7 +190,7 @@ namespace CDP4Dashboard.ViewModels
 
             this.Disposables.Add(iterationTrackParameterViewModel.OnDeleteCommand.Subscribe(x => this.RemoveWidget(iterationTrackParameterViewModel)));
 
-            this.Widgets.Insert(this.Widgets.Count - 1, this.GetIterationTrackWidget(iterationTrackParameterViewModel));
+            this.Widgets.Insert(Math.Max(this.Widgets.Count - 1, 0), this.GetIterationTrackWidget(iterationTrackParameterViewModel));
             this.ResizeControls();
         }
 
@@ -243,10 +245,7 @@ namespace CDP4Dashboard.ViewModels
 
             if (tile != null)
             {
-                var newTile = this.GetIterationTrackWidget(newMaximizedIterationTrackParameterViewModel);
-
-                this.Widgets[this.Widgets.IndexOf(tile)] = newTile;
-                this.MaximizedElement = newTile;
+                this.MaximizedElement = tile;
             }
         }
 
@@ -255,11 +254,6 @@ namespace CDP4Dashboard.ViewModels
         /// </summary>
         private void ResizeControls()
         {
-            if (this.currentOperation?.Status == DispatcherOperationStatus.Pending)
-            {
-                this.currentOperation.Abort();
-            }
-
             if (this.currentMaximizedViewModel != null)
             {
                 this.MainOrientation = this.ActualWidth > this.ActualHeight ? Orientation.Horizontal : Orientation.Vertical;
@@ -269,7 +263,7 @@ namespace CDP4Dashboard.ViewModels
                 this.MainOrientation = Orientation.Vertical;
             }
 
-            this.currentOperation = Dispatcher.CurrentDispatcher.InvokeAsync(this.ResizeControlsInternal, DispatcherPriority.Background);
+            this.ResizeControlsInternal();
         }
 
         /// <summary>
@@ -277,40 +271,43 @@ namespace CDP4Dashboard.ViewModels
         /// </summary>
         private void ResizeControlsInternal()
         {
-            var totalHeight = this.ActualHeight;
-            var totalWidth = this.ActualWidth;
-
-            var dummyWidget = this.Widgets.SingleOrDefault(x => x is DummyParameterView);
-
-            if (dummyWidget == null)
+            lock (this.resizeLocker)
             {
-                dummyWidget = new DummyParameterView();
-                this.Widgets.Add(dummyWidget);
-            }
-            else
-            {
-                this.Widgets.Move(this.Widgets.IndexOf(dummyWidget), this.Widgets.Count - 1);
-            }
+                var totalHeight = this.ActualHeight;
+                var totalWidth = this.ActualWidth;
 
-            foreach (var tile in this.Widgets)
-            {
-                if (tile == this.MaximizedElement)
+                var dummyWidget = this.Widgets.SingleOrDefault(x => x is DummyParameterView);
+
+                if (dummyWidget == null)
                 {
-                    if (this.mainOrientation == Orientation.Horizontal)
-                    {
-                        tile.Height = Math.Max(totalHeight - widgetMargin, widgetHeight);
-                        tile.Width = Math.Max(totalWidth - (this.Widgets.Count > 1 ? widgetWidth + widgetMargin : widgetMargin), widgetWidth);
-                    }
-                    else
-                    {
-                        tile.Height = Math.Max(totalHeight - (this.Widgets.Count > 1 ? widgetHeight + widgetMargin : widgetMargin), widgetHeight);
-                        tile.Width = Math.Max(totalWidth - widgetMargin, widgetWidth);
-                    }
+                    dummyWidget = new DummyParameterView();
+                    this.Widgets.Add(dummyWidget);
                 }
                 else
                 {
-                    tile.Height = widgetHeight;
-                    tile.Width = widgetWidth;
+                    this.Widgets.Move(this.Widgets.IndexOf(dummyWidget), this.Widgets.Count - 1);
+                }
+
+                foreach (var tile in this.Widgets)
+                {
+                    if (tile == this.MaximizedElement)
+                    {
+                        if (this.mainOrientation == Orientation.Horizontal)
+                        {
+                            tile.Height = Math.Max(totalHeight - widgetMargin, widgetHeight);
+                            tile.Width = Math.Max(totalWidth - (this.Widgets.Count > 1 ? widgetWidth + widgetMargin : widgetMargin), widgetWidth);
+                        }
+                        else
+                        {
+                            tile.Height = Math.Max(totalHeight - (this.Widgets.Count > 1 ? widgetHeight + widgetMargin : widgetMargin), widgetHeight);
+                            tile.Width = Math.Max(totalWidth - widgetMargin, widgetWidth);
+                        }
+                    }
+                    else
+                    {
+                        tile.Height = widgetHeight;
+                        tile.Width = widgetWidth;
+                    }
                 }
             }
         }
