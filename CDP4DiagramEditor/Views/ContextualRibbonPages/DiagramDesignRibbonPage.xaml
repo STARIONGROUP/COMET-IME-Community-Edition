@@ -6,7 +6,8 @@
                         xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                         mc:Ignorable="d"
                         Caption="Diagram Design"
-                        CustomPageCategoryName="whatever"
+                        CustomPageCategoryName="DiagramCategory"
+                        IsInDefaultPageCategory="False"
                         IsVisible="True"
                         MergeOrder="8002">
 

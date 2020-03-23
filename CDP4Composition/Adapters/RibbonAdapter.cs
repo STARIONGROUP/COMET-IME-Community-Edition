@@ -114,6 +114,35 @@ namespace CDP4Composition.Adapters
                 {
                     this.ProcessRibbonPageGroups(ribbonPageGroups);
                 }
+
+                var ribbonPageCategories = this.region.Views.OfType<ExtendedRibbonPageCategory>().ToList();
+                if (ribbonPageCategories.Any())
+                {
+                   this.ProcessRibbonPageCategories(ribbonPageCategories);
+                }
+            }
+            /// <summary>
+            /// handles the addition of <see cref="ExtendedRibbonPageCategory"/> to the <see cref="RibbonControl"/>
+            /// </summary>
+            /// <param name="ribbonPageCategories">
+            /// The <see cref="ExtendedRibbonPageCategory"/>s that need to be added to the <see cref="RibbonControl"/>
+            /// </param>
+            private void ProcessRibbonPageCategories(List<ExtendedRibbonPageCategory> ribbonPageCategories)
+            {
+                foreach (var category in ribbonPageCategories)
+                {
+                    if (this.regionTarget.Items?.Any(cat => (cat as ExtendedRibbonPageCategory)?.Name == category.Name) == false)
+                    {
+                        //this.regionTarget.Categories.Add(category);
+                        this.regionTarget.Items.Add(category);
+
+                        logger.Debug("Category {0} added to RibbonControl", category.Name);
+                    }
+                    else
+                    {
+                        logger.Warn("Category {0} has already been added", category.Name);
+                    }
+                }
             }
 
             /// <summary>
@@ -181,9 +210,11 @@ namespace CDP4Composition.Adapters
                     else
                     {
                         var categoryName = ribbonPage.CustomPageCategoryName;
+
                         var customPageCategory =
-                            this.regionTarget.SelfCategories.OfType<RibbonPageCategory>()
-                                .SingleOrDefault(x => x.Name == categoryName);
+                            this.region.Views.OfType<ExtendedRibbonPageCategory>().ToList().FirstOrDefault(cat => cat.Name == categoryName);
+                            //this.regionTarget.SelfCategories.OfType<RibbonPageCategory>()
+                            //    .SingleOrDefault(x => x.Name == categoryName);
 
                         if (customPageCategory != null)
                         {

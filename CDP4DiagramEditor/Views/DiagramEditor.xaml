@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CDP4DiagramEditor.Views.DiagramEditor"
+<UserControl x:Class="CDP4DiagramEditor.Views.DiagramEditor"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -13,9 +13,22 @@
              xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
              xmlns:diagram="clr-namespace:CDP4CommonView.Diagram;assembly=CDP4CommonView"
              xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d"
+             
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding OnClosingCommand}"></i:InvokeCommandAction>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="LostFocus">
+            <i:InvokeCommandAction Command="{Binding OnClosingCommand}"></i:InvokeCommandAction>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="GotFocus">
+            <i:InvokeCommandAction Command="{Binding OnOpenCommand}"></i:InvokeCommandAction>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -76,7 +89,9 @@
             <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
                                         ToolboxVisibility="Closed"
                                         SaveCommand="{Binding SaveDiagramCommand}"
-                                        dxb:MergingProperties.ElementMergingBehavior="InternalWithInternal">
+                                        dxb:MergingProperties.ElementMergingBehavior="InternalWithInternal"
+                                        dxb:BarItemLinkActionBase.Target="DiagramCategory"
+                                        >
                 <diagram:Cdp4DiagramControl.Resources>
                     <ResourceDictionary>
                         <ControlTemplate x:Key="DiagramObjectTemplate">
@@ -121,12 +136,7 @@
                     <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}" PropertyName="IsVisible">
                         <system:Boolean>True</system:Boolean>
                     </dxb:UpdateAction>
-                    <dxb:UpdateAction ElementName="DiagramDesignRibbonPage" PropertyName="IsVisible">
-                        <system:Boolean>True</system:Boolean>
-                    </dxb:UpdateAction>
-                    <dxb:UpdateAction ElementName="DiagramToolsRibbonPage" PropertyName="IsVisible">
-                        <system:Boolean>True</system:Boolean>
-                    </dxb:UpdateAction>
+
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.Save}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveFile}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveAsFile}"/>
@@ -134,23 +144,22 @@
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.NewFile}"/>
 
                     <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" 
-                                      PropertyName="Caption" 
+                                      PropertyName="Caption"
                                       Value="Diagram Tools"/>
 
                     <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.InsertRibbonPage}" 
                                       PropertyName="Caption" 
                                       Value="Diagram Design"/>
 
-
                     <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ViewRibbonPage}" 
                                       PropertyName="Caption" 
                                       Value="Diagram Design"/>
-                   
 
                     <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DesignRibbonPage}" 
                                       PropertyName="Caption" 
                                       Value="Diagram Design"/>
-                   
+
+                    <!--<dxb:UpdateAction ElementName="DiagramCategory" PropertyName="IsVisible" Value="True"></dxb:UpdateAction>-->
 
                     <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" PropertyName="MergeOrder">
                         <system:Int32>8000</system:Int32>
@@ -159,7 +168,7 @@
                     <!--<dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.ThemesGroup}"/>-->
                     <!--<dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}"/>-->
                     <!--<dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}"/>-->
-                    <helpers:MoveGroupAction TargetPageName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}" GroupName="{x:Static dxdiag:DefaultBarItemNames.PageSetupGroup}"/>
+                    <!--<helpers:MoveGroupAction TargetPageName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}" GroupName="{x:Static dxdiag:DefaultBarItemNames.PageSetupGroup}"/>
                     <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.OptionsGroup}"/>
                     <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.LayoutGroup}"/>
                     <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ShowGroup}"/>
@@ -169,7 +178,7 @@
                     <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}"/>
                     <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.InsertRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}"/>
                     <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.InsertRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ThemesGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ZoomGroup}"/>
+                    <helpers:MoveGroupAction TargetPageName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ZoomGroup}"/>-->
                     
                    
                  

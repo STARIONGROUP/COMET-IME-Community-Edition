@@ -8,6 +8,7 @@ namespace CDP4DiagramEditor.ViewModels
 {
     using System;
     using System.Collections;
+    using System.ComponentModel;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -30,12 +31,21 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using CDP4DiagramEditor.Events;
+    using CDP4DiagramEditor.ViewModels.ContextualRibbonPageViewModels;
+    using CDP4DiagramEditor.Views;
+
+    using DevExpress.Xpf.Ribbon;
+
     using ReactiveUI;
+
+    using EventKind = Events.EventKind;
 
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor"/> view
     /// </summary>
-    public class DiagramEditorViewModel : BrowserViewModelBase<DiagramCanvas>, IPanelViewModel, IDropTarget
+    public class DiagramEditorViewModel : BrowserViewModelBase<DiagramCanvas>, IPanelViewModel, IDropTarget, IViewChangedEventUsingCapable
     {
         /// <summary>
         /// Backing field for <see cref="CanCreateDiagram"/>
@@ -65,7 +75,21 @@ namespace CDP4DiagramEditor.ViewModels
         {
             this.Caption = this.Thing.Name;
             this.ToolTip = string.Format("The {0} diagram editor", this.Thing.Name);
+            this.ViewChangedEvent = new ViewChangedEvent(this, EventKind.Showing);
             this.UpdateProperties();
+            CDPMessageBus.Current.SendMessage(this.ViewChangedEvent, typeof(DiagramRibbonPageCategoryViewModel));
+        }
+
+        public void ExecuteOnClosingCommand()
+        {
+            this.ViewChangedEvent.EventKind = EventKind.Disappearing;
+            CDPMessageBus.Current.SendMessage(this.ViewChangedEvent, typeof(DiagramRibbonPageCategoryViewModel));
+        }
+
+        public void ExecuteOnOpenCommand()
+        {
+            this.ViewChangedEvent.EventKind = EventKind.Showing;
+            CDPMessageBus.Current.SendMessage(this.ViewChangedEvent, typeof(DiagramRibbonPageCategoryViewModel));
         }
 
         /// <summary>
@@ -129,6 +153,15 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<object> GenerateDiagramCommandDeep { get; private set; }
 
         /// <summary>
+        /// Gets the ViewChangedEvent used to send message through MessageBus <see cref="CDPMessageBus.SendMessage"/>
+        /// </summary>
+        public ViewChangedEvent ViewChangedEvent
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Initialize the browser
         /// </summary>
         protected override void Initialize()
@@ -163,7 +196,17 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.GenerateDiagramCommandDeep = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramObjectViewModel>().Any()));
             this.GenerateDiagramCommandDeep.Subscribe(x => this.ExecuteGenerateDiagramCommand(true));
+
+            this.OnClosingCommand = ReactiveCommand.Create();
+            this.OnClosingCommand.Subscribe(x => this.ExecuteOnClosingCommand());
+
+            this.OnOpenCommand = ReactiveCommand.Create();
+            this.OnOpenCommand.Subscribe(x => this.ExecuteOnOpenCommand());
         }
+
+        public ReactiveCommand<object> OnOpenCommand { get; set; }
+
+        public ReactiveCommand<object> OnClosingCommand { get; set; }
 
         /// <summary>
         /// Compute the permissions

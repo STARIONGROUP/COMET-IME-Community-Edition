@@ -5,11 +5,9 @@
                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                         xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                         mc:Ignorable="d"
-                        Name="DiagramTools"
-                        RegionName="DiagramTools"
-                        CategoryName="DiagramTools"
+                        IsInDefaultPageCategory="False"
+                        CustomPageCategoryName="DiagramCategory"
                         Caption="Diagram Tools"
-                        CustomPageCategoryName="whatever"
                         IsVisible="True"
                         MergeOrder="8001">
 
