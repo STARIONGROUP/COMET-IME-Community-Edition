@@ -8,7 +8,7 @@
                                    xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                    mc:Ignorable="d"
                                    Caption="Diagram"
-                                   IsVisible="{Binding ShouldItBeVisible}"
+                                   IsVisible="False"
                                    ribbon:Name="DiagramCategory"
                                    Color="SeaGreen"
                                    MergeOrder="8004">

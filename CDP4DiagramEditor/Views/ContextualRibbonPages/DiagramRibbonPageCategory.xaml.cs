@@ -27,8 +27,6 @@ namespace CDP4DiagramEditor.Views.ContextualRibbonPages
 {
     using System.ComponentModel.Composition;
 
-    using CDP4DiagramEditor.ViewModels.ContextualRibbonPageViewModels;
-
     using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>
@@ -40,8 +38,6 @@ namespace CDP4DiagramEditor.Views.ContextualRibbonPages
         public DiagramRibbonPageCategory()
         {
             this.InitializeComponent();
-
-            this.DataContext = new DiagramRibbonPageCategoryViewModel();
         }
     }
 }

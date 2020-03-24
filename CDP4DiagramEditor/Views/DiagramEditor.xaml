@@ -13,22 +13,14 @@
              xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
              xmlns:diagram="clr-namespace:CDP4CommonView.Diagram;assembly=CDP4CommonView"
              xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Unloaded">
-            <i:InvokeCommandAction Command="{Binding OnDisappearingCommand}"></i:InvokeCommandAction>
-        </i:EventTrigger>
-        <i:EventTrigger EventName="LostFocus">
-            <i:InvokeCommandAction Command="{Binding OnDisappearingCommand}"></i:InvokeCommandAction>
-        </i:EventTrigger>
-        <i:EventTrigger EventName="GotFocus">
-            <i:InvokeCommandAction Command="{Binding OnAppearingCommand}"></i:InvokeCommandAction>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-    <UserControl.Resources>
+    <dxmvvm:Interaction.Behaviors>
+        <behaviours:RibbonCategoryBehavior CategoryName="DiagramCategory"></behaviours:RibbonCategoryBehavior>
+    </dxmvvm:Interaction.Behaviors>
+        <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
