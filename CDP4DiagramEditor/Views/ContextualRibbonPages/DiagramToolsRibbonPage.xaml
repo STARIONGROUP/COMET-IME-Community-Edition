@@ -6,6 +6,7 @@
                         xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                         mc:Ignorable="d"
                         IsInDefaultPageCategory="False"
+                        RegionName="DiagramToolsRegion"
                         CustomPageCategoryName="DiagramCategory"
                         Caption="Diagram Tools"
                         IsVisible="True"

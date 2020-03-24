@@ -1,14 +1,31 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramEditorViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor.ViewModels
 {
     using System;
-    using System.Collections;
-    using System.ComponentModel;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -23,7 +40,6 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4CommonView.Diagram;
     using CDP4CommonView.EventAggregator;
     using CDP4Composition;
-    using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
@@ -34,9 +50,6 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4DiagramEditor.Events;
     using CDP4DiagramEditor.ViewModels.ContextualRibbonPageViewModels;
-    using CDP4DiagramEditor.Views;
-
-    using DevExpress.Xpf.Ribbon;
 
     using ReactiveUI;
 
@@ -80,13 +93,13 @@ namespace CDP4DiagramEditor.ViewModels
             CDPMessageBus.Current.SendMessage(this.ViewChangedEvent, typeof(DiagramRibbonPageCategoryViewModel));
         }
 
-        public void ExecuteOnClosingCommand()
+        public void ExecuteOnDisappearingCommand()
         {
             this.ViewChangedEvent.EventKind = EventKind.Disappearing;
             CDPMessageBus.Current.SendMessage(this.ViewChangedEvent, typeof(DiagramRibbonPageCategoryViewModel));
         }
 
-        public void ExecuteOnOpenCommand()
+        public void ExecuteOnAppearingCommand()
         {
             this.ViewChangedEvent.EventKind = EventKind.Showing;
             CDPMessageBus.Current.SendMessage(this.ViewChangedEvent, typeof(DiagramRibbonPageCategoryViewModel));
@@ -197,16 +210,16 @@ namespace CDP4DiagramEditor.ViewModels
             this.GenerateDiagramCommandDeep = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramObjectViewModel>().Any()));
             this.GenerateDiagramCommandDeep.Subscribe(x => this.ExecuteGenerateDiagramCommand(true));
 
-            this.OnClosingCommand = ReactiveCommand.Create();
-            this.OnClosingCommand.Subscribe(x => this.ExecuteOnClosingCommand());
+            this.OnDisappearingCommand = ReactiveCommand.Create();
+            this.OnDisappearingCommand.Subscribe(x => this.ExecuteOnDisappearingCommand());
 
-            this.OnOpenCommand = ReactiveCommand.Create();
-            this.OnOpenCommand.Subscribe(x => this.ExecuteOnOpenCommand());
+            this.OnAppearingCommand = ReactiveCommand.Create();
+            this.OnAppearingCommand.Subscribe(x => this.ExecuteOnAppearingCommand());
         }
 
-        public ReactiveCommand<object> OnOpenCommand { get; set; }
+        public ReactiveCommand<object> OnAppearingCommand { get; set; }
 
-        public ReactiveCommand<object> OnClosingCommand { get; set; }
+        public ReactiveCommand<object> OnDisappearingCommand { get; set; }
 
         /// <summary>
         /// Compute the permissions
