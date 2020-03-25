@@ -2,7 +2,7 @@
 // <copyright file="MoveGroupAction.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski, Kamil Wojnowski.
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -25,42 +25,92 @@
 
 namespace CDP4DiagramEditor.Helpers
 {
+    using System.Linq;
     using System.Windows;
+    using System.Windows.Media;
+
+    using CDP4Composition;
+    using CDP4Composition.Ribbon;
+    
     using DevExpress.Xpf.Bars;
     using DevExpress.Xpf.Bars.Native;
     using DevExpress.Xpf.Ribbon;
+
+    using Microsoft.Practices.Prism.Regions;
+    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// A custom action for moving a RibbonGroup from one RibbonPage to another
     /// </summary>
     public class MoveGroupAction : BarManagerControllerActionBase
     {
+        /// <summary>
+        /// <see cref="DependencyProperty"/> that can be set in XAML to specify what group to move
+        /// </summary>
         public static readonly DependencyProperty GroupNameProperty = DependencyProperty.Register("GroupName", typeof(string), typeof(MoveGroupAction), null);
-        public static readonly DependencyProperty TargetPageNameProperty = DependencyProperty.Register("TargetPageName", typeof(string), typeof(MoveGroupAction), null);
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> that can be set in XAML to specify the target page caption
+        /// </summary>
+        public static readonly DependencyProperty TargetPageCaptionProperty = DependencyProperty.Register("TargetPageCaption", typeof(string), typeof(MoveGroupAction), null);
+
+        /// <summary>
+        /// <para>Gets or sets the target <see cref="DevExpress.Xpf.Ribbon.RibbonPageGroup.Name"/> to be moved</para>
+        /// <para>This is a <see cref="DependencyProperty"/>.</para>
+        /// </summary>
         public string GroupName
         {
-            get { return (string) this.GetValue(GroupNameProperty); }
-            set { this.SetValue(GroupNameProperty, value); }
+            get => (string) this.GetValue(GroupNameProperty);
+            set => this.SetValue(GroupNameProperty, value);
         }
-        public string TargetPageName
+
+        /// <summary>
+        /// <para>Gets or sets the target <see cref="DevExpress.Xpf.Ribbon.RibbonPage.Caption"/> to be moved</para>
+        /// <para>This is a <see cref="DependencyProperty"/>.</para>
+        /// </summary>
+        public string TargetPageCaption
         {
-            get { return (string) this.GetValue(TargetPageNameProperty); }
-            set { this.SetValue(TargetPageNameProperty, value); }
+            get => (string) this.GetValue(TargetPageCaptionProperty);
+            set => this.SetValue(TargetPageCaptionProperty, value);
+        }
+
+        /// <summary>
+        /// the <see cref="IRegion"/> property that is used to get the <see cref="RibbonPage"/> to move
+        /// </summary>
+        public IRegion RibbonRegion { get; set; }
+
+        /// <summary>
+        /// the <see cref="IRegionManager"/> property that is used to get the <see cref="RibbonRegion"/>
+        /// </summary>
+        public IRegionManager RegionManager { get; set; }
+        
+        /// <summary>
+        /// Constructor of <see cref="MoveGroupAction"/>
+        /// Resolve <see cref="IRegionManager"/>
+        /// And Sets the <see cref="RibbonRegion"/> Property
+        /// </summary>
+        public MoveGroupAction()
+        {
+            this.RegionManager = ServiceLocator.Current.GetInstance<IRegionManager>();
+            this.RibbonRegion = this.RegionManager?.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);
         }
 
         protected override void ExecuteCore(DependencyObject context)
         {
-            var page = CollectionActionHelper.Instance.FindElementByName(context, this.TargetPageName, this.Container, ScopeSearchSettings.Descendants) as RibbonPage;
-            var group = CollectionActionHelper.Instance.FindElementByName(context, this.GroupName, this.Container, ScopeSearchSettings.Descendants) as RibbonPageGroup;
-
-            if (group == null || page == null || group.Page == null)
+            var page = this.RibbonRegion?.Views.OfType<ExtendedRibbonPage>().FirstOrDefault(rb => (string)rb.Caption == this.TargetPageCaption);
+            var group = CollectionActionHelper.Instance.FindElementByName(VisualTreeHelper.GetParent(context), this.GroupName, this.Container, ScopeSearchSettings.Descendants) as RibbonPageGroup;
+            
+            if (group == null || page == null || group.Page == null || group.Page.Caption == page.Caption)
             {
                 return;
             }
 
             group.Page.Groups.Remove(group);
-            page.Groups.Add(group);
+
+            if (page.Groups.All(gr => gr.Caption != group.Caption))
+            {
+                page.Groups.Add(group);
+            }
         }
 
         public override object GetObjectCore()

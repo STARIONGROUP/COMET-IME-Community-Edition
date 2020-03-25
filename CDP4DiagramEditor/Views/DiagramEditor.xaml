@@ -78,13 +78,10 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
-                                        ToolboxVisibility="Closed"
+                                        ToolboxVisibility="Full"
                                         SaveCommand="{Binding SaveDiagramCommand}"
-                                        dxb:MergingProperties.ElementMergingBehavior="InternalWithInternal"
+                                        dxb:MergingProperties.ElementMergingBehavior="InternalWithExternal"
                                         >
-                <!--dxb:BarItemLinkActionBase.Target="DiagramRibbonPageCategory"-->
-                                        
-                                        
                 <diagram:Cdp4DiagramControl.Resources>
                     <ResourceDictionary>
                         <ControlTemplate x:Key="DiagramObjectTemplate">
@@ -120,65 +117,36 @@
                     </diagram:Cdp4DiagramOrgChartBehavior>
                 </dxmvvm:Interaction.Behaviors>
                 <diagram:Cdp4DiagramControl.Actions>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DiagramPartsRibbonGroup}" PropertyName="IsVisible">
-                        <system:Boolean>True</system:Boolean>
-                    </dxb:UpdateAction>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}" PropertyName="IsVisible">
-                        <system:Boolean>True</system:Boolean>
-                    </dxb:UpdateAction>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}" PropertyName="IsVisible">
-                        <system:Boolean>True</system:Boolean>
-                    </dxb:UpdateAction>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DiagramPartsRibbonGroup}" PropertyName="Category">
-                        <system:String>DiagramCategory</system:String>
-                    </dxb:UpdateAction>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}" PropertyName="Category">
-                        <system:String>DiagramCategory</system:String>
-                    </dxb:UpdateAction>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}" PropertyName="Category">
-                        <system:String>DiagramCategory</system:String>
-                    </dxb:UpdateAction>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DiagramPartsRibbonGroup}" PropertyName="IsVisible" Value="False"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}" PropertyName="IsVisible" Value="True"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}" PropertyName="IsVisible" Value="True"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ZoomGroup}" PropertyName="IsVisible" Value="True"/>
+
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Tools" GroupName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Tools" GroupName="{x:Static dxdiag:DefaultBarItemNames.OptionsGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Tools" GroupName="{x:Static dxdiag:DefaultBarItemNames.LayoutGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Tools" GroupName="{x:Static dxdiag:DefaultBarItemNames.ShowGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Tools" GroupName="{x:Static dxdiag:DefaultBarItemNames.ZoomGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Tools" GroupName="{x:Static dxdiag:DefaultBarItemNames.ClipboardRibbonGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Tools" GroupName="{x:Static dxdiag:DefaultBarItemNames.FontRibbonGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Tools" GroupName="{x:Static dxdiag:DefaultBarItemNames.TextToolsGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Tools" GroupName="{x:Static dxdiag:DefaultBarItemNames.ArrangeGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Design" GroupName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Design" GroupName="{x:Static dxdiag:DefaultBarItemNames.DiagramPartsRibbonGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Design" GroupName="{x:Static dxdiag:DefaultBarItemNames.ThemesGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Design" GroupName="{x:Static dxdiag:DefaultBarItemNames.ZoomGroup}"/>
+                    <helpers:MoveGroupAction TargetPageCaption="Diagram Design" GroupName="{x:Static dxdiag:DefaultBarItemNames.PageSetupGroup}"/>
+
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.Save}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveFile}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveAsFile}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.OpenFile}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.NewFile}"/>
 
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" 
-                                      PropertyName="Caption" 
-                                      Value="Diagram Tools"/>
-
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.InsertRibbonPage}" 
-                                      PropertyName="Caption" 
-                                      Value="Diagram Design"/>
-
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ViewRibbonPage}" 
-                                      PropertyName="Caption" 
-                                      Value="Diagram Design"/>
-
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DesignRibbonPage}" 
-                                      PropertyName="Caption" 
-                                      Value="Diagram Design"/>
-
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" PropertyName="MergeOrder">
-                        <system:Int32>8000</system:Int32>
-                    </dxb:UpdateAction>
-
-                    <!--<dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.ThemesGroup}"/>-->
-                    <!--<dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}"/>-->
-                    <!--<dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}"/>-->
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.PageSetupGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.OptionsGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.LayoutGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ShowGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ZoomGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.DiagramPartsRibbonGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ThemesGroup}"/>
-                    <helpers:MoveGroupAction TargetPageName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" GroupName="{x:Static dxdiag:DefaultBarItemNames.ZoomGroup}"/>
-
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.InsertRibbonPage}" PropertyName="IsVisible" Value="False"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DesignRibbonPage}" PropertyName="IsVisible" Value="False"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ViewRibbonPage}" PropertyName="IsVisible" Value="False"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" PropertyName="IsVisible" Value="False"/>
                 </diagram:Cdp4DiagramControl.Actions>
             </diagram:Cdp4DiagramControl>
         </Grid>

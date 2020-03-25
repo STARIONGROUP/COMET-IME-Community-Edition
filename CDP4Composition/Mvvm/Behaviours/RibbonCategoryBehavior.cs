@@ -48,14 +48,24 @@ namespace CDP4Composition.Mvvm.Behaviours
             this.RibbonRegion = this.RegionManager.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);
         }
 
+        /// <summary>
+        /// the <see cref="IRegionManager"/> that is used to get the <see cref="RibbonRegion"/>
+        /// </summary>
         public IRegionManager RegionManager { get; set; }
 
+        /// <summary>
+        /// the <see cref="IRegion"/> that is used to get the <see cref="ExtendedRibbonPageCategory"/>
+        /// </summary>
         public IRegion RibbonRegion { get; set; }
 
+        /// <summary>
+        /// <para>Gets or sets the category name of the target <see cref="ExtendedRibbonPageCategory"/></para>
+        /// <para>This is a <see cref="DependencyProperty"/>.</para>
+        /// </summary>
         public string CategoryName { get; set; }
 
         /// <summary>
-        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="SetCategoryName"/> method.
+        /// <see cref="DependencyProperty"/> that
         /// </summary>
         public static readonly DependencyProperty CategoryNameProperty =
             DependencyProperty.RegisterAttached(
@@ -82,6 +92,12 @@ namespace CDP4Composition.Mvvm.Behaviours
             base.OnDetaching();
         }
 
+        /// <summary>
+        /// Handles <see cref="RibbonCategoryBehavior.AssociatedObject"/>.IsVisibleChanged event
+        /// and sets the IsVisible property of the target <see cref="ExtendedRibbonPageCategory"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AssociatedObject_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var category = this.RibbonRegion.Views.OfType<ExtendedRibbonPageCategory>().FirstOrDefault(view => view.Name == this.CategoryName);
@@ -93,7 +109,7 @@ namespace CDP4Composition.Mvvm.Behaviours
         }
 
         /// <summary>
-        /// Sets the dialog result of the target <see cref="RibbonCategoryBehavior"/>.
+        /// Sets the Category name property of the target <see cref="RibbonCategoryBehavior"/>.
         /// </summary>
         /// <param name="target">
         /// the <see cref="RibbonCategoryBehavior"/> that has this behavior attached.
