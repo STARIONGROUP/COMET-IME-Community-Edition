@@ -240,6 +240,7 @@
     <Compile Include="ViewModels\Dialogs\ActualFiniteStateDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BinaryRelationshipDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BuiltInRuleVerificationDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\FolderDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ElementUsageDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ElementDefinitionDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ActualFiniteStateListDialogViewModel.cs" />
@@ -337,6 +338,13 @@
     <Compile Include="Views\Dialogs\BuiltInRuleVerificationDialog.xaml.cs">
       <DependentUpon>BuiltInRuleVerificationDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Dialogs\FolderDialog.xaml.cs">
+      <DependentUpon>FolderDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\DomainFileStoreDialog.xaml.cs">
+      <DependentUpon>DomainFileStoreDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\Dialogs\DomainFileStoreDialogViewModel.cs" />
     <Compile Include="Views\Dialogs\ElementDefinitionDialog.xaml.cs">
       <DependentUpon>ElementDefinitionDialog.xaml</DependentUpon>
     </Compile>
@@ -445,6 +453,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Dialogs\BuiltInRuleVerificationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\FolderDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\DomainFileStoreDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
