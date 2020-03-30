@@ -48,7 +48,7 @@
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type cdp4Composition:FolderRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:FolderRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
@@ -67,7 +67,7 @@
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type cdpCommonView:FileRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:FileRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
@@ -97,7 +97,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <views:CommonThingControl GridView="{Binding ElementName=CommonFileStoreView}" />
+        <views:CommonThingControl GridView="{Binding ElementName=DomainFileStoreView}" />
 
         <views:BrowserHeader Grid.Row="1" />
 
@@ -119,6 +119,7 @@
                                   MaxHeight="1080"
                                   AllowEditing="False"
                                   AutoWidth="False"
+                                  ChildNodesPath="ContainedRows"
                                   ExpandCollapseNodesOnNavigation="True"
                                   ExpandStateFieldName="IsExpanded"
                                   HorizontalScrollbarVisibility="Auto"

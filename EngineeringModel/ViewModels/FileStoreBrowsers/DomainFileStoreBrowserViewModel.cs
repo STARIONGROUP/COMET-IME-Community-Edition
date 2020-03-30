@@ -359,6 +359,33 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Execute the generic <see cref="CreateCommand"/>
+        /// </summary>
+        /// <param name="container">
+        /// The container of the <see cref="Thing"/> that is to be created
+        /// </param>
+        /// <typeparam name="TThing">
+        /// The <see cref="Thing"/> that needs to be created.
+        /// </typeparam>
+        protected virtual void ExecuteCreateCommand<TThing>(Thing container = null) where TThing : Thing, new()
+        {
+            if ((typeof(TThing) == typeof(Folder)) && container is Folder folder)
+            {
+                var thing = new Folder
+                {
+                    ContainingFolder = folder
+                };
+
+                var realContainer = folder.GetContainerOfType(typeof(DomainFileStore));
+                
+                this.ExecuteCreateCommand(thing, realContainer);
+                return;
+            }
+
+            base.ExecuteCreateCommand<TThing>(container);
+        }
+
+        /// <summary>
         /// Executes the upload file command
         /// </summary>
         private void ExecuteUploadFile()

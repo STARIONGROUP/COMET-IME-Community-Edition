@@ -81,7 +81,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
         [Test]
         public void VerifyThatContainerViewModelMayNotBeNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new FileRowViewModel(this.file, this.session.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new FileRowViewModel(this.file, this.session.Object, null, null));
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
 
             this.file.FileRevision.Add(this.fileRevision1);
 
-            var viewModel = new FileRowViewModel(this.file, this.session.Object, commonFileStoreRowViewModel);
+            var viewModel = new FileRowViewModel(this.file, this.session.Object, commonFileStoreRowViewModel, null);
             Assert.AreEqual(new DateTime(1, 1, 1).ToString(CultureInfo.InvariantCulture), viewModel.CreatedOn);
             Assert.AreEqual("John Doe", viewModel.CreatorValue);
             Assert.IsFalse(viewModel.IsLocked);

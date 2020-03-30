@@ -205,6 +205,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RibbonControls\ViewRibbonTestFixture.cs" />
     <Compile Include="ViewModels\ElementDefinitionTreeRows\ElementDefinitionRowViewModelsTestFixtureBis.cs" />
+    <Compile Include="ViewModels\FileStoreBrowsers\FileStoreFileAndFolderHandlerTestFixture.cs" />
     <Compile Include="ViewModels\FiniteStateBrowser\FiniteStateBrowserRibbonViewModelTestFixture.cs" />
     <Compile Include="ViewModels\FiniteStateBrowser\FiniteStateBrowserViewModelTestFixture.cs" />
     <Compile Include="ViewModels\FiniteStateBrowser\ActualFiniteStateListRowViewModelTestFixture.cs" />

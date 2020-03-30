@@ -247,7 +247,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             Assert.AreEqual(2, folder2Row.ContainedRows.Count);
         }
 
-        [Test]
+        [Ignore("Not implemented yet")]
         public void VerifyUploadFileCommand()
         {
             this.model.CommonFileStore.Add(this.store);

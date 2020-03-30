@@ -1,15 +1,35 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FileRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
-    using CDP4EngineeringModel.ViewModels.FileStoreBrowsers;
     using System;
     using System.Globalization;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
@@ -17,6 +37,7 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
@@ -25,9 +46,9 @@ namespace CDP4EngineeringModel.ViewModels
     public class FileRowViewModel : CDP4CommonView.FileRowViewModel
     {
         /// <summary>
-        /// The <see cref="IFileStoreRow"/>
+        /// The <see cref="IFileStoreFileAndFolderHandler"/>
         /// </summary>
-        private readonly IFileStoreRow fileStoreRow;
+        private readonly IFileStoreFileAndFolderHandler parentFileStoreFileAndFolderHandler;
 
         /// <summary>
         /// The current <see cref="FileRevision"/>
@@ -71,15 +92,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="containerViewModel">
         /// The <see cref="IViewModelBase<Thing>"/> that is the container of this <see cref="IRowViewModelBase{Thing}"/>
         /// </param>
-        public FileRowViewModel(File file, ISession session, IFileStoreRow containerViewModel)
-            : base(file, session, (IViewModelBase<Thing>)containerViewModel)
+        public FileRowViewModel(File file, ISession session, IViewModelBase<Thing> containerViewModel, IFileStoreFileAndFolderHandler fileStoreFileAndFolderHandler)
+            : base(file, session, containerViewModel)
         {
             if (containerViewModel == null)
             {
-                throw new ArgumentNullException("containerViewModel", "The containerViewModel may not be null");
+                throw new ArgumentNullException(nameof(containerViewModel), $"The {nameof(containerViewModel)} may not be null");
             }
 
-            this.fileStoreRow = (IFileStoreRow)containerViewModel;
+            this.parentFileStoreFileAndFolderHandler = fileStoreFileAndFolderHandler;
             this.UpdateProperties();
         }
 
@@ -88,8 +109,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string Name
         {
-            get { return this.name; }
-            private set { this.RaiseAndSetIfChanged(ref this.name, value); }
+            get => this.name;
+            private set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         /// <summary>
@@ -97,8 +118,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string CreatedOn
         {
-            get { return this.createdOn; }
-            private set { this.RaiseAndSetIfChanged(ref this.createdOn, value); }
+            get => this.createdOn;
+            private set => this.RaiseAndSetIfChanged(ref this.createdOn, value);
         }
 
         /// <summary>
@@ -106,8 +127,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string CreatorValue
         {
-            get { return this.creatorValue; }
-            private set { this.RaiseAndSetIfChanged(ref this.creatorValue, value); }
+            get => this.creatorValue;
+            private set => this.RaiseAndSetIfChanged(ref this.creatorValue, value);
         }
 
         /// <summary>
@@ -115,8 +136,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool IsLocked
         {
-            get { return this.isLocked; }
-            private set { this.RaiseAndSetIfChanged(ref this.isLocked, value); }
+            get => this.isLocked;
+            private set => this.RaiseAndSetIfChanged(ref this.isLocked, value);
         }
 
         /// <summary>
@@ -124,8 +145,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string Locker
         {
-            get { return this.locker; }
-            private set { this.RaiseAndSetIfChanged(ref this.locker, value); }
+            get => this.locker;
+            private set => this.RaiseAndSetIfChanged(ref this.locker, value);
         }
 
         /// <summary>
@@ -157,6 +178,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             // check if there is a new file revision
             var lastCreatedDate = this.Thing.FileRevision.Select(x => x.CreatedOn).Max();
+
             if (this.fileRevision == null)
             {
                 this.fileRevision = this.Thing.FileRevision.First(x => x.CreatedOn == lastCreatedDate);
@@ -166,14 +188,15 @@ namespace CDP4EngineeringModel.ViewModels
             if (this.fileRevision.CreatedOn != lastCreatedDate)
             {
                 this.fileRevision = this.Thing.FileRevision.First(x => x.CreatedOn == lastCreatedDate);
-                ((IFileStoreRow)this.fileStoreRow).UpdateFileRowPosition(this.Thing, this.fileRevision);
+                this.parentFileStoreFileAndFolderHandler?.UpdateFileRowPosition(this.Thing, this.fileRevision);
                 this.UpdateFileRevisionProperties();
             }
 
             this.IsLocked = this.Thing.LockedBy != null;
+
             if (this.IsLocked)
             {
-                this.Locker = this.Thing.LockedBy.Name;
+                this.Locker = this.Thing.LockedBy?.Name;
             }
             else
             {

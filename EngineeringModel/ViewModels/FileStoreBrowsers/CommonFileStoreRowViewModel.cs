@@ -1,34 +1,64 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommonFileStoreRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
-    using CDP4EngineeringModel.ViewModels.FileStoreBrowsers;
     using System.Collections.Generic;
-    using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using CDP4EngineeringModel.ViewModels.FileStoreBrowsers;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The <see cref="CommonFileStore"/> row-view-model
     /// </summary>
-    public class CommonFileStoreRowViewModel : CDP4CommonView.CommonFileStoreRowViewModel, IFileStoreRow
+    public class CommonFileStoreRowViewModel : CDP4CommonView.CommonFileStoreRowViewModel, IFileStoreRow<CommonFileStore>
     {
         /// <summary>
-        /// The <see cref="Folder"/> cache
+        /// Backing field for <see cref="FolderCache"/>
         /// </summary>
         private Dictionary<Folder, FolderRowViewModel> folderCache;
 
         /// <summary>
-        /// The <see cref="File"/> cache
+        /// Backingfield for <see cref="FileCache"/>
         /// </summary>
         private Dictionary<File, FileRowViewModel> fileCache;
+
+        /// <summary>
+        /// The <see cref="IFileStoreFileAndFolderHandler"/>
+        /// </summary>
+        private readonly IFileStoreFileAndFolderHandler fileStoreFileAndFolderHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommonFileStoreRowViewModel"/> class
@@ -41,7 +71,26 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.folderCache = new Dictionary<Folder, FolderRowViewModel>();
             this.fileCache = new Dictionary<File, FileRowViewModel>();
+            this.fileStoreFileAndFolderHandler = new FileStoreFileAndFolderHandler<CommonFileStore>(this);
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Folder"/> cache
+        /// </summary>
+        public Dictionary<Folder, FolderRowViewModel> FolderCache
+        {
+            get => this.folderCache;
+            private set => this.RaiseAndSetIfChanged(ref this.folderCache, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="File"/> cache
+        /// </summary>
+        public Dictionary<File, FileRowViewModel> FileCache
+        {
+            get => this.fileCache;
+            private set => this.RaiseAndSetIfChanged(ref this.fileCache, value);
         }
 
         /// <summary>
@@ -62,144 +111,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.UpdateFolderRows();
-            this.UpdateFileRows();
-        }
-
-        /// <summary>
-        /// Update the <see cref="Folder"/> rows
-        /// </summary>
-        private void UpdateFolderRows()
-        {
-            var currentFolders = this.folderCache.Keys;
-
-            var addedFolders = this.Thing.Folder.Except(currentFolders).ToList();
-            var removedFolders = currentFolders.Except(this.Thing.Folder);
-            var updatedFolders = this.Thing.Folder.Intersect(currentFolders);
-
-            foreach (var removedFolder in removedFolders)
-            {
-                if (this.folderCache.TryGetValue(removedFolder, out var row))
-                {
-                    this.folderCache.Remove(removedFolder);
-                    ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.RemoveAndDispose(row);
-                }
-            }
-
-            foreach (var addedFolder in addedFolders)
-            {
-                var row = new FolderRowViewModel(addedFolder, this.Session, this);
-                this.folderCache.Add(addedFolder, row);
-            }
-
-            foreach (var addedFolder in addedFolders)
-            {
-                if (addedFolder.ContainingFolder == null)
-                {
-                    this.ContainedRows.Add(this.folderCache[addedFolder]);
-                }
-                else
-                {
-                    var row = this.folderCache[addedFolder];
-                    var containerViewModel = this.folderCache[addedFolder.ContainingFolder];
-                    containerViewModel.ContainedRows.Add(row);
-                    row.UpdateContainerViewModel(containerViewModel);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update the <see cref="File"/> rows
-        /// </summary>
-        private void UpdateFileRows()
-        {
-            var currentFiles = this.fileCache.Keys;
-
-            var addedFiles = this.Thing.File.Except(currentFiles).ToList();
-            var removedFiles = currentFiles.Except(this.Thing.File);
-
-            foreach (var removedFile in removedFiles)
-            {
-                if (this.fileCache.TryGetValue(removedFile, out var row))
-                {
-                    this.fileCache.Remove(removedFile);
-                    ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.RemoveAndDispose(row);
-                }
-            }
-
-            foreach (var addedFile in addedFiles)
-            {
-                var row = new FileRowViewModel(addedFile, this.Session, this);
-                this.fileCache.Add(addedFile, row);
-
-                var lastCreatedDate = addedFile.FileRevision.Select(x => x.CreatedOn).Max();
-                var lastRevision = addedFile.FileRevision.First(x => x.CreatedOn == lastCreatedDate);
-
-                if (lastRevision.ContainingFolder == null)
-                {
-                    this.ContainedRows.Add(row);
-                }
-                else
-                {
-                    var containerViewModel = this.folderCache[lastRevision.ContainingFolder];
-                    containerViewModel.ContainedRows.Add(row);
-                    row.UpdateContainerViewModel(containerViewModel);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update the position of a <see cref="Folder"/>
-        /// </summary>
-        /// <param name="updatedFolder">The updated <see cref="Folder"/></param>
-        public void UpdateFolderRowPosition(Folder updatedFolder)
-        {
-            var row = this.folderCache[updatedFolder];
-            if (updatedFolder.ContainingFolder == null)
-            {
-                if (row.ContainerViewModel != this)
-                {
-                    ((FolderRowViewModel)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
-                    this.ContainedRows.Add(row);
-                    row.UpdateContainerViewModel(this);
-                }
-            }
-            else if (updatedFolder.ContainingFolder != row.ContainerViewModel.Thing)
-            {
-                ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
-                var containerViewModel = this.folderCache[updatedFolder.ContainingFolder];
-                containerViewModel.ContainedRows.Add(row);
-                row.UpdateContainerViewModel(containerViewModel);
-            }
-        }
-
-        /// <summary>
-        /// Update the <see cref="File"/> row position
-        /// </summary>
-        /// <param name="file">The <see cref="File"/></param>
-        /// <param name="fileRevision">The latest <see cref="FileRevision"/></param>
-        public void UpdateFileRowPosition(File file, FileRevision fileRevision)
-        {
-            // make sure that the folders are all updated
-            this.UpdateFolderRows();
-
-            var row = this.fileCache[file];
-            if (fileRevision.ContainingFolder == null)
-            {
-                if (row.ContainerViewModel != this)
-                {
-                    ((FolderRowViewModel)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
-                    this.ContainedRows.Add(row);
-                    row.UpdateContainerViewModel(this);
-                }
-            }
-            else if (fileRevision.ContainingFolder != row.ContainerViewModel.Thing)
-            {
-                ((IRowViewModelBase<Thing>)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
-                var containerViewModel = this.folderCache[fileRevision.ContainingFolder];
-                containerViewModel.ContainedRows.Add(row);
-                row.UpdateContainerViewModel(containerViewModel);
-            }
+            this.fileStoreFileAndFolderHandler.UpdateFolderRows();
+            this.fileStoreFileAndFolderHandler.UpdateFileRows();
         }
     }
 }
