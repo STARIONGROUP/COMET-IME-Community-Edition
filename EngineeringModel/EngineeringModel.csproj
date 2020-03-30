@@ -293,8 +293,10 @@
     <Compile Include="ViewModels\FileStoreBrowsers\DomainFileStoreBrowserRibbonViewModel.cs" />
     <Compile Include="ViewModels\FileStoreBrowsers\DomainFileStoreBrowserViewModel.cs" />
     <Compile Include="ViewModels\FileStoreBrowsers\DomainFileStoreRowViewModel.cs" />
+    <Compile Include="ViewModels\FileStoreBrowsers\FileStoreFileAndFolderHandler.cs" />
     <Compile Include="ViewModels\FileStoreBrowsers\FileRowViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\FileStoreRow.cs" />
+    <Compile Include="ViewModels\FileStoreBrowsers\IFileStoreFileAndFolderHandler.cs" />
+    <Compile Include="ViewModels\FileStoreBrowsers\IFileStoreRow.cs" />
     <Compile Include="ViewModels\FileStoreBrowsers\FolderRowViewModel.cs" />
     <Compile Include="ViewModels\FiniteStateBrowser\FiniteStateBrowserRibbonViewModel.cs" />
     <Compile Include="ViewModels\FiniteStateBrowser\FiniteStateBrowserViewModel.cs" />
