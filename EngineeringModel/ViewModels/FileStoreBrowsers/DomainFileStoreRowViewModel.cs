@@ -38,23 +38,11 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4EngineeringModel.ViewModels.FileStoreBrowsers;
 
-    using ReactiveUI;
-
     /// <summary>
     /// The <see cref="DomainFileStore"/> row-view-model
     /// </summary>
     public class DomainFileStoreRowViewModel : CDP4CommonView.DomainFileStoreRowViewModel, IFileStoreRow<DomainFileStore>
     {
-        /// <summary>
-        /// Backing field for <see cref="FolderCache"/>
-        /// </summary>
-        private Dictionary<Folder, FolderRowViewModel> folderCache;
-
-        /// <summary>
-        /// Backingfield for <see cref="FileCache"/>
-        /// </summary>
-        private Dictionary<File, FileRowViewModel> fileCache;
-
         /// <summary>
         /// The <see cref="IFileStoreFileAndFolderHandler"/>
         /// </summary>
@@ -69,8 +57,8 @@ namespace CDP4EngineeringModel.ViewModels
         public DomainFileStoreRowViewModel(DomainFileStore store, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(store, session, containerViewModel)
         {
-            this.folderCache = new Dictionary<Folder, FolderRowViewModel>();
-            this.fileCache = new Dictionary<File, FileRowViewModel>();
+            this.FolderCache = new Dictionary<Folder, FolderRowViewModel>();
+            this.FileCache = new Dictionary<File, FileRowViewModel>();
             this.fileStoreFileAndFolderHandler = new FileStoreFileAndFolderHandler<DomainFileStore>(this);
             this.UpdateProperties();
         }
@@ -78,20 +66,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="Folder"/> cache
         /// </summary>
-        public Dictionary<Folder, FolderRowViewModel> FolderCache
-        {
-            get => this.folderCache;
-            private set => this.RaiseAndSetIfChanged(ref this.folderCache, value);
-        }
+        public Dictionary<Folder, FolderRowViewModel> FolderCache { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="File"/> cache
         /// </summary>
-        public Dictionary<File, FileRowViewModel> FileCache
-        {
-            get => this.fileCache;
-            private set => this.RaiseAndSetIfChanged(ref this.fileCache, value);
-        }
+        public Dictionary<File, FileRowViewModel> FileCache { get; private set; }
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
@@ -114,7 +94,5 @@ namespace CDP4EngineeringModel.ViewModels
             this.fileStoreFileAndFolderHandler.UpdateFolderRows();
             this.fileStoreFileAndFolderHandler.UpdateFileRows();
         }
-
-        public FileStore Thing { get; }
     }
 }
