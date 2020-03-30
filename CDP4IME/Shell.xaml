@@ -48,7 +48,8 @@
                            ApplicationButtonLargeIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48p10.png"
                            ApplicationButtonSmallIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_16x16.png"
                            ApplicationButtonText="CDP4-CE"
-                           PageCategoryAlignment="Right"
+                           MDIMergeStyle="Never"
+                           PageCategoryAlignment="Left"
                            RibbonStyle="Office2007"
                            regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.RibbonRegion}" Padding="0">
 
@@ -309,6 +310,7 @@
         <dxdo:DockLayoutManager x:Name="DockManager"
                                 Grid.Row="1"
                                 ClosingBehavior="ImmediatelyRemove"
+                                MDIMergeStyle="Always"
                                 FloatingMode="Desktop">
             <dxdo:LayoutGroup ItemHeight="0.7*" DestroyOnClosingChildren="False" Orientation="Horizontal">
                 <dxdo:TabbedGroup Name="LeftGroup"

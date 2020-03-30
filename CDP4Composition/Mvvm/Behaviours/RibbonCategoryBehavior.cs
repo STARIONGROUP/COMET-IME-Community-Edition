@@ -22,6 +22,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4Composition.Mvvm.Behaviours
 {
     using System.Linq;
@@ -29,7 +30,11 @@ namespace CDP4Composition.Mvvm.Behaviours
 
     using CDP4Composition.Ribbon;
 
+    using DevExpress.Mvvm.UI;
     using DevExpress.Mvvm.UI.Interactivity;
+    using DevExpress.Xpf.Core.Native;
+    using DevExpress.Xpf.Docking;
+    using DevExpress.Xpf.Ribbon;
 
     using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
@@ -96,16 +101,27 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// Handles <see cref="RibbonCategoryBehavior.AssociatedObject"/>.IsVisibleChanged event
         /// and sets the IsVisible property of the target <see cref="ExtendedRibbonPageCategory"/>
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The arguments.</param>
         private void AssociatedObject_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var category = this.RibbonRegion.Views.OfType<ExtendedRibbonPageCategory>().FirstOrDefault(view => view.Name == this.CategoryName);
 
-            if (category != null)
+            var hostPanel = LayoutTreeHelper.GetVisualParents(this.AssociatedObject).OfType<DocumentPanel>().FirstOrDefault();
+
+            if (category == null)
             {
-                category.IsVisible = (bool)e.NewValue;
+                return;
             }
+
+            if (hostPanel != null && hostPanel.IsFloating)
+            {
+                // if panel is not maximized the ribbon is not merged and thus the category can be hidden
+                category.IsVisible = false;
+                return;
+            }
+
+            category.IsVisible = (bool)e.NewValue;
         }
 
         /// <summary>

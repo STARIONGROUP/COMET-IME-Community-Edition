@@ -8,6 +8,7 @@
              xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
@@ -77,7 +78,7 @@
             <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
                                         ToolboxVisibility="Full"
                                         SaveCommand="{Binding SaveDiagramCommand}"
-                                        dxb:MergingProperties.ElementMergingBehavior="InternalWithExternal"
+                                        dxb:MergingProperties.ElementMergingBehavior="All"
                                         >
                 <diagram:Cdp4DiagramControl.Resources>
                     <ResourceDictionary>
@@ -108,32 +109,28 @@
                 <dxmvvm:Interaction.Behaviors>
                     <diagram:Cdp4DiagramOrgChartBehavior x:Name="orgChartBehavior" 
                                                          PageMargin="45" 
+                                                         RibbonMergeCategoryName="DiagramCategory"
                                                          DiagramObjectSource="{Binding DiagramObjectCollection, UpdateSourceTrigger=PropertyChanged}"
                                                          DiagramConnectorSource="{Binding DiagramConnectorCollection, UpdateSourceTrigger=PropertyChanged}"
                                                          EventPublisher="{Binding EventPublisher, Mode=OneWay}">
                     </diagram:Cdp4DiagramOrgChartBehavior>
                 </dxmvvm:Interaction.Behaviors>
                 <diagram:Cdp4DiagramControl.Actions>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DiagramPartsRibbonGroup}" PropertyName="IsVisible" Value="False"/>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}" PropertyName="IsVisible" Value="True"/>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}" PropertyName="IsVisible" Value="True"/>
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ZoomGroup}" PropertyName="IsVisible" Value="True"/>
-
-                    <dxb:UpdateAction Value="Diagram Tools" ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" PropertyName="Caption"/>
-                    <dxb:UpdateAction Value="Diagram Design" ElementName="{x:Static dxdiag:DefaultBarItemNames.InsertRibbonPage}" PropertyName="Caption"/>
-                    <dxb:UpdateAction Value="Diagram Design" ElementName="{x:Static dxdiag:DefaultBarItemNames.ViewRibbonPage}" PropertyName="Caption"/>
-                    <dxb:UpdateAction Value="Diagram Design" ElementName="{x:Static dxdiag:DefaultBarItemNames.DesignRibbonPage}" PropertyName="Caption"/>
-
-                    <dxb:UpdateAction Value="13001" ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" PropertyName="MergeOrder"/>
-                    <dxb:UpdateAction Value="13002" ElementName="{x:Static dxdiag:DefaultBarItemNames.InsertRibbonPage}" PropertyName="MergeOrder"/>
-                    <dxb:UpdateAction Value="13002" ElementName="{x:Static dxdiag:DefaultBarItemNames.ViewRibbonPage}" PropertyName="MergeOrder"/>
-                    <dxb:UpdateAction Value="13002" ElementName="{x:Static dxdiag:DefaultBarItemNames.DesignRibbonPage}" PropertyName="MergeOrder"/>
-
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.Save}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveFile}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveAsFile}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.OpenFile}"/>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.NewFile}"/>
+                    <dxb:UpdateAction
+                        ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}"
+                        PropertyName="Caption"
+                        Value="Tools" />
+                    
+                    <dxb:UpdateAction
+                        ElementName="{x:Static dxdiag:DefaultBarItemNames.DefaultPageCategory}"
+                        Property="dxr:RibbonDefaultPageCategory.MergeType"
+                        Value="Remove" />
+
                 </diagram:Cdp4DiagramControl.Actions>
             </diagram:Cdp4DiagramControl>
         </Grid>

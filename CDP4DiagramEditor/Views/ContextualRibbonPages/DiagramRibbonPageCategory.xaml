@@ -9,7 +9,8 @@
                                    mc:Ignorable="d"
                                    Caption="Diagram"
                                    IsVisible="False"
-                                   ribbon:Name="DiagramCategory"
-                                   Color="SeaGreen"
+                                   ToolTip="Diagram Controls"
+                                   x:Name="DiagramCategory"
+                                   Color="DarkOrange"
                                    MergeOrder="8004">
 </ribbon:ExtendedRibbonPageCategory>

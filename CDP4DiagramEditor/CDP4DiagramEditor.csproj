@@ -168,14 +168,8 @@
     <Compile Include="ViewModels\DiagramDialogViewModel.cs" />
     <Compile Include="ViewModels\DiagramEdgeViewModel.cs" />
     <Compile Include="ViewModels\DiagramObjectViewModel.cs" />
-    <Compile Include="Views\ContextualRibbonPages\DiagramDesignRibbonPage.xaml.cs">
-      <DependentUpon>DiagramDesignRibbonPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml.cs">
       <DependentUpon>DiagramRibbonPageCategory.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ContextualRibbonPages\DiagramToolsRibbonPage.xaml.cs">
-      <DependentUpon>DiagramToolsRibbonPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DiagramDialog.xaml.cs">
       <DependentUpon>DiagramDialog.xaml</DependentUpon>
@@ -191,15 +185,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\ContextualRibbonPages\DiagramDesignRibbonPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ContextualRibbonPages\DiagramToolsRibbonPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
