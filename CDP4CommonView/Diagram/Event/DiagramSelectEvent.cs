@@ -10,6 +10,8 @@ namespace CDP4CommonView.Diagram
     using CDP4Composition.Mvvm;
     using EventAggregator;
 
+    using ReactiveUI;
+
     /// <summary>
     /// A select event for the diagramming tool
     /// </summary>
@@ -19,7 +21,7 @@ namespace CDP4CommonView.Diagram
         /// Initializes a new instance of the <see cref="DiagramSelectEvent"/> class
         /// </summary>
         /// <param name="selectedViewModels">The selected view-models</param>
-        public DiagramSelectEvent(IRowViewModelBase<DiagramElementThing>[] selectedViewModels)
+        public DiagramSelectEvent(ReactiveList<DiagramElementThing> selectedViewModels)
         {
             this.SelectedViewModels = selectedViewModels;
         }
@@ -27,6 +29,6 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Gets the view-model that should be deleted
         /// </summary>
-        public IRowViewModelBase<DiagramElementThing>[] SelectedViewModels { get; private set; }
+        public ReactiveList<DiagramElementThing> SelectedViewModels { get; private set; }
     }
 }

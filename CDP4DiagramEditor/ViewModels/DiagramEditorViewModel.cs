@@ -49,6 +49,8 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using DevExpress.Xpf.Diagram;
+
     using ReactiveUI;
 
     /// <summary>
@@ -62,9 +64,23 @@ namespace CDP4DiagramEditor.ViewModels
         private bool canCreateDiagram;
 
         /// <summary>
+        /// Backing field for <see cref="SelectedItem"/>
+        /// </summary>
+        private DiagramElementThing selectedItem;
+
+        /// <summary>
         /// Backing field for <see cref="SelectedItems"/>
         /// </summary>
-        private IRowViewModelBase<DiagramElementThing>[] selectedItems;
+        private ReactiveList<DiagramElementThing> selectedItems;
+
+        /// <summary>
+        /// Gets or sets the <see cref="DiagramItem"/> item that is selected.
+        /// </summary>
+        public DiagramElementThing SelectedItem
+        {
+            get { return this.selectedItem; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedItem, value); }
+        }
 
         /// <summary>
         /// Backing field for <see cref="IsDirty"/>
@@ -98,9 +114,9 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveList<DiagramEdgeViewModel> DiagramConnectorCollection { get; private set; }
 
         /// <summary>
-        /// Gets or sets the collection selected view-model
+        /// Gets or sets the collection of <see cref="DiagramItem"/> items that are selected.
         /// </summary>
-        public IRowViewModelBase<DiagramElementThing>[] SelectedItems
+        public ReactiveList<DiagramElementThing> SelectedItems
         {
             get { return this.selectedItems; }
             set { this.RaiseAndSetIfChanged(ref this.selectedItems, value); }

@@ -17,18 +17,21 @@ namespace CDP4CommonView.Diagram
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
-
-    using DevExpress.Diagram.Core;
-    using DevExpress.Mvvm.UI;
+    using CDP4Composition.Diagram;
+    using DevExpress.Diagram;
     using DevExpress.Xpf.Diagram;
     using DevExpress.Xpf.Ribbon;
 
     using EventAggregator;
 
     using Point = System.Windows.Point;
+    using DevExpress.Diagram.Core;
+
+    using IDiagramContainer = CDP4Composition.Diagram.IDiagramContainer;
 
     /// <summary>
     /// Allows proper callbacks on the 
@@ -296,7 +299,20 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The arguments.</param>
         public void OnControlSelectionChanged(object sender, EventArgs e)
         {
-            this.EventPublisher.Publish(new DiagramSelectEvent(this.AssociatedObject.SelectedItems.Select(x => (IRowViewModelBase<DiagramElementThing>) x.DataContext).ToArray()));
+            //this.EventPublisher.Publish(new DiagramSelectEvent(this.AssociatedObject.SelectedItems.Select(x => (IRowViewModelBase<DiagramElementThing>)x.DataContext).ToArray()));
+            var vm = this.AssociatedObject.DataContext as IDiagramContainer;
+            var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
+
+            if (vm != null)
+            {
+                vm.SelectedItems.Clear();
+                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
+
+                foreach (var controlSelectedItem in controlSelectedItems)
+                {
+                    vm.SelectedItems.Add(controlSelectedItem);
+                }
+            }
         }
 
         /// <summary>
@@ -313,14 +329,22 @@ namespace CDP4CommonView.Diagram
             {
                 return;
             }
+            var vm = this.AssociatedObject.DataContext as IDiagramContainer;
+            var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
 
-            foreach (var oldItem in oldlist)
+            if (vm != null)
             {
                 var diagramItem = oldItem as DiagramItem;
 
                 if (diagramItem != null)
                 {
                     this.EventPublisher.Publish(new DiagramDeleteEvent((IRowViewModelBase<Thing>) diagramItem.DataContext));
+                vm.SelectedItems.Clear();
+                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
+
+                foreach (var controlSelectedItem in controlSelectedItems)
+                {
+                    vm.SelectedItems.Add(controlSelectedItem);
                 }
             }
         }
@@ -478,6 +502,11 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
         private void PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (!(e.Source is Thing))
+            {
+                return;
+            }
+
             if (e.ClickCount != 1 || VisualTreeExtensions.HitTestScrollBar(sender, e)
                                   || VisualTreeExtensions.HitTestGridColumnHeader(sender, e))
             {
@@ -498,6 +527,11 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
         private void PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if (!(e.Source is Thing))
+            {
+                return;
+            }
+
             this.dragInfo = null;
         }
 
@@ -518,6 +552,11 @@ namespace CDP4CommonView.Diagram
 
             if (this.dragInfo != null && !this.dragInProgress)
             {
+                if (!(e.Source is Thing))
+                {
+                    return;
+                }
+
                 var dragStart = this.dragInfo.DragStartPosition;
                 var position = e.GetPosition(null);
 
@@ -574,8 +613,12 @@ namespace CDP4CommonView.Diagram
         {
             this.dropInfo = new DiagramDropInfo(sender, e);
 
-            var dropTarget = this.AssociatedObject.DataContext as IDropTarget;
+            if (!(e.Source is Thing || this.dropInfo.Payload is Thing || this.dropInfo.Payload is Tuple<ParameterType, MeasurementScale>))
+            {
+                return;
+            }
 
+            var dropTarget = this.AssociatedObject.DataContext as IDropTarget;
             if (dropTarget != null)
             {
                 dropTarget.DragOver(this.dropInfo);
@@ -644,6 +687,11 @@ namespace CDP4CommonView.Diagram
         /// </remarks>
         private void PreviewDragLeave(object sender, DragEventArgs e)
         {
+            if (!(e.Source is Thing))
+            {
+                return;
+            }
+
             this.dropInfo = null;
             e.Handled = true;
         }
@@ -658,10 +706,14 @@ namespace CDP4CommonView.Diagram
         /// </remarks>
         private void PreviewDrop(object sender, DragEventArgs e)
         {
-            this.dropInfo = new DiagramDropInfo(sender, e)
+            this.dropInfo = new DiagramDropInfo(sender, e);
+            //{
+            //    DiagramDropPoint = this.GetDiagramPositionFromMousePosition(this.dropInfo.DropPosition)
+            //};
+            if (!(e.Source is Thing || this.dropInfo.Payload is Thing || this.dropInfo.Payload is Tuple<ParameterType, MeasurementScale>))
             {
-                DiagramDropPoint = this.GetDiagramPositionFromMousePosition(this.dropInfo.DropPosition)
-            };
+                return;
+            }
 
             var dropTarget = this.AssociatedObject.DataContext as IDropTarget;
 
@@ -695,9 +747,27 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Resets the active tool.
         /// </summary>
+        /// 
         public void ResetTool()
         {
             this.AssociatedObject.ActiveTool = null;
+        }
+        /// <summary>
+        /// Removes the specified item from the diagram collection.
+        /// </summary>
+        /// <param name="item">The <see cref="DiagramItem"/> to remove.</param>
+        public void RemoveItem(DiagramItem item)
+        {
+            this.AssociatedObject.Items.Remove(item);
+        }
+
+        /// <summary>
+        /// Adds a connector to the <see cref="DiagramControl"/> item collection.
+        /// </summary>
+        /// <param name="connector">The connector to add</param>
+        public void AddConnector(DiagramConnector connector)
+        {
+            this.AssociatedObject.Items.Add(connector);
         }
     }
 }
