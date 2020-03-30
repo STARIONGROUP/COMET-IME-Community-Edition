@@ -26,8 +26,6 @@
 
 namespace CDP4EngineeringModel.ViewModels.FileStoreBrowsers
 {
-    using System.Collections.Generic;
-
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Mvvm;
@@ -39,14 +37,5 @@ namespace CDP4EngineeringModel.ViewModels.FileStoreBrowsers
     /// </summary>
     public interface IFileStoreRow<out T> : IISession, IHaveContainedRows, IViewModelBase<T> where T : FileStore
     {
-        /// <summary>
-        /// Gets the <see cref="Folder"/> cache
-        /// </summary>
-        Dictionary<Folder, FolderRowViewModel> FolderCache { get; }
-
-        /// <summary>
-        /// Gets the <see cref="File"/> cache
-        /// </summary>
-        Dictionary<File, FileRowViewModel> FileCache { get; }
     }
 }

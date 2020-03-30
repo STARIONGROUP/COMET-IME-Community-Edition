@@ -26,8 +26,6 @@
 
 namespace CDP4EngineeringModel.ViewModels
 {
-    using System.Collections.Generic;
-
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
@@ -37,8 +35,6 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Events;
 
     using CDP4EngineeringModel.ViewModels.FileStoreBrowsers;
-
-    using ReactiveUI;
 
     /// <summary>
     /// The <see cref="CommonFileStore"/> row-view-model
@@ -59,21 +55,9 @@ namespace CDP4EngineeringModel.ViewModels
         public CommonFileStoreRowViewModel(CommonFileStore store, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(store, session, containerViewModel)
         {
-            this.FolderCache = new Dictionary<Folder, FolderRowViewModel>();
-            this.FileCache = new Dictionary<File, FileRowViewModel>();
             this.fileStoreFileAndFolderHandler = new FileStoreFileAndFolderHandler<CommonFileStore>(this);
             this.UpdateProperties();
         }
-
-        /// <summary>
-        /// Gets or sets the <see cref="Folder"/> cache
-        /// </summary>
-        public Dictionary<Folder, FolderRowViewModel> FolderCache { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="File"/> cache
-        /// </summary>
-        public Dictionary<File, FileRowViewModel> FileCache { get; private set; }
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
@@ -93,7 +77,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.fileStoreFileAndFolderHandler.UpdateFolderRows();
             this.fileStoreFileAndFolderHandler.UpdateFileRows();
         }
     }

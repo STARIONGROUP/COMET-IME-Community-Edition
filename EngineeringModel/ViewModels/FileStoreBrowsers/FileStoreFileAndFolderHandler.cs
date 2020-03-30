@@ -43,6 +43,16 @@ namespace CDP4EngineeringModel.ViewModels
     public class FileStoreFileAndFolderHandler<T> : IFileStoreFileAndFolderHandler where T : FileStore
     {
         /// <summary>
+        /// The <see cref="Folder"/> cache
+        /// </summary>
+        private readonly Dictionary<Folder, FolderRowViewModel> folderCache;
+
+        /// <summary>
+        /// The <see cref="File"/> cache
+        /// </summary>
+        private readonly Dictionary<File, FileRowViewModel> fileCache;
+
+        /// <summary>
         /// The ViewModel that implements both <see cref="IViewModelBase<FileStore>"/> and <see cref="IFileStoreRow"/>
         /// </summary>
         private readonly IFileStoreRow<T> fileStoreRow;
@@ -67,6 +77,8 @@ namespace CDP4EngineeringModel.ViewModels
         public FileStoreFileAndFolderHandler(IFileStoreRow<T> fileStoreRow) 
         {
             this.fileStoreRow = fileStoreRow;
+            this.folderCache = new Dictionary<Folder, FolderRowViewModel>();
+            this.fileCache = new Dictionary<File, FileRowViewModel>();
         }
 
         /// <summary>
@@ -74,16 +86,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public void UpdateFolderRows()
         {
-            var currentFolders = this.fileStoreRow.FolderCache.Keys;
+            var currentFolders = this.folderCache.Keys;
 
             var addedFolders = this.Folders.Except(currentFolders).ToList();
             var removedFolders = currentFolders.Except(this.Folders).ToList();
 
             foreach (var removedFolder in removedFolders)
             {
-                if (this.fileStoreRow.FolderCache.TryGetValue(removedFolder, out var row))
+                if (this.folderCache.TryGetValue(removedFolder, out var row))
                 {
-                    this.fileStoreRow.FolderCache.Remove(removedFolder);
+                    this.folderCache.Remove(removedFolder);
                     ((IHaveContainedRows)row.ContainerViewModel).ContainedRows.RemoveAndDispose(row);
                 }
             }
@@ -91,19 +103,19 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var addedFolder in addedFolders)
             {
                 var row = new FolderRowViewModel(addedFolder, this.fileStoreRow.Session, this.fileStoreRow, this);
-                this.fileStoreRow.FolderCache.Add(addedFolder, row);
+                this.folderCache.Add(addedFolder, row);
             }
 
             foreach (var addedFolder in addedFolders)
             {
                 if (addedFolder.ContainingFolder == null)
                 {
-                    this.fileStoreRow.ContainedRows.Add(this.fileStoreRow.FolderCache[addedFolder]);
+                    this.fileStoreRow.ContainedRows.Add(this.folderCache[addedFolder]);
                 }
                 else
                 {
-                    var row = this.fileStoreRow.FolderCache[addedFolder];
-                    var containerViewModel = this.fileStoreRow.FolderCache[addedFolder.ContainingFolder];
+                    var row = this.folderCache[addedFolder];
+                    var containerViewModel = this.folderCache[addedFolder.ContainingFolder];
                     containerViewModel.ContainedRows.Add(row);
                     row.UpdateContainerViewModel(containerViewModel);
                 }
@@ -117,16 +129,16 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateFolderRows();
 
-            var currentFiles = this.fileStoreRow.FileCache.Keys;
+            var currentFiles = this.fileCache.Keys;
 
             var addedFiles = this.Files.Except(currentFiles).ToList();
             var removedFiles = currentFiles.Except(this.Files).ToList();
 
             foreach (var removedFile in removedFiles)
             {
-                if (this.fileStoreRow.FileCache.TryGetValue(removedFile, out var row))
+                if (this.fileCache.TryGetValue(removedFile, out var row))
                 {
-                    this.fileStoreRow.FileCache.Remove(removedFile);
+                    this.fileCache.Remove(removedFile);
                     ((IHaveContainedRows)row.ContainerViewModel).ContainedRows.RemoveAndDispose(row);
                 }
             }
@@ -134,7 +146,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var addedFile in addedFiles)
             {
                 var row = new FileRowViewModel(addedFile, this.fileStoreRow.Session, this.fileStoreRow, this);
-                this.fileStoreRow.FileCache.Add(addedFile, row);
+                this.fileCache.Add(addedFile, row);
 
                 var lastRevision = addedFile.FileRevision.OrderByDescending(x => x.CreatedOn).First();
 
@@ -144,7 +156,7 @@ namespace CDP4EngineeringModel.ViewModels
                 }
                 else
                 {
-                    var containerViewModel = this.fileStoreRow.FolderCache[lastRevision.ContainingFolder];
+                    var containerViewModel = this.folderCache[lastRevision.ContainingFolder];
                     containerViewModel.ContainedRows.Add(row);
                     row.UpdateContainerViewModel(containerViewModel);
                 }
@@ -159,7 +171,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateFolderRows();
 
-            var row = this.fileStoreRow.FolderCache[updatedFolder];
+            var row = this.folderCache[updatedFolder];
 
             if (updatedFolder.ContainingFolder == null)
             {
@@ -177,7 +189,7 @@ namespace CDP4EngineeringModel.ViewModels
             else if (updatedFolder.ContainingFolder != row.ContainerViewModel.Thing)
             {
                 ((IHaveContainedRows)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
-                var containerViewModel = this.fileStoreRow.FolderCache[updatedFolder.ContainingFolder];
+                var containerViewModel = this.folderCache[updatedFolder.ContainingFolder];
                 containerViewModel.ContainedRows.Add(row);
                 row.UpdateContainerViewModel(containerViewModel);
             }
@@ -192,7 +204,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateFileRows();
 
-            var row = this.fileStoreRow.FileCache[file];
+            var row = this.fileCache[file];
 
             if (fileRevision.ContainingFolder == null)
             {
@@ -206,7 +218,7 @@ namespace CDP4EngineeringModel.ViewModels
             else if (fileRevision.ContainingFolder != row.ContainerViewModel.Thing)
             {
                 ((IHaveContainedRows)row.ContainerViewModel).ContainedRows.RemoveWithoutDispose(row);
-                var containerViewModel = this.fileStoreRow.FolderCache[fileRevision.ContainingFolder];
+                var containerViewModel = this.folderCache[fileRevision.ContainingFolder];
                 containerViewModel.ContainedRows.Add(row);
                 row.UpdateContainerViewModel(containerViewModel);
             }

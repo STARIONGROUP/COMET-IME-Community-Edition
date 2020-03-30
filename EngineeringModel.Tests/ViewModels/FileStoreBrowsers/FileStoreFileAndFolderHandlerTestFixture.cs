@@ -67,8 +67,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FileStoreBrowsers
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IFileStoreRow<FileStore>> fileStoreRow;
-        private Dictionary<Folder, FolderRowViewModel> folderCache;
-        private Dictionary<File, FileRowViewModel> fileCache;
         private DisposableReactiveList<IRowViewModelBase<Thing>> containedRows;
 
         private Mock<ISession> session;
@@ -112,11 +110,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FileStoreBrowsers
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
 
             this.fileStoreRow = new Mock<IFileStoreRow<FileStore>>();
-            this.folderCache = new Dictionary<Folder, FolderRowViewModel>();
-            this.fileCache = new Dictionary<File, FileRowViewModel>();
             this.containedRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
-            this.fileStoreRow.Setup(x => x.FolderCache).Returns(this.folderCache);
-            this.fileStoreRow.Setup(x => x.FileCache).Returns(this.fileCache);
             this.fileStoreRow.Setup(x => x.ContainedRows).Returns(this.containedRows);
             this.fileStoreRow.Setup(x => x.Session).Returns(this.session.Object);
         }
@@ -137,9 +131,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FileStoreBrowsers
 
             fileStoreFileAndFolderHandler.UpdateFolderRows();
 
-            Assert.AreEqual(3, this.folderCache.Count);
-            Assert.AreEqual(0, this.fileCache.Count);
-
             //two folders at root level
             Assert.AreEqual(2, this.containedRows.OfType<FolderRowViewModel>().Count());
 
@@ -155,9 +146,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FileStoreBrowsers
             this.fileStoreRow.Object.Thing.Folder.RemoveAt(0);
 
             fileStoreFileAndFolderHandler.UpdateFolderRows();
-
-            // only 2 folders
-            Assert.AreEqual(2, this.folderCache.Count);
 
             //no folder with one subfolders anymore
             Assert.AreEqual(0, this.containedRows.OfType<FolderRowViewModel>().Count(x => x.ContainedRows.OfType<FolderRowViewModel>().Count() == 1));
@@ -176,8 +164,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FileStoreBrowsers
 
             fileStoreFileAndFolderHandler.UpdateFileRows();
 
-            Assert.AreEqual(4, this.fileCache.Count);
-
             //one file at root level
             Assert.AreEqual(1, this.containedRows.OfType<FileRowViewModel>().Count());
 
@@ -195,9 +181,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FileStoreBrowsers
             this.fileStoreRow.Object.Thing.File.RemoveAt(this.fileStoreRow.Object.Thing.File.Count - 1);
 
             fileStoreFileAndFolderHandler.UpdateFileRows();
-
-            //Only 3 files there
-            Assert.AreEqual(3, this.fileCache.Count);
 
             //no file at root level anymore
             Assert.AreEqual(0, this.containedRows.OfType<FileRowViewModel>().Count());
