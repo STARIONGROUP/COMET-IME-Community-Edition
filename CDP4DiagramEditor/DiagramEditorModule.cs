@@ -100,6 +100,7 @@ namespace CDP4DiagramEditor
         public void Initialize()
         {
             this.RegionManager.RegisterViewWithRegion(CDP4Composition.RegionNames.RibbonRegion, typeof(CDP4DiagramEditorRibbon));
+            this.RegionManager.RegisterViewWithRegion(CDP4Composition.RegionNames.RibbonRegion, typeof(DiagramRibbonPageCategory));
         }
     }
 }

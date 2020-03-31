@@ -18,6 +18,9 @@
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
+    <dxmvvm:Interaction.Behaviors>
+        <behaviours:RibbonCategoryBehavior CategoryName="DiagramCategory"></behaviours:RibbonCategoryBehavior>
+    </dxmvvm:Interaction.Behaviors>
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -78,8 +81,8 @@
             <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
                                         ToolboxVisibility="Full"
                                         SaveCommand="{Binding SaveDiagramCommand}"
-                                        dxb:MergingProperties.ElementMergingBehavior="All"
-                                        >
+                                        dxb:MergingProperties.ElementMergingBehavior="All">
+
                 <diagram:Cdp4DiagramControl.Resources>
                     <ResourceDictionary>
                         <ControlTemplate x:Key="DiagramObjectTemplate">
