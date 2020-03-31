@@ -1214,6 +1214,7 @@
     <Compile Include="Diagram\DiagramDropInfo.cs" />
     <Compile Include="Diagram\Event\DiagramSelectEvent.cs" />
     <Compile Include="Diagram\Event\DiagramDeleteEvent.cs" />
+    <Compile Include="Diagram\ICdp4DiagramContainer.cs" />
     <Compile Include="Diagram\ICdp4DiagramOrgChartBehavior.cs" />
     <Compile Include="Diagram\IDiagramDropInfo.cs" />
     <Compile Include="Diagram\ViewModels\IDiagramConnectorViewModel.cs" />

@@ -31,7 +31,6 @@ namespace CDP4CommonView.Diagram
     using Point = System.Windows.Point;
     using DevExpress.Diagram.Core;
 
-    using IDiagramContainer = CDP4Composition.Diagram.IDiagramContainer;
     using DevExpress.Mvvm.UI;
 
     using ReactiveUI;
@@ -39,7 +38,7 @@ namespace CDP4CommonView.Diagram
     /// <summary>
     /// Allows proper callbacks on the 
     /// </summary>
-    public class Cdp4DiagramOrgChartBehavior : DiagramOrgChartBehavior
+    public class Cdp4DiagramOrgChartBehavior : DiagramOrgChartBehavior, ICdp4DiagramOrgChartBehavior
     {
         /// <summary>
         /// The name of the data format used for drag-n-drop operations
@@ -307,7 +306,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The arguments.</param>
         public void OnControlSelectionChanged(object sender, EventArgs e)
         {
-            var vm = this.AssociatedObject.DataContext as IDiagramContainer;
+            var vm = this.AssociatedObject.DataContext as ICdp4DiagramContainer;
             var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
             if (vm != null)
             {
@@ -362,7 +361,7 @@ namespace CDP4CommonView.Diagram
                 return;
             }
 
-            var vm = this.AssociatedObject.DataContext as IDiagramContainer;
+            var vm = this.AssociatedObject.DataContext as ICdp4DiagramContainer;
             var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
 
             if (vm != null)
@@ -386,6 +385,20 @@ namespace CDP4CommonView.Diagram
             }
         }
 
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (this.AssociatedObject.DataContext != null)
+            {
+                var viewModel = this.AssociatedObject.DataContext as ICdp4DiagramContainer;
+
+                if (viewModel != null)
+                {
+                    viewModel.Behavior = this;
+                }
+            }
+        }
+
+
         #region Event-Handler setting
 
         /// <summary>
@@ -394,9 +407,11 @@ namespace CDP4CommonView.Diagram
         protected override void OnAttached()
         {
             base.OnAttached();
-
-            this.AssociatedObject.Items.CollectionChanged += this.OnControlCollectionChanged;
+            this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
+            //this.AssociatedObject.Items.CollectionChanged += this.OnControlCollectionChanged;
             this.AssociatedObject.SelectionChanged += this.OnControlSelectionChanged;
+
+            this.CustomLayoutItems += this.OnCustomLayoutItems;
 
             this.AssociatedObject.PreviewMouseLeftButtonDown += this.PreviewMouseLeftButtonDown;
             this.AssociatedObject.PreviewMouseLeftButtonUp += this.PreviewMouseLeftButtonUp;
@@ -411,6 +426,31 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.Loaded += this.Loaded;
             this.AssociatedObject.Unloaded += this.Unloaded;
         }
+
+        private void OnCustomLayoutItems(object sender, DiagramCustomLayoutItemsEventArgs e)
+        {
+            if (this.ItemPositions.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var item in e.Items)
+            {
+                if (((DiagramContentItem)item).Content is NamedThingDiagramContentItem namedThingDiagramContentItem)
+                {
+                    if (this.ItemPositions.TryGetValue(namedThingDiagramContentItem, out var itemPosition))
+                    {
+                        item.Position = itemPosition;
+
+                        // remove from collection as it is not useful anymore.
+                        this.ItemPositions.Remove(namedThingDiagramContentItem);
+                    }
+                }
+            }
+
+            e.Handled = true;
+        }
+
 
         /// <summary>
         /// On Unloaded event handler.
@@ -768,7 +808,7 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="dropPosition">The control <see cref="System.Windows.Point"/> where the drop occurs.</param>
         /// <returns>The document drop position.</returns>
-        private Point GetDiagramPositionFromMousePosition(Point dropPosition)
+        public Point GetDiagramPositionFromMousePosition(Point dropPosition)
         {
             return this.AssociatedObject.PointToDocument(dropPosition);
         }

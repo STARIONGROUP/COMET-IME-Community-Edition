@@ -52,12 +52,23 @@ namespace CDP4DiagramEditor.ViewModels
     using DevExpress.Xpf.Diagram;
 
     using ReactiveUI;
+    using System.Collections;
 
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor"/> view
     /// </summary>
-    public class DiagramEditorViewModel : BrowserViewModelBase<DiagramCanvas>, IPanelViewModel, IDropTarget
+    public class DiagramEditorViewModel : BrowserViewModelBase<DiagramCanvas>, IPanelViewModel, IDropTarget, ICdp4DiagramContainer
     {
+        public DiagramItem selectedItem2;
+        public ReactiveList<DiagramItem> SelectedItems2 { get; set; }
+
+        public void RemoveItems(IList oldItems)
+        {
+
+        }
+
+
+
         /// <summary>
         /// Backing field for <see cref="CanCreateDiagram"/>
         /// </summary>
@@ -122,6 +133,9 @@ namespace CDP4DiagramEditor.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.selectedItems, value); }
         }
 
+        public ICdp4DiagramOrgChartBehavior Behavior { get; set; }
+
+
         /// <summary>
         /// The <see cref="IEventPublisher"/> that allows view/view-model communication
         /// </summary>
@@ -162,6 +176,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// Gets the diagram generator command
         /// </summary>
         public ReactiveCommand<object> GenerateDiagramCommandDeep { get; private set; }
+        DiagramItem ICdp4DiagramContainer.SelectedItem { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        ReactiveList<DiagramItem> ICdp4DiagramContainer.SelectedItems { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Initialize the browser
