@@ -17,23 +17,22 @@ namespace CDP4CommonView.Diagram
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
+
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
-    using CDP4Composition.Diagram;
+
+
     using DevExpress.Diagram;
     using DevExpress.Xpf.Diagram;
+    using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Ribbon;
+    using DevExpress.Mvvm.UI;
 
     using EventAggregator;
 
     using Point = System.Windows.Point;
-    using DevExpress.Diagram.Core;
-
-    using DevExpress.Mvvm.UI;
-
-    using ReactiveUI;
 
     /// <summary>
     /// Allows proper callbacks on the 
@@ -306,7 +305,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The arguments.</param>
         public void OnControlSelectionChanged(object sender, EventArgs e)
         {
-            var vm = this.AssociatedObject.DataContext as ICdp4DiagramContainer;
+            var vm = (ICdp4DiagramContainer)this.AssociatedObject.DataContext;
             var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
             if (vm != null)
             {
@@ -389,12 +388,13 @@ namespace CDP4CommonView.Diagram
         {
             if (this.AssociatedObject.DataContext != null)
             {
-                var viewModel = this.AssociatedObject.DataContext as ICdp4DiagramContainer;
+                var viewModel= this.AssociatedObject.DataContext as ICdp4DiagramContainer;
 
-                if (viewModel != null)
+                if (viewModel == null)
                 {
-                    viewModel.Behavior = this;
+                    return;
                 }
+                viewModel.Behavior = this;
             }
         }
 
@@ -434,19 +434,19 @@ namespace CDP4CommonView.Diagram
                 return;
             }
 
-            foreach (var item in e.Items)
-            {
-                if (((DiagramContentItem)item).Content is NamedThingDiagramContentItem namedThingDiagramContentItem)
-                {
-                    if (this.ItemPositions.TryGetValue(namedThingDiagramContentItem, out var itemPosition))
-                    {
-                        item.Position = itemPosition;
+            //foreach (var item in e.Items)
+            //{
+            //    if (((DiagramContentItem)item).Content is NamedThingDiagramContentItem namedThingDiagramContentItem)
+            //    {
+            //        if (this.ItemPositions.TryGetValue(namedThingDiagramContentItem, out var itemPosition))
+            //        {
+            //            item.Position = itemPosition;
 
-                        // remove from collection as it is not useful anymore.
-                        this.ItemPositions.Remove(namedThingDiagramContentItem);
-                    }
-                }
-            }
+            //            // remove from collection as it is not useful anymore.
+            //            this.ItemPositions.Remove(namedThingDiagramContentItem);
+            //        }
+            //    }
+            //}
 
             e.Handled = true;
         }

@@ -77,17 +77,17 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Backing field for <see cref="SelectedItem"/>
         /// </summary>
-        private DiagramElementThing selectedItem;
+        private DiagramItem selectedItem;
 
         /// <summary>
         /// Backing field for <see cref="SelectedItems"/>
         /// </summary>
-        private ReactiveList<DiagramElementThing> selectedItems;
+        private ReactiveList<DiagramItem> selectedItems;
 
         /// <summary>
         /// Gets or sets the <see cref="DiagramItem"/> item that is selected.
         /// </summary>
-        public DiagramElementThing SelectedItem
+        public DiagramItem SelectedItem
         {
             get { return this.selectedItem; }
             set { this.RaiseAndSetIfChanged(ref this.selectedItem, value); }
@@ -127,7 +127,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets or sets the collection of <see cref="DiagramItem"/> items that are selected.
         /// </summary>
-        public ReactiveList<DiagramElementThing> SelectedItems
+        public ReactiveList<DiagramItem> SelectedItems
         {
             get { return this.selectedItems; }
             set { this.RaiseAndSetIfChanged(ref this.selectedItems, value); }
@@ -176,8 +176,6 @@ namespace CDP4DiagramEditor.ViewModels
         /// Gets the diagram generator command
         /// </summary>
         public ReactiveCommand<object> GenerateDiagramCommandDeep { get; private set; }
-        DiagramItem ICdp4DiagramContainer.SelectedItem { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        ReactiveList<DiagramItem> ICdp4DiagramContainer.SelectedItems { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Initialize the browser
@@ -190,9 +188,10 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.EventPublisher = new EventPublisher();
             var deleteObservable = this.EventPublisher.GetEvent<DiagramDeleteEvent>().ObserveOn(RxApp.MainThreadScheduler).Subscribe(this.OnDiagramDeleteEvent);
-            var selectionObservable = this.EventPublisher.GetEvent<DiagramSelectEvent>().ObserveOn(RxApp.MainThreadScheduler).Subscribe(e => this.SelectedItems = e.SelectedViewModels);
+            //var selectionObservable = this.EventPublisher.GetEvent<DiagramSelectEvent>().ObserveOn(RxApp.MainThreadScheduler).Subscribe(e => this.SelectedItems = e.SelectedViewModels);
             this.Disposables.Add(deleteObservable);
-            this.Disposables.Add(selectionObservable);
+            //this.Disposables.Add(selectionObservable);
+            this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
 
             this.DiagramObjectCollection = new ReactiveList<DiagramObjectViewModel> { ChangeTrackingEnabled = true };
             this.DiagramConnectorCollection = new ReactiveList<DiagramEdgeViewModel> { ChangeTrackingEnabled = true };
