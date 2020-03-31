@@ -54,20 +54,21 @@ namespace CDP4DiagramEditor.ViewModels
     using ReactiveUI;
     using System.Collections;
 
+    using CDP4Composition.Mvvm.Types;
+
+    using CDP4DiagramEditor.ViewModels.Relation;
+    using System.Collections.Generic;
+
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor"/> view
     /// </summary>
     public class DiagramEditorViewModel : BrowserViewModelBase<DiagramCanvas>, IPanelViewModel, IDropTarget, ICdp4DiagramContainer
     {
-        public DiagramItem selectedItem2;
-        public ReactiveList<DiagramItem> SelectedItems2 { get; set; }
-
-        public void RemoveItems(IList oldItems)
-        {
-
-        }
-
-
+        private ReactiveList<object> thingDiagramItems;
+        private string currentModel;
+        private int currentIteration;
+        private string domainOfExpertise;
+        private DisposableReactiveList<RuleNavBarRelationViewModel> relationshipRules;
 
         /// <summary>
         /// Backing field for <see cref="CanCreateDiagram"/>
@@ -111,6 +112,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             this.Caption = this.Thing.Name;
             this.ToolTip = $"The {this.Thing.Name} diagram editor";
+            
             this.UpdateProperties();
         }
         
@@ -177,6 +179,18 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public ReactiveCommand<object> GenerateDiagramCommandDeep { get; private set; }
 
+        public DisposableReactiveList<RuleNavBarRelationViewModel> RelationshipRules
+        {
+            get { return this.relationshipRules; }
+            set { this.RaiseAndSetIfChanged(ref this.relationshipRules, value); }
+        }
+
+        public ReactiveList<object> ThingDiagramItems
+        {
+            get { return this.thingDiagramItems; }
+            set { this.RaiseAndSetIfChanged(ref this.thingDiagramItems, value); }
+        }
+
         /// <summary>
         /// Initialize the browser
         /// </summary>
@@ -191,10 +205,25 @@ namespace CDP4DiagramEditor.ViewModels
             //var selectionObservable = this.EventPublisher.GetEvent<DiagramSelectEvent>().ObserveOn(RxApp.MainThreadScheduler).Subscribe(e => this.SelectedItems = e.SelectedViewModels);
             this.Disposables.Add(deleteObservable);
             //this.Disposables.Add(selectionObservable);
+            this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel> { ChangeTrackingEnabled = true };
+            this.ThingDiagramItems = new ReactiveList<object> { ChangeTrackingEnabled = true };
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
 
             this.DiagramObjectCollection = new ReactiveList<DiagramObjectViewModel> { ChangeTrackingEnabled = true };
             this.DiagramConnectorCollection = new ReactiveList<DiagramEdgeViewModel> { ChangeTrackingEnabled = true };
+        }
+
+        public ReactiveCommand<object> CreateBinaryRelationshipCommand { get; protected set; }
+        public ReactiveCommand<object> CreateMultiRelationshipCommand { get; protected set; }
+        private bool CanCreateMultiRelationship()
+        {
+            if (this.SelectedItems.Count <= 1)
+            {
+                return false;
+            }
+
+            //return this.SelectedItems.All(x => x is NamedThingDiagramContentItem);
+            return true; // for try
         }
 
         /// <summary>
@@ -213,8 +242,73 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.GenerateDiagramCommandDeep = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramObjectViewModel>().Any()));
             this.GenerateDiagramCommandDeep.Subscribe(x => this.ExecuteGenerateDiagramCommand(true));
+
+            var canCreateMultiRelationship =
+                this.SelectedItems.Changed.Select(_ => this.CanCreateMultiRelationship());
+
+            this.CreateBinaryRelationshipCommand = ReactiveCommand.Create();
+            this.CreateBinaryRelationshipCommand.Subscribe(_ => this.CreateBinaryRelationshipCommandExecute());
+
+            // creation of multi relationship requires selected nodes
+            this.CreateMultiRelationshipCommand = ReactiveCommand.Create(canCreateMultiRelationship);
+            this.CreateMultiRelationshipCommand.Subscribe(_ => this.CreateMultiRelationshipCommandExecute());
         }
 
+        public void CreateBinaryRelationshipCommandExecute()
+        {
+            this.Behavior.ActivateConnectorTool();
+        }
+        public void CreateMultiRelationshipCommandExecute(MultiRelationshipRule rule = null)
+        {
+            //var relatableThings = this.SelectedItems.Select(i => ((NamedThingDiagramContentItem)i).Thing);
+            //this.CreateMultiRelationship(relatableThings, rule);
+        }
+        private async void CreateMultiRelationship(IEnumerable<Thing> relatableThings, MultiRelationshipRule rule)
+        {
+            // send off the relationship
+            Tuple<DomainOfExpertise, Participant> tuple;
+            //this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
+            //var multiRelationship = new MultiRelationship(Guid.NewGuid(), null, null) { Owner = tuple.Item1 };
+
+            if (rule != null)
+            {
+               // multiRelationship.Category.Add(rule.RelationshipCategory);
+            }
+
+            var iteration = this.Thing.Clone(false);
+
+            //iteration.Relationship.Add(multiRelationship);
+
+            //multiRelationship.Container = iteration;
+
+            //multiRelationship.RelatedThing = relatableThings.ToList();
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
+
+            var containerTransaction = new ThingTransaction(transactionContext, iteration);
+            //containerTransaction.CreateOrUpdate(multiRelationship);
+
+            try
+            {
+                var operationContainer = containerTransaction.FinalizeTransaction();
+                await this.Session.Write(operationContainer);
+
+                // at this point relationship has gone through.
+                //var returedRelationship =
+                //    this.Thing.Relationship.FirstOrDefault(r => r.Iid == multiRelationship.Iid) as MultiRelationship;
+
+                //if (returedRelationship != null)
+                //{
+                //    this.CreateMultiRelationshipDiagramConnector(returedRelationship);
+                //}
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Creation of Binary Relationship failed: {0}", ex.Message),
+                    "Binary Relationship Failed",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
         /// <summary>
         /// Compute the permissions
         /// </summary>
@@ -594,6 +688,24 @@ namespace CDP4DiagramEditor.ViewModels
             var removedItem = currentObject.Except(displayedObjects).Count();
 
             this.IsDirty = this.DiagramObjectCollection.Any(x => x.IsDirty) || removedItem > 0;
+        }
+
+        /// <summary>
+        /// Removes items provided by the behavior.
+        /// </summary>
+        /// <param name="oldItems">The list of items to be removed.</param>
+        public void RemoveItems(IList oldItems)
+        {
+            // wipes all selected items from the collection.
+            foreach (var oldItem in oldItems)
+            {
+                var item = oldItem as DiagramItem;
+
+                if (item != null)
+                {
+                    this.ThingDiagramItems.Remove(item);
+                }
+            }
         }
     }
 }

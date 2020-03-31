@@ -168,6 +168,7 @@
     <Compile Include="ViewModels\DiagramDialogViewModel.cs" />
     <Compile Include="ViewModels\DiagramEdgeViewModel.cs" />
     <Compile Include="ViewModels\DiagramObjectViewModel.cs" />
+    <Compile Include="ViewModels\Relation\RuleNavBarRelationViewModel.cs" />
     <Compile Include="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml.cs">
       <DependentUpon>DiagramRibbonPageCategory.xaml</DependentUpon>
     </Compile>
