@@ -79,7 +79,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
-                                        ToolboxVisibility="Full"
+                                        ToolboxVisibility="Closed"
                                         SaveCommand="{Binding SaveDiagramCommand}"
                                         dxb:MergingProperties.ElementMergingBehavior="All">
 

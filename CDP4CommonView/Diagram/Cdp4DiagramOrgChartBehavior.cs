@@ -32,6 +32,7 @@ namespace CDP4CommonView.Diagram
     using DevExpress.Diagram.Core;
 
     using IDiagramContainer = CDP4Composition.Diagram.IDiagramContainer;
+    using DevExpress.Mvvm.UI;
 
     /// <summary>
     /// Allows proper callbacks on the 
@@ -73,6 +74,11 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         private RibbonControl parentRibbon;
 
+        /// <summary>
+        /// Gets a dictionary of saved diagram item positions.
+        /// </summary>
+        public Dictionary<object, Point> ItemPositions { get; } = new Dictionary<object, Point>();
+
         #region DependencyProperties
 
         /// <summary>
@@ -110,7 +116,7 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         public INotifyCollectionChanged DiagramObjectSource
         {
-            get { return (INotifyCollectionChanged) this.GetValue(DiagramObjectSourceProperty); }
+            get { return (INotifyCollectionChanged)this.GetValue(DiagramObjectSourceProperty); }
             set { this.SetValue(DiagramObjectSourceProperty, value); }
         }
 
@@ -119,7 +125,7 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         public INotifyCollectionChanged DiagramConnectorSource
         {
-            get { return (INotifyCollectionChanged) this.GetValue(DiagramConnectorSourceProperty); }
+            get { return (INotifyCollectionChanged)this.GetValue(DiagramConnectorSourceProperty); }
             set { this.SetValue(DiagramConnectorSourceProperty, value); }
         }
 
@@ -128,7 +134,7 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         public IEventPublisher EventPublisher
         {
-            get { return (IEventPublisher) this.GetValue(EventPublisherProperty); }
+            get { return (IEventPublisher)this.GetValue(EventPublisherProperty); }
             set { this.SetValue(EventPublisherProperty, value); }
         }
 
@@ -137,7 +143,7 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         public string RibbonMergeCategoryName
         {
-            get { return (string) this.GetValue(RibbonMergeCategoryNameProperty); }
+            get { return (string)this.GetValue(RibbonMergeCategoryNameProperty); }
             set { this.SetValue(RibbonMergeCategoryNameProperty, value); }
         }
 
@@ -148,7 +154,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
         private static void DiagramObjectSourceChanged(DependencyObject caller, DependencyPropertyChangedEventArgs e)
         {
-            var diagramBehavior = (Cdp4DiagramOrgChartBehavior) caller;
+            var diagramBehavior = (Cdp4DiagramOrgChartBehavior)caller;
             diagramBehavior.InitializeDiagramObjectSource(e.OldValue, e.NewValue);
 
             var oldlist = e.OldValue as IList;
@@ -163,7 +169,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
         private static void DiagramConnectorSourceChanged(DependencyObject caller, DependencyPropertyChangedEventArgs e)
         {
-            var diagramBehavior = (Cdp4DiagramOrgChartBehavior) caller;
+            var diagramBehavior = (Cdp4DiagramOrgChartBehavior)caller;
             diagramBehavior.InitializeConnectorSourceChanged(e.OldValue, e.NewValue);
 
             var oldlist = e.OldValue as IList;
@@ -322,29 +328,57 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/></param>
         private void OnControlCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            // add not processed, a view component shall not be added without the component
+
+            //if (this.ItemPositions.Count == 0)
+            //{
+            //    return;
+            //}
+
+            //foreach (var item in e.Items)
+            //{
+            //    if (((DiagramContentItem)item).Content is NamedThingDiagramContentItem namedThingDiagramContentItem)
+            //    {
+            //        if (this.ItemPositions.TryGetValue(namedThingDiagramContentItem, out var itemPosition))
+            //        {
+            //            item.Position = itemPosition;
+
+            //            // remove from collection as it is not useful anymore.
+            //            this.ItemPositions.Remove(namedThingDiagramContentItem);
+            //        }
+            //    }
+            //}
+
+            //e.Handled = true;
+
+
+            //add not processed, a view component shall not be added without the component
             var oldlist = e.OldItems;
 
             if (oldlist == null)
             {
                 return;
             }
+
             var vm = this.AssociatedObject.DataContext as IDiagramContainer;
             var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
 
             if (vm != null)
             {
-                var diagramItem = oldItem as DiagramItem;
-
-                if (diagramItem != null)
+                foreach (var item in e.NewItems)
                 {
-                    this.EventPublisher.Publish(new DiagramDeleteEvent((IRowViewModelBase<Thing>) diagramItem.DataContext));
-                vm.SelectedItems.Clear();
-                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
+                    var diagramItem = item as DiagramElementThing;
 
-                foreach (var controlSelectedItem in controlSelectedItems)
-                {
-                    vm.SelectedItems.Add(controlSelectedItem);
+                    if (diagramItem != null)
+                    {
+                        //this.EventPublisher.Publish(new DiagramDeleteEvent((IRowViewModelBase<Thing>)diagramItem.DataContext));
+                        vm.SelectedItems.Clear();
+                        vm.SelectedItem = controlSelectedItems.FirstOrDefault();
+
+                        foreach (var controlSelectedItem in controlSelectedItems)
+                        {
+                            vm.SelectedItems.Add(controlSelectedItem);
+                        }
+                    }
                 }
             }
         }
@@ -432,7 +466,7 @@ namespace CDP4CommonView.Diagram
 
                 if (mainShell != null || this.parentRibbon != null)
                 {
-                    if (mainShell != null )
+                    if (mainShell != null)
                     {
                         this.parentRibbon = mainShell.ActualRibbon;
                     }
