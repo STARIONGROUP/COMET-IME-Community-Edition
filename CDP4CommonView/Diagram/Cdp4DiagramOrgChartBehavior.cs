@@ -366,11 +366,11 @@ namespace CDP4CommonView.Diagram
             {
                 foreach (var item in e.NewItems)
                 {
-                    var diagramItem = item as DiagramElementThing;
+                    var diagramItem = item as DiagramContentItem;
 
                     if (diagramItem != null)
                     {
-                        //this.EventPublisher.Publish(new DiagramDeleteEvent((IRowViewModelBase<Thing>)diagramItem.DataContext));
+                        this.EventPublisher.Publish(new DiagramDeleteEvent((IRowViewModelBase<Thing>)diagramItem.DataContext));
                         vm.SelectedItems.Clear();
                         vm.SelectedItem = controlSelectedItems.FirstOrDefault();
 
