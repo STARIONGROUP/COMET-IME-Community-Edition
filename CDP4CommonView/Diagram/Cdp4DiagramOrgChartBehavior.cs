@@ -34,6 +34,8 @@ namespace CDP4CommonView.Diagram
     using IDiagramContainer = CDP4Composition.Diagram.IDiagramContainer;
     using DevExpress.Mvvm.UI;
 
+    using ReactiveUI;
+
     /// <summary>
     /// Allows proper callbacks on the 
     /// </summary>
@@ -305,20 +307,21 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The arguments.</param>
         public void OnControlSelectionChanged(object sender, EventArgs e)
         {
-            //this.EventPublisher.Publish(new DiagramSelectEvent(this.AssociatedObject.SelectedItems.Select(x => (IRowViewModelBase<DiagramElementThing>)x.DataContext).ToArray()));
             var vm = this.AssociatedObject.DataContext as IDiagramContainer;
             var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
-
             if (vm != null)
             {
                 vm.SelectedItems.Clear();
                 vm.SelectedItem = controlSelectedItems.FirstOrDefault();
+
 
                 foreach (var controlSelectedItem in controlSelectedItems)
                 {
                     vm.SelectedItems.Add(controlSelectedItem);
                 }
             }
+
+            //this.EventPublisher.Publish(new DiagramSelectEvent(new ReactiveList<DiagramElementThing>(this.AssociatedObject.SelectedItems.Select(x => ((IRowViewModelBase<DiagramElementThing>)x.DataContext).Thing))));
         }
 
         /// <summary>
