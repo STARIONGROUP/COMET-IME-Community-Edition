@@ -15,6 +15,7 @@
              xmlns:diagram="clr-namespace:CDP4CommonView.Diagram;assembly=CDP4CommonView"
              xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
              xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
+             xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
@@ -75,13 +76,15 @@
             <views:BrowserHeader Grid.Row="0" />
         </Grid>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="150"/>
+            </Grid.ColumnDefinitions>
             <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
                                         ToolboxVisibility="Closed"
                                         SaveCommand="{Binding SaveDiagramCommand}"
-                                        dxb:MergingProperties.ElementMergingBehavior="All">
+                                        dxb:MergingProperties.ElementMergingBehavior="All"
+                                        ShowPageBreaks="True" IsManipulationEnabled="True" AllowRotateItems="False" AllowResizeItems="False" AllowApplyAutomaticLayoutForSubordinates="False" AllowApplyAutomaticLayout="False">
 
                 <diagram:Cdp4DiagramControl.Resources>
                     <ResourceDictionary>
@@ -114,9 +117,28 @@
                                                          PageMargin="45" 
                                                          RibbonMergeCategoryName="DiagramCategory"
                                                          ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}">
-                        <!--DiagramObjectSource="{Binding DiagramObjectCollection, UpdateSourceTrigger=PropertyChanged}"
+                                                         >
+                                                         
+                                                     <!--DiagramObjectSource="{Binding DiagramObjectCollection, UpdateSourceTrigger=PropertyChanged}"
                                                          DiagramConnectorSource="{Binding DiagramConnectorCollection, UpdateSourceTrigger=PropertyChanged}"
-                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}">-->
+                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}"-->
+                        <diagram:Cdp4DiagramOrgChartBehavior.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontSize="50" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <Image Style="{StaticResource ThingIcon}" Margin="10">
+                                        <Image.Source>
+                                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                                <Binding Path="Content"/>
+                                            </MultiBinding>
+                                        </Image.Source>
+                                    </Image>
+                                    <TextBlock Text="{Binding FullName}" FontWeight="Bold" FontSize="14" Margin="10,0,10,10"></TextBlock>
+                                    <TextBlock Text="{Binding ShortName}" FontStyle="Italic" FontSize="11" Margin="10,0,10,10"></TextBlock>
+
+                                </StackPanel>
+                            </DataTemplate>
+                        </diagram:Cdp4DiagramOrgChartBehavior.ItemTemplate>
                     </diagram:Cdp4DiagramOrgChartBehavior>
                 </dxmvvm:Interaction.Behaviors>
                 <diagram:Cdp4DiagramControl.Actions>
@@ -137,6 +159,50 @@
 
                 </diagram:Cdp4DiagramControl.Actions>
             </diagram:Cdp4DiagramControl>
+            <Grid Grid.Column="1" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <dxn:NavBarControl dx:ThemeManager.ThemeName="Seven" Margin="0,0,0,0" Background="Transparent" Compact="False">
+                    <dxn:NavBarControl.View>
+                        <dxn:ExplorerBarView/>
+                    </dxn:NavBarControl.View>
+                    <dxn:NavBarControl.Groups>
+                        <dxn:NavBarGroup Header="Ports and interfaces">
+                            <dxn:NavBarGroup.Items>
+                                <dxn:NavBarItem Command="{Binding CreateInterfaceCommand}">
+                                    <dxn:NavBarItem.Template>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="16"
+                                                   Height="16"
+                                                   Margin="10"
+                                                   Source="{dx:DXImage Image=LineItem_16x16.png}" />
+                                                <TextBlock Text="Interfaces" VerticalAlignment="Center"></TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </dxn:NavBarItem.Template>
+                                    Binary Relationship
+                                </dxn:NavBarItem>
+                                <dxn:NavBarItem Command="{Binding CreatePortCommand}">
+                                    <dxn:NavBarItem.Template>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="16"
+                                                   Height="16"
+                                                   Margin="10"
+                                                   Source="{dx:DXImage Image=DocumentMap_16x16.png}" />
+                                                <TextBlock Text="Ports" VerticalAlignment="Center"></TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </dxn:NavBarItem.Template>
+                                    Multi Relationship
+                                </dxn:NavBarItem>
+                            </dxn:NavBarGroup.Items>
+                        </dxn:NavBarGroup>
+                    </dxn:NavBarControl.Groups>
+                </dxn:NavBarControl>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>
