@@ -52,8 +52,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.0.0-rc02\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.6.0.1-2020.4.1.5\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4Dal, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">

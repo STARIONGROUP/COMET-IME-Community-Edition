@@ -57,8 +57,8 @@
     <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.4.4.0\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="CDP4Common, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.0.0-rc02\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.6.0.1-2020.4.1.5\lib\net452\CDP4Common.dll</HintPath>
     </Reference>
     <Reference Include="CDP4Dal, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CDP4Dal-CE.6.0.0-rc02\lib\net452\CDP4Dal.dll</HintPath>
@@ -166,6 +166,7 @@
     <Compile Include="ViewModels\SessionViewModelTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
