@@ -190,6 +190,7 @@
     <Compile Include="ViewModels\CommonFileStoreBrowser\CommonFileStoreBrowserRibbonViewModelTestFixture.cs" />
     <Compile Include="ViewModels\CommonFileStoreBrowser\FileRowViewModelTestFixture.cs" />
     <Compile Include="ViewModels\CommonFileStoreBrowser\CommonFileStoreBrowserViewModelTestFixture.cs" />
+    <Compile Include="ViewModels\Dialogs\FileDialogViewModelTestFixture.cs" />
     <Compile Include="ViewModels\DomainFileStoreBrowser\DomainFileStoreBrowserRibbonViewModelTestFixture.cs" />
     <Compile Include="ViewModels\DomainFileStoreBrowser\DomainFileStoreBrowserViewModelTestFixture.cs" />
     <Compile Include="ViewModels\DomainFileStoreRowViewModelTestFixture.cs" />
@@ -243,9 +244,7 @@
       <Name>EngineeringModel</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ViewModels\FileStoreBrowsers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
