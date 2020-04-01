@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramEditorViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -148,13 +148,23 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<object> GenerateDiagramCommandDeep { get; private set; }
 
         /// <summary>
+        /// Gets or sets the Create Port Command
+        /// </summary>
+        public ReactiveCommand<object> CreatePortCommand { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the Create RelationShip Command
+        /// </summary>
+        public ReactiveCommand<object> CreateInterfaceCommand { get; private set; }
+
+        /// <summary>
         /// Initialize the browser
         /// </summary>
         protected override void Initialize()
         {
             base.Initialize();
 
-            this.WhenAnyValue(x => x.IsDirty).Subscribe(x => this.Caption = string.Format("{0}{1}", this.Thing.Name, x ? " (Dirty)" : string.Empty));
+            this.WhenAnyValue(x => x.IsDirty).Subscribe(x => this.Caption = $"{this.Thing.Name}{(x ? " (Dirty)" : string.Empty)}");
 
             this.EventPublisher = new EventPublisher();
             var deleteObservable = this.EventPublisher.GetEvent<DiagramDeleteEvent>().ObserveOn(RxApp.MainThreadScheduler).Subscribe(this.OnDiagramDeleteEvent);
@@ -182,6 +192,12 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.GenerateDiagramCommandDeep = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramObjectViewModel>().Any()));
             this.GenerateDiagramCommandDeep.Subscribe(x => this.ExecuteGenerateDiagramCommand(true));
+
+            this.CreatePortCommand = ReactiveCommand.Create();
+            this.CreatePortCommand.Subscribe(_ => this.CreatePortCommandExecute());
+
+            this.CreateInterfaceCommand = ReactiveCommand.Create();
+            this.CreateInterfaceCommand.Subscribe(_ => this.CreateInterfaceCommandExecute());
         }
 
         /// <summary>
@@ -449,6 +465,22 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 this.GenerateDiagramRelation(item, extendDeep);
             }
+        }
+
+        // <summary>
+        /// Creates a <see cref="BinaryRelationship"/>
+        /// </summary>
+        public void CreateInterfaceCommandExecute()
+        {
+            this.Behavior.ActivateConnectorTool();
+        }
+
+        // <summary>
+        /// Creates a <see cref="BinaryRelationship"/>
+        /// </summary>
+        public void CreatePortCommandExecute()
+        {
+            this.CreateDiagramObject(new ElementUsage() { Name = "WhyNot", ShortName = "WhyNot"}, new Point(0,0));
         }
 
         /// <summary>
