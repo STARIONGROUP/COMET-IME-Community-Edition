@@ -112,7 +112,8 @@
                 <dxmvvm:Interaction.Behaviors>
                     <diagram:Cdp4DiagramOrgChartBehavior x:Name="orgChartBehavior" 
                                                          PageMargin="45" 
-                                                         RibbonMergeCategoryName="DiagramCategory">
+                                                         RibbonMergeCategoryName="DiagramCategory"
+                                                         ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}">
                         <!--DiagramObjectSource="{Binding DiagramObjectCollection, UpdateSourceTrigger=PropertyChanged}"
                                                          DiagramConnectorSource="{Binding DiagramConnectorCollection, UpdateSourceTrigger=PropertyChanged}"
                                                          EventPublisher="{Binding EventPublisher, Mode=OneWay}">-->

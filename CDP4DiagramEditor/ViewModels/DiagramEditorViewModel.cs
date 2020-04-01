@@ -59,6 +59,8 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4DiagramEditor.ViewModels.Relation;
     using System.Collections.Generic;
 
+    using CDP4Composition.Diagram;
+
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor"/> view
     /// </summary>
@@ -428,19 +430,37 @@ namespace CDP4DiagramEditor.ViewModels
         public void DragOver(IDropInfo dropInfo)
         {
             var rowPayload = dropInfo.Payload as Thing;
-            if (rowPayload is DiagramThingBase)
+
+            if (rowPayload != null)
             {
-                dropInfo.Effects = DragDropEffects.None;
-                return;
+                if (!this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.Thing).Contains(rowPayload))
+                {
+                    dropInfo.Effects = DragDropEffects.Copy;
+                    return;
+                }
             }
 
-            if (!this.DiagramObjectCollection.Select(x => x.Thing.DepictedThing).Contains(rowPayload))
+            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
             {
                 dropInfo.Effects = DragDropEffects.Copy;
                 return;
             }
 
             dropInfo.Effects = DragDropEffects.None;
+            //var rowPayload = dropInfo.Payload as Thing;
+            //if (rowPayload is DiagramThingBase)
+            //{
+            //    dropInfo.Effects = DragDropEffects.None;
+            //    return;
+            //}
+
+            //if (!this.DiagramObjectCollection.Select(x => x.Thing.DepictedThing).Contains(rowPayload))
+            //{
+            //    dropInfo.Effects = DragDropEffects.Copy;
+            //    return;
+            //}
+
+            //dropInfo.Effects = DragDropEffects.None;
         }
 
         /// <summary>
@@ -451,28 +471,53 @@ namespace CDP4DiagramEditor.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            var droppedThing = dropInfo.Payload as Thing;
-            if (droppedThing == null)
+            var rowPayload = dropInfo.Payload as Thing;
+
+            var convertedDropPosition = this.Behavior.GetDiagramPositionFromMousePosition(dropInfo.DropPosition);
+
+            if (rowPayload != null)
             {
+                if (this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.Thing).Contains(rowPayload))
+                {
+                    return;
+                }
+
+                var diagramItem = new NamedThingDiagramContentItem(rowPayload);
+                this.Behavior.ItemPositions.Add(diagramItem, convertedDropPosition);
+                this.ThingDiagramItems.Add(diagramItem);
+
                 return;
             }
 
-            if (this.DiagramObjectCollection.Select(x => x.Thing.DepictedThing).Contains(droppedThing))
+            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
             {
-                return;
+                var diagramItem = new NamedThingDiagramContentItem(tuplePayload.Item1);
+                this.Behavior.ItemPositions.Add(diagramItem, convertedDropPosition);
+                this.ThingDiagramItems.Add(diagramItem);
             }
 
-            var diagramDrop = (IDiagramDropInfo)dropInfo;
+            //var droppedThing = dropInfo.Payload as Thing;
+            //if (droppedThing == null)
+            //{
+            //    return;
+            //}
 
-            var binaryrelationship = droppedThing as BinaryRelationship;
-            if (binaryrelationship != null)
-            {
-                this.OnBinaryRelationshipDrop(binaryrelationship, diagramDrop.DiagramDropPoint);
-            }
-            else
-            {
-                this.CreateDiagramObject(droppedThing, diagramDrop.DiagramDropPoint);
-            }
+            //if (this.DiagramObjectCollection.Select(x => x.Thing.DepictedThing).Contains(droppedThing))
+            //{
+            //    return;
+            //}
+
+            //var diagramDrop = (IDiagramDropInfo)dropInfo;
+
+            //var binaryrelationship = droppedThing as BinaryRelationship;
+            //if (binaryrelationship != null)
+            //{
+            //    this.OnBinaryRelationshipDrop(binaryrelationship, diagramDrop.DiagramDropPoint);
+            //}
+            //else
+            //{
+            //    this.CreateDiagramObject(droppedThing, diagramDrop.DiagramDropPoint);
+            //}
         }
 
         /// <summary>
@@ -707,5 +752,86 @@ namespace CDP4DiagramEditor.ViewModels
                 }
             }
         }
+
+        protected void OnSelectedThingChanged()
+        {
+            if (this.SelectedItem == null)
+            {
+                return;
+            }
+
+            var thingDiagramItem = this.SelectedItem as IThingDiagramItem;
+
+            if (thingDiagramItem == null)
+            {
+                // logic to handle drawing of new connections
+                var newDiagramConnector = this.SelectedItem as DiagramConnector;
+
+                if (newDiagramConnector != null)
+                {
+                    // a new connection was drawn
+                    //this.CreateBinaryRelationship(newDiagramConnector);
+                }
+
+                return;
+            }
+
+            var thing = thingDiagramItem.Thing;
+
+            if (thing == null)
+            {
+                return;
+            }
+
+            this.ShowInPropertyGrid();
+        }
+
+        /// <summary>
+        /// Show the <see cref="SelectedItem"/> in the Property Grid
+        /// </summary>
+        protected override void ShowInPropertyGrid()
+        {
+            if (this.SelectedItem != null)
+            {
+                this.PanelNavigationService.Open(((IThingDiagramItem)this.SelectedItem).Thing, this.Session);
+            }
+        }
+
+        public string CurrentModel
+        {
+            get { return this.currentModel; }
+            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+        }
+
+        /// <summary>
+        /// Gets the current iteration caption to be displayed in the browser
+        /// </summary>
+        public int CurrentIteration
+        {
+            get { return this.currentIteration; }
+            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+        }
+
+        /// <summary>
+        /// Updates the properties of this viewmodel.
+        /// </summary>
+        //private void UpdateProperties()
+        //{
+        //    this.CurrentModel = this.CurrentEngineeringModelSetup.Name;
+        //    this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
+
+        //    var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
+
+        //    if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
+        //    {
+        //        this.DomainOfExpertise = "None";
+        //    }
+        //    else
+        //    {
+        //        this.DomainOfExpertise = (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null)
+        //            ? "None"
+        //            : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
+        //    }
+        //}
     }
 }
