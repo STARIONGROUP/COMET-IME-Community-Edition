@@ -389,8 +389,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
             var thing = new File();
 
-            thing.FileRevision.Add(new FileRevision());
-
             if (container is Folder fileFolder)
             {
                 var realContainer = fileFolder.GetContainerOfType(typeof(DomainFileStore));
