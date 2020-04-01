@@ -51,6 +51,8 @@ namespace CDP4DiagramEditor.ViewModels
 
     using ReactiveUI;
 
+    using Point = System.Windows.Point;
+
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor"/> view
     /// </summary>
