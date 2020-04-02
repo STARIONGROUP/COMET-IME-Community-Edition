@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FolderDialog.xaml.cs" company="RHEA System S.A.">
+// <copyright file="FileDialog.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -32,23 +32,23 @@ namespace CDP4EngineeringModel.Views.Dialogs
     using CDP4Composition.Navigation.Interfaces;
 
     /// <summary>
-    /// Interaction logic for FolderDialog
+    /// Interaction logic for FileDialog
     /// </summary>
-    [ThingDialogViewExport(ClassKind.Folder)]
-    public partial class FolderDialog : IThingDialogView
+    [ThingDialogViewExport(ClassKind.File)]
+    public partial class FileDialog : IThingDialogView
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FolderDialog"/> class.
+        /// Initializes a new instance of the <see cref="FileDialog"/> class.
         /// </summary>
         /// <remarks>
         /// This constructor is used by MEF to instation the view. The view is instantiated to enable navigation using the <see cref="IThingDialogNavigationService"/>
         /// </remarks>
-        public FolderDialog()
+        public FileDialog()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FolderDialog"/> class.
+        /// Initializes a new instance of the <see cref="FileDialog"/> class.
         /// </summary>
         /// <param name="initializeComponent">
         /// a value indicating whether the contained Components shall be loaded
@@ -56,7 +56,7 @@ namespace CDP4EngineeringModel.Views.Dialogs
         /// <remarks>
         /// This constructor is called by the <see cref="IThingDialogNavigationService"/>.
         /// </remarks>
-        public FolderDialog(bool initializeComponent)
+        public FileDialog(bool initializeComponent)
         {
             if (initializeComponent)
             {

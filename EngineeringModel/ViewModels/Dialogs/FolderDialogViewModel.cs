@@ -117,6 +117,11 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.UpdateProperties();
 
+            if (this.Container is Folder folder && this.Thing.ContainingFolder == null)
+            {
+                this.Thing.ContainingFolder = folder;
+            }
+
             this.CreatedOn = this.Thing.CreatedOn.Equals(DateTime.MinValue) ? DateTime.UtcNow : this.Thing.CreatedOn;
 
             if (this.SelectedCreator == null)

@@ -196,13 +196,13 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeCommands();
             this.CreateFolderCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateFolder));
-            this.CreateFolderCommand.Subscribe(_ => this.ExecuteCreateCommand<Folder>(this.SelectedThing.Thing));
+            this.CreateFolderCommand.Subscribe(_ => this.ExecuteCreateCommandForFolder(this.SelectedThing.Thing));
 
             this.CreateStoreCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateStore));
             this.CreateStoreCommand.Subscribe(_ => this.ExecuteCreateCommand<DomainFileStore>(this.Thing));
 
             this.UploadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanUploadFile));
-            this.UploadFileCommand.Subscribe(_ => this.ExecuteUploadFile());
+            this.UploadFileCommand.Subscribe(_ => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing));
         }
 
         /// <summary>
@@ -359,30 +359,45 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Execute the generic <see cref="CreateCommand"/>
+        /// Execute the generic <see cref="CreateCommand"/> for a <see cref="Folder"/>
         /// </summary>
         /// <param name="container">
-        /// The container of the <see cref="Thing"/> that is to be created
+        /// The container of the <see cref="Folder"/> that is to be created
         /// </param>
-        /// <typeparam name="TThing">
-        /// The <see cref="Thing"/> that needs to be created.
-        /// </typeparam>
-        protected virtual void ExecuteCreateCommand<TThing>(Thing container = null) where TThing : Thing, new()
+        protected void ExecuteCreateCommandForFolder(Thing container = null)
         {
-            if ((typeof(TThing) == typeof(Folder)) && container is Folder folder)
-            {
-                var thing = new Folder
-                {
-                    ContainingFolder = folder
-                };
+            var thing = new Folder();
 
+            if (container is Folder folder)
+            {
                 var realContainer = folder.GetContainerOfType(typeof(DomainFileStore));
-                
+
                 this.ExecuteCreateCommand(thing, realContainer);
                 return;
             }
 
-            base.ExecuteCreateCommand<TThing>(container);
+            this.ExecuteCreateCommand(thing, container);
+        }
+
+        /// <summary>
+        /// Execute the generic <see cref="CreateCommand"/> for a <see cref="File"/>
+        /// </summary>
+        /// <param name="container">
+        /// The container of the <see cref="File"/> that is to be created
+        /// </param>
+        protected void ExecuteCreateCommandForFile(Thing container = null)
+        {
+            var thing = new File();
+
+            if (container is Folder fileFolder)
+            {
+                var realContainer = fileFolder.GetContainerOfType(typeof(DomainFileStore));
+
+                this.ExecuteCreateCommand(thing, realContainer);
+                return;
+            }
+
+            this.ExecuteCreateCommand(thing, container);
         }
 
         /// <summary>
@@ -390,9 +405,9 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void ExecuteUploadFile()
         {
-            var result = this.fileDialogService.GetSaveFileDialog(string.Empty, string.Empty, string.Empty, string.Empty, 1);
+            var result = this.fileDialogService.GetOpenFileDialog(false, false, false, string.Empty, string.Empty, string.Empty, 1);
 
-            if (string.IsNullOrEmpty(result))
+            if (result.Length != 1)
             {
                 return;
             }

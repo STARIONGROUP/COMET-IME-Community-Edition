@@ -148,9 +148,9 @@ namespace CDP4EngineeringModel.ViewModels
                 var row = new FileRowViewModel(addedFile, this.fileStoreRow.Session, this.fileStoreRow, this);
                 this.fileCache.Add(addedFile, row);
 
-                var lastRevision = addedFile.FileRevision.OrderByDescending(x => x.CreatedOn).First();
+                var lastRevision = addedFile.FileRevision.OrderByDescending(x => x.CreatedOn).FirstOrDefault();
 
-                if (lastRevision.ContainingFolder == null)
+                if (lastRevision?.ContainingFolder == null)
                 {
                     this.fileStoreRow.ContainedRows.Add(row);
                 }

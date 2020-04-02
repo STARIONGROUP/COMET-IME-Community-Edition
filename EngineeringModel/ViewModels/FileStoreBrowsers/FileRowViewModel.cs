@@ -176,6 +176,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
+            if (!this.Thing.FileRevision.Any())
+            {
+                return;
+            }
+
             // check if there is a new file revision
             var lastCreatedDate = this.Thing.FileRevision.Select(x => x.CreatedOn).Max();
 

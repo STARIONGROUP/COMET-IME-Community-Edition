@@ -53,8 +53,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
-    <Reference Include="CDP4Common, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.0.0-rc02\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.6.0.1-2020.4.1.5\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4Dal, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -240,6 +240,7 @@
     <Compile Include="ViewModels\Dialogs\ActualFiniteStateDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BinaryRelationshipDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BuiltInRuleVerificationDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\FileDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\FolderDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ElementUsageDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ElementDefinitionDialogViewModel.cs" />
@@ -339,6 +340,9 @@
     </Compile>
     <Compile Include="Views\Dialogs\BuiltInRuleVerificationDialog.xaml.cs">
       <DependentUpon>BuiltInRuleVerificationDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\FileDialog.xaml.cs">
+      <DependentUpon>FileDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\FolderDialog.xaml.cs">
       <DependentUpon>FolderDialog.xaml</DependentUpon>
@@ -455,6 +459,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Dialogs\BuiltInRuleVerificationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\FileDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
