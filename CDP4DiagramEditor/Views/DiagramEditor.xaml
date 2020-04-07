@@ -185,8 +185,7 @@
                                                          PageMargin="45"
                                                          RibbonMergeCategoryName="DiagramCategory"
                                                          ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}"
-                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}"
-                                                         DiagramPortSource="{Binding DiagramPortCollection}">
+                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}">
 
                         <!--ItemTemplateSelector="{StaticResource DiagramItemDataTemplateSelector}"-->
                         <diagram:Cdp4DiagramOrgChartBehavior.ItemTemplate>

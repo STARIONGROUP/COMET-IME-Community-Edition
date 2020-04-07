@@ -601,16 +601,15 @@ namespace CDP4DiagramEditor.ViewModels
                 };
 
                 block.Bounds.Add(bound);
-                target.ConnectionPoints = DiagramPointCollection.Empty;
                 container.PortCollection.Add(block);
                 var diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Left};
-                this.DiagramPortCollection.Add(diagramItem); 
+                this.ThingDiagramItems.Add(diagramItem); 
                 diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Top};
-                this.DiagramPortCollection.Add(diagramItem); 
+                this.ThingDiagramItems.Add(diagramItem); 
                  diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Right};
-                this.DiagramPortCollection.Add(diagramItem); 
+                this.ThingDiagramItems.Add(diagramItem); 
                  diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Bottom};
-                this.DiagramPortCollection.Add(diagramItem);
+                this.ThingDiagramItems.Add(diagramItem);
 
                 //return diagramItem;
 

@@ -20,6 +20,7 @@ namespace CDP4CommonView.Diagram
 
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4CommonView.Diagram.ViewModels;
     using CDP4CommonView.Diagram.Views;
 
     using CDP4Composition.Diagram;
@@ -507,10 +508,20 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.PreviewDragOver += this.PreviewDragOver;
             this.AssociatedObject.PreviewDragLeave += this.PreviewDragLeave;
             this.AssociatedObject.PreviewDrop += this.PreviewDrop;
-
-
             this.AssociatedObject.Loaded += this.Loaded;
             this.AssociatedObject.Unloaded += this.Unloaded;
+
+        }
+
+
+        protected override void OnDiagramItemAdding(DiagramDiagramItemAddingEventArgs e)
+        {
+
+            if (e.DataItem is PortContainerDiagramContentItem)
+            {
+
+            }
+            base.OnDiagramItemAdding(e);
         }
 
         private void OnCustomLayoutItems(object sender, DiagramCustomLayoutItemsEventArgs e)
