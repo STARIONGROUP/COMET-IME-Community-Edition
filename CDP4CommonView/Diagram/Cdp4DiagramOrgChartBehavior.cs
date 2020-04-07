@@ -19,7 +19,9 @@ namespace CDP4CommonView.Diagram
     using CDP4Common.DiagramData;
 
     using CDP4Common.SiteDirectoryData;
-    
+
+    using CDP4CommonView.Diagram.Views;
+
     using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
@@ -80,7 +82,6 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         public Dictionary<object, Point> ItemPositions { get; } = new Dictionary<object, Point>();
 
-        
         /// <summary>
         /// The dependency property that allows setting the source to the view-model representing a diagram object
         /// </summary>
@@ -364,7 +365,7 @@ namespace CDP4CommonView.Diagram
         {
             if (oldValue != null)
             {
-                foreach (IDiagramObjectViewModel item in oldValue)
+                foreach (IDiagramPortViewModel item in oldValue)
                 {
                     var diagramObj = this.AssociatedObject.Items.SingleOrDefault(x => x.DataContext == item);
 
@@ -379,8 +380,8 @@ namespace CDP4CommonView.Diagram
             {
                 foreach (IDiagramPortViewModel item in newValue)
                 {
-                    //var diagramObj = new DiagramPortShape(item, this);
-                    //this.AssociatedObject.Items.Add(diagramObj);
+                    var diagramObj = new DiagramPortShape(item, this);
+                    this.AssociatedObject.Items.Add(diagramObj);
                 }
             }
         }
@@ -394,7 +395,7 @@ namespace CDP4CommonView.Diagram
         {
             var vm = (ICdp4DiagramContainer)this.AssociatedObject.DataContext;
             var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
-            if (vm != null)
+            if (vm != null) 
             {
                 vm.SelectedItems.Clear();
                 vm.SelectedItem = controlSelectedItems.FirstOrDefault();
@@ -506,6 +507,7 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.PreviewDragOver += this.PreviewDragOver;
             this.AssociatedObject.PreviewDragLeave += this.PreviewDragLeave;
             this.AssociatedObject.PreviewDrop += this.PreviewDrop;
+
 
             this.AssociatedObject.Loaded += this.Loaded;
             this.AssociatedObject.Unloaded += this.Unloaded;
@@ -771,14 +773,25 @@ namespace CDP4CommonView.Diagram
         private void PreviewDragOver(object sender, DragEventArgs e)
         {
             this.dropInfo = new DiagramDropInfo(sender, e);
+            //this.dropInfo.DropPosition;
+            var senda =((DiagramControl)sender).PrimarySelection;
 
+            if (senda is DiagramPortShape portShape)
+            {
+                portShape.MoveToTheClosestAllowed(this.dropInfo.DropPosition);
+                //e.Handled = true; Cancel
+            }
+            else if (senda is NamedThingDiagramContentItem)
+            {
+                // MoveAllPortShapeAttached
+            }
+            
             if (!(e.Source is Thing || this.dropInfo.Payload is Thing || this.dropInfo.Payload is Tuple<ParameterType, MeasurementScale>))
             {
                 return;
             }
 
-            var dropTarget = this.AssociatedObject.DataContext as IDropTarget;
-            if (dropTarget != null)
+            if (this.AssociatedObject.DataContext is IDropTarget dropTarget)
             {
                 dropTarget.DragOver(this.dropInfo);
 

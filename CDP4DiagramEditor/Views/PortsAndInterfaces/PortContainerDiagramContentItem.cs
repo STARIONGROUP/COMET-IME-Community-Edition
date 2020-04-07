@@ -4,6 +4,7 @@
     using System.Windows.Media;
 
     using CDP4Common.CommonData;
+    using CDP4Common.DiagramData;
 
     using CDP4Composition.Diagram;
 
@@ -19,8 +20,8 @@
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public PortContainerDiagramContentItem(Thing thing) : base(thing)
         {
-            this.PortShapeCollection = new ReactiveList<DiagramPortShape>();
-            this.PortShapeCollection.ItemsAdded.Subscribe(this.DistributePortsArroundTheShape);
+            this.PortCollection = new ReactiveList<DiagramObject>();
+            //this.PortCollection.ItemsAdded.Subscribe(this.DistributePortsArroundTheShape);
             this.LeftPortShapeCollection = new ReactiveList<DiagramPortShape>();
             this.TopPortShapeCollection = new ReactiveList<DiagramPortShape>();
             this.RightPortShapeCollection = new ReactiveList<DiagramPortShape>();
@@ -63,11 +64,12 @@
             }
         }
 
-        public ReactiveList<DiagramPortShape> PortShapeCollection { get; set; }
+        public ReactiveList<DiagramObject> PortCollection { get; set; }
 
         public ReactiveList<DiagramPortShape> LeftPortShapeCollection { get; private set; }
         public ReactiveList<DiagramPortShape> TopPortShapeCollection { get; private set; }
         public ReactiveList<DiagramPortShape> RightPortShapeCollection { get; private set; }
         public ReactiveList<DiagramPortShape> BottomPortShapeCollection { get; private set; }
+
     }
 }

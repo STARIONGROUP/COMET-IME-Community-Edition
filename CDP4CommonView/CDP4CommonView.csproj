@@ -1220,8 +1220,12 @@
     <Compile Include="Diagram\ViewModels\IDiagramConnectorViewModel.cs" />
     <Compile Include="Diagram\ViewModels\IDiagramPortViewModel.cs" />
     <Compile Include="Diagram\ViewModels\IDiagramObjectViewModel.cs" />
+    <Compile Include="Diagram\ViewModels\PortContainerShapeSide.cs" />
     <Compile Include="Diagram\Views\Cdp4DiagramConnector.cs" />
     <Compile Include="Diagram\Views\Cdp4DiagramContentItem.cs" />
+    <Compile Include="Diagram\Views\DiagramPortShape.xaml.cs">
+      <DependentUpon>DiagramPortShape.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EventAggregator\BaseEvent.cs" />
     <Compile Include="EventAggregator\ConfirmationEvent.cs" />
     <Compile Include="EventAggregator\EventPublisher.cs" />
@@ -1406,6 +1410,10 @@
     <Compile Include="ViewUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Diagram\Views\DiagramPortShape.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Items\CitationLayoutGroup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

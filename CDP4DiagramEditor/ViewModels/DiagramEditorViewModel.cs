@@ -61,7 +61,9 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4DiagramEditor.ViewModels.Relation;
     using System.Collections.Generic;
     using System.Windows.Media;
-    
+
+    using CDP4CommonView.Diagram.ViewModels;
+
     using CDP4Composition.Diagram;
 
     using CDP4DiagramEditor.Views;
@@ -568,45 +570,52 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>The <see cref="DiagramObjectViewModel"/> instantiated</returns>
         private void CreateDiagramPort(Thing depictedThing, System.Windows.Point diagramPosition)
         {
+            //if ((this.SelectedItem as DiagramContentItem)?.Content is PortContainerDiagramContentItem portContainer)
+            //{
+            //    portContainer.PortShapeCollection.Add(new DiagramPortShape());
+            //}
 
-            //((DiagramContentItem) this.SelectedItem).Background = Brushes.Transparent;
-            //((DiagramContentItem) this.SelectedItem).Anchors = Sides.None;
-            if ((this.SelectedItem as DiagramContentItem)?.Content is PortContainerDiagramContentItem portContainer)
+            if (this.SelectedItem is DiagramContentItem target && target?.Content is PortContainerDiagramContentItem container)
             {
-                portContainer.PortShapeCollection.Add(new DiagramPortShape());
+                var row = this.DiagramObjectCollection.SingleOrDefault(x => x.Thing.DepictedThing == depictedThing);
+
+                if (row != null)
+                {
+                    return; //return row;
+                }
+
+                var block = new DiagramObject()
+                {
+                    DepictedThing = depictedThing,
+                    Name = depictedThing.UserFriendlyName,
+                    Documentation = depictedThing.UserFriendlyName,
+                    Resolution = Cdp4DiagramHelper.DefaultResolution
+                };
+
+                var bound = new Bounds()
+                {
+                    X = (float) target.Position.X,
+                    Y = (float) target.Position.Y,
+                    Height = (float) target.ActualHeight,
+                    Width = (float) target.ActualWidth
+                };
+
+                block.Bounds.Add(bound);
+                target.ConnectionPoints = DiagramPointCollection.Empty;
+                container.PortCollection.Add(block);
+                var diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Left};
+                this.DiagramPortCollection.Add(diagramItem); 
+                diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Top};
+                this.DiagramPortCollection.Add(diagramItem); 
+                 diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Right};
+                this.DiagramPortCollection.Add(diagramItem); 
+                 diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Bottom};
+                this.DiagramPortCollection.Add(diagramItem);
+
+                //return diagramItem;
+
+                this.UpdateIsDirty();
             }
-
-            this.UpdateIsDirty();
-            //var row = this.DiagramPortCollection.SingleOrDefault(x => x.Thing.DepictedThing == depictedThing);
-            //if (row != null)
-            //{
-            //    return row;
-            //}
-
-            //DiagramPortViewModel diagramItem = null;
-            //if (this.SelectedItem != null)out
-            //{
-            //    var block = new DiagramObject()
-            //    {
-            //        DepictedThing = depictedThing,
-            //        Name = depictedThing.UserFriendlyName,
-            //        Documentation = depictedThing.UserFriendlyName,
-            //        Resolution = Cdp4DiagramHelper.DefaultResolution
-            //    };
-
-            //    var selectedItemBound =  this.SelectedItem.GetBounds();
-            //    var bound = new Bounds()
-            //    {
-            //        X = (float)(selectedItemBound.X + selectedItemBound.Width / 2),
-            //        Y = (float)(selectedItemBound.Y + selectedItemBound.Height)-15,
-            //    };
-
-            //    block.Bounds.Add(bound);
-
-            //    diagramItem = new DiagramPortViewModel(block, this.Session, this);
-            //    this.DiagramPortCollection.Add(diagramItem);
-            //}
-            //return diagramItem;
         }
 
         /// <summary>
