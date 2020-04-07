@@ -168,8 +168,13 @@
     <Compile Include="ViewModels\DiagramBrowserViewModel.cs" />
     <Compile Include="ViewModels\DiagramDialogViewModel.cs" />
     <Compile Include="ViewModels\DiagramEdgeViewModel.cs" />
+    <Compile Include="ViewModels\DiagramItemDataTemplateSelector.cs" />
     <Compile Include="ViewModels\DiagramObjectViewModel.cs" />
+    <Compile Include="ViewModels\DiagramPortViewModel.cs" />
     <Compile Include="ViewModels\Relation\RuleNavBarRelationViewModel.cs" />
+    <Compile Include="Views\PortsAndInterfaces\DiagramPortShape.xaml.cs">
+      <DependentUpon>DiagramPortShape.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml.cs">
       <DependentUpon>DiagramRibbonPageCategory.xaml</DependentUpon>
     </Compile>
@@ -185,9 +190,13 @@
     <Compile Include="Views\DiagramBrowser.xaml.cs">
       <DependentUpon>DiagramBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PortsAndInterfaces\DiagramPort.cs" />
+    <Compile Include="Views\PortsAndInterfaces\PortContainerDiagramContentItem.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\PortsAndInterfaces\DiagramPortShape.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -224,7 +233,9 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="DiagramData\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

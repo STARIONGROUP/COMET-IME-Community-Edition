@@ -60,8 +60,17 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4DiagramEditor.ViewModels.Relation;
     using System.Collections.Generic;
-
+    using System.Windows.Media;
+    
     using CDP4Composition.Diagram;
+
+    using CDP4DiagramEditor.Views;
+    using CDP4DiagramEditor.Views.PortsAndInterfaces;
+
+    using DevExpress.Diagram.Core;
+    using DevExpress.Xpf.Core;
+
+    using IDropTarget = CDP4Composition.DragDrop.IDropTarget;
 
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor"/> view
@@ -124,6 +133,11 @@ namespace CDP4DiagramEditor.ViewModels
         /// Gets the collection diagramming-object to display.
         /// </summary>
         public ReactiveList<DiagramObjectViewModel> DiagramObjectCollection { get; private set; }
+
+        /// <summary>
+        /// Gets the collection diagramming-port to display.
+        /// </summary>
+        public ReactiveList<DiagramPortViewModel> DiagramPortCollection { get; private set; }
 
         /// <summary>
         /// Gets the collection diagramming-item to display.
@@ -224,6 +238,7 @@ namespace CDP4DiagramEditor.ViewModels
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
 
             this.DiagramObjectCollection = new ReactiveList<DiagramObjectViewModel> { ChangeTrackingEnabled = true };
+            this.DiagramPortCollection = new ReactiveList<DiagramPortViewModel> { ChangeTrackingEnabled = true };
             this.DiagramConnectorCollection = new ReactiveList<DiagramEdgeViewModel> { ChangeTrackingEnabled = true };
         }
 
@@ -465,20 +480,6 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             dropInfo.Effects = DragDropEffects.None;
-            //var rowPayload = dropInfo.Payload as Thing;
-            //if (rowPayload is DiagramThingBase)
-            //{
-            //    dropInfo.Effects = DragDropEffects.None;
-            //    return;
-            //}
-
-            //if (!this.DiagramObjectCollection.Select(x => x.Thing.DepictedThing).Contains(rowPayload))
-            //{
-            //    dropInfo.Effects = DragDropEffects.Copy;
-            //    return;
-            //}
-
-            //dropInfo.Effects = DragDropEffects.None;
         }
 
         /// <summary>
@@ -500,42 +501,26 @@ namespace CDP4DiagramEditor.ViewModels
                     return;
                 }
 
-                var diagramItem = new NamedThingDiagramContentItem(rowPayload);
+                NamedThingDiagramContentItem diagramItem = null;
+
+                if (rowPayload is ElementDefinition elementDefinition)
+                {
+                    diagramItem = new PortContainerDiagramContentItem(elementDefinition);
+                }
+                else if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
+                {
+                    diagramItem = new NamedThingDiagramContentItem(tuplePayload.Item1);
+                }
+                else
+                {
+                    diagramItem = new NamedThingDiagramContentItem(rowPayload);
+                }
+
                 this.Behavior.ItemPositions.Add(diagramItem, convertedDropPosition);
                 this.ThingDiagramItems.Add(diagramItem);
 
                 return;
             }
-
-            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
-            {
-                var diagramItem = new NamedThingDiagramContentItem(tuplePayload.Item1);
-                this.Behavior.ItemPositions.Add(diagramItem, convertedDropPosition);
-                this.ThingDiagramItems.Add(diagramItem);
-            }
-
-            //var droppedThing = dropInfo.Payload as Thing;
-            //if (droppedThing == null)
-            //{
-            //    return;
-            //}
-
-            //if (this.DiagramObjectCollection.Select(x => x.Thing.DepictedThing).Contains(droppedThing))
-            //{
-            //    return;
-            //}
-
-            //var diagramDrop = (IDiagramDropInfo)dropInfo;
-
-            //var binaryrelationship = droppedThing as BinaryRelationship;
-            //if (binaryrelationship != null)
-            //{
-            //    this.OnBinaryRelationshipDrop(binaryrelationship, diagramDrop.DiagramDropPoint);
-            //}
-            //else
-            //{
-            //    this.CreateDiagramObject(droppedThing, diagramDrop.DiagramDropPoint);
-            //}
         }
 
         /// <summary>
@@ -573,6 +558,55 @@ namespace CDP4DiagramEditor.ViewModels
             var diagramItem = new DiagramObjectViewModel(block, this.Session, this);
             this.DiagramObjectCollection.Add(diagramItem);
             return diagramItem;
+        }
+
+        /// <summary>
+        /// create a <see cref="DiagramObject"/> from a dropped thing
+        /// </summary>
+        /// <param name="depictedThing">The dropped <see cref="Thing"/></param>
+        /// <param name="diagramPosition">The position of the <see cref="DiagramObject"/></param>
+        /// <returns>The <see cref="DiagramObjectViewModel"/> instantiated</returns>
+        private void CreateDiagramPort(Thing depictedThing, System.Windows.Point diagramPosition)
+        {
+
+            //((DiagramContentItem) this.SelectedItem).Background = Brushes.Transparent;
+            //((DiagramContentItem) this.SelectedItem).Anchors = Sides.None;
+            if ((this.SelectedItem as DiagramContentItem)?.Content is PortContainerDiagramContentItem portContainer)
+            {
+                portContainer.PortShapeCollection.Add(new DiagramPortShape());
+            }
+
+            this.UpdateIsDirty();
+            //var row = this.DiagramPortCollection.SingleOrDefault(x => x.Thing.DepictedThing == depictedThing);
+            //if (row != null)
+            //{
+            //    return row;
+            //}
+
+            //DiagramPortViewModel diagramItem = null;
+            //if (this.SelectedItem != null)out
+            //{
+            //    var block = new DiagramObject()
+            //    {
+            //        DepictedThing = depictedThing,
+            //        Name = depictedThing.UserFriendlyName,
+            //        Documentation = depictedThing.UserFriendlyName,
+            //        Resolution = Cdp4DiagramHelper.DefaultResolution
+            //    };
+
+            //    var selectedItemBound =  this.SelectedItem.GetBounds();
+            //    var bound = new Bounds()
+            //    {
+            //        X = (float)(selectedItemBound.X + selectedItemBound.Width / 2),
+            //        Y = (float)(selectedItemBound.Y + selectedItemBound.Height)-15,
+            //    };
+
+            //    block.Bounds.Add(bound);
+
+            //    diagramItem = new DiagramPortViewModel(block, this.Session, this);
+            //    this.DiagramPortCollection.Add(diagramItem);
+            //}
+            //return diagramItem;
         }
 
         /// <summary>
@@ -652,7 +686,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public void CreatePortCommandExecute()
         {
-            this.CreateDiagramObject(new ElementUsage() { Name = "WhyNot", ShortName = "WhyNot"}, new Point(0,0));
+            this.CreateDiagramPort(new ElementUsage() { Name = "WhyNot", ShortName = "WhyNot"}, new Point(0,0));
         }
 
         /// <summary>
@@ -762,11 +796,17 @@ namespace CDP4DiagramEditor.ViewModels
         public void UpdateIsDirty()
         {
             var currentObject = this.Thing.DiagramElement.OfType<DiagramObject>().ToArray();
-            var displayedObjects = this.DiagramObjectCollection.Select(x => x.Thing).ToArray();
+            var displayedObjects = this.ThingDiagramItems.Select(x => (x as NamedThingDiagramContentItem)?.Thing).ToArray();
 
             var removedItem = currentObject.Except(displayedObjects).Count();
 
-            this.IsDirty = this.DiagramObjectCollection.Any(x => x.IsDirty) || removedItem > 0;
+            //this.IsDirty = this.ThingDiagramItems.Any(x => (x as NamedThingDiagramContentItem)?.IsDirty) || removedItem > 0;
+            //var currentObject = this.Thing.DiagramElement.OfType<DiagramObject>().ToArray();
+            //var displayedObjects = this.DiagramObjectCollection.Select(x => x.Thing).ToArray();
+
+            //var removedItem = currentObject.Except(displayedObjects).Count();
+
+            this.IsDirty = this.DiagramPortCollection.Any(x => x.IsDirty) || removedItem > 0;
         }
 
         /// <summary>
@@ -799,9 +839,7 @@ namespace CDP4DiagramEditor.ViewModels
             if (thingDiagramItem == null)
             {
                 // logic to handle drawing of new connections
-                var newDiagramConnector = this.SelectedItem as DiagramConnector;
-
-                if (newDiagramConnector != null)
+                if (this.SelectedItem is DiagramConnector newDiagramConnector)
                 {
                     // a new connection was drawn
                     //this.CreateBinaryRelationship(newDiagramConnector);
@@ -845,27 +883,5 @@ namespace CDP4DiagramEditor.ViewModels
             get { return this.currentIteration; }
             private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
         }
-
-        /// <summary>
-        /// Updates the properties of this viewmodel.
-        /// </summary>
-        //private void UpdateProperties()
-        //{
-        //    this.CurrentModel = this.CurrentEngineeringModelSetup.Name;
-        //    this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
-
-        //    var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
-
-        //    if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
-        //    {
-        //        this.DomainOfExpertise = "None";
-        //    }
-        //    else
-        //    {
-        //        this.DomainOfExpertise = (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null)
-        //            ? "None"
-        //            : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
-        //    }
-        //}
     }
 }

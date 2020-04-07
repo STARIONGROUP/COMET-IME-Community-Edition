@@ -1218,6 +1218,7 @@
     <Compile Include="Diagram\ICdp4DiagramOrgChartBehavior.cs" />
     <Compile Include="Diagram\IDiagramDropInfo.cs" />
     <Compile Include="Diagram\ViewModels\IDiagramConnectorViewModel.cs" />
+    <Compile Include="Diagram\ViewModels\IDiagramPortViewModel.cs" />
     <Compile Include="Diagram\ViewModels\IDiagramObjectViewModel.cs" />
     <Compile Include="Diagram\Views\Cdp4DiagramConnector.cs" />
     <Compile Include="Diagram\Views\Cdp4DiagramContentItem.cs" />
