@@ -56,7 +56,7 @@
         private void DetermineRotation()
         {
             var datacontext = ((IDiagramPortViewModel) this.DataContext);
-            this.Position = ((IDiagramPortViewModel)this.DataContext).Position;
+            this.Position = ((IDiagramPortViewModel) this.DataContext).Position;
             switch (datacontext.PortContainerShapeSide)
             {
                 case PortContainerShapeSide.Top:

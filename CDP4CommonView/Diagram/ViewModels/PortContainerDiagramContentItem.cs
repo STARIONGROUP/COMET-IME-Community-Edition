@@ -11,6 +11,8 @@
 
     using CDP4Composition.Diagram;
 
+    using DevExpress.Xpf.Diagram;
+
     using NLog;
 
     using ReactiveUI;
@@ -48,30 +50,30 @@
             if (place == 0)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Bottom;
-                var presentPort = this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Bottom) - 1;
-                var portion = (20 - presentPort) / 100 * this.RenderSize.Width;
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(((presentPort + 1)  * portion)- (12.5), this.RenderSize.Height - (12.5)));
+                var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Bottom) - 1;
+                var portion = ((20 - presentPort) / 100) * (this.Parent as DiagramItem).ActualWidth;
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(((presentPort + 1)  * portion)- (12.5), (this.Parent as DiagramItem).ActualHeight - (12.5)));
             }
             else if (place == .25)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Left;
-                var presentPort = this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Left) - 1;
-                var portion = (20 - presentPort) / 100 * this.RenderSize.Height;
+                var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Left) - 1;
+                var portion = ((20 - presentPort) / 100) * (this.Parent as DiagramItem).ActualHeight;
                 lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(0 - (12.5), ((presentPort + 1) * portion) - (12.5)));
             }
             else if (place == .50)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Top;
-                var presentPort = this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Top) - 1;
-                var portion = (20 - presentPort) / 100 * this.RenderSize.Width;
+                var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Top) - 1;
+                var portion = ((20 - presentPort) / 100) * (this.Parent as DiagramItem).ActualWidth;
                 this.Position = System.Windows.Point.Add(this.Position, new Vector(((presentPort + 1) * portion) - (12.5), 0 - (12.5)));
             }
             else if (place == .75)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Right;
-                var presentPort = this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Left) - 1;
-                var portion = (20 - presentPort) / 100 * this.RenderSize.Height;
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(this.RenderSize.Width - (12.5), ((presentPort + 1) * portion) - (12.5)));
+                var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Left) - 1;
+                var portion = ((20 - presentPort) / 100) * (this.Parent as DiagramItem).ActualHeight;
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector((this.Parent as DiagramItem).ActualWidth - (12.5), ((presentPort + 1) * portion) - (12.5)));
             }
             
         }

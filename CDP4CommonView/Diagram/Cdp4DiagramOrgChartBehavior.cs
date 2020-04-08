@@ -536,23 +536,17 @@ namespace CDP4CommonView.Diagram
                 {
                     
                 }
-
-            }
-        }
-
-        protected override void OnDiagramItemAdded(DiagramDiagramItemAddedEventArgs e)
-        {
-            if (e.DataItem is PortContainerDiagramContentItem portContainer)
-            {
-                foreach (var port in portContainer.PortCollection)
+                else
                 {
-
+                    if (e.Item is PortContainerDiagramContentItem container)
+                    {
+                        //this.On
+                    }
                 }
+
             }
-
-            base.OnDiagramItemAdded(e);
         }
-
+        
         protected override void OnDiagramItemAdding(DiagramDiagramItemAddingEventArgs e)
         {
 
