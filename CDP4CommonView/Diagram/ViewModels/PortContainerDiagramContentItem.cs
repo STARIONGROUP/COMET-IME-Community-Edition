@@ -65,8 +65,9 @@
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Top;
                 var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Top) - 1;
-                var portion = ((20 - presentPort) / 100) * (this.Parent as DiagramItem).ActualWidth;
-                this.Position = System.Windows.Point.Add(this.Position, new Vector(((presentPort + 1) * portion) - (12.5), 0 - (12.5)));
+                var sideLength = (this.Parent as DiagramItem).ActualWidth;
+                double xVector = CalculateVector(presentPort, sideLength);
+                this.Position = System.Windows.Point.Add(this.Position, new Vector(xVector, 0 - (12.5)));
             }
             else if (place == .75)
             {
@@ -76,6 +77,12 @@
                 lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector((this.Parent as DiagramItem).ActualWidth - (12.5), ((presentPort + 1) * portion) - (12.5)));
             }
             
+        }
+
+        private static double CalculateVector(double presentPortNumberOnThisSide, double sideLength)
+        {
+            var portion = ((20 - presentPortNumberOnThisSide) / 100) * sideLength;
+            return ((presentPortNumberOnThisSide + 1) * portion) - (12.5);
         }
     }
 }
