@@ -5,7 +5,7 @@
                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                      xmlns:dxdiag="http://schemas.devexpress.com/winfx/2008/xaml/diagram"
                      mc:Ignorable="d"
-                     Shape="BasicShapes.Trapezoid"
+                     Shape="BasicShapes.Rectangle"
                      Height="25"
                      Width="25"
                      Anchors="Bottom"
@@ -14,8 +14,8 @@
                      CanSnapToThisItem="False"
                      CanMove="True"
                      ConnectionPoints="0.5,1"
-                     Background="DarkOrange"
-                     BorderBrush="DarkOrange"
+                     Background="Gray"
+                     BorderBrush="Gray"
                      BorderThickness="1"
                      d:DesignHeight="300" d:DesignWidth="300">
 

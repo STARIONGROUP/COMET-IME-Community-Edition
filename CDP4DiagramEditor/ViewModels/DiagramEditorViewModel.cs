@@ -31,7 +31,6 @@ namespace CDP4DiagramEditor.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
-    using System.Windows.Controls;
     using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
@@ -60,17 +59,10 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4DiagramEditor.ViewModels.Relation;
     using System.Collections.Generic;
-    using System.Windows.Media;
 
     using CDP4CommonView.Diagram.ViewModels;
 
     using CDP4Composition.Diagram;
-
-    using CDP4DiagramEditor.Views;
-    using CDP4DiagramEditor.Views.PortsAndInterfaces;
-
-    using DevExpress.Diagram.Core;
-    using DevExpress.Xpf.Core;
 
     using IDropTarget = CDP4Composition.DragDrop.IDropTarget;
 
@@ -113,7 +105,17 @@ namespace CDP4DiagramEditor.ViewModels
         /// Backing field for <see cref="IsDirty"/>
         /// </summary>
         private bool isDirty;
-        
+
+        /// <summary>
+        /// Backing field for <see cref="CanAddPort"/>
+        /// </summary>
+        private bool canAddPort;
+
+        /// <summary>
+        /// Backing field for <see cref="IsPortCommandSelected"/>
+        /// </summary>
+        private bool isPortCommandSelected;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramEditorViewModel"/> class
         /// </summary>
@@ -127,7 +129,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             this.Caption = this.Thing.Name;
             this.ToolTip = $"The {this.Thing.Name} diagram editor";
-            
+            this.CanAddPort = false;
             this.UpdateProperties();
         }
         
@@ -154,6 +156,25 @@ namespace CDP4DiagramEditor.ViewModels
             get { return this.selectedItems; }
             set { this.RaiseAndSetIfChanged(ref this.selectedItems, value); }
         }
+
+        /// <summary>
+        /// Get or Set the allowance to add port
+        /// </summary>
+        public bool CanAddPort
+        {
+            get => this.canAddPort; 
+            set => this.RaiseAndSetIfChanged(ref this.canAddPort, value);//, "CanAddPortProperty");
+        }
+
+        /// <summary>
+        /// Used to reset the IsSelected on port add command button
+        /// </summary>
+        public bool IsPortCommandSelected
+        {
+            get => this.isPortCommandSelected;
+            set => this.RaiseAndSetIfChanged(ref this.isPortCommandSelected, value); //, "IsPortCommandSelectedProperty");
+        }
+
 
         public ICdp4DiagramOrgChartBehavior Behavior { get; set; }
 
@@ -570,10 +591,6 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>The <see cref="DiagramObjectViewModel"/> instantiated</returns>
         private void CreateDiagramPort(Thing depictedThing, System.Windows.Point diagramPosition)
         {
-            //if ((this.SelectedItem as DiagramContentItem)?.Content is PortContainerDiagramContentItem portContainer)
-            //{
-            //    portContainer.PortShapeCollection.Add(new DiagramPortShape());
-            //}
 
             if (this.SelectedItem is DiagramContentItem target && target?.Content is PortContainerDiagramContentItem container)
             {
@@ -601,18 +618,10 @@ namespace CDP4DiagramEditor.ViewModels
                 };
 
                 block.Bounds.Add(bound);
-                container.PortCollection.Add(block);
-                var diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Left};
-                this.ThingDiagramItems.Add(diagramItem); 
-                diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Top};
-                this.ThingDiagramItems.Add(diagramItem); 
-                 diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Right};
-                this.ThingDiagramItems.Add(diagramItem); 
-                 diagramItem = new DiagramPortViewModel(block, this.Session, this) { PortContainerShapeSide = PortContainerShapeSide.Bottom};
-                this.ThingDiagramItems.Add(diagramItem);
-
-                //return diagramItem;
-
+                var diagramItem = new DiagramPortViewModel(block, this.Session, this);
+                container.PortCollection.Add(diagramItem);
+                this.DiagramPortCollection.Add(diagramItem);
+                this.IsPortCommandSelected = false;
                 this.UpdateIsDirty();
             }
         }
@@ -756,7 +765,7 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 diagramObjectViewModel.UpdateTransaction(transaction, clone);
             }
-
+            //TODO implement update transaction on this.ThingDiagramItems
 
             var deletedDiagramConnector = this.Thing.DiagramElement.OfType<DiagramEdge>().Except(this.DiagramConnectorCollection.Select(x => x.Thing));
             foreach (var connector in deletedDiagramConnector)

@@ -1220,6 +1220,7 @@
     <Compile Include="Diagram\ViewModels\IDiagramConnectorViewModel.cs" />
     <Compile Include="Diagram\ViewModels\IDiagramPortViewModel.cs" />
     <Compile Include="Diagram\ViewModels\IDiagramObjectViewModel.cs" />
+    <Compile Include="Diagram\ViewModels\PortContainerDiagramContentItem.cs" />
     <Compile Include="Diagram\ViewModels\PortContainerShapeSide.cs" />
     <Compile Include="Diagram\Views\Cdp4DiagramConnector.cs" />
     <Compile Include="Diagram\Views\Cdp4DiagramContentItem.cs" />

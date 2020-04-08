@@ -1,6 +1,7 @@
 ﻿namespace CDP4CommonView.Diagram.Views
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Windows;
     using System.Windows.Media;
@@ -55,28 +56,19 @@
         private void DetermineRotation()
         {
             var datacontext = ((IDiagramPortViewModel) this.DataContext);
-            this.Position = new Point(datacontext.ContainerBounds.X, datacontext.ContainerBounds.Y);
+            this.Position = ((IDiagramPortViewModel)this.DataContext).Position;
             switch (datacontext.PortContainerShapeSide)
             {
                 case PortContainerShapeSide.Top:
-                    this.Background = Brushes.Blue;
                     this.LayoutTransform = new RotateTransform(180);
-                    this.Anchors = Sides.Top;
-                    this.Position = Point.Add(this.Position, new Vector(datacontext.ContainerBounds.Width/2 - (this.Width / 2), 0 - (this.Width / 2)));
                     break;
                 case PortContainerShapeSide.Left:
-                    this.Background = Brushes.BlueViolet;
                     this.LayoutTransform = new RotateTransform(90);
-                    this.Position = Point.Add(this.Position, new Vector(0 - (this.Width / 2), datacontext.ContainerBounds.Height / 2 - (this.Width / 2)));
                     break;
                 case PortContainerShapeSide.Right:
-                    this.Background = Brushes.OrangeRed;
                     this.LayoutTransform = new RotateTransform(-90);
-                    this.Position = Point.Add(this.Position, new Vector(datacontext.ContainerBounds.Width - (this.Width / 2), datacontext.ContainerBounds.Height / 2 - (this.Width / 2)));
                     break;
                 case PortContainerShapeSide.Bottom:
-                    this.Background = Brushes.ForestGreen;
-                    this.Position = Point.Add(this.Position, new Vector(datacontext.ContainerBounds.Width / 2 - (this.Width / 2), datacontext.ContainerBounds.Height - (this.Width/2)));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -90,46 +82,6 @@
         {
             get => (Thing)this.GetValue(ContentObjectProperty);
             set => this.SetValue(ContentObjectProperty, value);
-        }
-
-        public void MoveToTheClosestAllowed(Point desired)
-        {
-            var bounds = new Point(this.Bounds().X, this.Bounds().Y);
-            var viewModel = ((IDiagramPortViewModel) this.DataContext);
-            var containerBounds = viewModel.ContainerBounds;
-
-            if (viewModel.PortContainerShapeSide == PortContainerShapeSide.Bottom || viewModel.PortContainerShapeSide == PortContainerShapeSide.Top)
-            {
-                if (desired.X < containerBounds.X)
-                {
-                    bounds.X = containerBounds.X;
-                }
-                else if (desired.X > containerBounds.X && desired.X < containerBounds.X + containerBounds.Width)
-                {
-                    bounds.X = desired.X;
-                }
-                else
-                {
-                    bounds.X = containerBounds.X + containerBounds.Width;
-                }
-            }
-            else
-            {
-                if (desired.Y < containerBounds.Y)
-                {
-                    bounds.Y = containerBounds.Y;
-                }
-                else if (desired.Y > containerBounds.Y && desired.Y < containerBounds.Y + containerBounds.Height)
-                {
-                    bounds.Y = desired.Y;
-                }
-                else
-                {
-                    bounds.Y = containerBounds.Y + containerBounds.Height;
-                }
-            }
-
-            this.RenderTransform = new TranslateTransform(Math.Abs(bounds.X - this.Bounds().X), Math.Abs(bounds.Y - this.Bounds().Y));
         }
     }
 }

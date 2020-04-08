@@ -11,8 +11,6 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4Composition.Diagram;
 
-    using CDP4DiagramEditor.Views.PortsAndInterfaces;
-
     /// <summary>
     /// The <see cref="DataTemplateSelector"/> to select a <see cref="DataTemplate"/> depending on the kind of budget to compute
     /// </summary>
@@ -30,15 +28,15 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 return base.SelectTemplate(item, container);
             }
-
-            return item is PortContainerDiagramContentItem ? this.ElementDefinitionDiagramItemTemplate : this.GenericDiagramItemDataTemplate;
+            
+            return item is DiagramPortViewModel ? this.DiagramPortTemplate : this.GenericDiagramItemDataTemplate;
 
             //switch (vm.ClassKind)
             //{
             //    case ClassKind.ElementDefinition:
-            //        return this.ElementDefinitionDiagramItemTemplate;
+            //        return this.DiagramPortTemplate;
             //    default:
-            //        return this.ElementDefinitionDiagramItemTemplate;
+            //        return this.DiagramPortTemplate;
             //}
         }
 
@@ -50,6 +48,6 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="DataTemplate"/> for a generic-budget
         /// </summary>
-        public DataTemplate ElementDefinitionDiagramItemTemplate { get; set; }
+        public DataTemplate DiagramPortTemplate { get; set; }
     }
 }

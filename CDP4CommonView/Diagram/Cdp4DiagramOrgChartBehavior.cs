@@ -10,6 +10,7 @@ namespace CDP4CommonView.Diagram
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.ComponentModel;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
@@ -33,6 +34,7 @@ namespace CDP4CommonView.Diagram
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Ribbon;
     using DevExpress.Mvvm.UI;
+    using DevExpress.Xpf.CodeView;
 
     using EventAggregator;
 
@@ -108,7 +110,6 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         public static readonly DependencyProperty RibbonMergeCategoryNameProperty = DependencyProperty.Register("RibbonMergeCategoryName", typeof(string), typeof(Cdp4DiagramOrgChartBehavior));
         
-
         /// <summary>
         /// Initializes static members of the <see cref="Cdp4DiagramOrgChartBehavior"/> class.
         /// </summary>
@@ -133,7 +134,7 @@ namespace CDP4CommonView.Diagram
             get => (INotifyCollectionChanged)this.GetValue(DiagramPortSourceProperty);
             set => this.SetValue(DiagramPortSourceProperty, value);
         }
-
+        
         /// <summary>
         /// Gets or sets the <see cref="INotifyCollectionChanged"/> containing the view-model for the <see cref="DiagramConnector"/>
         /// </summary>
@@ -396,7 +397,18 @@ namespace CDP4CommonView.Diagram
         {
             var vm = (ICdp4DiagramContainer)this.AssociatedObject.DataContext;
             var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
-            if (vm != null) 
+
+            if ((controlSelectedItems.FirstOrDefault() as DiagramContentItem)?.Content is PortContainerDiagramContentItem portContainer)
+            {
+                vm.SelectedItems.Clear();
+                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
+                vm.CanAddPort = true;
+                foreach (var port in portContainer.PortCollection)
+                {
+                    this.AssociatedObject.SelectItems(this.AssociatedObject.Items.OfType<DiagramPortShape>().Where(item => ((IDiagramPortViewModel)item.DataContext).ContainerViewModel == portContainer.DataContext ), ModifySelectionMode.AddToSelection);
+                }
+            }
+            else if (vm != null) 
             {
                 vm.SelectedItems.Clear();
                 vm.SelectedItem = controlSelectedItems.FirstOrDefault();
@@ -405,6 +417,8 @@ namespace CDP4CommonView.Diagram
                 {
                     vm.SelectedItems.Add(controlSelectedItem);
                 }
+
+                vm.CanAddPort = false;
             }
 
             //this.EventPublisher.Publish(new DiagramSelectEvent(new ReactiveList<DiagramElementThing>(this.AssociatedObject.SelectedItems.Select(x => ((IRowViewModelBase<DiagramElementThing>)x.DataContext).Thing))));
@@ -510,16 +524,46 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.PreviewDrop += this.PreviewDrop;
             this.AssociatedObject.Loaded += this.Loaded;
             this.AssociatedObject.Unloaded += this.Unloaded;
-
+            this.AssociatedObject.ItemsChanged += this.ItemsChanged;
         }
 
+        private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
+        {
+
+            if (e.Item is PortContainerDiagramContentItem portContainer)
+            {
+                if (e.Action == ItemsChangedAction.Added)
+                {
+                    
+                }
+
+            }
+        }
+
+        protected override void OnDiagramItemAdded(DiagramDiagramItemAddedEventArgs e)
+        {
+            if (e.DataItem is PortContainerDiagramContentItem portContainer)
+            {
+                foreach (var port in portContainer.PortCollection)
+                {
+
+                }
+            }
+
+            base.OnDiagramItemAdded(e);
+        }
 
         protected override void OnDiagramItemAdding(DiagramDiagramItemAddingEventArgs e)
         {
 
-            if (e.DataItem is PortContainerDiagramContentItem)
+            if (e.DataItem is PortContainerDiagramContentItem portContainer)
             {
+                foreach (var port in portContainer.PortCollection)
+                {
 
+                    //var diagramObj = new DiagramPortShape(port, this);
+                    //this.AssociatedObject.Items.Add(port);
+                }
             }
             base.OnDiagramItemAdding(e);
         }
@@ -787,10 +831,11 @@ namespace CDP4CommonView.Diagram
             //this.dropInfo.DropPosition;
             var senda =((DiagramControl)sender).PrimarySelection;
 
-            if (senda is DiagramPortShape portShape)
+            //If the sender is a port and its element definition is not selected
+            if (senda is DiagramPortShape portShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
             {
-                portShape.MoveToTheClosestAllowed(this.dropInfo.DropPosition);
-                //e.Handled = true; Cancel
+                e.Handled = true;
+                return;
             }
             else if (senda is NamedThingDiagramContentItem)
             {

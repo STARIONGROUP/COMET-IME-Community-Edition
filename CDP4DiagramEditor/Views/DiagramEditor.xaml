@@ -18,6 +18,7 @@
              xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
              xmlns:viewModels="clr-namespace:CDP4DiagramEditor.ViewModels"
              xmlns:portsAndInterfaces="clr-namespace:CDP4DiagramEditor.Views.PortsAndInterfaces"
+             xmlns:views1="clr-namespace:CDP4CommonView.Diagram.Views;assembly=CDP4CommonView"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
@@ -67,7 +68,7 @@
             </Style>
 
             <DataTemplate x:Key="GenericDiagramItemTemplate">
-                <StackPanel Background="DarkBlue" Orientation="Vertical" HorizontalAlignment="Center">
+                <StackPanel Margin="0,10" Background="Transparent" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" HorizontalAlignment="Center">
                     <TextBlock Text="{Binding ClassKind}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,10,10"/>
                     <Image Style="{StaticResource ThingIcon}">
                         <Image.Source>
@@ -80,57 +81,24 @@
                     <TextBlock Text="{Binding ShortName}" TextAlignment="Center" FontStyle="Italic" FontSize="11" Margin="10,0,10,10"></TextBlock>
                 </StackPanel>
             </DataTemplate>
-            <DataTemplate x:Key="ElementDefinitionDiagramItemTemplate">
-                <Grid Margin="0" Background="Transparent">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="12.5"></RowDefinition>
-                        <RowDefinition Height="12.5"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="12.5"></RowDefinition>
-                        <RowDefinition Height="12.5"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="12.5"></ColumnDefinition>
-                        <ColumnDefinition Width="12.5"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="12.5"></ColumnDefinition>
-                        <ColumnDefinition Width="12.5"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <ContentPresenter Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" ContentTemplate="{StaticResource GenericDiagramItemTemplate}"></ContentPresenter>
-                    <ItemsControl Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Center" Height="25" Grid.Column="0" Grid.Row="0" Grid.RowSpan="5" Grid.ColumnSpan="2" Margin="0,0" ItemsSource="{Binding LeftPortShapeCollection}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Vertical" IsItemsHost="True"></StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <ItemsControl Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Bottom" Height="25" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"  Grid.ColumnSpan="5" Margin="0,0"  ItemsSource="{Binding TopPortShapeCollection}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" IsItemsHost="True"></StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <ItemsControl Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Center" Height="25" Grid.Column="4" Grid.Row="0" Grid.RowSpan="5" Grid.ColumnSpan="2" Margin="0,0" x:Name="PortContainer" ItemsSource="{Binding RightPortShapeCollection}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Vertical" IsItemsHost="True"></StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <ItemsControl Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Top" Height="25" Grid.Column="0" Grid.Row="4" Grid.RowSpan="2" Grid.ColumnSpan="5" Margin="0,0"  ItemsSource="{Binding BottomPortShapeCollection}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" IsItemsHost="True"></StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Grid>
+            <DataTemplate x:Key="DiagramPortTemplate">
+                <dxdiag:DiagramShape Shape="BasicShapes.Rectangle"
+                                     Height="25"
+                                     Width="25"
+                                     Anchors="Bottom"
+                                     SnapsToDevicePixels="False"
+                                     CanSnapToOtherItems="False"
+                                     CanSnapToThisItem="False"
+                                     CanMove="True"
+                                     ConnectionPoints="0.5,1"
+                                     Background="Gray"
+                                     BorderBrush="Gray"
+                                     BorderThickness="1"/>
             </DataTemplate>
 
             <viewModels:DiagramItemDataTemplateSelector x:Key="DiagramItemDataTemplateSelector"
                                                         GenericDiagramItemDataTemplate="{StaticResource GenericDiagramItemTemplate}"
-                                                        ElementDefinitionDiagramItemTemplate="{StaticResource ElementDefinitionDiagramItemTemplate}">
+                                                        DiagramPortTemplate="{StaticResource DiagramPortTemplate}">
             </viewModels:DiagramItemDataTemplateSelector>
         </ResourceDictionary>
        
@@ -185,14 +153,14 @@
                                                          PageMargin="45"
                                                          RibbonMergeCategoryName="DiagramCategory"
                                                          ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}"
-                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}">
-
+                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}"
+                                                         DiagramPortSource="{Binding DiagramPortCollection}">
                         <!--ItemTemplateSelector="{StaticResource DiagramItemDataTemplateSelector}"-->
                         <diagram:Cdp4DiagramOrgChartBehavior.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="0,10" Background="Transparent" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" HorizontalAlignment="Center">
                                     <TextBlock Text="{Binding ClassKind}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,10,10"/>
-                                    <Image Style="{StaticResource ThingIcon}">
+                                    <Image Style="{StaticResource ThingIcon}" IsEnabled="{Binding Path=IsPortCommandSelected, UpdateSourceTrigger=PropertyChanged}">
                                         <Image.Source>
                                             <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                                 <Binding Path="Content"/>
@@ -250,7 +218,7 @@
                                     </dxn:NavBarItem.Template>
                                     Binary Relationship
                                 </dxn:NavBarItem>
-                                <dxn:NavBarItem Command="{Binding CreatePortCommand}">
+                                <dxn:NavBarItem IsSelected="{Binding Path=IsPortCommandSelected, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=CanAddPort, UpdateSourceTrigger=PropertyChanged}" Command="{Binding CreatePortCommand}">
                                     <dxn:NavBarItem.Template>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
