@@ -45,44 +45,41 @@
 
         public void SetNextAvailablePosition(IDiagramPortViewModel lastIn)
         {
-            double split = ((double)this.PortCollection.Count - 1) / 4;
+            var split = ((double)this.PortCollection.Count - 1) / 4;
             var place = Math.Abs(split - Math.Truncate(split));
+            var diagramItem = (this.Parent as DiagramItem);
             if (place == 0)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Bottom;
-                var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Bottom) - 1;
-                var portion = ((20 - presentPort) / 100) * (this.Parent as DiagramItem).ActualWidth;
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(((presentPort + 1)  * portion)- (12.5), (this.Parent as DiagramItem).ActualHeight - (12.5)));
+                var xVector = this.CalculateVector(PortContainerShapeSide.Bottom, diagramItem.ActualWidth);
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(xVector, diagramItem.ActualHeight - (12.5)));
             }
             else if (place == .25)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Left;
-                var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Left) - 1;
-                var portion = ((20 - presentPort) / 100) * (this.Parent as DiagramItem).ActualHeight;
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(0 - (12.5), ((presentPort + 1) * portion) - (12.5)));
+                var yVector = this.CalculateVector(PortContainerShapeSide.Left, diagramItem.ActualHeight);
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(0 - (12.5), yVector));
             }
             else if (place == .50)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Top;
-                var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Top) - 1;
-                var sideLength = (this.Parent as DiagramItem).ActualWidth;
-                double xVector = CalculateVector(presentPort, sideLength);
-                this.Position = System.Windows.Point.Add(this.Position, new Vector(xVector, 0 - (12.5)));
+                var xVector = this.CalculateVector(PortContainerShapeSide.Top, diagramItem.ActualWidth);
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(xVector, 0 - (12.5)));
             }
             else if (place == .75)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Right;
-                var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == PortContainerShapeSide.Left) - 1;
-                var portion = ((20 - presentPort) / 100) * (this.Parent as DiagramItem).ActualHeight;
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector((this.Parent as DiagramItem).ActualWidth - (12.5), ((presentPort + 1) * portion) - (12.5)));
+                var yVector = this.CalculateVector(PortContainerShapeSide.Right, diagramItem.ActualHeight);
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(diagramItem.ActualWidth - (12.5), yVector));
             }
             
         }
 
-        private static double CalculateVector(double presentPortNumberOnThisSide, double sideLength)
+        private double CalculateVector(PortContainerShapeSide side, double sideLength)
         {
-            var portion = ((20 - presentPortNumberOnThisSide) / 100) * sideLength;
-            return ((presentPortNumberOnThisSide + 1) * portion) - (12.5);
+            var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == side) - 1;
+            var portion = ((20 - presentPort) / 100) * sideLength;
+            return ((presentPort + 1) * portion) - (12.5);
         }
     }
 }

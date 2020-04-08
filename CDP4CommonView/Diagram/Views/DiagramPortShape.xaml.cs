@@ -61,12 +61,15 @@
             {
                 case PortContainerShapeSide.Top:
                     this.LayoutTransform = new RotateTransform(180);
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.5, 0)});
                     break;
                 case PortContainerShapeSide.Left:
                     this.LayoutTransform = new RotateTransform(90);
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0, 0.5) });
                     break;
                 case PortContainerShapeSide.Right:
                     this.LayoutTransform = new RotateTransform(-90);
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(1, 0.5) });
                     break;
                 case PortContainerShapeSide.Bottom:
                     break;

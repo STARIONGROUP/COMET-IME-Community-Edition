@@ -403,9 +403,9 @@ namespace CDP4CommonView.Diagram
                 vm.SelectedItems.Clear();
                 vm.SelectedItem = controlSelectedItems.FirstOrDefault();
                 vm.CanAddPort = true;
-                foreach (var port in portContainer.PortCollection)
+                foreach (var portViewModel in portContainer.PortCollection)
                 {
-                    this.AssociatedObject.SelectItems(this.AssociatedObject.Items.OfType<DiagramPortShape>().Where(item => ((IDiagramPortViewModel)item.DataContext).ContainerViewModel == portContainer.DataContext ), ModifySelectionMode.AddToSelection);
+                    this.AssociatedObject.SelectItems(this.AssociatedObject.Items.OfType<DiagramPortShape>().Where(item => (IDiagramPortViewModel)item.DataContext == portViewModel ), ModifySelectionMode.AddToSelection);
                 }
             }
             else if (vm != null) 
