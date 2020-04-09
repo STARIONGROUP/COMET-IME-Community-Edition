@@ -44,26 +44,28 @@ namespace CDP4ProductTree.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ActualFiniteStateRowViewModel"/> class
         /// </summary>
+        /// <param name="parameterBase">The associated value-set of a <see cref="ParameterBase"/></param>
         /// <param name="actualFiniteState">The <see cref="ActualFiniteState"/> represented</param>
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
-        public ActualFiniteStateRowViewModel(ParameterBase parameterBase, ActualFiniteState actualState, ISession session, IViewModelBase<Thing> containerViewModel)
+        public ActualFiniteStateRowViewModel(ParameterBase parameterBase, ActualFiniteState actualFiniteState, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(parameterBase, session, containerViewModel)
         {
             this.IsPublishable = false;
-            this.actualState = actualState;
+            this.ActualState = actualFiniteState;
             this.IsDefault = this.actualState.IsDefault;
             this.Name = this.actualState.Name;
         }
 
         /// <summary>
-        /// Gets or sets a value <see cref="ActualFiniteState"/> of row
+        /// Gets or sets the <see cref="ActualFiniteState"/> of this row
         /// </summary>
         public ActualFiniteState ActualState
         {
             get { return this.actualState; }
             private set { this.RaiseAndSetIfChanged(ref this.actualState, value); }
         }
+
         /// <summary>
         /// Gets the model-code
         /// </summary>
@@ -92,7 +94,7 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
-        /// Set the value for this row from the <see cref="ParameterBase"/> and the associated <see cref="ParameterValueSetBase"/>
+        /// Set the value for this row from the associated <see cref="ParameterValueSetBase"/>
         /// </summary>
         /// <param name="valueSet">The <see cref="ParameterValueSetBase"/></param>
         public void SetScalarValue(ParameterValueSetBase valueSet)
