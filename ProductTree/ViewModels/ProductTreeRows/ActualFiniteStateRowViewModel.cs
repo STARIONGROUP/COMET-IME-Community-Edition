@@ -19,18 +19,8 @@ namespace CDP4ProductTree.ViewModels
     /// <remarks>
     /// This row shall be used when a <see cref="Parameter"/> is state dependent
     /// </remarks>
-    public class ActualFiniteStateRowViewModel : CDP4CommonView.ActualFiniteStateRowViewModel, IModelCodeRowViewModel
+    public class ActualFiniteStateRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IModelCodeRowViewModel
     {
-        /// <summary>
-        /// backing field for <see cref="Value"/> property.
-        /// </summary>
-        private string value;
-
-        /// <summary>
-        /// Backing field for <see cref="Switch"/> property.
-        /// </summary>
-        private ParameterSwitchKind switchValue;
-
         /// <summary>
         /// Backing field for <see cref="IsPublishable"/> property.
         /// </summary>
@@ -42,14 +32,14 @@ namespace CDP4ProductTree.ViewModels
         private bool isDefault;
 
         /// <summary>
-        /// Backing field for the <see cref="OwnerShortName"/> property.
-        /// </summary>
-        private string ownerShortName;
-
-        /// <summary>
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
         private string modelCode;
+
+        /// <summary>
+        /// Backing field for <see cref="ActualState"/>
+        /// </summary>
+        private ActualFiniteState actualState;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActualFiniteStateRowViewModel"/> class
@@ -57,19 +47,29 @@ namespace CDP4ProductTree.ViewModels
         /// <param name="actualFiniteState">The <see cref="ActualFiniteState"/> represented</param>
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
-        public ActualFiniteStateRowViewModel(ActualFiniteState actualFiniteState, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(actualFiniteState, session, containerViewModel)
+        public ActualFiniteStateRowViewModel(ParameterBase parameterBase, ActualFiniteState actualState, ISession session, IViewModelBase<Thing> containerViewModel)
+            : base(parameterBase, session, containerViewModel)
         {
             this.IsPublishable = false;
-            this.IsDefault = this.Thing.IsDefault;
+            this.actualState = actualState;
+            this.IsDefault = this.actualState.IsDefault;
+            this.Name = this.actualState.Name;
 
-            var parameterOrOverrideBaseRowViewModel = containerViewModel as ParameterOrOverrideBaseRowViewModel;
-            if (parameterOrOverrideBaseRowViewModel != null)
-            {
-                this.OwnerShortName = parameterOrOverrideBaseRowViewModel.OwnerShortName;
-            }
+            //var parameterOrOverrideBaseRowViewModel = containerViewModel as ParameterOrOverrideBaseRowViewModel;
+            //if (parameterOrOverrideBaseRowViewModel != null)
+            //{
+            //    this.OwnerShortName = parameterOrOverrideBaseRowViewModel.OwnerShortName;
+            //}
         }
 
+        /// <summary>
+        /// Gets or sets a value of <see cref="ActualFiniteState"/>
+        /// </summary>
+        public ActualFiniteState ActualState
+        {
+            get { return this.actualState; }
+            private set { this.RaiseAndSetIfChanged(ref this.actualState, value); }
+        }
         /// <summary>
         /// Gets the model-code
         /// </summary>
@@ -95,33 +95,6 @@ namespace CDP4ProductTree.ViewModels
         {
             get { return this.isDefault; }
             set { this.RaiseAndSetIfChanged(ref this.isDefault, value); }
-        }
-        /// <summary>
-        /// Gets or sets the <see cref="ParameterSwitchKind"/>
-        /// </summary>
-        public ParameterSwitchKind Switch
-        {
-            get { return this.switchValue; }
-            set { this.RaiseAndSetIfChanged(ref this.switchValue, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the value
-        /// </summary>
-        public string Value
-        {
-            get { return this.value; }
-            set { this.RaiseAndSetIfChanged(ref this.value, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the short name of the <see cref="DomainOfExpertise"/> that owns the container
-        /// <see cref="ParameterOrOverrideBase"/>
-        /// </summary>
-        public string OwnerShortName
-        {
-            get { return this.ownerShortName; }
-            set { this.RaiseAndSetIfChanged(ref this.ownerShortName, value); }
         }
 
         /// <summary>
