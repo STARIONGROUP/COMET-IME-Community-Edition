@@ -247,6 +247,7 @@
     <Compile Include="Exceptions\AppSettingsException.cs" />
     <Compile Include="Exceptions\PluginSettingsException.cs" />
     <Compile Include="Exceptions\SettingsException.cs" />
+    <Compile Include="Extensions\FileExtensionMethods.cs" />
     <Compile Include="Modularity\PluginLoader.cs" />
     <Compile Include="Mvvm\IHaveContainedRows.cs" />
     <Compile Include="Mvvm\Types\DisposableReactiveList.cs" />
@@ -258,8 +259,10 @@
     <Compile Include="Navigation\Interfaces\IDeprecatableToggleViewModel.cs" />
     <Compile Include="Navigation\Interfaces\IDeprecatableBrowserViewModel.cs" />
     <Compile Include="Navigation\Interfaces\IFavoritesBrowserViewModel.cs" />
+    <Compile Include="Navigation\Interfaces\IThingSelectorDialogService.cs" />
     <Compile Include="Navigation\Interfaces\IPanelFilterableDataGridView.cs" />
     <Compile Include="Navigation\Interfaces\IRegionCollectionSearcher.cs" />
+    <Compile Include="Navigation\ThingSelectorDialogService.cs" />
     <Compile Include="Navigation\RegionCollectionSearcher.cs" />
     <Compile Include="Services\AppSettingService\AppSettingsService.cs" />
     <Compile Include="Services\AppSettingService\IAppSettingsService.cs" />
@@ -322,6 +325,7 @@
     <Compile Include="Services\RuleVerification\IRuleVerificationService.cs" />
     <Compile Include="Services\RuleVerification\RuleVerificationService.cs" />
     <Compile Include="Services\ThingCreator.cs" />
+    <Compile Include="Extensions\FileRevisionExtensionMethods.cs" />
     <Compile Include="Services\TooltipService.cs" />
     <Compile Include="Settings\ShellAppSettings.cs" />
     <Compile Include="SpecialTerms\ISpecialTermsService.cs" />
@@ -386,6 +390,7 @@
     <Compile Include="ViewModels\MessageHelper.cs" />
     <Compile Include="ViewModels\GenericConfirmationDialogViewModel.cs" />
     <Compile Include="ViewModels\InformationDialogViewModel.cs" />
+    <Compile Include="ViewModels\ThingSelectorDialogViewModel.cs" />
     <Compile Include="Views\BrowserHeader.xaml.cs">
       <DependentUpon>BrowserHeader.xaml</DependentUpon>
     </Compile>
@@ -406,6 +411,9 @@
     </Compile>
     <Compile Include="Views\GenericConfirmationDialog.xaml.cs">
       <DependentUpon>GenericConfirmationDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ThingSelectorDialog.xaml.cs">
+      <DependentUpon>ThingSelectorDialog.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -519,6 +527,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\GenericConfirmationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ThingSelectorDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

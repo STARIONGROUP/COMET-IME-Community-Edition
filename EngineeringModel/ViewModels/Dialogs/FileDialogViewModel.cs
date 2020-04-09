@@ -181,7 +181,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (model == null)
             {
-                throw new InvalidOperationException("the container is not set for this File.");
+                throw new InvalidOperationException("The container is not set for this File.");
             }
 
             var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();

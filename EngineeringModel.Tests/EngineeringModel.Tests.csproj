@@ -190,6 +190,7 @@
     <Compile Include="ViewModels\CommonFileStoreBrowser\CommonFileStoreBrowserRibbonViewModelTestFixture.cs" />
     <Compile Include="ViewModels\CommonFileStoreBrowser\FileRowViewModelTestFixture.cs" />
     <Compile Include="ViewModels\CommonFileStoreBrowser\CommonFileStoreBrowserViewModelTestFixture.cs" />
+    <Compile Include="ViewModels\Dialogs\FileRevisionDialogViewModelTestFixture.cs" />
     <Compile Include="ViewModels\Dialogs\FileDialogViewModelTestFixture.cs" />
     <Compile Include="ViewModels\DomainFileStoreBrowser\DomainFileStoreBrowserRibbonViewModelTestFixture.cs" />
     <Compile Include="ViewModels\DomainFileStoreBrowser\DomainFileStoreBrowserViewModelTestFixture.cs" />

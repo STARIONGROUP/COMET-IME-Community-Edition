@@ -1,4 +1,4 @@
-﻿<dx:DXWindow x:Class="CDP4EngineeringModel.Views.Dialogs.FileDialog"
+﻿<dx:DXWindow x:Class="CDP4EngineeringModel.Views.Dialogs.FileRevisionDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,7 +9,6 @@
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
-             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              Height="380"
              Width="500"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -29,48 +28,62 @@
                         View="Tabs"
                         lc:LayoutControl.AllowHorizontalSizing="True" RenderTransformOrigin="0.5,0.5"
                         IsEnabled="{Binding AllowEdit}">
-            <lc:LayoutGroup.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform AngleY="0.094"/>
-                    <RotateTransform/>
-                    <TranslateTransform Y="0.411"/>
-                </TransformGroup>
-            </lc:LayoutGroup.RenderTransform>
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
-                <lc:LayoutGroup Orientation="Horizontal">
-                    <lc:LayoutItem Label="Is Locked: ">
-                        <dxe:CheckEdit Name="IsLocked" 
-                                       IsChecked="{Binding Path=IsLocked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                       IsReadOnly="{Binding IsReadOnly}"/>
-                    </lc:LayoutItem>
-                    <lc:LayoutItem Label="Locked By: ">
-                        <TextBlock Name="LockedBy" Text="{Binding Path=LockedBy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                                       Visibility="{Binding Path=IsLocked, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}"/>
-                    </lc:LayoutItem>
-                </lc:LayoutGroup>
-                    <items:OwnerLayoutItem />
-                <lc:LayoutItem>
+                <lc:LayoutItem Label="Path:">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="31" />
+                            <ColumnDefinition Width="31" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Path=Path}" Height="25"></TextBlock>
+                        <dx:SimpleButton Grid.Column="1" Width="25"
+                            Height="25"
+                            Margin="3"
+                            Name="DownloadButton"
+                            Command="{Binding Path=DownloadFileCommand}"
+                            ToolTip="Download"
+                            HorizontalAlignment="Right"
+                            Glyph ="{dx:DXImage Image=Download_16x16.png}" 
+                            IsEnabled="{Binding Path=CanDownloadFile, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <dx:SimpleButton  Grid.Column="2" Width="25"
+                            Height="25"
+                            Name="UploadButton"
+                            Margin="3"
+                            ToolTip="Upload"
+                            Command="{Binding Path=AddFileCommand}"
+                            HorizontalAlignment="Right" 
+                            Glyph="{dx:DXImage Image=AddFile_16x16.png}"
+                            IsEnabled="{Binding Path=CanAddFile, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </lc:LayoutItem>
+                <items:NameLayoutItem />
+                <lc:LayoutItem  Label="File Types:" LabelPosition="Top">
                     <dxb:ToolBarControl Height="30" Background="Transparent">
-                        <dxb:BarButtonItem x:Name="CreateFileRevisionButton"
-                                           Command="{Binding CreateFileRevisionCommand}"
+                        <dxb:BarButtonItem x:Name="AddFileTypeButton"
+                                           Command="{Binding AddFileTypeCommand}"
                                            Glyph="{dx:DXImage Image=Add_16x16.png}"
-                                           Hint="Create a File Revision" />
-                        <dxb:BarButtonItem x:Name="DeleteFileRevisionButton"
-                                           Command="{Binding DeleteFileRevisionCommand}"
+                                           Hint="Create a File Type" />
+                        <dxb:BarButtonItem x:Name="DeleteFileTypeButton"
+                                           Command="{Binding DeleteFileTypeCommand}"
                                            Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                           Hint="Delete the selected File Revision" />
-                        <dxb:BarButtonItem Command="{Binding InspectFileRevisionCommand}"
-                                           Glyph="{dx:DXImage Image=Find_16x16.png}"
-                                           Hint="Inspect the selected File Revision" />
+                                           Hint="Remove the selected File Type" />
+                        <dxb:BarButtonItem x:Name="MoveUpFileTypeButton"
+                                           Command="{Binding MoveUpFileTypeCommand}"
+                                           Glyph="{dx:DXImage Image=MoveUp_16x16.png}"
+                                           Hint="Move Up a File Type." />
+                        <dxb:BarButtonItem x:Name="MoveDownFileTypeButton"
+                                           Command="{Binding MoveDownFileTypeCommand}"
+                                           Glyph="{dx:DXImage Image=MoveDown_16x16.png}"
+                                           Hint="Move Down a File Type." />
                     </dxb:ToolBarControl>
                 </lc:LayoutItem>
-                <lc:LayoutItem MaxHeight="350" MaxWidth="700" Label="File Revisions:" LabelPosition="Top">
+                <lc:LayoutItem MaxHeight="350" MaxWidth="700">
                     <dxg:GridControl 
-                             Name="FileRevisionsGridControl"
-                             AllowLiveDataShaping="False"
-                             ItemsSource="{Binding FileRevision}"
-                             SelectedItem="{Binding SelectedFileRevision}">
+                         Name="FileTypesGridControl"
+                         AllowLiveDataShaping="False"
+                         ItemsSource="{Binding FileType}"
+                         SelectedItem="{Binding SelectedFileType}">
                         <dxg:GridControl.View>
                             <dxg:TableView Name="View"
                                                HorizontalAlignment="Stretch"
@@ -91,17 +104,12 @@
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
                             <dxg:GridColumn FieldName="Name" Header="Name" />
-                            <dxg:GridColumn FieldName="Path" Header="Path" />
-                            <dxg:GridColumn FieldName="CreatedOn" Header="Created On">
-                                <dxg:GridColumn.EditSettings>
-                                    <dxe:DateEditSettings Mask="G" MaskUseAsDisplayFormat="True" />
-                                </dxg:GridColumn.EditSettings>
-                            </dxg:GridColumn >
+                            <dxg:GridColumn FieldName="ShortName" Header="ShortName" />
+                            <dxg:GridColumn FieldName="Extension" Header="Extension" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </lc:LayoutItem>
             </lc:LayoutGroup>
-            <items:CategoryLayoutGroup />
             <items:AdvancedLayoutGroup Margin="0,1,0,-1" />
         </lc:LayoutGroup>
         <items:UserValidationButtonsLayoutGroup />

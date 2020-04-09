@@ -14,8 +14,6 @@
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4EngineeringModel.Converters"
-             xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
-             xmlns:cdpCommonView="clr-namespace:CDP4CommonView;assembly=CDP4CommonView"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"

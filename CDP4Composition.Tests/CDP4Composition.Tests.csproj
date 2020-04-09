@@ -206,6 +206,8 @@
     <Compile Include="DragDrop\DragDropKeyStatesExtensionsTestFixture.cs" />
     <Compile Include="DragDrop\SelectionHelperTestFixture.cs" />
     <Compile Include="Events\TaskbarNotificationEventTestFixture.cs" />
+    <Compile Include="Extensions\FileExtensionMethodsTestFixture.cs" />
+    <Compile Include="Extensions\FileRevisionExtensionMethodsTestFixture.cs" />
     <Compile Include="IconCacheService\IconCacheServiceIconCachServiceTestFixture.cs" />
     <Compile Include="Mvvm\Behaviours\ContextMenuBehaviorTestFixture.cs" />
     <Compile Include="Mvvm\Behaviours\TreeCellEditBehaviorTestFixture.cs" />
@@ -242,6 +244,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\RequirementStateOfComplianceExtensionsTestFixture.cs" />
     <Compile Include="Utilities\CDP4ColorExtensionsTestFixture.cs" />
+    <Compile Include="ViewModels\ThingSelectorDialogViewModelTestFixture.cs" />
     <Compile Include="ViewModels\GenericConfirmationDialogViewModelTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>
