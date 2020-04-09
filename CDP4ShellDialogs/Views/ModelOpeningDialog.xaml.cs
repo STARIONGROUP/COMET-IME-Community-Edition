@@ -41,25 +41,4 @@ namespace CDP4ShellDialogs.Views
             }
         }
     }
-
-    /// <summary>
-    /// The Template Selector
-    /// </summary>
-    public class CellTemplateSelector : DataTemplateSelector
-    {
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
-        {
-            var containerElement = (FrameworkElement)container;
-            var cellData = (GridCellData)item;
-
-            var rowObject = cellData?.RowData.Row;
-
-            if (rowObject is ModelSelectionIterationSetupRowViewModel)
-            {
-                return (DataTemplate)containerElement.FindResource("iterationSetupDomainOfExpertiseTemplate");
-            }
-
-            return base.SelectTemplate(item, container);
-        }
-    }
 }

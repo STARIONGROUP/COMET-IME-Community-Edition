@@ -12,6 +12,7 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Security.Policy;
     using System.Threading.Tasks;
     using System.Windows.Input;
     using CDP4Common.CommonData;
@@ -49,9 +50,9 @@ namespace CDP4ShellDialogs.ViewModels
         private bool isIterationScreen;
 
         /// <summary>
-        /// Backing field for the <see cref="ScreenTitle"/> property.
+        /// Backing field for the <see cref="Title"/> property.
         /// </summary>
-        private string screenTitle = "Engineering Models";
+        private string title = "Engineering Models";
 
         /// <summary>
         /// Backing field for the <see cref="SelectedRowSession"/> property.
@@ -59,9 +60,9 @@ namespace CDP4ShellDialogs.ViewModels
         private ModelSelectionSessionRowViewModel selectedRowSession;
 
         /// <summary>
-        /// Backing field for the <see cref="SelectedRowModel"/> property.
+        /// Backing field for the <see cref="SelectedEngineeringModel"/> property.
         /// </summary>
-        private ModelSelectionEngineeringModelSetupRowViewModel selectedRowModel;
+        private ModelSelectionEngineeringModelSetupRowViewModel selectedEngineeringModel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelOpeningDialogViewModel"/> class. 
@@ -85,9 +86,9 @@ namespace CDP4ShellDialogs.ViewModels
                 this.IsBusy = false;
             });
 
-            var canActiveOk = this.WhenAnyValue(x => x.SelectedRowModel.IterationSetupRowViewModels.Count, count => count != 0);
-            this.SelectActiveCommand = ReactiveCommand.CreateAsyncTask(canActiveOk, x => this.ExecuteSelectActive(), RxApp.MainThreadScheduler);
-            this.SelectActiveCommand.ThrownExceptions.Select(ex => ex).Subscribe(
+            var canActiveOk = this.WhenAnyValue(x => x.SelectedEngineeringModel.IterationSetupRowViewModels.Count, count => count != 0);
+            this.SelectActiveIterationCommand = ReactiveCommand.CreateAsyncTask(canActiveOk, x => this.ExecuteSelectActiveIteration(), RxApp.MainThreadScheduler);
+            this.SelectActiveIterationCommand.ThrownExceptions.Select(ex => ex).Subscribe(
                 x =>
                 {
                     this.ErrorMessage = x.Message;
@@ -106,6 +107,8 @@ namespace CDP4ShellDialogs.ViewModels
             this.SelectedIterations.ChangeTrackingEnabled = true;
             this.SelectedIterations.ItemsAdded.Subscribe(this.FilterIterationSelectionItems);
 
+            this.WhenAnyValue(x => x.IsModelScreen).Subscribe(x => this.IsIterationScreen = !x);
+
             this.PopulateSessionsRowViewModel(sessionAvailable);
         }
 
@@ -120,10 +123,10 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets the title of the group
         /// </summary>
-        public string ScreenTitle
+        public string Title
         {
-            get { return this.screenTitle; }
-            set { this.RaiseAndSetIfChanged(ref this.screenTitle, value); }
+            get { return this.title; }
+            set { this.RaiseAndSetIfChanged(ref this.title, value); }
         }
 
         /// <summary>
@@ -132,11 +135,7 @@ namespace CDP4ShellDialogs.ViewModels
         public bool IsModelScreen
         {
             get { return this.isModelScreen; }
-            set
-            {
-                this.IsIterationScreen = !value;
-                this.RaiseAndSetIfChanged(ref this.isModelScreen, value);
-            }
+            set { this.RaiseAndSetIfChanged(ref this.isModelScreen, value); }
         }
 
         /// <summary>
@@ -166,7 +165,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets the Select Active Iteration <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<Unit> SelectActiveCommand { get; private set; }
+        public ReactiveCommand<Unit> SelectActiveIterationCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ICommand"/>
@@ -194,10 +193,10 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets or sets the selected row model.
         /// </summary>
-        public ModelSelectionEngineeringModelSetupRowViewModel SelectedRowModel
+        public ModelSelectionEngineeringModelSetupRowViewModel SelectedEngineeringModel
         {
-            get { return this.selectedRowModel; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedRowModel, value); }
+            get { return this.selectedEngineeringModel; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedEngineeringModel, value); }
         }
 
         /// <summary>
@@ -248,15 +247,15 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Executes the SelectActive command
+        /// Executes the SelectActiveIteration command
         /// </summary>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task ExecuteSelectActive()
+        private async Task ExecuteSelectActiveIteration()
         {
             var stopWatch = Stopwatch.StartNew();
-            var activeIterationSetupRow = this.SelectedRowModel.IterationSetupRowViewModels.FirstOrDefault(x => x.FrozenOnDate == "Active");
+            var activeIterationSetupRow = this.SelectedEngineeringModel.IterationSetupRowViewModels.FirstOrDefault(x => x.Thing.FrozenOn == null);
 
             this.IsBusy = true;
             this.LoadingMessage = "Loading the Active Iteration...";
@@ -276,7 +275,11 @@ namespace CDP4ShellDialogs.ViewModels
                 var iteration = new Iteration(activeIterationSetupRow.Thing.IterationIid, session.Assembler.Cache, session.Credentials.Uri);
 
                 model.Iteration.Add(iteration);
-                await session.Read(iteration, activeIterationSetupRow.SelectedDomain);
+                var t = Task.Run(() =>
+                {
+                    session.Read(iteration, activeIterationSetupRow.SelectedDomain);
+                });
+                await t;
             }
 
             this.IsBusy = false;
@@ -304,7 +307,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         private void ExecuteNext()
         {
-            this.ScreenTitle = "Model Iterations";
+            this.Title = "Model Iterations";
             this.IsModelScreen = false;
         }
 
@@ -313,7 +316,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         private void ExecuteBack()
         {
-            this.ScreenTitle = "Engineering Models";
+            this.Title = "Engineering Models";
             this.IsModelScreen = true;
         }
 
