@@ -1,0 +1,159 @@
+<UserControl x:Class="CDP4DiagramEditor.Views.DiagramEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxdiag="http://schemas.devexpress.com/winfx/2008/xaml/diagram"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
+             xmlns:diagram="clr-namespace:CDP4CommonView.Diagram;assembly=CDP4CommonView"
+             xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
+             xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
+             mc:Ignorable="d"
+             dx:ThemeManager.ThemeName="{Binding ThemeName}"
+             d:DesignHeight="300" d:DesignWidth="650">
+    <dxmvvm:Interaction.Behaviors>
+        <behaviours:RibbonCategoryBehavior CategoryName="DiagramCategory"></behaviours:RibbonCategoryBehavior>
+    </dxmvvm:Interaction.Behaviors>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+
+            <Style TargetType="{x:Type dxb:BarButtonItem}">
+                <Setter Property="Content" Value="{Binding Header}" />
+                <Setter Property="Command" Value="{Binding MenuCommand}" />
+                <Setter Property="GlyphSize" Value="Small"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Edit}">
+                        <Setter Property="Glyph" Value="{dx:DXImage Image=EditName_16x16.png}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Inspect}">
+                        <Setter Property="Glyph" Value="{dx:DXImage Image=Find_16x16.png}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Delete}">
+                        <Setter Property="Glyph" Value="{dx:DXImage Image=Delete_16x16.png}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Deprecate}">
+                        <Setter Property="Glyph" Value="{dx:DXImage Image=Delete_16x16.png}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Create}">
+                        <Setter Property="Glyph" Value="{dx:DXImage Image=Add_16x16.png}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Highlight}">
+                        <Setter Property="Glyph" Value="{dx:DXImage Image=HighlightField_16x16.png}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Copy}">
+                        <Setter Property="Glyph" Value="{dx:DXImage Image=Copy_16x16.png}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Save}">
+                        <Setter Property="Glyph" Value="{dx:DXImage Image=Save_16x16.png}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Navigate}">
+                        <Setter Property="Glyph" Value="{dx:DXImage Image=Redo_16x16.png}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+       
+    </UserControl.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <views:BrowserHeader Grid.Row="0" />
+        </Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
+                                        ToolboxVisibility="Full"
+                                        SaveCommand="{Binding SaveDiagramCommand}"
+                                        dxb:MergingProperties.ElementMergingBehavior="All">
+
+                <diagram:Cdp4DiagramControl.Resources>
+                    <ResourceDictionary>
+                        <ControlTemplate x:Key="DiagramObjectTemplate">
+                            <ControlTemplate.Resources>
+                                <helpers:ClassKindConverter x:Key="ClassKindConverter"></helpers:ClassKindConverter>
+                            </ControlTemplate.Resources>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" 
+                                       Content="{Binding ContentObject.ClassKind, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type diagram:Cdp4DiagramContentItem}}, Converter={StaticResource ClassKindConverter}}"
+                                       FontStyle="Normal"
+                                       FontSize="10"
+                                       HorizontalAlignment="Center" 
+                                       VerticalAlignment="Top" />
+                                <TextBlock Grid.Row="1"
+                                           Text="{Binding ContentObject.UserFriendlyShortName, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type diagram:Cdp4DiagramContentItem}}}" 
+                                           HorizontalAlignment="Center" 
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </ControlTemplate>
+                    </ResourceDictionary>
+                </diagram:Cdp4DiagramControl.Resources>
+                <dxmvvm:Interaction.Behaviors>
+                    <diagram:Cdp4DiagramOrgChartBehavior x:Name="orgChartBehavior" 
+                                                         PageMargin="45" 
+                                                         RibbonMergeCategoryName="DiagramCategory"
+                                                         DiagramObjectSource="{Binding DiagramObjectCollection, UpdateSourceTrigger=PropertyChanged}"
+                                                         DiagramConnectorSource="{Binding DiagramConnectorCollection, UpdateSourceTrigger=PropertyChanged}"
+                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}">
+                    </diagram:Cdp4DiagramOrgChartBehavior>
+                </dxmvvm:Interaction.Behaviors>
+                <diagram:Cdp4DiagramControl.Actions>
+<<<<<<< HEAD
+=======
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DiagramPartsRibbonGroup}" PropertyName="IsVisible" Value="False"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ToolsGroup}" PropertyName="IsVisible" Value="True"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ShapeStylesGroup}" PropertyName="IsVisible" Value="True"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ZoomGroup}" PropertyName="IsVisible" Value="True"/>
+
+                    <dxb:UpdateAction Value="Diagram Tools" ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" PropertyName="Caption"/>
+                    <dxb:UpdateAction Value="Diagram Design" ElementName="{x:Static dxdiag:DefaultBarItemNames.InsertRibbonPage}" PropertyName="Caption"/>
+                    <dxb:UpdateAction Value="Diagram Design" ElementName="{x:Static dxdiag:DefaultBarItemNames.ViewRibbonPage}" PropertyName="Caption"/>
+                    <dxb:UpdateAction Value="Diagram Design" ElementName="{x:Static dxdiag:DefaultBarItemNames.DesignRibbonPage}" PropertyName="Caption"/>
+
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}" PropertyName="IsVisible" Value="True"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.InsertRibbonPage}" PropertyName="IsVisible" Value="True"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.ViewRibbonPage}" PropertyName="IsVisible" Value="True"/>
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DesignRibbonPage}" PropertyName="IsVisible" Value="True"/>
+
+>>>>>>> Diagram Editor change
+                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.Save}"/>
+                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveFile}"/>
+                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveAsFile}"/>
+                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.OpenFile}"/>
+                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.NewFile}"/>
+                    <dxb:UpdateAction
+                        ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}"
+                        PropertyName="Caption"
+                        Value="Tools" />
+                    
+                    <dxb:UpdateAction
+                        ElementName="{x:Static dxdiag:DefaultBarItemNames.DefaultPageCategory}"
+                        Property="dxr:RibbonDefaultPageCategory.MergeType"
+                        Value="Remove" />
+
+                </diagram:Cdp4DiagramControl.Actions>
+            </diagram:Cdp4DiagramControl>
+        </Grid>
+    </Grid>
+</UserControl>
