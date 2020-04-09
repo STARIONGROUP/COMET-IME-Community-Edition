@@ -52,13 +52,11 @@ namespace CDP4ShellDialogs.Views
             var containerElement = (FrameworkElement)container;
             var cellData = (GridCellData)item;
 
-            if (cellData != null)
+            var rowObject = cellData?.RowData.Row;
+
+            if (rowObject is ModelSelectionIterationSetupRowViewModel)
             {
-                var rowObject = cellData.RowData.Row;
-                if (rowObject is ModelSelectionIterationSetupRowViewModel)
-                {
-                    return (DataTemplate)containerElement.FindResource("iterationSetupDomainOfExpertiseTemplate");
-                }
+                return (DataTemplate)containerElement.FindResource("iterationSetupDomainOfExpertiseTemplate");
             }
 
             return base.SelectTemplate(item, container);
