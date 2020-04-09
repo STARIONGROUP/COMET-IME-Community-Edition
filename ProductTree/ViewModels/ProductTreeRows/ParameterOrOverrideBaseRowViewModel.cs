@@ -428,7 +428,7 @@ namespace CDP4ProductTree.ViewModels
 
             if (compoundType == null)
             {
-                stateRow.SetScalarValue(this.Thing, valueSet);
+                stateRow.SetScalarValue(valueSet);
                 stateRow.IsPublishable = isStatePublishable;
             }
             else

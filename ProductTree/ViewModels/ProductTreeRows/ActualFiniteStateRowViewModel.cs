@@ -54,16 +54,10 @@ namespace CDP4ProductTree.ViewModels
             this.actualState = actualState;
             this.IsDefault = this.actualState.IsDefault;
             this.Name = this.actualState.Name;
-
-            //var parameterOrOverrideBaseRowViewModel = containerViewModel as ParameterOrOverrideBaseRowViewModel;
-            //if (parameterOrOverrideBaseRowViewModel != null)
-            //{
-            //    this.OwnerShortName = parameterOrOverrideBaseRowViewModel.OwnerShortName;
-            //}
         }
 
         /// <summary>
-        /// Gets or sets a value of <see cref="ActualFiniteState"/>
+        /// Gets or sets a value <see cref="ActualFiniteState"/> of row
         /// </summary>
         public ActualFiniteState ActualState
         {
@@ -98,11 +92,10 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
-        /// Set the value for this row from the <see cref="ParameterOrOverrideBase"/> and the associated <see cref="ParameterValueSetBase"/>
+        /// Set the value for this row from the <see cref="ParameterBase"/> and the associated <see cref="ParameterValueSetBase"/>
         /// </summary>
-        /// <param name="parameterOrOveride">The <see cref="ParameterOrOverrideBase"/></param>
         /// <param name="valueSet">The <see cref="ParameterValueSetBase"/></param>
-        public void SetScalarValue(ParameterOrOverrideBase parameterOrOveride, ParameterValueSetBase valueSet)
+        public void SetScalarValue(ParameterValueSetBase valueSet)
         {
             // perform checks to see if this is indeed a scalar value
             if (valueSet.Published.Count() > 1)
@@ -119,9 +112,9 @@ namespace CDP4ProductTree.ViewModels
                 this.Value = "-";
             }
 
-            if (parameterOrOveride.Scale != null)
+            if (this.Thing.Scale != null)
             {
-                this.Value += " [" + parameterOrOveride.Scale.ShortName + "]";
+                this.Value += " [" + this.Thing.Scale.ShortName + "]";
             }
 
             this.Switch = valueSet.ValueSwitch;
