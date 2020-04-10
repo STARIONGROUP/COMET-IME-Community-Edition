@@ -38,7 +38,7 @@ namespace CDP4Composition.Navigation
     public interface IThingSelectorDialogService
     {
         /// <summary>
-        /// Gets a single <see cref="Thing"/> 
+        /// Select a single <see cref="Thing"/> from the list of <param name="things"></param>, using the <see cref="ThingSelectorDialog"/> dialog window. />
         /// </summary>
         /// <typeparam name="T">Generic type reference that should be of type <see cref="Thing"/></typeparam>
         /// <param name="things"><see cref="IEnumerable{T}"/> where the user can choose from</param>

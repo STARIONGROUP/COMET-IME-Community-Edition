@@ -428,9 +428,9 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// 
+        /// Executes the DownloadFile command
         /// </summary>
-        /// <param name="selectedThingThing"></param>
+        /// <param name="thing"></param>
         private void ExecuteDownloadFile(Thing thing)
         {
             if (thing is File file)
@@ -492,46 +492,6 @@ namespace CDP4EngineeringModel.ViewModels
                 catch (Exception ex)
                 {
                     this.Feedback = ex.Message;
-                }
-                finally
-                {
-                    this.IsBusy = false;
-                }
-
-                return;
-            }
-
-            if (dropInfo.Payload is File file 
-                && (dropInfo.TargetItem is FolderRowViewModel || dropInfo.TargetItem is DomainFileStoreRowViewModel))
-            {
-                // copy the payload to this iteration
-                try
-                {
-                    this.IsBusy = true;
-
-                    //var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
-
-                    //var containerTransaction = new ThingTransaction(transactionContext, this.Thing.Container);
-                    //file.CurrentFileRevision.ContainingFolder = 
-
-                    //containerTransaction.CreateOrUpdate(file);
-
-                    //try
-                    //{
-                    //    var operationContainer = containerTransaction.FinalizeTransaction();
-                    //    await this.Session.Write(operationContainer);
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    MessageBox.Show(
-                    //        $"Moving file failed: {ex.Message}", "Moving File Failed",
-                    //        MessageBoxButton.OK, MessageBoxImage.Error);
-                    //}
-                }
-                catch (Exception e)
-                {
-                    logger.Error(e.Message);
-                    this.Feedback = e.Message;
                 }
                 finally
                 {

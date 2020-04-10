@@ -207,6 +207,10 @@ namespace CDP4EngineeringModel.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
+        /// <summary>
+        /// Calculates and sets the <see cref="ContentHash"/> property accordingly
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task"/></returns>
         private async Task SetContentHash()
         {
             this.ContentHash = null;
@@ -411,15 +415,13 @@ namespace CDP4EngineeringModel.ViewModels
         protected virtual void PopulatePossibleFileType()
         {
             this.PossibleFileType.Clear();
-            var siteDirectory = this.Session.RetrieveSiteDirectory();
+            var model = this.Container.GetContainerOfType<EngineeringModel>();
+            var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
 
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+            var allowedFileTypes = new List<FileType>(mrdl.FileType);
+            allowedFileTypes.AddRange(mrdl.GetRequiredRdls().SelectMany(rdl => rdl.FileType));
 
-            foreach (var referenceDataLibrary in siteDirectory.AvailableReferenceDataLibraries()
-                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
-            {
-                this.PossibleFileType.AddRange(referenceDataLibrary.FileType);
-            }
+            this.PossibleFileType.AddRange(allowedFileTypes.OrderBy(c => c.ShortName));
         }
 
         /// <summary>

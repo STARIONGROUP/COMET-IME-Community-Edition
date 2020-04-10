@@ -32,18 +32,13 @@ namespace CDP4Composition.ViewModels
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
 
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="ThingSelectorDialogViewModel{T}"/> is to allow a <see cref="File"/> to
-    /// be created or updated.
+    /// The purpose of the <see cref="ThingSelectorDialogViewModel{T}"/> is to select a specific <see cref="Thing"/> from a list of <see cref="Thing"/>s.
     /// </summary>
-    /// <remarks>
-    /// The creation of an <see cref="File"/> will result in an <see cref="File"/> being created by
-    /// the connected data-source
-    /// </remarks>
+    /// <typeparam name="T">The specific <see cref="Type"/> of the list of <see cref="Thing"/>s </typeparam>
     public class ThingSelectorDialogViewModel<T> : ReactiveObject where T : Thing
     {
         private IEnumerable<T> things;
@@ -54,6 +49,8 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ThingSelectorDialogViewModel{T}"/> class.
         /// </summary>
+        /// <param name="things">A list of <see cref="Thing"/>s from where the user can select a <see cref="Thing"/></param>
+        /// <param name="fieldNames">The names of the fields in the <see cref="Thing"/>s that will be shown as columns in the UI.</param>
         public ThingSelectorDialogViewModel(IEnumerable<T>things, IEnumerable<string> fieldNames)
         {
             this.Things = things;
@@ -90,7 +87,7 @@ namespace CDP4Composition.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets the IsLocked property
+        /// Gets or sets the Columns property
         /// </summary>
         public IEnumerable<dynamic> Columns
         {
@@ -98,6 +95,9 @@ namespace CDP4Composition.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.columns, value); }
         }
 
+        /// <summary>
+        /// Gets or sets the Title property
+        /// </summary>
         public string Title
         {
             get { return this.title; }

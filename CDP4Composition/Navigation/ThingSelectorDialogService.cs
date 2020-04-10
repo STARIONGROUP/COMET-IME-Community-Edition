@@ -42,6 +42,15 @@ namespace CDP4Composition.Navigation
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ThingSelectorDialogService : IThingSelectorDialogService
     {
+        /// <summary>
+        /// Select a single <see cref="Thing"/> from the list of <param name="things"></param>, using the <see cref="ThingSelectorDialog"/> dialog window. />
+        /// </summary>
+        /// <typeparam name="T">Generic type reference that should be of type <see cref="Thing"/></typeparam>
+        /// <param name="things"><see cref="IEnumerable{T}"/> where the user can choose from</param>
+        /// <param name="fieldNames"><see cref="IEnumerable{String}"/> that contains fieldnames of <see cref="Thing"/> data to be shown</param>
+        /// <returns>
+        /// A <see cref="Thing"/> of the specified generic type or null if the operation of the dialog was cancelled.
+        /// </returns>
         public T SelectThing<T>(IEnumerable<T> things, IEnumerable<string> fieldNames) where T : Thing
         {
             var viewModel = new ThingSelectorDialogViewModel<T>(things, fieldNames);
