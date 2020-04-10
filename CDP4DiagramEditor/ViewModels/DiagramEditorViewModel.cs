@@ -129,7 +129,6 @@ namespace CDP4DiagramEditor.ViewModels
         {
             this.Caption = this.Thing.Name;
             this.ToolTip = $"The {this.Thing.Name} diagram editor";
-            this.CanAddPort = false;
             this.UpdateProperties();
         }
         
@@ -157,27 +156,7 @@ namespace CDP4DiagramEditor.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.selectedItems, value); }
         }
 
-        /// <summary>
-        /// Get or Set the allowance to add port
-        /// </summary>
-        public bool CanAddPort
-        {
-            get => this.canAddPort; 
-            set => this.RaiseAndSetIfChanged(ref this.canAddPort, value);//, "CanAddPortProperty");
-        }
-
-        /// <summary>
-        /// Used to reset the IsSelected on port add command button
-        /// </summary>
-        public bool IsPortCommandSelected
-        {
-            get => this.isPortCommandSelected;
-            set => this.RaiseAndSetIfChanged(ref this.isPortCommandSelected, value); //, "IsPortCommandSelectedProperty");
-        }
-
-
         public ICdp4DiagramOrgChartBehavior Behavior { get; set; }
-
 
         /// <summary>
         /// The <see cref="IEventPublisher"/> that allows view/view-model communication
@@ -289,15 +268,15 @@ namespace CDP4DiagramEditor.ViewModels
             this.SaveDiagramCommand = ReactiveCommand.CreateAsyncTask(canExecute, x => this.ExecuteSaveDiagramCommand(), RxApp.MainThreadScheduler);
             this.SaveDiagramCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
 
-            this.GenerateDiagramCommandShallow = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<NamedThingDiagramContentItem>().Any()));
+            this.GenerateDiagramCommandShallow = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
             this.GenerateDiagramCommandShallow.Subscribe(x => this.ExecuteGenerateDiagramCommand(false));
 
-            this.GenerateDiagramCommandDeep = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<NamedThingDiagramContentItem>().Any()));
+            this.GenerateDiagramCommandDeep = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
             this.GenerateDiagramCommandDeep.Subscribe(x => this.ExecuteGenerateDiagramCommand(true));
 
-            this.CreatePortCommand = ReactiveCommand.Create();
+            this.CreatePortCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => (s as DiagramContentItem)?.Content is PortContainerDiagramContentItem));
             this.CreatePortCommand.Subscribe(_ => this.CreatePortCommandExecute());
-
+            
             this.CreateInterfaceCommand = ReactiveCommand.Create();
             this.CreateInterfaceCommand.Subscribe(_ => this.CreateInterfaceCommandExecute());
 
@@ -621,7 +600,6 @@ namespace CDP4DiagramEditor.ViewModels
                 var diagramItem = new DiagramPortViewModel(block, this.Session, this);
                 container.PortCollection.Add(diagramItem);
                 this.DiagramPortCollection.Add(diagramItem);
-                this.IsPortCommandSelected = false;
                 this.UpdateIsDirty();
             }
         }

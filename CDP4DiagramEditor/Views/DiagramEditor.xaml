@@ -217,7 +217,7 @@
                                     </dxn:NavBarItem.Template>
                                     Binary Relationship
                                 </dxn:NavBarItem>
-                                <dxn:NavBarItem IsSelected="{Binding Path=IsPortCommandSelected, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=CanAddPort, UpdateSourceTrigger=PropertyChanged}" Command="{Binding CreatePortCommand}">
+                                <dxn:NavBarItem IsSelected="{Binding Path=IsPortCommandSelected, UpdateSourceTrigger=PropertyChanged}" Command="{Binding CreatePortCommand}">
                                     <dxn:NavBarItem.Template>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">

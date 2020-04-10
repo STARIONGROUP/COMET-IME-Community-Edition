@@ -31,17 +31,5 @@ namespace CDP4CommonView.Diagram
         /// Resets the active tool.
         /// </summary>
         void ResetTool();
-
-        /// <summary>
-        /// Removes the specified item from the diagram collection.
-        /// </summary>
-        /// <param name="item">The <see cref="DiagramItem"/> to remove.</param>
-        void RemoveItem(DiagramItem item);
-
-        /// <summary>
-        /// Adds a connector to the <see cref="DiagramControl"/> item collection.
-        /// </summary>
-        /// <param name="connector">The connector to add</param>
-        void AddConnector(DiagramConnector connector);
     }
 }

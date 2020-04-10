@@ -17,6 +17,8 @@ namespace CDP4DiagramEditor.ViewModels
 
     public class DiagramPortViewModel : DiagramObjectViewModel, IDiagramPortViewModel
     {
+        public event EventHandler WhenPositionIsUpdated;
+
         public DiagramPortViewModel(DiagramObject diagramObject, ISession session, DiagramEditorViewModel containerViewModel) : base(diagramObject, session, containerViewModel)
         {
             this.ContainerBounds = diagramObject.Bounds.FirstOrDefault();
@@ -24,6 +26,11 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         public Bounds ContainerBounds { get; set; }
+
+        public void WhenPositionIsUpdatedInvoke()
+        {
+            this.WhenPositionIsUpdated?.Invoke(this, null);
+        }
 
         public PortContainerShapeSide PortContainerShapeSide { get; set; }
     }

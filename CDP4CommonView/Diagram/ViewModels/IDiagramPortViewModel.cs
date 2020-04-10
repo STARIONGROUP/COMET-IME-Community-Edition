@@ -4,21 +4,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4CommonView.Diagram
+namespace CDP4CommonView.Diagram.ViewModels
 {
+    using System;
+
     using CDP4Common.DiagramData;
 
-    using CDP4CommonView.Diagram.ViewModels;
-
     using CDP4Composition.Mvvm;
-
-    using Point = System.Windows.Point;
 
     /// <summary>
     /// The interface for view-model that shall be bound to a diagram object
     /// </summary>
     public interface IDiagramPortViewModel : IRowViewModelBase<DiagramObject>
     {
+        event EventHandler WhenPositionIsUpdated;
         /// <summary>
         /// Gets or sets the position
         /// </summary>
@@ -37,5 +36,7 @@ namespace CDP4CommonView.Diagram
         double Width { get; set; }
 
         Bounds ContainerBounds { get; set; }
+
+        void WhenPositionIsUpdatedInvoke();
     }
 }

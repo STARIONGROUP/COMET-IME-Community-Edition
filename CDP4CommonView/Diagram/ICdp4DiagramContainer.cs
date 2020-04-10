@@ -26,8 +26,6 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         ReactiveList<DiagramItem> SelectedItems { get; set; }
 
-        bool CanAddPort { get; set; }
-
         /// <summary>
         /// Removes items provided by the behavior.
         /// </summary>

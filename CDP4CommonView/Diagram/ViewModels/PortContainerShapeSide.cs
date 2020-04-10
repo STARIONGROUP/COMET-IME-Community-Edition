@@ -8,9 +8,10 @@ namespace CDP4CommonView.Diagram.ViewModels
 {
     public enum PortContainerShapeSide
     {
-        Left,
-        Top,
-        Right,
-        Bottom
+        Undefined = -1,
+        Bottom = 0,
+        Left = 25,
+        Top = 50,
+        Right = 75
     }
 }
