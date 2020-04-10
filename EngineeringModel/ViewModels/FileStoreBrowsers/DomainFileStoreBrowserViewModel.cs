@@ -30,6 +30,8 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
     using System.Windows.Controls;
 
     using CDP4Common.CommonData;
@@ -37,6 +39,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
+    using CDP4Composition.DragDrop;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -45,15 +49,14 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-
-    using Microsoft.Practices.ServiceLocation;
+    using CDP4Dal.Operations;
 
     using ReactiveUI;
 
     /// <summary>
     /// The view-model for the <see cref="DomainFileStoreBrowserViewModel"/> view
     /// </summary>
-    public class DomainFileStoreBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
+    public class DomainFileStoreBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget
     {
         /// <summary>
         /// The Panel Caption
@@ -86,9 +89,9 @@ namespace CDP4EngineeringModel.ViewModels
         private bool canUploadFile;
 
         /// <summary>
-        /// The <see cref="IOpenSaveFileDialogService"/>
+        /// Backing field for <see cref="CanDownloadFile"/>
         /// </summary>
-        private readonly IOpenSaveFileDialogService fileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
+        private bool canDownloadFile;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainFileStoreBrowserViewModel"/> class.
@@ -175,6 +178,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the <see cref="DownloadFileCommand"/> can be executed
+        /// </summary>
+        public bool CanDownloadFile
+        {
+            get => this.canDownloadFile;
+            private set => this.RaiseAndSetIfChanged(ref this.canDownloadFile, value);
+        }
+
+        /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="DomainFileStore"/>
         /// </summary>
         public ReactiveCommand<object> CreateStoreCommand { get; private set; }
@@ -190,6 +202,11 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveCommand<object> UploadFileCommand { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ICommand"/> to download a file from the newest <see cref="FileRevision"/> that belongs to the selected <see cref="File"/>
+        /// </summary>
+        public ReactiveCommand<object> DownloadFileCommand { get; private set; }
+
+        /// <summary>
         /// Initializes the <see cref="ICommand"/>s
         /// </summary>
         protected override void InitializeCommands()
@@ -203,6 +220,9 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.UploadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanUploadFile));
             this.UploadFileCommand.Subscribe(_ => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing));
+
+            this.DownloadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDownloadFile));
+            this.DownloadFileCommand.Subscribe(_ => this.ExecuteDownloadFile(this.SelectedThing.Thing));
         }
 
         /// <summary>
@@ -223,10 +243,12 @@ namespace CDP4EngineeringModel.ViewModels
             base.ComputePermission();
 
             var isContainer = this.SelectedThing?.Thing is DomainFileStore || this.SelectedThing?.Thing is Folder;
+            var isFile = this.SelectedThing?.Thing is File;
 
             this.CanCreateStore = this.PermissionService.CanWrite(ClassKind.DomainFileStore, this.Thing.Container);
             this.CanCreateFolder = isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
             this.CanUploadFile = isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
+            this.CanDownloadFile = isFile && this.PermissionService.CanRead(this.SelectedThing.Thing);
         }
 
         /// <summary>
@@ -238,7 +260,8 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Domain File Store", "", this.CreateStoreCommand, MenuItemKind.Create, ClassKind.DomainFileStore));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Upload a File to the File Store", "", this.UploadFileCommand, MenuItemKind.Create, ClassKind.File));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Add a File ", "", this.UploadFileCommand, MenuItemKind.Create, ClassKind.File));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Download File", "", this.DownloadFileCommand, MenuItemKind.Export, ClassKind.FileRevision));
         }
 
         /// <summary>
@@ -387,38 +410,94 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         protected void ExecuteCreateCommandForFile(Thing container = null)
         {
-            var thing = new File();
+            var file = new File
+            {
+                Container = this.Thing
+            };
 
             if (container is Folder fileFolder)
             {
                 var realContainer = fileFolder.GetContainerOfType(typeof(DomainFileStore));
+                file.CurrentContainingFolder = fileFolder;
 
-                this.ExecuteCreateCommand(thing, realContainer);
+                this.ExecuteCreateCommand(file, realContainer);
                 return;
             }
 
-            this.ExecuteCreateCommand(thing, container);
+            this.ExecuteCreateCommand(file, container);
         }
 
         /// <summary>
-        /// Executes the upload file command
+        /// Executes the DownloadFile command
         /// </summary>
-        private void ExecuteUploadFile()
+        /// <param name="thing"></param>
+        private void ExecuteDownloadFile(Thing thing)
         {
-            var result = this.fileDialogService.GetOpenFileDialog(false, false, false, string.Empty, string.Empty, string.Empty, 1);
-
-            if (result.Length != 1)
+            if (thing is File file)
             {
-                return;
+                var fileRevision = file.FileRevision.OrderByDescending(x => x.CreatedOn).FirstOrDefault();
+                fileRevision?.DownloadFile(this.Session);
             }
+        }
 
-            // TODO on Task T1250: Replace the following 3 lines with an actual call to the server to upload the file 
-            //var uploadedFile = new File();
-            //var participant = new Participant { Person = new Person() };
-            //var fileRevision = new FileRevision { Creator = participant };
-            //uploadedFile.FileRevision.Add(fileRevision);
-            //var uploadedRow = new DomainFileStoreRowViewModel(((Iteration)this.Thing).DomainFileStore.FirstOrDefault(), this.Session, this.domainFileStoreRow);
-            //this.ContainedRows.Add(uploadedRow);
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            try
+            {
+                logger.Trace("drag over {0}", dropInfo.TargetItem);
+
+                if (dropInfo.TargetItem is IDropTarget droptarget)
+                {
+                    droptarget.DragOver(dropInfo);
+                    return;
+                }
+
+                dropInfo.Effects = DragDropEffects.None;
+            }
+            catch (Exception ex)
+            {
+                dropInfo.Effects = DragDropEffects.None;
+                logger.Error(ex, "drag-over caused an error");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            if (dropInfo.TargetItem is IDropTarget droptarget)
+            {
+                try
+                {
+                    this.IsBusy = true;
+
+                    await droptarget.Drop(dropInfo);
+                }
+                catch (Exception ex)
+                {
+                    this.Feedback = ex.Message;
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            }
         }
     }
 }

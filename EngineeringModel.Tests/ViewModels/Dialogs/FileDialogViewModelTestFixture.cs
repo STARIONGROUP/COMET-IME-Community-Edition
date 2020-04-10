@@ -29,6 +29,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
     using System;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -57,7 +58,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
     using FileDialogViewModel = CDP4EngineeringModel.ViewModels.FileDialogViewModel;
 
     /// <summary>
-    /// Test suite for the <see cref="CDP4EngineeringModel.ViewModels.FileDialogViewModel"/> class
+    /// Test suite for the <see cref="FileDialogViewModel"/> class
     /// </summary>
     [TestFixture]
     internal class FileDialogViewModelTestFixture
@@ -232,9 +233,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        public void VerifyOkButtonWorks()
+        public async Task VerifyOkButtonWorks()
         {
-            var vm = new FileDialogViewModel(this.file, this.thingTransaction, this.session.Object, false, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.store);
+            var vm = new FileDialogViewModel(this.file, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.store);
 
             Assert.IsFalse(vm.OkCanExecute);
 

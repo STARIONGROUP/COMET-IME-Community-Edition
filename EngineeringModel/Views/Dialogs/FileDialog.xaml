@@ -9,7 +9,6 @@
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
-             xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              Height="380"
              Width="500"
@@ -17,14 +16,6 @@
              mc:Ignorable="d">
     <dx:DXWindow.Resources>
         <ResourceDictionary>
-            <DataTemplate DataType="{x:Type mvvm:ContextMenuItemViewModel}">
-                <ContentControl>
-                    <dxb:BarButtonItem Command="{Binding MenuCommand}" 
-                                       Content="{Binding Header}"
-                                       Glyph="{dx:DXImage Image=Add_16x16.png}">
-                    </dxb:BarButtonItem>
-                </ContentControl>
-            </DataTemplate>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/ErrorTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -64,18 +55,14 @@
                         <dxb:BarButtonItem x:Name="CreateFileRevisionButton"
                                            Command="{Binding CreateFileRevisionCommand}"
                                            Glyph="{dx:DXImage Image=Add_16x16.png}"
-                                           Hint="Create a FileRevision" />
+                                           Hint="Create a File Revision" />
                         <dxb:BarButtonItem x:Name="DeleteFileRevisionButton"
                                            Command="{Binding DeleteFileRevisionCommand}"
                                            Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                           Hint="Delete the selected FileRevision" />
-                        <dxb:BarButtonItem x:Name="EditFileRevisionButton"
-                                           Command="{Binding EditFileRevisionCommand}"
-                                           Glyph="{dx:DXImage Image=EditName_16x16.png}"
-                                           Hint="Edit the selected FileRevision" />
+                                           Hint="Delete the selected File Revision" />
                         <dxb:BarButtonItem Command="{Binding InspectFileRevisionCommand}"
                                            Glyph="{dx:DXImage Image=Find_16x16.png}"
-                                           Hint="Inspect the selected FileRevision" />
+                                           Hint="Inspect the selected File Revision" />
                     </dxb:ToolBarControl>
                 </lc:LayoutItem>
                 <lc:LayoutItem MaxHeight="350" MaxWidth="700" Label="File Revisions:" LabelPosition="Top">
@@ -95,9 +82,6 @@
                                                AutoWidth="true"
                                                IsDetailButtonVisibleBinding="{x:Null}"
                                                ShowGroupPanel="False">
-                                <!--<dxg:TableView.FocusedRow>
-                                    <dynamic:ExpandoObject />
-                                </dxg:TableView.FocusedRow>-->
                                 <dxg:TableView.RowStyle>
                                     <Style TargetType="{x:Type dxg:RowControl}">
                                         <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
@@ -108,8 +92,11 @@
                         <dxg:GridControl.Columns>
                             <dxg:GridColumn FieldName="Name" Header="Name" />
                             <dxg:GridColumn FieldName="Path" Header="Path" />
-                            <dxg:GridColumn FieldName="CreatedOn" Header="Created On" />
-                            <dxg:GridColumn FieldName="Creator" Header="Creator" />
+                            <dxg:GridColumn FieldName="CreatedOn" Header="Created On">
+                                <dxg:GridColumn.EditSettings>
+                                    <dxe:DateEditSettings Mask="G" MaskUseAsDisplayFormat="True" />
+                                </dxg:GridColumn.EditSettings>
+                            </dxg:GridColumn >
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </lc:LayoutItem>

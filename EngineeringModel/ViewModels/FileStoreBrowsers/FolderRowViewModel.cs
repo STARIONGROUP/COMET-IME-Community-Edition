@@ -26,9 +26,15 @@
 
 namespace CDP4EngineeringModel.ViewModels
 {
+    using System;
+    using System.Threading.Tasks;
+    using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.DragDrop;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -37,7 +43,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// The folder row view model.
     /// </summary>
-    public class FolderRowViewModel : CDP4CommonView.FolderRowViewModel
+    public class FolderRowViewModel : CDP4CommonView.FolderRowViewModel, IDropTarget
     {
         /// <summary>
         /// The <see cref="FileStoreFileAndFolderHandler{T}"/>
@@ -82,6 +88,70 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.ObjectChangeEventHandler(objectChange);
             this.parentFileStoreFileAndFolderHandler?.UpdateFolderRowPosition(this.Thing);
+        }
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            try
+            {
+                logger.Trace("drag over {0}", dropInfo.TargetItem);
+
+                if (dropInfo.Payload is File file && (file.CurrentContainingFolder != this.Thing) && file.Container.Iid.Equals(this.Thing.Container.Iid))
+                {
+                    dropInfo.Effects = DragDropEffects.Copy;
+                    return;
+                }
+
+                dropInfo.Effects = DragDropEffects.None;
+            }
+            catch (Exception ex)
+            {
+                dropInfo.Effects = DragDropEffects.None;
+                logger.Error(ex, "drag-over caused an error");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            if (dropInfo.Payload is File file && (file.CurrentContainingFolder != this.Thing) && file.Container.Iid.Equals(this.Thing.Container.Iid))
+            {
+                try
+                {
+                    this.IsBusy = true;
+
+                    var iteration = this.Thing.GetContainerOfType<Iteration>();
+                    this.Session.OpenIterations.TryGetValue(iteration, out var tuple);
+
+                    await file.MoveFile(this.Thing, tuple?.Item2, this.Session);
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e.Message);
+                    MessageBox.Show(e.Message, "Moving file failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            }
         }
     }
 }

@@ -1,0 +1,70 @@
+﻿<dx:ThemedWindow  x:Class="CDP4Composition.Views.ThingSelectorDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxci="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
+             Height="380"
+             Width="500"
+             ShowTitle="True"
+             Title="{Binding Title}"
+             ShowInTaskbar="False"
+             mc:Ignorable="d">
+    <dx:ThemedWindow.Resources>
+        <DataTemplate x:Key="DefaultColumnTemplate">
+            <ContentControl>
+                <dxg:GridColumn Header="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}" FieldName="{Binding Path=(dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}"/>
+            </ContentControl>
+        </DataTemplate>
+    </dx:ThemedWindow.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="35"/>
+        </Grid.RowDefinitions>
+        <dxg:GridControl Name="ThingsControl"
+             AllowLiveDataShaping="False"
+             ItemsSource="{Binding Things}"
+             ColumnsSource="{Binding Columns}"
+             SelectedItem="{Binding SelectedThing}"
+             ColumnGeneratorTemplate="{StaticResource DefaultColumnTemplate}">
+            <dxg:GridControl.View>
+                <dxg:TableView Name="View"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   AllowColumnMoving="True"
+                                   AllowEditing="False"
+                                   AllowGrouping="True"
+                                   ShowFilterPanelMode="Never"
+                                   AutoWidth="true"
+                                   IsDetailButtonVisibleBinding="{x:Null}"
+                                   ShowAutoFilterRow="True"
+                                   ShowGroupPanel="False">
+                </dxg:TableView>
+            </dxg:GridControl.View>
+        </dxg:GridControl>
+        <lc:LayoutGroup Grid.Row="1">
+            <dx:ThemedWindowDialogButton Width="75"
+                    Height="25"
+                    Margin="3"
+                    Name="OkButton"
+                    Command="{Binding Path=OkCommand}"
+                    IsDefault="True"
+                    Content="Ok" 
+                    DialogResult="OK" 
+                    HorizontalAlignment="Right"/>
+            <dx:ThemedWindowDialogButton Width="75"
+                    Height="25"
+                    Name="CancelButton"
+                    Command="{Binding Path=CancelCommand}"
+                    Margin="3"
+                    IsCancel="true"
+                    Content="Cancel" 
+                    DialogResult="Cancel"
+                    HorizontalAlignment="Right"/>
+        </lc:LayoutGroup>
+    </Grid>
+</dx:ThemedWindow>
