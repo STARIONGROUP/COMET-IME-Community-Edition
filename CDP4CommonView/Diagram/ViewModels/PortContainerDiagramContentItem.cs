@@ -13,6 +13,7 @@
 
     using CDP4Composition.Diagram;
 
+    using DevExpress.Data.Helpers;
     using DevExpress.Xpf.Diagram;
 
     using NLog;
@@ -40,48 +41,61 @@
 
         private void PortCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChanged)
         {
-            // set sides for any 
-            foreach (IDiagramPortViewModel port in notifyCollectionChanged.NewItems)
-            {
-                port.PortContainerShapeSide = this.GetAvailableSide();
+            // set sides for any
+            if (notifyCollectionChanged.NewItems != null)
+            { 
+                foreach (IDiagramPortViewModel port in notifyCollectionChanged.NewItems)
+                {
+                    port.PortContainerShapeSide = this.GetAvailableSide();
+                }
             }
+           
+            this.RecalculatePortsPosition();
+        }
+
+        private void RecalculatePortsPosition()
+        {
             var diagramItem = (this.Parent as DiagramItem);
 
             var bottomSide = this.PortCollection.Where(p => p.PortContainerShapeSide == PortContainerShapeSide.Bottom).ToArray();
-            var portion =this.CalculatePortion(PortContainerShapeSide.Bottom);
-            for(var index = 0; index < bottomSide.Count(); index++)
+            var portion = this.CalculatePortion(PortContainerShapeSide.Bottom);
+
+            for (var index = 0; index < bottomSide.Count(); index++)
             {
-                var vector =  portion * (index + 1);
-                bottomSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(vector, diagramItem.ActualHeight - (12.5)));
+                var vector = portion * (index + 1) - 10;
+                bottomSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(vector, diagramItem.ActualHeight - (10)));
                 bottomSide[index].WhenPositionIsUpdatedInvoke();
             }
 
             var leftSide = this.PortCollection.Where(p => p.PortContainerShapeSide == PortContainerShapeSide.Left).ToArray();
             portion = this.CalculatePortion(PortContainerShapeSide.Left);
+
             for (var index = 0; index < leftSide.Count(); index++)
             {
-                var vector = portion * (index + 1);
-                leftSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(0 - (12.5), vector));
+                var vector = portion * (index + 1) - 10;
+                leftSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(0 - (10), vector));
                 leftSide[index].WhenPositionIsUpdatedInvoke();
             }
 
             var topSide = this.PortCollection.Where(p => p.PortContainerShapeSide == PortContainerShapeSide.Top).ToArray();
             portion = this.CalculatePortion(PortContainerShapeSide.Top);
+
             for (var index = 0; index < topSide.Count(); index++)
             {
-                var vector = portion * (index + 1);
-                topSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(vector, 0 - (12.5)));
+                var vector = portion * (index + 1) - 10;
+                topSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(vector, 0 - (10)));
                 topSide[index].WhenPositionIsUpdatedInvoke();
             }
 
             var rightSide = this.PortCollection.Where(p => p.PortContainerShapeSide == PortContainerShapeSide.Right).ToArray();
             portion = this.CalculatePortion(PortContainerShapeSide.Right);
+
             for (var index = 0; index < rightSide.Count(); index++)
             {
-                var vector = portion * (index + 1);
-                rightSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(diagramItem.ActualWidth - (12.5), vector));
+                var vector = portion * (index + 1) - 10;
+                rightSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(diagramItem.ActualWidth - (10), vector));
                 rightSide[index].WhenPositionIsUpdatedInvoke();
-    }
+            }
         }
 
         private PortContainerShapeSide GetAvailableSide()
@@ -117,25 +131,25 @@
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Bottom;
                 var xVector = this.CalculateVector(PortContainerShapeSide.Bottom, diagramItem.ActualWidth);
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(xVector, diagramItem.ActualHeight - (12.5)));
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(xVector, diagramItem.ActualHeight - (10)));
             }
             else if (place == .25)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Left;
                 var yVector = this.CalculateVector(PortContainerShapeSide.Left, diagramItem.ActualHeight);
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(0 - (12.5), yVector));
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(0 - (10), yVector));
             }
             else if (place == .50)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Top;
                 var xVector = this.CalculateVector(PortContainerShapeSide.Top, diagramItem.ActualWidth);
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(xVector, 0 - (12.5)));
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(xVector, 0 - (10)));
             }
             else if (place == .75)
             {
                 lastIn.PortContainerShapeSide = PortContainerShapeSide.Right;
                 var yVector = this.CalculateVector(PortContainerShapeSide.Right, diagramItem.ActualHeight);
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(diagramItem.ActualWidth - (12.5), yVector));
+                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(diagramItem.ActualWidth - (10), yVector));
             }
             
         }
@@ -144,8 +158,12 @@
         {
             var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == side) - 1;
             var portion = ((20 - presentPort) / 100) * sideLength;
-            return ((presentPort + 1) * portion) - (12.5);
+            return ((presentPort + 1) * portion) - (10);
         }
 
+        public void UpdatePortLayout()
+        {
+            this.RecalculatePortsPosition();
+        }
     }
 }

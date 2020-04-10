@@ -201,7 +201,7 @@
                         <dxn:ExplorerBarView/>
                     </dxn:NavBarControl.View>
                     <dxn:NavBarControl.Groups>
-                        <dxn:NavBarGroup Header="Ports and interfaces">
+                        <dxn:NavBarGroup Header="Ports and Interfaces">
                             <dxn:NavBarGroup.Items>
                                 <dxn:NavBarItem Command="{Binding CreateInterfaceCommand}">
                                     <dxn:NavBarItem.Template>
@@ -211,13 +211,13 @@
                                                    Height="16"
                                                    Margin="10"
                                                    Source="{dx:DXImage Image=LineItem_16x16.png}" />
-                                                <TextBlock Text="Interfaces" VerticalAlignment="Center"></TextBlock>
+                                                <TextBlock Text="Draw Interface" VerticalAlignment="Center"></TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
                                     </dxn:NavBarItem.Template>
                                     Binary Relationship
                                 </dxn:NavBarItem>
-                                <dxn:NavBarItem IsSelected="{Binding Path=IsPortCommandSelected, UpdateSourceTrigger=PropertyChanged}" Command="{Binding CreatePortCommand}">
+                                <dxn:NavBarItem Command="{Binding CreatePortCommand}">
                                     <dxn:NavBarItem.Template>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -225,7 +225,21 @@
                                                    Height="16"
                                                    Margin="10"
                                                    Source="{dx:DXImage Image=DocumentMap_16x16.png}" />
-                                                <TextBlock Text="Ports" VerticalAlignment="Center"></TextBlock>
+                                                <TextBlock Text="Add Output Port" VerticalAlignment="Center"></TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </dxn:NavBarItem.Template>
+                                    Multi Relationship
+                                </dxn:NavBarItem>
+                                <dxn:NavBarItem Command="{Binding CreatePortCommand}">
+                                    <dxn:NavBarItem.Template>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="16"
+                                                       Height="16"
+                                                       Margin="10"
+                                                       Source="{dx:DXImage Image=DocumentMap_16x16.png}" />
+                                                <TextBlock Text="Add Input Port" VerticalAlignment="Center"></TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
                                     </dxn:NavBarItem.Template>

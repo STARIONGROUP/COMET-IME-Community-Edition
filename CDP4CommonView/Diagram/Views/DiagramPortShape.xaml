@@ -8,20 +8,19 @@
                      xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                      mc:Ignorable="d"
                      Shape="BasicShapes.Rectangle"
-                     Height="25"
-                     Width="25"
+                     Height="20"
+                     Width="20"
                      Anchors="Bottom"
                      SnapsToDevicePixels="False"
                      CanSnapToOtherItems="False"
                      CanSnapToThisItem="False"
                      CanMove="True"
                      ConnectionPoints="0.5,1"
-                     Background="Gray"
-                     BorderBrush="Gray"
+                     Background="LightGray"
+                     BorderBrush="LightGray"
                      BorderThickness="1"
                      d:DesignHeight="300" d:DesignWidth="300">
     <dxmvvm:Interaction.Behaviors>
         <behaviors:DiagramPortShapeBehavior></behaviors:DiagramPortShapeBehavior>
     </dxmvvm:Interaction.Behaviors>
-
 </dxdiag:DiagramShape>

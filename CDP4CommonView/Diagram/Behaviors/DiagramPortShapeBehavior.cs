@@ -38,8 +38,8 @@
             (this.AssociatedObject.DataContext as IDiagramPortViewModel).WhenPositionIsUpdated += this.WhenPositionIsUpdated;
             this.DeterminePortConnectorRotation();
 
-            //this.PositionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => ((IDiagramPortViewModel)x.AssociatedObject.DataContext).Position).Select(p => p != this.AssociatedObject.Position));
-            //this.PositionCommand.Subscribe(_ => this.PositionCommandExecute());
+            //this.WhenAnyValue(x => ((IDiagramPortViewModel)x.AssociatedObject.DataContext).Position).Subscribe(_ => this.PositionCommandExecute());
+            //STore
         }
 
         private void WhenPositionIsUpdated(object sender, EventArgs e)

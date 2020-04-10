@@ -38,8 +38,6 @@ namespace CDP4CommonView.Diagram
 
     using EventAggregator;
 
-    using ReactiveUI;
-
     using Point = System.Windows.Point;
 
     /// <summary>
@@ -423,7 +421,8 @@ namespace CDP4CommonView.Diagram
                     vm.SelectedItems.Add(controlSelectedItem);
                 }
             }
-            this.EventPublisher.Publish(new DiagramSelectEvent(new ReactiveList<DiagramElementThing>(this.AssociatedObject.SelectedItems.Select(x => (NamedThingDiagramContentItem)x.DataContext).Thing)));
+            //this.EventPublisher.Publish(new DiagramSelectEvent(new ReactiveList<DiagramElementThing>(this.AssociatedObject.SelectedItems.Select(x => ((IRowViewModelBase<DiagramElementThing>)x.DataContext).Thing))));
+
         }
 
         /// <summary>
@@ -456,6 +455,8 @@ namespace CDP4CommonView.Diagram
             //this.AssociatedObject.Items.CollectionChanged += this.OnControlCollectionChanged;
             this.AssociatedObject.SelectionChanged += this.OnControlSelectionChanged;
 
+            this.AssociatedObject.LayoutUpdated += this.LayoutUpdated;
+
             this.CustomLayoutItems += this.OnCustomLayoutItems;
 
             this.AssociatedObject.PreviewMouseLeftButtonDown += this.PreviewMouseLeftButtonDown;
@@ -472,16 +473,35 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
         }
 
+        private void LayoutUpdated(object sender, EventArgs e)
+        {
+            foreach (var portContainer in this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content as PortContainerDiagramContentItem))
+            {
+                portContainer.UpdatePortLayout();
+            }
+        }
+
         private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
-            if (e.Item is PortContainerDiagramContentItem portContainer && e.Action == ItemsChangedAction.Removed)
+            if (e.Action == ItemsChangedAction.Removed)
             {
-                foreach (var portViewModel in portContainer.PortCollection)
+                if (e.Item is PortContainerDiagramContentItem portContainer)
                 {
-                    this.AssociatedObject.Items.Remove(this.AssociatedObject.Items.OfType<DiagramPortShape>().FirstOrDefault(item => (IDiagramPortViewModel)item.DataContext == portViewModel));
+                    foreach (var portViewModel in portContainer.PortCollection)
+                    {
+                        this.AssociatedObject.Items.Remove(this.AssociatedObject.Items.OfType<DiagramPortShape>().FirstOrDefault(item => (IDiagramPortViewModel) item.DataContext == portViewModel));
+                    }
+
+                    portContainer.PortCollection.Clear();
                 }
-                portContainer.PortCollection.Clear();
+
+                if (e.Item is DiagramPortShape port)
+                {
+                    var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content).OfType<PortContainerDiagramContentItem>().FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
+                    container?.PortCollection.Remove(container.PortCollection.FirstOrDefault(i => i == port.DataContext));
+                }
             }
+
         }
         
         private void OnCustomLayoutItems(object sender, DiagramCustomLayoutItemsEventArgs e)

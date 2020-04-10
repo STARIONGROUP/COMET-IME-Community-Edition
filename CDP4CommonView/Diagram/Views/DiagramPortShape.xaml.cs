@@ -38,7 +38,7 @@
         public DiagramPortShape(IDiagramPortViewModel datacontext, Cdp4DiagramOrgChartBehavior behaviour)
         {
             this.DataContext = datacontext;
-            this.InitializeComponent();
+                this.InitializeComponent();
         }
     }
 }
