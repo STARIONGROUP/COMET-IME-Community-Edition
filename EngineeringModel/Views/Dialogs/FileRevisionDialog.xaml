@@ -36,7 +36,7 @@
                             <ColumnDefinition Width="31" />
                             <ColumnDefinition Width="31" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Path=Path}" Height="25"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{Binding Path=Path}" Height="18" ></TextBlock>
                         <dx:SimpleButton Grid.Column="1" Width="25"
                             Height="25"
                             Margin="3"
