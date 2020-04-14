@@ -398,20 +398,7 @@ namespace CDP4CommonView.Diagram
             var vm = (ICdp4DiagramContainer)this.AssociatedObject.DataContext;
             var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
 
-            if ((controlSelectedItems.FirstOrDefault() as DiagramContentItem)?.Content is PortContainerDiagramContentItem portContainer)
-            {
-                vm.SelectedItems.Clear();
-                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
-                foreach (var portViewModel in portContainer.PortCollection)
-                {
-                    this.AssociatedObject.SelectItem(this.AssociatedObject.Items.OfType<DiagramPortShape>().FirstOrDefault(item => (IDiagramPortViewModel)item.DataContext == portViewModel ), ModifySelectionMode.AddToSelection);
-                }
-                foreach (var controlSelectedItem in controlSelectedItems)
-                {
-                    vm.SelectedItems.Add(controlSelectedItem);
-                }
-            }
-            else if (vm != null)
+            if (vm != null)
             {
                 vm.SelectedItems.Clear();
                 vm.SelectedItem = controlSelectedItems.FirstOrDefault();
