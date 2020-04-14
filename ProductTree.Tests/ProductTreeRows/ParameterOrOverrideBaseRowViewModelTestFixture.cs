@@ -483,7 +483,5 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             this.thingCreator.Verify(x => x.CreateBinaryRelationshipForRequirementVerification(It.IsAny<ISession>(), It.IsAny<Iteration>(), It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()), Times.Never);
         }
-
-
     }
 }
