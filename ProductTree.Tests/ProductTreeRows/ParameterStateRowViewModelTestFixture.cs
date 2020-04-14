@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="ActualFiniteStateRowViewModelTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="ParameterStateRowViewModelTestFixture.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ namespace ProductTree.Tests.ProductTreeRows
     using NUnit.Framework;
 
     [TestFixture]
-    internal class ActualFiniteStateRowViewModelTestFixture
+    internal class ParameterStateRowViewModelTestFixture
     {
         private Mock<ISession> session;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
@@ -97,15 +97,15 @@ namespace ProductTree.Tests.ProductTreeRows
         public void VerifyThatPropertiesAreSet()
         {
             this.parameterRowViewModel = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
-            var vm = new ActualFiniteStateRowViewModel(this.parameter1, this.state1 , this.session.Object, this.parameterRowViewModel);
+            var row = new ParameterStateRowViewModel(this.parameter1, this.state1 , this.session.Object, this.parameterRowViewModel);
 
-            Assert.AreEqual(vm.ActualState, this.state1);
-            Assert.AreEqual(vm.IsDefault, vm.ActualState.IsDefault);
-            Assert.AreSame(this.state1.Name, vm.ActualState.Name);
+            Assert.AreEqual(row.ActualState, this.state1);
+            Assert.AreEqual(row.IsDefault, row.ActualState.IsDefault);
+            Assert.AreSame(this.state1.Name, row.ActualState.Name);
         }
 
         [Test]
-        public void VerifyThatSetScalarValueProperly()
+        public void VerifyThatSetScalarValueIsProperly()
         {
             var published = new ValueArray<string>(new List<string> { "manual" }, this.valueset);
             var actual = new ValueArray<string>(new List<string> { "manual" }, this.valueset);
@@ -118,7 +118,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.parameter1.ValueSet.Add(this.valueset);
             this.parameter1.IsOptionDependent = true;
 
-            var row = new ActualFiniteStateRowViewModel(this.parameter1, this.state1, this.session.Object, this.parameterRowViewModel);
+            var row = new ParameterStateRowViewModel(this.parameter1, this.state1, this.session.Object, this.parameterRowViewModel);
             row.SetScalarValue(this.valueset);
 
             Assert.AreEqual(row.Switch, this.valueset.ValueSwitch);

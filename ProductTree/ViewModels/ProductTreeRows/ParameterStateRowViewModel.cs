@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="ActualFiniteStateRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ParameterStateRowViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
@@ -14,12 +14,12 @@ namespace CDP4ProductTree.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// The row-view-model representing an <see cref="ActualFiniteState"/> 
+    /// The row-view-model representing an ActualFiniteState of a <see cref="Parameter"/> 
     /// </summary>
     /// <remarks>
     /// This row shall be used when a <see cref="Parameter"/> is state dependent
     /// </remarks>
-    public class ActualFiniteStateRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IModelCodeRowViewModel
+    public class ParameterStateRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IModelCodeRowViewModel
     {
         /// <summary>
         /// Backing field for <see cref="IsPublishable"/> property.
@@ -42,13 +42,13 @@ namespace CDP4ProductTree.ViewModels
         private ActualFiniteState actualState;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActualFiniteStateRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="ParameterStateRowViewModel"/> class
         /// </summary>
         /// <param name="parameterBase">The associated value-set of a <see cref="ParameterBase"/></param>
         /// <param name="actualFiniteState">The <see cref="ActualFiniteState"/> represented</param>
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
-        public ActualFiniteStateRowViewModel(ParameterBase parameterBase, ActualFiniteState actualFiniteState, ISession session, IViewModelBase<Thing> containerViewModel)
+        public ParameterStateRowViewModel(ParameterBase parameterBase, ActualFiniteState actualFiniteState, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(parameterBase, session, containerViewModel)
         {
             this.IsPublishable = false;
