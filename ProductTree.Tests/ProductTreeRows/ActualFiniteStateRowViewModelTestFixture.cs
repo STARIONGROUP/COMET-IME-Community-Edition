@@ -123,8 +123,6 @@ namespace ProductTree.Tests.ProductTreeRows
 
             Assert.AreEqual(row.Switch, this.valueset.ValueSwitch);
             Assert.AreEqual(row.ModelCode, this.valueset.ModelCode());
-
         }
-
     }
 }
