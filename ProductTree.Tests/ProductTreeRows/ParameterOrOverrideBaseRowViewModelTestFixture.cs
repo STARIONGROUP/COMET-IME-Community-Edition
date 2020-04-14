@@ -246,7 +246,6 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
             Assert.AreEqual(1, row.ContainedRows.Count);
-
             this.state1.Kind = ActualFiniteStateKind.FORBIDDEN;
             CDPMessageBus.Current.SendObjectChangeEvent(this.state1, EventKind.Updated);
             Assert.AreEqual(0, row.ContainedRows.Count);
@@ -484,5 +483,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             this.thingCreator.Verify(x => x.CreateBinaryRelationshipForRequirementVerification(It.IsAny<ISession>(), It.IsAny<Iteration>(), It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()), Times.Never);
         }
+
+
     }
 }

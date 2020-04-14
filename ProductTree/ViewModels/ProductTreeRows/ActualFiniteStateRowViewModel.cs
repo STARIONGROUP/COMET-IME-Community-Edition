@@ -53,8 +53,8 @@ namespace CDP4ProductTree.ViewModels
         {
             this.IsPublishable = false;
             this.ActualState = actualFiniteState;
-            this.IsDefault = this.actualState.IsDefault;
-            this.Name = this.actualState.Name;
+            this.IsDefault = this.ActualState.IsDefault;
+            this.Name = this.ActualState.Name;
         }
 
         /// <summary>
