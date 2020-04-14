@@ -190,6 +190,7 @@
     <Compile Include="OfficeRibbon\ProductTreeRibbonPartTestFixture.cs" />
     <Compile Include="Converters\ProductTreeIconUriConverterTestFixture.cs" />
     <Compile Include="ProductTreeModuleTestFixture.cs" />
+    <Compile Include="ProductTreeRows\ParameterStateRowViewModelTestFixture.cs" />
     <Compile Include="ProductTreeRows\ElementDefinitionRowViewModelTestFixture.cs" />
     <Compile Include="ProductTreeRows\ElementUsageRowViewModelTestFixture.cs" />
     <Compile Include="ProductTreeRows\ParameterGroupRowViewModelTestFixture.cs" />

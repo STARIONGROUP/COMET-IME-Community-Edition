@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="ActualFiniteStateRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="ParameterStateRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -14,23 +14,13 @@ namespace CDP4ProductTree.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// The row-view-model representing an <see cref="ActualFiniteState"/> 
+    /// The row-view-model representing an ActualFiniteState of a <see cref="Parameter"/> 
     /// </summary>
     /// <remarks>
     /// This row shall be used when a <see cref="Parameter"/> is state dependent
     /// </remarks>
-    public class ActualFiniteStateRowViewModel : CDP4CommonView.ActualFiniteStateRowViewModel, IModelCodeRowViewModel
+    public class ParameterStateRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IModelCodeRowViewModel
     {
-        /// <summary>
-        /// backing field for <see cref="Value"/> property.
-        /// </summary>
-        private string value;
-
-        /// <summary>
-        /// Backing field for <see cref="Switch"/> property.
-        /// </summary>
-        private ParameterSwitchKind switchValue;
-
         /// <summary>
         /// Backing field for <see cref="IsPublishable"/> property.
         /// </summary>
@@ -42,32 +32,38 @@ namespace CDP4ProductTree.ViewModels
         private bool isDefault;
 
         /// <summary>
-        /// Backing field for the <see cref="OwnerShortName"/> property.
-        /// </summary>
-        private string ownerShortName;
-
-        /// <summary>
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
         private string modelCode;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActualFiniteStateRowViewModel"/> class
+        /// Backing field for <see cref="ActualState"/>
         /// </summary>
+        private ActualFiniteState actualState;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterStateRowViewModel"/> class
+        /// </summary>
+        /// <param name="parameterBase">The associated value-set of a <see cref="ParameterBase"/></param>
         /// <param name="actualFiniteState">The <see cref="ActualFiniteState"/> represented</param>
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
-        public ActualFiniteStateRowViewModel(ActualFiniteState actualFiniteState, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(actualFiniteState, session, containerViewModel)
+        public ParameterStateRowViewModel(ParameterBase parameterBase, ActualFiniteState actualFiniteState, ISession session, IViewModelBase<Thing> containerViewModel)
+            : base(parameterBase, session, containerViewModel)
         {
             this.IsPublishable = false;
-            this.IsDefault = this.Thing.IsDefault;
+            this.ActualState = actualFiniteState;
+            this.IsDefault = this.ActualState.IsDefault;
+            this.Name = this.ActualState.Name;
+        }
 
-            var parameterOrOverrideBaseRowViewModel = containerViewModel as ParameterOrOverrideBaseRowViewModel;
-            if (parameterOrOverrideBaseRowViewModel != null)
-            {
-                this.OwnerShortName = parameterOrOverrideBaseRowViewModel.OwnerShortName;
-            }
+        /// <summary>
+        /// Gets or sets the <see cref="ActualFiniteState"/> of this row
+        /// </summary>
+        public ActualFiniteState ActualState
+        {
+            get { return this.actualState; }
+            private set { this.RaiseAndSetIfChanged(ref this.actualState, value); }
         }
 
         /// <summary>
@@ -96,40 +92,12 @@ namespace CDP4ProductTree.ViewModels
             get { return this.isDefault; }
             set { this.RaiseAndSetIfChanged(ref this.isDefault, value); }
         }
-        /// <summary>
-        /// Gets or sets the <see cref="ParameterSwitchKind"/>
-        /// </summary>
-        public ParameterSwitchKind Switch
-        {
-            get { return this.switchValue; }
-            set { this.RaiseAndSetIfChanged(ref this.switchValue, value); }
-        }
 
         /// <summary>
-        /// Gets or sets the value
+        /// Set the value for this row from the associated <see cref="ParameterValueSetBase"/>
         /// </summary>
-        public string Value
-        {
-            get { return this.value; }
-            set { this.RaiseAndSetIfChanged(ref this.value, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the short name of the <see cref="DomainOfExpertise"/> that owns the container
-        /// <see cref="ParameterOrOverrideBase"/>
-        /// </summary>
-        public string OwnerShortName
-        {
-            get { return this.ownerShortName; }
-            set { this.RaiseAndSetIfChanged(ref this.ownerShortName, value); }
-        }
-
-        /// <summary>
-        /// Set the value for this row from the <see cref="ParameterOrOverrideBase"/> and the associated <see cref="ParameterValueSetBase"/>
-        /// </summary>
-        /// <param name="parameterOrOveride">The <see cref="ParameterOrOverrideBase"/></param>
         /// <param name="valueSet">The <see cref="ParameterValueSetBase"/></param>
-        public void SetScalarValue(ParameterOrOverrideBase parameterOrOveride, ParameterValueSetBase valueSet)
+        public void SetScalarValue(ParameterValueSetBase valueSet)
         {
             // perform checks to see if this is indeed a scalar value
             if (valueSet.Published.Count() > 1)
@@ -146,9 +114,9 @@ namespace CDP4ProductTree.ViewModels
                 this.Value = "-";
             }
 
-            if (parameterOrOveride.Scale != null)
+            if (this.Thing.Scale != null)
             {
-                this.Value += " [" + parameterOrOveride.Scale.ShortName + "]";
+                this.Value += " [" + this.Thing.Scale.ShortName + "]";
             }
 
             this.Switch = valueSet.ValueSwitch;
