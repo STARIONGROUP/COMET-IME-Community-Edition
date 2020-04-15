@@ -126,7 +126,7 @@ namespace CDP4ShellDialogs.ViewModels
             this.SelectedIterations.ItemsAdded.Subscribe(this.FilterIterationSelectionItems);
 
             this.WhenAnyValue(x => x.IsModelScreen).Subscribe(x => this.IsIterationScreen = !x);
-
+            
             this.PopulateSessionsRowViewModel(sessionAvailable);
         }
 
@@ -351,6 +351,30 @@ namespace CDP4ShellDialogs.ViewModels
             }
 
             this.SelectedRowSession = this.SessionsAvailable.FirstOrDefault();
+
+            var modelSelectionSessionRowViewModel = this.SelectedRowSession;
+
+            if (modelSelectionSessionRowViewModel != null)
+            {
+                this.SortDomainOfExpertise();
+                this.SelectedEngineeringModelSetup = modelSelectionSessionRowViewModel.EngineeringModelSetupRowViewModels.FirstOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// Sort domain of expertise for model iterations list. Those are bound to the drop down inside the data grid.
+        /// </summary>
+        private void SortDomainOfExpertise()
+        {
+            foreach (var engineeringModel in this.SelectedRowSession.EngineeringModelSetupRowViewModels)
+            {
+                foreach (var iterationModelSetup in engineeringModel.IterationSetupRowViewModels)
+                {
+                    var sortedDomains = iterationModelSetup.DomainOfExpertises.OrderBy(o => o.UserFriendlyShortName).ToList();
+                    iterationModelSetup.DomainOfExpertises.Clear();
+                    iterationModelSetup.DomainOfExpertises.AddRange(sortedDomains);
+                }
+            }
         }
 
         /// <summary>
