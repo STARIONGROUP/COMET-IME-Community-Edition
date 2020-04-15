@@ -356,27 +356,10 @@ namespace CDP4ShellDialogs.ViewModels
 
             if (modelSelectionSessionRowViewModel != null)
             {
-                this.SortDomainOfExpertise();
                 this.SelectedEngineeringModelSetup = modelSelectionSessionRowViewModel.EngineeringModelSetupRowViewModels.FirstOrDefault();
             }
         }
-
-        /// <summary>
-        /// Sort domain of expertise for model iterations list. Those are bound to the drop down inside the data grid.
-        /// </summary>
-        private void SortDomainOfExpertise()
-        {
-            foreach (var engineeringModel in this.SelectedRowSession.EngineeringModelSetupRowViewModels)
-            {
-                foreach (var iterationModelSetup in engineeringModel.IterationSetupRowViewModels)
-                {
-                    var sortedDomains = iterationModelSetup.DomainOfExpertises.OrderBy(o => o.UserFriendlyShortName).ToList();
-                    iterationModelSetup.DomainOfExpertises.Clear();
-                    iterationModelSetup.DomainOfExpertises.AddRange(sortedDomains);
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Filters the <see cref="SelectedIterations"/> added items to only select <see cref="IterationSetupRowViewModel"/>
         /// </summary>
