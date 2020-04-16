@@ -8,6 +8,7 @@
     using System.Windows.Media;
 
     using CDP4Common.CommonData;
+    using CDP4Common.DiagramData;
 
     using CDP4CommonView.Diagram.Views;
 
@@ -32,10 +33,9 @@
 
         public ReactiveList<IDiagramPortViewModel> PortCollection { get; private set; }
 
-        public PortContainerDiagramContentItem(Thing thing) : base(thing)
+        public PortContainerDiagramContentItem(DiagramObject thing) : base(thing)
         {
             this.PortCollection = new ReactiveList<IDiagramPortViewModel>();
-            //this.PortCollection.ItemsAdded.Subscribe(this.SetItemPosition);
             this.PortCollection.Changed.Subscribe(this.PortCollectionChanged);
         }
 
