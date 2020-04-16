@@ -193,7 +193,7 @@ namespace CDP4DiagramEditor.ViewModels
             }
             else
             {
-                var clone = this.Thing.Clone(true);
+                var clone = this.Thing.Clone(true); 
                 var bound = clone.Bounds.SingleOrDefault();
                 if (bound != null)
                 {

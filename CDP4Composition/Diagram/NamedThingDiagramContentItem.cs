@@ -11,6 +11,7 @@ namespace CDP4Composition.Diagram
 
     using CDP4Common;
     using CDP4Common.CommonData;
+    using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
     using DevExpress.Diagram.Core;
@@ -28,23 +29,23 @@ namespace CDP4Composition.Diagram
         /// <param name="thing">
         /// The thing.
         /// </param>
-        public NamedThingDiagramContentItem(Thing thing) 
-            : base(thing)
+        public NamedThingDiagramContentItem(DiagramObject diagramthing) 
+            : base(diagramthing)
         {
-            if (thing is INamedThing namedThing)
+            if (this.Thing is INamedThing namedThing)
             {
                 this.FullName = namedThing.Name;
             }
 
-            if (thing is IShortNamedThing shortNamedThing)
+            if (this.Thing is IShortNamedThing shortNamedThing)
             {
                 this.ShortName = shortNamedThing.ShortName;
             }
 
-            this.ClassKind = $"<<{thing.ClassKind}>>";
+            this.ClassKind = $"<<{this.Thing.ClassKind}>>";
 
             // special cases
-            if (thing is ParameterBase parameterBaseThing)
+            if (this.Thing is ParameterBase parameterBaseThing)
             {
                 this.FullName = parameterBaseThing.UserFriendlyName;
                 this.ShortName = parameterBaseThing.UserFriendlyShortName;
