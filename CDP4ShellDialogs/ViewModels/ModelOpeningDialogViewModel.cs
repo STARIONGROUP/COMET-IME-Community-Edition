@@ -1,8 +1,27 @@
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelOpeningDialogViewModel.cs" company="RHEA System S.A.">
-// Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ShellDialogs.ViewModels
 {
@@ -12,7 +31,6 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
-    using System.Security.Policy;
     using System.Threading.Tasks;
     using System.Windows.Input;
     using CDP4Common.CommonData;
@@ -60,9 +78,9 @@ namespace CDP4ShellDialogs.ViewModels
         private ModelSelectionSessionRowViewModel selectedRowSession;
 
         /// <summary>
-        /// Backing field for the <see cref="SelectedEngineeringModel"/> property.
+        /// Backing field for the <see cref="SelectedEngineeringModelSetup "/> property.
         /// </summary>
-        private ModelSelectionEngineeringModelSetupRowViewModel selectedEngineeringModel;
+        private ModelSelectionEngineeringModelSetupRowViewModel selectedEngineeringModelSetup;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelOpeningDialogViewModel"/> class. 
@@ -86,7 +104,7 @@ namespace CDP4ShellDialogs.ViewModels
                 this.IsBusy = false;
             });
 
-            var canActiveOk = this.WhenAnyValue(x => x.SelectedEngineeringModel.IterationSetupRowViewModels.Count, count => count != 0);
+            var canActiveOk = this.WhenAnyValue(x => x.SelectedEngineeringModelSetup.IterationSetupRowViewModels.Count, count => count != 0);
             this.SelectActiveIterationCommand = ReactiveCommand.CreateAsyncTask(canActiveOk, x => this.ExecuteSelectActiveIteration(), RxApp.MainThreadScheduler);
             this.SelectActiveIterationCommand.ThrownExceptions.Select(ex => ex).Subscribe(
                 x =>
@@ -108,7 +126,7 @@ namespace CDP4ShellDialogs.ViewModels
             this.SelectedIterations.ItemsAdded.Subscribe(this.FilterIterationSelectionItems);
 
             this.WhenAnyValue(x => x.IsModelScreen).Subscribe(x => this.IsIterationScreen = !x);
-
+            
             this.PopulateSessionsRowViewModel(sessionAvailable);
         }
 
@@ -130,7 +148,7 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Gets if model screen is selected
+        /// Gets a value indicating whether the Model Screen is selected
         /// </summary>
         public bool IsModelScreen
         {
@@ -139,7 +157,7 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Gets if iteration screen is selected
+        /// Gets a value indicating whether the Iteration Screen is selected
         /// </summary>
         public bool IsIterationScreen
         {
@@ -193,10 +211,10 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets or sets the selected row model.
         /// </summary>
-        public ModelSelectionEngineeringModelSetupRowViewModel SelectedEngineeringModel
+        public ModelSelectionEngineeringModelSetupRowViewModel SelectedEngineeringModelSetup
         {
-            get { return this.selectedEngineeringModel; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedEngineeringModel, value); }
+            get { return this.selectedEngineeringModelSetup; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedEngineeringModelSetup, value); }
         }
 
         /// <summary>
@@ -255,10 +273,10 @@ namespace CDP4ShellDialogs.ViewModels
         private async Task ExecuteSelectActiveIteration()
         {
             var stopWatch = Stopwatch.StartNew();
-            var activeIterationSetupRow = this.SelectedEngineeringModel.IterationSetupRowViewModels.FirstOrDefault(x => x.Thing.FrozenOn == null);
+            var activeIterationSetupRow = this.SelectedEngineeringModelSetup.IterationSetupRowViewModels.FirstOrDefault(x => x.Thing.FrozenOn == null);
 
             this.IsBusy = true;
-            this.LoadingMessage = "Loading the Active Iteration...";
+            this.LoadingMessage = "Loading Iteration...";
 
             if (activeIterationSetupRow != null)
             {
@@ -275,11 +293,10 @@ namespace CDP4ShellDialogs.ViewModels
                 var iteration = new Iteration(activeIterationSetupRow.Thing.IterationIid, session.Assembler.Cache, session.Credentials.Uri);
 
                 model.Iteration.Add(iteration);
-                var t = Task.Run(() =>
-                {
-                    session.Read(iteration, activeIterationSetupRow.SelectedDomain);
-                });
-                await t;
+
+                var defaultDomain = session.ActivePerson.DefaultDomain ?? activeIterationSetupRow.DomainOfExpertises.FirstOrDefault();
+
+                await session.Read(iteration, defaultDomain);
             }
 
             this.IsBusy = false;
@@ -334,8 +351,15 @@ namespace CDP4ShellDialogs.ViewModels
             }
 
             this.SelectedRowSession = this.SessionsAvailable.FirstOrDefault();
-        }
 
+            var modelSelectionSessionRowViewModel = this.SelectedRowSession;
+
+            if (modelSelectionSessionRowViewModel != null)
+            {
+                this.SelectedEngineeringModelSetup = modelSelectionSessionRowViewModel.EngineeringModelSetupRowViewModels.FirstOrDefault();
+            }
+        }
+        
         /// <summary>
         /// Filters the <see cref="SelectedIterations"/> added items to only select <see cref="IterationSetupRowViewModel"/>
         /// </summary>

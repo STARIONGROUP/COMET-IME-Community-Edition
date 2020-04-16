@@ -17,7 +17,7 @@
              dx:ThemeManager.ThemeName="Seven"
              mc:Ignorable="d"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
-             Title="Select iterations to open">
+             Title="{Binding DialogTitle}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,7 +25,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Text ="{Binding SelectedEngineeringModel.Name}" Grid.Row ="0" Margin="5" FontWeight="Bold"
+        <TextBlock Text ="{Binding SelectedEngineeringModelSetup .Name}" Grid.Row ="0" Margin="5" FontWeight="Bold"
                    Visibility="{Binding IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}">
         </TextBlock>
         <dxlc:LayoutItem Grid.Row ="0" Margin="5" AddColonToLabel="True" 
@@ -37,7 +37,7 @@
         </dxlc:LayoutItem>
         <dxlc:LayoutGroup HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          Header="{Binding ScreenTitle}"
+                          Header="{Binding Title}"
                           View="GroupBox"
                           Grid.Row="1"
                           Margin="5"
@@ -46,7 +46,7 @@
                          Name="ModelSetupGridControl"
                          AllowLiveDataShaping="False"
                          ItemsSource="{Binding SelectedRowSession.EngineeringModelSetupRowViewModels}"
-                         SelectedItem="{Binding SelectedEngineeringModel,
+                         SelectedItem="{Binding SelectedEngineeringModelSetup ,
                                                 Mode=TwoWay,
                                                 UpdateSourceTrigger=PropertyChanged}"
                          SelectionMode="Row">
@@ -86,7 +86,7 @@
                              Name="IterationGridControl"
                              AllowLiveDataShaping="False"
                              AutoExpandAllGroups="True"
-                             ItemsSource="{Binding SelectedEngineeringModel.IterationSetupRowViewModels}"
+                             ItemsSource="{Binding SelectedEngineeringModelSetup .IterationSetupRowViewModels}"
                              SelectedItems="{Binding SelectedIterations,
                                                 Mode=TwoWay,
                                                 UpdateSourceTrigger=PropertyChanged}"
@@ -142,7 +142,7 @@
         <views1:LoadingControl Grid.Row="1" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
         <StackPanel Grid.Row="2" Margin="5" Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}">
             <TextBlock TextWrapping="Wrap" Background="Cornsilk"
-                       Text="Double-clicking on a row will open the active Iteration of the selected EngineeringModel using the default DomainOfExpertise"></TextBlock>
+                       Text="Double click to open the active iteration of this Engineering Model"></TextBlock>
         </StackPanel>
         <dxlc:LayoutGroup Grid.Row="3" Height="30" Margin="5">
             <Button Content="Back"
@@ -151,10 +151,10 @@
                     Width="60"
                     HorizontalAlignment="Left"
                     Command="{Binding BackCommand}"/>
-            <Button Content="Choose Iteration"
+            <Button Content="Next"
                     Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
                     Margin="5"
-                    Width="120"
+                    Width="60"
                     HorizontalAlignment="Left"
                     Command="{Binding NextCommand}">
                 <Button.Style>
