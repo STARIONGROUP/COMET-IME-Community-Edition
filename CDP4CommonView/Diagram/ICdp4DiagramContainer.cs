@@ -31,5 +31,8 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="oldItems">The list of items to be removed.</param>
         void RemoveItems(IList oldItems);
+
+        
+        void UpdateProperties();
     }
 }

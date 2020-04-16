@@ -17,7 +17,6 @@
              xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
              xmlns:viewModels="clr-namespace:CDP4DiagramEditor.ViewModels"
-             xmlns:views1="clr-namespace:CDP4CommonView.Diagram.Views;assembly=CDP4CommonView"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
@@ -153,6 +152,7 @@
                                                          RibbonMergeCategoryName="DiagramCategory"
                                                          ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}"
                                                          EventPublisher="{Binding EventPublisher, Mode=OneWay}"
+                                                         DiagramConnectorSource="{Binding DiagramConnectorCollection}"
                                                          DiagramPortSource="{Binding DiagramPortCollection}">
                         <!--ItemTemplateSelector="{StaticResource DiagramItemDataTemplateSelector}"-->
                         <diagram:Cdp4DiagramOrgChartBehavior.ItemTemplate>

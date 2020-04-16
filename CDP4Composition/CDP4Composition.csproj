@@ -221,6 +221,7 @@
     <Compile Include="Converters\RelationalOperatorKindConverter.cs" />
     <Compile Include="Converters\UnderscoreCapitalsToSpacedTitleCaseConverter.cs" />
     <Compile Include="Diagram\IDiagramContainer.cs" />
+    <Compile Include="Diagram\IDiagramEditorViewModel.cs" />
     <Compile Include="Diagram\IThingDiagramItem.cs" />
     <Compile Include="Diagram\NamedThingDiagramContentItem.cs" />
     <Compile Include="Diagram\ThingDiagramConnector.cs" />

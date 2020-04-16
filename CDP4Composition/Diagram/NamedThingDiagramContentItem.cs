@@ -29,8 +29,8 @@ namespace CDP4Composition.Diagram
         /// <param name="thing">
         /// The thing.
         /// </param>
-        public NamedThingDiagramContentItem(DiagramObject diagramthing) 
-            : base(diagramthing)
+        public NamedThingDiagramContentItem(DiagramObject diagramthing, IDiagramEditorViewModel container) 
+            : base(diagramthing, container)
         {
             if (this.Thing is INamedThing namedThing)
             {

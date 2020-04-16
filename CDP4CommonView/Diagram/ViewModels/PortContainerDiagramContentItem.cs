@@ -33,7 +33,7 @@
 
         public ReactiveList<IDiagramPortViewModel> PortCollection { get; private set; }
 
-        public PortContainerDiagramContentItem(DiagramObject thing) : base(thing)
+        public PortContainerDiagramContentItem(DiagramObject thing, IDiagramEditorViewModel container) : base(thing, container)
         {
             this.PortCollection = new ReactiveList<IDiagramPortViewModel>();
             this.PortCollection.Changed.Subscribe(this.PortCollectionChanged);

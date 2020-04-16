@@ -15,6 +15,8 @@ namespace CDP4Composition.Diagram
 
     using DevExpress.Xpf.Diagram;
 
+    using ReactiveUI;
+
     using Thing = CDP4Common.CommonData.Thing;
 
     /// <summary>
@@ -25,15 +27,22 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Initializes a new instance of the <see cref="ThingDiagramContentItem"/> class.
         /// </summary>
-        /// <param name="DiagramObject">
-        /// The diagramThing represented.
-        /// </param>
-        protected ThingDiagramContentItem(DiagramObject diagramThing)
+        /// <param name="diagramThing">
+        /// The diagramThing represented.</param>
+        protected ThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel containerViewModel)
         {
+            this.containerViewModel = containerViewModel;
             this.Thing = diagramThing.DepictedThing;
             this.Content = diagramThing.DepictedThing;
             this.DiagramThing = diagramThing;
+            this.WhenAnyValue(x => x.Height, x => x.Width, x => x.Position).Subscribe(x => this.SetDirty());
         }
+
+
+        /// <summary>
+        /// The <see cref="IDiagramEditorViewModel"/> container
+        /// </summary>
+        private IDiagramEditorViewModel containerViewModel;
 
         /// <summary>
         /// Gets or sets the <see cref="IThingDiagramItem.Thing"/>.
@@ -45,10 +54,26 @@ namespace CDP4Composition.Diagram
         /// </summary>
         public DiagramObject DiagramThing { get; set; }
 
-        public void Dispose()
+        /// <summary>
+        /// Gets a value indicating whether the diagram editor is dirty
+        /// </summary>
+        public bool IsDirty { get; set; }
+
+        /// <summary>
+        /// Set the <see cref="IsDirty"/> property
+        /// </summary>
+        private void SetDirty()
         {
-            throw new System.NotImplementedException();
+            var bound = this.DiagramThing.Bounds.Single();
+            this.IsDirty = this.Thing.Iid == Guid.Empty
+                           || this.Height != bound.Height
+                           || this.Width != bound.Width
+                           || this.Position.X != bound.X
+                           || this.Position.Y != bound.Y;
+
+            this.containerViewModel.UpdateIsDirty();
         }
+
         /// <summary>
         /// Update the transaction with the data contained in this view-model
         /// </summary>
@@ -86,10 +111,11 @@ namespace CDP4Composition.Diagram
         /// <param name="bound">The <see cref="Bounds"/> to update</param>
         private void UpdateBound(Bounds bound)
         {
-            bound.Height = (float)this.Height;
-            bound.Width = (float)this.Width;
-            bound.X = (float)this.Position.X;
-            bound.Y = (float)this.Position.Y;
+            var parent = (this.Parent as DiagramContentItem);
+            bound.Height = (float)parent.ActualHeight;
+            bound.Width = (float)parent.ActualWidth;
+            bound.X = (float)parent.Position.X;
+            bound.Y = (float)parent.Position.Y;
             bound.Name = "should not have a name";
         }
     }
