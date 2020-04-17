@@ -29,8 +29,26 @@ namespace CDP4Composition.Diagram
         /// <param name="thing">
         /// The thing.
         /// </param>
+        public NamedThingDiagramContentItem(Thing thing) : base(thing)
+        {
+            this.SetProperty();
+        }
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
+        /// </summary>
+        /// <param name="diagramthing"></param>
+        /// <param name="container"></param>
         public NamedThingDiagramContentItem(DiagramObject diagramthing, IDiagramEditorViewModel container) 
             : base(diagramthing, container)
+        {
+            this.SetProperty();
+        }
+
+        /// <summary>
+        /// Sets <see cref="ThingDiagramContentItem.Thing"/> related property used to display
+        /// </summary>
+        private void SetProperty()
         {
             if (this.Thing is INamedThing namedThing)
             {
@@ -51,7 +69,6 @@ namespace CDP4Composition.Diagram
                 this.ShortName = parameterBaseThing.UserFriendlyShortName;
             }
         }
-
 
 
         /// <summary>

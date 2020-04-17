@@ -14,9 +14,7 @@ namespace CDP4Composition.Diagram
     using CDP4Dal.Operations;
 
     using DevExpress.Xpf.Diagram;
-
-    using ReactiveUI;
-
+    
     using Thing = CDP4Common.CommonData.Thing;
 
     /// <summary>
@@ -27,22 +25,32 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Initializes a new instance of the <see cref="ThingDiagramContentItem"/> class.
         /// </summary>
+        /// <param name="thing">
+        /// The thing represented.</param>
+        protected ThingDiagramContentItem(Thing thing)
+        {
+            this.Thing = thing;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ThingDiagramContentItem"/> class.
+        /// </summary>
         /// <param name="diagramThing">
-        /// The diagramThing represented.</param>
+        /// The diagramThing contained</param>
+        /// <param name="containerViewModel"></param>
         protected ThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel containerViewModel)
         {
             this.containerViewModel = containerViewModel;
             this.Thing = diagramThing.DepictedThing;
             this.Content = diagramThing.DepictedThing;
             this.DiagramThing = diagramThing;
-            this.WhenAnyValue(x => x.Height, x => x.Width, x => x.Position).Subscribe(x => this.SetDirty());
         }
 
 
         /// <summary>
         /// The <see cref="IDiagramEditorViewModel"/> container
         /// </summary>
-        private IDiagramEditorViewModel containerViewModel;
+        private readonly IDiagramEditorViewModel containerViewModel;
 
         /// <summary>
         /// Gets or sets the <see cref="IThingDiagramItem.Thing"/>.
@@ -59,19 +67,21 @@ namespace CDP4Composition.Diagram
         /// </summary>
         public bool IsDirty { get; set; }
 
+        public IDisposable DirtyObservable { get; set; }
+
         /// <summary>
         /// Set the <see cref="IsDirty"/> property
         /// </summary>
-        private void SetDirty()
+        public void SetDirty()
         {
             var bound = this.DiagramThing.Bounds.Single();
-            this.IsDirty = this.Thing.Iid == Guid.Empty
-                           || this.Height != bound.Height
-                           || this.Width != bound.Width
-                           || this.Position.X != bound.X
-                           || this.Position.Y != bound.Y;
 
-            this.containerViewModel.UpdateIsDirty();
+            this.IsDirty = this.Parent is DiagramContentItem parent && (this.Thing.Iid == Guid.Empty
+                                                                    || (float)parent.ActualHeight != bound.Height
+                                                                    || (float)parent.ActualWidth != bound.Width
+                                                                    || (float)parent.Position.X != bound.X
+                                                                    || (float)parent.Position.Y != bound.Y);
+            this.containerViewModel?.UpdateIsDirty();
         }
 
         /// <summary>

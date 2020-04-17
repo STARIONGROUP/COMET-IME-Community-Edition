@@ -38,6 +38,8 @@ namespace CDP4CommonView.Diagram
 
     using EventAggregator;
 
+    using ReactiveUI;
+
     using Point = System.Windows.Point;
 
     /// <summary>
@@ -458,17 +460,38 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.Loaded += this.Loaded;
             this.AssociatedObject.Unloaded += this.Unloaded;
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
-            this.AssociatedObject.QueryConnectionPoints += this.QueryConnectionPoints;
+            this.AssociatedObject.ItemsDeleting += this.ItemsDeleting;
         }
 
-        private void QueryConnectionPoints(object sender, DiagramQueryConnectionPointsEventArgs e)
+        /// <summary>
+        /// Delete related port shape when ever an element definition gets deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ItemsDeleting(object sender, DiagramItemsDeletingEventArgs e)
         {
-            if (e.ConnectorPointType == ConnectorPointType.End)
+            foreach (var item in e.Items)
             {
-                var debug = e.Connector;
+                if (item is DiagramContentItem contentItem)
+                {
+                    if (contentItem.Content is PortContainerDiagramContentItem portContainer)
+                    {
+                        foreach (var portViewModel in portContainer.PortCollection.ToList())
+                        {
+                            this.AssociatedObject.Items.Remove(this.AssociatedObject.Items.OfType<DiagramPortShape>().FirstOrDefault(i => (IDiagramPortViewModel) i.DataContext == portViewModel));
+                        }
+
+                        portContainer.PortCollection.Clear();
+                    }
+                }
             }
         }
 
+        /// <summary>
+        /// Update ports position according to their element definition new position
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LayoutUpdated(object sender, EventArgs e)
         {
             foreach (var portContainer in this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content as PortContainerDiagramContentItem))
@@ -479,27 +502,30 @@ namespace CDP4CommonView.Diagram
 
         private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
+            var thingDiagramContentItem = ((e.Item as DiagramContentItem)?.Content as ThingDiagramContentItem);
             if (e.Action == ItemsChangedAction.Removed)
             {
-                if (e.Item is PortContainerDiagramContentItem portContainer)
-                {
-                    foreach (var portViewModel in portContainer.PortCollection)
-                    {
-                        this.AssociatedObject.Items.Remove(this.AssociatedObject.Items.OfType<DiagramPortShape>().FirstOrDefault(item => (IDiagramPortViewModel) item.DataContext == portViewModel));
-                    }
-
-                    portContainer.PortCollection.Clear();
-                }
-
                 if (e.Item is DiagramPortShape port)
                 {
                     var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content).OfType<PortContainerDiagramContentItem>().FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
                     container?.PortCollection.Remove(container.PortCollection.FirstOrDefault(i => i == port.DataContext));
                 }
+                thingDiagramContentItem?.DirtyObservable.Dispose();
             }
-
+            else
+            {
+                if (thingDiagramContentItem != null)
+                {
+                    thingDiagramContentItem.DirtyObservable = e.Item.WhenAnyValue(x => x.ActualWidth, x => x.ActualHeight, x => x.Position.Y, x => x.Position.X).Subscribe(x => thingDiagramContentItem.SetDirty());
+                }
+            }
         }
         
+        /// <summary>
+        /// update the position of diagramContentItem according to position they have been assigned through <see cref="Cdp4DiagramOrgChartBehavior.ItemPositions"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnCustomLayoutItems(object sender, DiagramCustomLayoutItemsEventArgs e)
         {
             if (this.ItemPositions.Count == 0)

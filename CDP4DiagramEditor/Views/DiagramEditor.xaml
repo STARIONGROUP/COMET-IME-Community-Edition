@@ -120,32 +120,6 @@
                                         SaveCommand="{Binding SaveDiagramCommand}"
                                         dxb:MergingProperties.ElementMergingBehavior="All"
                                         ShowPageBreaks="True" IsManipulationEnabled="True" AllowRotateItems="False" AllowResizeItems="False" AllowApplyAutomaticLayoutForSubordinates="True" AllowApplyAutomaticLayout="True">
-                <diagram:Cdp4DiagramControl.Resources>
-                    <ResourceDictionary>
-                        <ControlTemplate x:Key="DiagramObjectTemplate">
-                            <ControlTemplate.Resources>
-                                <helpers:ClassKindConverter x:Key="ClassKindConverter"></helpers:ClassKindConverter>
-                            </ControlTemplate.Resources>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Label Grid.Row="0" 
-                                       Content="{Binding ContentObject.ClassKind, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type diagram:Cdp4DiagramContentItem}}, Converter={StaticResource ClassKindConverter}}"
-                                       FontStyle="Normal"
-                                       FontSize="10"
-                                       HorizontalAlignment="Center" 
-                                       VerticalAlignment="Top" />
-                                <TextBlock Grid.Row="1"
-                                           Text="{Binding ContentObject.UserFriendlyShortName, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type diagram:Cdp4DiagramContentItem}}}" 
-                                           HorizontalAlignment="Center" 
-                                           FontWeight="Bold"
-                                           VerticalAlignment="Center" />
-                            </Grid>
-                        </ControlTemplate>
-                    </ResourceDictionary>
-                </diagram:Cdp4DiagramControl.Resources>
                 <dxmvvm:Interaction.Behaviors>
                     <diagram:Cdp4DiagramOrgChartBehavior x:Name="orgChartBehavior" 
                                                          PageMargin="45"
