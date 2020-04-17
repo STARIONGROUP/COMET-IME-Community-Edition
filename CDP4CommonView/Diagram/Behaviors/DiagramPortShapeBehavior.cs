@@ -1,10 +1,6 @@
 ﻿namespace CDP4CommonView.Diagram.Behaviors
 {
     using System;
-    using System.Reactive;
-    using System.Reactive.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4CommonView.Diagram.ViewModels;
@@ -17,20 +13,27 @@
 
     public class DiagramPortShapeBehavior : Behavior<DiagramPortShape>
     {
-        public ReactiveCommand<object> PositionCommand { get; set; }
+        /// <summary>
+        /// The command that can fire <see cref="PositionCommandExecute"/>
+        /// </summary>
+        public ReactiveCommand<object> PositionCommand { get; set; } 
 
-        public DiagramPortShapeBehavior()
-        {
-            
-        }
-
+        /// <summary>
+        /// The Method the command <see cref="PositionCommand"/> can fire
+        /// </summary>
         private void PositionCommandExecute()
         {
             this.AssociatedObject.Position = (this.AssociatedObject.DataContext as IDiagramPortViewModel).Position;
         }
 
+        /// <summary>
+        /// Get or set the property holding the associated object position
+        /// </summary>
         public Point Position { get; set; }
 
+        /// <summary>
+        /// The on Attached event Handler
+        /// </summary>
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -42,11 +45,19 @@
             //STore
         }
 
+        /// <summary>
+        /// Event handler of the event firing when Position property has changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void WhenPositionIsUpdated(object sender, EventArgs e)
         {
             this.AssociatedObject.Position = (this.AssociatedObject.DataContext as IDiagramPortViewModel).Position;
         }
 
+        /// <summary>
+        /// the on detaching event handler
+        /// </summary>
         protected override void OnDetaching()
         {
             base.OnDetaching();
@@ -54,6 +65,9 @@
             (this.AssociatedObject.DataContext as IDiagramPortViewModel).WhenPositionIsUpdated -= this.WhenPositionIsUpdated;
         }
 
+        /// <summary>
+        /// Method use to set the correction orientation of the associate object connection point based on which side of the container it belongs
+        /// </summary>
         public void DeterminePortConnectorRotation()
         {
             var datacontext = ((IDiagramPortViewModel)this.AssociatedObject.DataContext);

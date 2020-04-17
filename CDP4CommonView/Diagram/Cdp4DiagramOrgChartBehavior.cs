@@ -98,7 +98,7 @@ namespace CDP4CommonView.Diagram
         public static readonly DependencyProperty DiagramPortSourceProperty = DependencyProperty.Register("DiagramPortSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramPortSourceChanged));
 
         ///// <summary>
-        ///// The dependency property that allows setting the source to the view-model representing a diagram object
+        ///// The dependency property that allows setting the source to the view-model representing a diagram connector
         ///// </summary>
         public static readonly DependencyProperty DiagramConnectorSourceProperty = DependencyProperty.Register("DiagramConnectorSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramConnectorSourceChanged));
 
@@ -384,7 +384,7 @@ namespace CDP4CommonView.Diagram
             {
                 foreach (IDiagramPortViewModel viewModel in newValue)
                 {
-                    var diagramObj = new DiagramPortShape(viewModel, this);
+                    var diagramObj = new DiagramPortShape(viewModel);
                     this.AssociatedObject.Items.Add(diagramObj);
                 }
             }
