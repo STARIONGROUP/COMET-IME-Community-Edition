@@ -1,6 +1,26 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Cdp4DiagramOrgChartBehavior.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,15 +30,12 @@ namespace CDP4CommonView.Diagram
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.Specialized;
-    using System.ComponentModel;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
-    using CDP4Common.DiagramData;
-
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.Diagram.ViewModels;
@@ -26,22 +43,20 @@ namespace CDP4CommonView.Diagram
 
     using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
-    using CDP4Composition.Mvvm;
 
-
-    using DevExpress.Diagram;
     using DevExpress.Xpf.Diagram;
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Ribbon;
     using DevExpress.Mvvm.UI;
-    using DevExpress.Xpf.CodeView;
 
     using EventAggregator;
+
+    using ReactiveUI;
 
     using Point = System.Windows.Point;
 
     /// <summary>
-    /// Allows proper callbacks on the 
+    /// Allows proper callbacks on the DiagramEditor
     /// </summary>
     public class Cdp4DiagramOrgChartBehavior : DiagramOrgChartBehavior, ICdp4DiagramOrgChartBehavior
     {
@@ -96,9 +111,9 @@ namespace CDP4CommonView.Diagram
         public static readonly DependencyProperty DiagramPortSourceProperty = DependencyProperty.Register("DiagramPortSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramPortSourceChanged));
 
         ///// <summary>
-        ///// The dependency property that allows setting the source to the view-model representing a diagram object
+        ///// The dependency property that allows setting the source to the view-model representing a diagram connector
         ///// </summary>
-        //public static readonly DependencyProperty DiagramConnectorSourceProperty = DependencyProperty.Register("DiagramConnectorSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramConnectorSourceChanged));
+        public static readonly DependencyProperty DiagramConnectorSourceProperty = DependencyProperty.Register("DiagramConnectorSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramConnectorSourceChanged));
 
         /// <summary>
         /// The dependency property that allows setting the <see cref="IEventPublisher"/>
@@ -134,15 +149,15 @@ namespace CDP4CommonView.Diagram
             get => (INotifyCollectionChanged)this.GetValue(DiagramPortSourceProperty);
             set => this.SetValue(DiagramPortSourceProperty, value);
         }
-        
+
         /// <summary>
         /// Gets or sets the <see cref="INotifyCollectionChanged"/> containing the view-model for the <see cref="DiagramConnector"/>
         /// </summary>
-        //public INotifyCollectionChanged DiagramConnectorSource
-        //{
-        //    get { return (INotifyCollectionChanged)this.GetValue(DiagramConnectorSourceProperty); }
-        //    set { this.SetValue(DiagramConnectorSourceProperty, value); }
-        //}
+        public INotifyCollectionChanged DiagramConnectorSource
+        {
+            get { return (INotifyCollectionChanged)this.GetValue(DiagramConnectorSourceProperty); }
+            set { this.SetValue(DiagramConnectorSourceProperty, value); }
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="IEventPublisher"/>
@@ -197,15 +212,15 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="caller">The source of the call.</param>
         /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
-        //private static void DiagramConnectorSourceChanged(DependencyObject caller, DependencyPropertyChangedEventArgs e)
-        //{
-        //    var diagramBehavior = (Cdp4DiagramOrgChartBehavior)caller;
-        //    diagramBehavior.InitializeConnectorSourceChanged(e.OldValue, e.NewValue);
+        private static void DiagramConnectorSourceChanged(DependencyObject caller, DependencyPropertyChangedEventArgs e)
+        {
+            var diagramBehavior = (Cdp4DiagramOrgChartBehavior)caller;
+            diagramBehavior.InitializeConnectorSourceChanged(e.OldValue, e.NewValue);
 
-        //    var oldlist = e.OldValue as IList;
-        //    var newlist = e.NewValue as IList;
-        //    diagramBehavior.ComputeOldNewDiagramConnector(oldlist, newlist);
-        //}
+            var oldlist = e.OldValue as IList;
+            var newlist = e.NewValue as IList;
+            diagramBehavior.ComputeOldNewDiagramConnector(oldlist, newlist);
+        }
 
         /// <summary>
         /// Initialize the Event-Handler to subscribe on changes on the Diagram-object source collection
@@ -257,56 +272,56 @@ namespace CDP4CommonView.Diagram
         /// <param name="oldValue">The old collection</param>
         /// <param name="newValue">The new collection</param>
         /// <exception cref="InvalidOperationException">If the reference is changed</exception>
-        //private void InitializeConnectorSourceChanged(object oldValue, object newValue)
-        //{
-        //    var oldList = oldValue as INotifyCollectionChanged;
-        //    var newList = newValue as INotifyCollectionChanged;
+        private void InitializeConnectorSourceChanged(object oldValue, object newValue)
+        {
+            var oldList = oldValue as INotifyCollectionChanged;
+            var newList = newValue as INotifyCollectionChanged;
 
-        //    if (oldList == null && newList != null)
-        //    {
-        //        newList.CollectionChanged += this.OnDiagramConnectorSourceCollectionChanged;
-        //    }
+            if (oldList == null && newList != null)
+            {
+                newList.CollectionChanged += this.OnDiagramConnectorSourceCollectionChanged;
+            }
 
-        //    if (oldList != null && newList != null)
-        //    {
-        //        throw new InvalidOperationException("The reference to the collection should not be changed");
-        //    }
-        //}
+            if (oldList != null && newList != null)
+            {
+                throw new InvalidOperationException("The reference to the collection should not be changed");
+            }
+        }
 
         /// <summary>
         /// Add or Remove associated views 
         /// </summary>
         /// <param name="sender">The caller</param>
         /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/></param>
-        //private void OnDiagramConnectorSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        //{
-        //    this.ComputeOldNewDiagramConnector(e.OldItems, e.NewItems);
-        //}
+        private void OnDiagramConnectorSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            this.ComputeOldNewDiagramConnector(e.OldItems, e.NewItems);
+        }
 
-        //private void ComputeOldNewDiagramConnector(IList oldValue, IList newValue)
-        //{
-        //    if (oldValue != null)
-        //    {
-        //        foreach (IDiagramConnectorViewModel item in oldValue)
-        //        {
-        //            var diagramObj = this.AssociatedObject.Items.SingleOrDefault(x => x.DataContext == item);
+        private void ComputeOldNewDiagramConnector(IList oldValue, IList newValue)
+        {
+            if (oldValue != null)
+            {
+                foreach (IDiagramConnectorViewModel item in oldValue)
+                {
+                    var diagramObj = this.AssociatedObject.Items.SingleOrDefault(x => x.DataContext == item);
 
-        //            if (diagramObj != null)
-        //            {
-        //                this.AssociatedObject.Items.Remove(diagramObj);
-        //            }
-        //        }
-        //    }
+                    if (diagramObj != null)
+                    {
+                        this.AssociatedObject.Items.Remove(diagramObj);
+                    }
+                }
+            }
 
-        //    if (newValue != null)
-        //    {
-        //        foreach (IDiagramConnectorViewModel item in newValue)
-        //        {
-        //            var diagramObj = new Cdp4DiagramConnector(item, this);
-        //            this.AssociatedObject.Items.Add(diagramObj);
-        //        }
-        //    }
-        //}
+            if (newValue != null)
+            {
+                foreach (IDiagramConnectorViewModel item in newValue)
+                {
+                    var diagramObj = new Cdp4DiagramConnector(item, this);
+                    this.AssociatedObject.Items.Add(diagramObj);
+                }
+            }
+        }
 
         /// <summary>
         /// Add or Remove associated views 
@@ -382,7 +397,7 @@ namespace CDP4CommonView.Diagram
             {
                 foreach (IDiagramPortViewModel viewModel in newValue)
                 {
-                    var diagramObj = new DiagramPortShape(viewModel, this);
+                    var diagramObj = new DiagramPortShape(viewModel);
                     this.AssociatedObject.Items.Add(diagramObj);
                 }
             }
@@ -398,20 +413,7 @@ namespace CDP4CommonView.Diagram
             var vm = (ICdp4DiagramContainer)this.AssociatedObject.DataContext;
             var controlSelectedItems = this.AssociatedObject.SelectedItems.ToList();
 
-            if ((controlSelectedItems.FirstOrDefault() as DiagramContentItem)?.Content is PortContainerDiagramContentItem portContainer)
-            {
-                vm.SelectedItems.Clear();
-                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
-                foreach (var portViewModel in portContainer.PortCollection)
-                {
-                    this.AssociatedObject.SelectItem(this.AssociatedObject.Items.OfType<DiagramPortShape>().FirstOrDefault(item => (IDiagramPortViewModel)item.DataContext == portViewModel ), ModifySelectionMode.AddToSelection);
-                }
-                foreach (var controlSelectedItem in controlSelectedItems)
-                {
-                    vm.SelectedItems.Add(controlSelectedItem);
-                }
-            }
-            else if (vm != null)
+            if (vm != null)
             {
                 vm.SelectedItems.Clear();
                 vm.SelectedItem = controlSelectedItems.FirstOrDefault();
@@ -421,8 +423,6 @@ namespace CDP4CommonView.Diagram
                     vm.SelectedItems.Add(controlSelectedItem);
                 }
             }
-            //this.EventPublisher.Publish(new DiagramSelectEvent(new ReactiveList<DiagramElementThing>(this.AssociatedObject.SelectedItems.Select(x => ((IRowViewModelBase<DiagramElementThing>)x.DataContext).Thing))));
-
         }
 
         /// <summary>
@@ -441,6 +441,8 @@ namespace CDP4CommonView.Diagram
                     return;
                 }
                 viewModel.Behavior = this;
+                // need to draw the saved Things after the view model knows the behavior instance
+                viewModel.UpdateProperties();
             }
         }
 
@@ -471,39 +473,72 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.Loaded += this.Loaded;
             this.AssociatedObject.Unloaded += this.Unloaded;
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
+            this.AssociatedObject.ItemsDeleting += this.ItemsDeleting;
         }
 
+        /// <summary>
+        /// Delete related port shape when ever an element definition gets deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ItemsDeleting(object sender, DiagramItemsDeletingEventArgs e)
+        {
+            foreach (var item in e.Items)
+            {
+                if (item is DiagramContentItem contentItem)
+                {
+                    if (contentItem.Content is PortContainerDiagramContentItem portContainer)
+                    {
+                        foreach (var portViewModel in portContainer.PortCollection.ToList())
+                        {
+                            this.AssociatedObject.Items.Remove(this.AssociatedObject.Items.OfType<DiagramPortShape>().FirstOrDefault(i => (IDiagramPortViewModel) i.DataContext == portViewModel));
+                        }
+
+                        portContainer.PortCollection.Clear();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update ports position according to their element definition new position
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LayoutUpdated(object sender, EventArgs e)
         {
             foreach (var portContainer in this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content as PortContainerDiagramContentItem))
             {
-                portContainer.UpdatePortLayout();
+                portContainer?.UpdatePortLayout();
             }
         }
 
         private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
+            var thingDiagramContentItem = ((e.Item as DiagramContentItem)?.Content as ThingDiagramContentItem);
             if (e.Action == ItemsChangedAction.Removed)
             {
-                if (e.Item is PortContainerDiagramContentItem portContainer)
-                {
-                    foreach (var portViewModel in portContainer.PortCollection)
-                    {
-                        this.AssociatedObject.Items.Remove(this.AssociatedObject.Items.OfType<DiagramPortShape>().FirstOrDefault(item => (IDiagramPortViewModel) item.DataContext == portViewModel));
-                    }
-
-                    portContainer.PortCollection.Clear();
-                }
-
                 if (e.Item is DiagramPortShape port)
                 {
                     var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content).OfType<PortContainerDiagramContentItem>().FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
                     container?.PortCollection.Remove(container.PortCollection.FirstOrDefault(i => i == port.DataContext));
                 }
+                thingDiagramContentItem?.DirtyObservable.Dispose();
             }
-
+            else
+            {
+                if (thingDiagramContentItem != null)
+                {
+                    thingDiagramContentItem.DirtyObservable = e.Item.WhenAnyValue(x => x.ActualWidth, x => x.ActualHeight, x => x.Position.Y, x => x.Position.X).Subscribe(x => thingDiagramContentItem.SetDirty());
+                }
+            }
         }
         
+        /// <summary>
+        /// update the position of diagramContentItem according to position they have been assigned through <see cref="Cdp4DiagramOrgChartBehavior.ItemPositions"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnCustomLayoutItems(object sender, DiagramCustomLayoutItemsEventArgs e)
         {
             if (this.ItemPositions.Count == 0)

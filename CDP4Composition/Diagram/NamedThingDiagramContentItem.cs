@@ -11,6 +11,7 @@ namespace CDP4Composition.Diagram
 
     using CDP4Common;
     using CDP4Common.CommonData;
+    using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
     using DevExpress.Diagram.Core;
@@ -28,29 +29,46 @@ namespace CDP4Composition.Diagram
         /// <param name="thing">
         /// The thing.
         /// </param>
-        public NamedThingDiagramContentItem(Thing thing) 
-            : base(thing)
+        public NamedThingDiagramContentItem(Thing thing) : base(thing)
         {
-            if (thing is INamedThing namedThing)
+            this.SetProperty();
+        }
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
+        /// </summary>
+        /// <param name="diagramthing"></param>
+        /// <param name="container"></param>
+        public NamedThingDiagramContentItem(DiagramObject diagramthing, IDiagramEditorViewModel container) 
+            : base(diagramthing, container)
+        {
+            this.SetProperty();
+        }
+
+        /// <summary>
+        /// Sets <see cref="ThingDiagramContentItem.Thing"/> related property used to display
+        /// </summary>
+        private void SetProperty()
+        {
+            if (this.Thing is INamedThing namedThing)
             {
                 this.FullName = namedThing.Name;
             }
 
-            if (thing is IShortNamedThing shortNamedThing)
+            if (this.Thing is IShortNamedThing shortNamedThing)
             {
                 this.ShortName = shortNamedThing.ShortName;
             }
 
-            this.ClassKind = $"<<{thing.ClassKind}>>";
+            this.ClassKind = $"<<{this.Thing.ClassKind}>>";
 
             // special cases
-            if (thing is ParameterBase parameterBaseThing)
+            if (this.Thing is ParameterBase parameterBaseThing)
             {
                 this.FullName = parameterBaseThing.UserFriendlyName;
                 this.ShortName = parameterBaseThing.UserFriendlyShortName;
             }
         }
-
 
 
         /// <summary>

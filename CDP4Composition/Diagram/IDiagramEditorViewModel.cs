@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICdp4DiagramContainer.cs" company="RHEA System S.A.">
+// <copyright file="IDiagramEditorViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -24,34 +24,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4CommonView.Diagram
+namespace CDP4Composition.Diagram
 {
-    using DevExpress.Xpf.Diagram;
-    using ReactiveUI;
-    using System.Collections;
     /// <summary>
-    /// The interface that describes some of the DiagramEditorViewModel capability related to <see cref="ICdp4DiagramOrgChartBehavior"/>/>
+    /// The interface that describes the dirty mechanism of DiagramEditorViewModel
     /// </summary>
-    public interface ICdp4DiagramContainer
+    public interface IDiagramEditorViewModel
     {
         /// <summary>
-        /// Gets or sets the behaviour.
+        /// Defines the method that update <see cref="IsDirty"/> property
         /// </summary>
-        ICdp4DiagramOrgChartBehavior Behavior { get; set; }
+        void UpdateIsDirty();
 
         /// <summary>
-        /// Get or set the <see cref="DiagramItem"/> item that is selected.
+        /// Defines the <see cref="IsDirty"/> property
         /// </summary>
-        DiagramItem SelectedItem { get; set; }
-
-        /// <summary>
-        /// Get or set the collection of <see cref="DiagramItem"/> items that are selected.
-        /// </summary>
-        ReactiveList<DiagramItem> SelectedItems { get; set; }
-
-        /// <summary>
-        /// UpdateProperties update visual element collection
-        /// </summary>
-        void UpdateProperties();
+        bool IsDirty { get; }
     }
 }

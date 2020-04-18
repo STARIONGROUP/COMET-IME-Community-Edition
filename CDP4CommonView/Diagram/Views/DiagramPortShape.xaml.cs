@@ -1,28 +1,42 @@
-﻿namespace CDP4CommonView.Diagram.Views
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DiagramPortShape.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace CDP4CommonView.Diagram.Views
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Windows;
-    using System.Windows.Media;
-
-    using CDP4Common.DTO;
-
     using CDP4CommonView.Diagram;
     using CDP4CommonView.Diagram.ViewModels;
-
-    using DevExpress.Diagram.Core;
-    using DevExpress.Diagram.Core.Native;
-
-    using Bounds = CDP4Common.DiagramData.Bounds;
-    using Point = System.Windows.Point;
-    using Thing = CDP4Common.CommonData.Thing;
 
     /// <summary>
     /// Interaction logic for DiagramPortShape.xaml
     /// </summary>
     public partial class DiagramPortShape
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagramPortShape"/> class.
+        /// </summary>
         public DiagramPortShape()
         {
             this.InitializeComponent();
@@ -31,14 +45,12 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramPortShape"/> class.
         /// </summary>
-        /// <param name="datacontext">
+        /// <param name="datacontext"/>
         /// The <see cref="IDiagramPortViewModel"/> data-context
-        /// </param>
-        /// <param name="behaviour">The <see cref="Cdp4DiagramOrgChartBehavior"/></param>
-        public DiagramPortShape(IDiagramPortViewModel datacontext, Cdp4DiagramOrgChartBehavior behaviour)
+        public DiagramPortShape(IDiagramPortViewModel datacontext)
         {
             this.DataContext = datacontext;
-                this.InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

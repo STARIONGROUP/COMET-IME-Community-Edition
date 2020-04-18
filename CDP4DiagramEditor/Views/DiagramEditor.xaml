@@ -10,14 +10,11 @@
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
              xmlns:diagram="clr-namespace:CDP4CommonView.Diagram;assembly=CDP4CommonView"
              xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
              xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
              xmlns:viewModels="clr-namespace:CDP4DiagramEditor.ViewModels"
-             xmlns:views1="clr-namespace:CDP4CommonView.Diagram.Views;assembly=CDP4CommonView"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
@@ -121,38 +118,13 @@
                                         SaveCommand="{Binding SaveDiagramCommand}"
                                         dxb:MergingProperties.ElementMergingBehavior="All"
                                         ShowPageBreaks="True" IsManipulationEnabled="True" AllowRotateItems="False" AllowResizeItems="False" AllowApplyAutomaticLayoutForSubordinates="True" AllowApplyAutomaticLayout="True">
-                <diagram:Cdp4DiagramControl.Resources>
-                    <ResourceDictionary>
-                        <ControlTemplate x:Key="DiagramObjectTemplate">
-                            <ControlTemplate.Resources>
-                                <helpers:ClassKindConverter x:Key="ClassKindConverter"></helpers:ClassKindConverter>
-                            </ControlTemplate.Resources>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Label Grid.Row="0" 
-                                       Content="{Binding ContentObject.ClassKind, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type diagram:Cdp4DiagramContentItem}}, Converter={StaticResource ClassKindConverter}}"
-                                       FontStyle="Normal"
-                                       FontSize="10"
-                                       HorizontalAlignment="Center" 
-                                       VerticalAlignment="Top" />
-                                <TextBlock Grid.Row="1"
-                                           Text="{Binding ContentObject.UserFriendlyShortName, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type diagram:Cdp4DiagramContentItem}}}" 
-                                           HorizontalAlignment="Center" 
-                                           FontWeight="Bold"
-                                           VerticalAlignment="Center" />
-                            </Grid>
-                        </ControlTemplate>
-                    </ResourceDictionary>
-                </diagram:Cdp4DiagramControl.Resources>
                 <dxmvvm:Interaction.Behaviors>
                     <diagram:Cdp4DiagramOrgChartBehavior x:Name="orgChartBehavior" 
                                                          PageMargin="45"
                                                          RibbonMergeCategoryName="DiagramCategory"
                                                          ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}"
                                                          EventPublisher="{Binding EventPublisher, Mode=OneWay}"
+                                                         DiagramConnectorSource="{Binding DiagramConnectorCollection}"
                                                          DiagramPortSource="{Binding DiagramPortCollection}">
                         <!--ItemTemplateSelector="{StaticResource DiagramItemDataTemplateSelector}"-->
                         <diagram:Cdp4DiagramOrgChartBehavior.ItemTemplate>
