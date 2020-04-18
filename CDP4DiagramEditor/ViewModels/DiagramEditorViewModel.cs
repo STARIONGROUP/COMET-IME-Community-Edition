@@ -2,7 +2,8 @@
 // <copyright file="DiagramEditorViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -241,12 +242,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// Gets or sets the Create BinaryRelationShip Command
         /// </summary>
         public ReactiveCommand<object> CreateBinaryRelationshipCommand { get; protected set; }
-
-        /// <summary>
-        /// Gets or sets the Create MultipleRelationShip Command
-        /// </summary>
-        public ReactiveCommand<object> CreateMultiRelationshipCommand { get; protected set; }
-
+        
         /// <summary>
         /// Initialize the browser
         /// </summary>
@@ -300,70 +296,8 @@ namespace CDP4DiagramEditor.ViewModels
             
             this.CreateInterfaceCommand = ReactiveCommand.Create();
             this.CreateInterfaceCommand.Subscribe(_ => this.CreateInterfaceCommandExecute());
-            
-            this.CreateBinaryRelationshipCommand = ReactiveCommand.Create();
-            this.CreateBinaryRelationshipCommand.Subscribe(_ => this.CreateBinaryRelationshipCommandExecute());
-
-            // creation of multi relationship requires selected nodes
-            this.CreateMultiRelationshipCommand = ReactiveCommand.Create(this.SelectedItems.Changed.Select(_ => this.CanCreateMultiRelationship()));
-            this.CreateMultiRelationshipCommand.Subscribe(_ => this.CreateMultiRelationshipCommandExecute());
         }
 
-        public void CreateBinaryRelationshipCommandExecute()
-        {
-            this.Behavior.ActivateConnectorTool();
-        }
-        public void CreateMultiRelationshipCommandExecute(MultiRelationshipRule rule = null)
-        {
-            //var relatableThings = this.SelectedItems.Select(i => ((NamedThingDiagramContentItem)i).Thing);
-            //this.CreateMultiRelationship(relatableThings, rule);
-        }
-        private async void CreateMultiRelationship(IEnumerable<Thing> relatableThings, MultiRelationshipRule rule)
-        {
-            // send off the relationship
-            Tuple<DomainOfExpertise, Participant> tuple;
-            //this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
-            //var multiRelationship = new MultiRelationship(Guid.NewGuid(), null, null) { Owner = tuple.Item1 };
-
-            if (rule != null)
-            {
-               // multiRelationship.Category.Add(rule.RelationshipCategory);
-            }
-
-            var iteration = this.Thing.Clone(false);
-
-            //iteration.Relationship.Add(multiRelationship);
-
-            //multiRelationship.Container = iteration;
-
-            //multiRelationship.RelatedThing = relatableThings.ToList();
-
-            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
-
-            var containerTransaction = new ThingTransaction(transactionContext, iteration);
-            //containerTransaction.CreateOrUpdate(multiRelationship);
-
-            try
-            {
-                var operationContainer = containerTransaction.FinalizeTransaction();
-                await this.Session.Write(operationContainer);
-
-                // at this point relationship has gone through.
-                //var returedRelationship =
-                //    this.Thing.Relationship.FirstOrDefault(r => r.Iid == multiRelationship.Iid) as MultiRelationship;
-
-                //if (returedRelationship != null)
-                //{
-                //    this.CreateMultiRelationshipDiagramConnector(returedRelationship);
-                //}
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Creation of Binary Relationship failed: {ex.Message}",
-                    "Binary Relationship Failed",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
         /// <summary>
         /// Compute the permissions
         /// </summary>
@@ -580,7 +514,7 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 return row;// row;
             }
-
+            
             var block = new DiagramObject()
             {
                 DepictedThing = depictedThing,
@@ -853,50 +787,6 @@ namespace CDP4DiagramEditor.ViewModels
             this.IsDirty = this.DiagramPortCollection.Any(x => x.IsDirty) || removedItem > 0;
         }
 
-        /// <summary>
-        /// Removes items provided by the behavior.
-        /// </summary>
-        /// <param name="oldItems">The list of items to be removed.</param>
-        public void RemoveItems(IList oldItems)
-        {
-            // wipes all selected items from the collection.
-            foreach (var oldItem in oldItems)
-            {
-                if (oldItem is ThingDiagramContentItem item)
-                {
-                    this.ThingDiagramItems.Remove(item);
-                }
-            }
-        }
-
-        protected void OnSelectedThingChanged()
-        {
-            if (this.SelectedItem == null)
-            {
-                return;
-            }
-
-            if (!(this.SelectedItem is IThingDiagramItem thingDiagramItem))
-            {
-                // logic to handle drawing of new connections
-                if (this.SelectedItem is DiagramConnector newDiagramConnector)
-                {
-                    // a new connection was drawn
-                    this.CreateBinaryRelationshipCommandExecute();
-                }
-
-                return;
-            }
-
-            var thing = thingDiagramItem.Thing;
-
-            if (thing == null)
-            {
-                return;
-            }
-
-            this.ShowInPropertyGrid();
-        }
 
         /// <summary>
         /// Show the <see cref="SelectedItem"/> in the Property Grid

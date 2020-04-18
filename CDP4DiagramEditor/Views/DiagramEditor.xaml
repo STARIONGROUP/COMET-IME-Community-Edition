@@ -10,8 +10,6 @@
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
              xmlns:diagram="clr-namespace:CDP4CommonView.Diagram;assembly=CDP4CommonView"
              xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
              xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"

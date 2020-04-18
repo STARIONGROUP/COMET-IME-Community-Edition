@@ -1,28 +1,49 @@
-﻿namespace CDP4CommonView.Diagram.ViewModels
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="PortContainerDiagramContentItem.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace CDP4CommonView.Diagram.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Linq;
     using System.Windows;
-    using System.Windows.Media;
 
-    using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
-
-    using CDP4CommonView.Diagram.Views;
 
     using CDP4Composition.Diagram;
 
-    using DevExpress.Data.Helpers;
     using DevExpress.Xpf.Diagram;
 
     using NLog;
 
     using ReactiveUI;
 
-    using Point = CDP4Common.DiagramData.Point;
-
+    /// <summary>
+    /// Define an <see cref="NamedThingDiagramContentItem"/> kind that allows attaching <see cref="IDiagramPortViewModel"/> to it
+    /// </summary>
     public class PortContainerDiagramContentItem : NamedThingDiagramContentItem
     {
 
@@ -31,17 +52,29 @@
         /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Gets or sets the port collection
+        /// </summary>
         public ReactiveList<IDiagramPortViewModel> PortCollection { get; private set; }
 
+        /// <summary>
+        /// Initialize a new <see cref="PortContainerDiagramContentItem"/>
+        /// </summary>
+        /// <param name="thing"></param>
+        /// <param name="container"></param>
         public PortContainerDiagramContentItem(DiagramObject thing, IDiagramEditorViewModel container) : base(thing, container)
         {
             this.PortCollection = new ReactiveList<IDiagramPortViewModel>();
             this.PortCollection.Changed.Subscribe(this.PortCollectionChanged);
         }
 
+        /// <summary>
+        /// Fires whenever the <see cref="PortCollection"/> gets new items added or deleted
+        /// </summary>
+        /// <param name="notifyCollectionChanged"></param>
         private void PortCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChanged)
         {
-            // set sides for any
+            // set sides for any new item
             if (notifyCollectionChanged.NewItems != null)
             { 
                 foreach (IDiagramPortViewModel port in notifyCollectionChanged.NewItems)
@@ -49,10 +82,14 @@
                     port.PortContainerShapeSide = this.GetAvailableSide();
                 }
             }
-           
+            // then recalculate all the attached port position
             this.RecalculatePortsPosition();
         }
 
+        /// <summary>
+        /// Recalculate all Ports position then fires <see cref="IDiagramPortViewModel.WhenPositionIsUpdatedInvoke"/>
+        /// todo: refactor
+        /// </summary>
         private void RecalculatePortsPosition()
         {
             var diagramItem = (this.Parent as DiagramItem);
@@ -98,12 +135,22 @@
             }
         }
 
+        /// <summary>
+        /// Calculate the next available side where a port can join
+        /// </summary>
+        /// <returns></returns>
         private PortContainerShapeSide GetAvailableSide()
         {
             var split = ((double)this.PortCollection.Count(p => p.PortContainerShapeSide > PortContainerShapeSide.Undefined)) / 4;
             var place = Math.Abs(split - Math.Truncate(split)) * 100;
             return (PortContainerShapeSide)place;
         }
+
+        /// <summary>
+        /// Determine the length of a side portion
+        /// </summary>
+        /// <param name="side"></param>
+        /// <returns></returns>
         private double CalculatePortion(PortContainerShapeSide side)
         {
             var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == side);
@@ -112,55 +159,9 @@
             return portion;
         }
 
-        private void SetItemPosition(IDiagramPortViewModel viewModel)
-        {
-            if (this.PortCollection.LastOrDefault() is IDiagramPortViewModel lastIn)
-            {
-                this.SetNextAvailablePosition(lastIn);
-            }
-        }
-
-        public void SetNextAvailablePosition(IDiagramPortViewModel lastIn)
-        {
-            //Determine what side should the lastIn port drawn on
-            var split = ((double)this.PortCollection.Count - 1) / 4;
-            var place = Math.Abs(split - Math.Truncate(split));
-
-            var diagramItem = (this.Parent as DiagramItem);
-            if (place == 0)
-            {
-                lastIn.PortContainerShapeSide = PortContainerShapeSide.Bottom;
-                var xVector = this.CalculateVector(PortContainerShapeSide.Bottom, diagramItem.ActualWidth);
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(xVector, diagramItem.ActualHeight - (10)));
-            }
-            else if (place == .25)
-            {
-                lastIn.PortContainerShapeSide = PortContainerShapeSide.Left;
-                var yVector = this.CalculateVector(PortContainerShapeSide.Left, diagramItem.ActualHeight);
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(0 - (10), yVector));
-            }
-            else if (place == .50)
-            {
-                lastIn.PortContainerShapeSide = PortContainerShapeSide.Top;
-                var xVector = this.CalculateVector(PortContainerShapeSide.Top, diagramItem.ActualWidth);
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(xVector, 0 - (10)));
-            }
-            else if (place == .75)
-            {
-                lastIn.PortContainerShapeSide = PortContainerShapeSide.Right;
-                var yVector = this.CalculateVector(PortContainerShapeSide.Right, diagramItem.ActualHeight);
-                lastIn.Position = System.Windows.Point.Add(lastIn.Position, new Vector(diagramItem.ActualWidth - (10), yVector));
-            }
-            
-        }
-
-        private double CalculateVector(PortContainerShapeSide side, double sideLength)
-        {
-            var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == side) - 1;
-            var portion = ((20 - presentPort) / 100) * sideLength;
-            return ((presentPort + 1) * portion) - (10);
-        }
-
+        /// <summary>
+        /// Allows force recalculation of ports position
+        /// </summary>
         public void UpdatePortLayout()
         {
             this.RecalculatePortsPosition();

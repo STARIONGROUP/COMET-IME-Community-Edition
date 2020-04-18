@@ -1,6 +1,26 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Cdp4DiagramOrgChartBehavior.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,15 +30,12 @@ namespace CDP4CommonView.Diagram
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.Specialized;
-    using System.ComponentModel;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
-    using CDP4Common.DiagramData;
-
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.Diagram.ViewModels;
@@ -26,15 +43,11 @@ namespace CDP4CommonView.Diagram
 
     using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
-    using CDP4Composition.Mvvm;
 
-
-    using DevExpress.Diagram;
     using DevExpress.Xpf.Diagram;
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Ribbon;
     using DevExpress.Mvvm.UI;
-    using DevExpress.Xpf.CodeView;
 
     using EventAggregator;
 
@@ -43,7 +56,7 @@ namespace CDP4CommonView.Diagram
     using Point = System.Windows.Point;
 
     /// <summary>
-    /// Allows proper callbacks on the 
+    /// Allows proper callbacks on the DiagramEditor
     /// </summary>
     public class Cdp4DiagramOrgChartBehavior : DiagramOrgChartBehavior, ICdp4DiagramOrgChartBehavior
     {
