@@ -221,7 +221,7 @@ namespace CDP4DiagramEditor.Tests
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
             Assert.AreEqual(this.diagram.Name, viewmodel.Caption);
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
-            Assert.IsNotEmpty(viewmodel.DiagramObjectCollection);
+            Assert.IsNotEmpty(viewmodel.ThingDiagramItems);
             Assert.IsNotEmpty(viewmodel.DiagramConnectorCollection);
             Assert.IsFalse(viewmodel.CanCreateDiagram);
             viewmodel.Dispose();
@@ -252,7 +252,7 @@ namespace CDP4DiagramEditor.Tests
 
             vm.Drop(this.dropinfo.Object);
 
-            Assert.IsNotEmpty(vm.DiagramObjectCollection);
+            Assert.IsNotEmpty(vm.ThingDiagramItems);
             vm.Dispose();
         }
 
@@ -260,14 +260,14 @@ namespace CDP4DiagramEditor.Tests
         public void VerifyThatItemAreRemovedOnEvent()
         {
             var vm = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object);
-            Assert.AreEqual(2, vm.DiagramObjectCollection.Count);
+            Assert.AreEqual(2, vm.ThingDiagramItems.Count);
             Assert.AreEqual(1, vm.DiagramConnectorCollection.Count);
 
-            var row = vm.DiagramObjectCollection.First();
+            var row = vm.ThingDiagramItems.First();
             vm.EventPublisher.Publish(new DiagramDeleteEvent(row));
-
-            Assert.AreEqual(1, vm.DiagramObjectCollection.Count);
-            Assert.IsFalse(vm.DiagramObjectCollection.Any(x => x == row));
+            
+            Assert.AreEqual(1, vm.ThingDiagramItems.Count);
+            Assert.IsFalse(vm.ThingDiagramItems.Any(x => x == row));
 
             Assert.AreEqual(0, vm.DiagramConnectorCollection.Count);
             vm.Dispose();
@@ -307,7 +307,7 @@ namespace CDP4DiagramEditor.Tests
             drop1.Setup(x => x.DiagramDropPoint).Returns(new Point(1, 1));
             vm.Drop(drop1.Object);
 
-            Assert.AreEqual(2, vm.DiagramObjectCollection.Count);
+            Assert.AreEqual(2, vm.ThingDiagramItems.Count);
             Assert.AreEqual(1, vm.DiagramConnectorCollection.Count);
             vm.Dispose();
         }
@@ -321,12 +321,12 @@ namespace CDP4DiagramEditor.Tests
 
             Assert.IsFalse(vm.GenerateDiagramCommandDeep.CanExecute(null));
             Assert.IsFalse(vm.GenerateDiagramCommandShallow.CanExecute(null));
-            vm.EventPublisher.Publish(new DiagramSelectEvent(vm.DiagramObjectCollection.Select(x => x).ToArray()));
+            vm.EventPublisher.Publish(new DiagramSelectEvent(vm.ThingDiagramItems.Select(x => x).ToArray()));
             Assert.IsTrue(vm.GenerateDiagramCommandDeep.CanExecute(null));
             Assert.IsTrue(vm.GenerateDiagramCommandShallow.CanExecute(null));
 
             vm.GenerateDiagramCommandShallow.Execute(null);
-            Assert.AreEqual(2, vm.DiagramObjectCollection.Count);
+            Assert.AreEqual(2, vm.ThingDiagramItems.Count);
             Assert.AreEqual(1, vm.DiagramConnectorCollection.Count);
             vm.Dispose();
         }
@@ -352,12 +352,12 @@ namespace CDP4DiagramEditor.Tests
 
             Assert.IsFalse(vm.GenerateDiagramCommandDeep.CanExecute(null));
             Assert.IsFalse(vm.GenerateDiagramCommandShallow.CanExecute(null));
-            vm.EventPublisher.Publish(new DiagramSelectEvent(vm.DiagramObjectCollection.Select(x => x).ToArray()));
+            vm.EventPublisher.Publish(new DiagramSelectEvent(vm.ThingDiagramItems.Select(x => x).ToArray()));
             Assert.IsTrue(vm.GenerateDiagramCommandDeep.CanExecute(null));
             Assert.IsTrue(vm.GenerateDiagramCommandShallow.CanExecute(null));
 
             vm.GenerateDiagramCommandDeep.Execute(null);
-            Assert.AreEqual(3, vm.DiagramObjectCollection.Count);
+            Assert.AreEqual(3, vm.ThingDiagramItems.Count);
             Assert.AreEqual(2, vm.DiagramConnectorCollection.Count);
             vm.Dispose();
         }

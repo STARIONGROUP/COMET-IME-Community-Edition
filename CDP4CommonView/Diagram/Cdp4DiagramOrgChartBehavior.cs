@@ -529,7 +529,7 @@ namespace CDP4CommonView.Diagram
             {
                 if (thingDiagramContentItem != null)
                 {
-                    thingDiagramContentItem.DirtyObservable = e.Item.WhenAnyValue(x => x.ActualWidth, x => x.ActualHeight, x => x.Position.Y, x => x.Position.X).Subscribe(x => thingDiagramContentItem.SetDirty());
+                    thingDiagramContentItem.DirtyObservable = e.Item.WhenAnyValue(x => x.ActualWidth, x => x.ActualHeight, x => x.Position).Subscribe(x => thingDiagramContentItem.SetDirty());
                 }
             }
         }

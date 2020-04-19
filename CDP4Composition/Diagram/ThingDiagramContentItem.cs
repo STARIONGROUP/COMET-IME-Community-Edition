@@ -91,19 +91,21 @@ namespace CDP4Composition.Diagram
 
         /// <summary>
         /// Set the <see cref="IsDirty"/> property
+        /// REMARQUE the Height and Width are not monitored since visual containers are not resizable
+        /// <code>(float) parent.ActualHeight != bound.Height || (float) parent.ActualWidth != bound.Width</code>
         /// </summary>
         public void SetDirty()
         {
             var bound = this.DiagramThing.Bounds.Single();
 
-            this.IsDirty = this.Parent is DiagramContentItem parent && (this.Thing.Iid == Guid.Empty
-                                                                    || (float)parent.ActualHeight != bound.Height
-                                                                    || (float)parent.ActualWidth != bound.Width
-                                                                    || (float)parent.Position.X != bound.X
-                                                                    || (float)parent.Position.Y != bound.Y);
+            this.IsDirty = this.Parent is DiagramContentItem parent
+                           && parent.Position != default
+                           && (this.Thing.Iid == Guid.Empty 
+                           || (float)parent.Position.X != bound.X
+                           || (float)parent.Position.Y != bound.Y);
+
             this.containerViewModel?.UpdateIsDirty();
         }
-
         /// <summary>
         /// Update the transaction with the data contained in this view-model
         /// </summary>

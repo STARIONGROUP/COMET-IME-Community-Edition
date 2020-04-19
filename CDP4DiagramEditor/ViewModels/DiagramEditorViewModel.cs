@@ -122,8 +122,7 @@ namespace CDP4DiagramEditor.ViewModels
             : base(diagram, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = this.Thing.Name;
-            this.ToolTip = $"The {this.Thing.Name} diagram editor"; 
-            //this.UpdateProperties();
+            this.ToolTip = $"The {this.Thing.Name} diagram editor";
         }
 
 
@@ -784,7 +783,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.IsDirty = this.ThingDiagramItems.Any(x => x.IsDirty) || removedItem > 0;
             
-            this.IsDirty = this.DiagramPortCollection.Any(x => x.IsDirty) || removedItem > 0;
+            this.IsDirty |= this.DiagramPortCollection.Any(x => x.IsDirty) || removedItem > 0;
         }
 
 
