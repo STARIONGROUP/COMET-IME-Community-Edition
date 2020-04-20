@@ -288,12 +288,12 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Checks if the current <see cref="Participant"/>'s contained <see cref="Participant.Domain"/> contains the <see cref="IHaveOwner"/> instance's <see cref="IHaveOwner.Owner"/>.
+        /// Checks if the current <see cref="Participant"/>'s contained <see cref="Participant.Domain"/> contains the <see cref="IOwnedThingViewModel"/> instance's <see cref="IOwnedThingViewModel.Owner"/>.
         /// </summary>
-        /// <returns>True if <see cref="IHaveOwner.Owner"/> is contained in <see cref="Participant.Domain"/>, otherwise false</returns>
+        /// <returns>True if <see cref="IOwnedThingViewModel.Owner"/> is contained in <see cref="Participant.Domain"/>, otherwise false</returns>
         private bool IsOwner()
         {
-            if (this.SelectedThing is IHaveOwner ownedThing)
+            if (this.SelectedThing is IOwnedThingViewModel ownedThing)
             {
                 return this.Session.QueryDomainOfExpertise().Contains(ownedThing.Owner);
             }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IHaveOwner.cs" company="RHEA System S.A.">
+// <copyright file="IOwnedThingViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -32,7 +32,7 @@ namespace CDP4Composition.Mvvm
     /// <summary>
     /// The interface for the viewmodels that contain an <see cref="Owner"/> property
     /// </summary>
-    public interface IHaveOwner
+    public interface IOwnedThingViewModel
     {
         /// <summary>
         /// Gets the <see cref="DomainOfExpertise"/> that owns the <see cref="Thing"/>
