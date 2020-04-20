@@ -52,11 +52,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CDP4Common, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.0.1-2020.4.10.5-pre-release\lib\net452\CDP4Common.dll</HintPath>
+      <HintPath>..\packages\CDP4Common-CE.6.0.1-2020.4.20.1-pre-release\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4Dal, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.6.0.1-2020.4.10.5-pre-release\lib\net452\CDP4Dal.dll</HintPath>
+      <HintPath>..\packages\CDP4Dal-CE.6.0.1-2020.4.20.1-pre-release\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
