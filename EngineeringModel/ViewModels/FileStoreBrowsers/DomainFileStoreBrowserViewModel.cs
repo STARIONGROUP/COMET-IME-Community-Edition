@@ -501,8 +501,15 @@ namespace CDP4EngineeringModel.ViewModels
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex, $"Downloading {fileRevision.Name} caused an error");
-                        MessageBox.Show($"Downloading {fileRevision.Name} caused an error: {ex.Message}", "Download failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                        if (ex is OperationCanceledException || ex.InnerException is TaskCanceledException)
+                        {
+                            MessageBox.Show($"Downloading {fileRevision.Name} was cancelled", "Download cancelled", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        }
+                        else 
+                        {
+                            logger.Error(ex, $"Downloading {fileRevision.Name} caused an error");
+                            MessageBox.Show($"Downloading {fileRevision.Name} caused an error: {ex.Message}", "Download failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
                     finally
                     {
