@@ -10,6 +10,7 @@
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              Height="380"
              Width="500"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -21,90 +22,93 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </dx:DXWindow.Resources>
-    <lc:LayoutGroup Margin="5"
-                    Orientation="Vertical"
-                    ScrollBars="None">
-        <lc:LayoutGroup Margin="0,-1,-3,1"
+    <Grid>
+        <lc:LayoutGroup Margin="5"
                         Orientation="Vertical"
-                        View="Tabs"
-                        lc:LayoutControl.AllowHorizontalSizing="True" RenderTransformOrigin="0.5,0.5"
-                        IsEnabled="{Binding AllowEdit}">
-            <lc:LayoutGroup.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform AngleY="0.094"/>
-                    <RotateTransform/>
-                    <TranslateTransform Y="0.411"/>
-                </TransformGroup>
-            </lc:LayoutGroup.RenderTransform>
-            <lc:LayoutGroup Header="Basic" Orientation="Vertical">
-                <lc:LayoutGroup Orientation="Horizontal">
-                    <lc:LayoutItem Label="Is Locked: ">
-                        <dxe:CheckEdit Name="IsLocked" 
-                                       IsChecked="{Binding Path=IsLocked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                       IsReadOnly="{Binding IsReadOnly}"/>
+                        ScrollBars="None">
+            <lc:LayoutGroup Margin="0,-1,-3,1"
+                            Orientation="Vertical"
+                            View="Tabs"
+                            lc:LayoutControl.AllowHorizontalSizing="True" RenderTransformOrigin="0.5,0.5"
+                            IsEnabled="{Binding AllowEdit}">
+                <lc:LayoutGroup.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform AngleY="0.094"/>
+                        <RotateTransform/>
+                        <TranslateTransform Y="0.411"/>
+                    </TransformGroup>
+                </lc:LayoutGroup.RenderTransform>
+                <lc:LayoutGroup Header="Basic" Orientation="Vertical">
+                    <lc:LayoutGroup Orientation="Horizontal">
+                        <lc:LayoutItem Label="Is Locked: ">
+                            <dxe:CheckEdit Name="IsLocked" 
+                                           IsChecked="{Binding Path=IsLocked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                           IsReadOnly="{Binding IsReadOnly}"/>
+                        </lc:LayoutItem>
+                        <lc:LayoutItem Label="Locked By: ">
+                            <TextBlock Name="LockedBy" Text="{Binding Path=LockedBy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                           Visibility="{Binding Path=IsLocked, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}"/>
+                        </lc:LayoutItem>
+                    </lc:LayoutGroup>
+                        <items:OwnerLayoutItem />
+                    <lc:LayoutItem>
+                        <dxb:ToolBarControl Height="30" Background="Transparent">
+                            <dxb:BarButtonItem x:Name="CreateFileRevisionButton"
+                                               Command="{Binding CreateFileRevisionCommand}"
+                                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                               Hint="Create a File Revision" />
+                            <dxb:BarButtonItem x:Name="DeleteFileRevisionButton"
+                                               Command="{Binding DeleteFileRevisionCommand}"
+                                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                               Hint="Delete the selected File Revision" />
+                            <dxb:BarButtonItem Command="{Binding InspectFileRevisionCommand}"
+                                               Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                               Hint="Inspect the selected File Revision" />
+                        </dxb:ToolBarControl>
                     </lc:LayoutItem>
-                    <lc:LayoutItem Label="Locked By: ">
-                        <TextBlock Name="LockedBy" Text="{Binding Path=LockedBy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                                       Visibility="{Binding Path=IsLocked, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}"/>
+                    <lc:LayoutItem MaxHeight="350" MaxWidth="700" Label="File Revisions:" LabelPosition="Top">
+                        <dxg:GridControl 
+                                 Name="FileRevisionsGridControl"
+                                 AllowLiveDataShaping="False"
+                                 ItemsSource="{Binding FileRevision}"
+                                 SelectedItem="{Binding SelectedFileRevision}">
+                            <dxg:GridControl.View>
+                                <dxg:TableView Name="View"
+                                                   HorizontalAlignment="Stretch"
+                                                   VerticalAlignment="Stretch"
+                                                   AllowColumnMoving="True"
+                                                   AllowEditing="False"
+                                                   AllowGrouping="True"
+                                                   ShowFilterPanelMode="Never"
+                                                   AutoWidth="true"
+                                                   IsDetailButtonVisibleBinding="{x:Null}"
+                                                   ShowGroupPanel="False">
+                                    <dxg:TableView.RowStyle>
+                                        <Style TargetType="{x:Type dxg:RowControl}">
+                                            <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                                        </Style>
+                                    </dxg:TableView.RowStyle>
+                                </dxg:TableView>
+                            </dxg:GridControl.View>
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn FieldName="Name" Header="Name" />
+                                <dxg:GridColumn FieldName="Path" Header="Path" />
+                                <dxg:GridColumn FieldName="CreatedOn" Header="Created On">
+                                    <dxg:GridColumn.EditSettings>
+                                        <dxe:DateEditSettings Mask="G" MaskUseAsDisplayFormat="True" />
+                                    </dxg:GridColumn.EditSettings>
+                                </dxg:GridColumn >
+                            </dxg:GridControl.Columns>
+                        </dxg:GridControl>
                     </lc:LayoutItem>
                 </lc:LayoutGroup>
-                    <items:OwnerLayoutItem />
-                <lc:LayoutItem>
-                    <dxb:ToolBarControl Height="30" Background="Transparent">
-                        <dxb:BarButtonItem x:Name="CreateFileRevisionButton"
-                                           Command="{Binding CreateFileRevisionCommand}"
-                                           Glyph="{dx:DXImage Image=Add_16x16.png}"
-                                           Hint="Create a File Revision" />
-                        <dxb:BarButtonItem x:Name="DeleteFileRevisionButton"
-                                           Command="{Binding DeleteFileRevisionCommand}"
-                                           Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                           Hint="Delete the selected File Revision" />
-                        <dxb:BarButtonItem Command="{Binding InspectFileRevisionCommand}"
-                                           Glyph="{dx:DXImage Image=Find_16x16.png}"
-                                           Hint="Inspect the selected File Revision" />
-                    </dxb:ToolBarControl>
-                </lc:LayoutItem>
-                <lc:LayoutItem MaxHeight="350" MaxWidth="700" Label="File Revisions:" LabelPosition="Top">
-                    <dxg:GridControl 
-                             Name="FileRevisionsGridControl"
-                             AllowLiveDataShaping="False"
-                             ItemsSource="{Binding FileRevision}"
-                             SelectedItem="{Binding SelectedFileRevision}">
-                        <dxg:GridControl.View>
-                            <dxg:TableView Name="View"
-                                               HorizontalAlignment="Stretch"
-                                               VerticalAlignment="Stretch"
-                                               AllowColumnMoving="True"
-                                               AllowEditing="False"
-                                               AllowGrouping="True"
-                                               ShowFilterPanelMode="Never"
-                                               AutoWidth="true"
-                                               IsDetailButtonVisibleBinding="{x:Null}"
-                                               ShowGroupPanel="False">
-                                <dxg:TableView.RowStyle>
-                                    <Style TargetType="{x:Type dxg:RowControl}">
-                                        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
-                                    </Style>
-                                </dxg:TableView.RowStyle>
-                            </dxg:TableView>
-                        </dxg:GridControl.View>
-                        <dxg:GridControl.Columns>
-                            <dxg:GridColumn FieldName="Name" Header="Name" />
-                            <dxg:GridColumn FieldName="Path" Header="Path" />
-                            <dxg:GridColumn FieldName="CreatedOn" Header="Created On">
-                                <dxg:GridColumn.EditSettings>
-                                    <dxe:DateEditSettings Mask="G" MaskUseAsDisplayFormat="True" />
-                                </dxg:GridColumn.EditSettings>
-                            </dxg:GridColumn >
-                        </dxg:GridControl.Columns>
-                    </dxg:GridControl>
-                </lc:LayoutItem>
+                <items:CategoryLayoutGroup />
+                <items:AdvancedLayoutGroup Margin="0,1,0,-1" />
             </lc:LayoutGroup>
-            <items:CategoryLayoutGroup />
-            <items:AdvancedLayoutGroup Margin="0,1,0,-1" />
+            <items:UserValidationButtonsLayoutGroup />
+            <items:ErrorMessageLayoutGroup />
         </lc:LayoutGroup>
-        <items:UserValidationButtonsLayoutGroup />
-        <items:ErrorMessageLayoutGroup />
-    </lc:LayoutGroup>
+        <views:LoadingControl Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
+    </Grid>
 </dx:DXWindow>

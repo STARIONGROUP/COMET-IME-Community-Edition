@@ -34,6 +34,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Attributes;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -118,6 +119,8 @@ namespace CDP4EngineeringModel.ViewModels
             base.UpdateProperties();
 
             this.CreatedOn = this.Thing.CreatedOn.Equals(DateTime.MinValue) ? DateTime.UtcNow : this.Thing.CreatedOn;
+            this.SelectedOwner = this.SelectedOwner ?? this.Session.QueryCurrentDomainOfExpertise();
+            this.Name = this.Name ?? this.SelectedOwner.Name;
         }
 
         /// <summary>

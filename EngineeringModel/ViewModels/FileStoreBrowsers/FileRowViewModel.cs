@@ -43,7 +43,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// The folder row view model.
     /// </summary>
-    public class FileRowViewModel : CDP4CommonView.FileRowViewModel
+    public class FileRowViewModel : CDP4CommonView.FileRowViewModel, IHaveOwner
     {
         /// <summary>
         /// The <see cref="IFileStoreFileAndFolderHandler"/>

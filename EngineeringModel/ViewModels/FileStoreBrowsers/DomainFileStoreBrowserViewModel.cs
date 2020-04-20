@@ -49,7 +49,6 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Operations;
 
     using ReactiveUI;
 
@@ -92,6 +91,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="CanDownloadFile"/>
         /// </summary>
         private bool canDownloadFile;
+
+        /// <summary>
+        /// Backing field for <see cref="IsCancelButtonVisible"/>
+        /// </summary>
+        private bool isCancelButtonVisible;
+
+        /// <summary>
+        /// Backing field for <see cref="LoadingMessage"/>
+        /// </summary>
+        private string loadingMessage;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainFileStoreBrowserViewModel"/> class.
@@ -187,6 +196,24 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the Cancel button is visible on the <see cref="LoadingControl"/>
+        /// </summary>
+        public bool IsCancelButtonVisible
+        {
+            get => this.isCancelButtonVisible;
+            private set => this.RaiseAndSetIfChanged(ref this.isCancelButtonVisible, value);
+        }
+
+        /// <summary>
+        /// Gets a value the message text on the <see cref="LoadingControl"/>
+        /// </summary>
+        public string LoadingMessage
+        {
+            get => this.loadingMessage;
+            private set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
+        }
+
+        /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="DomainFileStore"/>
         /// </summary>
         public ReactiveCommand<object> CreateStoreCommand { get; private set; }
@@ -207,6 +234,11 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveCommand<object> DownloadFileCommand { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ICommand"/> to cancel download of a file
+        /// </summary>
+        public ReactiveCommand<object> CancelCommand { get; private set; }
+
+        /// <summary>
         /// Initializes the <see cref="ICommand"/>s
         /// </summary>
         protected override void InitializeCommands()
@@ -220,6 +252,9 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.UploadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanUploadFile));
             this.UploadFileCommand.Subscribe(_ => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing));
+
+            this.CancelCommand = ReactiveCommand.Create();
+            this.CancelCommand.Subscribe(_ => this.Session.Cancel());
 
             this.DownloadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDownloadFile));
             this.DownloadFileCommand.Subscribe(_ => this.ExecuteDownloadFile(this.SelectedThing.Thing));
@@ -244,11 +279,26 @@ namespace CDP4EngineeringModel.ViewModels
 
             var isContainer = this.SelectedThing?.Thing is DomainFileStore || this.SelectedThing?.Thing is Folder;
             var isFile = this.SelectedThing?.Thing is File;
+            var isOwner = this.IsOwner();
 
             this.CanCreateStore = this.PermissionService.CanWrite(ClassKind.DomainFileStore, this.Thing.Container);
-            this.CanCreateFolder = isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
-            this.CanUploadFile = isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
-            this.CanDownloadFile = isFile && this.PermissionService.CanRead(this.SelectedThing.Thing);
+            this.CanCreateFolder = isOwner && isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
+            this.CanUploadFile = isOwner && isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
+            this.CanDownloadFile = isOwner && isFile && this.PermissionService.CanRead(this.SelectedThing.Thing);
+        }
+
+        /// <summary>
+        /// Checks if the current <see cref="Participant"/>'s contained <see cref="Participant.Domain"/> contains the <see cref="IHaveOwner"/> instance's <see cref="IHaveOwner.Owner"/>.
+        /// </summary>
+        /// <returns>True if <see cref="IHaveOwner.Owner"/> is contained in <see cref="Participant.Domain"/>, otherwise false</returns>
+        private bool IsOwner()
+        {
+            if (this.SelectedThing is IHaveOwner ownedThing)
+            {
+                return this.Session.QueryDomainOfExpertise().Contains(ownedThing.Owner);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -258,8 +308,8 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulateContextMenu();
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Domain File Store", "", this.CreateStoreCommand, MenuItemKind.Create, ClassKind.DomainFileStore));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Add a File ", "", this.UploadFileCommand, MenuItemKind.Create, ClassKind.File));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Download File", "", this.DownloadFileCommand, MenuItemKind.Export, ClassKind.FileRevision));
         }
@@ -431,12 +481,37 @@ namespace CDP4EngineeringModel.ViewModels
         /// Executes the DownloadFile command
         /// </summary>
         /// <param name="thing"></param>
-        private void ExecuteDownloadFile(Thing thing)
+        private async Task ExecuteDownloadFile(Thing thing)
         {
             if (thing is File file)
             {
                 var fileRevision = file.FileRevision.OrderByDescending(x => x.CreatedOn).FirstOrDefault();
-                fileRevision?.DownloadFile(this.Session);
+
+                if (fileRevision != null)
+                {
+                    this.LoadingMessage = "Downloading";
+                    var cancelEnabledInterval = Observable.Interval(TimeSpan.FromMilliseconds(250));
+                    var subscription = cancelEnabledInterval.Subscribe(_ => { this.IsCancelButtonVisible = this.Session.CanCancel(); });
+
+                    this.IsBusy = true;
+
+                    try
+                    {
+                        await fileRevision.DownloadFile(this.Session); 
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex, $"Downloading {fileRevision.Name} caused an error");
+                        MessageBox.Show($"Downloading {fileRevision.Name} caused an error: {ex.Message}", "Download failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    finally
+                    {
+                        subscription.Dispose();
+                        this.LoadingMessage = "";
+                        this.IsCancelButtonVisible = false;
+                        this.IsBusy = false;
+                    }
+                }
             }
         }
 

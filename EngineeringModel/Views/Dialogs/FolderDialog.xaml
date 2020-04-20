@@ -21,8 +21,7 @@
     <lc:LayoutGroup Margin="5"
                     Orientation="Vertical"
                     ScrollBars="None">
-        <lc:LayoutGroup Margin="-10,-7,-10,-5"
-                        Orientation="Vertical"
+        <lc:LayoutGroup Orientation="Vertical"
                         View="Tabs"
                         lc:LayoutControl.AllowHorizontalSizing="True">
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">

@@ -35,6 +35,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Attributes;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -226,6 +227,8 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.IsLocked = this.SelectedLockedBy != null;
             this.LockedBy = this.SelectedLockedBy?.Name;
+
+            this.SelectedOwner = this.SelectedOwner ?? this.Session.QueryCurrentDomainOfExpertise();
         }
 
         /// <summary>

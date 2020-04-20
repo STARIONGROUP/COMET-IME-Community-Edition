@@ -247,8 +247,10 @@
     <Compile Include="Exceptions\AppSettingsException.cs" />
     <Compile Include="Exceptions\PluginSettingsException.cs" />
     <Compile Include="Exceptions\SettingsException.cs" />
+    <Compile Include="Extensions\ISessionExtensionMethods.cs" />
     <Compile Include="Extensions\FileExtensionMethods.cs" />
     <Compile Include="Modularity\PluginLoader.cs" />
+    <Compile Include="Mvvm\IHaveOwner.cs" />
     <Compile Include="Mvvm\IHaveContainedRows.cs" />
     <Compile Include="Mvvm\Types\DisposableReactiveList.cs" />
     <Compile Include="FolderRowViewModel.cs" />

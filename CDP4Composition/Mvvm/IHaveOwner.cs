@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IFileStoreRow.cs" company="RHEA System S.A.">
+// <copyright file="IHaveOwner.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -24,18 +24,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.ViewModels.FileStoreBrowsers
+namespace CDP4Composition.Mvvm
 {
-    using CDP4Common.EngineeringModelData;
-
-    using CDP4Composition.Mvvm;
-
-    using CDP4Dal;
+    using CDP4Common.CommonData;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Interface that FileStoreRowViewModels and FolderRowViewModels should implement.
+    /// The interface for the viewmodels that contain an <see cref="Owner"/> property
     /// </summary>
-    public interface IFileStoreRow<out T> : IISession, IHaveContainedRows, IViewModelBase<T>, IHaveOwner where T : FileStore
+    public interface IHaveOwner
     {
+        /// <summary>
+        /// Gets the <see cref="DomainOfExpertise"/> that owns the <see cref="Thing"/>
+        /// </summary>
+        DomainOfExpertise Owner { get; }
     }
 }
