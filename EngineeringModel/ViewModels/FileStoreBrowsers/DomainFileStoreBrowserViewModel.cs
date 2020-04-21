@@ -46,16 +46,20 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
+    using CDP4Composition.Views;
 
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using ReactiveUI;
 
     /// <summary>
     /// The view-model for the <see cref="DomainFileStoreBrowserViewModel"/> view
     /// </summary>
-    public class DomainFileStoreBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget
+    public class DomainFileStoreBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget, IDownloadFileViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -101,6 +105,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="LoadingMessage"/>
         /// </summary>
         private string loadingMessage;
+
+        /// <summary>
+        /// The (injected) <see cref="IDownloadFileService"/>
+        /// </summary>
+        private IDownloadFileService downloadFileService = ServiceLocator.Current.GetInstance<IDownloadFileService>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainFileStoreBrowserViewModel"/> class.
@@ -201,7 +210,7 @@ namespace CDP4EngineeringModel.ViewModels
         public bool IsCancelButtonVisible
         {
             get => this.isCancelButtonVisible;
-            private set => this.RaiseAndSetIfChanged(ref this.isCancelButtonVisible, value);
+            set => this.RaiseAndSetIfChanged(ref this.isCancelButtonVisible, value);
         }
 
         /// <summary>
@@ -210,7 +219,7 @@ namespace CDP4EngineeringModel.ViewModels
         public string LoadingMessage
         {
             get => this.loadingMessage;
-            private set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
+            set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
         }
 
         /// <summary>
@@ -236,7 +245,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to cancel download of a file
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<object> CancelDownloadCommand { get; private set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s
@@ -245,19 +254,27 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeCommands();
             this.CreateFolderCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateFolder));
-            this.CreateFolderCommand.Subscribe(_ => this.ExecuteCreateCommandForFolder(this.SelectedThing.Thing));
+            this.Disposables.Add(this.CreateFolderCommand.Subscribe(_ => this.ExecuteCreateCommandForFolder(this.SelectedThing.Thing)));
 
             this.CreateStoreCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateStore));
-            this.CreateStoreCommand.Subscribe(_ => this.ExecuteCreateCommand<DomainFileStore>(this.Thing));
+            this.Disposables.Add(this.CreateStoreCommand.Subscribe(_ => this.ExecuteCreateCommand<DomainFileStore>(this.Thing)));
 
             this.UploadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanUploadFile));
-            this.UploadFileCommand.Subscribe(_ => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing));
+            this.Disposables.Add(this.UploadFileCommand.Subscribe(_ => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing)));
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.Session.Cancel());
+            this.CancelDownloadCommand = ReactiveCommand.Create();
+            this.Disposables.Add(this.CancelDownloadCommand.Subscribe(_ => this.downloadFileService.CancelDownloadFile(this)));
 
             this.DownloadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDownloadFile));
-            this.DownloadFileCommand.Subscribe(_ => this.ExecuteDownloadFile(this.SelectedThing.Thing));
+
+            this.Disposables.Add(this.DownloadFileCommand.Subscribe(
+                _ =>
+            {
+                if (this.SelectedThing.Thing is File file)
+                {
+                    this.downloadFileService.ExecuteDownloadFile(this, file);
+                }
+            }));
         }
 
         /// <summary>
@@ -475,51 +492,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.ExecuteCreateCommand(file, container);
-        }
-
-        /// <summary>
-        /// Executes the DownloadFile command
-        /// </summary>
-        /// <param name="thing"></param>
-        private async Task ExecuteDownloadFile(Thing thing)
-        {
-            if (thing is File file)
-            {
-                var fileRevision = file.FileRevision.OrderByDescending(x => x.CreatedOn).FirstOrDefault();
-
-                if (fileRevision != null)
-                {
-                    this.LoadingMessage = "Downloading";
-                    var cancelEnabledInterval = Observable.Interval(TimeSpan.FromMilliseconds(250));
-                    var subscription = cancelEnabledInterval.Subscribe(_ => { this.IsCancelButtonVisible = this.Session.CanCancel(); });
-
-                    this.IsBusy = true;
-
-                    try
-                    {
-                        await fileRevision.DownloadFile(this.Session); 
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex is OperationCanceledException || ex.InnerException is TaskCanceledException)
-                        {
-                            MessageBox.Show($"Downloading {fileRevision.Name} was cancelled", "Download cancelled", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                        }
-                        else 
-                        {
-                            logger.Error(ex, $"Downloading {fileRevision.Name} caused an error");
-                            MessageBox.Show($"Downloading {fileRevision.Name} caused an error: {ex.Message}", "Download failed", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                    finally
-                    {
-                        subscription.Dispose();
-                        this.LoadingMessage = "";
-                        this.IsCancelButtonVisible = false;
-                        this.IsBusy = false;
-                    }
-                }
-            }
         }
 
         /// <summary>

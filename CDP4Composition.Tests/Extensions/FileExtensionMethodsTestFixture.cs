@@ -29,7 +29,6 @@ namespace CDP4Composition.Tests.Extensions
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -59,19 +58,20 @@ namespace CDP4Composition.Tests.Extensions
         private const string FileContent = "This is file content";
         private const string FileName = "FileRevisionDownloadTestFile.txt";
 
-        private Mock<ISession> session;
         private Mock<IOpenSaveFileDialogService> fileDialogService;
-        private Mock<IServiceLocator> serviceLocator;
-        private FileRevision fileRevision;
+        internal Mock<IServiceLocator> ServiceLocator;
+
+        internal Mock<ISession> Session;
+        internal FileRevision FileRevision;
 
         [SetUp]
         public void Setup()
         {
-            this.session = new Mock<ISession>();
+            this.Session = new Mock<ISession>();
             this.fileDialogService = new Mock<IOpenSaveFileDialogService>();
-            this.serviceLocator = new Mock<IServiceLocator>();
-            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
-            this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.fileDialogService.Object);
+            this.ServiceLocator = new Mock<IServiceLocator>();
+            Microsoft.Practices.ServiceLocation.ServiceLocator.SetLocatorProvider(() => this.ServiceLocator.Object);
+            this.ServiceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.fileDialogService.Object);
 
             this.fileDialogService.Setup(
                     x => x.GetSaveFileDialog(
@@ -82,9 +82,9 @@ namespace CDP4Composition.Tests.Extensions
                         It.IsAny<int>()))
                 .Returns(FileName);
 
-            this.session.Setup(x => x.ReadFile(It.IsAny<FileRevision>())).ReturnsAsync(Encoding.ASCII.GetBytes(FileContent));
+            this.Session.Setup(x => x.ReadFile(It.IsAny<FileRevision>())).ReturnsAsync(Encoding.ASCII.GetBytes(FileContent));
 
-            this.fileRevision = new FileRevision(Guid.NewGuid(), null, null)
+            this.FileRevision = new FileRevision(Guid.NewGuid(), null, null)
             {
                 Name = "File",
                 Creator = new Participant(),
@@ -93,7 +93,7 @@ namespace CDP4Composition.Tests.Extensions
                 ContentHash = "DOESNOTMATTER"
             };
 
-            this.fileRevision.FileType.Add(new FileType());
+            this.FileRevision.FileType.Add(new FileType());
         }
 
         [TearDown]
@@ -104,7 +104,7 @@ namespace CDP4Composition.Tests.Extensions
         [Test]
         public async Task VerifyThatDownloadFileWorks()
         {
-            await this.fileRevision.DownloadFile(this.session.Object);
+            await this.FileRevision.DownloadFile(this.Session.Object);
 
             var result = System.IO.File.ReadAllBytes(FileName);
 
@@ -123,23 +123,23 @@ namespace CDP4Composition.Tests.Extensions
 
             var expectedFileRevisionProperties = new List<string>
             {
-                nameof(FileRevision.Name),
-                nameof(FileRevision.ContainingFolder),
-                nameof(FileRevision.ContentHash),
-                nameof(FileRevision.Creator),
-                nameof(FileRevision.CreatedOn),
-                nameof(FileRevision.Path),
-                nameof(FileRevision.FileType),
-                nameof(FileRevision.ClassKind),
-                nameof(FileRevision.ExcludedDomain),
-                nameof(FileRevision.ExcludedPerson),
-                nameof(FileRevision.Iid),
-                nameof(FileRevision.ModifiedOn),
-                nameof(FileRevision.RevisionNumber)
+                nameof(CDP4Common.EngineeringModelData.FileRevision.Name),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.ContainingFolder),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.ContentHash),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.Creator),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.CreatedOn),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.Path),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.FileType),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.ClassKind),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.ExcludedDomain),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.ExcludedPerson),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.Iid),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.ModifiedOn),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.RevisionNumber)
             };
 
             CollectionAssert.AreEquivalent(realFileRevisionProperties, expectedFileRevisionProperties, 
-                $@"Found unexpected, or missing properties in {nameof(FileRevision)}. 
+                $@"Found unexpected, or missing properties in {nameof(CDP4Common.EngineeringModelData.FileRevision)}. 
                          Please update var {nameof(expectedFileRevisionProperties)} 
                          and make sure {nameof(this.VerifyThatCopyToNewWorks)} works as expected.");
         }
@@ -148,22 +148,22 @@ namespace CDP4Composition.Tests.Extensions
         public void VerifyThatCopyToNewWorks()
         {
             var participant = new Participant();
-            var newFileRevision =  this.fileRevision.CopyToNew(participant);
+            var newFileRevision =  this.FileRevision.CopyToNew(participant);
 
             // Copied properties
-            Assert.AreEqual(this.fileRevision.Name, newFileRevision.Name);
-            Assert.AreEqual(this.fileRevision.ContainingFolder, newFileRevision.ContainingFolder);
-            Assert.AreEqual(this.fileRevision.ContentHash, newFileRevision.ContentHash);
-            Assert.AreEqual(this.fileRevision.Path, newFileRevision.Path);
+            Assert.AreEqual(this.FileRevision.Name, newFileRevision.Name);
+            Assert.AreEqual(this.FileRevision.ContainingFolder, newFileRevision.ContainingFolder);
+            Assert.AreEqual(this.FileRevision.ContentHash, newFileRevision.ContentHash);
+            Assert.AreEqual(this.FileRevision.Path, newFileRevision.Path);
 
             // new Creator
             Assert.AreEqual(newFileRevision.Creator, participant);
             
             // CreatedOn of the copy is higher than CreatedOn of the source FileRevision
-            Assert.IsTrue(this.fileRevision.CreatedOn < newFileRevision.CreatedOn);
+            Assert.IsTrue(this.FileRevision.CreatedOn < newFileRevision.CreatedOn);
 
             // Same FileTypes
-            CollectionAssert.AreEqual(this.fileRevision.FileType, newFileRevision.FileType);
+            CollectionAssert.AreEqual(this.FileRevision.FileType, newFileRevision.FileType);
         }
     }
 }

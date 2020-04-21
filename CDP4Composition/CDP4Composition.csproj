@@ -271,6 +271,9 @@
     <Compile Include="Services\AppSettingService\AppSettings.cs" />
     <Compile Include="Services\AppSettingService\SettingsMetaData.cs" />
     <Compile Include="Services\AppSettingService\PluginSettingsMetaData.cs" />
+    <Compile Include="Services\MessageBoxService\MessageBoxService.cs" />
+    <Compile Include="Services\MessageBoxService\IMessageBoxService.cs" />
+    <Compile Include="Services\DownloadFileService\DownloadFileService.cs" />
     <Compile Include="Services\FavoritesService\FavoritesService.cs" />
     <Compile Include="Services\FavoritesService\IFavoritesService.cs" />
     <Compile Include="Mvvm\IHaveContainerViewModel.cs" />
@@ -314,6 +317,8 @@
     <Compile Include="Services\IconCacheService\IconCacheService.cs" />
     <Compile Include="Services\IconCacheService\IIconCacheService.cs" />
     <Compile Include="Services\IconCacheService\OverlayPositionKind.cs" />
+    <Compile Include="Services\DownloadFileService\IDownloadFileService.cs" />
+    <Compile Include="Services\DownloadFileService\IDownloadFileViewModel.cs" />
     <Compile Include="Services\ImageService\IImageService.cs" />
     <Compile Include="Services\ImageService\ImageService.cs" />
     <Compile Include="Services\IThingCreator.cs" />

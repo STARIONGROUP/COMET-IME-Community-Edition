@@ -159,6 +159,9 @@
                 </dxg:TreeListControl.InputBindings>
             </dxg:TreeListControl>
         </Grid>
-        <views:LoadingControl Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}" CancelCommand="{Binding CancelCommand}" IsCancelVisible="{Binding IsCancelButtonVisible}"/>
+        <views:LoadingControl 
+            Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}" 
+            CancelCommand="{Binding CancelDownloadCommand}" 
+            IsCancelVisible="{Binding IsCancelButtonVisible}"/>
     </Grid>
 </UserControl>
