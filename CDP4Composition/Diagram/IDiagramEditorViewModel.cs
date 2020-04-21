@@ -40,5 +40,9 @@ namespace CDP4Composition.Diagram
         /// Defines the <see cref="IsDirty"/> property
         /// </summary>
         bool IsDirty { get; }
+
+        void UpdateThingsBounds();
+
+        void ThingItemGotRemoved(object contentItemContent);
     }
 }

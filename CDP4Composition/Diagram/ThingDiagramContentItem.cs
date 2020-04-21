@@ -143,12 +143,14 @@ namespace CDP4Composition.Diagram
         /// <param name="bound">The <see cref="Bounds"/> to update</param>
         private void UpdateBound(Bounds bound)
         {
-            var parent = (this.Parent as DiagramContentItem);
-            bound.Height = (float)parent.ActualHeight;
-            bound.Width = (float)parent.ActualWidth;
-            bound.X = (float)parent.Position.X;
-            bound.Y = (float)parent.Position.Y;
-            bound.Name = "should not have a name";
+            if (this.Parent is DiagramContentItem parent)
+            {
+                bound.Height = (float)parent.ActualHeight;
+                bound.Width = (float)parent.ActualWidth;
+                bound.X = (float)parent.Position.X;
+                bound.Y = (float)parent.Position.Y;
+                bound.Name = "should not have a name";
+            }
         }
     }
 }

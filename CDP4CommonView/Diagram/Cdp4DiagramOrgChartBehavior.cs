@@ -96,6 +96,11 @@ namespace CDP4CommonView.Diagram
         private RibbonControl parentRibbon;
 
         /// <summary>
+        /// Making sure stuff gets call only once example: draw the connector when the view did loaded
+        /// </summary>
+        private bool hasFirstLoadHappened;
+
+        /// <summary>
         /// Gets a dictionary of saved diagram item positions.
         /// </summary>
         public Dictionary<object, Point> ItemPositions { get; } = new Dictionary<object, Point>();
@@ -432,14 +437,8 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/></param>
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (this.AssociatedObject.DataContext != null)
+            if (this.AssociatedObject.DataContext is ICdp4DiagramContainer viewModel && viewModel.Behavior == null)
             {
-                var viewModel= this.AssociatedObject.DataContext as ICdp4DiagramContainer;
-
-                if (viewModel == null)
-                {
-                    return;
-                }
                 viewModel.Behavior = this;
                 // need to draw the saved Things after the view model knows the behavior instance
                 viewModel.UpdateProperties();
@@ -496,6 +495,13 @@ namespace CDP4CommonView.Diagram
 
                         portContainer.PortCollection.Clear();
                     }
+
+                    foreach (var selected in this.AssociatedObject.SelectedItems.ToList())
+                    {
+                        this.AssociatedObject.UnselectItem(selected);
+                    }
+
+                    (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.ThingItemGotRemoved(contentItem.Content);
                 }
             }
         }
@@ -511,6 +517,8 @@ namespace CDP4CommonView.Diagram
             {
                 portContainer?.UpdatePortLayout();
             }
+
+            (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.UpdateThingsBounds();
         }
 
         private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
@@ -527,9 +535,10 @@ namespace CDP4CommonView.Diagram
             }
             else
             {
-                if (thingDiagramContentItem != null)
+                if (thingDiagramContentItem != null && thingDiagramContentItem.DirtyObservable is null)
                 {
-                    thingDiagramContentItem.DirtyObservable = e.Item.WhenAnyValue(x => x.ActualWidth, x => x.ActualHeight, x => x.Position).Subscribe(x => thingDiagramContentItem.SetDirty());
+                    //If you watch multiple values it will fires multiple times CAREFULL
+                    thingDiagramContentItem.DirtyObservable = e.Item.WhenAnyValue(x => x.Position).Subscribe(x => thingDiagramContentItem.SetDirty());
                 }
             }
         }
@@ -555,7 +564,7 @@ namespace CDP4CommonView.Diagram
                         item.Position = itemPosition;
 
                         // remove from collection as it is not useful anymore.
-                        this.ItemPositions.Remove(namedThingDiagramContentItem);
+                        //this.ItemPositions.Remove(namedThingDiagramContentItem);
                     }
                 }
             }
@@ -589,7 +598,14 @@ namespace CDP4CommonView.Diagram
                 // merge ribbon into category
                 this.MergeRibbonToCategory(designControl);
             }
+
+            if (!this.hasFirstLoadHappened)
+            {
+                (this.AssociatedObject.DataContext as ICdp4DiagramContainer)?.GenerateDiagramConnector();
+                this.hasFirstLoadHappened = true;
+            }
         }
+    
 
         /// <summary>
         /// Clears the diagram ribbon from a specified RibbonCategory
