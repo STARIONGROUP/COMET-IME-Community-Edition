@@ -30,17 +30,24 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+    
     using CDP4EngineeringModel.ViewModels;
+    
     using Microsoft.Practices.ServiceLocation;
+    
     using Moq;
+    
     using NUnit.Framework;
 
     [TestFixture]
@@ -94,16 +101,20 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "model"
             };
+            
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ShortName = "person",
                 GivenName = "person",
             };
+            
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Person = this.person,
@@ -115,7 +126,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
                 Name = "domain",
                 ShortName = "d"
             };
+            
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 RequiredRdl = this.srdl
@@ -134,6 +147,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             {
                 EngineeringModelSetup = this.engineeringModelSetup
             };
+
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 IterationSetup = this.iterationSetup
@@ -142,6 +156,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             this.model.Iteration.Add(this.iteration);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                 {
@@ -152,26 +167,36 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
 
-            this.store = new DomainFileStore(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.store = new DomainFileStore(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Owner = this.domain
+            };
+
             this.folder1 = new Folder(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
                 CreatedOn = new DateTime(1, 1, 1),
-                Creator = this.participant
+                Creator = this.participant,
+                Owner = this.domain
             };
+
             this.folder2 = new Folder(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "2",
                 CreatedOn = new DateTime(1, 1, 1),
-                Creator = this.participant
+                Creator = this.participant,
+                Owner = this.domain
             };
+
             this.file = new File(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.fileRevision1 = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
                 Creator = this.participant,
                 CreatedOn = new DateTime(1, 1, 1)
             };
+
             this.fileRevision2 = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
