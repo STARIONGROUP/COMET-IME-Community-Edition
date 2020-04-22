@@ -222,10 +222,7 @@ namespace CDP4DiagramEditor.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            if (this.SelectedThing == null)
-            {
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Diagram", "", this.CreateCommand, MenuItemKind.Create, ClassKind.DiagramCanvas));
-            }
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Diagram", "", this.CreateCommand, MenuItemKind.Create, ClassKind.DiagramCanvas));
         }
 
         /// <summary>
