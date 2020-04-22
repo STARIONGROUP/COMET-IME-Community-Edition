@@ -502,6 +502,13 @@ namespace CDP4CommonView.Diagram
                     }
 
                     (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.ThingItemGotRemoved(contentItem.Content);
+
+                    (contentItem.Content as ThingDiagramContentItem)?.DirtyObservable.Dispose();
+                }
+
+                else if (item is Cdp4DiagramConnector connector)
+                {
+                    (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.ThingItemGotRemoved(connector.DataContext);
                 }
             }
         }
@@ -517,8 +524,6 @@ namespace CDP4CommonView.Diagram
             {
                 portContainer?.UpdatePortLayout();
             }
-
-            (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.UpdateThingsBounds();
         }
 
         private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
@@ -531,7 +536,7 @@ namespace CDP4CommonView.Diagram
                     var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content).OfType<PortContainerDiagramContentItem>().FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
                     container?.PortCollection.Remove(container.PortCollection.FirstOrDefault(i => i == port.DataContext));
                 }
-                thingDiagramContentItem?.DirtyObservable.Dispose();
+                e.Handled = true;
             }
             else
             {
@@ -564,7 +569,7 @@ namespace CDP4CommonView.Diagram
                         item.Position = itemPosition;
 
                         // remove from collection as it is not useful anymore.
-                        //this.ItemPositions.Remove(namedThingDiagramContentItem);
+                        this.ItemPositions.Remove(namedThingDiagramContentItem);
                     }
                 }
             }
@@ -601,7 +606,7 @@ namespace CDP4CommonView.Diagram
 
             if (!this.hasFirstLoadHappened)
             {
-                (this.AssociatedObject.DataContext as ICdp4DiagramContainer)?.GenerateDiagramConnector();
+                (this.AssociatedObject.DataContext as ICdp4DiagramContainer)?.ComputeDiagramConnector();
                 this.hasFirstLoadHappened = true;
             }
         }

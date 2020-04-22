@@ -8,6 +8,8 @@ using System.Windows;
 
 namespace CDP4CommonView.Diagram
 {
+    using CDP4Common.CommonData;
+
     public interface ICdp4DiagramOrgChartBehavior
     {
         /// <summary>
@@ -31,5 +33,11 @@ namespace CDP4CommonView.Diagram
         /// Resets the active tool.
         /// </summary>
         void ResetTool();
+
+        /// <summary>
+        /// programmatically delete one diagram element containing the <param name="thing" ></param>
+        /// </summary>
+        /// <param name="thing"></param>
+        //void DeleteItem(Thing thing);
     }
 }

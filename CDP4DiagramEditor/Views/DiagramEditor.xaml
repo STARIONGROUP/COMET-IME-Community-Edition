@@ -131,7 +131,7 @@
                             <DataTemplate>
                                 <StackPanel Margin="0,10" Background="Transparent" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" HorizontalAlignment="Center">
                                     <TextBlock Text="{Binding ClassKind}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,10,10"/>
-                                    <Image Style="{StaticResource ThingIcon}" IsEnabled="{Binding Path=IsPortCommandSelected, UpdateSourceTrigger=PropertyChanged}">
+                                    <Image Style="{StaticResource ThingIcon}">
                                         <Image.Source>
                                             <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
                                                 <Binding Path="Content"/>

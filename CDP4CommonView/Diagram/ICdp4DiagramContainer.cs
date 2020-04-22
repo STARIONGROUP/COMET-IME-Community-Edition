@@ -54,6 +54,6 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         void UpdateProperties();
 
-        void GenerateDiagramConnector();
+        void ComputeDiagramConnector();
     }
 }

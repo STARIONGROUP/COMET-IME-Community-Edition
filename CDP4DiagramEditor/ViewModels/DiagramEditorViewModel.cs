@@ -216,14 +216,14 @@ namespace CDP4DiagramEditor.ViewModels
             if (contentItemContent is ThingDiagramContentItem item)
             {
                 var debug = this.ThingDiagramItems.Remove(item);
-                var connectors = this.DiagramConnectorCollection.Where(x => x.Source == item.Thing || x.Target == item.Thing).ToArray();
+                var connectors = this.DiagramConnectorCollection.Where(x => x.Source.DepictedThing == item.DiagramThing.DepictedThing || x.Target.DepictedThing == item.DiagramThing.DepictedThing).ToArray();
                 foreach (var diagramEdgeViewModel in connectors)
                 {
-                    //this.DiagramConnectorCollection.Remove(diagramEdgeViewModel);
+                    this.DiagramConnectorCollection.Remove(diagramEdgeViewModel);
                 }
             }
 
-            if (contentItemContent is DiagramEdgeViewModel connector)
+            else if (contentItemContent is DiagramEdgeViewModel connector)
             {
                 this.DiagramConnectorCollection.Remove(connector);
             }
@@ -416,41 +416,20 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Compute the <see cref="DiagramEdge"/> to show
         /// </summary>
-        private void ComputeDiagramConnector()
-        {
-            var updatedItems = this.Thing.DiagramElement.OfType<DiagramEdge>().ToArray();
-            var currentItems = this.DiagramConnectorCollection.Select(x => x.Thing).OfType<DiagramEdge>().ToArray();
-
-            var newItems = updatedItems.Except(currentItems).ToArray();
-            var oldItems = currentItems.Except(updatedItems).ToArray();
-
-            foreach (var diagramThingBase in oldItems)
-            {
-                var item = this.DiagramConnectorCollection.SingleOrDefault(x => x.Thing == diagramThingBase);
-                if (item != null)
-                {
-                    this.DiagramConnectorCollection.Remove(item);
-                    item.Dispose();
-                }
-            }
-
-            foreach (var diagramThingBase in newItems)
-            {
-                var newDiagramElement = new DiagramEdgeViewModel(diagramThingBase, this.Session, this);
-                this.DiagramConnectorCollection.Add(newDiagramElement);
-            }
-        }
-
-
-        /// <summary>
-        /// Compute the <see cref="DiagramEdge"/> to show
-        /// </summary>
-        public void GenerateDiagramConnector()
+        public void ComputeDiagramConnector()
         {
             foreach (var item in this.ThingDiagramItems.ToList())
             {
                 this.GenerateDiagramRelation(item, false, false);
             }
+        }
+        /// <summary>
+        /// Compute the <see cref="DiagramEdge"/> to show
+        /// </summary>
+        /// <param name="diagramItem"></param>
+        private void ComputeDiagramConnector(ThingDiagramContentItem diagramItem)
+        {
+            this.GenerateDiagramRelation(diagramItem, false, false);
         }
 
 
@@ -538,7 +517,9 @@ namespace CDP4DiagramEditor.ViewModels
 
                 this.Behavior.ItemPositions.Add(diagramItem, convertedDropPosition);
                 this.ThingDiagramItems.Add(diagramItem);
+                this.ComputeDiagramConnector(diagramItem);
                 this.IsDirty = true;
+                this.UpdateIsDirty();
             }
         }
 
@@ -756,7 +737,7 @@ namespace CDP4DiagramEditor.ViewModels
                 {
                     associatedViewModel = this.CreateDiagramObject(binaryRelationship.Source, new Point(item.Position.X - Cdp4DiagramHelper.DefaultSeparation, item.Position.Y), shouldAddMissingThings);
 
-                    if (associatedViewModel != null && sourceIsSet)
+                    if (associatedViewModel != null)
                     {
                         this.CreateDiagramConnector(binaryRelationship, associatedViewModel.DiagramThing, item.DiagramThing);
                     }
@@ -830,9 +811,12 @@ namespace CDP4DiagramEditor.ViewModels
             var displayedObjects = this.ThingDiagramItems.Select(x => (x as NamedThingDiagramContentItem)?.DiagramThing).ToArray();
 
             var removedItem = currentObject.Except(displayedObjects).Count();
+            var addedItem = displayedObjects.Except(currentObject).Count();
 
             this.IsDirty = this.ThingDiagramItems.Any(x => x.IsDirty) || removedItem > 0;
-            
+
+            this.IsDirty |= addedItem > 0;
+
             this.IsDirty |= this.DiagramPortCollection.Any(x => x.IsDirty) || removedItem > 0;
         }
 

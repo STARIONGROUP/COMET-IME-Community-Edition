@@ -50,6 +50,7 @@ namespace CDP4Composition.Diagram
         protected ThingDiagramContentItem(Thing thing)
         {
             this.Thing = thing;
+            this.Content = thing;
         }
 
         /// <summary>

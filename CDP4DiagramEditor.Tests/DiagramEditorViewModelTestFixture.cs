@@ -29,6 +29,9 @@ namespace CDP4DiagramEditor.Tests
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.CommonData;
@@ -39,6 +42,8 @@ namespace CDP4DiagramEditor.Tests
 
     using CDP4CommonView.Diagram;
 
+    using CDP4Composition.Diagram;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm.Behaviours;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -49,10 +54,13 @@ namespace CDP4DiagramEditor.Tests
     using CDP4Dal.Permission;
 
     using CDP4DiagramEditor.ViewModels;
+    using CDP4DiagramEditor.Views;
 
     using Moq;
 
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     using Point = System.Windows.Point;
 
@@ -65,7 +73,8 @@ namespace CDP4DiagramEditor.Tests
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<IDiagramDropInfo> dropinfo;
-        private Mock<IExtendedDiagramOrgChartBehavior> mockDiagramBehavior;
+        private Mock<IExtendedDiagramOrgChartBehavior> mockExtendedDiagramBehavior;
+        private Mock<ICdp4DiagramOrgChartBehavior> mockDiagramBehavior;
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
         private SiteDirectory sitedir;
@@ -79,9 +88,10 @@ namespace CDP4DiagramEditor.Tests
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private DiagramCanvas diagram;
-        private DiagramObject diagramObject1; 
+        private DiagramObject diagramObject1;
         private DiagramObject diagramObject2;
         private DiagramEdge connector;
+        private ElementDefinition elementDefinition;
         private Bounds bound1;
         private Bounds bound2;
 
@@ -98,7 +108,8 @@ namespace CDP4DiagramEditor.Tests
             this.session = new Mock<ISession>();
             this.assembler = new Assembler(this.uri);
             this.permissionService = new Mock<IPermissionService>();
-            this.mockDiagramBehavior = new Mock<IExtendedDiagramOrgChartBehavior>();
+            this.mockExtendedDiagramBehavior = new Mock<IExtendedDiagramOrgChartBehavior>();
+            this.mockDiagramBehavior = new Mock<ICdp4DiagramOrgChartBehavior>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -108,10 +119,11 @@ namespace CDP4DiagramEditor.Tests
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
-            this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) {Name = "model"};
+            this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
             this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) {Name = "domain"};
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
+
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri)
             {
                 Person = this.person,
@@ -130,7 +142,8 @@ namespace CDP4DiagramEditor.Tests
             {
                 EngineeringModelSetup = this.modelsetup
             };
-            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) {IterationSetup = this.iterationsetup};
+
+            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationsetup };
             this.iteration.DiagramCanvas.Add(this.diagram);
             this.model.Iteration.Add(this.iteration);
 
@@ -139,6 +152,7 @@ namespace CDP4DiagramEditor.Tests
 
             this.spec1 = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri);
             this.spec2 = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri);
+
             this.link1 = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri)
             {
                 Source = this.spec1,
@@ -158,6 +172,7 @@ namespace CDP4DiagramEditor.Tests
 
 
             var tuple = new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant);
+
             var openedIterations = new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
                 {
@@ -165,15 +180,16 @@ namespace CDP4DiagramEditor.Tests
                 }
             };
 
-            this.diagramObject1 = new DiagramObject(Guid.NewGuid(), this.cache, this.uri) {DepictedThing = this.spec1 };
-            this.diagramObject2 = new DiagramObject(Guid.NewGuid(), this.cache, this.uri) {DepictedThing = this.spec2};
+            this.diagramObject1 = new DiagramObject(Guid.NewGuid(), this.cache, this.uri) { DepictedThing = this.spec1 };
+            this.diagramObject2 = new DiagramObject(Guid.NewGuid(), this.cache, this.uri) { DepictedThing = this.spec2 };
+
             this.connector = new DiagramEdge(Guid.NewGuid(), this.cache, this.uri)
             {
                 Source = this.diagramObject1,
                 Target = this.diagramObject2,
                 DepictedThing = this.link1
             };
-
+            this.elementDefinition = new ElementDefinition() { Name = "WhyNot", ShortName = "WhyNot" };
             this.bound1 = new Bounds(Guid.NewGuid(), this.cache, this.uri)
             {
                 X = 1,
@@ -181,6 +197,7 @@ namespace CDP4DiagramEditor.Tests
                 Height = 12,
                 Width = 10
             };
+
             this.bound2 = new Bounds(Guid.NewGuid(), this.cache, this.uri)
             {
                 X = 1,
@@ -196,14 +213,16 @@ namespace CDP4DiagramEditor.Tests
             this.diagram.DiagramElement.Add(this.diagramObject2);
             this.diagram.DiagramElement.Add(this.connector);
 
-            
+
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(openedIterations);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
+            this.mockExtendedDiagramBehavior.Setup(x => x.GetDiagramPositionFromMousePosition(It.IsAny<Point>())).Returns(new Point());
             this.mockDiagramBehavior.Setup(x => x.GetDiagramPositionFromMousePosition(It.IsAny<Point>())).Returns(new Point());
+            this.mockDiagramBehavior.Setup(x => x.ItemPositions).Returns(new Dictionary<object, Point>() );
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
         }
@@ -265,7 +284,7 @@ namespace CDP4DiagramEditor.Tests
 
             var row = vm.ThingDiagramItems.First();
             vm.EventPublisher.Publish(new DiagramDeleteEvent(row));
-            
+
             Assert.AreEqual(1, vm.ThingDiagramItems.Count);
             Assert.IsFalse(vm.ThingDiagramItems.Any(x => x == row));
 
@@ -361,5 +380,57 @@ namespace CDP4DiagramEditor.Tests
             Assert.AreEqual(2, vm.DiagramConnectorCollection.Count);
             vm.Dispose();
         }
+
+        [Test, Apartment(ApartmentState.STA)]
+        public async Task VerifyThatIsDirtyIsTrueOnThingDropped()
+        {
+            var vm = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object);
+            Assert.IsFalse(vm.IsDirty);
+            vm.Behavior = this.mockDiagramBehavior.Object;//behavior.Object;
+            var drop = new Mock<IDiagramDropInfo>();
+            drop.Setup(x => x.Payload).Returns(this.elementDefinition);
+            drop.Setup(x => x.DiagramDropPoint).Returns(new Point(1, 1));
+            await vm.Drop(drop.Object);
+            Assert.IsTrue(vm.IsDirty);
+        }
+
+        [Test, Apartment(ApartmentState.STA)]
+        public async Task VerifyThatIsDirtyIsTrueOnThingDeleted()
+        {
+            var vm = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
+            {
+                Behavior = this.mockDiagramBehavior.Object
+            };
+
+            var drop = new Mock<IDiagramDropInfo>();
+            drop.Setup(x => x.Payload).Returns(this.elementDefinition);
+            drop.Setup(x => x.DiagramDropPoint).Returns(new Point(1, 1));
+            await vm.Drop(drop.Object);
+            vm.SaveDiagramCommand.Execute(null);
+            Assert.IsFalse(vm.IsDirty);
+            Assert.IsTrue(vm.ThingDiagramItems.Any());
+            vm.Behavior.DeleteItem(this.elementDefinition); 
+            var firstElement = vm.ThingDiagramItems.FirstOrDefault();
+            vm.ThingDiagramItems.Remove(firstElement);
+            Assert.IsTrue(vm.IsDirty && vm.ThingDiagramItems.IsEmpty);
+        }
+
+        //[Test(ExpectedResult = true)]
+        //public bool VerifyThatIsDirtyIsTrueOnThingMoved()
+        //{
+        //    return true;
+        //}
+
+        //[Test(ExpectedResult = false)]
+        //public bool VerifyThatIsDirtyIsFalseOnThingLoaded()
+        //{
+        //    return false;
+        //}
+
+        //[Test]
+        //public void VerifyThatRelationShipsGetDrawn()
+        //{
+
+        //}
     }
 }

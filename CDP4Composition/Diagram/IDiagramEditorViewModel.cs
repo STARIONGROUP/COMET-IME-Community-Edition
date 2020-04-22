@@ -41,8 +41,6 @@ namespace CDP4Composition.Diagram
         /// </summary>
         bool IsDirty { get; }
 
-        void UpdateThingsBounds();
-
         void ThingItemGotRemoved(object contentItemContent);
     }
 }
