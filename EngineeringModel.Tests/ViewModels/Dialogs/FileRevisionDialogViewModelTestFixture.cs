@@ -40,6 +40,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -66,6 +67,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
         private Mock<IPermissionService> permissionService;
         private Mock<ISession> session;
         private Mock<IOpenSaveFileDialogService> fileDialogService;
+        private Mock<IDownloadFileService> downloadFileService;
         private Mock<IThingSelectorDialogService> thingSelectorDialogService;
         private Mock<IServiceLocator> serviceLocator;
         private SiteDirectory sitedir;
@@ -98,11 +100,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
             this.fileDialogService = new Mock<IOpenSaveFileDialogService>();
+            this.downloadFileService = new Mock<IDownloadFileService>();
             this.thingSelectorDialogService = new Mock<IThingSelectorDialogService>();
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.fileDialogService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingSelectorDialogService>()).Returns(this.thingSelectorDialogService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IDownloadFileService>()).Returns(this.downloadFileService.Object);
 
             this.assembler = new Assembler(this.uri);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
@@ -353,11 +357,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, this.file);
             Assert.IsTrue(vm.CanDownloadFile);
 
-            this.fileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>())).Returns(default(string));
-
             vm.DownloadFileCommand.Execute(null);
 
-            this.fileDialogService.Verify(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()));
+            this.downloadFileService.Verify(x => x.ExecuteDownloadFile(vm, vm.Thing), Times.Once);
         }
 
         [Test]

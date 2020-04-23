@@ -66,7 +66,10 @@ namespace CDP4Composition.Extensions
             {
                 var fileContent = await session.ReadFile(fileRevision);
 
-                System.IO.File.WriteAllBytes(destinationPath, fileContent);
+                if (fileContent != null)
+                {
+                    System.IO.File.WriteAllBytes(destinationPath, fileContent);
+                }
             }
         }
 

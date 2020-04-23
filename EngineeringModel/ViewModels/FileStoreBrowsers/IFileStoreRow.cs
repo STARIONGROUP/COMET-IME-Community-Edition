@@ -35,7 +35,7 @@ namespace CDP4EngineeringModel.ViewModels.FileStoreBrowsers
     /// <summary>
     /// Interface that FileStoreRowViewModels and FolderRowViewModels should implement.
     /// </summary>
-    public interface IFileStoreRow<out T> : IISession, IHaveContainedRows, IViewModelBase<T> where T : FileStore
+    public interface IFileStoreRow<out T> : IISession, IHaveContainedRows, IViewModelBase<T>, IOwnedThingViewModel where T : FileStore
     {
     }
 }

@@ -39,7 +39,6 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Operations;
 
     using CDP4EngineeringModel.ViewModels.FileStoreBrowsers;
 

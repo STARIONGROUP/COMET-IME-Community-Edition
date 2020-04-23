@@ -40,23 +40,25 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.DragDrop;
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
+    using CDP4Composition.Views;
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Operations;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using ReactiveUI;
 
     /// <summary>
     /// The view-model for the <see cref="DomainFileStoreBrowserViewModel"/> view
     /// </summary>
-    public class DomainFileStoreBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget
+    public class DomainFileStoreBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget, IDownloadFileViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -92,6 +94,21 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="CanDownloadFile"/>
         /// </summary>
         private bool canDownloadFile;
+
+        /// <summary>
+        /// Backing field for <see cref="IsCancelButtonVisible"/>
+        /// </summary>
+        private bool isCancelButtonVisible;
+
+        /// <summary>
+        /// Backing field for <see cref="LoadingMessage"/>
+        /// </summary>
+        private string loadingMessage;
+
+        /// <summary>
+        /// The (injected) <see cref="IDownloadFileService"/>
+        /// </summary>
+        private IDownloadFileService downloadFileService = ServiceLocator.Current.GetInstance<IDownloadFileService>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainFileStoreBrowserViewModel"/> class.
@@ -187,6 +204,24 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the Cancel button is visible on the <see cref="LoadingControl"/>
+        /// </summary>
+        public bool IsCancelButtonVisible
+        {
+            get => this.isCancelButtonVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isCancelButtonVisible, value);
+        }
+
+        /// <summary>
+        /// Gets a value the message text on the <see cref="LoadingControl"/>
+        /// </summary>
+        public string LoadingMessage
+        {
+            get => this.loadingMessage;
+            set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
+        }
+
+        /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="DomainFileStore"/>
         /// </summary>
         public ReactiveCommand<object> CreateStoreCommand { get; private set; }
@@ -207,22 +242,38 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveCommand<object> DownloadFileCommand { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ICommand"/> to cancel download of a file
+        /// </summary>
+        public ReactiveCommand<object> CancelDownloadCommand { get; private set; }
+
+        /// <summary>
         /// Initializes the <see cref="ICommand"/>s
         /// </summary>
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
             this.CreateFolderCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateFolder));
-            this.CreateFolderCommand.Subscribe(_ => this.ExecuteCreateCommandForFolder(this.SelectedThing.Thing));
+            this.Disposables.Add(this.CreateFolderCommand.Subscribe(_ => this.ExecuteCreateCommandForFolder(this.SelectedThing.Thing)));
 
             this.CreateStoreCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateStore));
-            this.CreateStoreCommand.Subscribe(_ => this.ExecuteCreateCommand<DomainFileStore>(this.Thing));
+            this.Disposables.Add(this.CreateStoreCommand.Subscribe(_ => this.ExecuteCreateCommand<DomainFileStore>(this.Thing)));
 
             this.UploadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanUploadFile));
-            this.UploadFileCommand.Subscribe(_ => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing));
+            this.Disposables.Add(this.UploadFileCommand.Subscribe(_ => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing)));
+
+            this.CancelDownloadCommand = ReactiveCommand.Create();
+            this.Disposables.Add(this.CancelDownloadCommand.Subscribe(_ => this.downloadFileService.CancelDownloadFile(this)));
 
             this.DownloadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDownloadFile));
-            this.DownloadFileCommand.Subscribe(_ => this.ExecuteDownloadFile(this.SelectedThing.Thing));
+
+            this.Disposables.Add(this.DownloadFileCommand.Subscribe(
+                _ =>
+            {
+                if (this.SelectedThing.Thing is File file)
+                {
+                    this.downloadFileService.ExecuteDownloadFile(this, file);
+                }
+            }));
         }
 
         /// <summary>
@@ -244,11 +295,26 @@ namespace CDP4EngineeringModel.ViewModels
 
             var isContainer = this.SelectedThing?.Thing is DomainFileStore || this.SelectedThing?.Thing is Folder;
             var isFile = this.SelectedThing?.Thing is File;
+            var isOwner = this.IsOwner();
 
             this.CanCreateStore = this.PermissionService.CanWrite(ClassKind.DomainFileStore, this.Thing.Container);
-            this.CanCreateFolder = isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
-            this.CanUploadFile = isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
-            this.CanDownloadFile = isFile && this.PermissionService.CanRead(this.SelectedThing.Thing);
+            this.CanCreateFolder = isOwner && isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
+            this.CanUploadFile = isOwner && isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
+            this.CanDownloadFile = isOwner && isFile && this.PermissionService.CanRead(this.SelectedThing.Thing);
+        }
+
+        /// <summary>
+        /// Checks if the current <see cref="Participant"/>'s contained <see cref="Participant.Domain"/> contains the <see cref="IOwnedThingViewModel"/> instance's <see cref="IOwnedThingViewModel.Owner"/>.
+        /// </summary>
+        /// <returns>True if <see cref="IOwnedThingViewModel.Owner"/> is contained in <see cref="Participant.Domain"/>, otherwise false</returns>
+        private bool IsOwner()
+        {
+            if (this.SelectedThing is IOwnedThingViewModel ownedThing)
+            {
+                return this.Session.QueryDomainOfExpertise().Contains(ownedThing.Owner);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -258,8 +324,8 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulateContextMenu();
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Domain File Store", "", this.CreateStoreCommand, MenuItemKind.Create, ClassKind.DomainFileStore));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Add a File ", "", this.UploadFileCommand, MenuItemKind.Create, ClassKind.File));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Download File", "", this.DownloadFileCommand, MenuItemKind.Export, ClassKind.FileRevision));
         }
@@ -425,19 +491,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.ExecuteCreateCommand(file, container);
-        }
-
-        /// <summary>
-        /// Executes the DownloadFile command
-        /// </summary>
-        /// <param name="thing"></param>
-        private void ExecuteDownloadFile(Thing thing)
-        {
-            if (thing is File file)
-            {
-                var fileRevision = file.FileRevision.OrderByDescending(x => x.CreatedOn).FirstOrDefault();
-                fileRevision?.DownloadFile(this.Session);
-            }
         }
 
         /// <summary>

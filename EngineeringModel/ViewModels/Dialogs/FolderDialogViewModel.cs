@@ -134,6 +134,8 @@ namespace CDP4EngineeringModel.ViewModels
                     this.SelectedCreator = tuple?.Item2;
                 }
             }
+
+            this.SelectedOwner = this.SelectedOwner ?? this.Session.QueryCurrentDomainOfExpertise();
         }
 
         /// <summary>

@@ -23,6 +23,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
     using System;
@@ -100,7 +101,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             srdl.DefinedCategory.Add(new Category(Guid.NewGuid(), this.cache, this.uri));
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.engineeringModel.EngineeringModelSetup = engineeringModelSetup;
-            var iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
+            var iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = new IterationSetup() };
             this.engineeringModel.Iteration.Add(iteration);
             this.domainFileStore = new DomainFileStore(Guid.NewGuid(), this.cache, this.uri);
             iteration.DomainFileStore.Add(this.domainFileStore);
@@ -180,15 +181,24 @@ namespace CDP4EngineeringModel.Tests.Dialogs
                 new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
                     this.thingDialogNavigationService.Object, this.iterationClone);
 
+            Assert.IsTrue(domainFileStoreDialogViewModel.OkCanExecute);
+
+            domainFileStoreDialogViewModel.Name = null;
             Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
+
+            domainFileStoreDialogViewModel.CreatedOn = default;
+            Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
+
+            domainFileStoreDialogViewModel.SelectedOwner = null;
+            Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
+
             domainFileStoreDialogViewModel.Name = name;
-
             Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
+
             domainFileStoreDialogViewModel.CreatedOn = createdOn;
-
             Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
-            domainFileStoreDialogViewModel.SelectedOwner = this.domainOfExpertise;
 
+            domainFileStoreDialogViewModel.SelectedOwner = this.domainOfExpertise;
             Assert.IsTrue(domainFileStoreDialogViewModel.OkCanExecute);
         }
     }

@@ -118,6 +118,8 @@ namespace CDP4EngineeringModel.ViewModels
             base.UpdateProperties();
 
             this.CreatedOn = this.Thing.CreatedOn.Equals(DateTime.MinValue) ? DateTime.UtcNow : this.Thing.CreatedOn;
+            this.SelectedOwner = this.SelectedOwner ?? this.Session.QueryCurrentDomainOfExpertise();
+            this.Name = this.Name ?? this.SelectedOwner.Name;
         }
 
         /// <summary>

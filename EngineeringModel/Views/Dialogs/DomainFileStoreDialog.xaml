@@ -7,6 +7,7 @@
              xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              Height="410.405"
              Width="500"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -21,13 +22,18 @@
     <lc:LayoutGroup Margin="5"
                     Orientation="Vertical"
                     ScrollBars="None">
-        <lc:LayoutGroup Margin="-10,-7,-10,-5"
-                        Orientation="Vertical"
+        <lc:LayoutGroup Orientation="Vertical"
                         View="Tabs"
                         lc:LayoutControl.AllowHorizontalSizing="True">
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
                 <items:NameLayoutItem />
                 <items:OwnerLayoutItem />
+                <lc:LayoutItem Label="Private:">
+                    <dxe:CheckEdit Name="IsHidden" 
+                                   IsChecked="{Binding Path=IsHidden, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                   IsReadOnly="{Binding IsReadOnly}"/>
+
+                </lc:LayoutItem>
             </lc:LayoutGroup>
             <items:AdvancedLayoutGroup />
         </lc:LayoutGroup>

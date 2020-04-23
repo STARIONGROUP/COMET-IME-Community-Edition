@@ -38,9 +38,10 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Attributes;
-    using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
+    using CDP4Composition.Views;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
@@ -60,7 +61,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// the connected data-source
     /// </remarks>
     [ThingDialogViewModelExport(ClassKind.FileRevision)]
-    public class FileRevisionDialogViewModel : CDP4CommonView.FileRevisionDialogViewModel, IThingDialogViewModel
+    public class FileRevisionDialogViewModel : CDP4CommonView.FileRevisionDialogViewModel, IThingDialogViewModel, IDownloadFileViewModel
     {
         /// <summary>
         /// Backing field for <see cref="CanDownloadFile"/>
@@ -113,6 +114,16 @@ namespace CDP4EngineeringModel.ViewModels
         private string path;
 
         /// <summary>
+        /// Backing field for <see cref="IsCancelButtonVisible"/>
+        /// </summary>
+        private bool isCancelButtonVisible;
+
+        /// <summary>
+        /// Backing field for <see cref="LoadingMessage"/>
+        /// </summary>
+        private string loadingMessage;
+
+        /// <summary>
         /// The <see cref="IThingSelectorDialogService"/>
         /// </summary>
         private readonly IThingSelectorDialogService thingSelectorDialogService = ServiceLocator.Current.GetInstance<IThingSelectorDialogService>();
@@ -121,6 +132,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// The <see cref="IOpenSaveFileDialogService"/>
         /// </summary>
         private readonly IOpenSaveFileDialogService fileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
+
+        /// <summary>
+        /// The (injected) <see cref="IDownloadFileService"/>
+        /// </summary>
+        private IDownloadFileService downloadFileService = ServiceLocator.Current.GetInstance<IDownloadFileService>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileRevisionDialogViewModel"/> class.
@@ -299,6 +315,24 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the Cancel button is visible on the <see cref="LoadingControl"/>
+        /// </summary>
+        public bool IsCancelButtonVisible
+        {
+            get => this.isCancelButtonVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isCancelButtonVisible, value);
+        }
+
+        /// <summary>
+        /// Gets a value the message text on the <see cref="LoadingControl"/>
+        /// </summary>
+        public string LoadingMessage
+        {
+            get => this.loadingMessage;
+            set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
+        }
+
+        /// <summary>
         /// Gets the <see cref="ICommand"/> to download a file to a locally available drive
         /// </summary>
         public ReactiveCommand<object> DownloadFileCommand { get; private set; }
@@ -327,6 +361,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to to move a <see cref="FileType"/> up in the ordering of <see cref="FileType"/>s
         /// </summary>
         public ReactiveCommand<object> MoveDownFileTypeCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to cancel download of a file
+        /// </summary>
+        public ReactiveCommand<object> CancelDownloadCommand { get; private set; }
 
         /// <summary>
         /// Update the properties
@@ -377,9 +416,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeCommands();
 
-            this.DownloadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDownloadFile));
-            this.Disposables.Add(this.DownloadFileCommand.Subscribe(_ => this.Thing.DownloadFile(this.Session)));
-
             this.AddFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanAddFile));
             this.Disposables.Add(this.AddFileCommand.Subscribe(_ => this.AddFile()));
 
@@ -394,6 +430,12 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.MoveDownFileTypeCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanMoveDownFileType));
             this.Disposables.Add(this.MoveDownFileTypeCommand.Subscribe(_ => this.MoveDownFileType()));
+
+            this.DownloadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDownloadFile));
+            this.Disposables.Add(this.DownloadFileCommand.Subscribe(_ => this.downloadFileService.ExecuteDownloadFile(this, this.Thing)));
+
+            this.CancelDownloadCommand = ReactiveCommand.Create();
+            this.Disposables.Add(this.CancelDownloadCommand.Subscribe(_ => this.downloadFileService.CancelDownloadFile(this)));
         }
 
         /// <summary>

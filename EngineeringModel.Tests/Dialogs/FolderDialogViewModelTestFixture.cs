@@ -102,7 +102,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             srdl.DefinedCategory.Add(new Category(Guid.NewGuid(), this.cache, this.uri));
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.engineeringModel.EngineeringModelSetup = engineeringModelSetup;
-            var iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
+            var iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = new IterationSetup()};
             this.engineeringModel.Iteration.Add(iteration);
             this.folder = new Folder(Guid.NewGuid(), this.cache, this.uri);
             this.domainFileStore = new DomainFileStore(Guid.NewGuid(), this.cache, this.uri);
@@ -186,14 +186,26 @@ namespace CDP4EngineeringModel.Tests.Dialogs
                     this.thingDialogNavigationService.Object, this.domainFileStoreClone);
 
             Assert.IsFalse(folderDialogViewModel.OkCanExecute);
+
             folderDialogViewModel.Name = name;
+            Assert.IsTrue(folderDialogViewModel.OkCanExecute);
 
+            folderDialogViewModel.Name = default;
             Assert.IsFalse(folderDialogViewModel.OkCanExecute);
+
+            folderDialogViewModel.CreatedOn = default;
+            Assert.IsFalse(folderDialogViewModel.OkCanExecute);
+            
+            folderDialogViewModel.SelectedOwner = default;
+            Assert.IsFalse(folderDialogViewModel.OkCanExecute);
+
+            folderDialogViewModel.Name = name;
+            Assert.IsFalse(folderDialogViewModel.OkCanExecute);
+
             folderDialogViewModel.CreatedOn = createdOn;
-
             Assert.IsFalse(folderDialogViewModel.OkCanExecute);
-            folderDialogViewModel.SelectedOwner = this.domainOfExpertise;
 
+            folderDialogViewModel.SelectedOwner = this.domainOfExpertise;
             Assert.IsTrue(folderDialogViewModel.OkCanExecute);
         }
     }
