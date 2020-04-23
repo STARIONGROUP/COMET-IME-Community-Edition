@@ -30,9 +30,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using System.Windows;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
@@ -40,7 +38,6 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Attributes;
-    using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;

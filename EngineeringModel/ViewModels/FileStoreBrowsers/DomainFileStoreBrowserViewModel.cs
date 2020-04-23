@@ -40,7 +40,6 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.DragDrop;
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
