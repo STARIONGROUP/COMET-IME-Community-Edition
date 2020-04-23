@@ -6,17 +6,9 @@
 
 namespace CDP4Composition.Diagram
 {
-    using System;
-    using System.Windows.Media;
-
-    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
-
-    using DevExpress.Diagram.Core;
-
-    using ReactiveUI;
 
     /// <summary>
     /// Represents a <see cref="ThingDiagramContentItem"/> with a name.
@@ -33,7 +25,7 @@ namespace CDP4Composition.Diagram
         {
             this.SetProperty();
         }
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
         /// </summary>
@@ -69,7 +61,6 @@ namespace CDP4Composition.Diagram
                 this.ShortName = parameterBaseThing.UserFriendlyShortName;
             }
         }
-
 
         /// <summary>
         /// Gets or sets the class kind of the <see cref="NamedThingDiagramContentItem"/>

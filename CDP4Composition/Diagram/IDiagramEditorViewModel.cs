@@ -41,6 +41,10 @@ namespace CDP4Composition.Diagram
         /// </summary>
         bool IsDirty { get; }
 
-        void ThingItemGotRemoved(object contentItemContent);
+        /// <summary>
+        /// Removes a diagram item and its connectors.
+        /// </summary>
+        /// <param name="contentItemContent">The item to remove.</param>
+        void RemoveDiagramThingItem(object contentItemContent);
     }
 }

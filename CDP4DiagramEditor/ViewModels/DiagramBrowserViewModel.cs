@@ -48,8 +48,6 @@ namespace CDP4DiagramEditor.ViewModels
     /// </summary>
     public class DiagramBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
-        #region Fields
-
         /// <summary>
         /// Backing field for <see cref="CanSetDefaultDiagram"/>
         /// </summary>
@@ -80,9 +78,6 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         private const string PanelCaption = "Diagrams";
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramBrowserViewModel"/> class
         /// </summary>
@@ -102,9 +97,6 @@ namespace CDP4DiagramEditor.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -163,7 +155,6 @@ namespace CDP4DiagramEditor.ViewModels
         /// Gets the rows representing <see cref="Diagram"/>s
         /// </summary>
         public ReactiveList<DiagramCanvasRowViewModel> Diagrams { get; private set; }
-        #endregion
 
         /// <summary>
         /// Initializes the browser
@@ -239,8 +230,6 @@ namespace CDP4DiagramEditor.ViewModels
                 iteration.Dispose();
             }
         }
-
-        #region Private methods
 
         /// <summary>
         /// Update the <see cref="Diagrams"/> List
@@ -329,7 +318,5 @@ namespace CDP4DiagramEditor.ViewModels
             var vm = new DiagramEditorViewModel((DiagramCanvas)thing, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
             this.PanelNavigationService.Open(vm, true);
         }
-
-        #endregion
     }
 }

@@ -88,7 +88,7 @@ namespace CDP4Composition.Diagram
         /// </summary>
         public bool IsDirty { get; set; }
 
-        public IDisposable DirtyObservable { get; set; }
+        public IDisposable PositionObservable { get; set; }
 
         /// <summary>
         /// Set the <see cref="IsDirty"/> property

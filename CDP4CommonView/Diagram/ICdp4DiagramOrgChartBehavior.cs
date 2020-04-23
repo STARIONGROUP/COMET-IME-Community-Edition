@@ -1,14 +1,38 @@
-﻿using DevExpress.Xpf.Diagram;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ICdp4DiagramOrgChartBehavior.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView.Diagram
 {
-    using CDP4Common.CommonData;
+    using System.Collections.Generic;
+    using System.Windows;
+
+    using CDP4Composition.Diagram;
+
+    using DevExpress.Diagram.Core;
+    using DevExpress.Xpf.Diagram;
 
     public interface ICdp4DiagramOrgChartBehavior
     {
@@ -35,9 +59,9 @@ namespace CDP4CommonView.Diagram
         void ResetTool();
 
         /// <summary>
-        /// programmatically delete one diagram element containing the <param name="thing" ></param>
+        /// Applied the automatic layout to children of the item.
         /// </summary>
-        /// <param name="thing"></param>
-        //void DeleteItem(Thing thing);
+        /// <param name="item">The diagram item.</param>
+        void ApplyChildLayout(DiagramItem item);
     }
 }
