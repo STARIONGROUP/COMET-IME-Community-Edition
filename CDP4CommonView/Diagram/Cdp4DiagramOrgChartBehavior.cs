@@ -1014,14 +1014,5 @@ namespace CDP4CommonView.Diagram
         {
             this.AssociatedObject.ApplyMindMapTreeLayoutForSubordinates(new []{ item });
         }
-
-        /// <summary>
-        /// Removes the specified item from the diagram collection.
-        /// </summary>
-        /// <param name="item">The <see cref="DiagramItem"/> to remove.</param>
-        public void RemoveItem(DiagramItem item)
-        {
-            this.AssociatedObject.Items.Remove(item);
-        }
     }
 }

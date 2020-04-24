@@ -672,7 +672,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Execute the <see cref="GenerateDiagramCommandShallow"/>
         /// </summary>
-        private void ExecuteGenerateDiagramCommand(bool extendDeep)
+        public void ExecuteGenerateDiagramCommand(bool extendDeep)
         {
             foreach (var item in this.SelectedItems)
             {

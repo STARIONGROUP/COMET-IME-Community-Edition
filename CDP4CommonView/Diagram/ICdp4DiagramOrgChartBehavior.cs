@@ -29,8 +29,6 @@ namespace CDP4CommonView.Diagram
     using System.Collections.Generic;
     using System.Windows;
 
-    using CDP4Composition.Diagram;
-
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
 
