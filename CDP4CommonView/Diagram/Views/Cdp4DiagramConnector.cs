@@ -167,7 +167,6 @@ namespace CDP4CommonView.Diagram
             this.EndItem = this.GetDiagramContentItemToConnectTo(target);
         }
 
-
         /// <summary>
         /// Get the the target <see cref="DiagramContentItem"/>
         /// to be set either as <see cref="Cdp4DiagramConnector.BeginItem"/> or <see cref="Cdp4DiagramConnector.EndItem"/>

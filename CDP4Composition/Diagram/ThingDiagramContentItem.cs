@@ -88,12 +88,13 @@ namespace CDP4Composition.Diagram
         /// </summary>
         public bool IsDirty { get; set; }
 
+        /// <summary>
+        /// The observable for when the position of the view object changed
+        /// </summary>
         public IDisposable PositionObservable { get; set; }
 
         /// <summary>
-        /// Set the <see cref="IsDirty"/> property
-        /// REMARQUE the Height and Width are not monitored since visual containers are not resizable
-        /// <code>(float) parent.ActualHeight != bound.Height || (float) parent.ActualWidth != bound.Width</code>
+        /// Sets the <see cref="IsDirty"/> property
         /// </summary>
         public void SetDirty()
         {

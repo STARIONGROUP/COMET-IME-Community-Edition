@@ -156,14 +156,8 @@ namespace CDP4Composition.Adapters
                 {
                     if (this.regionTarget.Items?.Any(cat => (cat as ExtendedRibbonPageCategory)?.Name == category.Name) == false)
                     {
-                        //this.regionTarget.Categories.Add(category);
                         this.regionTarget.Items.Add(category);
-
                         logger.Debug("Category {0} added to RibbonControl", category.Name);
-                    }
-                    else
-                    {
-                        logger.Warn("Category {0} has already been added", category.Name);
                     }
                 }
             }

@@ -46,7 +46,6 @@ namespace CDP4CommonView.Diagram.ViewModels
     /// </summary>
     public class PortContainerDiagramContentItem : NamedThingDiagramContentItem
     {
-
         /// <summary>
         /// The logger for the current class
         /// </summary>

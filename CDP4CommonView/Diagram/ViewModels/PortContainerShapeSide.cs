@@ -36,9 +36,25 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// Default value
         /// </summary>
         Undefined = -1,
+
+        /// <summary>
+        /// Represent the bottom side of the port container <see cref="PortContainerDiagramContentItem"/>
+        /// </summary>
         Bottom = 0,
+
+        /// <summary>
+        /// Represent the left side of the port container <see cref="PortContainerDiagramContentItem"/>
+        /// </summary>
         Left = 25,
+
+        /// <summary>
+        /// represent the top side of the port container <see cref="PortContainerDiagramContentItem"/>
+        /// </summary>
         Top = 50,
+
+        /// <summary>
+        /// Represent the right side of the port container <see cref="PortContainerDiagramContentItem"/>
+        /// </summary>
         Right = 75
     }
 }

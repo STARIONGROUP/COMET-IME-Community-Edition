@@ -57,8 +57,13 @@ namespace CDP4CommonView.Diagram
     using Point = System.Windows.Point;
 
     /// <summary>
-    /// Allows proper callbacks on the DiagramEditor
+    /// The purpose of the <see cref="Cdp4DiagramOrgChartBehavior"/> is to handle events from 
+    /// the attached view of type <see cref="Cdp4DiagramControl"/>  and to relay relatable
+    /// data from and to the viewModel of type <see cref="IDiagramEditorViewModel"/>
     /// </summary>
+    /// <remarks>
+    /// This behavior is meant to be attached to the DiagramEditor view from CDP4DiagramEditor plugin
+    /// </remarks>
     public class Cdp4DiagramOrgChartBehavior : DiagramOrgChartBehavior, ICdp4DiagramOrgChartBehavior
     {
         /// <summary>
@@ -92,12 +97,16 @@ namespace CDP4CommonView.Diagram
         private List<RibbonPageCategoryBase> mergedCategories;
 
         /// <summary>
-        /// The main ribbon of tha shell.
+        /// The main ribbon of the shell.
         /// </summary>
         private RibbonControl parentRibbon;
 
         /// <summary>
-        /// Making sure stuff gets call only once example: draw the connector when the view did loaded
+        /// Holds the value whether the view has loaded for the first time or it has appeared
+        /// <remarks>
+        /// Since the <see cref="Loaded"/> event handler gets called whenever the view reappears from not being active within its tabgroup
+        /// and then reappears, the value of <see cref="hasFirstLoadHappened"/> is used as a condition to draw the connector when the view did loaded for first time
+        /// </remarks>
         /// </summary>
         private bool hasFirstLoadHappened;
 
@@ -466,7 +475,6 @@ namespace CDP4CommonView.Diagram
             base.OnAttached();
             this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
 
-            //this.AssociatedObject.Items.CollectionChanged += this.OnControlCollectionChanged;
             this.AssociatedObject.SelectionChanged += this.OnControlSelectionChanged;
 
             this.AssociatedObject.LayoutUpdated += this.LayoutUpdated;
