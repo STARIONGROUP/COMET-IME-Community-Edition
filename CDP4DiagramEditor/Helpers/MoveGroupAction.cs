@@ -95,6 +95,10 @@ namespace CDP4DiagramEditor.Helpers
             this.RibbonRegion = this.RegionManager?.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);
         }
 
+        /// <summary>
+        /// The main logic that is being executed when this <see cref="MoveGroupAction"/> action is used
+        /// </summary>
+        /// <param name="context"></param>
         protected override void ExecuteCore(DependencyObject context)
         {
             var page = this.RibbonRegion?.Views.OfType<ExtendedRibbonPage>().FirstOrDefault(rb => (string)rb.Caption == this.TargetPageCaption);
@@ -113,6 +117,10 @@ namespace CDP4DiagramEditor.Helpers
             }
         }
 
+        /// <summary>
+        /// Returns an object that is manipulated by the <see cref="MoveGroupAction"/>
+        /// </summary>
+        /// <returns></returns>
         public override object GetObjectCore()
         {
             return null;

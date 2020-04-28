@@ -38,15 +38,8 @@ namespace CDP4CommonView.Diagram.Behaviors
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="DiagramPortShapeBehavior"/> is to:
-    /// <list type="bullet">
-    /// <item>
-    ///     update the position of the attached <see cref="DiagramPortShape"/>
-    /// </item>
-    /// <item>
-    ///     set the correct orientation of the connection point of the attached <see cref="DiagramPortShape"/>
-    /// </item>
-    /// </list>
+    /// The purpose of the <see cref="DiagramPortShapeBehavior"/> is to update the position
+    /// and to set the correct orientation of the connection point of the attached <see cref="DiagramPortShape"/>
     /// </summary>
     public class DiagramPortShapeBehavior : Behavior<DiagramPortShape>
     {

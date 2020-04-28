@@ -23,13 +23,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4DiagramEditor.Helpers
 {
     using System;
     using System.Globalization;
     using System.Windows.Data;
+
     using CDP4Common.CommonData;
+
     using CDP4Composition.Converters;
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ThingDiagramContentItem.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -67,7 +67,6 @@ namespace CDP4Composition.Diagram
             this.DiagramThing = diagramThing;
         }
 
-
         /// <summary>
         /// The <see cref="IDiagramEditorViewModel"/> container
         /// </summary>
@@ -108,6 +107,7 @@ namespace CDP4Composition.Diagram
 
             this.containerViewModel?.UpdateIsDirty();
         }
+
         /// <summary>
         /// Update the transaction with the data contained in this view-model
         /// </summary>
@@ -128,6 +128,7 @@ namespace CDP4Composition.Diagram
             {
                 var clone = this.DiagramThing.Clone(true);
                 var bound = clone.Bounds.SingleOrDefault();
+
                 if (bound != null)
                 {
                     this.UpdateBound(bound);

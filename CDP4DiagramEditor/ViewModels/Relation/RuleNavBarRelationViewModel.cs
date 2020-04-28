@@ -28,30 +28,36 @@ namespace CDP4DiagramEditor.ViewModels.Relation
 {
     using System;
     using System.Linq;
-
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView;
 
     using CDP4Composition.Diagram;
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
+
     using ReactiveUI;
 
+    /// <summary>
+    /// Represent a rule for the navigation bar
+    /// </summary>
     public class RuleNavBarRelationViewModel : RuleRowViewModel<Rule>
-    { /// <summary>
-      /// Initializes a new instance of the <see cref="RuleNavBarItemViewModel"/> class.
-      /// </summary>
-      /// <param name="rule">The rule referenced by this row</param>
-      /// <param name="session">The session</param>
-      /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RuleNavBarRelationViewModel"/> class.
+        /// </summary>
+        /// <param name="rule">The rule referenced by this row</param>
+        /// <param name="session">The session</param>
+        /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
         public RuleNavBarRelationViewModel(Rule rule, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(rule, session, containerViewModel)
         {
             this.InitializeCommands();
         }
-
 
         /// <summary>
         /// Gets the public command to create a relationship.
@@ -92,9 +98,7 @@ namespace CDP4DiagramEditor.ViewModels.Relation
         /// </summary>
         private void ExecuteCreateRelationshipCommand()
         {
-            var diagramVm = this.ContainerViewModel as DiagramEditorViewModel;
-
-            if (diagramVm == null)
+            if (!(this.ContainerViewModel is DiagramEditorViewModel))
             {
                 throw new NullReferenceException("The Relationship Editor view mdoel is not set");
             }
