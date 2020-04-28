@@ -94,7 +94,7 @@ namespace CDP4CommonView.ViewModels
             var rdlsInChain = this.ChainOfContainer.Where(x => x is ReferenceDataLibrary).ToList();
             if (rdlsInChain.Any())
             {
-                referenceSources = rdlsInChain.SelectMany(x => ((ReferenceDataLibrary)x).ReferenceSource);
+                referenceSources = rdlsInChain.SelectMany(x => ((ReferenceDataLibrary)x).ReferenceSource).OrderBy(x=>x.Name);
             }
 
             this.PossibleSource.AddRange(referenceSources);
