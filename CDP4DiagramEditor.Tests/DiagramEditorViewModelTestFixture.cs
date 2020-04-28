@@ -214,9 +214,7 @@ namespace CDP4DiagramEditor.Tests
             this.diagram.DiagramElement.Add(this.diagramObject1);
             this.diagram.DiagramElement.Add(this.diagramObject2);
             this.diagram.DiagramElement.Add(this.connector);
-
-
-
+            
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(openedIterations);

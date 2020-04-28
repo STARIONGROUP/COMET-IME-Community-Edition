@@ -660,7 +660,7 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 Source = source,
                 Target = target,
-                DepictedThing = binaryRelationship,
+                DepictedThing = binaryRelationship
             };
 
             connectorItem = new DiagramEdgeViewModel(connector, this.Session, this);

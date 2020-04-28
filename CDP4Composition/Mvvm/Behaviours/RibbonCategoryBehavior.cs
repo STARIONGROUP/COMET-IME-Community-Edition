@@ -70,7 +70,7 @@ namespace CDP4Composition.Mvvm.Behaviours
         public string CategoryName { get; set; }
 
         /// <summary>
-        /// <see cref="DependencyProperty"/> that
+        /// <see cref="DependencyProperty"/> that binds the name of the ribbon category to <see cref="CategoryName"/>
         /// </summary>
         public static readonly DependencyProperty CategoryNameProperty =
             DependencyProperty.RegisterAttached(

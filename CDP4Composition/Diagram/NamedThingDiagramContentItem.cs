@@ -31,7 +31,7 @@ namespace CDP4Composition.Diagram
     using CDP4Common.EngineeringModelData;
 
     /// <summary>
-    /// Represents a <see cref="ThingDiagramContentItem"/> with a name and a class kind
+    /// Represents a <see cref="ThingDiagramContentItem"/> with a name and a <see cref="ClassKind"/>
     /// </summary>
     public class NamedThingDiagramContentItem : ThingDiagramContentItem
     {
@@ -49,10 +49,12 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
         /// </summary>
-        /// <param name="diagramthing"></param>
-        /// <param name="container"></param>
-        public NamedThingDiagramContentItem(DiagramObject diagramthing, IDiagramEditorViewModel container) 
-            : base(diagramthing, container)
+        /// <param name="diagramThing">
+        /// The diagramThing contained</param>
+        /// <param name="container">
+        /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
+        public NamedThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel container) 
+            : base(diagramThing, container)
         {
             this.SetProperty();
         }

@@ -321,13 +321,13 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Computes the diagram connectors.
         /// </summary>
-        /// <param name="oldDigramConnectors">The collection of old connectors.</param>
+        /// <param name="oldDiagramConnectors">The collection of old connectors.</param>
         /// <param name="newDiagramConnectors">The collection of new connectors.</param>
-        private void ComputeOldNewDiagramConnector(IList oldDigramConnectors, IList newDiagramConnectors)
+        private void ComputeOldNewDiagramConnector(IList oldDiagramConnectors, IList newDiagramConnectors)
         {
-            if (oldDigramConnectors != null)
+            if (oldDiagramConnectors != null)
             {
-                foreach (IDiagramConnectorViewModel item in oldDigramConnectors)
+                foreach (IDiagramConnectorViewModel item in oldDiagramConnectors)
                 {
                     var diagramObj = this.AssociatedObject.Items.SingleOrDefault(x => x.DataContext == item);
 
@@ -454,7 +454,7 @@ namespace CDP4CommonView.Diagram
         /// The event-handler for the <see cref="DiagramControl.Items"/> collection change
         /// </summary>
         /// <param name="sender">The sender</param>
-        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/></param>
+        /// <param name="e">The arguments</param>
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (this.AssociatedObject.DataContext is ICdp4DiagramContainer viewModel && viewModel.Behavior == null)
@@ -563,8 +563,8 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Update ports position according to their element definition new position
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The arguments</param>
         private void LayoutUpdated(object sender, EventArgs e)
         {
             foreach (var portContainer in this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content as PortContainerDiagramContentItem))
@@ -586,7 +586,9 @@ namespace CDP4CommonView.Diagram
             {
                 if (e.Item is DiagramPortShape port)
                 {
-                    var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content).OfType<PortContainerDiagramContentItem>().FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
+                    var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().
+                        Select(i => i.Content).OfType<PortContainerDiagramContentItem>().
+                        FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
                     container?.PortCollection.Remove(container.PortCollection.FirstOrDefault(i => i == port.DataContext));
                 }
 
@@ -669,7 +671,7 @@ namespace CDP4CommonView.Diagram
         {
             foreach (var ribbonPageCategoryBase in this.mergedCategories)
             {
-                ((IRibbonMergingSupport) this.mergeCategory).Unmerge(ribbonPageCategoryBase);
+                (this.mergeCategory as IRibbonMergingSupport)?.Unmerge(ribbonPageCategoryBase);
             }
 
             // select a valid selected page
@@ -874,10 +876,8 @@ namespace CDP4CommonView.Diagram
         {
             this.dropInfo = new DiagramDropInfo(sender, e);
 
-            var senda = ((DiagramControl) sender).PrimarySelection;
-
             //If the sender is a port and its element definition is not selected
-            if (senda is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
+            if (((DiagramControl)sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
             {
                 e.Handled = true;
                 return;

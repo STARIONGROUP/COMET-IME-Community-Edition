@@ -221,10 +221,7 @@ namespace CDP4Composition.Adapters
                     {
                         var categoryName = ribbonPage.CustomPageCategoryName;
 
-                        var customPageCategory =
-                            this.region.Views.OfType<ExtendedRibbonPageCategory>().ToList().FirstOrDefault(cat => cat.Name == categoryName);
-                            //this.regionTarget.SelfCategories.OfType<RibbonPageCategory>()
-                            //    .SingleOrDefault(x => x.Name == categoryName);
+                        var customPageCategory = this.region.Views.OfType<ExtendedRibbonPageCategory>().FirstOrDefault(cat => cat.Name == categoryName);
 
                         if (customPageCategory != null)
                         {

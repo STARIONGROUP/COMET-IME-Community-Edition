@@ -45,16 +45,16 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// <summary>
         /// Represent the left side of the port container <see cref="PortContainerDiagramContentItem"/>
         /// </summary>
-        Left = 25,
+        Left = 1,
 
         /// <summary>
         /// represent the top side of the port container <see cref="PortContainerDiagramContentItem"/>
         /// </summary>
-        Top = 50,
+        Top = 2,
 
         /// <summary>
         /// Represent the right side of the port container <see cref="PortContainerDiagramContentItem"/>
         /// </summary>
-        Right = 75
+        Right = 3
     }
 }

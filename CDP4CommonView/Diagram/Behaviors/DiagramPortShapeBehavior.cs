@@ -35,8 +35,6 @@ namespace CDP4CommonView.Diagram.Behaviors
     using DevExpress.Diagram.Core;
     using DevExpress.Mvvm.UI.Interactivity;
 
-    using ReactiveUI;
-
     /// <summary>
     /// The purpose of the <see cref="DiagramPortShapeBehavior"/> is to update the position
     /// and to set the correct orientation of the connection point of the attached <see cref="DiagramPortShape"/>
@@ -44,24 +42,30 @@ namespace CDP4CommonView.Diagram.Behaviors
     public class DiagramPortShapeBehavior : Behavior<DiagramPortShape>
     {
         /// <summary>
+        /// Gets or sets the viewModel <see cref="IDiagramPortViewModel"/> of the attached view <see cref="DiagramPortShape"/>
+        /// </summary>
+        private IDiagramPortViewModel viewModel;
+
+        /// <summary>
         /// The on Attached event Handler
         /// </summary>
         protected override void OnAttached()
         {
             base.OnAttached();
 
-            (this.AssociatedObject.DataContext as IDiagramPortViewModel).WhenPositionIsUpdated += this.WhenPositionIsUpdated;
+            this.viewModel = (IDiagramPortViewModel) this.AssociatedObject.DataContext;
+            this.viewModel.WhenPositionIsUpdated += this.WhenPositionIsUpdated;
             this.DeterminePortConnectorRotation();
         }
 
         /// <summary>
         /// Event handler of the event firing when Position property has changed
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The arguments</param>
         private void WhenPositionIsUpdated(object sender, EventArgs e)
         {
-            this.AssociatedObject.Position = (this.AssociatedObject.DataContext as IDiagramPortViewModel).Position;
+            this.AssociatedObject.Position = this.viewModel.Position;
         }
 
         /// <summary>
@@ -70,7 +74,7 @@ namespace CDP4CommonView.Diagram.Behaviors
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            (this.AssociatedObject.DataContext as IDiagramPortViewModel).WhenPositionIsUpdated -= this.WhenPositionIsUpdated;
+            this.viewModel.WhenPositionIsUpdated -= this.WhenPositionIsUpdated;
         }
 
         /// <summary>
@@ -78,9 +82,9 @@ namespace CDP4CommonView.Diagram.Behaviors
         /// </summary>
         public void DeterminePortConnectorRotation()
         {
-            var datacontext = ((IDiagramPortViewModel)this.AssociatedObject.DataContext);
-            this.AssociatedObject.Position = datacontext.Position;
-            switch (datacontext.PortContainerShapeSide)
+            this.AssociatedObject.Position = this.viewModel.Position;
+
+            switch (this.viewModel.PortContainerShapeSide)
             {
                 case PortContainerShapeSide.Top:
                     this.AssociatedObject.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.5, 0) });

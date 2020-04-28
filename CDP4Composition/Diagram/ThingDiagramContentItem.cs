@@ -58,7 +58,8 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="diagramThing">
         /// The diagramThing contained</param>
-        /// <param name="containerViewModel"></param>
+        /// <param name="containerViewModel">
+        /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
         protected ThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel containerViewModel)
         {
             this.containerViewModel = containerViewModel;
@@ -78,7 +79,7 @@ namespace CDP4Composition.Diagram
         public Thing Thing { get; set; }
 
         /// <summary>
-        /// Gets or sets
+        /// Gets or sets the <see cref="CDP4Common.CommonData.Thing"/> representing the diagram with all of its diagram elements
         /// </summary>
         public DiagramObject DiagramThing { get; set; }
 

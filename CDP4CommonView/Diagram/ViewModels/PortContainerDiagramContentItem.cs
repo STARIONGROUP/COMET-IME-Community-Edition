@@ -59,8 +59,10 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// <summary>
         /// Initialize a new <see cref="PortContainerDiagramContentItem"/>
         /// </summary>
-        /// <param name="thing"></param>
-        /// <param name="container"></param>
+        /// <param name="thing">
+        /// The diagramThing contained</param>
+        /// <param name="container">
+        /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
         public PortContainerDiagramContentItem(DiagramObject thing, IDiagramEditorViewModel container) : base(thing, container)
         {
             this.PortCollection = new ReactiveList<IDiagramPortViewModel>();
@@ -137,12 +139,10 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// <summary>
         /// Calculate the next available side where a port can join
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns a <see cref="PortContainerShapeSide"/></returns>
         private PortContainerShapeSide GetAvailableSide()
         {
-            var split = ((double)this.PortCollection.Count(p => p.PortContainerShapeSide > PortContainerShapeSide.Undefined)) / 4;
-            var place = Math.Abs(split - Math.Truncate(split)) * 100;
-            return (PortContainerShapeSide)place;
+            return (PortContainerShapeSide)(this.PortCollection.Count(p => p.PortContainerShapeSide > PortContainerShapeSide.Undefined) % 4);
         }
 
         /// <summary>

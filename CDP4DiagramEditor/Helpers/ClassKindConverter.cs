@@ -52,7 +52,7 @@ namespace CDP4DiagramEditor.Helpers
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var converter = new CamelCaseToSpaceConverter();
-            return string.Format("<<{0}>>", converter.Convert(value, targetType, parameter, culture));
+            return $"<<{converter.Convert(value, targetType, parameter, culture)}>>";
         }
 
         /// <summary>
