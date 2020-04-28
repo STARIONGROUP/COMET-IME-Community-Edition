@@ -159,7 +159,6 @@
   <ItemGroup>
     <Compile Include="Comparers\ParameterGroupChildRowComparerTestFixture.cs" />
     <Compile Include="Comparers\ElementBaseChildRowComparerTestFixture.cs" />
-    <Compile Include="converters\CommonFileStoreIconConverterTestFixture.cs" />
     <Compile Include="converters\DataTypeConverterTestFixture.cs" />
     <Compile Include="converters\ElementDefinitionBrowserIconConverterTestFixture.cs" />
     <Compile Include="Dialogs\ActualFiniteStateDialogViewModelTestFixture.cs" />
