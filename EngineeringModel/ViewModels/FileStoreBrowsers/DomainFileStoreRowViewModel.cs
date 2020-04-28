@@ -84,6 +84,16 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateProperties()
         {
             this.fileStoreFileAndFolderHandler.UpdateFileRows();
+            this.UpdateThingStatus();
+        }
+
+        /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            base.UpdateThingStatus();
+            this.ThingStatus = new ThingStatus(this.Thing) { IsHidden = this.IsHidden };
         }
 
         /// <summary>

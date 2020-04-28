@@ -11,6 +11,7 @@
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             xmlns:converters="clr-namespace:CDP4EngineeringModel.Converters"
              Height="380"
              Width="500"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -20,6 +21,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/ErrorTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <converters:FileRevisionBackgroundConverter x:Key="FileRevisionBackgroundConverter" />
+            <converters:FileRevisionOpacityConverter x:Key="FileRevisionOpacityConverter" />
         </ResourceDictionary>
     </dx:DXWindow.Resources>
     <Grid>
@@ -73,6 +76,9 @@
                                  AllowLiveDataShaping="False"
                                  ItemsSource="{Binding FileRevision}"
                                  SelectedItem="{Binding SelectedFileRevision}">
+                            <dxg:GridControl.SortInfo>
+                                <dxg:GridSortInfo FieldName="CreatedOn" SortOrder="Descending" />
+                            </dxg:GridControl.SortInfo>
                             <dxg:GridControl.View>
                                 <dxg:TableView Name="View"
                                                    HorizontalAlignment="Stretch"
@@ -87,6 +93,8 @@
                                     <dxg:TableView.RowStyle>
                                         <Style TargetType="{x:Type dxg:RowControl}">
                                             <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                                            <Setter Property="Background" Value="{Binding Row, Converter={StaticResource FileRevisionBackgroundConverter}}"/>
+                                            <Setter Property="Opacity" Value="{Binding Row, Converter={StaticResource FileRevisionOpacityConverter}}"/>
                                         </Style>
                                     </dxg:TableView.RowStyle>
                                 </dxg:TableView>
