@@ -17,6 +17,7 @@ namespace CDP4CommonView
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
+    using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     
     using CDP4Composition.Mvvm;
@@ -188,8 +189,9 @@ namespace CDP4CommonView
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-            
+
             var canExecuteCreateCitationCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
+            //var canExecuteCreateCitationCommand = this.WhenAny(vm => vm.ChainOfContainer, v => v.Value.Any(x => x is ReferenceDataLibrary));
             var canExecuteInspectSelectedCitationCommand = this.WhenAny(vm => vm.SelectedCitation, v => v.Value != null);
             var canExecuteEditSelectedCitationCommand = this.WhenAny(vm => vm.SelectedCitation, v => v.Value != null && !this.IsReadOnly);
 
