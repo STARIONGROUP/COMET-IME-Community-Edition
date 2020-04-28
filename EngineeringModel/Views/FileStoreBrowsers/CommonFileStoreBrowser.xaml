@@ -26,7 +26,7 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <converters:CommonFileStoreIconConverter x:Key="ThingToIconUriConverter" />
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
 
             <HierarchicalDataTemplate DataType="{x:Type viewModels:CommonFileStoreRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>

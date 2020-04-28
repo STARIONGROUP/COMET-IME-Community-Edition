@@ -76,6 +76,11 @@ namespace CDP4EngineeringModel.ViewModels
         private int currentIteration;
 
         /// <summary>
+        /// The currently known <see cref="Person"/>
+        /// </summary>
+        private Person currentPerson;
+
+        /// <summary>
         /// Backing field for <see cref="CancreateFolder"/>
         /// </summary>
         private bool canCreateFolder;
@@ -298,23 +303,37 @@ namespace CDP4EngineeringModel.ViewModels
             var isOwner = this.IsOwner();
 
             this.CanCreateStore = this.PermissionService.CanWrite(ClassKind.DomainFileStore, this.Thing.Container);
-            this.CanCreateFolder = isOwner && isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
-            this.CanUploadFile = isOwner && isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
-            this.CanDownloadFile = isOwner && isFile && this.PermissionService.CanRead(this.SelectedThing.Thing);
+            this.CanCreateFolder = (isOwner ?? false) && isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
+            this.CanUploadFile = (isOwner ?? false) && isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
+            this.CanDownloadFile = (isOwner ?? false) && isFile && this.PermissionService.CanRead(this.SelectedThing.Thing);
+            
+            this.CanWriteSelectedThing = this.CanWriteSelectedThing && (isOwner ?? true);
+
+            if (this.CanWriteSelectedThing && this.SelectedThing.Thing is File file && (file.LockedBy != null))
+            {
+                if (this.currentPerson != file.LockedBy)
+                {
+                    this.CanWriteSelectedThing = false;
+                }
+            }
         }
 
         /// <summary>
         /// Checks if the current <see cref="Participant"/>'s contained <see cref="Participant.Domain"/> contains the <see cref="IOwnedThingViewModel"/> instance's <see cref="IOwnedThingViewModel.Owner"/>.
         /// </summary>
-        /// <returns>True if <see cref="IOwnedThingViewModel.Owner"/> is contained in <see cref="Participant.Domain"/>, otherwise false</returns>
-        private bool IsOwner()
+        /// <returns>
+        /// True if <see cref="IOwnedThingViewModel.Owner"/> is contained in <see cref="Participant.Domain"/>, 
+        /// False if <see cref="IOwnedThingViewModel.Owner"/> is not contained in <see cref="Participant.Domain"/>
+        /// If the current <see cref="SelectedThing"/> is not an <see cref="IOwnedThingViewModel"/>, it returns null.
+        /// </returns>
+        private bool? IsOwner()
         {
             if (this.SelectedThing is IOwnedThingViewModel ownedThing)
             {
                 return this.Session.QueryDomainOfExpertise().Contains(ownedThing.Owner);
             }
 
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -430,6 +449,12 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.CurrentModel = this.CurrentEngineeringModelSetup.Name;
             this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
+            this.currentPerson = null;
+
+            if (this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple))
+            {
+                this.currentPerson = tuple?.Item2.Person;
+            }
 
             var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
 

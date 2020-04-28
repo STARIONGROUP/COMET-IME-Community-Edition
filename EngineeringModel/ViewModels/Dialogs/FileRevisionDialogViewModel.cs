@@ -404,7 +404,14 @@ namespace CDP4EngineeringModel.ViewModels
             base.Initialize();
             this.PopulatePossibleFileType();
 
-            this.CanDownloadFile = (this.Thing != null) && (this.dialogKind != ThingDialogKind.Create);
+            var isOwner = false;
+
+            if (this.Container is File file)
+            {
+                isOwner = this.Session.QueryDomainOfExpertise().Contains(file.Owner);
+            }
+
+            this.CanDownloadFile = (this.Thing != null) && isOwner && (this.dialogKind != ThingDialogKind.Create) && this.PermissionService.CanRead(this.Thing);
             this.CanAddFile = this.dialogKind == ThingDialogKind.Create;
             this.CanAddFileType = !this.IsReadOnly;
         }
