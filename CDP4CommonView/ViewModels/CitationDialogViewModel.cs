@@ -96,11 +96,11 @@ namespace CDP4CommonView.ViewModels
             {
                 referenceSources = rdlsInChain.SelectMany(x => ((ReferenceDataLibrary)x).ReferenceSource).OrderBy(x=>x.Name);
             }
-            this.PossibleSource.AddRange(referenceSources);
-            //if (referenceSources != null)
-            //{
-            //    this.PossibleSource.AddRange(referenceSources);
-            //}
+
+            if (referenceSources != null)
+            {
+                this.PossibleSource.AddRange(referenceSources);
+            }
         }
     }
 }

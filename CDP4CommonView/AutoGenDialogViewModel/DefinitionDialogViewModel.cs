@@ -190,8 +190,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
 
-            var canExecuteCreateCitationCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
-            //var canExecuteCreateCitationCommand = this.WhenAny(vm => vm.ChainOfContainer, v => v.Value.Any(x => x is ReferenceDataLibrary));
+            var canExecuteCreateCitationCommand = this.WhenAny(vm => vm.ChainOfContainer, v => v.Value.Any(x => x is ReferenceDataLibrary));
             var canExecuteInspectSelectedCitationCommand = this.WhenAny(vm => vm.SelectedCitation, v => v.Value != null);
             var canExecuteEditSelectedCitationCommand = this.WhenAny(vm => vm.SelectedCitation, v => v.Value != null && !this.IsReadOnly);
 
