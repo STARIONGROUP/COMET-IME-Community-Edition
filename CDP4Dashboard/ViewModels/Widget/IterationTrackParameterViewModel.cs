@@ -197,6 +197,11 @@ namespace CDP4Dashboard.ViewModels.Widget
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(async _ => await this.RefreshData()));
 
+            CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationTrackParameter.ParameterOrOverride)
+                .Where(objectChange => objectChange.EventKind == EventKind.Removed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(async _ => await this.OnDeleteCommand.ExecuteAsyncTask());
+
             this.OnRefreshCommand.Execute(null);
         }
 

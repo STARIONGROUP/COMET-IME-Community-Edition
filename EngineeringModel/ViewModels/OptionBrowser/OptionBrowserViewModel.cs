@@ -342,11 +342,14 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            var row = this.Options.Single(x => x.Thing == defaultOption);
-            this.defaultOptionRow = row;
-            row.IsDefaultOption = true;
-        }
+            var row = this.Options.SingleOrDefault(x => x.Thing == defaultOption);
 
+            if (row != null)
+            {
+                this.defaultOptionRow = row;
+                row.IsDefaultOption = true;
+            }
+        }
 
         /// <summary>
         /// Executes the <see cref="SetDefaultCommand"/>

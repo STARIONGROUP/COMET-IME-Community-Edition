@@ -207,6 +207,17 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.locker = string.Empty;
             }
+
+            this.UpdateThingStatus();
+        }
+
+        /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            base.UpdateThingStatus();
+            this.ThingStatus = new ThingStatus(this.Thing) { IsLocked = this.Thing.LockedBy != null };
         }
 
         /// <summary>

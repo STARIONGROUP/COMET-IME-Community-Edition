@@ -30,6 +30,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -73,6 +74,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Allow editting of this <see cref="File"/>
         /// </summary>
         private bool allowEdit;
+
+        /// <summary>
+        /// The currently active FileRevision
+        /// </summary>
+        private FileRevision currentFileRevision;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileDialogViewModel"/> class.
@@ -171,6 +177,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the CurrentFileRevision property
+        /// </summary>
+        public FileRevision CurrentFileRevision
+        {
+            get { return this.currentFileRevision; }
+            private set { this.RaiseAndSetIfChanged(ref this.currentFileRevision, value); }
+        }
+
+        /// <summary>
         /// Populate the possible <see cref="Category"/> for this <see cref="File"/>
         /// </summary>
         private void PopulatePossibleCategories()
@@ -206,6 +221,30 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Populates the <see cref="FileRevision"/> property with the content of the actual thing and the content of the transaction
+        /// </summary>
+        protected override void PopulateFileRevision()
+        {
+            this.CurrentFileRevision = null;
+
+            var dummyFile = new File();
+
+            var notDeletedCurrentFileRevisions = 
+                this.Thing.FileRevision
+                    .Where(t => t.ChangeKind != ChangeKind.Delete)
+                    .Select(x => x.Clone(false))
+                    .ToList();
+
+            if (notDeletedCurrentFileRevisions.Any())
+            {
+                dummyFile.FileRevision.AddRange(notDeletedCurrentFileRevisions);
+                this.CurrentFileRevision = this.Thing.FileRevision.SingleOrDefault(x => x.Iid == dummyFile.CurrentFileRevision.Iid);
+            }
+
+            base.PopulateFileRevision();
+        }
+
+        /// <summary>
         /// Update the properties
         /// </summary>
         protected override void UpdateProperties()
@@ -228,6 +267,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.LockedBy = this.SelectedLockedBy?.Name;
 
             this.SelectedOwner = this.SelectedOwner ?? this.Session.QueryCurrentDomainOfExpertise();
+
+            this.CurrentFileRevision = this.Thing.CurrentFileRevision;
         }
 
         /// <summary>

@@ -13,7 +13,6 @@
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
-             xmlns:converters="clr-namespace:CDP4EngineeringModel.Converters"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
@@ -25,7 +24,7 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <converters:CommonFileStoreIconConverter x:Key="ThingToIconUriConverter" />
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
 
             <HierarchicalDataTemplate DataType="{x:Type viewModels:DomainFileStoreRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
@@ -34,7 +33,7 @@
                             <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
-                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                        <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
                                     </MultiBinding>
                                 </Image.Source>
                             </Image>
@@ -72,8 +71,7 @@
                             <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
-                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
-                                        <Binding Path="DataContext.Row.IsLocked" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                        <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
                                     </MultiBinding>
                                 </Image.Source>
                             </Image>
@@ -137,6 +135,7 @@
                         </dxg:TreeListView.ContextMenu>
                         <dxg:TreeListView.RowStyle>
                             <Style TargetType="{x:Type dxg:RowControl}">
+                                <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
                                         <Setter Property="Background" Value="Yellow"/>
@@ -148,9 +147,10 @@
                 </dxg:TreeListControl.View>
                 <dxg:TreeListControl.Columns>
                     <dxg:TreeListColumn FieldName="Name" />
+                    <dxg:TreeListColumn FieldName="OwnerName" Header="Owner" />
+                    <dxg:TreeListColumn FieldName="Locker" Header="Locked by" />
                     <dxg:TreeListColumn FieldName="CreatorValue" Header="Creator" />
                     <dxg:TreeListColumn FieldName="CreatedOn" Header="Created on" />
-                    <dxg:TreeListColumn FieldName="Locker" Header="Locked by" />
                 </dxg:TreeListControl.Columns>
 
                 <dxg:TreeListControl.InputBindings>
