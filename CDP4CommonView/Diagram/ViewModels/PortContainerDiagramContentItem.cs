@@ -89,7 +89,7 @@ namespace CDP4CommonView.Diagram.ViewModels
 
         /// <summary>
         /// Recalculate all Ports position then fires <see cref="IDiagramPortViewModel.WhenPositionIsUpdatedInvoke"/>
-        /// todo: refactor
+        /// todo: refactor, issue GH410
         /// </summary>
         private void RecalculatePortsPosition()
         {
