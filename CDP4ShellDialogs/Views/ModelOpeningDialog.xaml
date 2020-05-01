@@ -7,127 +7,91 @@
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:viewModels="clr-namespace:CDP4ShellDialogs.ViewModels"
              xmlns:views="clr-namespace:CDP4ShellDialogs.Views"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:views1="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              x:Name="IterationsSelection"
-             Height="400"
-             Width="500"
+             Height="600"
+             Width="700"
              dx:ThemeManager.ThemeName="Seven"
              mc:Ignorable="d"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
-             Title="Select iterations to open">
-    <dx:DXWindow.Resources>
-        <views:CellTemplateSelector x:Key="DoETemplateSelector" />
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-
-        <DataTemplate x:Key="iterationSetupDomainOfExpertiseTemplate">
-            <dxe:ComboBoxEdit Name="PART_Editor"
-                              Width="150"
-                              HorizontalAlignment="Left"
-                              DisplayMember="Name"
-                              IsTextEditable="False"
-                              ItemsSource="{Binding RowData.Row.DomainOfExpertises}"
-                              NullValueButtonPlacement="EditBox"
-                              ShowCustomItems="True"
-                              ShowBorder="True"/>
-        </DataTemplate>
-
-        <HierarchicalDataTemplate DataType="{x:Type viewModels:ModelSelectionSessionRowViewModel}" ItemsSource="{Binding EngineeringModelSetupRowViewModels}">
-            <dx:MeasurePixelSnapper>
-                <StackPanel Orientation="Horizontal">
-                    <dx:PixelSnapper>
-                        <Image Width="16"
-                               Height="16"
-                               Margin="3"
-                               Source="{dx:DXImage Image=Database_16x16.png}" />
-                    </dx:PixelSnapper>
-                    <ContentPresenter x:Name="defaultRowPresenter"
-                                      Content="{Binding}"
-                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
-                </StackPanel>
-            </dx:MeasurePixelSnapper>
-        </HierarchicalDataTemplate>
-
-        <HierarchicalDataTemplate DataType="{x:Type viewModels:ModelSelectionEngineeringModelSetupRowViewModel}" ItemsSource="{Binding IterationSetupRowViewModels}">
-            <dx:MeasurePixelSnapper>
-                <StackPanel Orientation="Horizontal">
-                    <dx:PixelSnapper>
-                        <Image Width="16"
-                               Height="16"
-                               Margin="3"
-                               Source="{dx:DXImage Image=Technology_16x16.png}" />
-                    </dx:PixelSnapper>
-                    <ContentPresenter x:Name="defaultRowPresenter"
-                                      Content="{Binding}"
-                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
-                </StackPanel>
-            </dx:MeasurePixelSnapper>
-        </HierarchicalDataTemplate>
-
-        <HierarchicalDataTemplate DataType="{x:Type viewModels:ModelSelectionIterationSetupRowViewModel}">
-            <dx:MeasurePixelSnapper>
-                <StackPanel Orientation="Horizontal">
-                    <dx:PixelSnapper>
-                        <Image Width="16"
-                               Height="16"
-                               Margin="3"
-                               Source="{dx:DXImage Image=GroupFieldCollection_16x16.png}" />
-                    </dx:PixelSnapper>
-                    <dx:MeasurePixelSnapper>
-                        <ContentPresenter x:Name="defaultRowPresenter"
-                                          Content="{Binding}"
-                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
-                    </dx:MeasurePixelSnapper>
-                </StackPanel>
-            </dx:MeasurePixelSnapper>
-        </HierarchicalDataTemplate>
-    </dx:DXWindow.Resources>
-
+             Title="{Binding DialogTitle}">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <TextBlock Text ="{Binding SelectedEngineeringModelSetup .Name}" Grid.Row ="0" Margin="5" FontWeight="Bold"
+                   Visibility="{Binding IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}">
+        </TextBlock>
+        <dxlc:LayoutItem Grid.Row ="0" Margin="5" AddColonToLabel="True" 
+                         Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
+                         Name="SessionSource"  Label="Source" ToolTip="Select a Source">
+            <dxe:ComboBoxEdit ItemsSource="{Binding SessionsAvailable}"
+                              SelectedItem="{Binding SelectedRowSession, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              DisplayMember="Name"></dxe:ComboBoxEdit>
+        </dxlc:LayoutItem>
         <dxlc:LayoutGroup HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          Header="Engineering Models"
+                          Header="{Binding Title}"
                           View="GroupBox"
-                          Grid.Row="0"
+                          Grid.Row="1"
                           Margin="5"
                           Orientation="Vertical">
-            <dxg:TreeListControl x:Name="iterationSelectionTreeListControl"
-                                 HorizontalAlignment="Stretch"
-                                 VerticalAlignment="Stretch"
-                                 ItemsSource="{Binding SessionsAvailable}"
-                                 SelectedItems="{Binding SelectedIterations}"
-                                 SelectionMode="Row" >
-                <dxg:TreeListControl.Columns>
-                    <dxg:TreeListColumn FieldName="Name" HorizontalHeaderContentAlignment="Left"/>
-                    <dxg:TreeListColumn CellTemplateSelector="{StaticResource DoETemplateSelector}"
-                                        FieldName="SelectedDomain"
-                                        Header="Domain Of Expertise"
-                                        HorizontalHeaderContentAlignment="Left"
-                                        AllowEditing="True" />
-                    <dxg:TreeListColumn FieldName="FrozenOnDate" Header="Frozen On"  HorizontalHeaderContentAlignment="Left"/>
-                </dxg:TreeListControl.Columns>
-                <dxg:TreeListControl.View>
-                    <dxg:TreeListView x:Name="View"
-                                      AllowEditing="False"
-                                      AutoExpandAllNodes="True"
-                                      AutoWidth="True"
-                                      HorizontalScrollbarVisibility="Auto"
-                                      NavigationStyle="Cell"
-                                      ShowHorizontalLines="False"
-                                      ShowIndicator="False"
-                                      ShowNodeImages="False"
-                                      ShowVerticalLines="False"
-                                      TreeDerivationMode="HierarchicalDataTemplate"
-                                      TreeLineStyle="Solid"
-                                      VerticalScrollbarVisibility="Auto"/>
-                </dxg:TreeListControl.View>
+            <dxg:GridControl Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
+                         Name="ModelSetupGridControl"
+                         AllowLiveDataShaping="False"
+                         ItemsSource="{Binding SelectedRowSession.EngineeringModelSetupRowViewModels}"
+                         SelectedItem="{Binding SelectedEngineeringModelSetup ,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                         SelectionMode="Row">
+                <dxmvvm:Interaction.Behaviors>
+                    <dxmvvm:EventToCommand PassEventArgsToCommand="True" Command="{Binding SelectActiveIterationCommand}" EventName="MouseDoubleClick">
+                        <dxmvvm:EventToCommand.EventArgsConverter>
+                            <dx:EventArgsToDataRowConverter />
+                        </dxmvvm:EventToCommand.EventArgsConverter>
+                    </dxmvvm:EventToCommand>
+                </dxmvvm:Interaction.Behaviors>
+                <dxg:GridControl.View>
+                    <dxg:TableView Name="GridViewModel"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               AllowColumnMoving="True"
+                               AllowEditing="False"
+                               AutoWidth="true"
+                               ShowFilterPanelMode="Never"
+                               IsDetailButtonVisibleBinding="{x:Null}"
+                               ShowGroupPanel="False"
+                               ShowSearchPanelMode="Always">
+                        <dxg:TableView.RowStyle>
+                            <Style TargetType="{x:Type dxg:RowControl}">
+                                <Setter Property="ToolTip" Value="Double-Click to open the model (active iteration)" />
+                            </Style>
+                        </dxg:TableView.RowStyle>
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn FieldName="Name" Header="Name" SortMode="Value" SortIndex="0" />
+                    <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
+                    <dxg:GridColumn FieldName="Kind" Header="Kind" />
+                </dxg:GridControl.Columns>
+
+            </dxg:GridControl>
+            <dxg:GridControl Visibility="{Binding IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}"
+                             Name="IterationGridControl"
+                             AllowLiveDataShaping="False"
+                             AutoExpandAllGroups="True"
+                             ItemsSource="{Binding SelectedEngineeringModelSetup .IterationSetupRowViewModels}"
+                             SelectedItems="{Binding SelectedIterations,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                             SelectionMode="Row"
+                             DefaultSorting="FrozenOnDate">
                 <dxmvvm:Interaction.Behaviors>
                     <dxmvvm:EventToCommand PassEventArgsToCommand="True" Command="{Binding SelectCommand}" EventName="MouseDoubleClick">
                         <dxmvvm:EventToCommand.EventArgsConverter>
@@ -135,22 +99,78 @@
                         </dxmvvm:EventToCommand.EventArgsConverter>
                     </dxmvvm:EventToCommand>
                 </dxmvvm:Interaction.Behaviors>
-            </dxg:TreeListControl>
-
-            <dxlc:LayoutItem>
-            <TextBox IsReadOnly="True"
-                         Text="{Binding Path=ErrorMessage,
-                                        Mode=OneWay}"
-                         Visibility="{Binding Path=HasError,
-                                              UpdateSourceTrigger=PropertyChanged,
-                                              Converter={StaticResource BooleanToVisibilityConverter}}" />
-            </dxlc:LayoutItem>
+                <dxg:GridControl.View>
+                    <dxg:TableView Name="GridViewIteration"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   AllowColumnMoving="True"
+                                   AllowEditing="False"
+                                   AllowGrouping="True"
+                                   AutoWidth="true"
+                                   ShowFilterPanelMode="Never"
+                                   IsDetailButtonVisibleBinding="{x:Null}"
+                                   ShowGroupPanel="False"
+                                   ShowSearchPanelMode="Always">
+                        <dxg:TableView.RowStyle>
+                            <Style TargetType="{x:Type dxg:RowControl}">
+                                <Setter Property="ToolTip" Value="Double-Click on ''Domain Of Expertise'' to select" />
+                            </Style>
+                        </dxg:TableView.RowStyle>
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn FieldName="Name" Header="Name" />
+                    <dxg:GridColumn FieldName="SelectedDomain"
+                                    Header="Domain Of Expertise"
+                                    HorizontalHeaderContentAlignment="Left"
+                                    AllowEditing="True" >
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox IsEditable="False"
+                                          Margin="3"
+                                          Background="White"
+                                          DisplayMemberPath="UserFriendlyName"
+                                          SelectedValue="{Binding RowData.Row.SelectedDomain}"
+                                          ItemsSource="{Binding RowData.Row.DomainOfExpertises}"/>
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+                    <dxg:GridColumn FieldName="FrozenOnDate" Header="Frozen On" SortOrder="Descending" />
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
         </dxlc:LayoutGroup>
-        
-        <views1:LoadingControl Grid.Row="0" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
-        
-        <dxlc:LayoutGroup Grid.Row="1" Height="30" Margin="5">
+        <views1:LoadingControl Grid.Row="1" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
+        <StackPanel Grid.Row="2" Margin="5" Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}">
+            <TextBlock TextWrapping="Wrap" Background="Cornsilk"
+                       Text="Double click to open the active iteration of this Engineering Model"></TextBlock>
+        </StackPanel>
+        <dxlc:LayoutGroup Grid.Row="3" Height="30" Margin="5">
+            <Button Content="Back"
+                    Visibility="{Binding Path=IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}"
+                    Margin="5"
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Command="{Binding BackCommand}"/>
+            <Button Content="Next"
+                    Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
+                    Margin="5"
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Command="{Binding NextCommand}">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedItems.Count,ElementName=ModelSetupGridControl}"
+                                         Value="0">
+                                <Setter Property="IsEnabled"
+                                        Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
             <Button Content="Select"
+                    Visibility="{Binding IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}"
                     Margin="5"
                     Width="60"
                     HorizontalAlignment="Right"

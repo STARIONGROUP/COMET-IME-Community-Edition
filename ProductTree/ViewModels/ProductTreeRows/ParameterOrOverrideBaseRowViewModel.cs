@@ -391,8 +391,8 @@ namespace CDP4ProductTree.ViewModels
         /// <param name="actualState">The actual state</param>
         private void UpdateActualStateRow(Option actualOption, ActualFiniteState actualState)
         {
-            var existingRow = this.ContainedRows.OfType<ActualFiniteStateRowViewModel>()
-                .SingleOrDefault(x => x.Thing == actualState);
+            var existingRow = this.ContainedRows.OfType<ParameterStateRowViewModel>()
+                .SingleOrDefault(x => x.ActualState == actualState);
 
             if (actualState.Kind == ActualFiniteStateKind.FORBIDDEN)
             {
@@ -419,7 +419,7 @@ namespace CDP4ProductTree.ViewModels
                 return;
             }
 
-            var stateRow = new ActualFiniteStateRowViewModel(actualState, this.Session, this);
+            var stateRow = new ParameterStateRowViewModel(this.Thing, actualState, this.Session, this);
             this.ContainedRows.Add(stateRow);
             var isStatePublishable = this.CheckValuesPublishabledStatus(valueSet);
             this.IsPublishable = this.IsPublishable || isStatePublishable;
@@ -428,7 +428,7 @@ namespace CDP4ProductTree.ViewModels
 
             if (compoundType == null)
             {
-                stateRow.SetScalarValue(this.Thing, valueSet);
+                stateRow.SetScalarValue(valueSet);
                 stateRow.IsPublishable = isStatePublishable;
             }
             else

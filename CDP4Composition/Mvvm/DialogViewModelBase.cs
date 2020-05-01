@@ -1,6 +1,26 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DialogViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,6 +29,7 @@ namespace CDP4Composition.Mvvm
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.ComponentModel.Design;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -16,18 +37,23 @@ namespace CDP4Composition.Mvvm
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
-    using CDP4Common;
+  
     using CDP4Common.CommonData;
     using CDP4Common.Exceptions;
-    using CDP4Composition.Converters;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    
     using CDP4Dal;
     using CDP4Dal.Operations;
+    
     using CDP4JsonSerializer;
+    
     using DevExpress.Xpf.SpellChecker;
     using DevExpress.XtraSpellChecker;
+    
     using ReactiveUI;
+    
     using Services;
     
     /// <summary>
@@ -137,7 +163,7 @@ namespace CDP4Composition.Mvvm
             : base(thingClone, session)
         {
             // add the animation uri path            
-            this.AnimationUri = string.Format("{0}{1}", Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), CdpLogoAnimationPath);            
+            this.AnimationUri = $"{Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)}{CdpLogoAnimationPath}";            
             this.LoadingMessage = "Processing...";
 
             this.InitializeSpellingChecker();
@@ -167,10 +193,10 @@ namespace CDP4Composition.Mvvm
             switch (this.dialogKind)
             {
                 case ThingDialogKind.Create:                    
-                    this.transaction = new ThingTransaction(this.Thing, (ThingTransaction)parentTransaction, container);                    
+                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);                    
                     break;
                 case ThingDialogKind.Update:                    
-                    this.transaction = new ThingTransaction(this.Thing, (ThingTransaction)parentTransaction, container);                    
+                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);                    
                     break;
                 case ThingDialogKind.Inspect:
                     break;
@@ -216,8 +242,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public bool OkCanExecute
         {
-            get { return this.okCanExecute; }
-            set { this.RaiseAndSetIfChanged(ref this.okCanExecute, value); }
+            get => this.okCanExecute;
+            set => this.RaiseAndSetIfChanged(ref this.okCanExecute, value);
         }
 
         /// <summary>
@@ -225,8 +251,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public Thing Container
         {
-            get { return this.container; }
-            set { this.RaiseAndSetIfChanged(ref this.container, value); }
+            get => this.container;
+            set => this.RaiseAndSetIfChanged(ref this.container, value);
         }
 
         /// <summary>
@@ -237,13 +263,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the <see cref="SpellChecker"/> instance that the <see cref="SpellingCheckerService"/> provides
         /// </summary>
-        public SpellChecker SpellChecker
-        {
-            get
-            {
-                return this.spellChecker;
-            }
-        }
+        public SpellChecker SpellChecker => this.spellChecker;
 
         /// <summary>
         /// Gets the animation uri
@@ -274,41 +294,29 @@ namespace CDP4Composition.Mvvm
         public string Error { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of <see cref="ValidationRule"/>s that are violated.
+        /// Gets or sets the list of <see cref="ValidationService.ValidationRule"/>s that are violated.
         /// </summary>
         public ReactiveList<ValidationService.ValidationRule> ValidationErrors { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the associated view is read-only
         /// </summary>
-        public virtual bool IsReadOnly
-        {
-            get { return this.dialogKind == ThingDialogKind.Inspect; }
-        }
+        public virtual bool IsReadOnly => this.dialogKind == ThingDialogKind.Inspect;
 
         /// <summary>
         /// Gets a value indicating whether a non-editable field is read-only
         /// </summary>
-        public virtual bool IsNonEditableFieldReadOnly
-        {
-            get { return this.dialogKind != ThingDialogKind.Create; }
-        }
+        public virtual bool IsNonEditableFieldReadOnly => this.dialogKind != ThingDialogKind.Create;
 
         /// <summary>
         /// Gets a value indicating whether the Ok button is visible
         /// </summary>
-        public bool IsOkVisible
-        {
-            get { return !this.IsReadOnly; }
-        }
+        public bool IsOkVisible => !this.IsReadOnly;
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="writeException"/> is not empty.
         /// </summary>
-        public bool HasException
-        {
-            get { return this.hasException.Value; }
-        }
+        public bool HasException => this.hasException.Value;
 
         /// <summary>
         /// Gets or sets a value that forces the window to close, specifying whether the user
@@ -319,9 +327,9 @@ namespace CDP4Composition.Mvvm
         /// </remarks>
         public bool? DialogResult
         {
-            get { return this.dialogResult; }
+            get => this.dialogResult;
 
-            set { this.RaiseAndSetIfChanged(ref this.dialogResult, value); }
+            set => this.RaiseAndSetIfChanged(ref this.dialogResult, value);
         }
 
         /// <summary>
@@ -330,15 +338,9 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public Exception WriteException
         {
-            get
-            {
-                return this.writeException;
-            }
+            get => this.writeException;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.writeException, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.writeException, value);
         }
 
         /// <summary>
@@ -346,10 +348,7 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public ISpellDictionaryService DictionaryService
         {
-            get
-            {
-                return this.dictionaryService;
-            }
+            get => this.dictionaryService;
 
             set
             {
@@ -378,10 +377,7 @@ namespace CDP4Composition.Mvvm
         /// <remarks>
         /// Used by the view through the IDataErrorInfo interface to validate a field
         /// </remarks>
-        public virtual string this[string columnName]
-        {
-            get { return ValidationService.ValidateProperty(columnName, this); }
-        }
+        public virtual string this[string columnName] => ValidationService.ValidateProperty(columnName, this);
 
         /// <summary>
         /// Gets the <see cref="Uri"/> of the <see cref="Thing"/> with respect to it's data-source
@@ -548,10 +544,21 @@ namespace CDP4Composition.Mvvm
             }
 
             var operationContainer = this.parentTransaction.FinalizeTransaction();
+            var files = this.parentTransaction.GetFiles();
+
             try
             {
                 this.IsBusy = true;
-                await this.Session.Write(operationContainer);
+
+                if (files?.Any() ?? false)
+                {
+                    await this.Session.Write(operationContainer, files);
+                }
+                else
+                {
+                    await this.Session.Write(operationContainer);
+                }
+
                 this.DialogResult = true;
             }            
             finally
@@ -586,6 +593,7 @@ namespace CDP4Composition.Mvvm
             {
                 var dto = this.Thing.ToDto();
                 var dtoRoute = dto.Route;
+
                 if (this.IDalUri != null)
                 {
                     var uriBuilder = new UriBuilder(this.IDalUri) { Path = dtoRoute };
@@ -595,7 +603,6 @@ namespace CDP4Composition.Mvvm
                 {
                     this.ThingUri = "N/A";
                 }
-
             }
             catch (ContainmentException ex)
             {
@@ -641,6 +648,7 @@ namespace CDP4Composition.Mvvm
         protected void ExecuteEditCommand(Thing thing, Action repopulateAction)
         {
             var result = this.thingDialogNavigationService.Navigate(thing.Clone(false), this.transaction, this.Session, false, ThingDialogKind.Update, this.thingDialogNavigationService, this.Thing, this.ChainOfContainer);
+
             if (!result.HasValue || !result.Value)
             {
                 return;
@@ -664,6 +672,7 @@ namespace CDP4Composition.Mvvm
         protected void ExecuteMoveUpCommand<TRow>(ReactiveList<TRow> orderedList, TRow selectedItem) where TRow : IRowViewModelBase<Thing>
         {
             var selectedIndex = orderedList.IndexOf(selectedItem);
+
             if (selectedIndex == 0)
             {
                 return;

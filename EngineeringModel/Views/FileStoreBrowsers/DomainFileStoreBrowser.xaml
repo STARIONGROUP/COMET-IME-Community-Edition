@@ -13,9 +13,6 @@
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
-             xmlns:converters="clr-namespace:CDP4EngineeringModel.Converters"
-             xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm;assembly=CDP4Composition"
-             xmlns:cdpCommonView="clr-namespace:CDP4CommonView;assembly=CDP4CommonView"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
@@ -27,7 +24,7 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <converters:CommonFileStoreIconConverter x:Key="ThingToIconUriConverter" />
+            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
 
             <HierarchicalDataTemplate DataType="{x:Type viewModels:DomainFileStoreRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
@@ -36,7 +33,7 @@
                             <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
-                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                        <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
                                     </MultiBinding>
                                 </Image.Source>
                             </Image>
@@ -48,7 +45,7 @@
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type cdp4Composition:FolderRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:FolderRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
@@ -67,15 +64,14 @@
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type cdpCommonView:FileRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:FileRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
                             <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
-                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
-                                        <Binding Path="DataContext.Row.IsLocked" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                        <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
                                     </MultiBinding>
                                 </Image.Source>
                             </Image>
@@ -88,76 +84,84 @@
             </HierarchicalDataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
-
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <views:CommonThingControl GridView="{Binding ElementName=CommonFileStoreView}" />
+            <views:CommonThingControl GridView="{Binding ElementName=DomainFileStoreView}" />
 
-        <views:BrowserHeader Grid.Row="1" />
+            <views:BrowserHeader Grid.Row="1" />
 
-        <dxg:TreeListControl Grid.Row="2"
-                             MaxHeight="1080"
-                             ItemsSource="{Binding ContainedRows}"
-                             SelectedItem="{Binding SelectedThing}"
-                             SelectionMode="Row"
-                             services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
-            <i:Interaction.Behaviors>
-                <dragDrop:FrameworkElementDragBehavior />
-                <dragDrop:FrameworkElementDropBehavior />
-            </i:Interaction.Behaviors>
-            <dxmvvm:Interaction.Behaviors>
-                <cdp4Composition:ContextMenuBehavior />
-            </dxmvvm:Interaction.Behaviors>
-            <dxg:TreeListControl.View>
-                <dxg:TreeListView x:Name="DomainFileStoreView"
-                                  MaxHeight="1080"
-                                  AllowEditing="False"
-                                  AutoWidth="False"
-                                  ExpandCollapseNodesOnNavigation="True"
-                                  ExpandStateFieldName="IsExpanded"
-                                  HorizontalScrollbarVisibility="Auto"
-                                  NavigationStyle="Cell"
-                                  ShowHorizontalLines="False"
-                                  ShowIndicator="False"
-                                  ShowNodeImages="False"
-                                  ShowVerticalLines="False"
-                                  TreeDerivationMode="HierarchicalDataTemplate"
-                                  TreeLineStyle="Solid"
-                                  VerticalScrollbarVisibility="Auto">
-                    <dxg:TreeListView.FocusedRow>
-                        <dynamic:ExpandoObject />
-                    </dxg:TreeListView.FocusedRow>
-                    <dxg:TreeListView.ContextMenu>
-                        <ContextMenu Name="RowDomainContextMenu" />
-                    </dxg:TreeListView.ContextMenu>
-                    <dxg:TreeListView.RowStyle>
-                        <Style TargetType="{x:Type dxg:RowControl}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
-                                    <Setter Property="Background" Value="Yellow"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </dxg:TreeListView.RowStyle>
-                </dxg:TreeListView>
-            </dxg:TreeListControl.View>
-            <dxg:TreeListControl.Columns>
-                <dxg:TreeListColumn FieldName="Name" />
-                <dxg:TreeListColumn FieldName="CreatorValue" Header="Creator" />
-                <dxg:TreeListColumn FieldName="CreatedOn" Header="Created on" />
-                <dxg:TreeListColumn FieldName="Locker" Header="Locked by" />
-            </dxg:TreeListControl.Columns>
+            <dxg:TreeListControl Grid.Row="2"
+                                 MaxHeight="1080"
+                                 ItemsSource="{Binding ContainedRows}"
+                                 SelectedItem="{Binding SelectedThing}"
+                                 SelectionMode="Row"
+                                 services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
+                <i:Interaction.Behaviors>
+                    <dragDrop:FrameworkElementDragBehavior />
+                    <dragDrop:FrameworkElementDropBehavior />
+                </i:Interaction.Behaviors>
+                <dxmvvm:Interaction.Behaviors>
+                    <cdp4Composition:ContextMenuBehavior />
+                </dxmvvm:Interaction.Behaviors>
+                <dxg:TreeListControl.View>
+                    <dxg:TreeListView x:Name="DomainFileStoreView"
+                                      MaxHeight="1080"
+                                      AllowEditing="False"
+                                      AutoWidth="False"
+                                      ChildNodesPath="ContainedRows"
+                                      ExpandCollapseNodesOnNavigation="True"
+                                      ExpandStateFieldName="IsExpanded"
+                                      HorizontalScrollbarVisibility="Auto"
+                                      NavigationStyle="Cell"
+                                      ShowHorizontalLines="False"
+                                      ShowIndicator="False"
+                                      ShowNodeImages="False"
+                                      ShowVerticalLines="False"
+                                      TreeDerivationMode="HierarchicalDataTemplate"
+                                      TreeLineStyle="Solid"
+                                      VerticalScrollbarVisibility="Auto">
+                        <dxg:TreeListView.FocusedRow>
+                            <dynamic:ExpandoObject />
+                        </dxg:TreeListView.FocusedRow>
+                        <dxg:TreeListView.ContextMenu>
+                            <ContextMenu Name="RowDomainContextMenu" />
+                        </dxg:TreeListView.ContextMenu>
+                        <dxg:TreeListView.RowStyle>
+                            <Style TargetType="{x:Type dxg:RowControl}">
+                                <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
+                                        <Setter Property="Background" Value="Yellow"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </dxg:TreeListView.RowStyle>
+                    </dxg:TreeListView>
+                </dxg:TreeListControl.View>
+                <dxg:TreeListControl.Columns>
+                    <dxg:TreeListColumn FieldName="Name" />
+                    <dxg:TreeListColumn FieldName="OwnerName" Header="Owner" />
+                    <dxg:TreeListColumn FieldName="Locker" Header="Locked by" />
+                    <dxg:TreeListColumn FieldName="CreatorValue" Header="Creator" />
+                    <dxg:TreeListColumn FieldName="CreatedOn" Header="Created on" />
+                </dxg:TreeListControl.Columns>
 
-            <dxg:TreeListControl.InputBindings>
-                <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
-                <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
-            </dxg:TreeListControl.InputBindings>
-        </dxg:TreeListControl>
+                <dxg:TreeListControl.InputBindings>
+                    <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
+                    <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
+                </dxg:TreeListControl.InputBindings>
+            </dxg:TreeListControl>
+        </Grid>
+        <views:LoadingControl 
+            Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}" 
+            CancelCommand="{Binding CancelDownloadCommand}" 
+            IsCancelVisible="{Binding IsCancelButtonVisible}"/>
     </Grid>
 </UserControl>

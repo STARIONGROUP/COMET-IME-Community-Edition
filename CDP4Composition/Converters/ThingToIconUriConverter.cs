@@ -109,6 +109,16 @@ namespace CDP4Composition
                 return this.QueryIIconCacheService().QueryErrorOverlayBitmapSource(uri);
             }
 
+            if (thingStatus.IsLocked)
+            {
+                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.LockedOverlayUri, OverlayPositionKind.TopLeft);
+            }
+
+            if (thingStatus.IsHidden)
+            {
+                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.HiddenOverlayUri, OverlayPositionKind.TopLeft);
+            }
+
             if (thingStatus.HasRelationship)
             {
                 return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.RelationshipOverlayUri, OverlayPositionKind.TopRight);
