@@ -112,6 +112,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.QueryDomainOfExpertise()).Returns(new List<DomainOfExpertise>() {this.domain });
 
             var dal = new Mock<IDal>();
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
@@ -183,6 +184,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             this.model.Iteration.Add(this.iteration);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
 
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
