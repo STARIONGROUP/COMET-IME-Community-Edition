@@ -70,6 +70,14 @@
                                                Command="{Binding DeleteNoteCommand}"
                                                Glyph="{dx:DXImage Image=Delete_16x16.png}"
                                                Hint="Deprecate the note" />
+                        <dxb:BarButtonItem x:Name="MoveUpNoteButton"
+                                           Command="{Binding MoveUpExampleCommand}"
+                                           Glyph="{dx:DXImage Image=MoveUp_16x16.png}"
+                                           Hint="Move the selected note up" />
+                        <dxb:BarButtonItem x:Name="MoveDownNoteButton"
+                                           Command="{Binding MoveDownExampleCommand}"
+                                           Glyph="{dx:DXImage Image=MoveDown_16x16.png}"
+                                           Hint="Move the selected note down" />
                         <dxb:BarButtonItem x:Name="HelpNoteButton"
                                                Command="{Binding HelpNoteValueCommand}"
                                                Glyph="{dx:DXImage Image=Info_16x16.png}"
@@ -120,6 +128,14 @@
                                                Command="{Binding DeleteExampleCommand}"
                                                Glyph="{dx:DXImage Image=Delete_16x16.png}"
                                                Hint="Deprecate the note" />
+                        <dxb:BarButtonItem x:Name="MoveUpExampleButton"
+                                           Command="{Binding MoveUpExampleCommand}"
+                                           Glyph="{dx:DXImage Image=MoveUp_16x16.png}"
+                                           Hint="Move the selected note up" />
+                        <dxb:BarButtonItem x:Name="MoveDownExampleButton"
+                                           Command="{Binding MoveDownExampleCommand}"
+                                           Glyph="{dx:DXImage Image=MoveDown_16x16.png}"
+                                           Hint="Move the selected note down" />
                         <dxb:BarButtonItem x:Name="HelpExampleButton"
                                                Command="{Binding HelpExampleCommand}"
                                                Glyph="{dx:DXImage Image=Info_16x16.png}"
