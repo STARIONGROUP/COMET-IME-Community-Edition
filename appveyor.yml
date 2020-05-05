@@ -24,6 +24,7 @@ before_build:
   - cmd: nuget restore -verbosity quiet
 build:
   project: CDP4-CE.sln
+  verbosity: quiet
 test:
   assemblies:
     only:
