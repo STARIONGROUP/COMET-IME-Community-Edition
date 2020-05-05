@@ -20,7 +20,7 @@ for:
 # no "branches" section defined
 configuration: Debug
 before_build:
-  - cmd: nuget sources add -name devexpress -source $(DEVEXPRESS_API)
+  - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
   - cmd: nuget restore
 build:
   project: CDP4-CE.sln
