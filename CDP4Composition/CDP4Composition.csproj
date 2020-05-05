@@ -50,12 +50,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.0.0-rc02\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.6.0.1-2020.4.23.1-pre-release\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.6.0.0-rc02\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.6.0.1-2020.4.23.1-pre-release\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -338,7 +338,10 @@
     <Compile Include="Exceptions\AppSettingsException.cs" />
     <Compile Include="Exceptions\PluginSettingsException.cs" />
     <Compile Include="Exceptions\SettingsException.cs" />
+    <Compile Include="Extensions\FileExtensionMethods.cs" />
     <Compile Include="Modularity\PluginLoader.cs" />
+    <Compile Include="Mvvm\IOwnedThingViewModel.cs" />
+    <Compile Include="Mvvm\IHaveContainedRows.cs" />
     <Compile Include="Mvvm\Types\DisposableReactiveList.cs" />
     <Compile Include="FolderRowViewModel.cs" />
     <Compile Include="Mvvm\Behaviours\ContextMenuBehavior.cs" />
@@ -348,14 +351,19 @@
     <Compile Include="Navigation\Interfaces\IDeprecatableToggleViewModel.cs" />
     <Compile Include="Navigation\Interfaces\IDeprecatableBrowserViewModel.cs" />
     <Compile Include="Navigation\Interfaces\IFavoritesBrowserViewModel.cs" />
+    <Compile Include="Navigation\Interfaces\IThingSelectorDialogService.cs" />
     <Compile Include="Navigation\Interfaces\IPanelFilterableDataGridView.cs" />
     <Compile Include="Navigation\Interfaces\IRegionCollectionSearcher.cs" />
+    <Compile Include="Navigation\ThingSelectorDialogService.cs" />
     <Compile Include="Navigation\RegionCollectionSearcher.cs" />
     <Compile Include="Services\AppSettingService\AppSettingsService.cs" />
     <Compile Include="Services\AppSettingService\IAppSettingsService.cs" />
     <Compile Include="Services\AppSettingService\AppSettings.cs" />
     <Compile Include="Services\AppSettingService\SettingsMetaData.cs" />
     <Compile Include="Services\AppSettingService\PluginSettingsMetaData.cs" />
+    <Compile Include="Services\MessageBoxService\MessageBoxService.cs" />
+    <Compile Include="Services\MessageBoxService\IMessageBoxService.cs" />
+    <Compile Include="Services\DownloadFileService\DownloadFileService.cs" />
     <Compile Include="Services\FavoritesService\FavoritesService.cs" />
     <Compile Include="Services\FavoritesService\IFavoritesService.cs" />
     <Compile Include="Mvvm\IHaveContainerViewModel.cs" />
@@ -399,6 +407,8 @@
     <Compile Include="Services\IconCacheService\IconCacheService.cs" />
     <Compile Include="Services\IconCacheService\IIconCacheService.cs" />
     <Compile Include="Services\IconCacheService\OverlayPositionKind.cs" />
+    <Compile Include="Services\DownloadFileService\IDownloadFileService.cs" />
+    <Compile Include="Services\DownloadFileService\IDownloadFileViewModel.cs" />
     <Compile Include="Services\ImageService\IImageService.cs" />
     <Compile Include="Services\ImageService\ImageService.cs" />
     <Compile Include="Services\IThingCreator.cs" />
@@ -412,6 +422,7 @@
     <Compile Include="Services\RuleVerification\IRuleVerificationService.cs" />
     <Compile Include="Services\RuleVerification\RuleVerificationService.cs" />
     <Compile Include="Services\ThingCreator.cs" />
+    <Compile Include="Extensions\FileRevisionExtensionMethods.cs" />
     <Compile Include="Services\TooltipService.cs" />
     <Compile Include="Settings\ShellAppSettings.cs" />
     <Compile Include="SpecialTerms\ISpecialTermsService.cs" />
@@ -476,6 +487,7 @@
     <Compile Include="ViewModels\MessageHelper.cs" />
     <Compile Include="ViewModels\GenericConfirmationDialogViewModel.cs" />
     <Compile Include="ViewModels\InformationDialogViewModel.cs" />
+    <Compile Include="ViewModels\ThingSelectorDialogViewModel.cs" />
     <Compile Include="Views\BrowserHeader.xaml.cs">
       <DependentUpon>BrowserHeader.xaml</DependentUpon>
     </Compile>
@@ -496,6 +508,9 @@
     </Compile>
     <Compile Include="Views\GenericConfirmationDialog.xaml.cs">
       <DependentUpon>GenericConfirmationDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ThingSelectorDialog.xaml.cs">
+      <DependentUpon>ThingSelectorDialog.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -573,6 +588,7 @@
     <Resource Include="Resources\Images\Help_128x128.png" />
     <Resource Include="Resources\Images\cdplogo3d_48x48p10.png" />
     <Resource Include="Resources\Images\domain_switch.png" />
+    <Resource Include="Resources\Images\hidden_16x16.png" />
     <Content Include="Resources\Images\IconLicence.txt" />
     <Resource Include="Resources\Images\Thing\siteRdl_16x16.png" />
     <Resource Include="Resources\Images\Thing\siteRdl_32x32.png" />
@@ -609,6 +625,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\GenericConfirmationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ThingSelectorDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

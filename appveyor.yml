@@ -1,0 +1,38 @@
+image: Visual Studio 2019
+environment:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+for:
+# configuration for "master" branch, build in Release mode
+-
+  branches:
+    only:
+      - master
+  configuration: Release
+# configuration for "development" branch, build in Debug mode
+-
+  branches:
+    only:
+      - development
+  configuration: Debug
+# "fall back" configuration for all other branches
+# no "branches" section defined
+configuration: Debug
+before_build:
+  - cmd: nuget sources add -name devexpress -source $(DEVEXPRESS_API)
+  - cmd: nuget restore
+build:
+  project: CDP4-CE.sln
+test:
+  assemblies:
+    only:
+      - '**\bin\$(configuration)\*.Tests.dll'
+  categories:
+    except:
+      - WebServicesDependent
+      - AppVeyorExclusion
+notifications:
+  - provider: Email
+    to:
+      - cdp_devs@rheagroup.com

@@ -208,7 +208,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             Assert.IsNull(row.MeasurementScale);
             Assert.AreEqual(1, row.ContainedRows.Count);
 
-            var staterow = row.ContainedRows.OfType<ActualFiniteStateRowViewModel>().Single();
+            var staterow = row.ContainedRows.OfType<ParameterStateRowViewModel>().Single();
             Assert.IsTrue(staterow.Value.Contains("manual"));
             Assert.IsTrue(staterow.IsPublishable);
 
@@ -246,7 +246,6 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
             Assert.AreEqual(1, row.ContainedRows.Count);
-
             this.state1.Kind = ActualFiniteStateKind.FORBIDDEN;
             CDPMessageBus.Current.SendObjectChangeEvent(this.state1, EventKind.Updated);
             Assert.AreEqual(0, row.ContainedRows.Count);
@@ -372,9 +371,9 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             Assert.IsTrue(row.IsPublishable);
 
-            Assert.AreEqual(2, row.ContainedRows.OfType<ActualFiniteStateRowViewModel>().Count());
-            var s1row = row.ContainedRows.OfType<ActualFiniteStateRowViewModel>().First();
-            var s2row = row.ContainedRows.OfType<ActualFiniteStateRowViewModel>().Last();
+            Assert.AreEqual(2, row.ContainedRows.OfType<ParameterStateRowViewModel>().Count());
+            var s1row = row.ContainedRows.OfType<ParameterStateRowViewModel>().First();
+            var s2row = row.ContainedRows.OfType<ParameterStateRowViewModel>().Last();
 
             Assert.IsTrue(s1row.IsPublishable);
             Assert.IsFalse(s2row.IsPublishable);

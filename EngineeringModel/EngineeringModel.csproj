@@ -53,12 +53,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
-    <Reference Include="CDP4Common, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.0.0-rc02\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.6.0.1-2020.4.23.1-pre-release\lib\net452\CDP4Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CDP4Dal, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.6.0.0-rc02\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.6.0.1-2020.4.23.1-pre-release\lib\net452\CDP4Dal.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -268,11 +268,13 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\BaseFileRevisionViewModelConverter.cs" />
     <Compile Include="Converters\DataTypeConverter.cs" />
-    <Compile Include="Converters\CommonFileStoreIconConverter.cs" />
     <Compile Include="Converters\ElementDefinitionBrowserIconConverter.cs" />
     <Compile Include="Converters\ElementUsageOptionsConverter.cs" />
     <Compile Include="Converters\ElementUsageTypeToVisibilityConverter.cs" />
+    <Compile Include="Converters\FileRevisionBackgroundConverter.cs" />
+    <Compile Include="Converters\FileRevisionOpacityConverter.cs" />
     <Compile Include="Converters\ReactiveDomainToObjectListConverter.cs" />
     <Compile Include="EngineeringModelModule.cs" />
     <Compile Include="OfficeRibbon\EngineeringModelRibbonPart.cs" />
@@ -282,6 +284,9 @@
     <Compile Include="ViewModels\Dialogs\ActualFiniteStateDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BinaryRelationshipDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\BuiltInRuleVerificationDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\FileDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\FileRevisionDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\FolderDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ElementUsageDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ElementDefinitionDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\ActualFiniteStateListDialogViewModel.cs" />
@@ -334,8 +339,10 @@
     <Compile Include="ViewModels\FileStoreBrowsers\DomainFileStoreBrowserRibbonViewModel.cs" />
     <Compile Include="ViewModels\FileStoreBrowsers\DomainFileStoreBrowserViewModel.cs" />
     <Compile Include="ViewModels\FileStoreBrowsers\DomainFileStoreRowViewModel.cs" />
+    <Compile Include="ViewModels\FileStoreBrowsers\FileStoreFileAndFolderHandler.cs" />
     <Compile Include="ViewModels\FileStoreBrowsers\FileRowViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\FileStoreRow.cs" />
+    <Compile Include="ViewModels\FileStoreBrowsers\IFileStoreFileAndFolderHandler.cs" />
+    <Compile Include="ViewModels\FileStoreBrowsers\IFileStoreRow.cs" />
     <Compile Include="ViewModels\FileStoreBrowsers\FolderRowViewModel.cs" />
     <Compile Include="ViewModels\FiniteStateBrowser\FiniteStateBrowserRibbonViewModel.cs" />
     <Compile Include="ViewModels\FiniteStateBrowser\FiniteStateBrowserViewModel.cs" />
@@ -379,6 +386,19 @@
     <Compile Include="Views\Dialogs\BuiltInRuleVerificationDialog.xaml.cs">
       <DependentUpon>BuiltInRuleVerificationDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Dialogs\FileRevisionDialog.xaml.cs">
+      <DependentUpon>FileRevisionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\FileDialog.xaml.cs">
+      <DependentUpon>FileDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\FolderDialog.xaml.cs">
+      <DependentUpon>FolderDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\DomainFileStoreDialog.xaml.cs">
+      <DependentUpon>DomainFileStoreDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\Dialogs\DomainFileStoreDialogViewModel.cs" />
     <Compile Include="Views\Dialogs\ElementDefinitionDialog.xaml.cs">
       <DependentUpon>ElementDefinitionDialog.xaml</DependentUpon>
     </Compile>
@@ -487,6 +507,22 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Dialogs\BuiltInRuleVerificationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\FileRevisionDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\FileDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\FolderDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Dialogs\DomainFileStoreDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -12,6 +12,7 @@ namespace CDP4Dashboard.ViewModels.Widget
     using System.Linq;
     using System.Reactive.Linq;
     using System.Text;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Media;
 
@@ -42,6 +43,26 @@ namespace CDP4Dashboard.ViewModels.Widget
         where TValueSet : ParameterValueSetBase
 
     {
+        /// <summary>
+        /// Indicator that the widgets value trend is going up
+        /// </summary>
+        public const string StatusIndicatorUp = "▲";
+
+        /// <summary>
+        /// Indicator that the widgets value trend is going down
+        /// </summary>
+        public const string StatusIndicatorDown = "▼";
+
+        /// <summary>
+        /// Indicator that the widgets value trend is that it stays equal
+        /// </summary>
+        public const string StatusIndicatorEqual = "=";
+
+        /// <summary>
+        /// Indicator that the widgets value trend is unknown
+        /// </summary>
+        public const string StatusIndicatorUnknown = "?";
+
         /// <summary>
         /// The <see cref="ISession"/>
         /// </summary>
@@ -153,7 +174,7 @@ namespace CDP4Dashboard.ViewModels.Widget
             this.OnToggleChartVisibilityCommand.Subscribe(_ => this.ToggleChartVisibility());
 
             this.OnRefreshCommand = ReactiveCommand.Create();
-            this.OnRefreshCommand.Subscribe(_ => this.RefreshData());
+            this.OnRefreshCommand.Subscribe(async _ => await this.RefreshData());
 
             this.OnCopyDataCommand = ReactiveCommand.Create();
             this.OnCopyDataCommand.Subscribe(_ => this.CopyTextToClipboard());
@@ -174,7 +195,12 @@ namespace CDP4Dashboard.ViewModels.Widget
             this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(iterationTrackParameter)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.RefreshData()));
+                .Subscribe(async _ => await this.RefreshData()));
+
+            CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationTrackParameter.ParameterOrOverride)
+                .Where(objectChange => objectChange.EventKind == EventKind.Removed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(async _ => await this.OnDeleteCommand.ExecuteAsyncTask());
 
             this.OnRefreshCommand.Execute(null);
         }
@@ -298,7 +324,7 @@ namespace CDP4Dashboard.ViewModels.Widget
                 var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterValueSet)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.iterationTrackParameter.ParameterOrOverride.RevisionNumber)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.RefreshData());
+                    .Subscribe(async _ => await this.RefreshData());
 
                 this.valueSetListeners.Add(parameterValueSet, listener);
             }
@@ -353,7 +379,7 @@ namespace CDP4Dashboard.ViewModels.Widget
         /// <summary>
         /// Asynchronously refreshes the Widget's data 
         /// </summary>
-        private async void RefreshData()
+        private async Task RefreshData()
         {
             this.StatusIndicatorColor = CDP4Color.Inconclusive.GetBrush();
             this.CurrentValue = "Calculating...";
@@ -459,12 +485,13 @@ namespace CDP4Dashboard.ViewModels.Widget
         private void RefreshViewValues()
         {
             this.StatusIndicatorColor = CDP4Color.Inconclusive.GetBrush();
+            this.StatusIndicator = StatusIndicatorUnknown;
 
             var percentChange = "-";
             var latestTwoValues = this.LineSeriesCollection.FirstOrDefault()?.Lines.OrderByDescending(x => x.RevisionNumber).Take(2).ToList();
 
             var currentVal = latestTwoValues?.FirstOrDefault()?.Value?.ToString() ?? "-";
-            var previousVal = latestTwoValues?.LastOrDefault()?.Value?.ToString() ?? "-";
+            var previousVal = (latestTwoValues?.Count ?? 0) > 1 ? latestTwoValues?.LastOrDefault()?.Value?.ToString() ?? "-" : "-";
 
             if (double.TryParse(currentVal, out var currValDouble))
             {
@@ -474,15 +501,15 @@ namespace CDP4Dashboard.ViewModels.Widget
 
                     if (percent > 0)
                     {
-                        this.StatusIndicator = "▲";
+                        this.StatusIndicator = StatusIndicatorUp;
                     }
                     else if (percent < 0)
                     {
-                        this.StatusIndicator = "▼";
+                        this.StatusIndicator = StatusIndicatorDown;
                     }
                     else
                     {
-                        this.StatusIndicator = "=";
+                        this.StatusIndicator = StatusIndicatorEqual;
                     }
 
                     percentChange = string.Format(CultureInfo.InvariantCulture, "{0:#.##}", percent);

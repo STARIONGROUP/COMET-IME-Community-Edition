@@ -1,25 +1,53 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DomainFileStoreBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2017 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+    
     using CDP4EngineeringModel.ViewModels;
+    
     using Microsoft.Practices.ServiceLocation;
+    
     using Moq;
+    
     using NUnit.Framework;
 
     [TestFixture]
@@ -73,16 +101,20 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "model"
             };
+            
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ShortName = "person",
                 GivenName = "person",
             };
+            
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Person = this.person,
@@ -94,7 +126,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
                 Name = "domain",
                 ShortName = "d"
             };
+            
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 RequiredRdl = this.srdl
@@ -113,6 +147,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             {
                 EngineeringModelSetup = this.engineeringModelSetup
             };
+
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 IterationSetup = this.iterationSetup
@@ -121,34 +156,47 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             this.model.Iteration.Add(this.iteration);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                 {
                     { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) }
                 });
 
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
 
-            this.store = new DomainFileStore(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.store = new DomainFileStore(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Owner = this.domain
+            };
+
             this.folder1 = new Folder(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
                 CreatedOn = new DateTime(1, 1, 1),
-                Creator = this.participant
+                Creator = this.participant,
+                Owner = this.domain
             };
+
             this.folder2 = new Folder(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "2",
                 CreatedOn = new DateTime(1, 1, 1),
-                Creator = this.participant
+                Creator = this.participant,
+                Owner = this.domain
             };
+
             this.file = new File(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.fileRevision1 = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
                 Creator = this.participant,
                 CreatedOn = new DateTime(1, 1, 1)
             };
+
             this.fileRevision2 = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
@@ -191,11 +239,18 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
 
             vm.ComputePermission();
 
-            Assert.IsFalse(vm.CanCreateStore);
-            Assert.IsTrue(vm.CanCreateFolder);
+            Assert.IsTrue(vm.CanCreateStore);
+            Assert.IsFalse(vm.CanCreateFolder);
+            Assert.IsFalse(vm.CanUploadFile);
 
             var storeRow = vm.ContainedRows.Single();
             Assert.IsEmpty(storeRow.ContainedRows);
+
+            vm.SelectedThing = storeRow;
+
+            Assert.IsTrue(vm.CanCreateStore);
+            Assert.IsTrue(vm.CanCreateFolder);
+            Assert.IsTrue(vm.CanUploadFile);
 
             this.store.Folder.Add(this.folder1);
             this.store.Folder.Add(this.folder2);
@@ -208,6 +263,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             Assert.AreEqual(1, storeRow.ContainedRows.Count);
 
             var folder1Row = storeRow.ContainedRows.Single();
+            vm.SelectedThing = folder1Row;
+
+            Assert.IsTrue(vm.CanCreateStore);
+            Assert.IsTrue(vm.CanCreateFolder);
+            Assert.IsTrue(vm.CanUploadFile);
+
             var folder2Row = folder1Row.ContainedRows.Single();
 
             this.store.File.Add(this.file);
@@ -223,6 +284,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             CDPMessageBus.Current.SendObjectChangeEvent(this.file, EventKind.Updated);
 
             Assert.AreEqual(1, folder2Row.ContainedRows.Count);
+            vm.SelectedThing = folder2Row.ContainedRows.Single();
+
+            Assert.IsTrue(vm.CanCreateStore);
+            Assert.IsFalse(vm.CanCreateFolder);
+            Assert.IsFalse(vm.CanUploadFile);
 
             this.folder2.ContainingFolder = null;
             this.rev.SetValue(this.folder2, 5);
@@ -247,7 +313,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             Assert.AreEqual(2, folder2Row.ContainedRows.Count);
         }
 
-        [Test]
+        [Ignore("File upload not implmented yet")]
         public void VerifyUploadFileCommand()
         {
             this.model.Iteration.FirstOrDefault().DomainFileStore.Add(this.store);

@@ -105,14 +105,14 @@
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type viewModels:ActualFiniteStateRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ParameterStateRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
                             <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
-                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                        <Binding Path="DataContext.Row.ActualState" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
                                     </MultiBinding>
                                 </Image.Source>
                             </Image>

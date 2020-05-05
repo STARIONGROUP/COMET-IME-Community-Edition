@@ -10,7 +10,7 @@
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="70"
                                 ShowCaptionButton="False"
-                                IsVisible="False">
+                                IsVisible="True">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
