@@ -21,7 +21,7 @@ for:
 configuration: Debug
 before_build:
   - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
-  - cmd: nuget restore
+  - cmd: nuget restore -verbosity quiet
 build:
   project: CDP4-CE.sln
 test:
