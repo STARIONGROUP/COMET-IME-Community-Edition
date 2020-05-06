@@ -20,8 +20,8 @@ for:
 # no "branches" section defined
 configuration: Debug
 before_build:
-  - cmd: nuget install NUnit.Console -Version 3.11.0 -OutputDirectory testrunner
-  - cmd: nuget install NUnit.Runners -Version 3.11.0 -OutputDirectory testrunner
+  - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
+  - cmd: nuget install NUnit.Runners -Version 3.11.1 -OutputDirectory testrunner
   - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
   - cmd: nuget restore -verbosity quiet
   - cmd: choco install opencover.portable
@@ -39,7 +39,7 @@ test:
       - WebServicesDependent
       - AppVeyorExclusion
 after_test:
-  - OpenCover.Console.exe -register:user -target:".\testrunner\NUnit.ConsoleRunner.3.11.0\tools/\nunit3-console.exe" -targetargs:"cdp4ime-tests.nunit /exclude:WebServicesDependent,AppVeyorExclusion" -filter:"-[*.Tests*]*" -output:".\cdp4ime_coverage.xml" -oldstyle -log:Error
+  - OpenCover.Console.exe -register:user -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools/\nunit3-console.exe" -targetargs:"cdp4ime-tests.nunit /exclude:WebServicesDependent,AppVeyorExclusion" -filter:"-[*.Tests*]*" -output:".\cdp4ime_coverage.xml" -oldstyle -log:Error
   - codecov -f "cdp4ime_coverage.xml" -t %CODECOV_TOKEN%
 notifications:
   - provider: Email
