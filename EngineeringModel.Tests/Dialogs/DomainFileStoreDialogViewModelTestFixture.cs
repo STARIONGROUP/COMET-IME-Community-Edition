@@ -176,6 +176,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         {
             var name = "name";
             var createdOn = DateTime.UtcNow;
+            this.domainFileStore.Owner = this.domainOfExpertise;
 
             var domainFileStoreDialogViewModel = 
                 new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
