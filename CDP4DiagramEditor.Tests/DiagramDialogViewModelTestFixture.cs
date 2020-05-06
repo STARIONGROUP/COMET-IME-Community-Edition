@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramDialogViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -134,8 +134,8 @@ namespace CDP4DiagramEditor.Tests
             nameCheck = viewmodel["Name"];
             Assert.IsTrue(viewmodel.OkCanExecute);
 
-            viewmodel.OkCommand.Execute(null);
-            Assert.AreNotEqual(diagram.CreatedOn.Year, 1);
+            var result = viewmodel.OkCommand.ExecuteAsync(null);
+            Assert.AreNotEqual(default, diagram.CreatedOn);
         }
     }
 }
