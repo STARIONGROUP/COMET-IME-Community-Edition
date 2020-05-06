@@ -186,7 +186,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
-                Manual = new ValueArray<string>(new List<string> { "A" }),
+                Manual = new ValueArray<string>(new List<string> { "=SAT.l" }),
                 Computed = new ValueArray<string>(new List<string> { "B" }),
                 Formula = new ValueArray<string>(new List<string> { "C" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
@@ -203,7 +203,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             var excelRow = new NestedParameterExcelRow(nestedparameter);
 
             Assert.AreEqual("=SAT.l", excelRow.ActualValue);
-            Assert.AreEqual("SAT\\l\\option1\\", excelRow.ModelCode);
+            Assert.AreEqual("SAT\\l\\\\option1", excelRow.ModelCode);
             Assert.AreEqual("Length", excelRow.Name);
             Assert.AreEqual("SYS", excelRow.Owner);
             Assert.AreEqual("l [m]", excelRow.ParameterTypeShortName);
@@ -221,7 +221,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
-                Manual = new ValueArray<string>(new List<string> { "A" }),
+                Manual = new ValueArray<string>(new List<string> { "=SAT.txt" }),
                 Computed = new ValueArray<string>(new List<string> { "B" }),
                 Formula = new ValueArray<string>(new List<string> { "C" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
@@ -238,7 +238,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             var excelRow = new NestedParameterExcelRow(nestedparameter);
 
             Assert.AreEqual("=SAT.txt", excelRow.ActualValue);
-            Assert.AreEqual("SAT\\txt\\option1\\", excelRow.ModelCode);
+            Assert.AreEqual("SAT\\txt\\\\option1", excelRow.ModelCode);
             Assert.AreEqual("Text", excelRow.Name);
             Assert.AreEqual("SYS", excelRow.Owner);
             Assert.AreEqual("txt", excelRow.ParameterTypeShortName);
@@ -278,7 +278,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
-                Manual = new ValueArray<string>(new List<string> { "A", "A1" }),
+                Manual = new ValueArray<string>(new List<string> { "=SAT.coord.x", "=SAT.coord.txt" }),
                 Computed = new ValueArray<string>(new List<string> { "B", "B1" }),
                 Formula = new ValueArray<string>(new List<string> { "C", "C1" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
@@ -295,7 +295,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             var excelRow_1 = new NestedParameterExcelRow(nestedparameter_1);
 
             Assert.AreEqual("=SAT.coord.x", excelRow_1.ActualValue);
-            Assert.AreEqual("SAT\\coord.x\\option1\\", excelRow_1.ModelCode);
+            Assert.AreEqual("SAT\\coord.x\\\\option1", excelRow_1.ModelCode);
             Assert.AreEqual("coordinate", excelRow_1.Name);
             Assert.AreEqual("SYS", excelRow_1.Owner);
             Assert.AreEqual("coord.x [m]", excelRow_1.ParameterTypeShortName);
@@ -306,7 +306,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             var excelRow_2 = new NestedParameterExcelRow(nestedparameter_2);
 
             Assert.AreEqual("=SAT.coord.txt", excelRow_2.ActualValue);
-            Assert.AreEqual("SAT\\coord.txt\\option1\\", excelRow_2.ModelCode);
+            Assert.AreEqual("SAT\\coord.txt\\\\option1", excelRow_2.ModelCode);
             Assert.AreEqual("coordinate", excelRow_2.Name);
             Assert.AreEqual("SYS", excelRow_2.Owner);
             Assert.AreEqual("coord.txt", excelRow_2.ParameterTypeShortName);
@@ -337,7 +337,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var parameterSubscriptionValueSet = new ParameterSubscriptionValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
-                Manual = new ValueArray<string>(new List<string> { "AA" }),
+                Manual = new ValueArray<string>(new List<string> { "=SAT.l" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL,
                 SubscribedValueSet = parameterValueSet
             };
@@ -353,7 +353,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             var excelRow = new NestedParameterExcelRow(nestedparameter);
 
             Assert.AreEqual("=SAT.l", excelRow.ActualValue);
-            Assert.AreEqual("SAT\\l\\option1\\", excelRow.ModelCode);
+            Assert.AreEqual("SAT\\l\\\\option1", excelRow.ModelCode);
             Assert.AreEqual("Length", excelRow.Name);
             Assert.AreEqual("PWR [SYS]", excelRow.Owner);
             Assert.AreEqual("l [m]", excelRow.ParameterTypeShortName);
@@ -385,7 +385,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
 
             var paameterOverrideValueSet = new ParameterOverrideValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
-                Manual = new ValueArray<string>(new List<string> { "A" }),
+                Manual = new ValueArray<string>(new List<string> { "=BAT.l" }),
                 Computed = new ValueArray<string>(new List<string> { "B" }),
                 Formula = new ValueArray<string>(new List<string> { "C" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL,
@@ -410,7 +410,7 @@ namespace CDP4ParameterSheetGenerator.Tests.RowModels
             var excelRow = new NestedParameterExcelRow(nestedparameter);
 
             Assert.AreEqual("=BAT.l", excelRow.ActualValue);
-            Assert.AreEqual("SAT.batt\\l\\option1\\", excelRow.ModelCode);
+            Assert.AreEqual("SAT.batt\\l\\\\option1", excelRow.ModelCode);
             Assert.AreEqual("Length", excelRow.Name);
             Assert.AreEqual("PWR", excelRow.Owner);
             Assert.AreEqual("l [m]", excelRow.ParameterTypeShortName);
