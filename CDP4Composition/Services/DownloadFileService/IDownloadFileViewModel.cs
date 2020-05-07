@@ -43,7 +43,7 @@ namespace CDP4Composition.Services
         /// <summary>
         /// Gets or sets a value indicating whether the browser is busy
         /// </summary>
-        bool IsBusy { get; set; }
+        bool? IsBusy { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the Cancel button is visible on the <see cref="LoadingControl"/>
