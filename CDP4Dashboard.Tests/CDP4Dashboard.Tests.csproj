@@ -46,6 +46,9 @@
     <Reference Include="CDP4RequirementsVerification, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CDP4RequirementsVerification-CE.0.2.0-rc02\lib\net452\CDP4RequirementsVerification.dll</HintPath>
     </Reference>
+    <Reference Include="DevExpress.Charts.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Charts.Core.20.1.3\lib\net452\DevExpress.Charts.v20.1.Core.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.CodeParser.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.CodeParser.20.1.3\lib\net452\DevExpress.CodeParser.v20.1.dll</HintPath>
     </Reference>
@@ -82,6 +85,9 @@
     <Reference Include="DevExpress.Xpf.Accordion.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Accordion.v20.1.dll</HintPath>
     </Reference>
+    <Reference Include="DevExpress.Xpf.Charts.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Wpf.Charts.20.1.3\lib\net452\DevExpress.Xpf.Charts.v20.1.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.Xpf.Controls.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Controls.v20.1.dll</HintPath>
     </Reference>
@@ -94,6 +100,18 @@
     <Reference Include="DevExpress.Xpf.Docking.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Docking.v20.1.dll</HintPath>
     </Reference>
+    <Reference Include="DevExpress.Xpf.DocumentViewer.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Wpf.DocumentViewer.Core.20.1.3\lib\net452\DevExpress.Xpf.DocumentViewer.v20.1.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Wpf.Grid.Core.20.1.3\lib\net452\DevExpress.Xpf.Grid.v20.1.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Wpf.Grid.Core.20.1.3\lib\net452\DevExpress.Xpf.Grid.v20.1.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v20.1.Extensions, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Wpf.Grid.Core.20.1.3\lib\net452\DevExpress.Xpf.Grid.v20.1.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.Xpf.Layout.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Layout.v20.1.Core.dll</HintPath>
     </Reference>
@@ -102,6 +120,9 @@
     </Reference>
     <Reference Include="DevExpress.Xpf.NavBar.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.NavBar.v20.1.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Printing.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Wpf.Printing.20.1.3\lib\net452\DevExpress.Xpf.Printing.v20.1.dll</HintPath>
     </Reference>
     <Reference Include="DevExpress.Xpf.Ribbon.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Ribbon.v20.1.dll</HintPath>
