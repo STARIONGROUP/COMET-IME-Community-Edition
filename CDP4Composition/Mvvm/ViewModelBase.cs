@@ -74,7 +74,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Backing Field For isBusy
         /// </summary>
-        private bool isBusy;
+        private bool? isBusy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelBase{T}"/> class.
@@ -129,7 +129,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets or sets a value indicating whether the browser is busy
         /// </summary>
-        public bool IsBusy
+        public bool? IsBusy
         {
             get { return this.isBusy; }
             set { this.RaiseAndSetIfChanged(ref this.isBusy, value); }

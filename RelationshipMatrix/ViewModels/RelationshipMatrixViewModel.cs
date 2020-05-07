@@ -463,7 +463,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void BuildRelationshipMatrix()
         {
-            if (this.rebuildSuppressed || this.IsBusy)
+            if (this.rebuildSuppressed || this.IsBusy == true)
             {
                 // if we are suppressing rebuild or it is already
                 return;

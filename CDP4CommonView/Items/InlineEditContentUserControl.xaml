@@ -8,7 +8,6 @@
              xmlns:markdown="clr-namespace:Markdown.Xaml;assembly=Markdown.Xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:spellChecker="clr-namespace:DevExpress.Xpf.SpellChecker;assembly=DevExpress.Xpf.SpellChecker.v19.2"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              x:Name="ContentUserControl"
              mc:Ignorable="d">
