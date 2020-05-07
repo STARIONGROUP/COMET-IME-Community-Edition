@@ -257,6 +257,7 @@
     <Compile Include="Helpers\EditorCompletionDataTestFixture.cs" />
     <Compile Include="Helpers\ScriptingProxyTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DispatcherTestFixture.cs" />
     <Compile Include="ViewModels\LuaScriptPanelViewModelTestFIxture.cs" />
     <Compile Include="ViewModels\PythonScriptPanelViewModelTestFixture.cs" />
     <Compile Include="ViewModels\ScriptingEngineRibbonPageGroupTestFixture.cs" />

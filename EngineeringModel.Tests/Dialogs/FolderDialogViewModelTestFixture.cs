@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FolderDialogViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -180,6 +180,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         {
             var name = "name";
             var createdOn = DateTime.UtcNow;
+            this.folder.Owner = this.domainOfExpertise;
 
             var folderDialogViewModel = 
                 new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 

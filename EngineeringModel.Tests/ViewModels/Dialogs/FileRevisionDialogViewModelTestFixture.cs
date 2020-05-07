@@ -145,6 +145,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
                 ShortName = "d"
             };
 
+            this.session.Setup(x => x.QueryDomainOfExpertise()).Returns(new List<DomainOfExpertise>() { this.domain });
+
             this.fileType1 = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Extension = "jpg" };
             this.fileType2 = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Extension = "zip" };
 
@@ -183,6 +185,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             this.model.Iteration.Add(this.iteration);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
 
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -203,7 +206,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
 
             this.file = new File(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
-                Container = this.store
+                Container = this.store,
+                Owner = this.domain
             };
 
             this.fileRevision = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri);
