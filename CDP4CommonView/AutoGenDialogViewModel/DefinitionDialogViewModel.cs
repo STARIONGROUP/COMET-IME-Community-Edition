@@ -238,10 +238,37 @@ namespace CDP4CommonView
             clone.Content = this.Content;
             clone.Note.Clear();
             clone. Note.AddOrderedItems(this.Note.Select(x => new OrderedItem { K = x.Index, V = x.Value }));
- 
+            if (!clone.Note.SortedItems.Keys.SequenceEqual(this.Note.Select(x=>x.Index)))
+            {
+                var noteListCount = this.Note.Count;
+                for (var i = 0; i < noteListCount; i++)
+                {
+                    var item = this.Note[i];
+                    var currentIndex = clone.Note.IndexOf(item.Value);
+
+                    if (currentIndex != i)
+                    {
+                        clone.Note.Move(currentIndex, i);
+                    }
+                }
+            }
+
             clone.Example.Clear();
             clone. Example.AddOrderedItems(this.Example.Select(x => new OrderedItem { K = x.Index, V = x.Value }));
- 
+            if (!clone.Example.SortedItems.Keys.SequenceEqual(this.Example.Select(x => x.Index)))
+            {
+                var noteListCount = this.Example.Count;
+                for (var i = 0; i < noteListCount; i++)
+                {
+                    var item = this.Example[i];
+                    var currentIndex = clone.Example.IndexOf(item.Value);
+
+                    if (currentIndex != i)
+                    {
+                        clone.Example.Move(currentIndex, i);
+                    }
+                }
+            }
         }
 
         /// <summary>

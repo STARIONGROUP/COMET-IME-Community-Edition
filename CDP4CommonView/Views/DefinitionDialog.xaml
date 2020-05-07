@@ -58,10 +58,17 @@
             </dxlc:LayoutGroup>
 
             <items:CitationLayoutGroup />
-            
-            <dxlc:LayoutGroup Header="Note" Orientation="Vertical">
+
+            <dxlc:LayoutGroup Header="Note" 
+                              Orientation="Vertical" 
+                              Width="Auto"
+                              Height="Auto"
+                              MaxWidth="525"
+                              MaxHeight="350"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch">
                 <dxlc:LayoutItem>
-                    <dxb:ToolBarControl Height="30" Width="480" Background="Transparent">
+                    <dxb:ToolBarControl Height="30" Background="Transparent">
                         <dxb:BarButtonItem x:Name="CreateNoteButton"
                                                Command="{Binding CreateNoteCommand}"
                                                Glyph="{dx:DXImage Image=Add_16x16.png}"
@@ -86,7 +93,7 @@
                 </dxlc:LayoutItem>
 
                 <dxlc:LayoutItem>
-                    <dxg:GridControl Height="250" Width="480"
+                    <dxg:GridControl Height="250" 
                                          AllowLiveDataShaping="False"
                                          ItemsSource="{Binding Note}"
                                          SelectedItem="{Binding SelectedNote,
@@ -117,9 +124,16 @@
                 </dxlc:LayoutItem>
             </dxlc:LayoutGroup>
 
-            <dxlc:LayoutGroup Header="Example" Orientation="Vertical" >
+            <dxlc:LayoutGroup Header="Example" 
+                              Orientation="Vertical" 
+                              Width="Auto"
+                              Height="Auto"
+                              MaxWidth="525"
+                              MaxHeight="350"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch">
                 <dxlc:LayoutItem>
-                    <dxb:ToolBarControl Height="30" Width="480" Background="Transparent">
+                    <dxb:ToolBarControl Height="30" Background="Transparent">
                         <dxb:BarButtonItem x:Name="CreateExampleButton"
                                                Command="{Binding CreateExampleCommand}"
                                                Glyph="{dx:DXImage Image=Add_16x16.png}"
@@ -144,7 +158,7 @@
                 </dxlc:LayoutItem>
 
                 <dxlc:LayoutItem>
-                    <dxg:GridControl Height="250" Width="480"
+                    <dxg:GridControl Height="250" 
                                          AllowLiveDataShaping="False"
                                          ItemsSource="{Binding Example}"
                                          SelectedItem="{Binding SelectedExample,

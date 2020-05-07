@@ -14,7 +14,7 @@
                   mc:Ignorable="d"
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Stretch"
-                  Width="500"
+                  Width="525"
                   MaxWidth="1920">
     <dxlc:LayoutGroup.Resources>
         <ResourceDictionary>
