@@ -68,8 +68,10 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             var configFileContent = File.ReadAllText(configurator.ConfigurationFilePath);
 
             // Ensure the generated file is the same as the testing one
-            Assert.IsTrue(
-                testFileContent.GetHashCode() == configFileContent.GetHashCode(), 
+            Assert.AreEqual(testFileContent.Length, configFileContent.Length,
+                $"test file content:\n{testFileContent}\n, config file content:\n{configFileContent}\n");
+
+            Assert.AreEqual(testFileContent,  configFileContent, 
                 $"test file content:\n{testFileContent}\n, config file content:\n{configFileContent}\n" );
         }
 
