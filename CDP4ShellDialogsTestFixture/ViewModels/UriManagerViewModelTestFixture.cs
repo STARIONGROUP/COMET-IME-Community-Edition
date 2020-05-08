@@ -64,8 +64,9 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             configurator.Write(rows);
 
-            var testFileContent = File.ReadAllText(this.testfile.FullName);
-            var configFileContent = File.ReadAllText(configurator.ConfigurationFilePath);
+            // Normalize line endings, because JSON.Net serialization is a bit inconsistent on handling indentation and line endings on different platforms
+            var testFileContent = File.ReadAllText(this.testfile.FullName).Replace("\r\n", "\n");
+            var configFileContent = File.ReadAllText(configurator.ConfigurationFilePath).Replace("\r\n", "\n");
 
             // Ensure the generated file is the same as the testing one
             Assert.AreEqual(testFileContent.Length, configFileContent.Length,
