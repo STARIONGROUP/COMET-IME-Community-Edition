@@ -38,10 +38,8 @@ namespace CDP4Composition.Tests.PluginSettingService
     public class PluginSettingsServiceTestFixture
     {
         private PluginSettingsService pluginSettingsService;
-        private TestModule testModule;
         private string expectedSettingsPath;
         private TestSettings testSettings;
-
 
         [SetUp]
         public void SetUp()
@@ -53,7 +51,6 @@ namespace CDP4Composition.Tests.PluginSettingService
                     "CDP4Composition.Tests.settings.json");
             
             this.pluginSettingsService = new PluginSettingsService();
-            this.testModule = new TestModule(this.pluginSettingsService);
 
             this.testSettings = new TestSettings
             {
