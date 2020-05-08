@@ -52,13 +52,25 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             Assert.Throws<ArgumentNullException>(() => configurator.Write(null));
 
             // Write row the same as the testing one
-            List<UriConfig> rows = new List<UriConfig>();
-            rows.Add(new UriConfig() { Alias="Alias0", Uri="Uri0", DalType="Web"});
+            var rows = new List<UriConfig>
+            {
+                new UriConfig
+                {
+                    Alias = "Alias0", 
+                    Uri = "Uri0", 
+                    DalType = "Web"
+                }
+            };
+
             configurator.Write(rows);
 
+            var testFileContent = File.ReadAllText(this.testfile.FullName);
+            var configFileContent = File.ReadAllText(configurator.ConfigurationFilePath);
+
             // Ensure the generated file is the same as the testing one
-            Assert.IsTrue(File.ReadAllText(this.testfile.FullName).GetHashCode() ==
-                          File.ReadAllText(configurator.ConfigurationFilePath).GetHashCode() );
+            Assert.IsTrue(
+                testFileContent.GetHashCode() == configFileContent.GetHashCode(), 
+                $"test file content:\n{testFileContent}\n, config file content:\n{configFileContent}\n" );
         }
 
         [Test]
