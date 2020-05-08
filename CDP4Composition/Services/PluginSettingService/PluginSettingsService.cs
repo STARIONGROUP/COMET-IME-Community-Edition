@@ -127,7 +127,7 @@ namespace CDP4Composition.PluginSettingService
         /// <summary>
         /// Checks for the existence of the <see cref="PluginSettingsService.ApplicationConfigurationDirectory"/>
         /// </summary>
-        private void CheckApplicationConfigurationDirectory()
+        public void CheckApplicationConfigurationDirectory()
         {
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {

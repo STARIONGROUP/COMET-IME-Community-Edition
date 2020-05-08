@@ -90,6 +90,8 @@ namespace CDP4Composition.Tests.PluginSettingService
         [Test]
         public void Verify_that_the_settings_can_be_read_from_disk()
         {
+            this.pluginSettingsService.CheckApplicationConfigurationDirectory();
+
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"), this.expectedSettingsPath);
             Assert.IsTrue(File.Exists(this.expectedSettingsPath));
 
@@ -101,6 +103,8 @@ namespace CDP4Composition.Tests.PluginSettingService
         [Test]
         public void Verify_that_settings_can_be_read_and_written_to_disk()
         {
+            this.pluginSettingsService.CheckApplicationConfigurationDirectory();
+
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"), this.expectedSettingsPath);
             Assert.IsTrue(File.Exists(this.expectedSettingsPath));
 
