@@ -40,7 +40,7 @@ test:
       - AppVeyorExclusion
       - OfficeDependent
 after_test:
-  - OpenCover.Console.exe -register:user -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools/\nunit3-console.exe" -targetargs:"cdp4ime-tests.nunit --where "cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent "" -filter:"-[*.Tests*]*" -output:".\cdp4ime_coverage.xml" -oldstyle -log:Error
+  - OpenCover.Console.exe -register:user -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools/\nunit3-console.exe" -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent""" -filter:"-[*.Tests*]*" -output:".\cdp4ime_coverage.xml" -oldstyle -log:Error
   - codecov -f "cdp4ime_coverage.xml" -t %CODECOV_TOKEN%
 notifications:
   - provider: Email
