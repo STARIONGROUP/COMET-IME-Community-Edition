@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="AfterBuild">
+    <!-- Declaring MSBuild property -->
+    <PropertyGroup>
+      <IsPluginPackagerNotCompiled>True</IsPluginPackagerNotCompiled>
+      <IsPluginPackagerNotCompiled Condition="Exists('..\CDP4PluginPackager\bin\debug\netcoreapp3.1\CDP4PluginPackager.exe')">False</IsPluginPackagerNotCompiled>
+      <ShouldPack></ShouldPack>
+      <ShouldPack Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">pack</ShouldPack>
+    </PropertyGroup>
+    <!-- Debug information on the tool being present -->
+    <Message Importance="High" Condition="$(IsPluginPackagerNotCompiled)" Text="------ PluginPackager tool is not present --MSBuild-- running ------ " />
+    <Message Importance="High" Condition="!$(IsPluginPackagerNotCompiled)" Text="------ PluginPackager tool is present ------ " />
+    <!-- Compile tool if not already -->
+    <Exec Condition="$(IsPluginPackagerNotCompiled)" Command="&quot;$(MSBuildToolsPath)\MSBuild.exe&quot; ..\CDP4PluginPackager\CDP4PluginPackager.csproj" YieldDuringToolExecution="True" ConsoleToMSBuild="False" EchoOff="True" />
+    <!-- at last running the tool -->
+    <Message Importance="High" Text="------ PluginPackager tool Started ------ " />
+    <Exec Command="&quot;..\CDP4PluginPackager\bin\debug\netcoreapp3.1\CDP4PluginPackager.exe&quot; $(ShouldPack)" YieldDuringToolExecution="True" ConsoleToMSBuild="True" />
+    <Message Importance="High" Text="------ PluginPackager tool has completed ------ " />
+  </Target>
+</Project>
