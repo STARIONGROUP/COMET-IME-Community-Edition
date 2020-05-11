@@ -8,7 +8,6 @@
     <assembly path="CDP4CommonView.Tests/bin/Debug/CDP4CommonView.Tests.dll" />
     <assembly path="CDP4Composition.Tests/bin/Debug/CDP4Composition.Tests.dll" />
     <assembly path="CDP4Dashboard.Tests/bin/Debug/CDP4Dashboard.Tests.dll" />
-    <assembly path="CDP4DiagramEditor.Tests/bin/Debug/CDP4DiagramEditor.Tests.dll" />
     <assembly path="CDP4IME.Tests/bin/Debug/CDP4IME.Tests.dll" />
     <assembly path="CDP4LogInfo.Tests/bin/Debug/CDP4LogInfo.Tests.dll" />
     <assembly path="CDP4ObjectBrowser.Tests/bin/Debug/CDP4ObjectBrowser.Tests.dll" />
