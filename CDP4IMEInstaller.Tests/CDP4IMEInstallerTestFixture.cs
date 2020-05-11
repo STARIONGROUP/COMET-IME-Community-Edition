@@ -160,12 +160,6 @@ namespace CDP4IMEInstaller.Tests
             }
         }
 
-        /// <summary>
-        /// Finds a parent directory based on the fact that at least one file's name in its directory matches a certain wildcard text
-        /// </summary>
-        /// <param name="currentDirectory">The directory to search in</param>
-        /// <param name="filenameWildCard">The filename wildcard text</param>
-        /// <returns>A <see cref="DirectoryInfo"/> object if found, otherwise null</returns>
         public DirectoryInfo FindParentFileLocation(DirectoryInfo currentDirectory, string filenameWildCard)
         {
             if (currentDirectory.GetFiles(filenameWildCard).Any())
@@ -173,7 +167,7 @@ namespace CDP4IMEInstaller.Tests
                 return currentDirectory;
             }
 
-            return currentDirectory.Parent ?? this.FindParentFileLocation(currentDirectory.Parent, filenameWildCard);
+            return currentDirectory.Parent != null ? this.FindParentFileLocation(currentDirectory.Parent, filenameWildCard) : null;
         }
     }
 }
