@@ -22,6 +22,10 @@
         <File Id="_90BBA601" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Data.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_F0F0E94FA752" Guid="{461C5BA0-DBDB-4F35-B87C-F0F0E94FA752}" Win64="$(var.Win64)">
+        <File Id="_461C5BA0" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Data.Desktop.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_2992F34AA343" Guid="{A159A34F-C2BC-4E62-AB7A-2992F34AA343}" Win64="$(var.Win64)">
         <File Id="_A159A34F" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.DataAccess.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
@@ -38,8 +42,16 @@
         <File Id="_0D612BC9" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Mvvm.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_CFD96232C662" Guid="{6B2516CB-D935-4E94-A2E0-CFD96232C662}" Win64="$(var.Win64)">
+        <File Id="_6B2516CB" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Office.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_1C2754BDEF90" Guid="{BE68B644-1558-4082-A5A7-1C2754BDEF90}" Win64="$(var.Win64)">
         <File Id="_BE68B644" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Pdf.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_A69FD2974052" Guid="{A9F7341E-61D8-454C-8D03-A69FD2974052}" Win64="$(var.Win64)">
+        <File Id="_A9F7341E" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Pdf.v20.1.Drawing.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_4A9CA28498D7" Guid="{3826E4B8-F154-4B0A-84F2-4A9CA28498D7}" Win64="$(var.Win64)">
@@ -50,18 +62,6 @@
         <File Id="_6215A1C8" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.RichEdit.v20.1.Export.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
-      <Component Id="_52604A2B655A" Guid="{40E62069-BCCC-406F-95A0-52604A2B655A}" Win64="$(var.Win64)">
-        <File Id="_40E62069" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Sparkline.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_F668F0AA6236" Guid="{9071C230-2BF6-42BB-A935-F668F0AA6236}" Win64="$(var.Win64)">
-        <File Id="_9071C230" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Utils.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_CFD96232C662" Guid="{6B2516CB-D935-4E94-A2E0-CFD96232C662}" Win64="$(var.Win64)">
-        <File Id="_6B2516CB" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Office.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
       <Component Id="_3631B07802CB" Guid="{4B9B71D8-4412-49A5-A1E5-3631B07802CB}" Win64="$(var.Win64)">
         <File Id="_4B9B71D8" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Printing.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
@@ -70,11 +70,23 @@
         <File Id="_BF10AE75" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.RichEdit.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_52604A2B655A" Guid="{40E62069-BCCC-406F-95A0-52604A2B655A}" Win64="$(var.Win64)">
+        <File Id="_40E62069" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Sparkline.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_7099E07131BB" Guid="{C6F208B7-78F8-4584-B2B0-7099E07131BB}" Win64="$(var.Win64)">
         <File Id="_C6F208B7" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.SpellChecker.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
-      <Component Id="_E6E58CD0325B" Guid="{794F805A-F925-48E3-9495-E6E58CD0325B}" Location="local" Win64="$(var.Win64)">
+      <Component Id="_F668F0AA6236" Guid="{9071C230-2BF6-42BB-A935-F668F0AA6236}" Win64="$(var.Win64)">
+        <File Id="_9071C230" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Utils.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_C376A260FCCA" Guid="{514DF947-1C96-4F8D-A919-C376A260FCCA}" Win64="$(var.Win64)">
+        <File Id="_514DF947" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Accordion.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_E6E58CD0325B" Guid="{794F805A-F925-48E3-9495-E6E58CD0325B}" Win64="$(var.Win64)">
         <File Id="_794F805A" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Charts.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
@@ -94,6 +106,10 @@
         <File Id="_CCADFC40" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Core.v20.1.Extensions.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_438245661AE1" Guid="{E44FC402-03B0-4E2A-A918-438245661AE1}" Win64="$(var.Win64)">
+        <File Id="_E44FC402" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.DataAccess.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_87990B9C4AC7" Guid="{14D51648-6A12-48D7-BD14-87990B9C4AC7}" Win64="$(var.Win64)">
         <File Id="_14D51648" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Diagram.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
@@ -106,8 +122,12 @@
         <File Id="_A43E3DFA" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.DocumentViewer.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_7F20CBB63AE3" Guid="{2D29816F-7125-438F-B36D-7F20CBB63AE3}" Win64="$(var.Win64)">
+        <File Id="_2D29816F" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.ExpressionEditor.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_5B4F714F0F70" Guid="{9B10747B-031D-4FCD-9E2D-5B4F714F0F70}" Win64="$(var.Win64)">
-        <File Id="_9B10747B" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)devexpress.xpf.grid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_9B10747B" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Grid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_AEED67461EA4" Guid="{4BF10AF7-46B3-470E-90C2-AEED67461EA4}" Win64="$(var.Win64)">
@@ -130,6 +150,14 @@
         <File Id="_B5D4E1CB" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.NavBar.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_0DDB4CC55A04" Guid="{ED22B90E-D14C-46FD-9410-0DDB4CC55A04}" Win64="$(var.Win64)">
+        <File Id="_ED22B90E" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Office.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_A9727703690B" Guid="{B37C23DB-E8FB-4B0E-BA48-A9727703690B}" Win64="$(var.Win64)">
+        <File Id="_B37C23DB" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.PivotGrid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_B79038CBE4F5" Guid="{51C4C490-50F8-49A9-86E3-B79038CBE4F5}" Win64="$(var.Win64)">
         <File Id="_51C4C490" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Printing.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
@@ -140,6 +168,14 @@
 
       <Component Id="_D56ED025548D" Guid="{536398DE-BCA0-4756-B124-D56ED025548D}" Win64="$(var.Win64)">
         <File Id="_536398DE" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Ribbon.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_5E0EC27ED878" Guid="{FFA5D964-3E1D-4375-B490-5E0EC27ED878}" Win64="$(var.Win64)">
+        <File Id="_FFA5D964" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.RichEdit.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_E06731211115" Guid="{27BBFF45-CB03-475A-9A7C-E06731211115}" Win64="$(var.Win64)">
+        <File Id="_27BBFF45" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.ReportDesigner.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_2C0712005553" Guid="{B21A5DDA-08F4-4988-BB3E-2C0712005553}" Win64="$(var.Win64)">
@@ -198,6 +234,54 @@
         <File Id="_F6E798C2" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2013LightGray.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_5CB9EF02DFBC" Guid="{23A852A0-C7AE-41AC-9476-5CB9EF02DFBC}" Win64="$(var.Win64)">
+        <File Id="_23A852A0" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2016Black.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_AD4054935F34" Guid="{A6179DE5-7FD4-4C43-9958-AD4054935F34}" Win64="$(var.Win64)">
+        <File Id="_A6179DE5" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2016BlackSE.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_9A4F1660F686" Guid="{D16F3591-6EFB-4CEA-88E3-9A4F1660F686}" Win64="$(var.Win64)">
+        <File Id="_D16F3591" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2016Colorful.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_CCAD29866706" Guid="{380A6A42-B924-4492-AC28-CCAD29866706}" Win64="$(var.Win64)">
+        <File Id="_380A6A42" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2016ColorfulSE.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_06BBDFDFCF71" Guid="{6977AB6C-1D26-4B35-932B-06BBDFDFCF71}" Win64="$(var.Win64)">
+        <File Id="_6977AB6C" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2016DarkGraySE.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_F60FBEAAFC7D" Guid="{194B4B00-50B8-4BE5-9526-F60FBEAAFC7D}" Win64="$(var.Win64)">
+        <File Id="_194B4B00" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2016White.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_BB2EAF63A442" Guid="{99A6087E-9BB9-420A-80A2-BB2EAF63A442}" Win64="$(var.Win64)">
+        <File Id="_99A6087E" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2016WhiteSE.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_18F4677EA0C7" Guid="{E30D419A-807E-4F8E-8693-18F4677EA0C7}" Win64="$(var.Win64)">
+        <File Id="_E30D419A" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2019Black.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_AFA996091AE4" Guid="{E3E747FB-3B71-4BA0-9818-AFA996091AE4}" Win64="$(var.Win64)">
+        <File Id="_E3E747FB" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2019Colorful.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_B6EA5F998A31" Guid="{74C3C750-26FF-4A5E-A76C-B6EA5F998A31}" Win64="$(var.Win64)">
+        <File Id="_74C3C750" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2019DarkGray.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_D02C4ACAB4BE" Guid="{C87487FF-C8DE-407E-A524-D02C4ACAB4BE}" Win64="$(var.Win64)">
+        <File Id="_C87487FF" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2019HighContrast.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_90D571BF8926" Guid="{7B6ED347-E3EF-4AF1-B58B-90D571BF8926}" Win64="$(var.Win64)">
+        <File Id="_7B6ED347" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Office2019White.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_0A164189F766" Guid="{E12B5FD0-85B1-44CE-B686-0A164189F766}" Win64="$(var.Win64)">
         <File Id="_E12B5FD0" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.Seven.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
@@ -210,16 +294,84 @@
         <File Id="_F6E8C7E6" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.VS2010.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_DC399DB4FAF7" Guid="{6047ABA9-B05E-43AE-808A-DC399DB4FAF7}" Win64="$(var.Win64)">
+        <File Id="_6047ABA9" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.VS2017Blue.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_59CFC41D923B" Guid="{E682BD8C-9640-4582-92CB-59CFC41D923B}" Win64="$(var.Win64)">
+        <File Id="_E682BD8C" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.VS2017Dark.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_06ADF8BCC18F" Guid="{BBCC0063-B6F4-432F-90FB-06ADF8BCC18F}" Win64="$(var.Win64)">
+        <File Id="_BBCC0063" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.VS2017Light.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_4D76BD95A65E" Guid="{533DFB88-2C11-46B0-9B03-4D76BD95A65E}" Win64="$(var.Win64)">
+        <File Id="_533DFB88" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.VS2019Blue.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_96C91DEB9009" Guid="{8CD4A3DC-287E-4BF9-8B41-96C91DEB9009}" Win64="$(var.Win64)">
+        <File Id="_8CD4A3DC" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.VS2019Dark.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_08A22767B37C" Guid="{1B2B69EF-58B5-4E69-9C6A-08A22767B37C}" Win64="$(var.Win64)">
+        <File Id="_1B2B69EF" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Themes.VS2019Light.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_B94032EE1CAA" Guid="{62646496-DC18-43D0-AE37-B94032EE1CAA}" Win64="$(var.Win64)">
         <File Id="_62646496" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpo.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_7116AA16559C" Guid="{5EAFD90B-7F26-4100-86B9-7116AA16559C}" Win64="$(var.Win64)">
+        <File Id="_5EAFD90B" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraBars.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_BF4FBB271E0D" Guid="{C3BD8574-1870-4780-B7D9-BF4FBB271E0D}" Win64="$(var.Win64)">
         <File Id="_C3BD8574" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraCharts.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_C1CC8F7DCB05" Guid="{83EF3F9A-B013-49C0-B841-C1CC8F7DCB05}" Win64="$(var.Win64)">
+        <File Id="_83EF3F9A" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraEditors.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_603C4C81ECC9" Guid="{939F9678-5859-4EC9-A15B-603C4C81ECC9}" Win64="$(var.Win64)">
         <File Id="_939F9678" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraGauges.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_2978AA787293" Guid="{7F7DF990-9AA1-459B-BF10-2978AA787293}" Win64="$(var.Win64)">
+        <File Id="_7F7DF990" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraGrid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_57954C4C09E8" Guid="{89546FC2-40A5-4A25-9FAC-57954C4C09E8}" Win64="$(var.Win64)">
+        <File Id="_89546FC2" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraLayout.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_5998F0929FE8" Guid="{38D91884-536B-40BA-ADD7-5998F0929FE8}" Win64="$(var.Win64)">
+        <File Id="_38D91884" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraNavBar.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_0C7D56628EF1" Guid="{C9B60BF2-D299-4AF3-8C04-0C7D56628EF1}" Win64="$(var.Win64)">
+        <File Id="_C9B60BF2" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraPivotGrid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_129C536677D3" Guid="{1BACC5FE-5739-4048-954E-129C536677D3}" Win64="$(var.Win64)">
+        <File Id="_1BACC5FE" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraPrinting.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_5569D5672272" Guid="{BC95F656-BEE7-4DFA-A9D2-5569D5672272}" Win64="$(var.Win64)">
+        <File Id="_BC95F656" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraReports.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_2C569452A7C7" Guid="{36B17D24-2AA8-4E20-8A7C-2C569452A7C7}" Win64="$(var.Win64)">
+        <File Id="_36B17D24" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraTreeList.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_FEFBE3BC62B3" Guid="{F26DEBE4-6BF2-4A72-8754-FEFBE3BC62B3}" Win64="$(var.Win64)">
+        <File Id="_F26DEBE4" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraVerticalGrid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_466F4136E0B2" Guid="{4043AEC7-1839-4094-8C59-466F4136E0B2}" Win64="$(var.Win64)">
+        <File Id="_4043AEC7" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraWizard.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
     </ComponentGroup>
