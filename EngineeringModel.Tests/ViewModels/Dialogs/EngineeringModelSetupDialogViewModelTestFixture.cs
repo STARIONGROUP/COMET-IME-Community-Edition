@@ -1,8 +1,28 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelSetupDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests
 {
@@ -10,17 +30,24 @@ namespace CDP4EngineeringModel.Tests
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
     using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;    
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    
     using CDP4Composition.Navigation;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
+    
     using CDP4EngineeringModel.ViewModels;
+    
     using Moq;
+    
     using NUnit.Framework;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -78,7 +105,7 @@ namespace CDP4EngineeringModel.Tests
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             var sourceEngineeringModelSetupIid = Guid.NewGuid();
             this.sourceEngineeringModelSetup = new EngineeringModelSetup(sourceEngineeringModelSetupIid, this.cache, this.uri);
-            this.siteDirectory.Model.Add(sourceEngineeringModelSetup);
+            this.siteDirectory.Model.Add(this.sourceEngineeringModelSetup);
             
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.FromResult("some result"));
@@ -114,8 +141,10 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatConstructorSetsPropertiesOfNewEngineeringModelSetup()
         {
             // The EngineeringModelSetup that is to be created
-            var engineeringModelSetup = new EngineeringModelSetup();
-            engineeringModelSetup.SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid;
+            var engineeringModelSetup = new EngineeringModelSetup
+            {
+                SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid
+            };
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
@@ -133,8 +162,10 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatWhenExceptionIsNotNullHasExceptionReturnsTrue()
         {
-            var engineeringModelSetup = new EngineeringModelSetup();
-            engineeringModelSetup.SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid;
+            var engineeringModelSetup = new EngineeringModelSetup
+            {
+                SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid
+            };
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
@@ -152,8 +183,10 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatWriteExecutesOnTheSessionAndThatPropertiesAreSetFromViewModel()
         {
-            var engineeringModelSetup = new EngineeringModelSetup();
-            engineeringModelSetup.SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid;
+            var engineeringModelSetup = new EngineeringModelSetup
+            {
+                SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid
+            };
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
@@ -192,8 +225,10 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatWriteExceptionCanBeSetFromExecuteOkCommand()
         {
-            var engineeringModelSetup = new EngineeringModelSetup();
-            engineeringModelSetup.SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid;
+            var engineeringModelSetup = new EngineeringModelSetup
+            {
+                SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid
+            };
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
@@ -214,11 +249,13 @@ namespace CDP4EngineeringModel.Tests
             var name = "name";
             var studyPhase = StudyPhaseKind.PREPARATION_PHASE;
 
-            var engineeringModelSetup = new EngineeringModelSetup();
-            engineeringModelSetup.ShortName = shortname;
-            engineeringModelSetup.Name = name;
-            engineeringModelSetup.StudyPhase = studyPhase;
-            engineeringModelSetup.SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid;
+            var engineeringModelSetup = new EngineeringModelSetup
+            {
+                ShortName = shortname, 
+                Name = name, 
+                StudyPhase = studyPhase, 
+                SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid
+            };
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
@@ -237,7 +274,6 @@ namespace CDP4EngineeringModel.Tests
             this.viewModel.SourceEngineeringModelSetup = newSourceModel;
 
             this.viewModel.CancelCommand.Execute(null);
-
 
             Assert.AreEqual(shortname, engineeringModelSetup.ShortName);
             Assert.AreEqual(name, engineeringModelSetup.Name);

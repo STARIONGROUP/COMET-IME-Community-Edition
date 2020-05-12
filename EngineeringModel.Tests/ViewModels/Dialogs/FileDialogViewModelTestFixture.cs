@@ -233,7 +233,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        public async Task VerifyOkButtonWorks()
+        public void VerifyOkButtonWorks()
         {
             var vm = new FileDialogViewModel(this.file, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.store);
 

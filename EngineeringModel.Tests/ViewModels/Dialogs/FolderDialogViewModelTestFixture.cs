@@ -1,5 +1,5 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DomainFileStoreDialogViewModelTestFixture.cs" company="RHEA System S.A.">
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="FolderDialogViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -44,7 +44,6 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
-    using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.ViewModels;
 
@@ -55,24 +54,24 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using ReactiveUI;
 
     /// <summary>
-    /// Suite of tests for the <see cref="DomainFileStoreDialogViewModel"/>
+    /// Suite of tests for the <see cref="FolderDialogViewModel"/>
     /// </summary>
     [TestFixture]
-    public class DomainFileStoreDialogViewModelTestFixture
+    public class FolderDialogViewModelTestFixture
     {
         private Uri uri = new Uri("http://www.rheagroup.com");
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private IThingTransaction thingTransaction;
         private Mock<ISession> session;
-        private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
 
-        private Iteration iterationClone;
         private EngineeringModel engineeringModel;
         private DomainOfExpertise domainOfExpertise;
         private Participant participant;
 
+        private Folder folder;
         private DomainFileStore domainFileStore;
+        private DomainFileStore domainFileStoreClone;
 
         [SetUp]
         public void SetUp()
@@ -83,7 +82,6 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
-            this.permissionService = new Mock<IPermissionService>();
 
             this.domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "system", ShortName = "SYS" };
 
@@ -101,16 +99,19 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             srdl.DefinedCategory.Add(new Category(Guid.NewGuid(), this.cache, this.uri));
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.engineeringModel.EngineeringModelSetup = engineeringModelSetup;
-            var iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = new IterationSetup() };
+            var iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = new IterationSetup()};
             this.engineeringModel.Iteration.Add(iteration);
+            this.folder = new Folder(Guid.NewGuid(), this.cache, this.uri);
             this.domainFileStore = new DomainFileStore(Guid.NewGuid(), this.cache, this.uri);
+            this.domainFileStore.Folder.Add(this.folder);
             iteration.DomainFileStore.Add(this.domainFileStore);
 
             this.cache.TryAdd(new CacheKey(iteration.Iid, null), new Lazy<Thing>(() => iteration));
-            this.iterationClone = iteration.Clone(false);
 
-            var transactionContext = TransactionContextResolver.ResolveContext(iteration);
-            this.thingTransaction = new ThingTransaction(transactionContext, this.iterationClone);
+            this.domainFileStoreClone = this.domainFileStore.Clone(false);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.domainFileStore);
+            this.thingTransaction = new ThingTransaction(transactionContext, this.domainFileStoreClone);
 
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
@@ -120,6 +121,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             openIterations.Add(iteration, new Tuple<DomainOfExpertise, Participant>(this.domainOfExpertise, this.participant));
 
             this.session.Setup(x => x.OpenIterations).Returns(openIterations);
+            this.session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(this.domainOfExpertise);
 
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
@@ -127,8 +129,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [Test]
         public void VerifyThatDefaultConstructorIsAvailable()
         {
-            var domainFileStoreDialogViewModel = new DomainFileStoreDialogViewModel();
-            Assert.IsNotNull(domainFileStoreDialogViewModel);
+            var folderDialogViewModel = new FolderDialogViewModel();
+            Assert.IsNotNull(folderDialogViewModel);
         }
 
         [Test]
@@ -137,19 +139,33 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var name = "name";
             var createdOn = DateTime.UtcNow;
 
-            this.domainFileStore.Name = name;
-            this.domainFileStore.CreatedOn = createdOn;
-            this.domainFileStore.Owner = this.domainOfExpertise;
+            this.folder.Name = name;
+            this.folder.CreatedOn = createdOn;
+            this.folder.Owner = this.domainOfExpertise;
 
-            var domainFileStoreDialogViewModel = 
-                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
-                    this.thingDialogNavigationService.Object, this.iterationClone);
+            var folderDialogViewModel = 
+                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+                    this.thingDialogNavigationService.Object, this.domainFileStoreClone);
 
-            Assert.AreEqual(name, domainFileStoreDialogViewModel.Name);
-            Assert.AreEqual(createdOn, domainFileStoreDialogViewModel.CreatedOn);
-            Assert.AreEqual(this.domainOfExpertise, domainFileStoreDialogViewModel.SelectedOwner);
-            Assert.AreSame(this.iterationClone, domainFileStoreDialogViewModel.Container);
-            Assert.IsTrue(domainFileStoreDialogViewModel.PossibleOwner.Any());
+            Assert.AreEqual(name, folderDialogViewModel.Name);
+            Assert.AreEqual(createdOn, folderDialogViewModel.CreatedOn);
+            Assert.AreEqual(this.domainOfExpertise, folderDialogViewModel.SelectedOwner);
+            Assert.AreSame(this.domainFileStoreClone, folderDialogViewModel.Container);
+            Assert.IsTrue(folderDialogViewModel.PossibleOwner.Any());
+        }
+
+        [Test]
+        public void VerifyThatPropertiesAreSetForNewFolder()
+        {
+            var folderDialogViewModel =
+                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create,
+                    this.thingDialogNavigationService.Object, this.domainFileStoreClone);
+
+            Assert.AreNotEqual(DateTime.MinValue, folderDialogViewModel.CreatedOn);
+            Assert.AreEqual(this.domainOfExpertise, folderDialogViewModel.SelectedOwner);
+            Assert.AreSame(this.domainFileStoreClone, folderDialogViewModel.Container);
+            Assert.IsTrue(folderDialogViewModel.PossibleOwner.Any());
+            Assert.IsNull(this.folder.ContainingFolder);
         }
 
         [Test]
@@ -158,15 +174,15 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var name = "name";
             var createdOn = DateTime.UtcNow;
 
-            this.domainFileStore.Name = name;
-            this.domainFileStore.CreatedOn = createdOn;
-            this.domainFileStore.Owner = this.domainOfExpertise;
+            this.folder.Name = name;
+            this.folder.CreatedOn = createdOn;
+            this.folder.Owner = this.domainOfExpertise;
 
-            var domainFileStoreDialogViewModel = 
-                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
-                    this.thingDialogNavigationService.Object, this.iterationClone);
+            var folderDialogViewModel = 
+                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+                    this.thingDialogNavigationService.Object, this.domainFileStoreClone);
 
-            domainFileStoreDialogViewModel.OkCommand.Execute(null);
+            folderDialogViewModel.OkCommand.Execute(null);
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
@@ -176,31 +192,34 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         {
             var name = "name";
             var createdOn = DateTime.UtcNow;
-            this.domainFileStore.Owner = this.domainOfExpertise;
+            this.folder.Owner = this.domainOfExpertise;
 
-            var domainFileStoreDialogViewModel = 
-                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
-                    this.thingDialogNavigationService.Object, this.iterationClone);
+            var folderDialogViewModel = 
+                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+                    this.thingDialogNavigationService.Object, this.domainFileStoreClone);
 
-            Assert.IsTrue(domainFileStoreDialogViewModel.OkCanExecute);
+            Assert.IsFalse(folderDialogViewModel.OkCanExecute);
 
-            domainFileStoreDialogViewModel.Name = null;
-            Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
+            folderDialogViewModel.Name = name;
+            Assert.IsTrue(folderDialogViewModel.OkCanExecute);
 
-            domainFileStoreDialogViewModel.CreatedOn = default;
-            Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
+            folderDialogViewModel.Name = default;
+            Assert.IsFalse(folderDialogViewModel.OkCanExecute);
 
-            domainFileStoreDialogViewModel.SelectedOwner = null;
-            Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
+            folderDialogViewModel.CreatedOn = default;
+            Assert.IsFalse(folderDialogViewModel.OkCanExecute);
+            
+            folderDialogViewModel.SelectedOwner = default;
+            Assert.IsFalse(folderDialogViewModel.OkCanExecute);
 
-            domainFileStoreDialogViewModel.Name = name;
-            Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
+            folderDialogViewModel.Name = name;
+            Assert.IsFalse(folderDialogViewModel.OkCanExecute);
 
-            domainFileStoreDialogViewModel.CreatedOn = createdOn;
-            Assert.IsFalse(domainFileStoreDialogViewModel.OkCanExecute);
+            folderDialogViewModel.CreatedOn = createdOn;
+            Assert.IsFalse(folderDialogViewModel.OkCanExecute);
 
-            domainFileStoreDialogViewModel.SelectedOwner = this.domainOfExpertise;
-            Assert.IsTrue(domainFileStoreDialogViewModel.OkCanExecute);
+            folderDialogViewModel.SelectedOwner = this.domainOfExpertise;
+            Assert.IsTrue(folderDialogViewModel.OkCanExecute);
         }
     }
 }
