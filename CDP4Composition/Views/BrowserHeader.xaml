@@ -3,9 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:Converter="clr-namespace:CDP4Composition.Converters"
              d:DesignHeight="60"
              d:DesignWidth="400"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <Converter:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <UserControl.ToolTip>
         <ToolTip >
             <StackPanel Orientation="Vertical">
@@ -104,6 +110,23 @@
                    Margin="3"
                    FontSize="10"
                    Text="{Binding Person}" />
+
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Height="Auto"
+                   FontWeight="Bold"
+                   Margin="6,3,3,3"
+                   FontSize="10"
+                   Text="Option:"
+                   Visibility="{Binding IsOptionDependant, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+        <TextBlock Grid.Row="2"
+                   Grid.Column="1"
+                   Height="Auto"
+                   TextTrimming="CharacterEllipsis"
+                   Margin="3"
+                   FontSize="10"
+                   Text="{Binding CurrentOption}"
+                   Visibility="{Binding IsOptionDependant, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
 
         <TextBlock Grid.Row="2"
                    Grid.Column="2"

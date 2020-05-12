@@ -1,8 +1,28 @@
-﻿// ------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ProductTree.ViewModels
 {
@@ -12,10 +32,14 @@ namespace CDP4ProductTree.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    
     using CDP4Dal.Operations;
+    
     using CDP4Common.SiteDirectoryData;
+    
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
@@ -23,8 +47,10 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    
     using CDP4Dal;
     using CDP4Dal.Events;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -88,6 +114,11 @@ namespace CDP4ProductTree.ViewModels
         private bool canCreateOverride;
 
         /// <summary>
+        /// Backing field for <see cref="IsOptionDependant"/>
+        /// </summary>
+        private bool isOptionDependant;
+
+        /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Product Tree";
@@ -133,6 +164,16 @@ namespace CDP4ProductTree.ViewModels
             this.SetTopElement(iteration);
 
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Gets the value whether <see cref="ProductTreeViewModel"/> is option dependant
+        /// the value is used by the <see cref="CDP4CommonView.Views.BrowserHeader"/> to display or not the option informations
+        /// </summary>
+        public bool IsOptionDependant
+        {
+            get => this.isOptionDependant;
+            private set => this.RaiseAndSetIfChanged(ref this.isOptionDependant, value);
         }
 
         /// <summary>
@@ -522,6 +563,7 @@ namespace CDP4ProductTree.ViewModels
             this.CurrentModel = this.modelSetup.Name;
             this.CurrentIteration = this.iterationSetup.IterationNumber;
             this.CurrentOption = this.Thing.Name;
+            this.IsOptionDependant = true;
 
             var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing.Container);
             if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
