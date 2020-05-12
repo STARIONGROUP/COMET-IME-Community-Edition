@@ -2,6 +2,10 @@ image: Visual Studio 2019
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  PROJECT_MAIN:   'CDP4-CE'
+  TEST_RESULT:    'TestResult.xml'
+  TEST_COVERAGE:  'CoverResults.xml'
+  TEST_LOG:       'TestResults'
 
 for:
 # configuration for "master" branch, build in Release mode
@@ -28,20 +32,25 @@ before_build:
   - cmd: choco install codecov
 
 build:
-  project: CDP4-CE.sln
-  verbosity: quiet
-test:
-  assemblies:
-    only:
-      - '**\bin\$(configuration)\*.Tests.dll'
-  categories:
-    except:
-      - WebServicesDependent
-      - AppVeyorExclusion
-      - OfficeDependent
+  project: '%PROJECT_MAIN%.sln'
+  verbosity: minimal
+
+test_script:
+    - >
+      OpenCover.Console.exe
+      -log:Error
+      -register:user
+      -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools\nunit3-console.exe"
+      -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent"""
+      -returntargetcode
+      -hideskipped:All
+      -output:"%TEST_COVERAGE%"
+      -filter:"%TEST_FILTERS%"
 after_test:
-  - OpenCover.Console.exe -register:user -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools/\nunit3-console.exe" -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent""" -filter:"-[*.Tests*]*" -output:".\cdp4ime_coverage.xml" -log:Error
-  - codecov -f "cdp4ime_coverage.xml" -t %CODECOV_TOKEN%
+    - codecov -f "%TEST_COVERAGE%" -t %CODECOV_TOKEN%
+    - xcopy /q /Y /I "%TEST_COVERAGE%" "%TEST_LOG%\"
+artifacts:
+    - path: '%TEST_LOG%'
 notifications:
   - provider: Email
     to:
