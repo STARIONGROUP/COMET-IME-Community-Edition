@@ -39,15 +39,16 @@ test_script:
     - >
       OpenCover.Console.exe
       -log:Error
-      -register:user
+      -register
       -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools\nunit3-console.exe"
       -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent"""
       -returntargetcode
       -hideskipped:All
       -output:"%TEST_COVERAGE%"
-      -filter:"%TEST_FILTERS%"
+      -filter:"-[*.Tests*]*"
 after_test:
     - codecov -f "%TEST_COVERAGE%" -t %CODECOV_TOKEN%
+    - xcopy /q /Y /I "%TEST_RESULT%" "%TEST_LOG%\"
     - xcopy /q /Y /I "%TEST_COVERAGE%" "%TEST_LOG%\"
 artifacts:
     - path: '%TEST_LOG%'
