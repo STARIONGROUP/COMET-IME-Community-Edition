@@ -32,6 +32,7 @@ namespace CDP4IMEInstaller.Tests
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
 
     using DotLiquid;
     using DotLiquid.NamingConventions;
@@ -68,12 +69,12 @@ namespace CDP4IMEInstaller.Tests
         [Test]
         public void VerifyThatDevExpressWxsIsCorrect()
         {
-            var template = Template.Parse(File.ReadAllText("DevExpress.wxs.liquid"));
+            var template = Template.Parse(File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "DevExpress.wxs.liquid")));
 
             // the contents of the code variable can be copied to DevExpress.wxs manually when changes are found.
             var code = template.Render(Hash.FromAnonymousObject(new { KnownAssemblies = this.knownAssembliesClassDrop }));
 
-            var myProjectLocation = this.FindParentFileLocation(new DirectoryInfo(Environment.CurrentDirectory), "CDP4IMEInstaller.Tests.csproj");
+            var myProjectLocation = this.FindParentFileLocation(new DirectoryInfo(TestContext.CurrentContext.TestDirectory), "CDP4IMEInstaller.Tests.csproj");
             Assert.IsNotNull(myProjectLocation, "CDP4IMEInstaller.Tests.csproj file not found");
 
             var devExpressWxsLocation = Path.Combine(myProjectLocation.Parent?.FullName, "CDP4IMEInstaller" , "DevExpress.wxs");
@@ -88,7 +89,7 @@ namespace CDP4IMEInstaller.Tests
         {
             var knownAssemblies = this.knownAssembliesClassDrop.Assemblies;
 
-            var myProjectLocation = this.FindParentFileLocation(new DirectoryInfo(Environment.CurrentDirectory), "CDP4IMEInstaller.Tests.csproj");
+            var myProjectLocation = this.FindParentFileLocation(new DirectoryInfo(TestContext.CurrentContext.TestDirectory), "CDP4IMEInstaller.Tests.csproj");
             Assert.IsNotNull(myProjectLocation, "CDP4IMEInstaller.Tests.csproj file not found");
 
             var separator = Path.DirectorySeparatorChar;
@@ -137,10 +138,10 @@ namespace CDP4IMEInstaller.Tests
                                              "the licensors of this Program grant you additional permission to convey the resulting work.\r\n");
             }
 
-            //The content of this variable can be manually copied to the License.rtf file in the CDPIME-CE project
+            //The content of the textToCopiedManuallyToLicenseFile variable can be manually copied to the License.rtf file in the CDPIME-CE project
             var textToCopiedManuallyToLicenseFile = devExpressTextBuilder.ToString();
 
-            var myProjectLocation = this.FindParentFileLocation(new DirectoryInfo(Environment.CurrentDirectory), "CDP4IMEInstaller.Tests.csproj");
+            var myProjectLocation = this.FindParentFileLocation(new DirectoryInfo(TestContext.CurrentContext.TestDirectory), "CDP4IMEInstaller.Tests.csproj");
             Assert.IsNotNull(myProjectLocation, "CDP4IMEInstaller.Tests.csproj file not found");
 
             var licenseRtfLocation = Path.Combine(myProjectLocation.Parent?.FullName, "CDP4IME", "license.rtf");
@@ -149,7 +150,7 @@ namespace CDP4IMEInstaller.Tests
             var rtfText = RichTextStripper.StripRichTextFormat(File.ReadAllText(licenseRtfLocation));
 
             var expectedTimes = knownAssembliesWithoutExtension.Count * 2;
-            var foundTimes = rtfText.Split("DevExpress").Length - 1;
+            var foundTimes = Regex.Matches(rtfText, "DevExpress").Count;
 
             Assert.AreEqual(expectedTimes, foundTimes,
                 $"Expected to find the text 'DevExpress' {knownAssembliesWithoutExtension.Count * 2} times, but {foundTimes} were found instead.");
