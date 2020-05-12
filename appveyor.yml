@@ -45,7 +45,7 @@ test_script:
       -returntargetcode
       -hideskipped:All
       -output:"%TEST_COVERAGE%"
-      -filter:"+[CDP4Budget*]* +[CDP4AddinCE*]* +[CDP4Composition*]* +[CDP4BasicRdl*]* +[CDP4ShellDialogs*]* +[CDP4CommonView*]* +[CDP4BuiltInRules*]* +[CDP4Dashboard*]* +[CDP4IME*]* +[CDP4LogInfo*]* +[CDP4OfficeInfrastructure*]* +[CDP4ObjectBrowser*]* +[CDP4ParameterSheetGenerator*]* +[CDP4PropertyGrid*]* +[CDP4Scripting*]* +[CDP4RelationshipEditor*]* +[CDP4SiteDirectory*]* +[CDP4SystemsToolKit*]* +[CDP4ProductTree*]* +[CDP4EngineeringModel*]* -[*.Tests*]* -[*.Views]*"
+      -filter:"+[CDP4Budget*]* +[CDP4AddinCE*]* +[CDP4Composition*]* +[CDP4BasicRdl*]* +[CDP4ShellDialogs*]* +[CDP4CommonView*]* +[CDP4BuiltInRules*]* +[CDP4Dashboard*]* +[CDP4IME*]* +[CDP4LogInfo*]* +[CDP4OfficeInfrastructure*]* +[CDP4ObjectBrowser*]* +[CDP4ParameterSheetGenerator*]* +[CDP4PropertyGrid*]* +[CDP4Scripting*]* +[CDP4RelationshipEditor*]* +[CDP4SiteDirectory*]* +[CDP4SystemsToolKit*]* +[CDP4ProductTree*]* -[*.Tests*]* -[*.Views]*"
 after_test:
     - codecov -f "%TEST_COVERAGE%" -t %CODECOV_TOKEN%
     - xcopy /q /Y /I "%TEST_RESULT%" "%TEST_LOG%\"
