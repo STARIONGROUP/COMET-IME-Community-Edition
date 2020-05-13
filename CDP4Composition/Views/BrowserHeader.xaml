@@ -3,13 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:Converter="clr-namespace:CDP4Composition.Converters"
+             xmlns:converter="clr-namespace:CDP4Composition.Converters"
+             xmlns:views="clr-namespace:CDP4Composition.Views"
              d:DesignHeight="60"
              d:DesignWidth="400"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
-            <Converter:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converter:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.ToolTip>
@@ -118,7 +119,9 @@
                    Margin="6,3,3,3"
                    FontSize="10"
                    Text="Option:"
-                   Visibility="{Binding IsOptionDependant, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                   Visibility="{Binding Converter={StaticResource BooleanToVisibilityConverter}, 
+                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:BrowserHeader}},
+                        Path=IsOptionDependant}"/>
         <TextBlock Grid.Row="2"
                    Grid.Column="1"
                    Height="Auto"
@@ -126,7 +129,9 @@
                    Margin="3"
                    FontSize="10"
                    Text="{Binding CurrentOption}"
-                   Visibility="{Binding IsOptionDependant, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                   Visibility="{Binding Converter={StaticResource BooleanToVisibilityConverter}, 
+                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:BrowserHeader}},
+                        Path=IsOptionDependant}"/>
 
         <TextBlock Grid.Row="2"
                    Grid.Column="2"

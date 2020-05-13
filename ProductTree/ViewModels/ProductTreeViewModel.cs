@@ -2,7 +2,7 @@
 // <copyright file="ProductTreeViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
@@ -114,11 +114,6 @@ namespace CDP4ProductTree.ViewModels
         private bool canCreateOverride;
 
         /// <summary>
-        /// Backing field for <see cref="IsOptionDependant"/>
-        /// </summary>
-        private bool isOptionDependant;
-
-        /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Product Tree";
@@ -164,16 +159,6 @@ namespace CDP4ProductTree.ViewModels
             this.SetTopElement(iteration);
 
             this.UpdateProperties();
-        }
-
-        /// <summary>
-        /// Gets the value whether <see cref="ProductTreeViewModel"/> is option dependant
-        /// the value is used by the <see cref="CDP4CommonView.Views.BrowserHeader"/> to display or not the option informations
-        /// </summary>
-        public bool IsOptionDependant
-        {
-            get => this.isOptionDependant;
-            private set => this.RaiseAndSetIfChanged(ref this.isOptionDependant, value);
         }
 
         /// <summary>
@@ -563,7 +548,6 @@ namespace CDP4ProductTree.ViewModels
             this.CurrentModel = this.modelSetup.Name;
             this.CurrentIteration = this.iterationSetup.IterationNumber;
             this.CurrentOption = this.Thing.Name;
-            this.IsOptionDependant = true;
 
             var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing.Container);
             if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))

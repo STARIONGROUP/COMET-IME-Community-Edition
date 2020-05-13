@@ -2,7 +2,7 @@
 // <copyright file="BooleanToVisibilityConverter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
@@ -54,6 +54,7 @@ namespace CDP4Composition.Converters
 
             return (bool)value ? Visibility.Visible : Visibility.Collapsed;
         }
+
 
         /// <summary>
         /// Does nothing.
