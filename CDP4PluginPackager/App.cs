@@ -132,7 +132,7 @@ namespace CDP4PluginPackager
                 TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFrameworkVersion)).TargetFrameworkVersion,
                 Author = "RHEA System S.A.",
                 References = this.ComputeReferences().ToList(),
-                Website = "https://store.cdp4.com",
+                Website = "https://store.cdp4.org",
                 Description = this.AssemblyInfo.FullName,
                 ReleaseNote = this.GetReleaseNote()
             };

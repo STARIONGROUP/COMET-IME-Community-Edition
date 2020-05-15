@@ -6,6 +6,10 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <RootNamespace>CDP4PluginPackager</RootNamespace>
     <LangVersion>latest</LangVersion>
+    <Authors>RHEA System S.A.</Authors>
+    <Company>RHEA System S.A.</Company>
+    <Description>CDP4 Plugin Packager and Plugin Manifest generator</Description>
+    <Copyright>Copyright © RHEA System S.A.</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
