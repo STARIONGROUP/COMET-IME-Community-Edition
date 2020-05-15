@@ -91,9 +91,9 @@ namespace CDP4EngineeringModel.ViewModels
         private bool canCreateStore;
 
         /// <summary>
-        /// Backing field for <see cref="CanUploadFile"/>
+        /// Backing field for <see cref="CanCreateFile"/>
         /// </summary>
-        private bool canUploadFile;
+        private bool canCreateFile;
 
         /// <summary>
         /// Backing field for <see cref="CanDownloadFile"/>
@@ -191,12 +191,12 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether the <see cref="UploadFileCommand"/> can be executed
+        /// Gets a value indicating whether the <see cref="CreateFileCommand"/> can be executed
         /// </summary>
-        public bool CanUploadFile
+        public bool CanCreateFile
         {
-            get => this.canUploadFile;
-            private set => this.RaiseAndSetIfChanged(ref this.canUploadFile, value);
+            get => this.canCreateFile;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateFile, value);
         }
 
         /// <summary>
@@ -237,9 +237,9 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveCommand<object> CreateFolderCommand { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="ICommand"/> to upload a <see cref="CDP4Common.EngineeringModelData.File"/>
+        /// Gets the <see cref="ICommand"/> to create a <see cref="CDP4Common.EngineeringModelData.File"/>
         /// </summary>
-        public ReactiveCommand<object> UploadFileCommand { get; private set; }
+        public ReactiveCommand<object> CreateFileCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to download a file from the newest <see cref="FileRevision"/> that belongs to the selected <see cref="File"/>
@@ -263,8 +263,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.CreateStoreCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateStore));
             this.Disposables.Add(this.CreateStoreCommand.Subscribe(_ => this.ExecuteCreateCommand<DomainFileStore>(this.Thing)));
 
-            this.UploadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanUploadFile));
-            this.Disposables.Add(this.UploadFileCommand.Subscribe(_ => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing)));
+            this.CreateFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateFile));
+            this.Disposables.Add(this.CreateFileCommand.Subscribe(_ => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing)));
 
             this.CancelDownloadCommand = ReactiveCommand.Create();
             this.Disposables.Add(this.CancelDownloadCommand.Subscribe(_ => this.downloadFileService.CancelDownloadFile(this)));
@@ -304,7 +304,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CanCreateStore = this.PermissionService.CanWrite(ClassKind.DomainFileStore, this.Thing.Container);
             this.CanCreateFolder = (isOwner ?? false) && isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
-            this.CanUploadFile = (isOwner ?? false) && isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
+            this.CanCreateFile = (isOwner ?? false) && isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
             this.CanDownloadFile = (isOwner ?? false) && isFile && this.PermissionService.CanRead(this.SelectedThing.Thing);
             
             this.CanWriteSelectedThing = this.CanWriteSelectedThing && (isOwner ?? true);
@@ -345,7 +345,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Domain File Store", "", this.CreateStoreCommand, MenuItemKind.Create, ClassKind.DomainFileStore));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Add a File ", "", this.UploadFileCommand, MenuItemKind.Create, ClassKind.File));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Add a File ", "", this.CreateFileCommand, MenuItemKind.Create, ClassKind.File));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Download File", "", this.DownloadFileCommand, MenuItemKind.Export, ClassKind.FileRevision));
         }
 
@@ -413,33 +413,35 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                 .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties());
+                .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(engineeringModelSetupSubscription);
-
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                 .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties());
+                .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(domainOfExpertiseSubscription);
-
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
                 .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties());
+                .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(iterationSetupSubscription);
-
-            var modelSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
                 .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties());
+                .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(modelSubscription);
+            this.Disposables.Add(
+                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Folder))
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
+                    .Subscribe(_ => this.ComputePermission()));
+
+            this.Disposables.Add(
+                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(File))
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
+                    .Subscribe(_ => this.ComputePermission()));
         }
 
         /// <summary>

@@ -1,8 +1,28 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests
 {
@@ -13,24 +33,33 @@ namespace CDP4EngineeringModel.Tests
     using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;    
+    
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+    
     using CDP4EngineeringModel.ViewModels;
+    
     using Moq;
+    
     using NUnit.Framework;
+    
     using ReactiveUI;
+    
     using ElementDefinitionRowViewModel = CDP4EngineeringModel.ViewModels.ElementDefinitionRowViewModel;
+    
     using ElementUsageRowViewModel = CDP4EngineeringModel.ViewModels.ElementUsageRowViewModel;
 
     [TestFixture]
@@ -55,7 +84,7 @@ namespace CDP4EngineeringModel.Tests
         private Assembler assembler;
         private Mock<IPermissionService> permissionService;
         private TextParameterType pt;
-        private PropertyInfo rev = typeof (Thing).GetProperty("RevisionNumber");
+        private readonly PropertyInfo rev = typeof (Thing).GetProperty("RevisionNumber");
 
         [SetUp]
         public void Setup()
@@ -71,16 +100,21 @@ namespace CDP4EngineeringModel.Tests
             this.pt = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.sitedir.Person.Add(person);
+            this.sitedir.Person.Add(this.person);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri){Name = "TestDoE"};
             this.sitedir.Domain.Add(this.domain);
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "1" };
-            this.elementDef.Owner = this.domain;
-            this.elementDef.Container = this.iteration;
+            
+            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Name = "1", 
+                Owner = this.domain, 
+                Container = this.iteration
+            };
+            
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = this.person };
             this.participant.Domain.Add(this.domain);
 
@@ -108,8 +142,11 @@ namespace CDP4EngineeringModel.Tests
             this.sitedir.SiteReferenceDataLibrary.Add(this.srdl);
             this.srdl.ParameterType.Add(this.pt);
 
-            this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.mrdl.RequiredRdl = this.srdl;
+            this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                RequiredRdl = this.srdl
+            };
+
             this.engineeringModelSetup.RequiredRdl.Add(this.mrdl);
 
             this.model.EngineeringModelSetup = this.engineeringModelSetup;
@@ -127,7 +164,6 @@ namespace CDP4EngineeringModel.Tests
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
-            
         }
 
         [TearDown]
@@ -139,17 +175,14 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatElementDefArePopulatedFromEvent()
         {
-            var type = this.iteration.GetType();
-            var rev = type.GetProperty("RevisionNumber");
-
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
 
-            rev.SetValue(this.iteration, 50);
+            this.rev.SetValue(this.iteration, 50);
             this.iteration.Element.Add(this.elementDef);
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(1, vm.ElementDefinitionRowViewModels.Count);
 
-            rev.SetValue(this.iteration, 51);
+            this.rev.SetValue(this.iteration, 51);
             this.iteration.Element.Remove(this.elementDef);
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
@@ -177,9 +210,9 @@ namespace CDP4EngineeringModel.Tests
 
             this.elementDef.Name = "updated";
             this.elementDef.Owner = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test" };
+
             // workaround to modify a read-only field
-            var type = this.elementDef.GetType();
-            type.GetProperty("RevisionNumber").SetValue(this.elementDef, 50);
+            this.rev.SetValue(this.elementDef, 50);
             CDPMessageBus.Current.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
 
             Assert.AreEqual(this.elementDef.Name, row.Name);
@@ -189,8 +222,8 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyHighlightElementUsagesEventIsSent()
         {
-            var eu1 = new CDP4Common.EngineeringModelData.ElementDefinition();
-            var eu2 = new CDP4Common.EngineeringModelData.ElementDefinition();
+            var eu1 = new ElementDefinition();
+            var eu2 = new ElementDefinition();
 
             CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>().Subscribe(x => this.OnElementUsageHighlightEvent(x.ElementDefinition));
 
@@ -322,11 +355,11 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatActiveDomainIsDisplayed()
         {
-            var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain" };
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain" };
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, this.participant) }
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, this.participant) }
             });
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
@@ -344,42 +377,38 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifThatIfDomainIsRenamedBrowserIsUpdated()
         {
-            var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null) }
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, null) }
             });
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("System [SYS]", vm.DomainOfExpertise);
 
-            var type = domain.GetType();
-            var revisionNumber = type.GetProperty("RevisionNumber");
-            domain.Name = "Systems";
-            revisionNumber.SetValue(domain, 50);
+            domainOfExpertise.Name = "Systems";
+            this.rev.SetValue(domainOfExpertise, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(domain, EventKind.Updated);
+            CDPMessageBus.Current.SendObjectChangeEvent(domainOfExpertise, EventKind.Updated);
             Assert.AreEqual("Systems [SYS]", vm.DomainOfExpertise);
         }
 
         [Test]
         public void VerifyThatIfEngineeringModelSetupIsChangedBrowserIsUpdated()
         {
-            var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null) }
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, null) }
             });
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("ModelSetup", vm.CurrentModel);
 
-            var type = this.engineeringModelSetup.GetType();
-            var revisionNumber = type.GetProperty("RevisionNumber");
             this.engineeringModelSetup.Name = "testing";
-            revisionNumber.SetValue(this.engineeringModelSetup, 50);
+            this.rev.SetValue(this.engineeringModelSetup, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.engineeringModelSetup, EventKind.Updated);
             Assert.AreEqual("testing", vm.CurrentModel);
@@ -432,21 +461,28 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public async Task VerifyDropElementDef()
         {
-            var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.sitedir.Domain.Add(domain);
-            this.engineeringModelSetup.ActiveDomain.Add(domain);
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.sitedir.Domain.Add(domainOfExpertise);
+            this.engineeringModelSetup.ActiveDomain.Add(domainOfExpertise);
 
             var model2 = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var modelsetup2 = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            modelsetup2.EngineeringModelIid = model2.Iid;
+            
+            var modelsetup2 = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                EngineeringModelIid = model2.Iid
+            };
+            
             model2.EngineeringModelSetup = modelsetup2;
-            modelsetup2.ActiveDomain.Add(domain);
+            modelsetup2.ActiveDomain.Add(domainOfExpertise);
 
             this.sitedir.Model.Add(modelsetup2);
 
             var model2Iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var def = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            def.Owner = domain;
+            
+            var def = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Owner = domainOfExpertise
+            };
 
             model2.Iteration.Add(model2Iteration);
             model2Iteration.Element.Add(def);
@@ -458,11 +494,12 @@ namespace CDP4EngineeringModel.Tests
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
 
             var dropinfo = new Mock<IDropInfo>();
+
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                 {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)},
-                    {model2Iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)}
+                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, null)},
+                    {model2Iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, null)}
                 });
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
@@ -480,21 +517,28 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public async Task VerifyDropElementDefExceptionCaught()
         {
-            var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.sitedir.Domain.Add(domain);
-            this.engineeringModelSetup.ActiveDomain.Add(domain);
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.sitedir.Domain.Add(domainOfExpertise);
+            this.engineeringModelSetup.ActiveDomain.Add(domainOfExpertise);
 
             var model2 = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var modelsetup2 = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            modelsetup2.EngineeringModelIid = model2.Iid;
+            
+            var modelsetup2 = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                EngineeringModelIid = model2.Iid
+            };
+
             model2.EngineeringModelSetup = modelsetup2;
-            modelsetup2.ActiveDomain.Add(domain);
+            modelsetup2.ActiveDomain.Add(domainOfExpertise);
 
             this.sitedir.Model.Add(modelsetup2);
 
             var model2Iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var def = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            def.Owner = domain;
+
+            var def = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Owner = domainOfExpertise
+            };
 
             model2.Iteration.Add(model2Iteration);
             model2Iteration.Element.Add(def);
@@ -509,8 +553,8 @@ namespace CDP4EngineeringModel.Tests
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                 {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)},
-                    {model2Iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)}
+                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, null)},
+                    {model2Iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, null)}
                 });
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
@@ -531,18 +575,27 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatContextMenuIsPopulated()
         {
             var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            parameter.ParameterType = this.pt;
+            
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ParameterType = this.pt
+            };
 
             var def2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var parameter2 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var usage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var paramOverride = new ParameterOverride(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            paramOverride.Parameter = parameter2;
+            
+            var paramOverride = new ParameterOverride(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Parameter = parameter2
+            };
+
             parameter2.ParameterType = this.pt;
 
-            var usage2 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            usage2.ElementDefinition = def2;
+            var usage2 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ElementDefinition = def2
+            };
 
             def2.Parameter.Add(parameter2);
             usage.ParameterOverride.Add(paramOverride);
@@ -610,13 +663,13 @@ namespace CDP4EngineeringModel.Tests
             Assert.IsFalse(def2Row.IsTopElement);
 
             this.iteration.TopElement = def2;
-            rev.SetValue(this.iteration, 50);
+            this.rev.SetValue(this.iteration, 50);
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.IsFalse(defRow.IsTopElement);
             Assert.IsTrue(def2Row.IsTopElement);
 
             this.iteration.Element.Remove(def2);
-            rev.SetValue(this.iteration, 51);
+            this.rev.SetValue(this.iteration, 51);
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.IsTrue(def2Row.IsTopElement);
         }
@@ -625,7 +678,13 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatSubscriptionCommandWorks()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(new DomainOfExpertise(), null) } });
+
+            this.session
+                .Setup(x => x.OpenIterations)
+                .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> 
+                {
+                    { this.iteration, new Tuple<DomainOfExpertise, Participant>(new DomainOfExpertise(), null) }
+                });
 
             var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt };
 
@@ -700,18 +759,27 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatRefocusWorks()
         {
             var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            parameter.ParameterType = this.pt;
+
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ParameterType = this.pt
+            };
 
             var def2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var parameter2 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var usage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var paramOverride = new ParameterOverride(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            paramOverride.Parameter = parameter2;
+
+            var paramOverride = new ParameterOverride(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Parameter = parameter2
+            };
+            
             parameter2.ParameterType = this.pt;
 
-            var usage2 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            usage2.ElementDefinition = def2;
+            var usage2 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ElementDefinition = def2
+            };
 
             def2.Parameter.Add(parameter2);
             usage.ParameterOverride.Add(paramOverride);

@@ -36,9 +36,12 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.DragDrop;
     using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// The folder row view model.
@@ -49,6 +52,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// The <see cref="FileStoreFileAndFolderHandler{T}"/>
         /// </summary>
         private readonly IFileStoreFileAndFolderHandler parentFileStoreFileAndFolderHandler;
+
+        /// <summary>
+        /// The (injected) <see cref="DevExpress.Mvvm.IMessageBoxService"/>
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FolderRowViewModel"/> class. 
@@ -145,7 +153,7 @@ namespace CDP4EngineeringModel.ViewModels
                 catch (Exception e)
                 {
                     logger.Error(e.Message);
-                    MessageBox.Show(e.Message, "Moving file failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    this.messageBoxService.Show(e.Message, "Moving file failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 finally
                 {

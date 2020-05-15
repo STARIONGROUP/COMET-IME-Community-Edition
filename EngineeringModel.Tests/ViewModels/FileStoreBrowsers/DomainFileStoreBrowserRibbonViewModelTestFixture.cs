@@ -31,28 +31,32 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
     using System.Reflection;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    
     using CDP4Dal;
     using CDP4Dal.Permission;
+    
     using CDP4EngineeringModel.ViewModels;
 
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
+    
     using NUnit.Framework;
+    
     using ReactiveUI;
 
     [TestFixture]
     class DomainFileStoreBrowserRibbonViewModelTestFixture
     {
-        private PropertyInfo revision;
-
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -77,8 +81,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
         [SetUp]
         public void SetUp()
         {
-            this.revision = typeof(Thing).GetProperty("RevisionNumber");
-
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
