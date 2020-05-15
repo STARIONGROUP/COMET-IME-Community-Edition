@@ -29,7 +29,6 @@ before_build:
   - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
   - cmd: nuget restore -verbosity quiet
   - cmd: choco install opencover.portable
-  - cmd: choco install codecov
 
 build:
   project: '%PROJECT_MAIN%.sln'
@@ -47,7 +46,6 @@ test_script:
       -output:"%TEST_COVERAGE%"
       -filter:"+[CDP4*]* -[*.Tests*]* -[*.Views]*"
 after_test:
-    - codecov -f "%TEST_COVERAGE%" -t %CODECOV_TOKEN%
     - xcopy /q /Y /I "%TEST_RESULT%" "%TEST_LOG%\"
     - xcopy /q /Y /I "%TEST_COVERAGE%" "%TEST_LOG%\"
 artifacts:
