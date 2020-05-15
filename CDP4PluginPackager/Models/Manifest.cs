@@ -2,7 +2,7 @@
 // <copyright file="Manifest.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
@@ -53,7 +53,12 @@ namespace CDP4PluginPackager.Models
         /// <summary>
         /// Gets or sets the version of the plugin
         /// </summary>
-        public string Version { get; set; }
+        public Version Version { get; set; }
+
+        /// <summary>
+        /// Gets or set the target framework of the Plugin
+        /// </summary>
+        public string TargetFramework { get; set; }
 
         /// <summary>
         /// Gets or sets the release note related to the target Plugin version
@@ -71,18 +76,8 @@ namespace CDP4PluginPackager.Models
         public string Website { get; set; }
         
         /// <summary>
-        /// Gets or set the license
-        /// </summary>
-        public string License { get; set; }
-
-        /// <summary>
         /// Gets or set the libraries referenced by the target Plugin
         /// </summary>
         public List<Reference> References { get; set; }
-        
-        /// <summary>
-        /// Gets or set the target framework of the Plugin
-        /// </summary>
-        public string TargetFramework { get; set; }
     }
 }

@@ -1,8 +1,8 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="App.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
@@ -36,8 +36,9 @@ namespace CDP4PluginPackager
 
     using CDP4PluginPackager.Models;
     using CDP4PluginPackager.Models.AutoGen;
-    using Newtonsoft.Json;
 
+    using Newtonsoft.Json;
+    
     /// <summary>
     /// App class handles plugin manifest generation and packing
     /// </summary>
@@ -67,7 +68,7 @@ namespace CDP4PluginPackager
         /// Gets or sets the <see cref="AssemblyName"/> info reflected from the target plugin
         /// </summary>
         public AssemblyName AssemblyInfo { get; private set; }
-
+        
         /// <summary>
         /// The actual manifest meant to be serialized
         /// </summary>
@@ -100,6 +101,7 @@ namespace CDP4PluginPackager
             this.GetAssemblyInfo();
             this.BuildManifest();
             this.Serialize();
+            this.WriteLicense();
 
             if (this.shouldPluginGetPacked)
             {
@@ -108,7 +110,15 @@ namespace CDP4PluginPackager
                 Console.WriteLine("---- Packing done ----");
             }
         }
-        
+
+        /// <summary>
+        /// Write the license file in the output folder
+        /// </summary>
+        private void WriteLicense()
+        {
+            File.WriteAllText($"{Path.Combine(this.OutputPath, this.Manifest.Name)}.license.txt", this.GetLicense()); 
+        }
+
         /// <summary>
         /// Set properties of the <see cref="Manifest"/>
         /// </summary>
@@ -117,10 +127,9 @@ namespace CDP4PluginPackager
             this.Manifest = new Manifest
             {
                 Name = this.AssemblyInfo.Name,
-                Version = this.AssemblyInfo.Version.ToString(),
+                Version = this.AssemblyInfo.Version,
                 ProjectGuid = this.Csproj.PropertyGroup.First(p => p.ProjectGuid != Guid.Empty).ProjectGuid,
                 TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFrameworkVersion)).TargetFrameworkVersion,
-                License = this.GetLicense(),
                 Author = "RHEA System S.A.",
                 References = this.ComputeReferences().ToList(),
                 Website = "https://store.cdp4.com",
@@ -173,6 +182,15 @@ namespace CDP4PluginPackager
         }
 
         /// <summary>
+        /// Fetches the current IME version to set the IME version that the plugin is compatible with
+        /// </summary>
+        public Version GetCurrentIMEVersion()
+        {
+            var imePath = Path.GetFullPath(Path.Combine(this.OutputPath, @"..\..\", "CDP4IME.exe"));
+            return Assembly.LoadFrom(imePath).GetName().Version;
+        }
+        
+        /// <summary>
         /// Retrieve Plugin assembly info from reflection
         /// </summary>
         public void GetAssemblyInfo()
@@ -189,7 +207,7 @@ namespace CDP4PluginPackager
         public void Serialize()
         {
             var output = JsonConvert.SerializeObject(this.Manifest);
-            File.WriteAllText($"{Path.Join(this.OutputPath, this.Manifest.Name)}.plugin.manifest",output);
+            File.WriteAllText($"{Path.Combine(this.OutputPath, this.Manifest.Name)}.plugin.manifest",output);
         }
 
         /// <summary>
@@ -205,20 +223,30 @@ namespace CDP4PluginPackager
         }
 
         /// <summary>
-        /// Zip all the file in the Plugin output folder including the manifest
+        /// Zip all the file in the Plugin output folder including the manifest and excluding symbols. 
         /// <remarks>Building the package in another folder is mandatory</remarks>
         /// </summary>
         private void Pack()
         {
             var zipPath = Path.Combine(this.OutputPath, $"{this.Manifest.Name}.cdp4ck");
             var temporaryZipPath = Path.Combine(this.path, $"{this.Manifest.Name}.cdp4ck");
-            
+
             if (File.Exists(zipPath))
             {
                 File.Delete(zipPath);
             }
-
+            
             ZipFile.CreateFromDirectory(this.OutputPath, temporaryZipPath, CompressionLevel.Optimal, false);
+
+            using (var zip = ZipFile.Open(temporaryZipPath, ZipArchiveMode.Update))
+            {
+                var selection = zip.Entries.Where(b => b.FullName.EndsWith(".pdb")).Select(x => x.Name).ToList();
+
+                foreach (var zipEntry in selection)
+                {
+                    zip.GetEntry(zipEntry)?.Delete();
+                }
+            }
 
             File.Move(temporaryZipPath, zipPath);
         }
