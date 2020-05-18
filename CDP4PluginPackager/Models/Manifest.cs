@@ -27,6 +27,7 @@
 namespace CDP4PluginPackager.Models
 {
     using CDP4PluginPackager.Models.AutoGen;
+
     using System;
     using System.Collections.Generic;
 
