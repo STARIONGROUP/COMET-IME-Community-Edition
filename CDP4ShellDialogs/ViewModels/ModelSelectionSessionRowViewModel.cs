@@ -65,7 +65,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.Name += string.Format(" ({0})", this.IDalUri);
+            this.Name += string.Format(" ({0})", this.Session.Name);
         }
     }
 }
