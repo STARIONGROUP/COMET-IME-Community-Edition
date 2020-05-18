@@ -176,7 +176,7 @@ namespace CDP4ShellDialogs.ViewModels
         public ReactiveList<IViewModelBase<Thing>> SelectedIterations { get; set; }
 
         /// <summary>
-        /// Gets the Select <see cref="ICommand"/>
+        /// Gets the SelectCommand <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<Unit> SelectCommand { get; private set; }
 
@@ -186,17 +186,17 @@ namespace CDP4ShellDialogs.ViewModels
         public ReactiveCommand<Unit> SelectActiveIterationCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Cancel <see cref="ICommand"/>
+        /// Gets the CancelCommand <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> CancelCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Next Command <see cref="ICommand"/>
+        /// Gets the SelectIterationCommand <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> SelectIterationCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Back Command <see cref="ICommand"/>
+        /// Gets the BackCommand <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> BackCommand { get; private set; }
 
