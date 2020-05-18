@@ -157,7 +157,7 @@
                     Margin="5"
                     Width="120"
                     HorizontalAlignment="Right"
-                    Command="{Binding NextCommand}">
+                    Command="{Binding SelectIterationCommand}">
                 <Button.Style>
                     <Style TargetType="Button">
                         <Style.Triggers>

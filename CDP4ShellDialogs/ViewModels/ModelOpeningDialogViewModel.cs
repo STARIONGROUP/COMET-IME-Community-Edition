@@ -113,8 +113,8 @@ namespace CDP4ShellDialogs.ViewModels
                     this.IsBusy = false;
                 });
 
-            this.NextCommand = ReactiveCommand.Create();
-            this.NextCommand.Subscribe(_ => this.ExecuteNext());
+            this.SelectIterationCommand = ReactiveCommand.Create();
+            this.SelectIterationCommand.Subscribe(_ => this.ExecuteNext());
 
             this.BackCommand = ReactiveCommand.Create();
             this.BackCommand.Subscribe(_ => this.ExecuteBack());
@@ -193,7 +193,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets the Next Command <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> NextCommand { get; private set; }
+        public ReactiveCommand<object> SelectIterationCommand { get; private set; }
 
         /// <summary>
         /// Gets the Back Command <see cref="ICommand"/>
