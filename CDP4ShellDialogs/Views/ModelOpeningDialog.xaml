@@ -28,13 +28,26 @@
         <TextBlock Text ="{Binding SelectedEngineeringModelSetup .Name}" Grid.Row ="0" Margin="5" FontWeight="Bold"
                    Visibility="{Binding IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}">
         </TextBlock>
-        <dxlc:LayoutItem Grid.Row ="0" Margin="5" AddColonToLabel="True" 
+        <dxlc:LayoutGroup HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          Grid.Row="0"
+                          Margin="10"
+                          Orientation="Vertical">
+            <dxlc:LayoutItem  AddColonToLabel="True" 
                          Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
                          Name="SessionSource"  Label="Source" ToolTip="Select a Source">
-            <dxe:ComboBoxEdit ItemsSource="{Binding SessionsAvailable}"
+                <dxe:ComboBoxEdit ItemsSource="{Binding SessionsAvailable}"
                               SelectedItem="{Binding SelectedRowSession, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               DisplayMember="Name"></dxe:ComboBoxEdit>
-        </dxlc:LayoutItem>
+            </dxlc:LayoutItem>
+            <dxlc:LayoutItem AddColonToLabel="True" 
+                         Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
+                         Name="Username"  Label="Username" ToolTip="Select a Username">
+                <dxe:ComboBoxEdit ItemsSource="{Binding SessionsAvailable}"
+                              SelectedItem="{Binding SelectedRowSession, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              DisplayMember="Name"></dxe:ComboBoxEdit>
+            </dxlc:LayoutItem>
+        </dxlc:LayoutGroup>
         <dxlc:LayoutGroup HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           Header="{Binding Title}"
@@ -71,16 +84,16 @@
                         <dxg:TableView.RowStyle>
                             <Style TargetType="{x:Type dxg:RowControl}">
                                 <Setter Property="ToolTip" Value="Double-Click to open the model (active iteration)" />
+                                <Setter Property="Height" Value="30" />
                             </Style>
                         </dxg:TableView.RowStyle>
                     </dxg:TableView>
                 </dxg:GridControl.View>
                 <dxg:GridControl.Columns>
-                    <dxg:GridColumn FieldName="Name" Header="Name" SortMode="Value" SortIndex="0" />
-                    <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
+                    <dxg:GridColumn FieldName="Name" Header="Name" SortMode="Value" SortIndex="0"/>
+                    <dxg:GridColumn FieldName="ShortName" Header="Short Name"/>
                     <dxg:GridColumn FieldName="Kind" Header="Kind" />
                 </dxg:GridControl.Columns>
-
             </dxg:GridControl>
             <dxg:GridControl Visibility="{Binding IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}"
                              Name="IterationGridControl"
@@ -114,6 +127,7 @@
                         <dxg:TableView.RowStyle>
                             <Style TargetType="{x:Type dxg:RowControl}">
                                 <Setter Property="ToolTip" Value="Double-Click on ''Domain Of Expertise'' to select" />
+                                <Setter Property="Height" Value="30" />
                             </Style>
                         </dxg:TableView.RowStyle>
                     </dxg:TableView>
@@ -149,13 +163,13 @@
                     Visibility="{Binding Path=IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}"
                     Margin="5"
                     Width="60"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Right"
                     Command="{Binding BackCommand}"/>
-            <Button Content="Next"
+            <Button Content="Select Iteration"
                     Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
                     Margin="5"
-                    Width="60"
-                    HorizontalAlignment="Left"
+                    Width="120"
+                    HorizontalAlignment="Right"
                     Command="{Binding NextCommand}">
                 <Button.Style>
                     <Style TargetType="Button">
@@ -175,6 +189,12 @@
                     Width="60"
                     HorizontalAlignment="Right"
                     Command="{Binding SelectCommand}"/>
+            <Button Content="Open"
+                    Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
+                    Margin="5"
+                    Width="60"
+                    HorizontalAlignment="Right"
+                    Command="{Binding SelectActiveIterationCommand}"/>
             <Button Content="Cancel"
                     Margin="5"
                     Width="60"
