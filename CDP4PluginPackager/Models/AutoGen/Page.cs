@@ -3,7 +3,7 @@
 //    Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // <summary>
-//   This is an auto-generated class. Any manual changes on this file will be overwritten!
+//   This file has been generated using a csproj file with this tool to convert Xml structure into Csharp: https://xmltocsharp.azurewebsites.net/
 // </summary>
 // -------------------------------------------------------------------------------------------------
 

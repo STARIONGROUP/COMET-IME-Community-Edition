@@ -128,6 +128,7 @@ namespace CDP4PluginPackager
             {
                 Name = this.AssemblyInfo.Name,
                 Version = this.AssemblyInfo.Version,
+                CompatibleIMEVersion = this.GetCurrentIMEVersion(),
                 ProjectGuid = this.Csproj.PropertyGroup.First(p => p.ProjectGuid != Guid.Empty).ProjectGuid,
                 TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFrameworkVersion)).TargetFrameworkVersion,
                 Author = "RHEA System S.A.",
