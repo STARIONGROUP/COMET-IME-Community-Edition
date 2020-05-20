@@ -31,14 +31,12 @@ namespace CDP4PluginPackager.Tests
     using System.Linq;
     using System.Reflection;
 
-    using CDP4Composition.Modularity;
-
     using CDP4PluginPackager.Models;
 
     using Newtonsoft.Json;
 
     using NUnit.Framework;
-
+    
     [TestFixture]
     public class AppTestFixture
     {
@@ -75,7 +73,7 @@ namespace CDP4PluginPackager.Tests
             Assert.IsNotNull(app.AssemblyInfo.Version);
         }
         
-        [Test]
+        [Test, Ignore("IME version not added at the moment")]
         public void VerifyIMEVersion()
         {
             var app = new App();
@@ -125,6 +123,36 @@ namespace CDP4PluginPackager.Tests
             Assert.IsFalse(license.Contains("$YEAR"));
             Assert.IsFalse(license.Contains("$PLUGIN_NAME"));
             Assert.IsTrue(license.Contains(app.AssemblyInfo.Name));
+        }
+
+        [Test]
+        public void VerifyThatPropertiesAreTheSameOnManifestClasses()
+        {
+            var pluginPackagerManifestProperties = typeof(Manifest).GetProperties();
+            var compositionManifestProperties = typeof(CDP4Composition.Modularity.Manifest).GetProperties();
+            Assert.AreEqual(pluginPackagerManifestProperties.Length, compositionManifestProperties.Length);
+
+            foreach (var property in pluginPackagerManifestProperties)
+            {
+                var propertyInComposition = compositionManifestProperties.Single(p => p.Name == property.Name);
+                Assert.IsNotNull(propertyInComposition);
+                Assert.AreEqual(property.PropertyType, propertyInComposition.PropertyType);
+            }
+        }
+
+        [Test]
+        public void VerifyThatMethodsAreTheSameOnManifestClasses()
+        {
+            var pluginPackagerManifestProperties = typeof(Manifest).GetMethods();
+            var compositionManifestProperties = typeof(CDP4Composition.Modularity.Manifest).GetMethods();
+            Assert.AreEqual(pluginPackagerManifestProperties.Length, compositionManifestProperties.Length);
+
+            foreach (var property in pluginPackagerManifestProperties)
+            {
+                var propertyInComposition = compositionManifestProperties.Single(p => p.Name == property.Name);
+                Assert.IsNotNull(propertyInComposition);
+                Assert.AreEqual(property.ReturnType, propertyInComposition.ReturnType);
+            }
         }
     }
 }

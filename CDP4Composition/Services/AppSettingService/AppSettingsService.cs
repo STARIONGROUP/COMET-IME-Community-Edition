@@ -7,18 +7,15 @@
 namespace CDP4Composition.Services.AppSettingService
 {
     using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.Composition;
     using System.IO;
     using System.Reflection;
-    using CDP4Composition.Exceptions;
-    using CDP4Composition.Modularity;
-    using CDP4Composition.Settings;
 
-    using DevExpress.XtraRichEdit.Model;
+    using CDP4Composition.Exceptions;
+    using CDP4Composition.Settings;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
+
     using NLog;
 
     /// <summary>
@@ -172,28 +169,6 @@ namespace CDP4Composition.Services.AppSettingService
                     serializer.Serialize(streamWriter, this.AppSettings);
                 }
             }
-        }
-
-        public IEnumerable<Manifest> GetManifests()
-        {
-            var manifests = new List<Manifest>();
-            var currentPath = Directory.GetCurrentDirectory();
-
-            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
-
-            if (directoryInfo.Exists)
-            {
-                foreach (var manifest in directoryInfo.EnumerateFiles("*.plugin.manifest", SearchOption.AllDirectories))
-                {
-                    manifests.Add(JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(manifest.FullName)));
-                }
-            }
-            else
-            {
-                throw new FileNotFoundException();
-            }
-
-            return manifests;
         }
 
         /// <summary>

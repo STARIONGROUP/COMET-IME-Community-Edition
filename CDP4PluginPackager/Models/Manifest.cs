@@ -26,10 +26,7 @@
 
 namespace CDP4PluginPackager.Models
 {
-    using CDP4PluginPackager.Models.AutoGen;
-
     using System;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Represents the Manifest file related to the target plugin
@@ -80,10 +77,5 @@ namespace CDP4PluginPackager.Models
         /// Gets or set the website related to the target Plugin
         /// </summary>
         public string Website { get; set; }
-        
-        /// <summary>
-        /// Gets or set the libraries referenced by the target Plugin
-        /// </summary>
-        public List<Reference> References { get; set; }
     }
 }

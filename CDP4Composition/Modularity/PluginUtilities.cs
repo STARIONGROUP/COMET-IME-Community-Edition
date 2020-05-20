@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Manifest.cs" company="RHEA System S.A.">
+// <copyright file="PluginUtilities.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -26,56 +26,46 @@
 
 namespace CDP4Composition.Modularity
 {
-    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Reflection;
+
+    using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents the Manifest file related to the target plugin
+    /// Utility class that help with plugin management
     /// </summary>
-    public class Manifest
+    public static class PluginUtilities
     {
         /// <summary>
-        /// Gets or sets the project <see cref="Guid"/> sets in the target Plugin Csproj
+        /// The name of the plugin directory
         /// </summary>
-        public Guid ProjectGuid { get; set; }
+        public const string PluginDirectoryName = "plugins";
 
         /// <summary>
-        /// Gets or sets the project Name sets in the target Plugin Csproj
+        /// Gets the plugin <see cref="Manifest"/> present in the IME plugin folder
         /// </summary>
-        public string Name { get; set; }
+        /// <returns><see cref="IEnumerable{Manifest}"/> containing all founds plugin manifests</returns>
+        public static IEnumerable<Manifest> GetPluginManifests()
+        {
+            var manifests = new List<Manifest>();
+            var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        /// <summary>
-        /// Gets or sets the project description
-        /// </summary>
-        public string Description { get; set; }
+            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
 
-        /// <summary>
-        /// Gets or sets the version of the plugin
-        /// </summary>
-        public Version Version { get; set; }
+            if (directoryInfo.Exists)
+            {
+                foreach (var manifest in directoryInfo.EnumerateFiles("*.plugin.manifest", SearchOption.AllDirectories))
+                {
+                    manifests.Add(JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(manifest.FullName)));
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException();
+            }
 
-        /// <summary>
-        /// Gets or set the IME version with which the plugin is compatible
-        /// </summary>
-        public Version CompatibleIMEVersion { get; set; }
-
-        /// <summary>
-        /// Gets or set the target framework of the Plugin
-        /// </summary>
-        public string TargetFramework { get; set; }
-
-        /// <summary>
-        /// Gets or sets the release note related to the target Plugin version
-        /// </summary>
-        public string ReleaseNote { get; set; }
-
-        /// <summary>
-        /// Gets or set the author
-        /// </summary>
-        public string Author { get; set; }
-
-        /// <summary>
-        /// Gets or set the website related to the target Plugin
-        /// </summary>
-        public string Website { get; set; }
+            return manifests;
+        }
     }
 }

@@ -45,12 +45,14 @@ namespace CDP4Composition.Modularity
     public class PluginLoader<T> where T : AppSettings, new()
     {
         /// <summary>
-        /// The name of the plugin directory
+        /// Gets or sets a list of disabled plugins
         /// </summary>
-        private const string PluginDirectoryName = "plugins";
-
         public List<Guid> DisabledPlugins { get; set; } = new List<Guid>();
-        public List<Manifest> ManifestsList { get; set; } = new List<Manifest>();
+
+        /// <summary>
+        /// Gets or sets a <see cref="IEnumerable{Manifest}"/> of <see cref="Manifest"/>
+        /// </summary>
+        public IEnumerable<Manifest> ManifestsList { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PluginLoader"/> class.
@@ -60,10 +62,9 @@ namespace CDP4Composition.Modularity
             this.AppSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<T>>();
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
 
-            //var executinAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var currentPath = Directory.GetCurrentDirectory();
+            var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
+            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginUtilities.PluginDirectoryName));
 
             if (directoryInfo.Exists)
             {
@@ -91,7 +92,7 @@ namespace CDP4Composition.Modularity
 
         private void GetManifests()
         {
-            this.ManifestsList = this.AppSettingsService.GetManifests().ToList();
+            this.ManifestsList = PluginUtilities.GetPluginManifests();
         }
 
         /// <summary>

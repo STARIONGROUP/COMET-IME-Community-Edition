@@ -34,12 +34,11 @@ namespace CDP4PluginPackager
     using System.Reflection;
     using System.Xml.Serialization;
 
-    using CDP4Composition.Modularity;
-
+    using CDP4PluginPackager.Models;
     using CDP4PluginPackager.Models.AutoGen;
 
     using Newtonsoft.Json;
-    
+
     /// <summary>
     /// App class handles plugin manifest generation and packing
     /// </summary>
@@ -129,12 +128,11 @@ namespace CDP4PluginPackager
             {
                 Name = this.AssemblyInfo.Name,
                 Version = this.AssemblyInfo.Version,
-                CompatibleIMEVersion = this.GetCurrentIMEVersion(),
                 ProjectGuid = this.Csproj.PropertyGroup.First(p => p.ProjectGuid != Guid.Empty).ProjectGuid,
                 TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFrameworkVersion)).TargetFrameworkVersion,
                 Author = "RHEA System S.A.",
                 Website = "https://store.cdp4.org",
-                Description = this.AssemblyInfo.FullName,
+                Description = this.AssemblyInfo.Name,
                 ReleaseNote = this.GetReleaseNote()
             };
         }
@@ -188,6 +186,11 @@ namespace CDP4PluginPackager
         public Version GetCurrentIMEVersion()
         {
             var imePath = Path.GetFullPath(Path.Combine(this.OutputPath, @"..\..\", "CDP4IME.exe"));
+
+            if (!File.Exists(imePath))
+            {
+                throw new FileNotFoundException("You should build IME first");
+            }
             return Assembly.LoadFrom(imePath).GetName().Version;
         }
         

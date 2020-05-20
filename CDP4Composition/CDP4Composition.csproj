@@ -250,6 +250,7 @@
     <Compile Include="Extensions\FileExtensionMethods.cs" />
     <Compile Include="Modularity\Manifest.cs" />
     <Compile Include="Modularity\PluginLoader.cs" />
+    <Compile Include="Modularity\PluginUtilities.cs" />
     <Compile Include="Mvvm\IOwnedThingViewModel.cs" />
     <Compile Include="Mvvm\IHaveContainedRows.cs" />
     <Compile Include="Mvvm\Types\DisposableReactiveList.cs" />

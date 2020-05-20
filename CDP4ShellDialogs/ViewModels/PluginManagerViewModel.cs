@@ -13,6 +13,8 @@ namespace CDP4ShellDialogs.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.AppSettingService;
 
+    using DevExpress.Mvvm.POCO;
+
     using ReactiveUI;
 
     /// <summary>
@@ -139,20 +141,20 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         private void ExecuteSave()
         {
-            var dirtyPlugins = this.Plugins.Where(x => x.IsRowDirty).ToList();
+            var pluginsToProcess = this.Plugins.Where(x => x.IsRowDirty || !x.IsPluginEnabled).ToList();
             this.AppSettingsService.AppSettings.DisabledPlugins.Clear();
 
-            foreach (var dirtyItem in dirtyPlugins)
+            foreach (var item in pluginsToProcess)
             {
-                var wasAlreadyDisabled = this.AppSettingsService.AppSettings.DisabledPlugins.Any(p => p == dirtyItem.ProjectGuid);
+                var wasAlreadyDisabled = this.AppSettingsService.AppSettings.DisabledPlugins.Any(p => p == item.ProjectGuid);
                 
-                if (dirtyItem.IsPluginEnabled && wasAlreadyDisabled)
+                if (item.IsPluginEnabled && wasAlreadyDisabled)
                 {
-                    this.AppSettingsService.AppSettings.DisabledPlugins.Remove(dirtyItem.ProjectGuid);
+                    this.AppSettingsService.AppSettings.DisabledPlugins.Remove(item.ProjectGuid);
                 }
-                else if (!dirtyItem.IsPluginEnabled && !wasAlreadyDisabled)
+                else if (!item.IsPluginEnabled && !wasAlreadyDisabled)
                 {
-                    this.AppSettingsService.AppSettings.DisabledPlugins.Add(dirtyItem.ProjectGuid);
+                    this.AppSettingsService.AppSettings.DisabledPlugins.Add(item.ProjectGuid);
                 }
             }
 
@@ -168,7 +170,7 @@ namespace CDP4ShellDialogs.ViewModels
             if (this.AppSettingsService != null)
             {
                 var disabledPlugins = this.AppSettingsService.AppSettings.DisabledPlugins;
-                var presentPlugins = this.AppSettingsService.GetManifests();
+                var presentPlugins = PluginUtilities.GetPluginManifests();
 
                 foreach (var pluginSetting in presentPlugins)
                 {

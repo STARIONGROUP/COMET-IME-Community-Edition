@@ -24,7 +24,5 @@ namespace CDP4Composition.Services.AppSettingService
         /// Writes the <see cref="AppSettings"/> to disk
         /// </summary>
         void Save();
-
-        IEnumerable<Manifest> GetManifests();
     }
 }
