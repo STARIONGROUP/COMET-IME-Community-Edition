@@ -37,36 +37,6 @@ namespace CDP4Composition.Services.AppSettingService
     public abstract class AppSettings
     {
         /// <summary>
-        /// TODO Implement
-        /// </summary>
-        /// <param name="manifests"></param>
-        public void AutoClean(List<Manifest> manifests)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Updating plugin settings
-        /// </summary>
-        /// <param name="pluginSettings">
-        ///The plugin settings to be updated
-        /// </param>
-        public void UpdatePlugin(Manifest manifest)
-        {
-            if (manifest.ProjectGuid == Guid.Empty)
-            {
-                return;
-            }
-
-            //var plugin = this.Plugins.FirstOrDefault(x => x.Key == pluginSettings.Key);
-
-            //if (plugin != null)
-            //{
-            //    plugin.IsEnabled = pluginSettings.IsEnabled;
-            //}
-        }
-
-        /// <summary>
         /// Gets or sets the disabled Plugins
         /// </summary>
         public List<Guid> DisabledPlugins { get; set; } = new List<Guid>();

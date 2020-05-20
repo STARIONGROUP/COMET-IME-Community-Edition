@@ -2,7 +2,7 @@
 // <copyright file="AppTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Geren�, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 

@@ -55,11 +55,15 @@ namespace CDP4Composition.Modularity
         public IEnumerable<Manifest> ManifestsList { get; set; }
 
         /// <summary>
+        /// Gets the <see cref="DirectoryCatalog"/>s that are loaded by the CDP4PluginLoader
+        /// </summary>
+        public List<DirectoryCatalog> DirectoryCatalogues { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PluginLoader"/> class.
         /// </summary>
         public PluginLoader()
         {
-            this.AppSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<T>>();
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
 
             var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -82,23 +86,22 @@ namespace CDP4Composition.Modularity
                 }
             }
         }
-
+        /// <summary>
+        /// Sets the <see cref="DisabledPlugins"/> property
+        /// </summary>
         private void GetDisabledPlugins()
         {
-            this.DisabledPlugins = this.AppSettingsService.AppSettings.DisabledPlugins;
+            var appSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<T>>();
+            this.DisabledPlugins = appSettingsService.AppSettings.DisabledPlugins;
         }
 
-        public IAppSettingsService<T> AppSettingsService { get; set; }
-
+        /// <summary>
+        /// Sets the <see cref="ManifestsList"/> property
+        /// </summary>
         private void GetManifests()
         {
             this.ManifestsList = PluginUtilities.GetPluginManifests();
         }
-
-        /// <summary>
-        /// Gets the <see cref="DirectoryCatalog"/>s that are loaded by the CDP4PluginLoader
-        /// </summary>
-        public List<DirectoryCatalog> DirectoryCatalogues { get; private set; }
 
         /// <summary>
         /// Load the plugins in the specified folder
