@@ -13,11 +13,5 @@ namespace CDP4IME.Settings
     /// </summary>
     public class ImeAppSettings : AppSettings
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="ImeAppSettings"/> class
-        /// </summary>
-        public ImeAppSettings()
-        {
-        }
     }
 }

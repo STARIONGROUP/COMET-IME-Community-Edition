@@ -30,7 +30,9 @@ namespace CDP4PluginPackager.Tests
     using System.IO.Compression;
     using System.Linq;
     using System.Reflection;
-    
+
+    using CDP4Composition.Modularity;
+
     using CDP4PluginPackager.Models;
 
     using Newtonsoft.Json;
@@ -96,7 +98,6 @@ namespace CDP4PluginPackager.Tests
             Assert.AreEqual(app.Manifest.Description, json.Description);
             Assert.AreEqual(app.Manifest.ReleaseNote, json.ReleaseNote);
             Assert.AreEqual(app.Manifest.Version, json.Version);
-            json.References.ForEach(r => Assert.IsTrue(app.Manifest.References.Any(m => m.Include == r.Include)));
         }
 
         [Test]

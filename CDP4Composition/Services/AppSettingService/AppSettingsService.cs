@@ -12,7 +12,10 @@ namespace CDP4Composition.Services.AppSettingService
     using System.IO;
     using System.Reflection;
     using CDP4Composition.Exceptions;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Settings;
+
+    using DevExpress.XtraRichEdit.Model;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
@@ -23,6 +26,11 @@ namespace CDP4Composition.Services.AppSettingService
     /// </summary>
     public abstract class AppSettingsService<T> : IAppSettingsService<T> where T : AppSettings, new()
     {
+        /// <summary>
+        /// The name of the plugin directory
+        /// </summary>
+        private const string PluginDirectoryName = "plugins";
+
         /// <summary>
         /// The logger for the current class
         /// </summary>
@@ -46,7 +54,7 @@ namespace CDP4Composition.Services.AppSettingService
         /// <summary>
         /// Initializes a new instance of <see cref="AppSettingsService{T}"/>
         /// </summary>
-        public AppSettingsService()
+        protected AppSettingsService()
         {
             try
             {
@@ -164,6 +172,28 @@ namespace CDP4Composition.Services.AppSettingService
                     serializer.Serialize(streamWriter, this.AppSettings);
                 }
             }
+        }
+
+        public IEnumerable<Manifest> GetManifests()
+        {
+            var manifests = new List<Manifest>();
+            var currentPath = Directory.GetCurrentDirectory();
+
+            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
+
+            if (directoryInfo.Exists)
+            {
+                foreach (var manifest in directoryInfo.EnumerateFiles("*.plugin.manifest", SearchOption.AllDirectories))
+                {
+                    manifests.Add(JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(manifest.FullName)));
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException();
+            }
+
+            return manifests;
         }
 
         /// <summary>

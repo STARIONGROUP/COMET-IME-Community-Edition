@@ -34,7 +34,8 @@ namespace CDP4PluginPackager
     using System.Reflection;
     using System.Xml.Serialization;
 
-    using CDP4PluginPackager.Models;
+    using CDP4Composition.Modularity;
+
     using CDP4PluginPackager.Models.AutoGen;
 
     using Newtonsoft.Json;
@@ -132,7 +133,6 @@ namespace CDP4PluginPackager
                 ProjectGuid = this.Csproj.PropertyGroup.First(p => p.ProjectGuid != Guid.Empty).ProjectGuid,
                 TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFrameworkVersion)).TargetFrameworkVersion,
                 Author = "RHEA System S.A.",
-                References = this.ComputeReferences().ToList(),
                 Website = "https://store.cdp4.org",
                 Description = this.AssemblyInfo.FullName,
                 ReleaseNote = this.GetReleaseNote()

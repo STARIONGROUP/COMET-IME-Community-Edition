@@ -6,10 +6,14 @@
 
 namespace CDP4Composition.Services.AppSettingService
 {
+    using System.Collections.Generic;
+
+    using CDP4Composition.Modularity;
+
     /// <summary>
     /// Definition of the <see cref="IAppSettingsService{T}"/> used to load application specific settings
     /// </summary>
-    public interface IAppSettingsService<T>
+    public interface IAppSettingsService<out T>
     {
         /// <summary>
         /// Holder of application settings
@@ -20,5 +24,7 @@ namespace CDP4Composition.Services.AppSettingService
         /// Writes the <see cref="AppSettings"/> to disk
         /// </summary>
         void Save();
+
+        IEnumerable<Manifest> GetManifests();
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AppSettingService.cs" company="RHEA System S.A.">
+// <copyright file="Manifest.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -24,51 +24,53 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services.AppSettingService
+namespace CDP4Composition.Modularity
 {
     using System;
-    using System.Collections.Generic;
-
-    using CDP4Composition.Modularity;
 
     /// <summary>
-    /// Base class from which all <see cref="AppSettings"/> shall derive
+    /// Represents the Manifest file related to the target plugin
     /// </summary>
-    public abstract class AppSettings
+    public class Manifest
     {
         /// <summary>
-        /// TODO Implement
+        /// Gets or sets the project <see cref="Guid"/> sets in the target Plugin Csproj
         /// </summary>
-        /// <param name="manifests"></param>
-        public void AutoClean(List<Manifest> manifests)
-        {
-            throw new NotImplementedException();
-        }
+        public Guid ProjectGuid { get; set; }
 
         /// <summary>
-        /// Updating plugin settings
+        /// Gets or sets the project Name sets in the target Plugin Csproj
         /// </summary>
-        /// <param name="pluginSettings">
-        ///The plugin settings to be updated
-        /// </param>
-        public void UpdatePlugin(Manifest manifest)
-        {
-            if (manifest.ProjectGuid == Guid.Empty)
-            {
-                return;
-            }
-
-            //var plugin = this.Plugins.FirstOrDefault(x => x.Key == pluginSettings.Key);
-
-            //if (plugin != null)
-            //{
-            //    plugin.IsEnabled = pluginSettings.IsEnabled;
-            //}
-        }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the disabled Plugins
+        /// Gets or sets the project description
         /// </summary>
-        public List<Guid> DisabledPlugins { get; set; } = new List<Guid>();
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the version of the plugin
+        /// </summary>
+        public Version Version { get; set; }
+
+        /// <summary>
+        /// Gets or set the target framework of the Plugin
+        /// </summary>
+        public string TargetFramework { get; set; }
+
+        /// <summary>
+        /// Gets or sets the release note related to the target Plugin version
+        /// </summary>
+        public string ReleaseNote { get; set; }
+
+        /// <summary>
+        /// Gets or set the author
+        /// </summary>
+        public string Author { get; set; }
+
+        /// <summary>
+        /// Gets or set the website related to the target Plugin
+        /// </summary>
+        public string Website { get; set; }
     }
 }

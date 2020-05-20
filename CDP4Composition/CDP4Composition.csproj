@@ -248,6 +248,7 @@
     <Compile Include="Exceptions\PluginSettingsException.cs" />
     <Compile Include="Exceptions\SettingsException.cs" />
     <Compile Include="Extensions\FileExtensionMethods.cs" />
+    <Compile Include="Modularity\Manifest.cs" />
     <Compile Include="Modularity\PluginLoader.cs" />
     <Compile Include="Mvvm\IOwnedThingViewModel.cs" />
     <Compile Include="Mvvm\IHaveContainedRows.cs" />

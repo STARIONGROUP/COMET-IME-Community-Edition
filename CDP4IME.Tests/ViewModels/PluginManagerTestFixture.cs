@@ -31,9 +31,9 @@ namespace CDP4IME.Tests.ViewModels
         [SetUp]
         public void Setup()
         {
-
             this.appSettings = new ImeAppSettings();
-            this.appSettings.Plugins.Add(new PluginSettingsMetaData { Assembly = "Test Assembly", Company = "RHEA",Description= "Plugin Description",IsEnabled= true,IsMandatory= false, Name = "test", Key= "PluginFolder", Version= "5.1" });
+
+            //this.appSettings.Plugins.Add(new PluginSettingsMetaData { Assembly = "Test Assembly", Company = "RHEA",Description= "Plugin Description",IsEnabled= true,IsMandatory= false, Name = "test", Key= "PluginFolder", Version= "5.1" });
 
             this.appSettingService = new Mock<IAppSettingsService<ImeAppSettings>>();
             this.appSettingService.Setup(x => x.AppSettings).Returns(this.appSettings);

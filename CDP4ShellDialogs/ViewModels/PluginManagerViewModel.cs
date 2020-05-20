@@ -9,6 +9,7 @@ namespace CDP4ShellDialogs.ViewModels
     using System;
     using System.Linq;
 
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.AppSettingService;
 
@@ -139,39 +140,39 @@ namespace CDP4ShellDialogs.ViewModels
         private void ExecuteSave()
         {
             var dirtyPlugins = this.Plugins.Where(x => x.IsRowDirty).ToList();
+            this.AppSettingsService.AppSettings.DisabledPlugins.Clear();
 
             foreach (var dirtyItem in dirtyPlugins)
             {
-                var pluginMetaData = new PluginSettingsMetaData
+                var wasAlreadyDisabled = this.AppSettingsService.AppSettings.DisabledPlugins.Any(p => p == dirtyItem.ProjectGuid);
+                
+                if (dirtyItem.IsPluginEnabled && wasAlreadyDisabled)
                 {
-                    Key = dirtyItem.Key,
-                    Name = dirtyItem.Name,
-                    Assembly = dirtyItem.AssemblyName,
-                    Description = dirtyItem.Description,
-                    Company = dirtyItem.Company,
-                    Version = dirtyItem.Version,
-                    IsEnabled = dirtyItem.IsPluginEnabled,
-                    IsMandatory = !dirtyItem.IsRowEnabled
-                };
-
-                this.AppSettingsService.AppSettings.UpdatePlugin(pluginMetaData);
+                    this.AppSettingsService.AppSettings.DisabledPlugins.Remove(dirtyItem.ProjectGuid);
+                }
+                else if (!dirtyItem.IsPluginEnabled && !wasAlreadyDisabled)
+                {
+                    this.AppSettingsService.AppSettings.DisabledPlugins.Add(dirtyItem.ProjectGuid);
+                }
             }
+
             this.AppSettingsService.Save();
             this.DialogResult = new BaseDialogResult(false);
         }
 
         /// <summary>
-        /// Populates the list of modules
+        /// Populates the list of modules TODO: Implement with manifest file
         /// </summary>
         private void PopulateModuleList()
         {
             if (this.AppSettingsService != null)
             {
-                var pluginSettings = this.AppSettingsService.AppSettings.Plugins;
+                var disabledPlugins = this.AppSettingsService.AppSettings.DisabledPlugins;
+                var presentPlugins = this.AppSettingsService.GetManifests();
 
-                foreach (var pluginSetting in pluginSettings)
+                foreach (var pluginSetting in presentPlugins)
                 {
-                    this.Plugins.Add(new PluginRowViewModel((PluginSettingsMetaData)pluginSetting));
+                    this.Plugins.Add(new PluginRowViewModel(pluginSetting, disabledPlugins.All(p => p != pluginSetting.ProjectGuid)));
                 }
             }
         }
