@@ -1,28 +1,11 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CsprojectFile.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
-//            Nathanael Smiechowski, Kamil Wojnowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
-//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
-//    modify it under the terms of the GNU Affero General Public
-//    License as published by the Free Software Foundation; either
-//    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//    GNU Affero General Public License for more details.
-//
-//    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// <summary>
+//   This file has been generated using a csproj file with this tool to convert Xml structure into Csharp: https://xmltocsharp.azurewebsites.net/
+// </summary>
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4PluginPackager.Models.AutoGen
 {
@@ -34,24 +17,24 @@ namespace CDP4PluginPackager.Models.AutoGen
     /// This is the top container element
     /// </summary>
     [XmlRoot(ElementName = "Project", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
-	public class CsprojectFile
-	{
-		[XmlElement(ElementName = "Import", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
-		public List<Import> Import { get; set; }
+    public class CsprojectFile
+    {
+        [XmlElement(ElementName = "Import", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
+        public List<Import> Import { get; set; }
 
         [XmlElement(ElementName = "PropertyGroup", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
-		public List<PropertyGroup> PropertyGroup { get; set; }
+        public List<PropertyGroup> PropertyGroup { get; set; }
 
         [XmlElement(ElementName = "ItemGroup", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
-		public List<ItemGroup> ItemGroup { get; set; }
+        public List<ItemGroup> ItemGroup { get; set; }
 
         [XmlElement(ElementName = "Target", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
-		public Target Target { get; set; }
+        public Target Target { get; set; }
 
         [XmlAttribute(AttributeName = "ToolsVersion")]
-		public string ToolsVersion { get; set; }
+        public string ToolsVersion { get; set; }
 
         [XmlAttribute(AttributeName = "xmlns")]
-		public string Xmlns { get; set; }
-	}
+        public string Xmlns { get; set; }
+    }
 }

@@ -27,6 +27,7 @@
 namespace CDP4PluginPackager.Models
 {
     using CDP4PluginPackager.Models.AutoGen;
+
     using System;
     using System.Collections.Generic;
 
@@ -54,6 +55,11 @@ namespace CDP4PluginPackager.Models
         /// Gets or sets the version of the plugin
         /// </summary>
         public Version Version { get; set; }
+
+        /// <summary>
+        /// Gets or set the IME version with which the plugin is compatible
+        /// </summary>
+        public Version CompatibleIMEVersion { get; set; }
 
         /// <summary>
         /// Gets or set the target framework of the Plugin

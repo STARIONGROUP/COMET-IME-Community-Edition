@@ -2,7 +2,7 @@
 // <copyright file="AppTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//    Author: Sam Gerenï¿½, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
@@ -77,11 +77,10 @@ namespace CDP4PluginPackager.Tests
         public void VerifyIMEVersion()
         {
             var app = new App();
-            app.Deserialize();
-            app.GetAssemblyInfo();
-            var version = app.GetCurrentIMEVersion();
-            Assert.IsNotNull(version);
-            Assert.AreEqual(version.ToString(), "6.0.0.2");
+            app.Start();
+            var version = app.GetCurrentIMEVersion(); 
+            var json = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText($"{Path.Combine(app.OutputPath, app.Manifest.Name)}.plugin.manifest"));
+            Assert.AreEqual(version, json.CompatibleIMEVersion);
         }
 
         [Test]
@@ -110,7 +109,7 @@ namespace CDP4PluginPackager.Tests
 
             using var zipFile = ZipFile.OpenRead(Path.Combine(app.OutputPath, $"{app.Manifest.Name}.cdp4ck"));
 
-            Assert.AreEqual(zipFile.Entries.Count, Directory.EnumerateFiles(app.OutputPath).Count(f => !f.EndsWith(".pdb") || !f.EndsWith(".cdp4ck")));
+            Assert.AreEqual(zipFile.Entries.Count, Directory.EnumerateFiles(app.OutputPath).Count(f => !f.EndsWith(".pdb") && !f.EndsWith(".cdp4ck")));
         }
 
         [Test]
