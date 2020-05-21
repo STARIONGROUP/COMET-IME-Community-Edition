@@ -2,7 +2,7 @@
 // <copyright file="ModelOpeningDialogViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski.
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -113,8 +113,8 @@ namespace CDP4ShellDialogs.ViewModels
                     this.IsBusy = false;
                 });
 
-            this.NextCommand = ReactiveCommand.Create();
-            this.NextCommand.Subscribe(_ => this.ExecuteNext());
+            this.SelectIterationCommand = ReactiveCommand.Create();
+            this.SelectIterationCommand.Subscribe(_ => this.ExecuteNext());
 
             this.BackCommand = ReactiveCommand.Create();
             this.BackCommand.Subscribe(_ => this.ExecuteBack());
@@ -176,7 +176,7 @@ namespace CDP4ShellDialogs.ViewModels
         public ReactiveList<IViewModelBase<Thing>> SelectedIterations { get; set; }
 
         /// <summary>
-        /// Gets the Select <see cref="ICommand"/>
+        /// Gets the SelectCommand <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<Unit> SelectCommand { get; private set; }
 
@@ -186,17 +186,17 @@ namespace CDP4ShellDialogs.ViewModels
         public ReactiveCommand<Unit> SelectActiveIterationCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Cancel <see cref="ICommand"/>
+        /// Gets the CancelCommand <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> CancelCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Next Command <see cref="ICommand"/>
+        /// Gets the SelectIterationCommand <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> NextCommand { get; private set; }
+        public ReactiveCommand<object> SelectIterationCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Back Command <see cref="ICommand"/>
+        /// Gets the BackCommand <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> BackCommand { get; private set; }
 
