@@ -27,6 +27,7 @@
 namespace CDP4Composition.Tests.Modularity
 {
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 
     using CDP4Composition.Modularity;
@@ -85,7 +86,6 @@ namespace CDP4Composition.Tests.Modularity
             var pluginLoader = new PluginLoader<ImeAppSettings>();
             Assert.IsNotEmpty(pluginLoader.ManifestsList);
             Assert.IsNotEmpty(pluginLoader.DisabledPlugins);
-            //Assert.IsFalse(pluginLoader.DirectoryCatalogues.FirstOrDefault(d => d.Path.Contains(pluginLoader)) != null);
         }
     }
 }

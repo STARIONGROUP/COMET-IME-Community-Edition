@@ -32,6 +32,7 @@ namespace CDP4PluginPackager.Tests
     using System.Reflection;
 
     using CDP4PluginPackager.Models;
+    using CDP4PluginPackager.Utilities;
 
     using Newtonsoft.Json;
 
@@ -42,7 +43,7 @@ namespace CDP4PluginPackager.Tests
     {
         private string[] args;
 
-        private const string TargetProject = "CDP4Dashboard";
+        private const string TargetProject = "CDP4Scripting";
 
         [OneTimeSetUp]
         public void Setup()
@@ -70,7 +71,7 @@ namespace CDP4PluginPackager.Tests
             app.Deserialize();
             app.GetAssemblyInfo();
             Assert.IsNotNull(app.AssemblyInfo);
-            Assert.IsNotNull(app.AssemblyInfo.Version);
+            Assert.IsNotNull(app.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>());
         }
         
         [Test, Ignore("IME version not added at the moment")]
@@ -122,7 +123,7 @@ namespace CDP4PluginPackager.Tests
             Assert.IsNotEmpty(license);
             Assert.IsFalse(license.Contains("$YEAR"));
             Assert.IsFalse(license.Contains("$PLUGIN_NAME"));
-            Assert.IsTrue(license.Contains(app.AssemblyInfo.Name));
+            Assert.IsTrue(license.Contains(app.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>()));
         }
 
         [Test]

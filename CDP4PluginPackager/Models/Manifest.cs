@@ -51,7 +51,7 @@ namespace CDP4PluginPackager.Models
         /// <summary>
         /// Gets or sets the version of the plugin
         /// </summary>
-        public Version Version { get; set; }
+        public string Version { get; set; }
 
         /// <summary>
         /// Gets or set the IME version with which the plugin is compatible
