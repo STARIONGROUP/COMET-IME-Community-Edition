@@ -145,17 +145,19 @@
             <TextBlock TextWrapping="Wrap" Margin="5,5,5,5"
                        Text="Double click to open the active iteration of this Engineering Model"></TextBlock>
         </StackPanel>
-        <dxlc:LayoutGroup Grid.Row="3" Height="30" Margin="5">
+        <dxlc:LayoutGroup Grid.Row="3" Height="30" Margin="0,0,0,5">
             <Button Content="Back"
                     Visibility="{Binding Path=IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}"
                     Margin="5"
-                    Width="60"
+                    Width="75"
+                    Height="25"
                     HorizontalAlignment="Right"
                     Command="{Binding BackCommand}"/>
             <Button Content="Select Iteration"
                     Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
                     Margin="5"
-                    Width="120"
+                    Width="150"
+                    Height="25"
                     HorizontalAlignment="Right"
                     Command="{Binding SelectIterationCommand}">
                 <Button.Style>
@@ -173,18 +175,21 @@
             <Button Content="Select"
                     Visibility="{Binding IsIterationScreen, Converter={dx:BooleanToVisibilityConverter}}"
                     Margin="5"
-                    Width="60"
+                    Width="75"
+                    Height="25"
                     HorizontalAlignment="Right"
                     Command="{Binding SelectCommand}"/>
             <Button Content="Open"
                     Visibility="{Binding IsModelScreen, Converter={dx:BooleanToVisibilityConverter}}"
                     Margin="5"
-                    Width="60"
+                    Width="75"
+                    Height="25"
                     HorizontalAlignment="Right"
                     Command="{Binding SelectActiveIterationCommand}"/>
             <Button Content="Cancel"
                     Margin="5"
-                    Width="60"
+                    Width="75"
+                    Height="25"
                     HorizontalAlignment="Right"
                     Command="{Binding CancelCommand}"
                     IsDefault="True"/>
