@@ -24,7 +24,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4PluginPackager.Models
+namespace CDP4Composition.Modularity
 {
     using System;
 

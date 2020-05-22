@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AppSettingService.cs" company="RHEA System S.A.">
+// <copyright file="PluginUtilities.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -24,21 +24,54 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services.AppSettingService
+namespace CDP4Composition.Modularity
 {
-    using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Reflection;
 
-    using CDP4Composition.Modularity;
+    using CDP4Composition.Utilities;
+
+    using DevExpress.Mvvm;
+
+    using Microsoft.Practices.ServiceLocation;
+
+    using Newtonsoft.Json;
 
     /// <summary>
-    /// Base class from which all <see cref="AppSettings"/> shall derive
+    /// Utility class that help with plugin management
     /// </summary>
-    public abstract class AppSettings
+    public static class PluginUtilities
     {
         /// <summary>
-        /// Gets or sets the disabled Plugins
+        /// The name of the plugin directory
         /// </summary>
-        public List<Guid> DisabledPlugins { get; set; } = new List<Guid>();
+        public const string PluginDirectoryName = "plugins";
+
+        /// <summary>
+        /// Gets the plugin <see cref="Manifest"/> present in the IME plugin folder
+        /// </summary>
+        /// <returns><see cref="IEnumerable{Manifest}"/> containing all founds plugin manifests</returns>
+        public static IEnumerable<Manifest> GetPluginManifests()
+        {
+            var manifests = new List<Manifest>();
+            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
+
+            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
+
+            if (directoryInfo.Exists)
+            {
+                foreach (var manifest in directoryInfo.EnumerateFiles("*.plugin.manifest", SearchOption.AllDirectories))
+                {
+                    manifests.Add(JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(manifest.FullName)));
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException();
+            }
+
+            return manifests;
+        }
     }
 }

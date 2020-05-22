@@ -36,9 +36,10 @@ namespace CDP4PluginPackager
 
     using CDP4PluginPackager.Models;
     using CDP4PluginPackager.Models.AutoGen;
+    using CDP4PluginPackager.Utilities;
 
     using Newtonsoft.Json;
-    
+
     /// <summary>
     /// App class handles plugin manifest generation and packing
     /// </summary>
@@ -65,9 +66,9 @@ namespace CDP4PluginPackager
         public CsprojectFile Csproj { get; private set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="AssemblyName"/> info reflected from the target plugin
+        /// Gets a <see cref="IEnumerable{T}"/> of custom attribute data reflected from the target plugin
         /// </summary>
-        public AssemblyName AssemblyInfo { get; private set; }
+        public IEnumerable<CustomAttributeData> AssemblyInfo { get; private set; }
         
         /// <summary>
         /// The actual manifest meant to be serialized
@@ -126,15 +127,13 @@ namespace CDP4PluginPackager
         {
             this.Manifest = new Manifest
             {
-                Name = this.AssemblyInfo.Name,
-                Version = this.AssemblyInfo.Version,
-                CompatibleIMEVersion = this.GetCurrentIMEVersion(),
+                Name = this.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>(),
+                Version = this.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyFileVersionAttribute>(),
                 ProjectGuid = this.Csproj.PropertyGroup.First(p => p.ProjectGuid != Guid.Empty).ProjectGuid,
                 TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFrameworkVersion)).TargetFrameworkVersion,
                 Author = "RHEA System S.A.",
-                References = this.ComputeReferences().ToList(),
                 Website = "https://store.cdp4.org",
-                Description = this.AssemblyInfo.FullName,
+                Description = this.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyDescriptionAttribute>(),
                 ReleaseNote = this.GetReleaseNote()
             };
         }
@@ -153,7 +152,9 @@ namespace CDP4PluginPackager
                 return null;
             }
 
-            return  File.ReadAllText(licensePath).Replace("$PLUGIN_NAME", this.AssemblyInfo.Name).Replace("$YEAR", DateTime.Now.Year.ToString());
+            return File.ReadAllText(licensePath)
+                .Replace("$PLUGIN_NAME", this.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>())
+                .Replace("$YEAR", DateTime.Now.Year.ToString());
         }
 
         /// <summary>
@@ -188,6 +189,12 @@ namespace CDP4PluginPackager
         public Version GetCurrentIMEVersion()
         {
             var imePath = Path.GetFullPath(Path.Combine(this.OutputPath, @"..\..\", "CDP4IME.exe"));
+
+            if (!File.Exists(imePath))
+            {
+                throw new FileNotFoundException("You should build IME first");
+            }
+
             return Assembly.LoadFrom(imePath).GetName().Version;
         }
         
@@ -199,7 +206,7 @@ namespace CDP4PluginPackager
             this.OutputPath = this.Csproj.PropertyGroup.FirstOrDefault(d => !string.IsNullOrWhiteSpace(d.OutputPath))?.OutputPath;
             var assemblyName = this.Csproj.PropertyGroup.FirstOrDefault(d => !string.IsNullOrWhiteSpace(d.AssemblyName))?.AssemblyName;
             var dllpath = $"{this.OutputPath}{assemblyName}.dll";
-            this.AssemblyInfo = Assembly.LoadFrom(dllpath).GetName();
+            this.AssemblyInfo = Assembly.LoadFrom(dllpath).GetCustomAttributesData();
         }
         
         /// <summary>
@@ -231,12 +238,9 @@ namespace CDP4PluginPackager
         {
             var zipPath = Path.Combine(this.OutputPath, $"{this.Manifest.Name}.cdp4ck");
             var temporaryZipPath = Path.Combine(this.path, $"{this.Manifest.Name}.cdp4ck");
-
-            if (File.Exists(zipPath))
-            {
-                File.Delete(zipPath);
-            }
             
+            CleanUpOldPackages(zipPath, temporaryZipPath);
+
             ZipFile.CreateFromDirectory(this.OutputPath, temporaryZipPath, CompressionLevel.Optimal, false);
 
             using (var zip = ZipFile.Open(temporaryZipPath, ZipArchiveMode.Update))
@@ -250,6 +254,24 @@ namespace CDP4PluginPackager
             }
 
             File.Move(temporaryZipPath, zipPath);
+        }
+
+        /// <summary>
+        /// Delete old package in the temporary folder and the output folder
+        /// </summary>
+        /// <param name="zipPath">the path where the zip is moved after creation</param>
+        /// <param name="temporaryZipPath">the path where the zip is created</param>
+        private static void CleanUpOldPackages(string zipPath, string temporaryZipPath)
+        {
+            if (File.Exists(temporaryZipPath))
+            {
+                File.Delete(temporaryZipPath);
+            }
+
+            if (File.Exists(zipPath))
+            {
+                File.Delete(zipPath);
+            }
         }
     }
 }

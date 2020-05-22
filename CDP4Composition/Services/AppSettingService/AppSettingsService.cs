@@ -7,15 +7,15 @@
 namespace CDP4Composition.Services.AppSettingService
 {
     using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.Composition;
     using System.IO;
     using System.Reflection;
+
     using CDP4Composition.Exceptions;
     using CDP4Composition.Settings;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
+
     using NLog;
 
     /// <summary>
@@ -23,6 +23,11 @@ namespace CDP4Composition.Services.AppSettingService
     /// </summary>
     public abstract class AppSettingsService<T> : IAppSettingsService<T> where T : AppSettings, new()
     {
+        /// <summary>
+        /// The name of the plugin directory
+        /// </summary>
+        private const string PluginDirectoryName = "plugins";
+
         /// <summary>
         /// The logger for the current class
         /// </summary>
@@ -46,7 +51,7 @@ namespace CDP4Composition.Services.AppSettingService
         /// <summary>
         /// Initializes a new instance of <see cref="AppSettingsService{T}"/>
         /// </summary>
-        public AppSettingsService()
+        protected AppSettingsService()
         {
             try
             {

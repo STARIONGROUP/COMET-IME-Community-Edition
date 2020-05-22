@@ -25,42 +25,35 @@
 
 namespace CDP4Composition.Modularity
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
+
+    using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.Utilities;
+
+    using Microsoft.Practices.ServiceLocation;
+
+    using Newtonsoft.Json;
 
     /// <summary>
     /// The purpose of the <see cref="PluginLoader"/> is to load the various
     /// CDP4 plugins that are located in the plugins folder.
     /// </summary>
-    public class PluginLoader
+    public class PluginLoader<T> where T : AppSettings, new()
     {
         /// <summary>
-        /// The name of the plugin directory
+        /// Gets or sets a list of disabled plugins
         /// </summary>
-        private const string PluginDirectoryName = "plugins";
+        public List<Guid> DisabledPlugins { get; set; } = new List<Guid>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AddinPluginLoader"/> class.
+        /// Gets or sets a <see cref="IEnumerable{Manifest}"/> of <see cref="Manifest"/>
         /// </summary>
-        public PluginLoader()
-        {
-            this.DirectoryCatalogues = new List<DirectoryCatalog>();
-
-            var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            var path = Path.Combine(currentPath, PluginDirectoryName);
-            var directoryInfo = new DirectoryInfo(path);
-
-            if (directoryInfo.Exists)
-            {
-                foreach (var dir in directoryInfo.EnumerateDirectories())
-                {
-                    this.LoadPlugins(dir);
-                }
-            }
-        }
+        public IEnumerable<Manifest> ManifestsList { get; set; }
 
         /// <summary>
         /// Gets the <see cref="DirectoryCatalog"/>s that are loaded by the CDP4PluginLoader
@@ -68,17 +61,57 @@ namespace CDP4Composition.Modularity
         public List<DirectoryCatalog> DirectoryCatalogues { get; private set; }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="PluginLoader"/> class.
+        /// </summary>
+        public PluginLoader()
+        {
+            this.DirectoryCatalogues = new List<DirectoryCatalog>();
+            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
+            
+            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginUtilities.PluginDirectoryName));
+
+            if (directoryInfo.Exists)
+            {
+                this.GetManifests();
+                this.GetDisabledPlugins();
+
+                foreach (var manifest in this.ManifestsList.Where(m => !this.DisabledPlugins.Contains(m.ProjectGuid)))
+                {
+                    var path = Path.Combine(directoryInfo.FullName, manifest.Name);
+                    
+                    if (Directory.Exists(path))
+                    {
+                        this.LoadPlugins(path);
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Sets the <see cref="DisabledPlugins"/> property
+        /// </summary>
+        private void GetDisabledPlugins()
+        {
+            var appSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<T>>();
+            this.DisabledPlugins = appSettingsService.AppSettings.DisabledPlugins;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="ManifestsList"/> property
+        /// </summary>
+        private void GetManifests()
+        {
+            this.ManifestsList = PluginUtilities.GetPluginManifests();
+        }
+
+        /// <summary>
         /// Load the plugins in the specified folder
         /// </summary>
-        /// <param name="dir">
+        /// <param name="path">
         /// the folder info that contains the CDP4 plugin
         /// </param>
-        /// <param name="pluginSettingsMetaData">
-        /// the plugin to be loaded if it is new
-        /// </param>
-        private void LoadPlugins(DirectoryInfo dir)
+        private void LoadPlugins(string path)
         {
-            var dllCatalog = new DirectoryCatalog(path: dir.FullName, searchPattern: "*.dll");
+            var dllCatalog = new DirectoryCatalog(path: path, searchPattern: "*.dll");
             this.DirectoryCatalogues.Add(dllCatalog);
         }
     }

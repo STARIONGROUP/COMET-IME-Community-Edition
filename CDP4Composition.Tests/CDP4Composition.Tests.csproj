@@ -209,6 +209,7 @@
     <Compile Include="Extensions\FileExtensionMethodsTestFixture.cs" />
     <Compile Include="Extensions\FileRevisionExtensionMethodsTestFixture.cs" />
     <Compile Include="IconCacheService\IconCacheServiceIconCachServiceTestFixture.cs" />
+    <Compile Include="Modularity\PluginLoaderTestFixture.cs" />
     <Compile Include="Mvvm\Behaviours\ContextMenuBehaviorTestFixture.cs" />
     <Compile Include="Mvvm\Behaviours\TreeCellEditBehaviorTestFixture.cs" />
     <Compile Include="Mvvm\Behaviours\CellEditBehaviorTestFixture.cs" />
@@ -245,11 +246,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\RequirementStateOfComplianceExtensionsTestFixture.cs" />
     <Compile Include="Utilities\CDP4ColorExtensionsTestFixture.cs" />
+    <Compile Include="Utilities\AssemblyLocationLoader.cs" />
     <Compile Include="ViewModels\ThingSelectorDialogViewModelTestFixture.cs" />
     <Compile Include="ViewModels\GenericConfirmationDialogViewModelTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Modularity\AppSettingsTest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\RibbonXml\customui14.xsd">
       <SubType>Designer</SubType>
@@ -272,6 +277,10 @@
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>
       <Name>CDP4Composition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4IME\CDP4IME-CE.csproj">
+      <Project>{E8A6C54E-80C1-42E3-A2C2-D698B97BE7C2}</Project>
+      <Name>CDP4IME-CE</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

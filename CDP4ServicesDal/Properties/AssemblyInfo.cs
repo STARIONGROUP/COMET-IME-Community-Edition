@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CDP4ServicesDal")]
+[assembly: AssemblyTitle("CDP4ServicesDalPlugin")]
 [assembly: AssemblyDescription("CDP4 Services DAL to be used exclusively with CDP4 Services")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RHEA System S.A")]

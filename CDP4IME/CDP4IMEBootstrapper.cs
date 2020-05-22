@@ -36,6 +36,8 @@ namespace CDP4IME
     using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
 
+    using CDP4IME.Settings;
+
     using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;
@@ -78,7 +80,7 @@ namespace CDP4IME
         {
             this.UpdateBootstrapperState("Loading CDP4 Plugins");
 
-            var pluginLoader = new PluginLoader();
+            var pluginLoader = new PluginLoader<ImeAppSettings>();
 
             foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
             {
@@ -125,7 +127,7 @@ namespace CDP4IME
             }
 
             var sw = new Stopwatch();
-            sw.Start();
+            sw.Start();    
             this.UpdateBootstrapperState("Loading CDP4 Catalogs");
 
             var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");

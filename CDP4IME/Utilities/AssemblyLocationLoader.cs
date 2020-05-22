@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AppSettingService.cs" company="RHEA System S.A.">
+// <copyright file="AssemblyLocationLoader.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -24,21 +24,28 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services.AppSettingService
+namespace CDP4IME.Utilities
 {
-    using System;
-    using System.Collections.Generic;
+    using System.ComponentModel.Composition;
+    using System.IO;
+    using System.Reflection;
 
-    using CDP4Composition.Modularity;
+    using CDP4Composition.Utilities;
 
     /// <summary>
-    /// Base class from which all <see cref="AppSettings"/> shall derive
+    /// The helper class that make method that uses <code>Assembly.GetExecutingAssembly().Location</code>
+    /// testable, in order to find plugins
     /// </summary>
-    public abstract class AppSettings
+    [Export(typeof(IAssemblyLocationLoader))]
+    public class AssemblyLocationLoader : IAssemblyLocationLoader
     {
         /// <summary>
-        /// Gets or sets the disabled Plugins
+        /// Gets the path of the executing assembly
         /// </summary>
-        public List<Guid> DisabledPlugins { get; set; } = new List<Guid>();
+        /// <returns>the path of the assembly</returns>
+        public string GetLocation()
+        {
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
     }
 }

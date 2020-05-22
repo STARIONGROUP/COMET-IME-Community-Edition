@@ -1,13 +1,37 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ShellDialogs.ViewModels
 {
-    using CDP4Composition.Services.AppSettingService;
+    using System;
+
+    using CDP4Composition.Modularity;
+
     using Microsoft.Practices.Prism.Modularity;
+
     using ReactiveUI;
 
     /// <summary>
@@ -16,9 +40,9 @@ namespace CDP4ShellDialogs.ViewModels
     public class PluginRowViewModel : ReactiveObject
     {
         /// <summary>
-        /// The backing field for the <see cref="Key"/> property
+        /// The backing field for the <see cref="ProjectGuid"/> property
         /// </summary>
-        private string key;
+        private Guid projectGuid;
 
         /// <summary>
         /// The backing field for the <see cref="AssemblyName"/> property
@@ -71,33 +95,26 @@ namespace CDP4ShellDialogs.ViewModels
         /// <param name="module">
         /// The <see cref="IModule"/> to extract information from.
         /// </param>
-        public PluginRowViewModel(PluginSettingsMetaData module)
+        /// <param name="isPluginEnabled">Whether the plugin is enabled</param>
+        public PluginRowViewModel(Manifest module, bool isPluginEnabled)
         {
-            this.key = module.Key;
-            this.assemblyName = module.Assembly;
+            this.projectGuid = module.ProjectGuid;
+            this.assemblyName = module.Name;
             this.name = module.Name;
             this.description = module.Description;
-            this.version = module.Version;
-            this.company = module.Company;
-            this.isPluginEnabled = module.IsEnabled;
-            this.isRowEnabled = !module.IsMandatory;
-            this.isMandatory = module.IsMandatory;
+            this.version = module.Version.ToString();
+            this.company = module.Author;
+            this.isPluginEnabled = isPluginEnabled;
+            this.isRowEnabled = true;
         }
 
         /// <summary>
         /// Gets or sets the key of the Plugin
         /// </summary>
-        public string Key
+        public Guid ProjectGuid
         {
-            get
-            {
-                return this.key;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.key, value);
-            }
+            get => this.projectGuid;
+            set => this.RaiseAndSetIfChanged(ref this.projectGuid, value);
         }
 
         /// <summary>
@@ -105,15 +122,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string AssemblyName
         {
-            get
-            {
-                return this.assemblyName;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.assemblyName, value);
-            }
+            get => this.assemblyName;
+            set => this.RaiseAndSetIfChanged(ref this.assemblyName, value);
         }
 
         /// <summary>
@@ -121,15 +131,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string Name
         {
-            get
-            {
-                return this.name;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.name, value);
-            }
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         /// <summary>
@@ -137,15 +140,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string Description
         {
-            get
-            {
-                return this.description;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.description, value);
-            }
+            get => this.description;
+            set => this.RaiseAndSetIfChanged(ref this.description, value);
         }
 
         /// <summary>
@@ -153,15 +149,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string Version
         {
-            get
-            {
-                return this.version;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.version, value);
-            }
+            get => this.version;
+            set => this.RaiseAndSetIfChanged(ref this.version, value);
         }
 
         /// <summary>
@@ -169,15 +158,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string Company
         {
-            get
-            {
-                return this.company;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.company, value);
-            }
+            get => this.company;
+            set => this.RaiseAndSetIfChanged(ref this.company, value);
         }
 
         /// <summary>
@@ -185,15 +167,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public bool IsPluginEnabled
         {
-            get
-            {
-                return this.isPluginEnabled;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isPluginEnabled, value);
-            }
+            get => this.isPluginEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isPluginEnabled, value);
         }
 
         /// <summary>
@@ -201,15 +176,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public bool IsRowEnabled
         {
-            get
-            {
-                return this.isRowEnabled;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isRowEnabled, value);
-            }
+            get => this.isRowEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isRowEnabled, value);
         }
 
         /// <summary>
@@ -217,15 +185,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public bool IsMandatory
         {
-            get
-            {
-                return this.isMandatory;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isMandatory, value);
-            }
+            get => this.isMandatory;
+            set => this.RaiseAndSetIfChanged(ref this.isMandatory, value);
         }
 
         /// <summary>
@@ -233,15 +194,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public bool IsRowDirty
         {
-            get
-            {
-                return this.isRowDirty;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isRowDirty, value);
-            }
+            get => this.isRowDirty;
+            set => this.RaiseAndSetIfChanged(ref this.isRowDirty, value);
         }
     }
 }

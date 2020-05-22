@@ -218,6 +218,7 @@
     <Compile Include="AddinTestFixture.cs" />
     <Compile Include="OfficeRibbon\AddinRibbonPartTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\AssemblyLocationLoader.cs" />
     <Compile Include="Utils\StringExtensionTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>

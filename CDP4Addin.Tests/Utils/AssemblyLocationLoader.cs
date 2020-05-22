@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AppSettingService.cs" company="RHEA System S.A.">
+// <copyright file="AssemblyLocationLoader.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -24,21 +24,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services.AppSettingService
+namespace CDP4Addin.Tests.Utils
 {
-    using System;
-    using System.Collections.Generic;
+    using System.IO;
+    using System.Reflection;
 
-    using CDP4Composition.Modularity;
+    using CDP4Composition.Utilities;
 
     /// <summary>
-    /// Base class from which all <see cref="AppSettings"/> shall derive
+    /// The helper class that make method that uses <code>Assembly.GetExecutingAssembly().Location</code>
+    /// testable, in order to find plugins
     /// </summary>
-    public abstract class AppSettings
+    public class AssemblyLocationLoader : IAssemblyLocationLoader
     {
         /// <summary>
-        /// Gets or sets the disabled Plugins
+        /// Gets the path of the IME bin folder
         /// </summary>
-        public List<Guid> DisabledPlugins { get; set; } = new List<Guid>();
+        /// <returns>the path of the assembly</returns>
+        public string GetLocation()
+        {
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../");
+            return Path.GetFullPath(Path.Combine(testDirectory, @"CDP4IME\bin\Debug"));
+        }
     }
 }

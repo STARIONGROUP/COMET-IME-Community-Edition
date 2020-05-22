@@ -2,7 +2,7 @@
 // <copyright file="AppTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//    Author: Sam GerenÃ©, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
@@ -30,19 +30,20 @@ namespace CDP4PluginPackager.Tests
     using System.IO.Compression;
     using System.Linq;
     using System.Reflection;
-    
+
     using CDP4PluginPackager.Models;
+    using CDP4PluginPackager.Utilities;
 
     using Newtonsoft.Json;
 
     using NUnit.Framework;
-
+    
     [TestFixture]
     public class AppTestFixture
     {
         private string[] args;
 
-        private const string TargetProject = "CDP4Dashboard";
+        private const string TargetProject = "CDP4Scripting";
 
         [OneTimeSetUp]
         public void Setup()
@@ -70,10 +71,10 @@ namespace CDP4PluginPackager.Tests
             app.Deserialize();
             app.GetAssemblyInfo();
             Assert.IsNotNull(app.AssemblyInfo);
-            Assert.IsNotNull(app.AssemblyInfo.Version);
+            Assert.IsNotNull(app.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>());
         }
         
-        [Test]
+        [Test, Ignore("IME version not added at the moment")]
         public void VerifyIMEVersion()
         {
             var app = new App();
@@ -96,7 +97,6 @@ namespace CDP4PluginPackager.Tests
             Assert.AreEqual(app.Manifest.Description, json.Description);
             Assert.AreEqual(app.Manifest.ReleaseNote, json.ReleaseNote);
             Assert.AreEqual(app.Manifest.Version, json.Version);
-            json.References.ForEach(r => Assert.IsTrue(app.Manifest.References.Any(m => m.Include == r.Include)));
         }
 
         [Test]
@@ -123,7 +123,37 @@ namespace CDP4PluginPackager.Tests
             Assert.IsNotEmpty(license);
             Assert.IsFalse(license.Contains("$YEAR"));
             Assert.IsFalse(license.Contains("$PLUGIN_NAME"));
-            Assert.IsTrue(license.Contains(app.AssemblyInfo.Name));
+            Assert.IsTrue(license.Contains(app.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>()));
+        }
+
+        [Test]
+        public void VerifyThatPropertiesAreTheSameOnManifestClasses()
+        {
+            var pluginPackagerManifestProperties = typeof(Manifest).GetProperties();
+            var compositionManifestProperties = typeof(CDP4Composition.Modularity.Manifest).GetProperties();
+            Assert.AreEqual(pluginPackagerManifestProperties.Length, compositionManifestProperties.Length);
+
+            foreach (var property in pluginPackagerManifestProperties)
+            {
+                var propertyInComposition = compositionManifestProperties.Single(p => p.Name == property.Name);
+                Assert.IsNotNull(propertyInComposition);
+                Assert.AreEqual(property.PropertyType, propertyInComposition.PropertyType);
+            }
+        }
+
+        [Test]
+        public void VerifyThatMethodsAreTheSameOnManifestClasses()
+        {
+            var pluginPackagerManifestProperties = typeof(Manifest).GetMethods();
+            var compositionManifestProperties = typeof(CDP4Composition.Modularity.Manifest).GetMethods();
+            Assert.AreEqual(pluginPackagerManifestProperties.Length, compositionManifestProperties.Length);
+
+            foreach (var property in pluginPackagerManifestProperties)
+            {
+                var propertyInComposition = compositionManifestProperties.Single(p => p.Name == property.Name);
+                Assert.IsNotNull(propertyInComposition);
+                Assert.AreEqual(property.ReturnType, propertyInComposition.ReturnType);
+            }
         }
     }
 }
