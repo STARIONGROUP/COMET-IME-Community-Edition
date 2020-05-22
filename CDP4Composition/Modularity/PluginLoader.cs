@@ -33,6 +33,7 @@ namespace CDP4Composition.Modularity
     using System.Reflection;
 
     using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.Utilities;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -65,9 +66,8 @@ namespace CDP4Composition.Modularity
         public PluginLoader()
         {
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
-
-            var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
+            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
+            
             var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginUtilities.PluginDirectoryName));
 
             if (directoryInfo.Exists)

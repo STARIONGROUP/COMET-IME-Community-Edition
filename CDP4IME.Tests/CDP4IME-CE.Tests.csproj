@@ -160,6 +160,7 @@
     <Compile Include="ShellViewModelTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextDataProviderTestFixture.cs" />
+    <Compile Include="Utilities\AssemblyLocationLoader.cs" />
     <Compile Include="ViewModels\DataSourceExportViewModelTestFixture.cs" />
     <Compile Include="ViewModels\LogDetailsViewModelTestFixture.cs" />
     <Compile Include="ViewModels\PluginManagerTestFixture.cs" />
@@ -188,6 +189,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

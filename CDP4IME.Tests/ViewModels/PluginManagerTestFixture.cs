@@ -29,13 +29,17 @@ namespace CDP4IME.Tests.ViewModels
     using System;
     using System.Linq;
 
+    using CDP4Composition.Modularity;
     using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.Utilities;
 
     using CDP4IME.Settings;
+    using CDP4IME.Tests.Utilities;
 
     using CDP4ShellDialogs.ViewModels;
 
     using Microsoft.Practices.Prism.Modularity;
+    using Microsoft.Practices.ServiceLocation;
 
     using Moq;
 
@@ -47,22 +51,30 @@ namespace CDP4IME.Tests.ViewModels
         private Mock<IAppSettingsService<ImeAppSettings>> appSettingService;
         private PluginManagerViewModel<ImeAppSettings> viewModel;
         private ImeAppSettings appSettings;
+        private Mock<IServiceLocator> serviceLocator;
 
         [SetUp]
         public void Setup()
         {
             this.appSettings = new ImeAppSettings();
 
+            this.serviceLocator = new Mock<IServiceLocator>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            
             this.appSettingService = new Mock<IAppSettingsService<ImeAppSettings>>();
             this.appSettingService.Setup(x => x.AppSettings).Returns(this.appSettings);
 
+            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(new AssemblyLocationLoader());
+            this.serviceLocator.Setup(s => s.GetInstance<IAppSettingsService<ImeAppSettings>>()).Returns(this.appSettingService.Object);
+            
             this.viewModel = new PluginManagerViewModel<ImeAppSettings>(this.appSettingService.Object);
         }
 
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            Assert.AreEqual(1, this.viewModel.Plugins.Count);
+            Assert.AreEqual(PluginUtilities.GetPluginManifests().Count(), this.viewModel.Plugins.Count);
         }
 
         [Test]
@@ -85,12 +97,22 @@ namespace CDP4IME.Tests.ViewModels
             Assert.IsNotNull(this.viewModel.SelectedPlugin.Version);
         }
 
-        public class TestModule : IModule
+        [Test]
+        public void VerifyDisabledPluginsUpdatesSettingFile()
         {
-            public void Initialize()
-            {
-                throw new NotImplementedException();
-            }
+            var currentlyDisabledInSettings = new PluginLoader<ImeAppSettings>().DisabledPlugins;
+            var alreadyDisabled = this.viewModel.Plugins.Count(p => !p.IsPluginEnabled);
+
+            Assert.AreEqual(currentlyDisabledInSettings.Count, alreadyDisabled);
+            var oneToDisabled = this.viewModel.Plugins.First(p => p.IsPluginEnabled);
+            Assert.IsNotNull(oneToDisabled);
+            oneToDisabled.IsPluginEnabled = false;
+            oneToDisabled.IsRowDirty = true;
+            this.viewModel.SaveCommand.Execute(null);
+            var newCount = this.viewModel.Plugins.Count(p => !p.IsPluginEnabled);
+
+            Assert.Greater(newCount, alreadyDisabled);
+            Assert.AreEqual(newCount, new PluginLoader<ImeAppSettings>().DisabledPlugins.Count) ;
         }
     }
 }

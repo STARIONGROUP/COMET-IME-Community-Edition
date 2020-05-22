@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginUtilities.cs" company="RHEA System S.A.">
+// <copyright file="AssemblyLocationLoader.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -24,54 +24,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Modularity
+namespace CDP4Addin.Tests.Utils
 {
-    using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
 
     using CDP4Composition.Utilities;
 
-    using DevExpress.Mvvm;
-
-    using Microsoft.Practices.ServiceLocation;
-
-    using Newtonsoft.Json;
-
     /// <summary>
-    /// Utility class that help with plugin management
+    /// The helper class that make method that uses <code>Assembly.GetExecutingAssembly().Location</code>
+    /// testable, in order to find plugins
     /// </summary>
-    public static class PluginUtilities
+    public class AssemblyLocationLoader : IAssemblyLocationLoader
     {
         /// <summary>
-        /// The name of the plugin directory
+        /// Gets the path of the IME bin folder
         /// </summary>
-        public const string PluginDirectoryName = "plugins";
-
-        /// <summary>
-        /// Gets the plugin <see cref="Manifest"/> present in the IME plugin folder
-        /// </summary>
-        /// <returns><see cref="IEnumerable{Manifest}"/> containing all founds plugin manifests</returns>
-        public static IEnumerable<Manifest> GetPluginManifests()
+        /// <returns>the path of the assembly</returns>
+        public string GetLocation()
         {
-            var manifests = new List<Manifest>();
-            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
-
-            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
-
-            if (directoryInfo.Exists)
-            {
-                foreach (var manifest in directoryInfo.EnumerateFiles("*.plugin.manifest", SearchOption.AllDirectories))
-                {
-                    manifests.Add(JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(manifest.FullName)));
-                }
-            }
-            else
-            {
-                throw new FileNotFoundException();
-            }
-
-            return manifests;
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../");
+            return Path.GetFullPath(Path.Combine(testDirectory, @"CDP4IME\bin\Debug"));
         }
     }
 }

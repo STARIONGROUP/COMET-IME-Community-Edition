@@ -26,12 +26,15 @@
 
 namespace CDP4Composition.Tests.Modularity
 {
+    using System;
     using System.IO;
     using System.Linq;
     using System.Reflection;
 
     using CDP4Composition.Modularity;
     using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.Tests.Utilities;
+    using CDP4Composition.Utilities;
 
     using CDP4IME.Settings;
 
@@ -58,9 +61,11 @@ namespace CDP4Composition.Tests.Modularity
         public void Setup()
         {
             var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../");
-            testDirectory = Path.Combine(testDirectory, ImeFolder);
+            testDirectory = Path.GetFullPath(Path.Combine(testDirectory, ImeFolder));
 
             this.serviceLocator = new Mock<IServiceLocator>();
+            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(new AssemblyLocationLoader());
+
             this.appSettingsService = new Mock<IAppSettingsService<ImeAppSettings>>();
 
             this.appSettings = JsonConvert.DeserializeObject<ImeAppSettings>(File.ReadAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, @"../Modularity/", AppSettingsJson)));
