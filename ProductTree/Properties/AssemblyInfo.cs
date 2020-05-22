@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ProductTree")]
+[assembly: AssemblyTitle("CDP4ProductTree")]
 [assembly: AssemblyDescription("CDP4 Product Tree Plugin")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RHEA System S.A.")]

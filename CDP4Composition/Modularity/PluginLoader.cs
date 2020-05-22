@@ -86,6 +86,7 @@ namespace CDP4Composition.Modularity
                 }
             }
         }
+
         /// <summary>
         /// Sets the <see cref="DisabledPlugins"/> property
         /// </summary>

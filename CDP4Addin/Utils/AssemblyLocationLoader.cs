@@ -26,6 +26,7 @@
 
 namespace CDP4AddinCE.Utils
 {
+    using System.ComponentModel.Composition;
     using System.IO;
     using System.Reflection;
 
@@ -35,6 +36,7 @@ namespace CDP4AddinCE.Utils
     /// The helper class that make method that uses <code>Assembly.GetExecutingAssembly().Location</code>
     /// testable, in order to find plugins
     /// </summary>
+    [Export(typeof(IAssemblyLocationLoader))]
     public class AssemblyLocationLoader : IAssemblyLocationLoader
     {
         /// <summary>

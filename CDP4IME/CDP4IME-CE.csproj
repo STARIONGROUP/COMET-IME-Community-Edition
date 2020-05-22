@@ -335,7 +335,6 @@
     <Compile Include="DynamicDirectoryModuleCatalog.cs" />
     <Compile Include="Settings\ImeAppSettings.cs" />
     <Compile Include="Settings\ImeAppSettingsService.cs" />
-    <Compile Include="Utilities\AssemblyLocationLoader.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\DataSourceExportViewModel.cs" />
     <Compile Include="ViewModels\LogDetailsViewModel.cs" />
