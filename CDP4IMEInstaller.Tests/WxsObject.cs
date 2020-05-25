@@ -1,8 +1,8 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDownloadFileViewModel.cs" company="RHEA System S.A.">
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="WxsObject.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//    Author: Sam Geren�, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
@@ -24,35 +24,46 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services
+namespace CDP4IMEInstaller.Tests
 {
-    using CDP4Composition.Views;
-
-    using CDP4Dal;
-
     /// <summary>
-    /// A <see cref="IDownloadFileViewModel"/> defines properties needed by the <see cref="DownloadFileService"/> for its download and upload functionality
+    /// Contains all data needed to create a assembly entry in DevExpress.wxs 
     /// </summary>
-    public interface IDownloadFileViewModel
+    public class WxsObject
     {
         /// <summary>
-        /// Gets a value the message text on the <see cref="LoadingControl"/>
+        /// Constructor
         /// </summary>
-        string LoadingMessage { get; set; }
+        /// <param name="assemblyName">The assembly's' name</param>
+        /// <param name="guid">The assembly's guid</param>
+        /// <param name="componentId">The assembly's component id</param>
+        /// <param name="fileId">The assembly's file id</param>
+        public WxsObject(string assemblyName, string guid, string componentId, string fileId)
+        {
+            this.AssemblyName = assemblyName;
+            this.ComponentId = componentId;
+            this.FileId = fileId;
+            this.Guid = guid;
+        }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the browser is busy
+        /// Gets the assembly's' name
         /// </summary>
-        bool? IsBusy { get; set; }
+        public string AssemblyName { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the Cancel button is visible on the <see cref="LoadingControl"/>
+        /// Gets the assembly's guid
         /// </summary>
-        bool IsCancelButtonVisible { get; set; }
+        public string ComponentId { get; }
 
         /// <summary>
-        /// Gets the <see cref="ISession"/>
+        /// Gets the assembly's component id
         /// </summary>
-        ISession Session { get; }
+        public string FileId { get; }
+
+        /// <summary>
+        /// Gets the assembly's file id
+        /// </summary>
+        public string Guid { get; }
     }
 }

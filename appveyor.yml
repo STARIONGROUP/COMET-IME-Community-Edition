@@ -2,6 +2,10 @@ image: Visual Studio 2019
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  PROJECT_MAIN:   'CDP4-CE'
+  TEST_RESULT:    'TestResult.xml'
+  TEST_COVERAGE:  'CoverResults.xml'
+  TEST_LOG:       'TestResults'
 
 for:
 # configuration for "master" branch, build in Release mode
@@ -20,18 +24,32 @@ for:
 # no "branches" section defined
 configuration: Debug
 before_build:
-  - cmd: nuget sources add -name devexpress -source $(DEVEXPRESS_API)
-  - cmd: nuget restore
+  - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
+  - cmd: nuget install NUnit.Runners -Version 3.11.1 -OutputDirectory testrunner
+  - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
+  - cmd: nuget restore -verbosity quiet
+  - cmd: choco install opencover.portable
+
 build:
-  project: CDP4-CE.sln
-test:
-  assemblies:
-    only:
-      - '**\bin\$(configuration)\*.Tests.dll'
-  categories:
-    except:
-      - WebServicesDependent
-      - AppVeyorExclusion
+  project: '%PROJECT_MAIN%.sln'
+  verbosity: minimal
+
+test_script:
+    - >
+      OpenCover.Console.exe
+      -log:Error
+      -register
+      -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools\nunit3-console.exe"
+      -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent"""
+      -returntargetcode
+      -hideskipped:All
+      -output:"%TEST_COVERAGE%"
+      -filter:"+[CDP4*]* -[*.Tests*]* -[*.Views]*"
+after_test:
+    - xcopy /q /Y /I "%TEST_RESULT%" "%TEST_LOG%\"
+    - xcopy /q /Y /I "%TEST_COVERAGE%" "%TEST_LOG%\"
+artifacts:
+    - path: '%TEST_LOG%'
 notifications:
   - provider: Email
     to:
