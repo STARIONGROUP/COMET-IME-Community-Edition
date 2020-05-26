@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BasicRdl")]
+[assembly: AssemblyTitle("CDP4BasicRdl")]
 [assembly: AssemblyDescription("CDP4 Basic Reference Data Library Plugin")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RHEA System S.A.")]
