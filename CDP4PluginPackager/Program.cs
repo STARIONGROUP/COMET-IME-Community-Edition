@@ -27,6 +27,8 @@
 namespace CDP4PluginPackager
 {
     using System;
+    using System.IO;
+    using System.Linq;
 
     internal class Program
     {
@@ -38,7 +40,38 @@ namespace CDP4PluginPackager
         {
             try
             {
-                new App(args).Start();
+                string path = null;
+
+                if (args == null || !args.Any(Directory.Exists))
+                {
+                    path = Directory.GetCurrentDirectory();
+                }
+                else
+                {
+                    path = args.FirstOrDefault(Directory.Exists);
+                }
+
+                var shouldPluginGetPacked = args?.Any(a => a.ToLower() == "pack") == true;
+
+                string buildConfiguration = null;
+
+                var configParameterPosition = Array.FindIndex(args, x => x.StartsWith("config:"));
+
+                if (configParameterPosition >= 0)
+                {
+                    buildConfiguration = args[configParameterPosition].Split(new [] {':'}, StringSplitOptions.None)[1];
+                }
+
+                var projectFile = Directory.EnumerateFiles(path).FirstOrDefault(f => f.EndsWith(".csproj"));
+
+                if (File.ReadAllText(projectFile).Contains("<Project Sdk=\"Microsoft.NET.Sdk\">"))
+                {
+                    new SdkPluginPackager(path, shouldPluginGetPacked, buildConfiguration).Start();
+                }
+                else
+                {
+                    new OldSchoolPluginPackager(path, shouldPluginGetPacked, buildConfiguration).Start();
+                }
             }
             catch (Exception e)
             {

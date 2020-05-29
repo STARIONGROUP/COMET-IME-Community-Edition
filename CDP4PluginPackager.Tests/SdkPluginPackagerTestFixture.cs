@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AppTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="SdkPluginPackagerTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -32,98 +32,72 @@ namespace CDP4PluginPackager.Tests
     using System.Reflection;
 
     using CDP4PluginPackager.Models;
-    using CDP4PluginPackager.Utilities;
 
     using Newtonsoft.Json;
 
     using NUnit.Framework;
-    
-    [TestFixture]
-    public class AppTestFixture
-    {
-        private string[] args;
 
-        private const string TargetProject = "CDP4Scripting";
+    /// <summary>
+    /// Suite of tests for The <see cref="SdkPluginPackager"/> class
+    /// </summary>
+    [TestFixture]
+    public class SdkPluginPackagerTestFixture
+    {
+        private const string TargetProject = "EngineeringModel";
+
+        private SdkPluginPackager sdkPluginPackager;
 
         [OneTimeSetUp]
         public void Setup()
         {
             var prefix = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
             var testDirectory = Path.Combine(prefix, TargetProject);
-
             Directory.SetCurrentDirectory(testDirectory);
-            this.args = new string[] { testDirectory, "pack" };
+
+            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Debug");
+            this.sdkPluginPackager.Start();
         }
 
         [Test]
-        public void VerifyCsprojGetsDeSerialized()
+        public void VerifyProperties()
         {
-            var app = new App();
-            app.Deserialize();
-            Assert.IsNotNull(app.Csproj);
-            Assert.IsNotEmpty(app.Csproj.ItemGroup);
+            Assert.IsNotNull(this.sdkPluginPackager.Csproj);
+            CollectionAssert.IsNotEmpty(this.sdkPluginPackager.Csproj.PropertyGroup);
         }
 
         [Test]
-        public void VerifyAssemblyInfoAreLoaded()
+        public void VerifyManifest()
         {
-            var app = new App();
-            app.Deserialize();
-            app.GetAssemblyInfo();
-            Assert.IsNotNull(app.AssemblyInfo);
-            Assert.IsNotNull(app.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>());
-        }
-        
-        [Test, Ignore("IME version not added at the moment")]
-        public void VerifyIMEVersion()
-        {
-            var app = new App();
-            app.Start();
-            var version = app.GetCurrentIMEVersion(); 
-            var json = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText($"{Path.Combine(app.OutputPath, app.Manifest.Name)}.plugin.manifest"));
-            Assert.AreEqual(version, json.CompatibleIMEVersion);
-        }
-
-        [Test]
-        public void VerifyManifestIntegrity()
-        {
-            var app = new App();
-            app.Start();
-            var json = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText($"{Path.Combine(app.OutputPath, app.Manifest.Name)}.plugin.manifest"));
+            var json = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText($"{Path.Combine(this.sdkPluginPackager.OutputPath, this.sdkPluginPackager.Manifest.Name)}.plugin.manifest"));
             Assert.IsNotNull(json);
-            Assert.AreEqual(app.Manifest.Name, json.Name);
-            Assert.AreEqual(app.Manifest.ProjectGuid, json.ProjectGuid);
-            Assert.AreEqual(app.Manifest.Author, json.Author);
-            Assert.AreEqual(app.Manifest.Description, json.Description);
-            Assert.AreEqual(app.Manifest.ReleaseNote, json.ReleaseNote);
-            Assert.AreEqual(app.Manifest.Version, json.Version);
+            Assert.AreEqual(this.sdkPluginPackager.Manifest.Name, json.Name);
+            Assert.AreEqual(this.sdkPluginPackager.Manifest.ProjectGuid, json.ProjectGuid);
+            Assert.AreEqual(this.sdkPluginPackager.Manifest.Author, json.Author);
+            Assert.AreEqual(this.sdkPluginPackager.Manifest.Description, json.Description);
+            Assert.AreEqual(this.sdkPluginPackager.Manifest.ReleaseNote, json.ReleaseNote);
+            Assert.AreEqual(this.sdkPluginPackager.Manifest.Version, json.Version);
         }
 
         [Test]
         public void VerifyPackageIntegrity()
         {
-            var app = new App(this.args);
-            app.Start();
+            Assert.IsNotNull(Directory.EnumerateFiles(this.sdkPluginPackager.OutputPath).First(f => Path.GetFileName(f) == $"{this.sdkPluginPackager.Manifest.Name}.cdp4ck"));
 
-            Assert.IsNotNull(Directory.EnumerateFiles(app.OutputPath).First(f => Path.GetFileName(f) == $"{app.Manifest.Name}.cdp4ck"));
-
-            using var zipFile = ZipFile.OpenRead(Path.Combine(app.OutputPath, $"{app.Manifest.Name}.cdp4ck"));
-
-            Assert.AreEqual(zipFile.Entries.Count, Directory.EnumerateFiles(app.OutputPath).Count(f => !f.EndsWith(".pdb") && !f.EndsWith(".cdp4ck")));
+            using (var zipFile = ZipFile.OpenRead(Path.Combine(this.sdkPluginPackager.OutputPath, $"{this.sdkPluginPackager.Manifest.Name}.cdp4ck")))
+            {
+                Assert.AreEqual(zipFile.Entries.Count, Directory.EnumerateFiles(this.sdkPluginPackager.OutputPath).Count(f => !f.EndsWith(".pdb") && !f.EndsWith(".cdp4ck")));
+            }
         }
 
         [Test]
         public void VerifyLicense()
         {
-            var app = new App();
-            app.Deserialize();
-            app.GetAssemblyInfo();
-            var license = app.GetLicense();
+            var license = this.sdkPluginPackager.GetLicense();
+
             Assert.IsNotNull(license);
             Assert.IsNotEmpty(license);
             Assert.IsFalse(license.Contains("$YEAR"));
             Assert.IsFalse(license.Contains("$PLUGIN_NAME"));
-            Assert.IsTrue(license.Contains(app.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>()));
         }
 
         [Test]
