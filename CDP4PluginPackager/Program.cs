@@ -62,15 +62,25 @@ namespace CDP4PluginPackager
                     buildConfiguration = args[configParameterPosition].Split(new [] {':'}, StringSplitOptions.None)[1];
                 }
 
+                string targetFramework = null;
+
+                var targetFrameworkParameterPosition = Array.FindIndex(args, x => x.StartsWith("framework:"));
+
+                if (targetFrameworkParameterPosition >= 0)
+                {
+                    targetFramework = args[targetFrameworkParameterPosition].Split(new[] { ':' }, StringSplitOptions.None)[1];
+                }
+
+
                 var projectFile = Directory.EnumerateFiles(path).FirstOrDefault(f => f.EndsWith(".csproj"));
 
                 if (File.ReadAllText(projectFile).Contains("<Project Sdk=\"Microsoft.NET.Sdk\">"))
                 {
-                    new SdkPluginPackager(path, shouldPluginGetPacked, buildConfiguration).Start();
+                    new SdkPluginPackager(path, shouldPluginGetPacked, buildConfiguration, targetFramework).Start();
                 }
                 else
                 {
-                    new OldSchoolPluginPackager(path, shouldPluginGetPacked, buildConfiguration).Start();
+                    new OldSchoolPluginPackager(path, shouldPluginGetPacked).Start();
                 }
             }
             catch (Exception e)

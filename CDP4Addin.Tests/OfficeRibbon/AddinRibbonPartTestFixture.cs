@@ -59,6 +59,8 @@ namespace CDP4Addin.Tests.OfficeRibbon
 
     using NUnit.Framework;
 
+    using AssemblyLocationLoader = CDP4Addin.Tests.Utils.AssemblyLocationLoader;
+
     /// <summary>
     /// suite of tests for the <see cref="AddinRibbonPart"/> class
     /// </summary>

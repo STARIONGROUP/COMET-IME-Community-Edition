@@ -43,7 +43,7 @@ namespace CDP4PluginPackager.Tests
     [TestFixture]
     public class SdkPluginPackagerTestFixture
     {
-        private const string TargetProject = "EngineeringModel";
+        private const string TargetProject = "CDP4WspDal";
 
         private SdkPluginPackager sdkPluginPackager;
 
@@ -54,7 +54,7 @@ namespace CDP4PluginPackager.Tests
             var testDirectory = Path.Combine(prefix, TargetProject);
             Directory.SetCurrentDirectory(testDirectory);
 
-            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Debug");
+            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Debug", "net452");
             this.sdkPluginPackager.Start();
         }
 

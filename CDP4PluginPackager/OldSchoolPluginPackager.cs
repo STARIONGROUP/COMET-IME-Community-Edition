@@ -43,8 +43,7 @@ namespace CDP4PluginPackager
         /// </summary>
         /// <param name="path">the working directory</param>
         /// <param name="shouldPluginGetPacked">state if a plugin needs to be packed in a zip</param>
-        /// <param name="buildConfiguration">the current build configuration (Debug/Release)</param>
-        public OldSchoolPluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration = "") : base(path, shouldPluginGetPacked, buildConfiguration)
+        public OldSchoolPluginPackager(string path, bool shouldPluginGetPacked) : base(path, shouldPluginGetPacked)
         {
         }
 
@@ -60,9 +59,9 @@ namespace CDP4PluginPackager
             var dllpath = $"{this.OutputPath}{assemblyName}.dll";
             var assemblyInfo = Assembly.LoadFrom(dllpath).GetCustomAttributesData();
 
-            this.pluginName = assemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>();
+            this.PluginName = assemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>();
 
-            this.Manifest.Name = this.pluginName;
+            this.Manifest.Name = this.PluginName;
             this.Manifest.Version = assemblyInfo.QueryAssemblySpecificInfo<AssemblyFileVersionAttribute>();
             this.Manifest.ProjectGuid = this.Csproj.PropertyGroup.First(p => p.ProjectGuid != Guid.Empty).ProjectGuid;
             this.Manifest.TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFrameworkVersion)).TargetFrameworkVersion;

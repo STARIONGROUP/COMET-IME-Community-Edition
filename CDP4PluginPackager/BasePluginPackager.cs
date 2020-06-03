@@ -45,22 +45,27 @@ namespace CDP4PluginPackager
         /// <summary>
         /// Field that holds the value whether Plugin is to be packed in a zip
         /// </summary>
-        protected readonly bool shouldPluginGetPacked;
+        protected readonly bool ShouldPluginGetPacked;
 
         /// <summary>
         /// Fields that holds the working directory
         /// </summary>
-        protected readonly string path;
+        protected readonly string Path;
 
         /// <summary>
         /// Contains the current build configuration (Debug/Release)
         /// </summary>
-        protected string buildConfiguration;
+        protected string BuildConfiguration;
+
+        /// <summary>
+        /// The target framework version (net452)
+        /// </summary>
+        protected string BuildTargetFramework;
 
         /// <summary>
         /// Contains the plugin name
         /// </summary>
-        protected string pluginName;
+        protected string PluginName;
 
         /// <summary>
         /// Gets or Sets the path where the plugin dll is and where the manifest is
@@ -83,23 +88,25 @@ namespace CDP4PluginPackager
         /// <param name="path">the working directory</param>
         /// <param name="shouldPluginGetPacked">state if a plugin needs to be packed in a zip</param>
         /// <param name="buildConfiguration">the current build configuration (Debug/Release)</param>
-        protected BasePluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration = "")
+        /// <param name="buildTargetFramework">The target framework version (net452)</param>
+        protected BasePluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration = "", string buildTargetFramework = "")
         {
-            this.path = path;
-            this.shouldPluginGetPacked = shouldPluginGetPacked;
-            this.buildConfiguration = buildConfiguration;
+            this.Path = path;
+            this.ShouldPluginGetPacked = shouldPluginGetPacked;
+            this.BuildConfiguration = buildConfiguration;
+            this.BuildTargetFramework = buildTargetFramework;
         }
 
         /// <summary>
-        /// Wrapper calling every needed method in the right order to generate the Plugin Manifest and pack the dll and manifest <see cref="shouldPluginGetPacked"/>
+        /// Wrapper calling every needed method in the right order to generate the Plugin Manifest and pack the dll and manifest <see cref="ShouldPluginGetPacked"/>
         /// </summary>
         public void Start()
-        {
+        { 
             this.Deserialize();
             this.Serialize();
             this.WriteLicense();
 
-            if (this.shouldPluginGetPacked)
+            if (this.ShouldPluginGetPacked)
             {
                 Console.WriteLine("---- Packing starting ----");
                 this.Pack();
@@ -112,7 +119,7 @@ namespace CDP4PluginPackager
         /// </summary>
         protected void WriteLicense()
         {
-            File.WriteAllText($"{Path.Combine(this.OutputPath, this.Manifest.Name)}.license.txt", this.GetLicense());
+            File.WriteAllText($"{System.IO.Path.Combine(this.OutputPath, this.Manifest.Name)}.license.txt", this.GetLicense());
         }
 
         /// <summary>
@@ -134,7 +141,7 @@ namespace CDP4PluginPackager
         /// <returns>license as <see cref="string"/></returns>
         public string GetLicense()
         {
-            var licensePath = Directory.GetParent(this.path).EnumerateFiles().FirstOrDefault(f => f.Name == "PluginLicense.txt")?.FullName;
+            var licensePath = Directory.GetParent(this.Path).EnumerateFiles().FirstOrDefault(f => f.Name == "PluginLicense.txt")?.FullName;
 
             if (string.IsNullOrWhiteSpace(licensePath))
             {
@@ -143,7 +150,7 @@ namespace CDP4PluginPackager
             }
 
             return File.ReadAllText(licensePath)
-                .Replace("$PLUGIN_NAME", this.pluginName)
+                .Replace("$PLUGIN_NAME", this.PluginName)
                 .Replace("$YEAR", DateTime.Now.Year.ToString());
         }
 
@@ -153,7 +160,7 @@ namespace CDP4PluginPackager
         /// <returns>release note as <see cref="string"/></returns>
         protected string GetReleaseNote()
         {
-            var releaseNotePath = Directory.EnumerateFiles(this.path).FirstOrDefault(f => f.ToLower() == "releasenote.md");
+            var releaseNotePath = Directory.EnumerateFiles(this.Path).FirstOrDefault(f => f.ToLower() == "releasenote.md");
 
             if (string.IsNullOrWhiteSpace(releaseNotePath))
             {
@@ -169,7 +176,7 @@ namespace CDP4PluginPackager
         /// </summary>
         protected Version GetCurrentIMEVersion()
         {
-            var imePath = Path.GetFullPath(Path.Combine(this.OutputPath, @"..\..\", "CDP4IME.exe"));
+            var imePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(this.OutputPath, @"..\..\", "CDP4IME.exe"));
 
             if (!File.Exists(imePath))
             {
@@ -190,7 +197,7 @@ namespace CDP4PluginPackager
         protected void Serialize()
         {
             var output = JsonConvert.SerializeObject(this.Manifest);
-            File.WriteAllText($"{Path.Combine(this.OutputPath, this.Manifest.Name)}.plugin.manifest", output);
+            File.WriteAllText($"{System.IO.Path.Combine(this.OutputPath, this.Manifest.Name)}.plugin.manifest", output);
         }
 
         /// <summary>
@@ -198,7 +205,7 @@ namespace CDP4PluginPackager
         /// </summary>
         protected void Deserialize()
         {
-            var csprojPath = Directory.EnumerateFiles(this.path).FirstOrDefault(f => f.EndsWith(".csproj"));
+            var csprojPath = Directory.EnumerateFiles(this.Path).FirstOrDefault(f => f.EndsWith(".csproj"));
 
             using (var stream = File.OpenText(csprojPath))
             {
@@ -214,8 +221,8 @@ namespace CDP4PluginPackager
         /// </summary>
         protected void Pack()
         {
-            var zipPath = Path.Combine(this.OutputPath, $"{this.Manifest.Name}.cdp4ck");
-            var temporaryZipPath = Path.Combine(this.path, $"{this.Manifest.Name}.cdp4ck");
+            var zipPath = System.IO.Path.Combine(this.OutputPath, $"{this.Manifest.Name}.cdp4ck");
+            var temporaryZipPath = System.IO.Path.Combine(this.Path, $"{this.Manifest.Name}.cdp4ck");
 
             CleanUpOldPackages(zipPath, temporaryZipPath);
 

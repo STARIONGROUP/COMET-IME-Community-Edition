@@ -43,7 +43,8 @@ namespace CDP4PluginPackager
         /// <param name="path">the working directory</param>
         /// <param name="shouldPluginGetPacked">state if a plugin needs to be packed in a zip</param>
         /// <param name="buildConfiguration">the current build configuration (Debug/Release)</param>
-        public SdkPluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration) : base(path, shouldPluginGetPacked, buildConfiguration)
+        /// <param name="buildTargetFramework">The target framework version (net452)</param>
+        public SdkPluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration, string buildTargetFramework) : base(path, shouldPluginGetPacked, buildConfiguration, buildTargetFramework)
         {
         }
 
@@ -55,18 +56,24 @@ namespace CDP4PluginPackager
             this.BuildManifest();
             
             this.OutputPath =
-                Path.Combine(
+                System.IO.Path.Combine(
                     this.Csproj.PropertyGroup
                         .First(d => !string.IsNullOrWhiteSpace(d.OutputPath))
                         .OutputPath
-                        .Replace("$(Configuration)", this.buildConfiguration));
+                        .Replace("$(Configuration)", this.BuildConfiguration)
+                        .Replace("$(TargetFramework)", this.BuildTargetFramework));
 
-            this.pluginName = this.Csproj.PropertyGroup.First(d => !string.IsNullOrWhiteSpace(d.AssemblyTitle))?.AssemblyTitle ?? "";
+            if (!Directory.Exists(this.OutputPath))
+            {
+                Directory.CreateDirectory(this.OutputPath);
+            }
 
-            this.Manifest.Name = this.pluginName;
+            this.PluginName = this.Csproj.PropertyGroup.First(d => !string.IsNullOrWhiteSpace(d.AssemblyTitle))?.AssemblyTitle ?? "";
+
+            this.Manifest.Name = this.PluginName;
             this.Manifest.Version = this.Csproj.PropertyGroup.First(d => !string.IsNullOrWhiteSpace(d.AssemblyVersion))?.AssemblyVersion ?? "";
-            this.Manifest.ProjectGuid = Guid.Parse(this.Csproj.PropertyGroup.First(p => p.ProjectGuid != string.Empty).ProjectGuid);
-            this.Manifest.TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFrameworkVersion)).TargetFrameworkVersion;
+            this.Manifest.ProjectGuid = Guid.Parse(this.Csproj.PropertyGroup.FirstOrDefault(p => p.ProjectGuid != string.Empty)?.ProjectGuid ?? "");
+            this.Manifest.TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFramework)).TargetFramework;
             this.Manifest.Description = this.Csproj.PropertyGroup.First(d => !string.IsNullOrWhiteSpace(d.Description))?.Description ?? "";
         }
     }

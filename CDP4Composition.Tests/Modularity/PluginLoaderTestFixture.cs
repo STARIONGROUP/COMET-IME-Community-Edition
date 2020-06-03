@@ -46,6 +46,8 @@ namespace CDP4Composition.Tests.Modularity
 
     using NUnit.Framework;
 
+    using AssemblyLocationLoader = CDP4Composition.Tests.Utilities.AssemblyLocationLoader;
+
     [TestFixture]
     public class PluginLoaderTestFixture
     {

@@ -4,7 +4,7 @@
     <RootNamespace>CDP4EngineeringModel</RootNamespace>
     <AssemblyName>CDP4EngineeringModel</AssemblyName>
     <TargetFramework>net452</TargetFramework>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+   
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4EngineeringModel</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -16,7 +16,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
-    <OutputPath>..\CDP4IME\bin\$(Configuration)\plugins\CDP4EngineeringModel\</OutputPath>
+    <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4EngineeringModel\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
@@ -25,7 +25,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <OutputPath>..\CDP4IME\bin\$(Configuration)\plugins\CDP4EngineeringModel\</OutputPath>
+    <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4EngineeringModel\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <WarningLevel>0</WarningLevel>
     <DebugType>full</DebugType>
@@ -194,9 +194,6 @@
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Splat" Version="1.6.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.ValueTuple" Version="4.5.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
@@ -533,10 +530,12 @@
     <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -661,5 +660,5 @@
       <Private>false</Private>
     </Reference>
   </ItemGroup>
-  <Import Project="..\Sdk.Plugin.target"/>
+  <Import Project="..\Sdk.Plugin.target" />
 </Project>

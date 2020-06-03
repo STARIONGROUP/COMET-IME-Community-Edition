@@ -24,13 +24,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4AddinCE.Utils
+namespace CDP4Composition.Utilities
 {
     using System.ComponentModel.Composition;
     using System.IO;
     using System.Reflection;
-
-    using CDP4Composition.Utilities;
 
     /// <summary>
     /// The helper class that make method that uses <code>Assembly.GetExecutingAssembly().Location</code>

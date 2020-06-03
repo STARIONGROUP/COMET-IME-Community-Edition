@@ -26,7 +26,6 @@
 
 namespace CDP4IME.Tests.ViewModels
 {
-    using System;
     using System.Linq;
 
     using CDP4Composition.Modularity;
@@ -34,16 +33,16 @@ namespace CDP4IME.Tests.ViewModels
     using CDP4Composition.Utilities;
 
     using CDP4IME.Settings;
-    using CDP4IME.Tests.Utilities;
 
     using CDP4ShellDialogs.ViewModels;
 
-    using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
 
     using NUnit.Framework;
+
+    using AssemblyLocationLoader = CDP4IME.Tests.Utilities.AssemblyLocationLoader;
 
     [TestFixture]
     public class PluginManagerTestFixture

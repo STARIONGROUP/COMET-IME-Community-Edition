@@ -56,12 +56,6 @@ namespace CDP4PluginPackager.Models.AutoGen.Sdk
         public string TargetFramework { get; set; }
 
         /// <summary>
-        /// Gets or Sets the Target Framework Version
-        /// </summary>
-        [XmlElement(ElementName = "TargetFrameworkVersion")]
-        public string TargetFrameworkVersion { get; set; }
-
-        /// <summary>
         /// Gets or Sets the Assembly Title
         /// </summary>
         [XmlElement(ElementName = "AssemblyTitle")]

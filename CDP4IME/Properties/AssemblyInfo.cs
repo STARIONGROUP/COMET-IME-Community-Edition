@@ -28,24 +28,9 @@ using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
-
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("CDP4IME")]
-[assembly: AssemblyDescription("The CDP4 Integrated Modelling Environment")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("RHEA System S.A")]
-[assembly: AssemblyProduct("CDP4IME")]
-[assembly: AssemblyCopyright("Copyright © RHEA System S.A")]
 [assembly: AssemblyTrademark("CDP")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
-
-
-[assembly: AssemblyVersion("6.0.0.2")]
-[assembly: AssemblyFileVersion("6.0.0.2")]
