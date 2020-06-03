@@ -35,7 +35,7 @@ namespace CDP4PluginPackager
         /// <summary>
         /// Main entry for the PluginPackager, handles exception and notify the user in the output build window of visual studio
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Array containing all command line arguments</param>
         static void Main(string[] args)
         {
             try
@@ -53,41 +53,49 @@ namespace CDP4PluginPackager
 
                 var shouldPluginGetPacked = args?.Any(a => a.ToLower() == "pack") == true;
 
-                string buildConfiguration = null;
+                var buildConfiguration = GetBuildConfigurationFromArgs(args);
 
-                var configParameterPosition = Array.FindIndex(args, x => x.StartsWith("config:"));
+                var targetFramework = GetTargetFrameworkFromArgs(args);
 
-                if (configParameterPosition >= 0)
-                {
-                    buildConfiguration = args[configParameterPosition].Split(new [] {':'}, StringSplitOptions.None)[1];
-                }
+                var plugingPacker = new SdkPluginPackager(path, shouldPluginGetPacked, buildConfiguration, targetFramework);
 
-                string targetFramework = null;
-
-                var targetFrameworkParameterPosition = Array.FindIndex(args, x => x.StartsWith("framework:"));
-
-                if (targetFrameworkParameterPosition >= 0)
-                {
-                    targetFramework = args[targetFrameworkParameterPosition].Split(new[] { ':' }, StringSplitOptions.None)[1];
-                }
-
-
-                var projectFile = Directory.EnumerateFiles(path).FirstOrDefault(f => f.EndsWith(".csproj"));
-
-                if (File.ReadAllText(projectFile).Contains("<Project Sdk=\"Microsoft.NET.Sdk\">"))
-                {
-                    new SdkPluginPackager(path, shouldPluginGetPacked, buildConfiguration, targetFramework).Start();
-                }
-                else
-                {
-                    new OldSchoolPluginPackager(path, shouldPluginGetPacked).Start();
-                }
+                plugingPacker.Start();
             }
             catch (Exception e)
             {
                 Console.WriteLine($"{e}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Gets the Build Configuration (Debug/Release) from the command line arguments
+        /// </summary>
+        /// <param name="args">The array of command line arguments</param>
+        /// <returns>Build Configuration when found in arguments, otherwise null</returns>
+        private static string GetBuildConfigurationFromArgs(string[] args)
+        {
+            var configParameterPosition = Array.FindIndex(args, x => x.StartsWith("config:"));
+            
+            return 
+                configParameterPosition >= 0 
+                    ? args[configParameterPosition].Split(new[] { ':' }, StringSplitOptions.None)[1] 
+                    : null;
+        }
+
+        /// <summary>
+        /// Gets the Target Framework (net452, net48, netcore31, enz...) from the command line arguments
+        /// </summary>
+        /// <param name="args">The array of command line arguments</param>
+        /// <returns>Target Framework when found in arguments, otherwise null</returns>
+        private static string GetTargetFrameworkFromArgs(string[] args)
+        {
+            var targetFrameworkParameterPosition = Array.FindIndex(args, x => x.StartsWith("framework:"));
+
+            return 
+                targetFrameworkParameterPosition >= 0 
+                    ? args[targetFrameworkParameterPosition].Split(new[] { ':' }, StringSplitOptions.None)[1] 
+                    : null;
         }
     }
 }

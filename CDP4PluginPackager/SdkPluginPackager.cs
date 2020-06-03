@@ -30,7 +30,7 @@ namespace CDP4PluginPackager
     using System.IO;
     using System.Linq;
 
-    using CDP4PluginPackager.Models.AutoGen.Sdk;
+    using CDP4PluginPackager.Models.Sdk;
 
     /// <summary>
     /// SdkPluginPackager class handles plugin manifest generation and packing for Sdk type project files

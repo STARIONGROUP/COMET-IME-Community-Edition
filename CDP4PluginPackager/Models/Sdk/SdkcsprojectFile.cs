@@ -22,12 +22,9 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// <summary>
-//   This file has been generated using a csproj file with this tool to convert Xml structure into Csharp: https://xmltocsharp.azurewebsites.net/
-// </summary>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4PluginPackager.Models.AutoGen.Sdk
+namespace CDP4PluginPackager.Models.Sdk
 {
     using System.Collections.Generic;
     using System.Xml.Serialization;

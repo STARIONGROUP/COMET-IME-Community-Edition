@@ -2,7 +2,8 @@
 // <copyright file="PluginLoader.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -30,14 +31,11 @@ namespace CDP4Composition.Modularity
     using System.ComponentModel.Composition.Hosting;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
 
     using CDP4Composition.Services.AppSettingService;
     using CDP4Composition.Utilities;
 
     using Microsoft.Practices.ServiceLocation;
-
-    using Newtonsoft.Json;
 
     /// <summary>
     /// The purpose of the <see cref="PluginLoader"/> is to load the various
@@ -67,7 +65,7 @@ namespace CDP4Composition.Modularity
         {
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
             var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
-            
+
             var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginUtilities.PluginDirectoryName));
 
             if (directoryInfo.Exists)
@@ -78,7 +76,7 @@ namespace CDP4Composition.Modularity
                 foreach (var manifest in this.ManifestsList.Where(m => !this.DisabledPlugins.Contains(m.ProjectGuid)))
                 {
                     var path = Path.Combine(directoryInfo.FullName, manifest.Name);
-                    
+
                     if (Directory.Exists(path))
                     {
                         this.LoadPlugins(path);
@@ -112,7 +110,7 @@ namespace CDP4Composition.Modularity
         /// </param>
         private void LoadPlugins(string path)
         {
-            var dllCatalog = new DirectoryCatalog(path: path, searchPattern: "*.dll");
+            var dllCatalog = new DirectoryCatalog(path, "*.dll");
             this.DirectoryCatalogues.Add(dllCatalog);
         }
     }
