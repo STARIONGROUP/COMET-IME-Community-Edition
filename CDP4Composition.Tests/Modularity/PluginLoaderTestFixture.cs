@@ -71,7 +71,7 @@ namespace CDP4Composition.Tests.Modularity
 
             this.appSettingsService = new Mock<IAppSettingsService<ImeAppSettings>>();
 
-            this.appSettings = JsonConvert.DeserializeObject<ImeAppSettings>(File.ReadAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../Modularity/", AppSettingsJson)));
+            this.appSettings = JsonConvert.DeserializeObject<ImeAppSettings>(File.ReadAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, @"../Modularity/", AppSettingsJson)));
             this.appSettingsService.Setup(x => x.AppSettings).Returns(this.appSettings);
             
             this.serviceLocator.Setup(x => x.GetInstance<IAppSettingsService<ImeAppSettings>>())
