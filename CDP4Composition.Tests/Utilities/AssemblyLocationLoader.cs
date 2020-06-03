@@ -28,9 +28,13 @@ namespace CDP4Composition.Tests.Utilities
 {
     using System.ComponentModel.Composition;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
+    using System.Runtime.Versioning;
 
     using CDP4Composition.Utilities;
+
+    using DevExpress.Utils.Extensions;
 
     /// <summary>
     /// The helper class that make method that uses <code>Assembly.GetExecutingAssembly().Location</code>
@@ -44,8 +48,9 @@ namespace CDP4Composition.Tests.Utilities
         /// <returns>the path of the assembly</returns>
         public string GetLocation()
         {
-            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../");
-            return Path.GetFullPath(Path.Combine(testDirectory, @"CDP4IME\bin\Debug"));
+            var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
+            return Path.GetFullPath(Path.Combine(testDirectory, $@"CDP4IME\bin\Debug\{frameworkVersion}"));
         }
     }
 }

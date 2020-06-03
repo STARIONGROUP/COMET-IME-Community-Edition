@@ -62,15 +62,16 @@ namespace CDP4Composition.Tests.Modularity
         [OneTimeSetUp]
         public void Setup()
         {
-            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../");
-            testDirectory = Path.GetFullPath(Path.Combine(testDirectory, ImeFolder));
+            var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
+            testDirectory = Path.GetFullPath(Path.Combine(testDirectory, $"{ImeFolder}\\{frameworkVersion}"));
 
             this.serviceLocator = new Mock<IServiceLocator>();
             this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(new AssemblyLocationLoader());
 
             this.appSettingsService = new Mock<IAppSettingsService<ImeAppSettings>>();
 
-            this.appSettings = JsonConvert.DeserializeObject<ImeAppSettings>(File.ReadAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, @"../Modularity/", AppSettingsJson)));
+            this.appSettings = JsonConvert.DeserializeObject<ImeAppSettings>(File.ReadAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../Modularity/", AppSettingsJson)));
             this.appSettingsService.Setup(x => x.AppSettings).Returns(this.appSettings);
             
             this.serviceLocator.Setup(x => x.GetInstance<IAppSettingsService<ImeAppSettings>>())

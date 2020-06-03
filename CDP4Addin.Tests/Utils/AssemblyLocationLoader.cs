@@ -43,8 +43,9 @@ namespace CDP4Addin.Tests.Utils
         /// <returns>the path of the assembly</returns>
         public string GetLocation()
         {
-            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../");
-            return Path.GetFullPath(Path.Combine(testDirectory, @"CDP4IME\bin\Debug"));
+            var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
+            return Path.GetFullPath(Path.Combine(testDirectory, $@"CDP4IME\bin\Debug\{frameworkVersion}"));
         }
     }
 }
