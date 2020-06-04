@@ -1,0 +1,1 @@
+get-childitem -Include (@("Debug")) -Recurse -force | Remove-Item -Force –Recurse
