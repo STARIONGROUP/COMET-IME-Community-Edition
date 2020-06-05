@@ -24,28 +24,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.Utilities
+namespace CDP4Composition.Utilities
 {
     using System.ComponentModel.Composition;
     using System.IO;
     using System.Reflection;
 
-    using CDP4Composition.Utilities;
-
     /// <summary>
     /// The helper class that make method that uses <code>Assembly.GetExecutingAssembly().Location</code>
     /// testable, in order to find plugins
     /// </summary>
+    [Export(typeof(IAssemblyLocationLoader))]
     public class AssemblyLocationLoader : IAssemblyLocationLoader
     {
         /// <summary>
-        /// Gets the path of the IME bin folder
+        /// Gets the path of the executing assembly
         /// </summary>
         /// <returns>the path of the assembly</returns>
         public string GetLocation()
         {
-            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../");
-            return Path.GetFullPath(Path.Combine(testDirectory, @"CDP4IME\bin\Debug"));
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
     }
 }

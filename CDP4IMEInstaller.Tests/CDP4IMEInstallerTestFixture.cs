@@ -31,6 +31,7 @@ namespace CDP4IMEInstaller.Tests
     using System;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
 
@@ -93,12 +94,14 @@ namespace CDP4IMEInstaller.Tests
             Assert.IsNotNull(myProjectLocation, "CDP4IMEInstaller.Tests.csproj file not found");
 
             var separator = Path.DirectorySeparatorChar;
-            
+
+            var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
+
             var allAssemblies = 
                 Directory.GetFiles(
                     myProjectLocation.Parent?.FullName, 
                     "DevExpress*.dll", SearchOption.AllDirectories)
-                    .Where(x => x.Contains($"{separator}bin{separator}Debug{separator}DevExpress")).ToList();
+                    .Where(x => x.Contains($"{separator}bin{separator}Debug{separator}{frameworkVersion}{separator}DevExpress")).ToList();
 
             var imeAssemblies = allAssemblies.Where(x => x.Contains($"CDP4IME{separator}bin")).ToList();
             var otherAssemblies = allAssemblies.Where(x => !x.Contains($"CDP4IME{separator}bin")).ToList();

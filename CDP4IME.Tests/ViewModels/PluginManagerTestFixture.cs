@@ -26,19 +26,18 @@
 
 namespace CDP4IME.Tests.ViewModels
 {
-    using System;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using CDP4Composition.Modularity;
     using CDP4Composition.Services.AppSettingService;
     using CDP4Composition.Utilities;
 
     using CDP4IME.Settings;
-    using CDP4IME.Tests.Utilities;
 
     using CDP4ShellDialogs.ViewModels;
 
-    using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
@@ -52,6 +51,7 @@ namespace CDP4IME.Tests.ViewModels
         private PluginManagerViewModel<ImeAppSettings> viewModel;
         private ImeAppSettings appSettings;
         private Mock<IServiceLocator> serviceLocator;
+        private Mock<IAssemblyLocationLoader> assemblyLocationLoader;
 
         [SetUp]
         public void Setup()
@@ -61,13 +61,21 @@ namespace CDP4IME.Tests.ViewModels
             this.serviceLocator = new Mock<IServiceLocator>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
-            
+
             this.appSettingService = new Mock<IAppSettingsService<ImeAppSettings>>();
             this.appSettingService.Setup(x => x.AppSettings).Returns(this.appSettings);
 
-            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(new AssemblyLocationLoader());
+            this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
+
+            var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
+
+            this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetFullPath(Path.Combine(testDirectory, $@"CDP4IME\bin\Debug\{frameworkVersion}")));
+
+            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(this.assemblyLocationLoader.Object);
+
             this.serviceLocator.Setup(s => s.GetInstance<IAppSettingsService<ImeAppSettings>>()).Returns(this.appSettingService.Object);
-            
+
             this.viewModel = new PluginManagerViewModel<ImeAppSettings>(this.appSettingService.Object);
         }
 
@@ -112,7 +120,7 @@ namespace CDP4IME.Tests.ViewModels
             var newCount = this.viewModel.Plugins.Count(p => !p.IsPluginEnabled);
 
             Assert.Greater(newCount, alreadyDisabled);
-            Assert.AreEqual(newCount, new PluginLoader<ImeAppSettings>().DisabledPlugins.Count) ;
+            Assert.AreEqual(newCount, new PluginLoader<ImeAppSettings>().DisabledPlugins.Count);
         }
     }
 }

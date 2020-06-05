@@ -1,44 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net452</TargetFramework>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <RootNamespace>CDP4PluginPackager</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Authors>RHEA System S.A.</Authors>
     <Company>RHEA System S.A.</Company>
     <Description>CDP4 Plugin Packager and Plugin Manifest generator</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <DocumentationFile />
+    <OutputPath />
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath></OutputPath>
-    <DocumentationFile></DocumentationFile>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
-
   <ItemGroup>
-    <Reference Include="Microsoft.Practices.Prism.Composition">
-      <HintPath>..\packages\Prism.Composition.5.0.0\lib\NET45\Microsoft.Practices.Prism.Composition.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.MefExtensions">
-      <HintPath>..\packages\Prism.MEFExtensions.5.0.0\lib\NET45\Microsoft.Practices.Prism.MefExtensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Mvvm">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.IO.Compression">
       <HintPath>..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.IO.Compression.dll</HintPath>
     </Reference>
   </ItemGroup>
-  
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-  </Target>
 </Project>

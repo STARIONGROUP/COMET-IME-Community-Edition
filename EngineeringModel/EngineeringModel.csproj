@@ -1,543 +1,376 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{7B0F3699-960F-4A9C-BC32-6A5B73A5B895}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CDP4EngineeringModel</RootNamespace>
     <AssemblyName>CDP4EngineeringModel</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net452</TargetFramework>
+   
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <TargetFrameworkProfile />
+    <AssemblyTitle>CDP4EngineeringModel</AssemblyTitle>
+    <Company>RHEA System S.A.</Company>
+    <Product>CDP4EngineeringModel</Product>
+    <Description>CDP4 Engineering Model Plugin</Description>
+    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <AssemblyVersion>6.0.0.0</AssemblyVersion>
+    <FileVersion>6.0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\CDP4IME\bin\Debug\plugins\CDP4EngineeringModel\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
+    <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4EngineeringModel\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\CDP4IME\bin\Debug\plugins\CDP4EngineeringModel\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4EngineeringModel\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <WarningLevel>0</WarningLevel>
     <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Accessibility" />
-    <Reference Include="CDP4Common, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.0.1-2020.4.23.1-pre-release\lib\net452\CDP4Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="CDP4Dal, Version=6.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.6.0.1-2020.4.23.1-pre-release\lib\net452\CDP4Dal.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.6.0.0-rc02\lib\net452\CDP4JsonSerializer.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.CodeParser.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.CodeParser.20.1.3\lib\net452\DevExpress.CodeParser.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Data.Desktop.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Data.Desktop.20.1.3\lib\net452\DevExpress.Data.Desktop.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Data.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Data.20.1.3\lib\net452\DevExpress.Data.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.DataAccess.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.DataAccess.20.1.3\lib\net452\DevExpress.DataAccess.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Diagram.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Diagram.Core.20.1.3\lib\net452\DevExpress.Diagram.v20.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Images.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Images.20.1.3\lib\net452\DevExpress.Images.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Mvvm.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Mvvm.20.1.3\lib\net452\DevExpress.Mvvm.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Office.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Office.Core.20.1.3\lib\net452\DevExpress.Office.v20.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Pdf.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Pdf.Core.20.1.3\lib\net452\DevExpress.Pdf.v20.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Pdf.v20.1.Drawing, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Pdf.Drawing.20.1.3\lib\net452\DevExpress.Pdf.v20.1.Drawing.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Printing.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Printing.Core.20.1.3\lib\net452\DevExpress.Printing.v20.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.RichEdit.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.RichEdit.Core.20.1.3\lib\net452\DevExpress.RichEdit.v20.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.RichEdit.v20.1.Export, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.RichEdit.Export.20.1.3\lib\net452\DevExpress.RichEdit.v20.1.Export.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.SpellChecker.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.SpellChecker.Core.20.1.3\lib\net452\DevExpress.SpellChecker.v20.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Accordion.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Accordion.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Controls.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Controls.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Core.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Core.20.1.3\lib\net452\DevExpress.Xpf.Core.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Core.v20.1.Extensions, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Core.20.1.3\lib\net452\DevExpress.Xpf.Core.v20.1.Extensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Diagram.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Diagram.20.1.3\lib\net452\DevExpress.Xpf.Diagram.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Docking.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Docking.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.DocumentViewer.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.DocumentViewer.Core.20.1.3\lib\net452\DevExpress.Xpf.DocumentViewer.v20.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.ExpressionEditor.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.ExpressionEditor.20.1.3\lib\net452\DevExpress.Xpf.ExpressionEditor.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Grid.Core.20.1.3\lib\net452\DevExpress.Xpf.Grid.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Grid.Core.20.1.3\lib\net452\DevExpress.Xpf.Grid.v20.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v20.1.Extensions, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Grid.Core.20.1.3\lib\net452\DevExpress.Xpf.Grid.v20.1.Extensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Layout.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Layout.v20.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.LayoutControl.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Layout.20.1.3\lib\net452\DevExpress.Xpf.LayoutControl.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.NavBar.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.NavBar.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Office.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Office.20.1.3\lib\net452\DevExpress.Xpf.Office.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Printing.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Printing.20.1.3\lib\net452\DevExpress.Xpf.Printing.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.PropertyGrid.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.PropertyGrid.20.1.3\lib\net452\DevExpress.Xpf.PropertyGrid.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Ribbon.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Navigation.20.1.3\lib\net452\DevExpress.Xpf.Ribbon.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.RichEdit.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.RichEdit.20.1.3\lib\net452\DevExpress.Xpf.RichEdit.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.SpellChecker.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.SpellChecker.20.1.3\lib\net452\DevExpress.Xpf.SpellChecker.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Themes.Office2016White.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Themes.Office2016White.20.1.3\lib\net452\DevExpress.Xpf.Themes.Office2016White.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Themes.Office2019Colorful.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Themes.Office2019Colorful.20.1.3\lib\net452\DevExpress.Xpf.Themes.Office2019Colorful.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Themes.Seven.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Wpf.Themes.Seven.20.1.3\lib\net452\DevExpress.Xpf.Themes.Seven.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpo.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DevExpress.Xpo.20.1.3\lib\net452\DevExpress.Xpo.v20.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Composition">
-      <HintPath>..\packages\Prism.Composition.5.0.0\lib\NET45\Microsoft.Practices.Prism.Composition.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Interactivity">
-      <HintPath>..\packages\Prism.Interactivity.5.0.0\lib\NET45\Microsoft.Practices.Prism.Interactivity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.MefExtensions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Prism.MEFExtensions.5.0.0\lib\NET45\Microsoft.Practices.Prism.MefExtensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Mvvm">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.PubSubEvents">
-      <HintPath>..\packages\Prism.PubSubEvents.1.1.2\lib\portable-sl5+windowsphone8+windows8+net40+wpa81\Microsoft.Practices.Prism.PubSubEvents.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.6.8\lib\net45\NLog.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="PresentationUI, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="ReachFramework" />
-    <Reference Include="ReactiveUI">
-      <HintPath>..\packages\reactiveui-core.6.4.0\lib\Net45\ReactiveUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Splat">
-      <HintPath>..\packages\Splat.1.6.0\lib\Net45\Splat.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Printing" />
-    <Reference Include="System.Reactive.Core">
-      <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces">
-      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Linq">
-      <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Expression.Blend.Sdk.1.0.2\lib\net45\System.Windows.Interactivity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="UIAutomationProvider" />
-    <Reference Include="UIAutomationTypes" />
-    <Reference Include="WindowsBase" />
+    <PackageReference Include="CDP4Common-CE" Version="6.0.1-2020.4.23.1-pre-release">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CDP4Dal-CE" Version="6.0.1-2020.4.23.1-pre-release">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.0.0-rc02">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CommonServiceLocator" Version="1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.CodeParser" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Data" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.DataAccess" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Diagram.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Images" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Mvvm" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Office.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Printing.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Office" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2016White" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Xpo" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="NLog" Version="4.6.8">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism" Version="5.0.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.Composition" Version="5.0.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.Interactivity" Version="5.0.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.MEFExtensions" Version="5.0.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.Mvvm" Version="1.1.1">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.PubSubEvents" Version="1.1.2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="reactiveui" Version="6.4.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="reactiveui-core" Version="6.4.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-Core" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-Interfaces" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-Linq" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-Main" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-PlatformServices" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-XAML" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Splat" Version="1.6.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Converters\BaseFileRevisionViewModelConverter.cs" />
-    <Compile Include="Converters\DataTypeConverter.cs" />
-    <Compile Include="Converters\ElementDefinitionBrowserIconConverter.cs" />
-    <Compile Include="Converters\ElementUsageOptionsConverter.cs" />
-    <Compile Include="Converters\ElementUsageTypeToVisibilityConverter.cs" />
-    <Compile Include="Converters\FileRevisionBackgroundConverter.cs" />
-    <Compile Include="Converters\FileRevisionOpacityConverter.cs" />
-    <Compile Include="Converters\ReactiveDomainToObjectListConverter.cs" />
-    <Compile Include="EngineeringModelModule.cs" />
-    <Compile Include="OfficeRibbon\EngineeringModelRibbonPart.cs" />
-    <Compile Include="Services\ElementDefinitionService.cs" />
-    <Compile Include="Utilities\CopyElementDefinitionCreator.cs" />
-    <Compile Include="Utilities\CopyCreator.cs" />
-    <Compile Include="ViewModels\Dialogs\ActualFiniteStateDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\BinaryRelationshipDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\BuiltInRuleVerificationDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\FileDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\FileRevisionDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\FolderDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ElementUsageDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ElementDefinitionDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ActualFiniteStateListDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ParameterSubscriptionDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\PossibleFiniteStateListDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\PossibleFiniteStateDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\OptionDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ParameterDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ParameterGroupDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\ParameterOverrideDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ActualFiniteStateRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\CategoryRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\DomainOfExpertiseRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\GroupSelectionViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\IDialogValueSetRow.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ParameterBaseRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ParameterComponentValueRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ParameterOptionRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ParameterOrOverrideBaseRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ParameterOverrideRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ParameterRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ParameterStateRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ParameterSubscriptionRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\ParameterValueBaseRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\RuleVerificationListDialogViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\Rows\PossibleFiniteStateListRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\Comparers\ElementBaseChildRowComparer.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\Comparers\ElementDefinitionBrowserChildComparer.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\Comparers\ParameterGroupChildRowComparer.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionsBrowserViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ElementBaseRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ElementDefinitionRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ElementUsageRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\IElementBaseRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\IModelCodeRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterBaseRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterComponentValueRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterGroupRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterOptionRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterOrOverrideBaseRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterOverrideRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterStateRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterSubscriptionRowViewModel.cs" />
-    <Compile Include="ViewModels\ElementDefinitionBrowser\ElementDefinitionTreeRows\ParameterValueBaseRowViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\EngineeringModelSetupDialogViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\CommonFileStoreBrowserRibbonViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\CommonFileStoreBrowserViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\CommonFileStoreRowViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\DomainFileStoreBrowserRibbonViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\DomainFileStoreBrowserViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\DomainFileStoreRowViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\FileStoreFileAndFolderHandler.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\FileRowViewModel.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\IFileStoreFileAndFolderHandler.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\IFileStoreRow.cs" />
-    <Compile Include="ViewModels\FileStoreBrowsers\FolderRowViewModel.cs" />
-    <Compile Include="ViewModels\FiniteStateBrowser\FiniteStateBrowserRibbonViewModel.cs" />
-    <Compile Include="ViewModels\FiniteStateBrowser\FiniteStateBrowserViewModel.cs" />
-    <Compile Include="ViewModels\FiniteStateBrowser\ActualFiniteStateListRowViewModel.cs" />
-    <Compile Include="ViewModels\FiniteStateBrowser\PossibleFiniteStateListRowViewModel.cs" />
-    <Compile Include="ViewModels\FiniteStateBrowser\ActualFiniteStateRowViewModel.cs" />
-    <Compile Include="ViewModels\FiniteStateBrowser\PossibleFiniteStateRowViewModel.cs" />
-    <Compile Include="ViewModels\OptionBrowser\OptionBrowserViewModel.cs" />
-    <Compile Include="ViewModels\OptionBrowser\OptionRowViewModel.cs" />
-    <Compile Include="ViewModels\PublicationBrowser\Comparers\PublicationChildRowComparer.cs" />
-    <Compile Include="ViewModels\PublicationBrowser\PublicationDomainOfExpertiseRowViewModel.cs" />
-    <Compile Include="ViewModels\PublicationBrowser\IPublishableRow.cs" />
-    <Compile Include="ViewModels\PublicationBrowser\PublicationBrowserRibbonViewModel.cs" />
-    <Compile Include="ViewModels\PublicationBrowser\PublicationBrowserViewModel.cs" />
-    <Compile Include="ViewModels\PublicationBrowser\PublicationParameterOrOverrideRowViewModel.cs" />
-    <Compile Include="ViewModels\PublicationBrowser\PublicationRowViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\Creator\BinaryRelationshipCreatorViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\Creator\CategoryListConverter.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\Creator\IRelationshipCreatorViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\Creator\MultiRelationshipCreatorViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\Creator\RelatedThingRowViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\Creator\RelationshipCreatorMainViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\Creator\RelatedThingViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\MultiRelationshipRowViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\RelationshipBrowserRibbonViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\RelationshipBrowserViewModel.cs" />
-    <Compile Include="ViewModels\RelationshipBrowser\BinaryRelationshipRowViewModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\Ribbon Controls\ElementDefinitionRibbonViewModel.cs" />
-    <Compile Include="ViewModels\OptionBrowser\OptionBrowserRibbonViewModel.cs" />
-    <Compile Include="ViewModels\RuleVerificationListBrowser\RuleVerificationRowViewModel.cs" />
-    <Compile Include="ViewModels\RuleVerificationListBrowser\RuleVerificationListRibbonViewModel.cs" />
-    <Compile Include="ViewModels\RuleVerificationListBrowser\RuleVerificationListRowViewModel.cs" />
-    <Compile Include="ViewModels\RuleVerificationListBrowser\RuleVerificationListBrowserViewModel.cs" />
-    <Compile Include="ViewModels\Dialogs\UserRuleVerificationDialogViewModel.cs" />
-    <Compile Include="ViewModels\RuleVerificationListBrowser\BuiltInRuleVerificationRowViewModel.cs" />
-    <Compile Include="ViewModels\RuleVerificationListBrowser\UserRuleVerificationRowViewModel.cs" />
-    <Compile Include="Views\Dialogs\ActualFiniteStateDialog.xaml.cs">
+    <Reference Include="Accessibility">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PresentationUI">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ReachFramework">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Configuration">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Deployment">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.IO.Compression">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Printing">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Transactions">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Xaml">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UIAutomationProvider">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UIAutomationTypes">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="WindowsBase">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\Dialogs\ActualFiniteStateDialog.xaml.cs">
       <DependentUpon>ActualFiniteStateDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\BuiltInRuleVerificationDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\BuiltInRuleVerificationDialog.xaml.cs">
       <DependentUpon>BuiltInRuleVerificationDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\FileRevisionDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\FileRevisionDialog.xaml.cs">
       <DependentUpon>FileRevisionDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\FileDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\FileDialog.xaml.cs">
       <DependentUpon>FileDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\FolderDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\FolderDialog.xaml.cs">
       <DependentUpon>FolderDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\DomainFileStoreDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\DomainFileStoreDialog.xaml.cs">
       <DependentUpon>DomainFileStoreDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\Dialogs\DomainFileStoreDialogViewModel.cs" />
-    <Compile Include="Views\Dialogs\ElementDefinitionDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\ElementDefinitionDialog.xaml.cs">
       <DependentUpon>ElementDefinitionDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\ActualFiniteStateListDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\ActualFiniteStateListDialog.xaml.cs">
       <DependentUpon>ActualFiniteStateListDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\GroupSelectionLookUpEdit.xaml.cs">
+    <Compile Update="Views\Dialogs\GroupSelectionLookUpEdit.xaml.cs">
       <DependentUpon>GroupSelectionLookUpEdit.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\ParameterSubscriptionDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\ParameterSubscriptionDialog.xaml.cs">
       <DependentUpon>ParameterSubscriptionDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\PossibleFiniteStateListDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\PossibleFiniteStateListDialog.xaml.cs">
       <DependentUpon>PossibleFiniteStateListDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\PossibleFiniteStateDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\PossibleFiniteStateDialog.xaml.cs">
       <DependentUpon>PossibleFiniteStateDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\OptionDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\OptionDialog.xaml.cs">
       <DependentUpon>OptionDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\ParameterDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\ParameterDialog.xaml.cs">
       <DependentUpon>ParameterDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\BinaryRelationshipDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\BinaryRelationshipDialog.xaml.cs">
       <DependentUpon>BinaryRelationshipDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\ParameterGroupDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\ParameterGroupDialog.xaml.cs">
       <DependentUpon>ParameterGroupDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\ElementUsageDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\ElementUsageDialog.xaml.cs">
       <DependentUpon>ElementUsageDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\ParameterOverrideDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\ParameterOverrideDialog.xaml.cs">
       <DependentUpon>ParameterOverrideDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\EngineeringModelSetupDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\EngineeringModelSetupDialog.xaml.cs">
       <DependentUpon>EngineeringModelSetupDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\RuleVerificationListDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\RuleVerificationListDialog.xaml.cs">
       <DependentUpon>RuleVerificationListDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\UserRuleVerificationDialog.xaml.cs">
+    <Compile Update="Views\Dialogs\UserRuleVerificationDialog.xaml.cs">
       <DependentUpon>UserRuleVerificationDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ElementDefinitionBrowser\ElementDefinitionRibbon.xaml.cs">
+    <Compile Update="Views\ElementDefinitionBrowser\ElementDefinitionRibbon.xaml.cs">
       <DependentUpon>ElementDefinitionRibbon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ElementDefinitionBrowser\ElementDefinitionsBrowser.xaml.cs">
+    <Compile Update="Views\ElementDefinitionBrowser\ElementDefinitionsBrowser.xaml.cs">
       <DependentUpon>ElementDefinitionsBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FileStoreBrowsers\CommonFileStoreBrowser.xaml.cs">
+    <Compile Update="Views\FileStoreBrowsers\CommonFileStoreBrowser.xaml.cs">
       <DependentUpon>CommonFileStoreBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FileStoreBrowsers\CommonFileStoreBrowserRibbon.xaml.cs">
+    <Compile Update="Views\FileStoreBrowsers\CommonFileStoreBrowserRibbon.xaml.cs">
       <DependentUpon>CommonFileStoreBrowserRibbon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FileStoreBrowsers\DomainFileStoreBrowser.xaml.cs">
+    <Compile Update="Views\FileStoreBrowsers\DomainFileStoreBrowser.xaml.cs">
       <DependentUpon>DomainFileStoreBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FileStoreBrowsers\DomainFileStoreBrowserRibbon.xaml.cs">
+    <Compile Update="Views\FileStoreBrowsers\DomainFileStoreBrowserRibbon.xaml.cs">
       <DependentUpon>DomainFileStoreBrowserRibbon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FiniteStateBrowser\FiniteStateBrowser.xaml.cs">
+    <Compile Update="Views\FiniteStateBrowser\FiniteStateBrowser.xaml.cs">
       <DependentUpon>FiniteStateBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FiniteStateBrowser\FiniteStateBrowserRibbon.xaml.cs">
+    <Compile Update="Views\FiniteStateBrowser\FiniteStateBrowserRibbon.xaml.cs">
       <DependentUpon>FiniteStateBrowserRibbon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Items\ParameterValueSetLayoutItem.xaml.cs">
+    <Compile Update="Views\Items\ParameterValueSetLayoutItem.xaml.cs">
       <DependentUpon>ParameterValueSetLayoutItem.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\OptionBrowser\OptionBrowser.xaml.cs">
+    <Compile Update="Views\OptionBrowser\OptionBrowser.xaml.cs">
       <DependentUpon>OptionBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\OptionBrowser\OptionBrowserRibbon.xaml.cs">
+    <Compile Update="Views\OptionBrowser\OptionBrowserRibbon.xaml.cs">
       <DependentUpon>OptionBrowserRibbon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\OptionCellTemplateSelector.cs" />
-    <Compile Include="Views\PublicationBrowser\PublicationBrowser.xaml.cs">
+    <Compile Update="Views\PublicationBrowser\PublicationBrowser.xaml.cs">
       <DependentUpon>PublicationBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PublicationBrowser\PublicationBrowserRibbon.xaml.cs">
+    <Compile Update="Views\PublicationBrowser\PublicationBrowserRibbon.xaml.cs">
       <DependentUpon>PublicationBrowserRibbon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RelationshipBrowser\RelationshipBrowser.xaml.cs">
+    <Compile Update="Views\RelationshipBrowser\RelationshipBrowser.xaml.cs">
       <DependentUpon>RelationshipBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RelationshipBrowser\RelationshipBrowserRibbon.xaml.cs">
+    <Compile Update="Views\RelationshipBrowser\RelationshipBrowserRibbon.xaml.cs">
       <DependentUpon>RelationshipBrowserRibbon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RelationshipBrowser\RelationshipCreatorTemplateSelector.cs" />
-    <Compile Include="Views\RuleVerificationListBrowser\RuleVerificationListRibbon.xaml.cs">
+    <Compile Update="Views\RuleVerificationListBrowser\RuleVerificationListRibbon.xaml.cs">
       <DependentUpon>RuleVerificationListRibbon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RuleVerificationListBrowser\RuleVerificationListBrowser.xaml.cs">
+    <Compile Update="Views\RuleVerificationListBrowser\RuleVerificationListBrowser.xaml.cs">
       <DependentUpon>RuleVerificationListBrowser.xaml</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\Dialogs\ActualFiniteStateDialog.xaml">
@@ -695,29 +528,137 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
-      <Project>{5e0e5c30-df40-4708-abae-4da03ec9b881}</Project>
-      <Name>CDP4CommonView</Name>
-      <Private>False</Private>
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
-      <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>
-      <Name>CDP4Composition</Name>
-      <Private>False</Private>
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Resources\RibbonXml\engineeringmodelribbon.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\Plugin.target"/>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ActualFiniteStateDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ActualFiniteStateDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ActualFiniteStateListDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ActualFiniteStateListDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\BinaryRelationshipDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\BinaryRelationshipDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\BuiltInRuleVerificationDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\BuiltInRuleVerificationDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ElementDefinitionDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ElementDefinitionDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ElementUsageDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ElementUsageDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\EngineeringModelSetupDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\EngineeringModelSetupDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\GroupSelectionLookUpEdit.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\GroupSelectionLookUpEdit.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\OptionDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\OptionDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterGroupDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterGroupDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterOverrideDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterOverrideDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterSubscriptionDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterSubscriptionDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateListDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateListDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\RuleVerificationListDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\RuleVerificationListDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\UserRuleVerificationDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\UserRuleVerificationDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\ElementDefinitionBrowser\ElementDefinitionRibbon.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\ElementDefinitionBrowser\ElementDefinitionRibbon.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\ElementDefinitionBrowser\ElementDefinitionsBrowser.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\ElementDefinitionBrowser\ElementDefinitionsBrowser.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FileStoreBrowsers\CommonFileStoreBrowser.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FileStoreBrowsers\CommonFileStoreBrowser.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FileStoreBrowsers\CommonFileStoreBrowserRibbon.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FileStoreBrowsers\CommonFileStoreBrowserRibbon.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FileStoreBrowsers\DomainFileStoreBrowser.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FileStoreBrowsers\DomainFileStoreBrowser.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FileStoreBrowsers\DomainFileStoreBrowserRibbon.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FileStoreBrowsers\DomainFileStoreBrowserRibbon.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FiniteStateBrowser\FiniteStateBrowser.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FiniteStateBrowser\FiniteStateBrowser.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FiniteStateBrowser\FiniteStateBrowserRibbon.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\FiniteStateBrowser\FiniteStateBrowserRibbon.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Items\ParameterValueSetLayoutItem.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Items\ParameterValueSetLayoutItem.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\OptionBrowser\OptionBrowser.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\OptionBrowser\OptionBrowser.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\OptionBrowser\OptionBrowserRibbon.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\OptionBrowser\OptionBrowserRibbon.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\PublicationBrowser\PublicationBrowser.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\PublicationBrowser\PublicationBrowser.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\PublicationBrowser\PublicationBrowserRibbon.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\PublicationBrowser\PublicationBrowserRibbon.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\RelationshipBrowser\RelationshipBrowser.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\RelationshipBrowser\RelationshipBrowser.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\RelationshipBrowser\RelationshipBrowserRibbon.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\RelationshipBrowser\RelationshipBrowserRibbon.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\RuleVerificationListBrowser\RuleVerificationListBrowser.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\RuleVerificationListBrowser\RuleVerificationListBrowser.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\RuleVerificationListBrowser\RuleVerificationListRibbon.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\RuleVerificationListBrowser\RuleVerificationListRibbon.g.i.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Core">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Data">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Drawing">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.IO.Compression.FileSystem">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Numerics">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Runtime.Serialization">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Xml">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Xml.Linq">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Import Project="..\Sdk.Plugin.target" />
 </Project>

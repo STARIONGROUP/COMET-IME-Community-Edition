@@ -27,24 +27,75 @@
 namespace CDP4PluginPackager
 {
     using System;
+    using System.IO;
+    using System.Linq;
 
     internal class Program
     {
         /// <summary>
         /// Main entry for the PluginPackager, handles exception and notify the user in the output build window of visual studio
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Array containing all command line arguments</param>
         static void Main(string[] args)
         {
             try
             {
-                new App(args).Start();
+                string path = null;
+
+                if (args == null || !args.Any(Directory.Exists))
+                {
+                    path = Directory.GetCurrentDirectory();
+                }
+                else
+                {
+                    path = args.FirstOrDefault(Directory.Exists);
+                }
+
+                var shouldPluginGetPacked = args?.Any(a => a.ToLower() == "pack") == true;
+
+                var buildConfiguration = GetBuildConfigurationFromArgs(args);
+
+                var targetFramework = GetTargetFrameworkFromArgs(args);
+
+                var plugingPacker = new SdkPluginPackager(path, shouldPluginGetPacked, buildConfiguration, targetFramework);
+
+                plugingPacker.Start();
             }
             catch (Exception e)
             {
                 Console.WriteLine($"{e}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Gets the Build Configuration (Debug/Release) from the command line arguments
+        /// </summary>
+        /// <param name="args">The array of command line arguments</param>
+        /// <returns>Build Configuration when found in arguments, otherwise null</returns>
+        private static string GetBuildConfigurationFromArgs(string[] args)
+        {
+            var configParameterPosition = Array.FindIndex(args, x => x.StartsWith("config:"));
+            
+            return 
+                configParameterPosition >= 0 
+                    ? args[configParameterPosition].Split(new[] { ':' }, StringSplitOptions.None)[1] 
+                    : null;
+        }
+
+        /// <summary>
+        /// Gets the Target Framework (net452, net48, netcore31, enz...) from the command line arguments
+        /// </summary>
+        /// <param name="args">The array of command line arguments</param>
+        /// <returns>Target Framework when found in arguments, otherwise null</returns>
+        private static string GetTargetFrameworkFromArgs(string[] args)
+        {
+            var targetFrameworkParameterPosition = Array.FindIndex(args, x => x.StartsWith("framework:"));
+
+            return 
+                targetFrameworkParameterPosition >= 0 
+                    ? args[targetFrameworkParameterPosition].Split(new[] { ':' }, StringSplitOptions.None)[1] 
+                    : null;
         }
     }
 }
