@@ -27,7 +27,6 @@
 namespace CDP4PluginPackager
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
@@ -35,76 +34,79 @@ namespace CDP4PluginPackager
     using System.Xml.Serialization;
 
     using CDP4PluginPackager.Models;
-    using CDP4PluginPackager.Models.AutoGen;
-    using CDP4PluginPackager.Utilities;
 
     using Newtonsoft.Json;
 
     /// <summary>
-    /// App class handles plugin manifest generation and packing
+    /// BasePluginPackager class handles plugin manifest generation and packing
     /// </summary>
-    public class App
+    public abstract class BasePluginPackager<T> where T : class
     {
         /// <summary>
         /// Field that holds the value whether Plugin is to be packed in a zip
         /// </summary>
-        private readonly bool shouldPluginGetPacked;
+        protected readonly bool ShouldPluginGetPacked;
 
         /// <summary>
         /// Fields that holds the working directory
         /// </summary>
-        private readonly string path;
+        protected readonly string Path;
+
+        /// <summary>
+        /// Contains the current build configuration (Debug/Release)
+        /// </summary>
+        protected string BuildConfiguration;
+
+        /// <summary>
+        /// The target framework version (net452)
+        /// </summary>
+        protected string BuildTargetFramework;
+
+        /// <summary>
+        /// Contains the plugin name
+        /// </summary>
+        protected string PluginName;
 
         /// <summary>
         /// Gets or Sets the path where the plugin dll is and where the manifest is
         /// </summary>
-        public string OutputPath { get; private set; }
+        public string OutputPath { get; protected set; }
 
         /// <summary>
-        /// Gets or sets the deserialized <see cref="CsprojectFile"/>
+        /// Gets or sets the deserialized project file
         /// </summary>
-        public CsprojectFile Csproj { get; private set; }
+        public T Csproj { get; private set; }
 
-        /// <summary>
-        /// Gets a <see cref="IEnumerable{T}"/> of custom attribute data reflected from the target plugin
-        /// </summary>
-        public IEnumerable<CustomAttributeData> AssemblyInfo { get; private set; }
-        
         /// <summary>
         /// The actual manifest meant to be serialized
         /// </summary>
         public Manifest Manifest { get; set; }
 
         /// <summary>
-        /// Instantiate a new <see cref="App"/>
+        /// Default constructor for <see cref="BasePluginPackager{T}"/>
         /// </summary>
-        /// <param name="args"></param>
-        public App(string[] args = null)
+        /// <param name="path">the working directory</param>
+        /// <param name="shouldPluginGetPacked">state if a plugin needs to be packed in a zip</param>
+        /// <param name="buildConfiguration">the current build configuration (Debug/Release)</param>
+        /// <param name="buildTargetFramework">The target framework version (net452)</param>
+        protected BasePluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration = "", string buildTargetFramework = "")
         {
-            if (args == null || !args.Any(Directory.Exists))
-            {
-                this.path = Directory.GetCurrentDirectory();
-            }
-            else
-            {
-                this.path = args.FirstOrDefault(Directory.Exists);
-            }
-
-            this.shouldPluginGetPacked = args?.Any(a => a.ToLower() == "pack") == true;
+            this.Path = path;
+            this.ShouldPluginGetPacked = shouldPluginGetPacked;
+            this.BuildConfiguration = buildConfiguration;
+            this.BuildTargetFramework = buildTargetFramework;
         }
 
         /// <summary>
-        /// Wrapper calling every needed method in the right order to generate the Plugin Manifest and pack the dll and manifest <see cref="shouldPluginGetPacked"/>
+        /// Wrapper calling every needed method in the right order to generate the Plugin Manifest and pack the dll and manifest <see cref="ShouldPluginGetPacked"/>
         /// </summary>
         public void Start()
-        {
+        { 
             this.Deserialize();
-            this.GetAssemblyInfo();
-            this.BuildManifest();
             this.Serialize();
             this.WriteLicense();
 
-            if (this.shouldPluginGetPacked)
+            if (this.ShouldPluginGetPacked)
             {
                 Console.WriteLine("---- Packing starting ----");
                 this.Pack();
@@ -115,25 +117,20 @@ namespace CDP4PluginPackager
         /// <summary>
         /// Write the license file in the output folder
         /// </summary>
-        private void WriteLicense()
+        protected void WriteLicense()
         {
-            File.WriteAllText($"{Path.Combine(this.OutputPath, this.Manifest.Name)}.license.txt", this.GetLicense()); 
+            File.WriteAllText($"{System.IO.Path.Combine(this.OutputPath, this.Manifest.Name)}.license.txt", this.GetLicense());
         }
 
         /// <summary>
         /// Set properties of the <see cref="Manifest"/>
         /// </summary>
-        private void BuildManifest()
+        protected void BuildManifest()
         {
             this.Manifest = new Manifest
             {
-                Name = this.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>(),
-                Version = this.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyFileVersionAttribute>(),
-                ProjectGuid = this.Csproj.PropertyGroup.First(p => p.ProjectGuid != Guid.Empty).ProjectGuid,
-                TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFrameworkVersion)).TargetFrameworkVersion,
                 Author = "RHEA System S.A.",
                 Website = "https://store.cdp4.org",
-                Description = this.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyDescriptionAttribute>(),
                 ReleaseNote = this.GetReleaseNote()
             };
         }
@@ -144,7 +141,7 @@ namespace CDP4PluginPackager
         /// <returns>license as <see cref="string"/></returns>
         public string GetLicense()
         {
-            var licensePath = Directory.GetParent(this.path).EnumerateFiles().FirstOrDefault(f => f.Name == "PluginLicense.txt")?.FullName;
+            var licensePath = Directory.GetParent(this.Path).EnumerateFiles().FirstOrDefault(f => f.Name == "PluginLicense.txt")?.FullName;
 
             if (string.IsNullOrWhiteSpace(licensePath))
             {
@@ -153,7 +150,7 @@ namespace CDP4PluginPackager
             }
 
             return File.ReadAllText(licensePath)
-                .Replace("$PLUGIN_NAME", this.AssemblyInfo.QueryAssemblySpecificInfo<AssemblyTitleAttribute>())
+                .Replace("$PLUGIN_NAME", this.PluginName)
                 .Replace("$YEAR", DateTime.Now.Year.ToString());
         }
 
@@ -161,9 +158,9 @@ namespace CDP4PluginPackager
         /// Retrieve relative release note if any
         /// </summary>
         /// <returns>release note as <see cref="string"/></returns>
-        private string GetReleaseNote()
+        protected string GetReleaseNote()
         {
-            var releaseNotePath = Directory.EnumerateFiles(this.path).FirstOrDefault(f => f.ToLower() == "releasenote.md");
+            var releaseNotePath = Directory.EnumerateFiles(this.Path).FirstOrDefault(f => f.ToLower() == "releasenote.md");
 
             if (string.IsNullOrWhiteSpace(releaseNotePath))
             {
@@ -175,20 +172,11 @@ namespace CDP4PluginPackager
         }
 
         /// <summary>
-        /// Retrieve all the plugins references
-        /// </summary>
-        /// <returns>returns all pluging references as <see cref="IEnumerable{Reference}"/></returns>
-        private IEnumerable<Reference> ComputeReferences()
-        {
-            return this.Csproj.ItemGroup.SelectMany(r => r.Reference);
-        }
-
-        /// <summary>
         /// Fetches the current IME version to set the IME version that the plugin is compatible with
         /// </summary>
-        public Version GetCurrentIMEVersion()
+        protected Version GetCurrentIMEVersion()
         {
-            var imePath = Path.GetFullPath(Path.Combine(this.OutputPath, @"..\..\", "CDP4IME.exe"));
+            var imePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(this.OutputPath, @"..\..\", "CDP4IME.exe"));
 
             if (!File.Exists(imePath))
             {
@@ -197,48 +185,45 @@ namespace CDP4PluginPackager
 
             return Assembly.LoadFrom(imePath).GetName().Version;
         }
-        
+
         /// <summary>
         /// Retrieve Plugin assembly info from reflection
         /// </summary>
-        public void GetAssemblyInfo()
-        {
-            this.OutputPath = this.Csproj.PropertyGroup.FirstOrDefault(d => !string.IsNullOrWhiteSpace(d.OutputPath))?.OutputPath;
-            var assemblyName = this.Csproj.PropertyGroup.FirstOrDefault(d => !string.IsNullOrWhiteSpace(d.AssemblyName))?.AssemblyName;
-            var dllpath = $"{this.OutputPath}{assemblyName}.dll";
-            this.AssemblyInfo = Assembly.LoadFrom(dllpath).GetCustomAttributesData();
-        }
-        
+        protected abstract void GetAssemblyInfo();
+
         /// <summary>
         /// Serialize the <see cref="Manifest"/> into Json format and write the Json file in the Plugin output directory next to the plugin binary 
         /// </summary>
-        public void Serialize()
+        protected void Serialize()
         {
             var output = JsonConvert.SerializeObject(this.Manifest);
-            File.WriteAllText($"{Path.Combine(this.OutputPath, this.Manifest.Name)}.plugin.manifest",output);
+            File.WriteAllText($"{System.IO.Path.Combine(this.OutputPath, this.Manifest.Name)}.plugin.manifest", output);
         }
 
         /// <summary>
         /// Deserialize the target Plugin Csproj and set <see cref="Csproj"/> property
         /// </summary>
-        public void Deserialize()
+        protected void Deserialize()
         {
-            var csprojPath = Directory.EnumerateFiles(this.path).FirstOrDefault(f => f.EndsWith(".csproj"));
+            var csprojPath = Directory.EnumerateFiles(this.Path).FirstOrDefault(f => f.EndsWith(".csproj"));
 
-            using var stream = File.OpenText(csprojPath);
-            var serializer = new XmlSerializer(typeof(CsprojectFile));
-            this.Csproj = (CsprojectFile)serializer.Deserialize(stream);
+            using (var stream = File.OpenText(csprojPath))
+            {
+                var serializer = new XmlSerializer(typeof(T));
+                this.Csproj = (T) serializer.Deserialize(stream);
+                this.GetAssemblyInfo();
+            }
         }
 
         /// <summary>
         /// Zip all the file in the Plugin output folder including the manifest and excluding symbols. 
         /// <remarks>Building the package in another folder is mandatory</remarks>
         /// </summary>
-        private void Pack()
+        protected void Pack()
         {
-            var zipPath = Path.Combine(this.OutputPath, $"{this.Manifest.Name}.cdp4ck");
-            var temporaryZipPath = Path.Combine(this.path, $"{this.Manifest.Name}.cdp4ck");
-            
+            var zipPath = System.IO.Path.Combine(this.OutputPath, $"{this.Manifest.Name}.cdp4ck");
+            var temporaryZipPath = System.IO.Path.Combine(this.Path, $"{this.Manifest.Name}.cdp4ck");
+
             CleanUpOldPackages(zipPath, temporaryZipPath);
 
             ZipFile.CreateFromDirectory(this.OutputPath, temporaryZipPath, CompressionLevel.Optimal, false);

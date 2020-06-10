@@ -7,9 +7,5 @@ namespace CDP4CommonView.Resources
     /// </summary>
     public partial class RibbonMenuItemTemplate : ResourceDictionary
     {
-        public RibbonMenuItemTemplate()
-        {
-            InitializeComponent();
-        }
     }
 }
