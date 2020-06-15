@@ -7,6 +7,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              Height="317"
              d:DesignWidth="300"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -25,6 +26,11 @@
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
                 <items:NameLayoutItem/>
                 <items:ShortNameLayoutItem/>
+                <lc:LayoutItem Label="Is Default:">
+                    <dxe:CheckEdit Name="IsDefault" 
+                               IsChecked="{Binding Path=IsDefault, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                               IsReadOnly="{Binding IsReadOnly}"/>
+                </lc:LayoutItem>
             </lc:LayoutGroup>
             <items:CategoryLayoutGroup />
             <items:AliasLayoutGroup/>
