@@ -2,7 +2,8 @@
 // <copyright file="OptionBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2019 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
+//            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -29,18 +30,24 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -62,7 +69,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private Option option;
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
-        
+
         [SetUp]
         public void Setup()
         {
@@ -78,7 +85,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person, SelectedDomain = this.domain };
-            
+
             this.sitedir.Model.Add(this.modelsetup);
             this.sitedir.Person.Add(this.person);
             this.sitedir.Domain.Add(this.domain);
@@ -110,7 +117,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         public void VerifyThatRowsAreCreated()
         {
             var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
-        
+
             Assert.AreEqual(1, viewmodel.Options.Count);
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
@@ -174,10 +181,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             defaultRow = viewmodel.Options.Single(x => x.IsDefaultOption);
             Assert.AreSame(newoption, defaultRow.Thing);
+
+            revision.SetValue(this.iteration, 4);
+            this.iteration.DefaultOption = null;
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            Assert.IsFalse(viewmodel.Options.Any(x => x.IsDefaultOption));
         }
 
         [Test]
-        public void VerifyThatSetDefaultCommandWorks()
+        public void VerifyThatToggleDefaultCommandWorksForSet()
         {
             var newoption = new Option(Guid.NewGuid(), null, this.uri);
             this.iteration.Option.Add(newoption);
@@ -187,15 +200,40 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var optionRow = viewmodel.Options.First();
             optionRow.IsDefaultOption = true;
 
-            Assert.IsFalse(viewmodel.SetDefaultCommand.CanExecute(null));
-            
-            optionRow.IsDefaultOption = false;
-            Assert.IsFalse(viewmodel.SetDefaultCommand.CanExecute(null));
-            viewmodel.SelectedThing = optionRow;
-            
-            Assert.IsTrue(viewmodel.SetDefaultCommand.CanExecute(null));
+            Assert.IsFalse(viewmodel.ToggleDefaultCommand.CanExecute(null));
 
-            viewmodel.SetDefaultCommand.Execute(null);
+            optionRow.IsDefaultOption = false;
+            Assert.IsFalse(viewmodel.ToggleDefaultCommand.CanExecute(null));
+
+            viewmodel.SelectedThing = optionRow;
+
+            Assert.IsTrue(viewmodel.ToggleDefaultCommand.CanExecute(null));
+
+            viewmodel.ToggleDefaultCommand.Execute(null);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
+        }
+
+        [Test]
+        public void VerifyThatToggleDefaultCommandWorksForUnSet()
+        {
+            var newoption = new Option(Guid.NewGuid(), null, this.uri);
+            this.iteration.Option.Add(newoption);
+
+            var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            var optionRow = viewmodel.Options.First();
+            optionRow.IsDefaultOption = false;
+
+            Assert.IsFalse(viewmodel.ToggleDefaultCommand.CanExecute(null));
+
+            optionRow.IsDefaultOption = true;
+            Assert.IsFalse(viewmodel.ToggleDefaultCommand.CanExecute(null));
+
+            viewmodel.SelectedThing = optionRow;
+
+            Assert.IsTrue(viewmodel.ToggleDefaultCommand.CanExecute(null));
+
+            viewmodel.ToggleDefaultCommand.Execute(null);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
 
@@ -206,7 +244,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null) }
             });
 
             var vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
@@ -214,7 +252,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, null}
+                { this.iteration, null }
             });
 
             vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
