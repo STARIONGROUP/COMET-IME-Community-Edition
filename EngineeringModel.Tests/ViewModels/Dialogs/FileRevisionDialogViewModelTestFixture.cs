@@ -150,7 +150,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             this.fileType1 = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Extension = "jpg" };
             this.fileType2 = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Extension = "zip" };
 
-            this.thingSelectorDialogService.Setup(x => x.SelectThing(It.IsAny<IEnumerable<Thing>>(), It.IsAny<IEnumerable<string>>())).Returns(this.fileType1);
+            this.thingSelectorDialogService.Setup(x => x.SelectThing(It.IsAny<IEnumerable<FileType>>(), It.IsAny<IEnumerable<string>>())).Returns(this.fileType1);
 
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
 

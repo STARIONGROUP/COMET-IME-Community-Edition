@@ -559,7 +559,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.PossibleFileType.Except(this.FileType).ToList(),
                 new List<string> { "Name", "ShortName", "Extension" });
 
-            if (!this.FileType.Contains(result))
+            if (result != null && !this.FileType.Contains(result))
             {
                 this.FileType.Add(result);
             }
