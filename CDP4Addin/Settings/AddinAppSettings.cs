@@ -13,11 +13,5 @@ namespace CDP4AddinCE.Settings
     /// </summary>
     public class AddinAppSettings : AppSettings
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AddinAppSettings"/> class
-        /// </summary>
-        public AddinAppSettings()
-        {
-        }
     }
 }

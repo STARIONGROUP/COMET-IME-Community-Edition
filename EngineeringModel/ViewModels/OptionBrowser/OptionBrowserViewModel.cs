@@ -2,7 +2,8 @@
 // <copyright file="OptionBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
+//            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -31,20 +32,25 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
-    using CDP4Composition.DragDrop;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
+
     using CDP4EngineeringModel.Views;
+
     using ReactiveUI;
 
     /// <summary>
@@ -58,9 +64,9 @@ namespace CDP4EngineeringModel.ViewModels
         private OptionRowViewModel defaultOptionRow;
 
         /// <summary>
-        /// Backing field for <see cref="CanSetDefaultOption"/>
+        /// Backing field for <see cref="CanToggleDefaultOption"/>
         /// </summary>
-        private bool canSetDefaultOption;
+        private bool canToggleDefaultOption;
 
         /// <summary>
         /// Backing field for <see cref="CanCreateOption"/>
@@ -96,30 +102,27 @@ namespace CDP4EngineeringModel.ViewModels
         public OptionBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.UpdateOptions();
 
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup
-        {
-            get { return this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>(); }
-        }
+        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -127,17 +130,17 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
         /// Gets or sets a value indicating whether the set default option command is enabled
         /// </summary>
-        public bool CanSetDefaultOption
+        public bool CanToggleDefaultOption
         {
-            get { return this.canSetDefaultOption; }
-            set { this.RaiseAndSetIfChanged(ref this.canSetDefaultOption, value); }
+            get => this.canToggleDefaultOption;
+            set => this.RaiseAndSetIfChanged(ref this.canToggleDefaultOption, value);
         }
 
         /// <summary>
@@ -145,20 +148,20 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreateOption
         {
-            get { return this.canCreateOption; }
-            set { this.RaiseAndSetIfChanged(ref this.canCreateOption, value); }
+            get => this.canCreateOption;
+            set => this.RaiseAndSetIfChanged(ref this.canCreateOption, value);
         }
 
         /// <summary>
         /// Gets a <see cref="ICommand"/> to set the current option as the default one
         /// </summary>
-        public ReactiveCommand<object> SetDefaultCommand { get; private set; }
+        public ReactiveCommand<object> ToggleDefaultCommand { get; private set; }
 
         /// <summary>
         /// Gets the rows representing <see cref="Option"/>s
         /// </summary>
         public DisposableReactiveList<OptionRowViewModel> Options { get; private set; }
-        
+
         /// <summary>
         /// Initializes the browser
         /// </summary>
@@ -177,8 +180,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateOption));
             this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Option>(this.Thing));
 
-            this.SetDefaultCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanSetDefaultOption));
-            this.SetDefaultCommand.Subscribe(_ => this.ExecuteSetDefaultCommand());
+            this.ToggleDefaultCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanToggleDefaultOption));
+            this.ToggleDefaultCommand.Subscribe(_ => this.ExecuteToggleDefaultCommand());
         }
 
         /// <summary>
@@ -208,14 +211,13 @@ namespace CDP4EngineeringModel.ViewModels
                 this.CanCreateOption = this.PermissionService.CanWrite(ClassKind.Option, this.Thing);
             }
 
-            var optionRow = this.SelectedThing as OptionRowViewModel;
-            if (optionRow == null)
+            if (!(this.SelectedThing is OptionRowViewModel))
             {
-                this.CanSetDefaultOption = false;
+                this.CanToggleDefaultOption = false;
                 return;
             }
 
-            this.CanSetDefaultOption = !optionRow.IsDefaultOption && this.PermissionService.CanWrite(this.Thing);
+            this.CanToggleDefaultOption = this.PermissionService.CanWrite(this.Thing);
         }
 
         /// <summary>
@@ -227,12 +229,12 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Option", "", this.CreateCommand, MenuItemKind.Create, ClassKind.Option));
 
-            if (this.SelectedThing == null)
+            if (this.SelectedThing != null)
             {
-                return;
-            }
+                var setOrUnsetText = this.SelectedThing == this.defaultOptionRow ? "Unset" : "Set";
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Set as Default", "", this.SetDefaultCommand, MenuItemKind.Edit, ClassKind.Iteration));
+                this.ContextMenu.Add(new ContextMenuItemViewModel($"{setOrUnsetText} as Default", "", this.ToggleDefaultCommand, MenuItemKind.Edit, ClassKind.Iteration));
+            }
         }
 
         /// <summary>
@@ -244,12 +246,13 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var iteration in this.Options)
             {
                 iteration.Dispose();
             }
         }
-        
+
         /// <summary>
         /// Update the <see cref="Options"/> List
         /// </summary>
@@ -269,6 +272,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var option in oldOptions)
             {
                 var row = this.Options.SingleOrDefault(x => x.Thing == option);
+
                 if (row != null)
                 {
                     this.Options.RemoveAndDispose(row);
@@ -285,21 +289,24 @@ namespace CDP4EngineeringModel.ViewModels
         private void AddSubscriptions()
         {
             var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(engineeringModelSetupSubscription);
 
             var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(domainOfExpertiseSubscription);
 
             var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(iterationSetupSubscription);
         }
 
@@ -312,15 +319,16 @@ namespace CDP4EngineeringModel.ViewModels
             this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
 
             var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
+
             if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
             {
                 this.DomainOfExpertise = "None";
             }
             else
             {
-                this.DomainOfExpertise = (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null)
-                                        ? "None"
-                                        : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
+                this.DomainOfExpertise = iterationDomainPair.Value?.Item1 == null
+                    ? "None"
+                    : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
             }
         }
 
@@ -342,24 +350,21 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            var row = this.Options.Single(x => x.Thing == defaultOption);
-            this.defaultOptionRow = row;
-            row.IsDefaultOption = true;
+            var row = this.Options.SingleOrDefault(x => x.Thing == defaultOption);
+
+            if (row != null)
+            {
+                this.defaultOptionRow = row;
+                row.IsDefaultOption = true;
+            }
         }
 
-
         /// <summary>
-        /// Executes the <see cref="SetDefaultCommand"/>
+        /// Executes the <see cref="ToggleDefaultCommand"/>
         /// </summary>
-        private async Task ExecuteSetDefaultCommand()
+        private async Task ExecuteToggleDefaultCommand()
         {
-            if (this.SelectedThing == null)
-            {
-                return;
-            }
-
-            var option = this.SelectedThing.Thing as Option;
-            if (option == null)
+            if (!(this.SelectedThing?.Thing is Option option))
             {
                 return;
             }
@@ -367,7 +372,8 @@ namespace CDP4EngineeringModel.ViewModels
             var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
             var transaction = new ThingTransaction(transactionContext);
             var clone = this.Thing.Clone(false);
-            clone.DefaultOption = option;
+
+            clone.DefaultOption = option.IsDefault ? null : option;
 
             transaction.CreateOrUpdate(clone);
             await this.DalWrite(transaction);
@@ -388,6 +394,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             logger.Trace("drag over {0}", dropInfo.TargetItem);
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget == null)
             {
                 dropInfo.Effects = DragDropEffects.None;
@@ -406,6 +413,7 @@ namespace CDP4EngineeringModel.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget == null)
             {
                 return;

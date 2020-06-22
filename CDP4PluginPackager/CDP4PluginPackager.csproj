@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net452</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Authors>RHEA System S.A.</Authors>
+    <Company>RHEA System S.A.</Company>
+    <Description>CDP4 Plugin Packager and Plugin Manifest generator</Description>
+    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <DocumentationFile />
+    <OutputPath />
+  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" />
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.IO.Compression">
+      <HintPath>..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.IO.Compression.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

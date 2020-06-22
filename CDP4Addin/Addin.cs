@@ -321,6 +321,7 @@ namespace CDP4AddinCE
         {
             logger.Trace("Markdown.Xaml");
             Assembly.Load("Markdown.Xaml");
+            Assembly.Load("System.Net.Http.Formatting");
         }
 
         /// <summary>

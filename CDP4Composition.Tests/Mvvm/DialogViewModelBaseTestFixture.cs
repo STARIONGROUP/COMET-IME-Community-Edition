@@ -1,8 +1,28 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DialogViewModelBaseTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Tests.Mvvm
 {
@@ -15,21 +35,31 @@ namespace CDP4Composition.Tests.Mvvm
     using System.Reactive.Concurrency;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
+    /// <summary>
+    /// Test suite for the <see cref="DialogViewModelBase"/> class
+    /// </summary>
     [TestFixture]
     internal class DialogViewModelBaseTestFixture
     {
@@ -62,6 +92,7 @@ namespace CDP4Composition.Tests.Mvvm
             this.dal = new Mock<IDal>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>())
                 .Returns(this.navigation.Object);
 
@@ -94,7 +125,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, this.clone);
             testdialog.CopyUriCommand.Execute(true);
-            Assert.AreEqual(testdialog.ThingUri,Clipboard.GetText());
+            Assert.AreEqual(testdialog.ThingUri, Clipboard.GetText());
         }
 
         [Test]
@@ -139,6 +170,25 @@ namespace CDP4Composition.Tests.Mvvm
         }
 
         [Test]
+        public void VerifyThatExecuteOkOnWithFileUploadWork()
+        {
+            var fakeTransaction = new Mock<IThingTransaction>();
+            var fileRevision = new FileRevision(Guid.NewGuid(), null, null);
+            var file = new File(Guid.NewGuid(), null, null);
+
+            fakeTransaction.Setup(x => x.AddedThing).Returns(new List<Thing> {file});
+            fakeTransaction.Setup(x => x.UpdatedThing).Returns(new Dictionary<Thing, Thing>());
+
+            fakeTransaction.Setup(x => x.GetFiles()).Returns(new List<string> { "c:\\filelocation\file.txt" }.ToArray());
+
+            var testdialog = new TestFileRevisionDialogViewModel(fileRevision, fakeTransaction.Object, this.session.Object, true, ThingDialogKind.Create, this.navigation.Object, file);
+
+            testdialog.OkCommand.Execute(null);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()));
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+        }
+
+        [Test]
         public void VerifyThatExecuteOkOnNotRootWork()
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, this.clone);
@@ -154,9 +204,9 @@ namespace CDP4Composition.Tests.Mvvm
 
             testdialog.CancelCommand.Execute(null);
             Assert.IsFalse(testdialog.DialogResult.Value);
-            Assert.AreEqual(1, transaction.UpdatedThing.Count);
-            Assert.AreEqual(0, transaction.AddedThing.Count());
-            Assert.AreEqual(0, transaction.DeletedThing.Count());
+            Assert.AreEqual(1, this.transaction.UpdatedThing.Count);
+            Assert.AreEqual(0, this.transaction.AddedThing.Count());
+            Assert.AreEqual(0, this.transaction.DeletedThing.Count());
         }
 
         [Test]
@@ -166,7 +216,7 @@ namespace CDP4Composition.Tests.Mvvm
 
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, this.clone);
 
-            testdialog.Name = "";            
+            testdialog.Name = "";
             Assert.That(testdialog["Name"], Is.Not.Null.Or.Not.Empty);
 
             Assert.IsFalse(testdialog.OkCommand.CanExecute(null));
@@ -190,7 +240,7 @@ namespace CDP4Composition.Tests.Mvvm
             testdialog.CreateCommand.Execute(null);
 
             this.navigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), It.IsAny<bool>(),
-                        It.IsAny<ThingDialogKind>(), this.navigation.Object, It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()));
+                It.IsAny<ThingDialogKind>(), this.navigation.Object, It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()));
 
             Assert.IsTrue(testdialog.PopulateCalled);
         }
@@ -208,7 +258,7 @@ namespace CDP4Composition.Tests.Mvvm
             testdialog.CreateCommand.Execute(null);
 
             this.navigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), It.IsAny<bool>(),
-                        It.IsAny<ThingDialogKind>(), this.navigation.Object, It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()));
+                It.IsAny<ThingDialogKind>(), this.navigation.Object, It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()));
 
             Assert.IsFalse(testdialog.PopulateCalled);
         }
@@ -218,7 +268,6 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, this.clone);
             Assert.IsNotNull(testdialog.SpellChecker);
-
         }
 
         [Test]
@@ -283,7 +332,8 @@ namespace CDP4Composition.Tests.Mvvm
             this.OrderedRows = new ReactiveList<OrderedRow>();
         }
 
-        public ContainerList<TelephoneNumber> Phone { get; private set; } 
+        public ContainerList<TelephoneNumber> Phone { get; private set; }
+
         public bool UpdateTransactionCalled;
         public bool PopulateCalled;
 
@@ -295,7 +345,7 @@ namespace CDP4Composition.Tests.Mvvm
 
         public ReactiveCommand<object> CreateCommand { get; private set; }
 
-        public ReactiveList<OrderedRow> OrderedRows { get; private set; } 
+        public ReactiveList<OrderedRow> OrderedRows { get; private set; }
 
         protected override void UpdateTransaction()
         {
@@ -315,6 +365,15 @@ namespace CDP4Composition.Tests.Mvvm
         public void MoveUp(OrderedRow row)
         {
             this.ExecuteMoveUpCommand(this.OrderedRows, row);
+        }
+    }
+
+    internal class TestFileRevisionDialogViewModel : DialogViewModelBase<FileRevision>
+    {
+        public TestFileRevisionDialogViewModel(FileRevision fileRevision, IThingTransaction transaction, ISession session, bool isRoot,
+            ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNav, Thing container)
+            : base(fileRevision, transaction, session, isRoot, dialogKind, thingDialogNav, container, null)
+        {
         }
     }
 }

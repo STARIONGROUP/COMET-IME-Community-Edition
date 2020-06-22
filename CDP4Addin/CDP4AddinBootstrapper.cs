@@ -32,6 +32,8 @@ namespace CDP4AddinCE
     using System.Reflection;
     using System.Windows;
 
+    using CDP4AddinCE.Settings;
+
     using CDP4Composition.Modularity;
 
     using Microsoft.Practices.Prism.MefExtensions;
@@ -68,12 +70,11 @@ namespace CDP4AddinCE
         {
             logger.Log(LogLevel.Debug, "Loading CDP4 Plugins");
 
-            var pluginLoader = new PluginLoader();
+            var pluginLoader = new PluginLoader<AddinAppSettings>();
 
             foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
             {
                 this.AggregateCatalog.Catalogs.Add(directoryCatalog);
-
                 logger.Log(LogLevel.Debug, $"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
 

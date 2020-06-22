@@ -52,13 +52,28 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             Assert.Throws<ArgumentNullException>(() => configurator.Write(null));
 
             // Write row the same as the testing one
-            List<UriConfig> rows = new List<UriConfig>();
-            rows.Add(new UriConfig() { Alias="Alias0", Uri="Uri0", DalType="Web"});
+            var rows = new List<UriConfig>
+            {
+                new UriConfig
+                {
+                    Alias = "Alias0", 
+                    Uri = "Uri0", 
+                    DalType = "Web"
+                }
+            };
+
             configurator.Write(rows);
 
+            // Normalize line endings, because JSON.Net serialization is a bit inconsistent on handling indentation and line endings on different platforms
+            var testFileContent = File.ReadAllText(this.testfile.FullName).Replace("\r\n", "\n");
+            var configFileContent = File.ReadAllText(configurator.ConfigurationFilePath).Replace("\r\n", "\n");
+
             // Ensure the generated file is the same as the testing one
-            Assert.IsTrue(File.ReadAllText(this.testfile.FullName).GetHashCode() ==
-                          File.ReadAllText(configurator.ConfigurationFilePath).GetHashCode() );
+            Assert.AreEqual(testFileContent.Length, configFileContent.Length,
+                $"test file content:\n{testFileContent}\n, config file content:\n{configFileContent}\n");
+
+            Assert.AreEqual(testFileContent,  configFileContent, 
+                $"test file content:\n{testFileContent}\n, config file content:\n{configFileContent}\n" );
         }
 
         [Test]

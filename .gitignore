@@ -73,3 +73,6 @@ CDP4.v12.suo
 
 /RelationshipMatrix/Settings.StyleCop
 **l.cs.orig
+
+*.cdp4ck
+**.orig

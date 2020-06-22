@@ -1,8 +1,9 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AddinRibbonPartTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -23,15 +24,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4AddinCE.Tests.OfficeRibbon
+namespace CDP4Addin.Tests.OfficeRibbon
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.IO.Packaging;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
 
+    using CDP4AddinCE;
     using CDP4AddinCE.Settings;
 
     using CDP4Common.CommonData;
@@ -42,6 +46,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.Utilities;
 
     using CDP4Dal;
     using CDP4Dal.Composition;
@@ -57,7 +62,8 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
     /// <summary>
     /// suite of tests for the <see cref="AddinRibbonPart"/> class
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class AddinRibbonPartTestFixture
     {
         private Uri uri;
@@ -71,13 +77,14 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
         private Assembler assembler;
         private Mock<IAppSettingsService<AddinAppSettings>> appSettingService;
         private SiteDirectory siteDirectory;
+        private Mock<IAssemblyLocationLoader> assemblyLocationLoader;
 
         [SetUp]
         public void SetUp()
         {
             this.SetupRecognizePackUir();
 
-            this.uri = new Uri("http://www.rheageoup.com");
+            this.uri = new Uri("http://www.rheagroup.com");
             this.assembler = new Assembler(this.uri);
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, new Uri("http://test.com"));
 
@@ -88,10 +95,10 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
             this.session.Setup(x => x.DataSourceUri).Returns("test");
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
-            var iterationDictionary = new Dictionary<CDP4Common.EngineeringModelData.Iteration, Tuple<CDP4Common.SiteDirectoryData.DomainOfExpertise, CDP4Common.SiteDirectoryData.Participant>>();
+            var iterationDictionary = new Dictionary<CDP4Common.EngineeringModelData.Iteration, Tuple<DomainOfExpertise, Participant>>();
             this.session.Setup(x => x.OpenIterations).Returns(iterationDictionary);
 
-            this.appSettingService =new Mock<IAppSettingsService<AddinAppSettings>>();
+            this.appSettingService = new Mock<IAppSettingsService<AddinAppSettings>>();
             this.appSettingService.Setup(x => x.AppSettings).Returns(new AddinAppSettings());
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -103,6 +110,15 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             var dals = new List<Lazy<IDal, IDalMetaData>>();
             var availableDals = new AvailableDals(dals);
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>()).Returns(availableDals);
+
+            this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
+
+            var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
+
+            this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetFullPath(Path.Combine(testDirectory, $@"CDP4IME\bin\Debug\{frameworkVersion}")));
+
+            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(this.assemblyLocationLoader.Object);
 
             this.amountOfRibbonControls = 9;
             this.order = 1;
@@ -135,7 +151,7 @@ namespace CDP4AddinCE.Tests.OfficeRibbon
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine(ex);
+                Console.WriteLine(ex);
             }
         }
 

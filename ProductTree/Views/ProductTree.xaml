@@ -105,14 +105,14 @@
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type viewModels:ActualFiniteStateRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ParameterStateRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
                             <Image Style="{StaticResource ThingIcon}">
                                 <Image.Source>
                                     <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
-                                        <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                        <Binding Path="DataContext.Row.ActualState" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
                                     </MultiBinding>
                                 </Image.Source>
                             </Image>
@@ -155,97 +155,8 @@
             </dxb:ToolBarControl>
             <views:CommonThingControl GridView="{Binding ElementName=View}" />
         </dxlc:LayoutGroup>
-        <Grid Grid.Row="1" Background="AliceBlue">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0"
-                       Grid.Column="0"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="Model: " />
-            <TextBlock Grid.Row="0"
-                       Grid.Column="1"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="{Binding CurrentModel}" />
-
-            <TextBlock Grid.Row="0"
-                       Grid.Column="2"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="Data-Source" />
-            <TextBlock Grid.Row="0"
-                       Grid.Column="3"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="{Binding DataSource}" />
-
-            <TextBlock Grid.Row="1"
-                       Grid.Column="0"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="Iteration: " />
-            <TextBlock Grid.Row="1"
-                       Grid.Column="1"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="{Binding CurrentIteration}" />
-
-            <TextBlock Grid.Row="1"
-                       Grid.Column="2"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="Person: " />
-            <TextBlock Grid.Row="1"
-                       Grid.Column="3"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="{Binding Person}" />
-
-            <TextBlock Grid.Row="2"
-                       Grid.Column="0"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="Option: " />
-            <TextBlock Grid.Row="2"
-                       Grid.Column="1"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="{Binding CurrentOption}" />
-
-            <TextBlock Grid.Row="2"
-                       Grid.Column="2"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="Domain Of Expertise" />
-            <TextBlock Grid.Row="2"
-                       Grid.Column="3"
-                       Height="Auto"
-                       Margin="3"
-                       FontSize="10"
-                       Text="{Binding DomainOfExpertise}" />
-        </Grid>
+        <views:BrowserHeader Grid.Row="1" IsOptionDependant="True"/>
 
         <dxg:TreeListControl Grid.Row="2"
                              ItemsSource="{Binding TopElement}"

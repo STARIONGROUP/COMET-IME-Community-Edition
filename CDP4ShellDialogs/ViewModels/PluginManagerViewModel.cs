@@ -1,6 +1,26 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginManagerViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,8 +29,11 @@ namespace CDP4ShellDialogs.ViewModels
     using System;
     using System.Linq;
 
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.AppSettingService;
+
+    using DevExpress.Mvvm.POCO;
 
     using ReactiveUI;
 
@@ -19,7 +42,7 @@ namespace CDP4ShellDialogs.ViewModels
     /// and interact with MEF loaded modules
     /// </summary>
     public class PluginManagerViewModel<T> : DialogViewModelBase where T : AppSettings
-    {
+    { 
         /// <summary>
         /// The <see cref="ReactiveList{T}"/> of <see cref="PluginRowViewModel"/>s contained withing this view.
         /// </summary>
@@ -138,24 +161,23 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         private void ExecuteSave()
         {
-            var dirtyPlugins = this.Plugins.Where(x => x.IsRowDirty).ToList();
+            var pluginsToProcess = this.Plugins.Where(x => x.IsRowDirty || !x.IsPluginEnabled).ToList();
+            this.AppSettingsService.AppSettings.DisabledPlugins.Clear();
 
-            foreach (var dirtyItem in dirtyPlugins)
+            foreach (var item in pluginsToProcess)
             {
-                var pluginMetaData = new PluginSettingsMetaData
+                var wasAlreadyDisabled = this.AppSettingsService.AppSettings.DisabledPlugins.Any(p => p == item.ProjectGuid);
+                
+                if (item.IsPluginEnabled && wasAlreadyDisabled)
                 {
-                    Key = dirtyItem.Key,
-                    Name = dirtyItem.Name,
-                    Assembly = dirtyItem.AssemblyName,
-                    Description = dirtyItem.Description,
-                    Company = dirtyItem.Company,
-                    Version = dirtyItem.Version,
-                    IsEnabled = dirtyItem.IsPluginEnabled,
-                    IsMandatory = !dirtyItem.IsRowEnabled
-                };
-
-                this.AppSettingsService.AppSettings.UpdatePlugin(pluginMetaData);
+                    this.AppSettingsService.AppSettings.DisabledPlugins.Remove(item.ProjectGuid);
+                }
+                else if (!item.IsPluginEnabled && !wasAlreadyDisabled)
+                {
+                    this.AppSettingsService.AppSettings.DisabledPlugins.Add(item.ProjectGuid);
+                }
             }
+
             this.AppSettingsService.Save();
             this.DialogResult = new BaseDialogResult(false);
         }
@@ -167,11 +189,12 @@ namespace CDP4ShellDialogs.ViewModels
         {
             if (this.AppSettingsService != null)
             {
-                var pluginSettings = this.AppSettingsService.AppSettings.Plugins;
+                var disabledPlugins = this.AppSettingsService.AppSettings.DisabledPlugins;
+                var presentPlugins = PluginUtilities.GetPluginManifests();
 
-                foreach (var pluginSetting in pluginSettings)
+                foreach (var pluginSetting in presentPlugins)
                 {
-                    this.Plugins.Add(new PluginRowViewModel((PluginSettingsMetaData)pluginSetting));
+                    this.Plugins.Add(new PluginRowViewModel(pluginSetting, disabledPlugins.All(p => p != pluginSetting.ProjectGuid)));
                 }
             }
         }

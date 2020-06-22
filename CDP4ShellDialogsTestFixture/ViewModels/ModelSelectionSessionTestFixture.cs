@@ -35,7 +35,7 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
         [SetUp]
         public void Setup()
         {
-            this.session = new Mock<ISession>();
+            this.session = new Mock<ISession>(){Name = "http://www.rheagroup.com/"};
             this.permissionService = new Mock<IPermissionService>();
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com")) { Name = "TestSiteDir" };
@@ -83,7 +83,7 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
         public void VerifyThatPropertiesAreSetAndAdded()
         {
             var viewmodel = new ModelSelectionSessionRowViewModel(this.siteDirectory, this.session.Object);
-            Assert.AreEqual(this.siteDirectory.Name + string.Format(" ({0})", this.siteDirectory.IDalUri), viewmodel.Name);
+            Assert.AreEqual(this.siteDirectory.Name + $" ({this.siteDirectory.IDalUri})", viewmodel.Name.Insert(13, this.session.Name));
 
             var models = viewmodel.EngineeringModelSetupRowViewModels;
             Assert.AreEqual(2, models.Count);

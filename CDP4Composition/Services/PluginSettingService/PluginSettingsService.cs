@@ -1,8 +1,28 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginSettingsService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2018-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.PluginSettingService
 {
@@ -33,7 +53,7 @@ namespace CDP4Composition.PluginSettingService
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public const string ConfigurationDirectoryFolder = @"RHEA\CDP4\";
+        public static string CDP4ConfigurationDirectoryFolder = $"RHEA{Path.DirectorySeparatorChar}CDP4{Path.DirectorySeparatorChar}";
 
         /// <summary>
         /// The setting file extension
@@ -58,7 +78,7 @@ namespace CDP4Composition.PluginSettingService
         /// </summary>
         public string ApplicationConfigurationDirectory
         {
-            get { return Path.Combine(AppDataFolder, ConfigurationDirectoryFolder); }
+            get { return Path.Combine(AppDataFolder, CDP4ConfigurationDirectoryFolder); }
         }
 
         /// <summary>
@@ -77,12 +97,7 @@ namespace CDP4Composition.PluginSettingService
                 return result as T;
             }
 
-            if (!Directory.Exists(this.ApplicationConfigurationDirectory))
-            {
-                logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
-                Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
-                logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
-            }
+            this.CheckApplicationConfigurationDirectory();
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
 
@@ -110,6 +125,19 @@ namespace CDP4Composition.PluginSettingService
         }
 
         /// <summary>
+        /// Checks for the existence of the <see cref="PluginSettingsService.ApplicationConfigurationDirectory"/>
+        /// </summary>
+        public void CheckApplicationConfigurationDirectory()
+        {
+            if (!Directory.Exists(this.ApplicationConfigurationDirectory))
+            {
+                logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
+                Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
+                logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
+            }
+        }
+
+        /// <summary>
         /// Writes the <see cref="PluginSettings"/> to disk
         /// </summary>
         /// <param name="pluginSettings">
@@ -124,12 +152,7 @@ namespace CDP4Composition.PluginSettingService
 
             var assemblyName = this.QueryAssemblyTitle(pluginSettings.GetType());
 
-            if (!Directory.Exists(this.ApplicationConfigurationDirectory))
-            {
-                logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
-                Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
-                logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
-            }
+            this.CheckApplicationConfigurationDirectory();
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}");
 

@@ -1,6 +1,25 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="DefinitionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2016 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -149,6 +168,49 @@ namespace CDP4CommonView.Tests
             transaction.CreateOrUpdate(clone);
             
             Assert.DoesNotThrow(() => new DefinitionDialogViewModel(definition, transaction, this.session.Object, true, ThingDialogKind.Create, null, clone, null));
+        }
+
+        [Test]
+        public void VerifyMoveUpAndMoveDownDefinitionDialogViewModel()
+        {
+            var group = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.assembler.Cache.TryAdd(new CacheKey(group.Iid, null), new Lazy<Thing>(() => group));
+
+            var clone = group.Clone(false);
+            clone.Definition.Add(this.simpleDefinition);
+
+            this.transaction.CreateOrUpdate(clone);
+
+            this.viewmodel = new DefinitionDialogViewModel(this.simpleDefinition, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, clone, null);
+            Assert.IsNotNull(this.viewmodel);
+
+            //Test Note features
+            this.viewmodel.CreateNoteCommand.Execute(null);
+            this.viewmodel.CreateNoteCommand.Execute(null);
+            this.viewmodel.CreateNoteCommand.Execute(null);
+            Assert.AreEqual(this.viewmodel.Note.Count, 4);
+            this.viewmodel.SelectedNote = this.viewmodel.Note[1];
+            Assert.IsTrue(this.viewmodel.SelectedNote.Value.Equals(this.viewmodel.Note[1].Value));
+            this.viewmodel.MoveUpNoteCommand.Execute(null);
+            Assert.IsTrue(this.viewmodel.SelectedNote.Value.Equals(this.viewmodel.Note[0].Value));
+            this.viewmodel.MoveDownNoteCommand.Execute(null);
+            this.viewmodel.MoveDownNoteCommand.Execute(null);
+            Assert.IsTrue(this.viewmodel.SelectedNote.Value.Equals(this.viewmodel.Note[2].Value));
+            this.viewmodel.DeleteNoteCommand.Execute(null);
+            Assert.AreEqual(this.viewmodel.Note.Count, 3);
+
+            //Test Example features
+            this.viewmodel.CreateExampleCommand.Execute(null);
+            this.viewmodel.CreateExampleCommand.Execute(null);
+            Assert.AreEqual(this.viewmodel.Example.Count, 3);
+            this.viewmodel.SelectedExample = this.viewmodel.Example[2];
+            Assert.IsTrue(this.viewmodel.SelectedExample.Value.Equals(this.viewmodel.Example[2].Value));
+            this.viewmodel.MoveUpExampleCommand.Execute(null);
+            Assert.IsTrue(this.viewmodel.SelectedExample.Value.Equals(this.viewmodel.Example[1].Value));
+            this.viewmodel.MoveDownExampleCommand.Execute(null);
+            Assert.IsTrue(this.viewmodel.SelectedExample.Value.Equals(this.viewmodel.Example[2].Value));
+            this.viewmodel.DeleteExampleCommand.Execute(null);
+            Assert.AreEqual(this.viewmodel.Example.Count, 2);
         }
     }
 }

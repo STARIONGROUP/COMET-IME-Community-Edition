@@ -1,919 +1,876 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C6B4A2B4-5DD4-45D8-93B4-17DF82641B86}</ProjectGuid>
-    <OutputType>library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CDP4ObjectBrowser</RootNamespace>
-    <AssemblyName>CDP4ObjectBrowser</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>net452</TargetFramework>
+   
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <TargetFrameworkProfile />
+    <AssemblyTitle>CDP4ObjectBrowser</AssemblyTitle>
+    <Company>RHEA System S.A.</Company>
+    <Product>CDP4ObjectBrowser</Product>
+    <Description>CDP4 Object Browser Plugin</Description>
+    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <AssemblyVersion>6.0.0.0</AssemblyVersion>
+    <FileVersion>6.0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\CDP4IME\bin\Debug\plugins\CDP4ObjectBrowser\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4ObjectBrowser\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\CDP4IME\bin\Debug\plugins\CDP4ObjectBrowser\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4ObjectBrowser\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <Import Project="..\Plugin.target" />
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.0.0-rc02\lib\net452\CDP4Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="CDP4Dal, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.6.0.0-rc02\lib\net452\CDP4Dal.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.6.0.0-rc02\lib\net452\CDP4JsonSerializer.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Data.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Images.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Mvvm.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.CodeView.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Core.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Docking.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Printing.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Pdf.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Office.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.RichEdit.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.RichEdit.v19.2.Export, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Printing.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v19.2.Core, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Ribbon.v19.2, Version=19.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Composition">
-      <HintPath>..\packages\Prism.Composition.5.0.0\lib\NET45\Microsoft.Practices.Prism.Composition.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Interactivity">
-      <HintPath>..\packages\Prism.Interactivity.5.0.0\lib\NET45\Microsoft.Practices.Prism.Interactivity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.MefExtensions">
-      <HintPath>..\packages\Prism.MEFExtensions.5.0.0\lib\NET45\Microsoft.Practices.Prism.MefExtensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Mvvm">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Mvvm.Desktop">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.Desktop.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.PubSubEvents, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Prism.PubSubEvents.1.1.2\lib\portable-sl5+windowsphone8+windows8+net40+wpa81\Microsoft.Practices.Prism.PubSubEvents.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.SharedInterfaces">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.SharedInterfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.6.8\lib\net45\NLog.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ReactiveUI">
-      <HintPath>..\packages\reactiveui-core.6.4.0\lib\Net45\ReactiveUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Splat">
-      <HintPath>..\packages\Splat.1.6.0\lib\Net45\Splat.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Reactive.Core">
-      <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces">
-      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Linq">
-      <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices">
-      <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Windows.Threading">
-      <HintPath>..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+    <PackageReference Include="CDP4Common-CE" Version="6.1.1">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CDP4Dal-CE" Version="6.1.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.1.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CommonServiceLocator" Version="1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.CodeParser" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Data" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.DataAccess" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Diagram.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Images" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Mvvm" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Office.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Printing.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Office" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2016White" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Xpo" Version="20.1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="NLog" Version="4.6.8">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism" Version="5.0.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.Composition" Version="5.0.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.Interactivity" Version="5.0.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.MEFExtensions" Version="5.0.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.Mvvm" Version="1.1.1">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Prism.PubSubEvents" Version="1.1.2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="reactiveui" Version="6.4.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="reactiveui-core" Version="6.4.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-Core" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-Interfaces" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-Linq" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-Main" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-PlatformServices" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Rx-XAML" Version="2.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Splat" Version="1.6.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoGen\ActionItemRowViewModel.cs">
+    <Reference Include="System.ComponentModel.Composition">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Configuration">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.IO.Compression">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Transactions">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Xaml">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="WindowsBase">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PresentationCore">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="AutoGen\ActionItemRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ActualFiniteStateListRowViewModel.cs">
+    <Compile Update="AutoGen\ActualFiniteStateListRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ActualFiniteStateRowViewModel.cs">
+    <Compile Update="AutoGen\ActualFiniteStateRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\AliasRowViewModel.cs">
+    <Compile Update="AutoGen\AliasRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\AndExpressionRowViewModel.cs">
+    <Compile Update="AutoGen\AndExpressionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ApprovalRowViewModel.cs">
+    <Compile Update="AutoGen\ApprovalRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ArrayParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\ArrayParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\BinaryNoteRowViewModel.cs">
+    <Compile Update="AutoGen\BinaryNoteRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\BinaryRelationshipRowViewModel.cs">
+    <Compile Update="AutoGen\BinaryRelationshipRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\BinaryRelationshipRuleRowViewModel.cs">
+    <Compile Update="AutoGen\BinaryRelationshipRuleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\BookRowViewModel.cs">
+    <Compile Update="AutoGen\BookRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\BooleanExpressionRowViewModel.cs">
+    <Compile Update="AutoGen\BooleanExpressionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\BooleanParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\BooleanParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\BoundsRowViewModel.cs">
+    <Compile Update="AutoGen\BoundsRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\BuiltInRuleVerificationRowViewModel.cs">
+    <Compile Update="AutoGen\BuiltInRuleVerificationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\CategoryRowViewModel.cs">
+    <Compile Update="AutoGen\CategoryRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ChangeProposalRowViewModel.cs">
+    <Compile Update="AutoGen\ChangeProposalRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ChangeRequestRowViewModel.cs">
+    <Compile Update="AutoGen\ChangeRequestRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\CitationRowViewModel.cs">
+    <Compile Update="AutoGen\CitationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ColorRowViewModel.cs">
+    <Compile Update="AutoGen\ColorRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\CommonFileStoreRowViewModel.cs">
+    <Compile Update="AutoGen\CommonFileStoreRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\CompoundParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\CompoundParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ConstantRowViewModel.cs">
+    <Compile Update="AutoGen\ConstantRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ContractChangeNoticeRowViewModel.cs">
+    <Compile Update="AutoGen\ContractChangeNoticeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ContractDeviationRowViewModel.cs">
+    <Compile Update="AutoGen\ContractDeviationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ConversionBasedUnitRowViewModel.cs">
+    <Compile Update="AutoGen\ConversionBasedUnitRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\CyclicRatioScaleRowViewModel.cs">
+    <Compile Update="AutoGen\CyclicRatioScaleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DateParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\DateParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DateTimeParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\DateTimeParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DecompositionRuleRowViewModel.cs">
+    <Compile Update="AutoGen\DecompositionRuleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DefinedThingRowViewModel.cs">
+    <Compile Update="AutoGen\DefinedThingRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DefinitionRowViewModel.cs">
+    <Compile Update="AutoGen\DefinitionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DerivedQuantityKindRowViewModel.cs">
+    <Compile Update="AutoGen\DerivedQuantityKindRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DerivedUnitRowViewModel.cs">
+    <Compile Update="AutoGen\DerivedUnitRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DiagramCanvasRowViewModel.cs">
+    <Compile Update="AutoGen\DiagramCanvasRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DiagramEdgeRowViewModel.cs">
+    <Compile Update="AutoGen\DiagramEdgeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DiagramElementContainerRowViewModel.cs">
+    <Compile Update="AutoGen\DiagramElementContainerRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DiagramElementThingRowViewModel.cs">
+    <Compile Update="AutoGen\DiagramElementThingRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DiagrammingStyleRowViewModel.cs">
+    <Compile Update="AutoGen\DiagrammingStyleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DiagramObjectRowViewModel.cs">
+    <Compile Update="AutoGen\DiagramObjectRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DiagramShapeRowViewModel.cs">
+    <Compile Update="AutoGen\DiagramShapeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DiagramThingBaseRowViewModel.cs">
+    <Compile Update="AutoGen\DiagramThingBaseRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DiscussionItemRowViewModel.cs">
+    <Compile Update="AutoGen\DiscussionItemRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DomainFileStoreRowViewModel.cs">
+    <Compile Update="AutoGen\DomainFileStoreRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DomainOfExpertiseGroupRowViewModel.cs">
+    <Compile Update="AutoGen\DomainOfExpertiseGroupRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\DomainOfExpertiseRowViewModel.cs">
+    <Compile Update="AutoGen\DomainOfExpertiseRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ElementBaseRowViewModel.cs">
+    <Compile Update="AutoGen\ElementBaseRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ElementDefinitionRowViewModel.cs">
+    <Compile Update="AutoGen\ElementDefinitionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ElementUsageRowViewModel.cs">
+    <Compile Update="AutoGen\ElementUsageRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\EmailAddressRowViewModel.cs">
+    <Compile Update="AutoGen\EmailAddressRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\EngineeringModelDataAnnotationRowViewModel.cs">
+    <Compile Update="AutoGen\EngineeringModelDataAnnotationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\EngineeringModelDataDiscussionItemRowViewModel.cs">
+    <Compile Update="AutoGen\EngineeringModelDataDiscussionItemRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\EngineeringModelDataNoteRowViewModel.cs">
+    <Compile Update="AutoGen\EngineeringModelDataNoteRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\EngineeringModelRowViewModel.cs">
+    <Compile Update="AutoGen\EngineeringModelRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\EngineeringModelSetupRowViewModel.cs">
+    <Compile Update="AutoGen\EngineeringModelSetupRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\EnumerationParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\EnumerationParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\EnumerationValueDefinitionRowViewModel.cs">
+    <Compile Update="AutoGen\EnumerationValueDefinitionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ExclusiveOrExpressionRowViewModel.cs">
+    <Compile Update="AutoGen\ExclusiveOrExpressionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ExternalIdentifierMapRowViewModel.cs">
+    <Compile Update="AutoGen\ExternalIdentifierMapRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\FileRevisionRowViewModel.cs">
+    <Compile Update="AutoGen\FileRevisionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\FileRowViewModel.cs">
+    <Compile Update="AutoGen\FileRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\FileStoreRowViewModel.cs">
+    <Compile Update="AutoGen\FileStoreRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\FileTypeRowViewModel.cs">
+    <Compile Update="AutoGen\FileTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\FolderRowViewModel.cs">
+    <Compile Update="AutoGen\FolderRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\GenericAnnotationRowViewModel.cs">
+    <Compile Update="AutoGen\GenericAnnotationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\GlossaryRowViewModel.cs">
+    <Compile Update="AutoGen\GlossaryRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\GoalRowViewModel.cs">
+    <Compile Update="AutoGen\GoalRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\HyperLinkRowViewModel.cs">
+    <Compile Update="AutoGen\HyperLinkRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\IdCorrespondenceRowViewModel.cs">
+    <Compile Update="AutoGen\IdCorrespondenceRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\IntervalScaleRowViewModel.cs">
+    <Compile Update="AutoGen\IntervalScaleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\IterationRowViewModel.cs">
+    <Compile Update="AutoGen\IterationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\IterationSetupRowViewModel.cs">
+    <Compile Update="AutoGen\IterationSetupRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\LinearConversionUnitRowViewModel.cs">
+    <Compile Update="AutoGen\LinearConversionUnitRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\LogarithmicScaleRowViewModel.cs">
+    <Compile Update="AutoGen\LogarithmicScaleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\MappingToReferenceScaleRowViewModel.cs">
+    <Compile Update="AutoGen\MappingToReferenceScaleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\MeasurementScaleRowViewModel.cs">
+    <Compile Update="AutoGen\MeasurementScaleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\MeasurementUnitRowViewModel.cs">
+    <Compile Update="AutoGen\MeasurementUnitRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ModellingAnnotationItemRowViewModel.cs">
+    <Compile Update="AutoGen\ModellingAnnotationItemRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ModellingThingReferenceRowViewModel.cs">
+    <Compile Update="AutoGen\ModellingThingReferenceRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ModelLogEntryRowViewModel.cs">
+    <Compile Update="AutoGen\ModelLogEntryRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ModelReferenceDataLibraryRowViewModel.cs">
+    <Compile Update="AutoGen\ModelReferenceDataLibraryRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\MultiRelationshipRowViewModel.cs">
+    <Compile Update="AutoGen\MultiRelationshipRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\MultiRelationshipRuleRowViewModel.cs">
+    <Compile Update="AutoGen\MultiRelationshipRuleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\NaturalLanguageRowViewModel.cs">
+    <Compile Update="AutoGen\NaturalLanguageRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\NestedElementRowViewModel.cs">
+    <Compile Update="AutoGen\NestedElementRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\NestedParameterRowViewModel.cs">
+    <Compile Update="AutoGen\NestedParameterRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\NoteRowViewModel.cs">
+    <Compile Update="AutoGen\NoteRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\NotExpressionRowViewModel.cs">
+    <Compile Update="AutoGen\NotExpressionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\OptionRowViewModel.cs">
+    <Compile Update="AutoGen\OptionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\OrdinalScaleRowViewModel.cs">
+    <Compile Update="AutoGen\OrdinalScaleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\OrExpressionRowViewModel.cs">
+    <Compile Update="AutoGen\OrExpressionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\OrganizationRowViewModel.cs">
+    <Compile Update="AutoGen\OrganizationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\OwnedStyleRowViewModel.cs">
+    <Compile Update="AutoGen\OwnedStyleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\PageRowViewModel.cs">
+    <Compile Update="AutoGen\PageRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterBaseRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterBaseRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterGroupRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterGroupRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterizedCategoryRuleRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterizedCategoryRuleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterOrOverrideBaseRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterOrOverrideBaseRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterOverrideRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterOverrideRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterOverrideValueSetRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterOverrideValueSetRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterSubscriptionRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterSubscriptionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterSubscriptionValueSetRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterSubscriptionValueSetRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterTypeComponentRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterTypeComponentRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterValueRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterValueRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterValueSetBaseRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterValueSetBaseRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParameterValueSetRowViewModel.cs">
+    <Compile Update="AutoGen\ParameterValueSetRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParametricConstraintRowViewModel.cs">
+    <Compile Update="AutoGen\ParametricConstraintRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParticipantPermissionRowViewModel.cs">
+    <Compile Update="AutoGen\ParticipantPermissionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParticipantRoleRowViewModel.cs">
+    <Compile Update="AutoGen\ParticipantRoleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ParticipantRowViewModel.cs">
+    <Compile Update="AutoGen\ParticipantRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\PersonPermissionRowViewModel.cs">
+    <Compile Update="AutoGen\PersonPermissionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\PersonRoleRowViewModel.cs">
+    <Compile Update="AutoGen\PersonRoleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\PersonRowViewModel.cs">
+    <Compile Update="AutoGen\PersonRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\PointRowViewModel.cs">
+    <Compile Update="AutoGen\PointRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\PossibleFiniteStateListRowViewModel.cs">
+    <Compile Update="AutoGen\PossibleFiniteStateListRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\PossibleFiniteStateRowViewModel.cs">
+    <Compile Update="AutoGen\PossibleFiniteStateRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\PrefixedUnitRowViewModel.cs">
+    <Compile Update="AutoGen\PrefixedUnitRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\PublicationRowViewModel.cs">
+    <Compile Update="AutoGen\PublicationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\QuantityKindFactorRowViewModel.cs">
+    <Compile Update="AutoGen\QuantityKindFactorRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\QuantityKindRowViewModel.cs">
+    <Compile Update="AutoGen\QuantityKindRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RatioScaleRowViewModel.cs">
+    <Compile Update="AutoGen\RatioScaleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ReferenceDataLibraryRowViewModel.cs">
+    <Compile Update="AutoGen\ReferenceDataLibraryRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ReferencerRuleRowViewModel.cs">
+    <Compile Update="AutoGen\ReferencerRuleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ReferenceSourceRowViewModel.cs">
+    <Compile Update="AutoGen\ReferenceSourceRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RelationalExpressionRowViewModel.cs">
+    <Compile Update="AutoGen\RelationalExpressionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RelationshipParameterValueRowViewModel.cs">
+    <Compile Update="AutoGen\RelationshipParameterValueRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RelationshipRowViewModel.cs">
+    <Compile Update="AutoGen\RelationshipRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RequestForDeviationRowViewModel.cs">
+    <Compile Update="AutoGen\RequestForDeviationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RequestForWaiverRowViewModel.cs">
+    <Compile Update="AutoGen\RequestForWaiverRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RequirementRowViewModel.cs">
+    <Compile Update="AutoGen\RequirementRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RequirementsContainerParameterValueRowViewModel.cs">
+    <Compile Update="AutoGen\RequirementsContainerParameterValueRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RequirementsContainerRowViewModel.cs">
+    <Compile Update="AutoGen\RequirementsContainerRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RequirementsGroupRowViewModel.cs">
+    <Compile Update="AutoGen\RequirementsGroupRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RequirementsSpecificationRowViewModel.cs">
+    <Compile Update="AutoGen\RequirementsSpecificationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ReviewItemDiscrepancyRowViewModel.cs">
+    <Compile Update="AutoGen\ReviewItemDiscrepancyRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RuleRowViewModel.cs">
+    <Compile Update="AutoGen\RuleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RuleVerificationListRowViewModel.cs">
+    <Compile Update="AutoGen\RuleVerificationListRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RuleVerificationRowViewModel.cs">
+    <Compile Update="AutoGen\RuleVerificationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\RuleViolationRowViewModel.cs">
+    <Compile Update="AutoGen\RuleViolationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ScalarParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\ScalarParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ScaleReferenceQuantityValueRowViewModel.cs">
+    <Compile Update="AutoGen\ScaleReferenceQuantityValueRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ScaleValueDefinitionRowViewModel.cs">
+    <Compile Update="AutoGen\ScaleValueDefinitionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SectionRowViewModel.cs">
+    <Compile Update="AutoGen\SectionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SharedStyleRowViewModel.cs">
+    <Compile Update="AutoGen\SharedStyleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SimpleParameterizableThingRowViewModel.cs">
+    <Compile Update="AutoGen\SimpleParameterizableThingRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SimpleParameterValueRowViewModel.cs">
+    <Compile Update="AutoGen\SimpleParameterValueRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SimpleQuantityKindRowViewModel.cs">
+    <Compile Update="AutoGen\SimpleQuantityKindRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SimpleUnitRowViewModel.cs">
+    <Compile Update="AutoGen\SimpleUnitRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SiteDirectoryDataAnnotationRowViewModel.cs">
+    <Compile Update="AutoGen\SiteDirectoryDataAnnotationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SiteDirectoryDataDiscussionItemRowViewModel.cs">
+    <Compile Update="AutoGen\SiteDirectoryDataDiscussionItemRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SiteDirectoryRowViewModel.cs">
+    <Compile Update="AutoGen\SiteDirectoryRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SiteDirectoryThingReferenceRowViewModel.cs">
+    <Compile Update="AutoGen\SiteDirectoryThingReferenceRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SiteLogEntryRowViewModel.cs">
+    <Compile Update="AutoGen\SiteLogEntryRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SiteReferenceDataLibraryRowViewModel.cs">
+    <Compile Update="AutoGen\SiteReferenceDataLibraryRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SolutionRowViewModel.cs">
+    <Compile Update="AutoGen\SolutionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\SpecializedQuantityKindRowViewModel.cs">
+    <Compile Update="AutoGen\SpecializedQuantityKindRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\StakeholderRowViewModel.cs">
+    <Compile Update="AutoGen\StakeholderRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\StakeHolderValueMapRowViewModel.cs">
+    <Compile Update="AutoGen\StakeHolderValueMapRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\StakeHolderValueMapSettingsRowViewModel.cs">
+    <Compile Update="AutoGen\StakeHolderValueMapSettingsRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\StakeholderValueRowViewModel.cs">
+    <Compile Update="AutoGen\StakeholderValueRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\TelephoneNumberRowViewModel.cs">
+    <Compile Update="AutoGen\TelephoneNumberRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\TermRowViewModel.cs">
+    <Compile Update="AutoGen\TermRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\TextParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\TextParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\TextualNoteRowViewModel.cs">
+    <Compile Update="AutoGen\TextualNoteRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ThingReferenceRowViewModel.cs">
+    <Compile Update="AutoGen\ThingReferenceRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\TimeOfDayParameterTypeRowViewModel.cs">
+    <Compile Update="AutoGen\TimeOfDayParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\TopContainerRowViewModel.cs">
+    <Compile Update="AutoGen\TopContainerRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\UnitFactorRowViewModel.cs">
+    <Compile Update="AutoGen\UnitFactorRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\UnitPrefixRowViewModel.cs">
+    <Compile Update="AutoGen\UnitPrefixRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\UserPreferenceRowViewModel.cs">
+    <Compile Update="AutoGen\UserPreferenceRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\UserRuleVerificationRowViewModel.cs">
+    <Compile Update="AutoGen\UserRuleVerificationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="AutoGen\ValueGroupRowViewModel.cs">
+    <Compile Update="AutoGen\ValueGroupRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="HandCoded\BookRowViewModel.cs" />
-    <Compile Include="HandCoded\ConversionBasedUnitRowViewModel.cs" />
-    <Compile Include="HandCoded\ParameterValueSetBaseRowViewModel.cs" />
-    <Compile Include="HandCoded\ParameterOrOverrideBaseRowViewModel.cs" />
-    <Compile Include="HandCoded\ParameterBaseRowViewModel.cs" />
-    <Compile Include="HandCoded\ReferenceDataLibraryRowViewModel.cs" />
-    <Compile Include="HandCoded\MeasurementScaleRowViewModel.cs" />
-    <Compile Include="HandCoded\ElementBaseRowViewModel.cs" />
-    <Compile Include="HandCoded\MeasurementUnitRowViewModel.cs" />
-    <Compile Include="HandCoded\QuantityKindRowViewModel.cs" />
-    <Compile Include="HandCoded\ParameterTypeRowViewModel.cs" />
-    <Compile Include="HandCoded\FileStoreRowViewModel.cs" />
-    <Compile Include="HandCoded\RequirementsContainerRowViewModel.cs" />
-    <Compile Include="HandCoded\SectionRowViewModel.cs" />
-    <Compile Include="HandCoded\RuleViolationRowViewModel.cs" />
-    <Compile Include="HandCoded\SimpleParameterValueRowViewModel.cs" />
-    <Compile Include="HandCoded\SimpleParameterizableThingRowViewModel.cs" />
-    <Compile Include="HandCoded\RuleVerificationRowViewModel.cs" />
-    <Compile Include="HandCoded\ContractDeviationRowViewModel.cs" />
-    <Compile Include="HandCoded\ScalarParameterTypeRowViewModel.cs" />
-    <Compile Include="HandCoded\RuleRowViewModel.cs" />
-    <Compile Include="HandCoded\DiagrammingThingRowViewModel.cs" />
-    <Compile Include="HandCoded\RelationshipRowViewModel.cs" />
-    <Compile Include="HandCoded\NoteRowViewModel.cs" />
-    <Compile Include="HandCoded\ExternalIdentifierMapRowViewModel.cs" />
-    <Compile Include="HandCoded\FileRowViewModel.cs" />
-    <Compile Include="HandCoded\FileRevisionRowViewModel.cs" />
-    <Compile Include="HandCoded\IdCorrespondenceRowViewModel.cs" />
-    <Compile Include="HandCoded\BooleanExpressionRowViewModel.cs" />
-    <Compile Include="HandCoded\ModellingAnnotationItemRowViewModel.cs" />
-    <Compile Include="HandCoded\ModelLogEntryRowViewModel.cs" />
-    <Compile Include="HandCoded\MappingToReferenceScaleRowViewModel.cs" />
-    <Compile Include="HandCoded\NestedParameterRowViewModel.cs" />
-    <Compile Include="HandCoded\NestedElementRowViewModel.cs" />
-    <Compile Include="HandCoded\QuantityKindFactorRowViewModel.cs" />
-    <Compile Include="HandCoded\PageRowViewModel.cs" />
-    <Compile Include="HandCoded\ParameterSubscriptionValueSetRowViewModel.cs" />
-    <Compile Include="HandCoded\ParametricConstraintRowViewModel.cs" />
-    <Compile Include="HandCoded\ParameterTypeComponentRowViewModel.cs" />
-    <Compile Include="HandCoded\ActualFiniteStateRowViewModel.cs" />
-    <Compile Include="HandCoded\ActualFiniteStateListRowViewModel.cs" />
-    <Compile Include="HandCoded\CitationRowViewModel.cs" />
-    <Compile Include="HandCoded\FolderRowViewModel.cs" />
-    <Compile Include="HandCoded\NaturalLanguageRowViewModel.cs" />
-    <Compile Include="HandCoded\IterationSetupRowViewModel.cs" />
-    <Compile Include="HandCoded\IterationRowViewModel.cs" />
-    <Compile Include="HandCoded\HyperlinkRowViewModel.cs" />
-    <Compile Include="HandCoded\DefinitionRowViewModel.cs" />
-    <Compile Include="HandCoded\DefinedThingRowViewModel.cs" />
-    <Compile Include="HandCoded\PublicationRowViewModel.cs" />
-    <Compile Include="HandCoded\ParticipentRowViewModel.cs" />
-    <Compile Include="HandCoded\ParticipantPermissionRowViewModel.cs" />
-    <Compile Include="HandCoded\AliasRowViewModel.cs" />
-    <Compile Include="HandCoded\ParameterGroupRowViewModel.cs" />
-    <Compile Include="HandCoded\PersonPermissionRowViewModel.cs" />
-    <Compile Include="HandCoded\EngineeringModelRowViewModel.cs" />
-    <Compile Include="HandCoded\UserPreferenceRowViewModel.cs" />
-    <Compile Include="HandCoded\UnitFactorRowViewModel.cs" />
-    <Compile Include="HandCoded\SiteLogEntryRowViewModel.cs" />
-    <Compile Include="HandCoded\TelephoneNumberRowViewModel.cs" />
-    <Compile Include="HandCoded\EmailAddressRowViewModel.cs" />
-    <Compile Include="HandCoded\PersonRowViewModel.cs" />
-    <Compile Include="HandCoded\OrganizationRowViewModel.cs" />
-    <Compile Include="HandCoded\SiteDirectoryRowViewModel.cs" />
-    <Compile Include="Interface\IBooleanExpressionRowViewModel.cs">
+    <Compile Update="Interface\IBooleanExpressionRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\IContractDeviationRowViewModel.cs">
+    <Compile Update="Interface\IContractDeviationRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\IConversionBasedUnitRowViewModel.cs">
+    <Compile Update="Interface\IConversionBasedUnitRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IDefinedThingRowViewModel.cs">
+    <Compile Update="Interface\IDefinedThingRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\IDiagramElementContainerRowViewModel.cs">
+    <Compile Update="Interface\IDiagramElementContainerRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\IDiagramElementThingRowViewModel.cs">
+    <Compile Update="Interface\IDiagramElementThingRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\IDiagrammingStyleRowViewModel.cs">
+    <Compile Update="Interface\IDiagrammingStyleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\IDiagramShapeRowViewModel.cs">
+    <Compile Update="Interface\IDiagramShapeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\IDiagramThingBaseRowViewModel.cs">
+    <Compile Update="Interface\IDiagramThingBaseRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\IDiscussionItemRowViewModel.cs">
+    <Compile Update="Interface\IDiscussionItemRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\IElementBaseRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Interface\IEngineeringModelDataAnnotationRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IFileStoreRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IGenericAnnotationRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IMeasurementScaleRowViewModel.cs">
+    <Compile Update="Interface\IElementBaseRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IMeasurementUnitRowViewModel.cs">
+    <Compile Update="Interface\IEngineeringModelDataAnnotationRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\IFileStoreRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\IGenericAnnotationRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\IMeasurementScaleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IModellingAnnotationItemRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\INoteRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IParameterBaseRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IParameterOrOverrideBaseRowViewModel.cs">
+    <Compile Update="Interface\IMeasurementUnitRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IParameterTypeRowViewModel.cs">
+    <Compile Update="Interface\IModellingAnnotationItemRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\INoteRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\IParameterBaseRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\IParameterOrOverrideBaseRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IParameterValueRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IParameterValueSetBaseRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IQuantityKindRowViewModel.cs">
+    <Compile Update="Interface\IParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IReferenceDataLibraryRowViewModel.cs">
+    <Compile Update="Interface\IParameterValueRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\IParameterValueSetBaseRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\IQuantityKindRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IRelationshipRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IRequirementsContainerRowViewModel.cs">
+    <Compile Update="Interface\IReferenceDataLibraryRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IRuleRowViewModel.cs">
+    <Compile Update="Interface\IRelationshipRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\IRequirementsContainerRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IRuleVerificationRowViewModel.cs">
-      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IScalarParameterTypeRowViewModel.cs">
+    <Compile Update="Interface\IRuleRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\ISimpleParameterizableThingRowViewModel.cs">
+    <Compile Update="Interface\IRuleVerificationRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+    </Compile>
+    <Compile Update="Interface\IScalarParameterTypeRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\IThingReferenceRowViewModel.cs">
+    <Compile Update="Interface\ISimpleParameterizableThingRowViewModel.cs">
+      <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Interface\IThingReferenceRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="Interface\ITopContainerRowViewModel.cs">
+    <Compile Update="Interface\ITopContainerRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Include="ObjectBrowserRibbonPageViewModel.cs" />
-    <Compile Include="ObjectBrowserRowViewModel.cs" />
-    <Compile Include="ObjectBrowserViewModel.cs" />
-    <Compile Include="SessionRowViewModel.cs" />
-    <Compile Include="Views\ObjectBrowserRibbonPage.xaml.cs">
+    <Compile Update="Views\ObjectBrowserRibbonPage.xaml.cs">
       <DependentUpon>ObjectBrowserRibbonPage.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\ObjectBrowser.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="ObjectBrowserModule.cs" />
-    <Compile Include="Views\ObjectBrowser.xaml.cs">
+    <Compile Update="Views\ObjectBrowser.xaml.cs">
       <DependentUpon>ObjectBrowser.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -928,36 +885,73 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <None Include="AutoGen\ObjectBrowserRowViewTemplate.txt4" />
     <None Include="Interface\ObjectBrowserRowViewTemplate.txt4" />
-    <None Include="packages.config" />
-    <AppDesigner Include="Properties\" />
     <None Include="Views\ObjectBrowserXamlGenerator.txt4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
-      <Project>{72903eca-b315-4bfb-aaad-bc43ae41403b}</Project>
-      <Name>CDP4CommonView</Name>
-      <Private>False</Private>
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
-      <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>
-      <Name>CDP4Composition</Name>
-      <Private>False</Private>
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\ObjectBrowser.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\ObjectBrowser.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\ObjectBrowserRibbonPage.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\ObjectBrowserRibbonPage.g.i.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <Reference Update="System">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Core">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Data">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Drawing">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.IO.Compression.FileSystem">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Numerics">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Runtime.Serialization">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Xml">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="System.Xml.Linq">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
 </Project>

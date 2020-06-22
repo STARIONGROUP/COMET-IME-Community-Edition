@@ -47,7 +47,7 @@ namespace CDP4ShellDialogs.ViewModels
 
             if (participant.Domain.Count != 0)
             {
-                this.DomainOfExpertises.AddRange(participant.Domain);
+                this.DomainOfExpertises.AddRange(participant.Domain.OrderBy(x => x.ShortName)); 
 
                 this.SelectedDomain = this.DomainOfExpertises.Contains(this.ActiveParticipant.Person.DefaultDomain)
                     ? this.ActiveParticipant.Person.DefaultDomain

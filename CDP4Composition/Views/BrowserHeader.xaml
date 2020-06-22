@@ -1,11 +1,18 @@
-﻿<UserControl x:Class="CDP4Composition.Views.BrowserHeader"
+<UserControl x:Class="CDP4Composition.Views.BrowserHeader"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converter="clr-namespace:CDP4Composition.Converters"
+             xmlns:views="clr-namespace:CDP4Composition.Views"
              d:DesignHeight="60"
              d:DesignWidth="400"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converter:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <UserControl.ToolTip>
         <ToolTip >
             <StackPanel Orientation="Vertical">
@@ -104,6 +111,27 @@
                    Margin="3"
                    FontSize="10"
                    Text="{Binding Person}" />
+
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Height="Auto"
+                   FontWeight="Bold"
+                   Margin="3"
+                   FontSize="10"
+                   Text="Option:"
+                   Visibility="{Binding Converter={StaticResource BooleanToVisibilityConverter}, 
+                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:BrowserHeader}},
+                        Path=IsOptionDependant}"/>
+        <TextBlock Grid.Row="2"
+                   Grid.Column="1"
+                   Height="Auto"
+                   TextTrimming="CharacterEllipsis"
+                   Margin="3"
+                   FontSize="10"
+                   Text="{Binding CurrentOption}"
+                   Visibility="{Binding Converter={StaticResource BooleanToVisibilityConverter}, 
+                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:BrowserHeader}},
+                        Path=IsOptionDependant}"/>
 
         <TextBlock Grid.Row="2"
                    Grid.Column="2"

@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "CDP4PluginPackager": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,6 +1,25 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="DefinitionDialogViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015 RHEA S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -99,6 +118,16 @@ namespace CDP4CommonView.ViewModels
         public ReactiveCommand<object> DeleteNoteCommand { get; private set; }
 
         /// <summary>
+        /// Gets the move up note command.
+        /// </summary>
+        public ReactiveCommand<object> MoveUpNoteCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the move down note command.
+        /// </summary>
+        public ReactiveCommand<object> MoveDownNoteCommand { get; private set; }
+
+        /// <summary>
         /// Gets the create example command.
         /// </summary>
         public ReactiveCommand<object> CreateExampleCommand { get; private set; }
@@ -107,6 +136,16 @@ namespace CDP4CommonView.ViewModels
         /// Gets the delete example command.
         /// </summary>
         public ReactiveCommand<object> DeleteExampleCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the move up example command.
+        /// </summary>
+        public ReactiveCommand<object> MoveUpExampleCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the move down example command.
+        /// </summary>
+        public ReactiveCommand<object> MoveDownExampleCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="CultureInfo"/> for this definition
@@ -139,11 +178,24 @@ namespace CDP4CommonView.ViewModels
         {
             base.InitializeCommands();
 
+            var canExecuteSelectedMoveNoteCommand = this.WhenAny(vm => vm.SelectedNote, v => v.Value != null && !this.IsReadOnly);
+            var canExecuteSelectedMoveExampleCommand = this.WhenAny(vm => vm.SelectedExample, v => v.Value != null && !this.IsReadOnly);
+
             this.CreateNoteCommand = ReactiveCommand.Create();
             this.CreateNoteCommand.Subscribe(_ => this.ExecuteCreateNoteCommand());
 
             this.DeleteNoteCommand = ReactiveCommand.Create();
             this.DeleteNoteCommand.Subscribe(_ => this.ExecuteDeleteNoteCommand());
+
+            this.MoveUpNoteCommand = ReactiveCommand.Create(canExecuteSelectedMoveNoteCommand);
+            this.MoveUpNoteCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Note, this.SelectedNote));
+            this.MoveDownNoteCommand = ReactiveCommand.Create(canExecuteSelectedMoveNoteCommand);
+            this.MoveDownNoteCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Note, this.SelectedNote));
+
+            this.MoveUpExampleCommand = ReactiveCommand.Create(canExecuteSelectedMoveExampleCommand);
+            this.MoveUpExampleCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Example, this.SelectedExample));
+            this.MoveDownExampleCommand = ReactiveCommand.Create(canExecuteSelectedMoveExampleCommand);
+            this.MoveDownExampleCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Example, this.SelectedExample));
 
             this.CreateExampleCommand = ReactiveCommand.Create();
             this.CreateExampleCommand.Subscribe(_ => this.ExecuteCreateExampleCommand());
@@ -300,6 +352,47 @@ namespace CDP4CommonView.ViewModels
             {
                 this.RaiseAndSetIfChanged(ref this.selectedExample, value);
             }
+        }
+
+        /// <summary>
+        /// Execute the "Move Up" Command which puts a selected item one level up
+        /// </summary>
+        /// <param name="orderedList">
+        /// The list of ordered rows
+        /// </param>
+        /// <param name="selectedItem">
+        /// the row to move
+        /// </param>
+        private void ExecuteMoveUpCommand(ReactiveList<PrimitiveRow<string>> orderedList, PrimitiveRow<string> selectedItem)
+        {
+            var selectedIndex = orderedList.IndexOf(selectedItem);
+
+            if (selectedIndex == 0)
+            {
+                return;
+            }
+
+            orderedList.Move(selectedIndex, selectedIndex - 1);
+        }
+
+        /// <summary>
+        /// Execute the "Move Down" Command which puts a selected item one level down
+        /// </summary>
+        /// <param name="orderedList">
+        /// The list of ordered rows
+        /// </param>
+        /// <param name="selectedItem">
+        /// the row to move
+        /// </param>
+        protected void ExecuteMoveDownCommand(ReactiveList<PrimitiveRow<string>> orderedList, PrimitiveRow<string> selectedItem)
+        {
+            var selectedIndex = orderedList.IndexOf(selectedItem);
+            if (selectedIndex == orderedList.Count - 1)
+            {
+                return;
+            }
+
+            orderedList.Move(selectedIndex, selectedIndex + 1);
         }
     }
 }

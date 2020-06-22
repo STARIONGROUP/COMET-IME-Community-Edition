@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <!--Components are listed in alphabetical order using the name of the dll-->
+
+  <!-- The DevExpress libraries are registered in the GAC (using Assembly=".net") to make sure the CDP4 Excel Addin Works-->
+
+  <?include variables.wxi ?>
+
+  <Fragment>
+    <ComponentGroup Id="DEVEXPRESS" Directory="BIN">
+      {%- assign specialChar1 = "{" -%}
+      {%- assign specialChar2 = "}" -%}
+
+      {%- for wxsObject in KnownAssemblies.WxsObjects -%}
+      <Component Id="{{wxsObject.ComponentId}}" Guid="{{specialChar1}}{{wxsObject.Guid}}{{specialChar2}}" Win64="$(var.Win64)">
+        <File Id="{{wxsObject.FileId}}" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir){{wxsObject.AssemblyName}}" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      {%- endfor -%}
+    </ComponentGroup>
+  </Fragment>
+</Wix>
