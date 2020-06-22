@@ -39,7 +39,7 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="6.1.1-2020.6.22.1-pre-release">
+    <PackageReference Include="CDP4Common-CE" Version="6.1.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CDP4Dal-CE" Version="6.1.0">
