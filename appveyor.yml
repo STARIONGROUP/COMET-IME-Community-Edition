@@ -7,7 +7,8 @@ environment:
   TEST_COVERAGE:  'CoverResults.xml'
   SONARCLOUD_PROJECT_KEY: RHEAGROUP_CDP4-IME-Community-Edition
   SONARCLOUD_ORGANIZATION: rheagroup
-  SONARCLOUD_TOKEN: e3ee7273bfce14712e6521cbe48ca53b820aa5b9
+  SONARCLOUD_TOKEN:
+    secure: RJpHeisH3JWki7R+ya/gATuQd4dWLrNjdS8jFqZjmqwPtBIp6zpbwa0ArtqwIA12
 
 for:
 # configuration for "master" branch, build in Release mode
