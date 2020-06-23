@@ -4,6 +4,20 @@ The Concurrent Design Platform 4 (CDP4) Integrated Modelling Environemnt (IME) C
 
 The user manual for the CDP4-IME is available [online](http://cdp4docs.rheagroup.com/)
 
+## SonarQube Status:
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=alert_status)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=security_rating)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=coverage)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=bugs)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=ncloc)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=sqale_index)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
+
 ## Concurrent Design
 
 The Concurrent Design method is an approach to design activities in which all design disciplines and stakeholders are brought together to create an integrated design in a collaborative way of working.
