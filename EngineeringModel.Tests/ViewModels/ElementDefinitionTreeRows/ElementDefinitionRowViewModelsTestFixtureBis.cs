@@ -349,7 +349,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             CDPMessageBus.Current.ClearSubscriptions();
         }
 
-        [Test]
+        /* [Test]
         public void VerifyThatGroupAreCorrectlyHandled()
         {
             var revision = typeof (ElementDefinition).GetProperty("RevisionNumber");
@@ -511,7 +511,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             var paramRow = vm.ContainedRows.Single();
             Assert.AreSame(this.parameter5ForSubscription, paramRow.Thing);
-        }
+        } */
 
         [Test]
         public void VerifyThatExistingParameterTypeDragOverSetsNoneEffectNoPermission()
