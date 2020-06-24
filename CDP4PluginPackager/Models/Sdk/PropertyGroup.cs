@@ -35,6 +35,12 @@ namespace CDP4PluginPackager.Models.Sdk
     public class PropertyGroup
     {
         /// <summary>
+        /// Gets or Sets the Condition
+        /// </summary>
+        [XmlAttribute(AttributeName = "Condition")]
+        public string Condition { get; set; }
+
+        /// <summary>
         /// Gets or Sets the Project Guid
         /// </summary>
         [XmlElement(ElementName = "ProjectGuid")]

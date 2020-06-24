@@ -32,7 +32,7 @@
     <DebugType>pdbonly</DebugType>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <Import Project="..\Plugin.target" />
+  <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="6.1.1">
       <ExcludeAssets>runtime</ExcludeAssets>

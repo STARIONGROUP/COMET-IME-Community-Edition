@@ -5,9 +5,15 @@
 
   <Fragment>
     <ComponentGroup Id="PRODUCTTREE_CG" Directory="PRODUCTTREE">
+      
       <Component Id="comp_ProductTree" Guid="{CC2CF0B6-28B8-455F-B155-FF19898E6BB5}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_ProductTree"  Vital="yes" Source="$(var.ProductTree.TargetPath)" KeyPath="yes"></File>
       </Component>
+
+      <Component Id="comp_Manifest_CDP4ProductTree" Guid="{F05EDC78-E8B2-4B2A-A0EB-7D3B5B996D4F}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4ProductTree"  Vital="yes" Source="$(var.ProductTree.TargetDir)CDP4ProductTree.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>

@@ -57,7 +57,9 @@ namespace CDP4PluginPackager
 
                 var targetFramework = GetTargetFrameworkFromArgs(args);
 
-                var plugingPacker = new SdkPluginPackager(path, shouldPluginGetPacked, buildConfiguration, targetFramework);
+                var buildPlatform = GetBuildPlatformFromArgs(args);
+
+                var plugingPacker = new SdkPluginPackager(path, shouldPluginGetPacked, buildConfiguration, targetFramework, buildPlatform);
 
                 plugingPacker.Start();
             }
@@ -95,6 +97,21 @@ namespace CDP4PluginPackager
             return 
                 targetFrameworkParameterPosition >= 0 
                     ? args[targetFrameworkParameterPosition].Split(new[] { ':' }, StringSplitOptions.None)[1] 
+                    : null;
+        }
+
+        /// <summary>
+        /// Gets the Build Platform (AnyCpu, x86, x64, enz...) from the command line arguments
+        /// </summary>
+        /// <param name="args">The array of command line arguments</param>
+        /// <returns>Build Platform when found in arguments, otherwise null</returns>
+        private static string GetBuildPlatformFromArgs(string[] args)
+        {
+            var buildPlatformParameterPosition = Array.FindIndex(args, x => x.StartsWith("platform:"));
+
+            return
+                buildPlatformParameterPosition >= 0
+                    ? args[buildPlatformParameterPosition].Split(new[] { ':' }, StringSplitOptions.None)[1]
                     : null;
         }
     }

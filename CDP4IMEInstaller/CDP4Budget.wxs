@@ -5,9 +5,15 @@
 
   <Fragment>
     <ComponentGroup Id="BUDGET_CG" Directory="BUDGET">
+
       <Component Id="comp_Budget" Guid="{22399B02-D4D4-4726-8869-5D8BB9E81722}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_Budget"  Vital="yes" Source="$(var.CDP4Budget.TargetPath)" KeyPath="yes"></File>
       </Component>
+
+      <Component Id="comp_Manifest_CDP4BudgetViewer" Guid="{707EEFAA-4B88-40AF-B6C2-69D1708628A2}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4BudgetViewer"  Vital="yes" Source="$(var.CDP4Budget.TargetDir)CDP4BudgetViewer.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
     </ComponentGroup>
 	</Fragment>
 </Wix>

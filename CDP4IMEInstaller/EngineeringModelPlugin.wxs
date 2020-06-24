@@ -5,9 +5,15 @@
 
   <Fragment>
     <ComponentGroup Id="ENGINEERINGMODEL_CG" Directory="ENGINEERINGMODEL">
+      
       <Component Id="comp_EngineeringModel" Guid="{6FBD347F-FE92-4A1C-9FCD-5AF3900F60E7}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_EngineeringModel"  Vital="yes" Source="$(var.EngineeringModel.TargetPath)" KeyPath="yes"></File>
       </Component>
+
+      <Component Id="comp_Manifest_CDP4EngineeringModel" Guid="{AB268318-CCFD-4EAD-BEBD-DF648752AAF9}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4EngineeringModel"  Vital="yes" Source="$(var.EngineeringModel.TargetDir)CDP4EngineeringModel.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>
