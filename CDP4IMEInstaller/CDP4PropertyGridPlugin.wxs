@@ -5,9 +5,15 @@
   
   <Fragment>
     <ComponentGroup Id="PROPERTYGRID_CG" Directory="PROPERTYGRID">
+
       <Component Id="comp_CDP4PropertyGrid" Guid="{527C1073-3EFD-495F-A2F5-2AAD7BFDDC8D}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_CDP4PropertyGrid"  Vital="yes" Source="$(var.CDP4PropertyGrid.TargetPath)" KeyPath="yes"></File>
       </Component>
+
+      <Component Id="comp_Manifest_CDP4PropertyGrid" Guid="{7391CC18-EA96-4542-846F-295A565529B2}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4PropertyGrid"  Vital="yes" Source="$(var.CDP4PropertyGrid.TargetDir)CDP4PropertyGrid.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>

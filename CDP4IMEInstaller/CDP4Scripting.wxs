@@ -10,6 +10,10 @@
         <File Id="fil_CDP4Scripting"  Vital="yes" Source="$(var.CDP4Scripting.TargetPath)" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="comp_Manifest_CDP4Scripting" Guid="{6BEB2F67-845B-473C-9DCA-9796CC1E33B8}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4Scripting"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)CDP4Scripting.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
       <Component Id="comp_avalonedit" Guid="{93A09AF1-FF5D-4413-A039-610711F2216D}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_avalonedit" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)ICSharpCode.AvalonEdit.dll" KeyPath="yes" />
       </Component>

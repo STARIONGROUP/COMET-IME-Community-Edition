@@ -10,6 +10,10 @@
         <File Id="fil_Requirements"  Vital="yes" Source="$(var.Requirements.TargetPath)" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="comp_Manifest_CDP4Requirements" Guid="{4E2B0309-63C7-48BD-A402-922AE0230B96}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4Requirements"  Vital="yes" Source="$(var.Requirements.TargetDir)CDP4Requirements.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
       <Component Id="comp_reqif" Guid="{A628AC1E-6361-4294-93DB-068A674EBF40}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_reqif" Vital="yes" Source="$(var.Requirements.TargetDir)ReqIFSharp.dll" KeyPath="yes" />
       </Component>

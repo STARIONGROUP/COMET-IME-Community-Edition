@@ -29,6 +29,7 @@ namespace CDP4PluginPackager
     using System;
     using System.IO;
     using System.Linq;
+    using System.Windows;
 
     using CDP4PluginPackager.Models.Sdk;
 
@@ -44,7 +45,8 @@ namespace CDP4PluginPackager
         /// <param name="shouldPluginGetPacked">state if a plugin needs to be packed in a zip</param>
         /// <param name="buildConfiguration">the current build configuration (Debug/Release)</param>
         /// <param name="buildTargetFramework">The target framework version (net452)</param>
-        public SdkPluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration, string buildTargetFramework) : base(path, shouldPluginGetPacked, buildConfiguration, buildTargetFramework)
+        /// <param name="buildPlatform">The build platform (AnyCpu/x64)</param>
+        public SdkPluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration, string buildTargetFramework, string buildPlatform) : base(path, shouldPluginGetPacked, buildConfiguration, buildTargetFramework, buildPlatform)
         {
         }
 
@@ -58,10 +60,15 @@ namespace CDP4PluginPackager
             this.OutputPath =
                 System.IO.Path.Combine(
                     this.Csproj.PropertyGroup
-                        .First(d => !string.IsNullOrWhiteSpace(d.OutputPath))
+                        .First(d => d.Condition?.Contains($"{this.BuildConfiguration}|{this.BuildPlatform}") ?? false)
                         .OutputPath
                         .Replace("$(Configuration)", this.BuildConfiguration)
                         .Replace("$(TargetFramework)", this.BuildTargetFramework));
+
+            if (this.BuildConfiguration == "Release")
+            {
+                this.OutputPath = System.IO.Path.Combine(this.OutputPath, this.BuildTargetFramework);
+            }
 
             if (!Directory.Exists(this.OutputPath))
             {

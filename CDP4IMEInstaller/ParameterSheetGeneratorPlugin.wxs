@@ -8,6 +8,11 @@
       <Component Id="comp_ParameterSheetGenerator" Guid="{6D18C516-993E-4C05-A9FF-045FDA734439}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_ParameterSheetGenerator"  Vital="yes" Source="$(var.CDP4ParameterSheetGenerator.TargetPath)" KeyPath="yes"></File>
       </Component>
+
+      <Component Id="comp_Manifest_CDP4ParameterSheetGenerator" Guid="{B6DAAA51-1A21-497A-98ED-F15F7DEDA09D}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4ParameterSheetGenerator"  Vital="yes" Source="$(var.CDP4ParameterSheetGenerator.TargetDir)CDP4ParameterSheetGenerator.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>

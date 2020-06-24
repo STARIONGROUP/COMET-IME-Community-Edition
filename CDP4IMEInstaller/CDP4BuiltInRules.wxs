@@ -5,9 +5,15 @@
 
   <Fragment>
     <ComponentGroup Id="BUILTINRULES_CG" Directory="BUILTINRULES">
+
       <Component Id="comp_BUILTINRULES" Guid="{B659E6A2-2BB3-48EC-BCC5-A4386413EA8E}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_BUILTINRULES"  Vital="yes" Source="$(var.CDP4BuiltInRules.TargetPath)" KeyPath="yes"></File>
       </Component>
+
+      <Component Id="comp_Manifest_CDP4BuiltInRules" Guid="{8979D499-C709-47A5-9F4F-844835EBB86A}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4BuiltInRules"  Vital="yes" Source="$(var.CDP4BuiltInRules.TargetDir)CDP4BuiltInRules.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>
