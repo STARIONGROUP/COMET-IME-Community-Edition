@@ -9,7 +9,7 @@ environment:
   SONARCLOUD_ORGANIZATION: rheagroup
   SONARCLOUD_TOKEN:
     secure: SusLBtRCNeSFMhatgx83owIfxgme9yjV8PxhORbPZ0Mz/aixNIbXWZlSz4Zxc05u
-
+skip_branch_with_pr: true
 for:
 # configuration for "master" branch, build in Release mode
 -
@@ -56,7 +56,7 @@ before_build:
   - cmd: nuget restore -verbosity quiet
   - ps: >-
       if ($env:APPVEYOR_PULL_REQUEST_NUMBER){
-        Write-Host Scanning $env:APPVEYOR_REPO_BRANCH, PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
+        Write-Host Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
       }
       else {
