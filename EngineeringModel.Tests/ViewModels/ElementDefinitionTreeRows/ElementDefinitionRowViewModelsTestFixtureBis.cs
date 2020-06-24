@@ -511,7 +511,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             var paramRow = vm.ContainedRows.Single();
             Assert.AreSame(this.parameter5ForSubscription, paramRow.Thing);
-        } */
+        } 
 
         [Test]
         public void VerifyThatExistingParameterTypeDragOverSetsNoneEffectNoPermission()
@@ -538,7 +538,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             row.DragOver(dropInfo.Object);
 
             Assert.AreEqual(DragDropEffects.None, dropInfo.Object.Effects);
-        }
+        } */
 
         [Test]
         public void VerifyThatExistingParameterTypeDragOverSetsNoneEffectParameterExists()
