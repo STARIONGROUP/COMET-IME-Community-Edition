@@ -61,6 +61,7 @@ test_script:
       -hideskipped:All
       -output:"%TEST_COVERAGE%"
       -filter:"+[CDP4*]* -[*.Tests*]* -[*.Views]*"
+      -excludebyattribute:*.ExcludeFromCodeCoverageAttribute
 after_test:
     - ps: SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
 notifications:

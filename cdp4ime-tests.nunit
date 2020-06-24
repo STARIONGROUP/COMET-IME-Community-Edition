@@ -23,5 +23,6 @@
     <assembly path="ProductTree.Tests/bin/Debug/net452/ProductTree.Tests.dll" />
     <assembly path="RelationshipMatrix.Tests/bin/Debug/net452/CDP4RelationshipMatrix.Tests.dll" />
     <assembly path="Requirements.Tests/bin/Debug/net452/CDP4Requirements.Tests.dll" />
+    <assembly path="CDP4PluginPackager.Tests/bin/Debug/net452/CDP4Requirements.Tests.dll" />
   </Config>
 </NUnitProject>
