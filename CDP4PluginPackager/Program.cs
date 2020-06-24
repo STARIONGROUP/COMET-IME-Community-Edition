@@ -27,9 +27,11 @@
 namespace CDP4PluginPackager
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
 
+    [ExcludeFromCodeCoverage]
     internal class Program
     {
         /// <summary>
