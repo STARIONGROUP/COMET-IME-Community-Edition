@@ -151,7 +151,7 @@ namespace CDP4RelationshipMatrix
                 if (!settings.PossibleDisplayKinds.Any())
                 {
                     // if setting is empty, repopulate with default set and save it
-                    settings.PossibleDisplayKinds = RelationshipMatrixPluginSettings.DefaultDisplayKinds;
+                    settings.PossibleDisplayKinds = RelationshipMatrixPluginSettings.DefaultDisplayKinds.ToList();
                     this.PluginSettingService.Write(settings);
                 }
             }
