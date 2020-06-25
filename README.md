@@ -4,6 +4,17 @@ The Concurrent Design Platform 4 (CDP4) Integrated Modelling Environemnt (IME) C
 
 The user manual for the CDP4-IME is available [online](http://cdp4docs.rheagroup.com/)
 
+## Build status
+
+AppVeyor is used to build and test the C# CDP4-IME
+
+Branch | Build Status
+------- | :------------
+Master |  [![Build Status](https://ci.appveyor.com/api/projects/status/rj6ldroow4nxma6y/branch/master?svg=true)](https://ci.appveyor.com/project/rheagroup/cdp4-ime-community-edition/branch/master)
+Development |  [![Build status](https://ci.appveyor.com/api/projects/status/rj6ldroow4nxma6y/branch/development?svg=true)](https://ci.appveyor.com/project/rheagroup/cdp4-ime-community-edition/branch/development)
+
+[![Build history](https://buildstats.info/appveyor/chart/rheagroup/cdp4-ime-community-edition)](https://ci.appveyor.com/project/rheagroup/cdp4-ime-community-edition)
+
 ## SonarQube Status:
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=alert_status)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=RHEAGROUP_CDP4-IME-Community-Edition&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=RHEAGROUP_CDP4-IME-Community-Edition)
