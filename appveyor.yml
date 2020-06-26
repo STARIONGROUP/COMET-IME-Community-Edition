@@ -56,7 +56,7 @@ test_script:
       -log:Error
       -register
       -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools\nunit3-console.exe"
-      -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent"""
+      -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent"" --config=%CONFIGURATION%"
       -returntargetcode
       -hideskipped:All
       -output:"%TEST_COVERAGE%"
