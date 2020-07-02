@@ -1,0 +1,42 @@
+﻿<UserControl
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxrud="http://schemas.devexpress.com/winfx/2008/xaml/reports/userdesigner"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
+    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+    xmlns:localBehaviour="clr-namespace:CDP4Reporting.Behaviours"
+    x:Class="CDP4Reporting.Views.ReportDesigner"
+             mc:Ignorable="d"
+             dx:ThemeManager.ThemeName="{Binding ThemeName}"
+             d:DesignHeight="300" d:DesignWidth="650">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <dxmvvm:Interaction.Behaviors>
+        <behaviours:RibbonCategoryBehavior CategoryName="ReportingCategory" />
+    </dxmvvm:Interaction.Behaviors>
+    <Grid>
+        <dxrud:ReportDesigner x:Name ="reportDesigner" dxb:MergingProperties.ElementMergingBehavior="All">
+            <dxmvvm:Interaction.Behaviors>
+                <localBehaviour:ReportDesignerBehaviour RibbonMergeCategoryName="ReportingCategory" />
+            </dxmvvm:Interaction.Behaviors>
+            <dxrud:ReportDesigner.RibbonCustomizationActions>
+                <dxb:UpdateAction
+                        ElementName="{x:Static dxrud:DefaultBarItemNames.DesignerHomePage}"
+                        PropertyName="Caption"
+                        Value="File" />
+            </dxrud:ReportDesigner.RibbonCustomizationActions>
+            <dxrud:ReportDesignerClassicView/>
+        </dxrud:ReportDesigner>
+    </Grid>
+</UserControl>
+
+
