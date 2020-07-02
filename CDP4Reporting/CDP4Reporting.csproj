@@ -328,7 +328,7 @@
     <Page Include="Views\ReportDesigner.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ReportingRibbon.xaml">
+    <Page Include="Views\ReportDesignerRibbon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

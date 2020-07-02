@@ -32,7 +32,7 @@ namespace CDP4Reporting.Views
         public ReportingRibbon()
         {
             this.InitializeComponent();
-            this.DataContext = new ReportingRibbonViewModel();
+            this.DataContext = new ReportDesignerRibbonViewModel();
         }
     }
 }
