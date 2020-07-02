@@ -158,7 +158,6 @@ namespace CDP4RelationshipMatrix
             catch (PluginSettingsException pluginSettingsException)
             {
                 var relationshipMatrixPluginSettings = new RelationshipMatrixPluginSettings(true);
-
                 this.PluginSettingService.Write(relationshipMatrixPluginSettings);
                 
                 logger.Error(pluginSettingsException);
