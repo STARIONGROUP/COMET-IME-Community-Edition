@@ -73,6 +73,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Rules\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
 </Project>
