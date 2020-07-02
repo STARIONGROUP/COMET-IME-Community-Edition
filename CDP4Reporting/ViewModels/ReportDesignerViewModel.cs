@@ -47,8 +47,6 @@ namespace CDP4Reporting.ViewModels
         {
             this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
-
-            this.AddSubscriptions();
         }
 
         /// <summary>
@@ -57,13 +55,6 @@ namespace CDP4Reporting.ViewModels
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-        }
-
-        /// <summary>
-        /// Add the necessary subscriptions for this view model.
-        /// </summary>
-        private void AddSubscriptions()
-        {
         }
 
         /// <summary>

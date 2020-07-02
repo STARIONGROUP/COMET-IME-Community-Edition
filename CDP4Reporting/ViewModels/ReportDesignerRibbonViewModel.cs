@@ -22,18 +22,18 @@ namespace CDP4Reporting.ViewModels
     /// <summary>
     /// The view-model for the <see cref="ReportingRibbon"/> view
     /// </summary>
-    public class ReportingRibbonViewModel : RibbonButtonIterationDependentViewModel
+    public class ReportDesignerRibbonViewModel : RibbonButtonIterationDependentViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReportingRibbonViewModel"/> class.
+        /// Initializes a new instance of the <see cref="ReportDesignerRibbonViewModel"/> class.
         /// </summary>
-        public ReportingRibbonViewModel()
+        public ReportDesignerRibbonViewModel()
             : base(InstantiatePanelViewModel)
         {
         }
 
         /// <summary>
-        /// Returns an instance of <see cref="ReportingRibbonViewModel"/>
+        /// Returns an instance of <see cref="ReportDesignerRibbonViewModel"/>
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration"/></param>
         /// <param name="session">The <see cref="ISession"/></param>
@@ -43,7 +43,7 @@ namespace CDP4Reporting.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        /// <returns>An instance of <see cref="ReportingRibbonViewModel"/></returns>
+        /// <returns>An instance of <see cref="ReportDesignerRibbonViewModel"/></returns>
         public static ReportDesignerViewModel InstantiatePanelViewModel(Iteration iteration, ISession session,
             IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
