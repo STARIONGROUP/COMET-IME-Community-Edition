@@ -38,6 +38,9 @@ namespace CDP4Scripting.Tests
         /// </summary>
         public static Application application;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="DispatcherTestFixture"/> class
+        /// </summary>
         protected DispatcherTestFixture()
         {
             application = application ?? new Application();
