@@ -105,7 +105,7 @@ namespace CDP4Reporting
         /// </summary>
         private void RegisterRegions()
         {
-            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(ReportingRibbon));
+            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(ReportingDesignerRibbon));
             this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(ReportingRibbonPageCategory));
         }
     }

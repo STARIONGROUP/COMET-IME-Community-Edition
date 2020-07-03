@@ -20,7 +20,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Composition;
 
     /// <summary>
-    /// The view-model for the <see cref="ReportingRibbon"/> view
+    /// The view-model for the <see cref="ReportingDesignerRibbon"/> view
     /// </summary>
     public class ReportDesignerRibbonViewModel : RibbonButtonIterationDependentViewModel
     {

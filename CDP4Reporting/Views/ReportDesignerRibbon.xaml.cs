@@ -15,12 +15,12 @@ namespace CDP4Reporting.Views
     /// <summary>
     /// Interaction logic for ObjectBrowserRibbon
     /// </summary>
-    [Export(typeof(ReportingRibbon))]
+    [Export(typeof(ReportingDesignerRibbon))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public partial class ReportingRibbon : ExtendedRibbonPageGroup, IView
+    public partial class ReportingDesignerRibbon : ExtendedRibbonPageGroup, IView
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReportingRibbon"/> class.
+        /// Initializes a new instance of the <see cref="ReportingDesignerRibbon"/> class.
         /// </summary>
         /// <param name="panelNavigationService">
         /// The (MEF) injected <see cref="IPanelNavigationService"/> that is used to navigate to panels/browsers
@@ -29,7 +29,7 @@ namespace CDP4Reporting.Views
         /// The (MEF) injected <see cref="IDialogNavigationService"/> that is used to navigate to generic dialogs
         /// </param>
         [ImportingConstructor]
-        public ReportingRibbon()
+        public ReportingDesignerRibbon()
         {
             this.InitializeComponent();
             this.DataContext = new ReportDesignerRibbonViewModel();
