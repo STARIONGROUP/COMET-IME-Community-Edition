@@ -35,16 +35,16 @@ namespace CDP4Reporting
     using Microsoft.Practices.Prism.Regions;
 
     /// <summary>
-    /// The <see cref="IModule"/> implementation for the <see cref="CDP4ReportingModule"/> Component
+    /// The <see cref="IModule"/> implementation for the <see cref="Cdp4ReportingModule"/> Component
     /// </summary>
     /// <summary>
-    /// The <see cref="IModule"/> implementation for the <see cref="CDP4ReportingModule"/> Component
+    /// The <see cref="IModule"/> implementation for the <see cref="Cdp4ReportingModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(CDP4ReportingModule), "Reporting Module")]
-    public class CDP4ReportingModule : IModule
+    [ModuleExportName(typeof(Cdp4ReportingModule), "Reporting Module")]
+    public class Cdp4ReportingModule : IModule
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CDP4ReportingModule"/> class.
+        /// Initializes a new instance of the <see cref="Cdp4ReportingModule"/> class.
         /// </summary>
         /// <param name="regionManager">
         /// The (MEF injected) instance of <see cref="IRegionManager"/>
@@ -58,7 +58,7 @@ namespace CDP4Reporting
         /// <param name="thingDialogNavigationService">The MEF injected instance of <see cref="IThingDialogNavigationService"/></param>
         /// <param name="dialogNavigationService">The MEF injected instance of <see cref="IDialogNavigationService"/></param>
         [ImportingConstructor]
-        public CDP4ReportingModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService)
+        public Cdp4ReportingModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService)
         {
             this.RegionManager = regionManager;
             this.RibbonManager = ribbonManager;
@@ -68,27 +68,27 @@ namespace CDP4Reporting
         }
 
         /// <summary>
-        /// Gets the <see cref="IRegionManager"/> that is used by the <see cref="CDP4ReportingModule"/> to register the regions
+        /// Gets the <see cref="IRegionManager"/> that is used by the <see cref="Cdp4ReportingModule"/> to register the regions
         /// </summary>
         internal IRegionManager RegionManager { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="IFluentRibbonManager"/> that is used by the <see cref="CDP4ReportingModule"/> to register Office Fluent Ribbon XML
+        /// Gets the <see cref="IFluentRibbonManager"/> that is used by the <see cref="Cdp4ReportingModule"/> to register Office Fluent Ribbon XML
         /// </summary>
         internal IFluentRibbonManager RibbonManager { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="IPanelNavigationService"/> that is used by the <see cref="CDP4ReportingModule"/> to support panel navigation
+        /// Gets the <see cref="IPanelNavigationService"/> that is used by the <see cref="Cdp4ReportingModule"/> to support panel navigation
         /// </summary>
         internal IPanelNavigationService PanelNavigationService { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="IThingDialogNavigationService"/> that is used by the <see cref="CDP4ReportingModule"/> to support <see cref="Thing"/> dialog navigation
+        /// Gets the <see cref="IThingDialogNavigationService"/> that is used by the <see cref="Cdp4ReportingModule"/> to support <see cref="Thing"/> dialog navigation
         /// </summary>
         internal IThingDialogNavigationService ThingDialogNavigationService { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="IDialogNavigationService"/> that is used by the <see cref="CDP4ReportingModule"/> to support generic dialog navigation.
+        /// Gets the <see cref="IDialogNavigationService"/> that is used by the <see cref="Cdp4ReportingModule"/> to support generic dialog navigation.
         /// </summary>
         internal IDialogNavigationService DialogNavigationService { get; private set; }
 

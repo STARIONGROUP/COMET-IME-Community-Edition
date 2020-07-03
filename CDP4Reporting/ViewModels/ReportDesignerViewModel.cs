@@ -48,21 +48,5 @@ namespace CDP4Reporting.ViewModels
             this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
             this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
         }
-
-        /// <summary>
-        /// Initialize the <see cref="ICommand"/>s
-        /// </summary>
-        protected override void InitializeCommands()
-        {
-            base.InitializeCommands();
-        }
-
-        /// <summary>
-        /// Loads the <see cref="Thing"/>s from the cache when the browser is instantiated.
-        /// </summary>
-        protected override void Initialize()
-        {
-            base.Initialize();
-        }
     }
 }
