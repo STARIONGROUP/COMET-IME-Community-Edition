@@ -45,10 +45,17 @@ namespace CDP4IMEInstaller.Tests
     {
         private KnownAssembliesClassDrop knownAssembliesClassDrop;
         private string devExpressVersion = "v20.1";
+        private string currentConfiguration;
 
         [SetUp]
         public void Setup()
         {
+#if DEBUG
+            this.currentConfiguration = "Debug";
+#else
+            this.currentConfiguration = "Release";
+#endif
+
             Template.NamingConvention = new CSharpNamingConvention();
 
             Template.RegisterSafeType(typeof(KnownAssembliesClassDrop), new[]
@@ -101,7 +108,7 @@ namespace CDP4IMEInstaller.Tests
                 Directory.GetFiles(
                     myProjectLocation.Parent?.FullName, 
                     "DevExpress*.dll", SearchOption.AllDirectories)
-                    .Where(x => x.Contains($"{separator}bin{separator}Debug{separator}{frameworkVersion}{separator}DevExpress")).ToList();
+                    .Where(x => x.Contains($"{separator}bin{separator}{this.currentConfiguration}{separator}{frameworkVersion}{separator}DevExpress")).ToList();
 
             var imeAssemblies = allAssemblies.Where(x => x.Contains($"CDP4IME{separator}bin")).ToList();
             var otherAssemblies = allAssemblies.Where(x => !x.Contains($"CDP4IME{separator}bin")).ToList();
@@ -119,13 +126,13 @@ namespace CDP4IMEInstaller.Tests
             var inImeButNotInOther = imeAssemblies.Select(Path.GetFileName).Where(x => !otherAssemblies.Select(Path.GetFileName).Contains(x));
 
             CollectionAssert.IsEmpty(inOtherButNotInIme,
-                $"There are DevExpress files found in projects that are not found in the IME project's Debug folder: {string.Join(", ", inOtherButNotInIme)} ");
+                $"There are DevExpress files found in projects that are not found in the IME project's {this.currentConfiguration} folder: {string.Join(", ", inOtherButNotInIme)} ");
 
             CollectionAssert.IsEmpty(inImeButNotInKnownAssemblies, 
-                $"There are DevExpress files in the IME project's Debug folder that are not known to the installer project: {string.Join(", ", inImeButNotInKnownAssemblies)}");
+                $"There are DevExpress files in the IME project's {this.currentConfiguration} folder that are not known to the installer project: {string.Join(", ", inImeButNotInKnownAssemblies)}");
 
             CollectionAssert.IsEmpty(inKnownAssembliesButNotInIme,
-                $"There are DevExpress files that are known to the installer project, but are not found in the IME project's Debug folder (rebuild all needed?): {string.Join(", ", inKnownAssembliesButNotInIme)}");
+                $"There are DevExpress files that are known to the installer project, but are not found in the IME project's {this.currentConfiguration} folder (rebuild all needed?): {string.Join(", ", inKnownAssembliesButNotInIme)}");
         }
 
         [Test]

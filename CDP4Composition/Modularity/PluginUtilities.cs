@@ -28,11 +28,8 @@ namespace CDP4Composition.Modularity
 {
     using System.Collections.Generic;
     using System.IO;
-    using System.Reflection;
 
     using CDP4Composition.Utilities;
-
-    using DevExpress.Mvvm;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -55,14 +52,24 @@ namespace CDP4Composition.Modularity
         public static IEnumerable<Manifest> GetPluginManifests()
         {
             var manifests = new List<Manifest>();
-            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
 
-            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
+#if DEBUG
+            var currentConfiguration = "Debug";
+#else
+            var currentConfiguration = "Release";
+#endif
+
+            var directoryInfo = PluginDirectoryExists(out var specificPluginFolderExists);
 
             if (directoryInfo.Exists)
             {
                 foreach (var manifest in directoryInfo.EnumerateFiles("*.plugin.manifest", SearchOption.AllDirectories))
                 {
+                    if (!specificPluginFolderExists && (!manifest.Directory?.FullName.Contains($"{Path.DirectorySeparatorChar}{currentConfiguration}{Path.DirectorySeparatorChar}") ?? true))
+                    {
+                        continue;
+                    }
+
                     manifests.Add(JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(manifest.FullName)));
                 }
             }
@@ -72,6 +79,26 @@ namespace CDP4Composition.Modularity
             }
 
             return manifests;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="DirectoryInfo"/> object tha contains the root folder where to search for .manifest files
+        /// </summary>
+        /// <param name="specificPluginFolderExists">States if a specific plugin directory exists</param>
+        /// <returns>The <see cref="DirectoryInfo"/></returns>
+        public static DirectoryInfo PluginDirectoryExists(out bool specificPluginFolderExists)
+        {
+            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
+
+            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
+            specificPluginFolderExists = directoryInfo.Exists;
+
+            if (!specificPluginFolderExists)
+            {
+                directoryInfo = new DirectoryInfo(currentPath);
+            }
+
+            return directoryInfo;
         }
     }
 }

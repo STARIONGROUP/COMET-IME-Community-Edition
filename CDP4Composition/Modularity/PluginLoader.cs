@@ -64,9 +64,8 @@ namespace CDP4Composition.Modularity
         public PluginLoader()
         {
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
-            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
 
-            var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginUtilities.PluginDirectoryName));
+            var directoryInfo = PluginUtilities.PluginDirectoryExists(out _);
 
             if (directoryInfo.Exists)
             {
