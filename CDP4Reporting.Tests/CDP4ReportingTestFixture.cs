@@ -38,7 +38,7 @@ namespace CDP4Reporting.Tests
         [Test]
         public void VerifyThatServicesAreSetByConstructor()
         {
-            var module = new CDP4ReportingModule(this.regionManager.Object, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object);
+            var module = new Cdp4ReportingModule(this.regionManager.Object, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object);
 
             Assert.AreEqual(this.regionManager.Object, module.RegionManager);
             Assert.AreEqual(this.fluentRibbonManager.Object, module.RibbonManager);

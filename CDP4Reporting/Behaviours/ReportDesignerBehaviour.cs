@@ -137,44 +137,49 @@ namespace CDP4Reporting.Behaviours
         /// <param name="reportDesignerControl">The diagram design control</param>
         private void MergeRibbonToCategory(ReportDesigner reportDesignerControl)
         {
+            // extract the report ribbon
             var reportRibbon = LayoutTreeHelper.GetVisualChildren(reportDesignerControl).OfType<RibbonControl>().FirstOrDefault();
 
-            if (reportRibbon != null)
+            if (reportRibbon == null)
             {
-                // extract the main ribbon
-                var mainShell = LayoutTreeHelper.GetVisualParents(reportDesignerControl).OfType<DXRibbonWindow>().FirstOrDefault();
+                return;
+            }
 
-                if (mainShell != null || this.parentRibbon != null)
+            // extract the main ribbon
+            var mainShell = LayoutTreeHelper.GetVisualParents(reportDesignerControl).OfType<DXRibbonWindow>().FirstOrDefault();
+
+            if (mainShell == null && this.parentRibbon == null)
+            {
+                return;
+            }
+
+            if (mainShell != null)
+            {
+                this.parentRibbon = mainShell.ActualRibbon;
+            }
+
+            // get the category to merge controls into
+            var category = this.parentRibbon.ActualCategories.FirstOrDefault(x => x.Name == this.RibbonMergeCategoryName);
+
+            if (category == null)
+            {
+                return;
+            }
+
+            // only merge if the category is visible, its visibility is controlled by RibbonCategoryBehavior
+            if (category.IsVisible)
+            {
+                this.mergedCategories = new List<RibbonPageCategoryBase>();
+
+                foreach (var reportingRibbonActualCategory in reportRibbon.ActualCategories)
                 {
-                    if (mainShell != null)
-                    {
-                        this.parentRibbon = mainShell.ActualRibbon;
-                    }
-
-                    // get the category to merge controls into
-                    var category = this.parentRibbon.ActualCategories.FirstOrDefault(x => x.Name == this.RibbonMergeCategoryName);
-
-                    if (category == null)
-                    {
-                        return;
-                    }
-
-                    // only merge if the category is visible, its visibility is controlled by RibbonCategoryBehavior
-                    if (category.IsVisible)
-                    {
-                        this.mergedCategories = new List<RibbonPageCategoryBase>();
-
-                        foreach (var reportingRibbonActualCategory in reportRibbon.ActualCategories)
-                        {
-                            this.mergedCategories.Add(reportingRibbonActualCategory);
-                            ((IRibbonMergingSupport)category).Merge(reportingRibbonActualCategory);
-                        }
-                    }
-
-                    // store category for cleanup
-                    this.mergeCategory = category;
+                    this.mergedCategories.Add(reportingRibbonActualCategory);
+                    ((IRibbonMergingSupport)category).Merge(reportingRibbonActualCategory);
                 }
             }
+
+            // store category for cleanup
+            this.mergeCategory = category;
         }
 
         /// <summary>
