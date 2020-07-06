@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="CDP4ReportingTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="ReportingRibbonViewModelTextFixture.cs" company="RHEA System S.A.">
 //   Copyright (c) 2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
