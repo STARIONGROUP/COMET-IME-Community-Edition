@@ -126,6 +126,7 @@ namespace CDP4Reporting.Tests.ViewModels
                     this.pluginSettingsService.Object));
         }
 
+        [Test]
         public void VerifyThatInstantiatePanelViewModelNotReturnsExpectedViewModelWhenModelIsNull()
         {
             this.iteration.Container = null;
@@ -139,6 +140,7 @@ namespace CDP4Reporting.Tests.ViewModels
                     this.pluginSettingsService.Object));
         }
 
+        [TearDown]
         public void TearDown()
         {
             CDPMessageBus.Current.ClearSubscriptions();
