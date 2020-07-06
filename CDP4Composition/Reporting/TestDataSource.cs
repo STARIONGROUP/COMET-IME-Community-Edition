@@ -9,8 +9,6 @@ namespace CDP4Composition.Reporting
         [ParameterTypeShortName("m")]
         public class MassParameter : ReportingDataSourceParameter
         {
-            public MassParameter(ReportingDataSourceRow row) : base(row) { }
-
             public double? ParseValue()
             {
                 if (double.TryParse(this.Value, out var result))
@@ -25,8 +23,6 @@ namespace CDP4Composition.Reporting
         [ParameterTypeShortName("total_mass")]
         public class TotalMassParameter : ReportingDataSourceParameter
         {
-            public TotalMassParameter(ReportingDataSourceRow row) : base(row) { }
-
             public double? ParseValue()
             {
                 var children = this.GetChildren<TotalMassParameter>();

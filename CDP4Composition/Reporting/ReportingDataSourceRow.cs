@@ -1,8 +1,10 @@
 ﻿using CDP4Common.EngineeringModelData;
 using CDP4Common.SiteDirectoryData;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace CDP4Composition.Reporting
 {
@@ -45,8 +47,13 @@ namespace CDP4Composition.Reporting
             foreach (var type in parameterStore.DeclaredParameters.Values)
             {
                 var parameter = type
-                    .GetConstructor(new[] { typeof(ReportingDataSourceRow) })
-                    .Invoke(new object[] { this }) as ReportingDataSourceParameter;
+                    .GetConstructor(Type.EmptyTypes)
+                    .Invoke(new object[] { }) as ReportingDataSourceParameter;
+
+                // set parameter row from here so no constructor declaration is needed
+                typeof(ReportingDataSourceParameter)
+                    .GetField("row", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .SetValue(parameter, this);
 
                 this.reportedParameters.Add(parameter);
 

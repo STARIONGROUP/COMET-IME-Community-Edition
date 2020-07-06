@@ -18,26 +18,16 @@ namespace CDP4Composition.Reporting
             return attr as ParameterTypeShortNameAttribute;
         }
 
+        // set with reflection to avoid the user-declared constructor having to see it
         private readonly ReportingDataSourceRow row;
 
         internal readonly string ShortName;
 
-        internal string Value;
+        internal string Value { get; private set; }
 
-        /// <summary>
-        /// Constructors are called auto-magically by the row, this should never be called directly
-        /// </summary>
         public ReportingDataSourceParameter()
         {
-            throw new NotImplementedException();
-        }
-
-        public ReportingDataSourceParameter(ReportingDataSourceRow row)
-        {
-            this.row = row;
-
-            this.ShortName = ReportingDataSourceParameter
-                .GetParameterAttribute(this.GetType()).ShortName;
+            this.ShortName = GetParameterAttribute(this.GetType()).ShortName;
         }
 
         internal void Initialize(ContainerList<ParameterValueSet> valueSet)
