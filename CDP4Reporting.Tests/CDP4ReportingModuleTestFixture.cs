@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="CDP4ReportingTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="CDP4ReportingModuleTestFixture.cs" company="RHEA System S.A.">
 //   Copyright (c) 2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
@@ -15,13 +15,14 @@ namespace CDP4Reporting.Tests
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
+    using System;
     using System.Reactive.Concurrency;
 
     /// <summary>
     /// Suite of tests for the <see cref="CDP4Reporting"/>
     /// </summary>
     [TestFixture]
-    public class CDP4ReportingTestFixture
+    public class CDP4ReportingModuleTestFixture
     {
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IRegionManager> regionManager;
@@ -29,7 +30,6 @@ namespace CDP4Reporting.Tests
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
-        private Mock<IRegionViewRegistry> region;
 
         [SetUp]
         public void SetUp()
@@ -40,7 +40,6 @@ namespace CDP4Reporting.Tests
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             this.regionManager = new Mock<IRegionManager>();
-            this.region = new Mock<IRegionViewRegistry>();
             this.serviceLocator.Setup(x => x.GetInstance<IRegionManager>()).Returns(this.regionManager.Object);
 
             this.fluentRibbonManager = new Mock<IFluentRibbonManager>();
@@ -62,9 +61,6 @@ namespace CDP4Reporting.Tests
         public void VerifyThatServicesAreSetByConstructor()
         {
             var module = new Cdp4ReportingModule(this.regionManager.Object, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object);
-
-            this.region.Setup(r => r.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(ReportDesignerRibbon)));
-            this.region.Setup(r => r.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(ReportingRibbonPageCategory)));
 
             Assert.AreEqual(this.regionManager.Object, module.RegionManager);
             Assert.AreEqual(this.fluentRibbonManager.Object, module.RibbonManager);
