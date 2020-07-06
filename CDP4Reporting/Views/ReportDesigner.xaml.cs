@@ -2,6 +2,7 @@
 {
     using System;
     using System.CodeDom.Compiler;
+    using System.ComponentModel.Composition;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
@@ -15,6 +16,7 @@
     /// Interaction logic for ReportDesigner.xaml
     /// </summary>
     [PanelViewExport(RegionNames.EditorPanel)]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class ReportDesigner : UserControl, IPanelView
     {
         /// <summary>
