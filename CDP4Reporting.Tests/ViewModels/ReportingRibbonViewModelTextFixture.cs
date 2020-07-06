@@ -112,8 +112,36 @@ namespace CDP4Reporting.Tests.ViewModels
             Assert.IsInstanceOf<ReportDesignerViewModel>(viewmodel);
         }
 
+        [Test]
+        public void VerifyThatInstantiatePanelViewModelNotReturnsExpectedViewModelWhenActiveParticipantIsNull()
+        {
+            (this.iteration.Container as EngineeringModel).EngineeringModelSetup.Participant.Clear();
+            Assert.Throws<InvalidOperationException>(() =>
+                ReportDesignerRibbonViewModel.InstantiatePanelViewModel(
+                    this.iteration,
+                    this.session.Object,
+                    this.thingDialogNavigationService.Object,
+                    this.panelNavigationService.Object,
+                    this.dialogNavigationService.Object,
+                    this.pluginSettingsService.Object));
+        }
+
+        public void VerifyThatInstantiatePanelViewModelNotReturnsExpectedViewModelWhenModelIsNull()
+        {
+            this.iteration.Container = null;
+            Assert.Throws<InvalidOperationException>(() =>
+                ReportDesignerRibbonViewModel.InstantiatePanelViewModel(
+                    this.iteration,
+                    this.session.Object,
+                    this.thingDialogNavigationService.Object,
+                    this.panelNavigationService.Object,
+                    this.dialogNavigationService.Object,
+                    this.pluginSettingsService.Object));
+        }
+
         public void TearDown()
         {
+            CDPMessageBus.Current.ClearSubscriptions();
         }
     }
 }
