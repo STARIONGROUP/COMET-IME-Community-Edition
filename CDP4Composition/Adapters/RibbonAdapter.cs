@@ -28,6 +28,7 @@ namespace CDP4Composition.Adapters
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using CDP4Composition.Ribbon;
     using DevExpress.Xpf.Ribbon;
@@ -38,6 +39,7 @@ namespace CDP4Composition.Adapters
     /// A region adaptor for the <see cref="RibbonControl"/>
     /// </summary>
     [Export(typeof(RibbonAdapter)), PartCreationPolicy(CreationPolicy.NonShared)]
+    [ExcludeFromCodeCoverage]
     public class RibbonAdapter : RegionAdapterBase<RibbonControl>
     {
         /// <summary>
