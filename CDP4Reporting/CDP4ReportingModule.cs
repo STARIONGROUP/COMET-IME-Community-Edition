@@ -26,6 +26,8 @@
 namespace CDP4Reporting
 {
     using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
+
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
@@ -95,6 +97,7 @@ namespace CDP4Reporting
         /// <summary>
         /// Initialize the Module
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public void Initialize()
         {
             this.RegisterRegions();
@@ -103,6 +106,7 @@ namespace CDP4Reporting
         /// <summary>
         /// Register the <see cref="RibbonPart"/> implementations of the current Module
         /// </summary>
+        [ExcludeFromCodeCoverage]
         private void RegisterRegions()
         {
             this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(ReportDesignerRibbon));
