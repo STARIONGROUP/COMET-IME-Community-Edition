@@ -1,14 +1,15 @@
-﻿using CDP4Dal;
+﻿// -------------------------------------------------------------------------------------------------
+// <copyright file="ReportDesignerBehaviourTextFixture.cs" company="RHEA System S.A.">
+//   Copyright (c) 2020 RHEA System S.A.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
+
+using CDP4Dal;
 using CDP4Reporting.Behaviours;
 using NUnit.Framework;
 using ReactiveUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Concurrency;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace CDP4Reporting.Tests.Behaviour
 {

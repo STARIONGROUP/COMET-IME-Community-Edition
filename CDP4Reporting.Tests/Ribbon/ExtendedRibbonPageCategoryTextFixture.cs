@@ -1,4 +1,10 @@
-﻿using CDP4Dal;
+﻿// -------------------------------------------------------------------------------------------------
+// <copyright file="ExtendedRibbonPageCategoryTextFixture.cs" company="RHEA System S.A.">
+//   Copyright (c) 2020 RHEA System S.A.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
+
+using CDP4Dal;
 using NUnit.Framework;
 using ReactiveUI;
 using System.Reactive.Concurrency;
