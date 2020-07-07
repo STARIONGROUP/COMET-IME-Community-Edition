@@ -25,6 +25,7 @@
 
 namespace CDP4Composition.Mvvm.Behaviours
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Windows;
 
@@ -47,8 +48,20 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// </summary>
         public RibbonCategoryBehavior()
         {
+            this.RegisterRegions();
+        }
+
+        /// <summary>
+        /// Register the regions
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void RegisterRegions()
+        {
             this.RegionManager = ServiceLocator.Current.GetInstance<IRegionManager>();
-            this.RibbonRegion = this.RegionManager.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);
+            if (this.RegionManager.Regions != null)
+            {
+                this.RibbonRegion = this.RegionManager.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);
+            }
         }
 
         /// <summary>
@@ -80,6 +93,7 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// <summary>
         /// The on attached event handler
         /// </summary>
+        [ExcludeFromCodeCoverage]
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -89,6 +103,7 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// <summary>
         /// Unsubscribes eventhandlers when detaching.
         /// </summary>
+        [ExcludeFromCodeCoverage]
         protected override void OnDetaching()
         {
             this.AssociatedObject.IsVisibleChanged -= this.AssociatedObject_IsVisibleChanged;
@@ -101,6 +116,7 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The arguments.</param>
+        [ExcludeFromCodeCoverage]
         private void AssociatedObject_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var category = this.RibbonRegion.Views.OfType<ExtendedRibbonPageCategory>().FirstOrDefault(view => view.Name == this.CategoryName);
