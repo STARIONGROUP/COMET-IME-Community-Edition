@@ -33,6 +33,7 @@ namespace CDP4Reporting.Behaviours
     using DevExpress.Mvvm.UI;
     using DevExpress.Mvvm.UI.Interactivity;
     using DevExpress.Xpf.Reports.UserDesigner;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// The purpose of the <see cref="ReportDesignerBehaviour"/> is to handle events from
@@ -82,6 +83,7 @@ namespace CDP4Reporting.Behaviours
         /// <summary>
         /// The on attached event handler
         /// </summary>
+        [ExcludeFromCodeCoverage]
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -94,6 +96,7 @@ namespace CDP4Reporting.Behaviours
         /// </summary>
         /// <param name="sender">The sender report designer control.</param>
         /// <param name="e">Event arguments.</param>
+        [ExcludeFromCodeCoverage]
         private void Unloaded(object sender, RoutedEventArgs e)
         {
             if (sender is ReportDesigner && this.mergeCategory != null)
@@ -108,6 +111,7 @@ namespace CDP4Reporting.Behaviours
         /// </summary>
         /// <param name="sender">The sender report designer control.</param>
         /// <param name="e">Event arguments.</param>
+        [ExcludeFromCodeCoverage]
         private void Loaded(object sender, RoutedEventArgs e)
         {
             if (sender is ReportDesigner designControl && !string.IsNullOrWhiteSpace(this.RibbonMergeCategoryName))
@@ -135,6 +139,7 @@ namespace CDP4Reporting.Behaviours
         /// Merges the reporting ribbon into a spcified RibbonCategory
         /// </summary>
         /// <param name="reportDesignerControl">The diagram design control</param>
+        [ExcludeFromCodeCoverage]
         private void MergeRibbonToCategory(ReportDesigner reportDesignerControl)
         {
             // extract the report ribbon
@@ -185,6 +190,7 @@ namespace CDP4Reporting.Behaviours
         /// <summary>
         /// Unsubscribes eventhandlers when detaching.
         /// </summary>
+        [ExcludeFromCodeCoverage]
         protected override void OnDetaching()
         {
             this.AssociatedObject.Loaded -= this.Loaded;
