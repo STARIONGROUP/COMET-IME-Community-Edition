@@ -124,6 +124,7 @@ namespace CDP4Reporting.Behaviours
         /// <summary>
         /// Clears the reporting ribbon from a specified RibbonCategory
         /// </summary>
+        [ExcludeFromCodeCoverage]
         private void ClearCategory()
         {
             foreach (var ribbonPageCategoryBase in this.mergedCategories)
