@@ -1,12 +1,12 @@
-﻿using CDP4Common.EngineeringModelData;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-namespace CDP4Composition.Reporting
+﻿namespace CDP4Composition.Reporting
 {
+    using CDP4Common.EngineeringModelData;
+
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
     public class ReportingDataSourceRow
     {
         #region Hierarchy

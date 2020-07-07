@@ -1,10 +1,10 @@
-﻿using CDP4Common.SiteDirectoryData;
-using CDP4Common.EngineeringModelData;
-
-using System.Linq;
-
-namespace CDP4Composition.Reporting
+﻿namespace CDP4Composition.Reporting
 {
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.EngineeringModelData;
+
+    using System.Linq;
+
     public class CategoryHierarchy
     {
         internal class Builder

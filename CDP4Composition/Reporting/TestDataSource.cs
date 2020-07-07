@@ -1,9 +1,9 @@
-﻿using CDP4Common.EngineeringModelData;
-
-using System.Linq;
-
-namespace CDP4Composition.Reporting
+﻿namespace CDP4Composition.Reporting
 {
+    using CDP4Common.EngineeringModelData;
+
+    using System.Linq;
+
     public class TestDataSource : ICDP4ReportingDataSource
     {
         [ParameterTypeShortName("m")]

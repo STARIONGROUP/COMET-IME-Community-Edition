@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-namespace CDP4Composition.Reporting
+﻿namespace CDP4Composition.Reporting
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
     public class ParameterStore
     {
         private static ParameterStore instance;

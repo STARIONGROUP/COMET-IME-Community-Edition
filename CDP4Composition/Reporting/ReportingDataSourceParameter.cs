@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using CDP4Common.EngineeringModelData;
-using CDP4Common.Types;
-
-namespace CDP4Composition.Reporting
+﻿namespace CDP4Composition.Reporting
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.Types;
+
     public class ReportingDataSourceParameter
     {
         public static ParameterTypeShortNameAttribute GetParameterAttribute(Type type)
