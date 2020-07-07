@@ -1,4 +1,5 @@
-﻿using CDP4Reporting.Behaviours;
+﻿using CDP4Dal;
+using CDP4Reporting.Behaviours;
 using NUnit.Framework;
 using ReactiveUI;
 using System;
@@ -37,6 +38,12 @@ namespace CDP4Reporting.Tests.Behaviour
             Assert.IsNull(reportDesignerBehaviour.RibbonMergeCategoryName);
             reportDesignerBehaviour.RibbonMergeCategoryName = "abc";
             Assert.AreEqual(reportDesignerBehaviour.RibbonMergeCategoryName, "abc");
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            CDPMessageBus.Current.ClearSubscriptions();
         }
     }
 }
