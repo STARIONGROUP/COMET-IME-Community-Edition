@@ -1,17 +1,15 @@
-﻿using CDP4Dal;
+﻿// -------------------------------------------------------------------------------------------------
+// <copyright file="RibbonCategoryBehaviorTextFixture.cs" company="RHEA System S.A.">
+//   Copyright (c) 2020 RHEA System S.A.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
+
+using CDP4Dal;
 using NUnit.Framework;
 using ReactiveUI;
 using System.Reactive.Concurrency;
 using System.Threading;
-using CDP4Composition.Ribbon;
 using CDP4Composition.Mvvm.Behaviours;
-using Moq;
-using Microsoft.Practices.ServiceLocation;
-using Microsoft.Practices.Prism.Regions;
-using CDP4Composition.Navigation;
-using System;
-using CDP4Composition;
-using CDP4Reporting.Views;
 
 namespace CDP4Reporting.Tests.Behaviour
 {
