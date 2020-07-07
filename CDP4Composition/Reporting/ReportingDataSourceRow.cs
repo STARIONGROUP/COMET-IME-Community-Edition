@@ -1,5 +1,4 @@
 ﻿using CDP4Common.EngineeringModelData;
-using CDP4Common.SiteDirectoryData;
 
 using System;
 using System.Collections.Generic;
@@ -42,9 +41,7 @@ namespace CDP4Composition.Reporting
 
             this.elementBase = elementBase;
 
-            var parameterStore = ParameterStore.GetInstance(elementBase.TopContainer);
-
-            foreach (var type in parameterStore.DeclaredParameters.Values)
+            foreach (var type in ParameterStore.GetInstance().DeclaredParameters.Values)
             {
                 var parameter = type
                     .GetConstructor(Type.EmptyTypes)
@@ -55,12 +52,7 @@ namespace CDP4Composition.Reporting
                     .GetField("row", BindingFlags.NonPublic | BindingFlags.Instance)
                     .SetValue(parameter, this);
 
-                this.reportedParameters.Add(parameter);
-
-                if (parameterStore.ParameterTypes.TryGetValue(parameter.ShortName, out var parameterType))
-                {
-                    this.InitializeParameter(parameter, parameterType);
-                }
+                this.InitializeParameter(parameter);
             }
 
             foreach (var childUsage in this.ElementDefinition.ContainedElement)
@@ -69,10 +61,12 @@ namespace CDP4Composition.Reporting
             }
         }
 
-        private void InitializeParameter(ReportingDataSourceParameter reportedParameter, ParameterType parameterType)
+        private void InitializeParameter(ReportingDataSourceParameter reportedParameter)
         {
+            this.reportedParameters.Add(reportedParameter);
+
             var parameter = this.ElementDefinition.Parameter
-                .SingleOrDefault(x => x.ParameterType == parameterType);
+                .SingleOrDefault(x => x.ParameterType.ShortName == reportedParameter.ShortName);
 
             if (parameter != null)
             {
@@ -80,7 +74,7 @@ namespace CDP4Composition.Reporting
             }
 
             var parameterOverride = this.ElementUsage?.ParameterOverride
-                .SingleOrDefault(x => x.Parameter.ParameterType == parameterType);
+                .SingleOrDefault(x => x.Parameter.ParameterType.ShortName == reportedParameter.ShortName);
 
             if (parameterOverride != null)
             {
