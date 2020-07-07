@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ContextMenuExtension.cs" company="RHEA System S.A.">
+// <copyright file="NestedElementExtension.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -24,36 +24,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Grapher.Utilities
 {
+    using System.CodeDom;
     using System.Linq;
-    using System.Windows.Controls;
 
-    using CDP4Composition.Mvvm;
-
-    using ReactiveUI;
+    using CDP4Common.EngineeringModelData;
 
     /// <summary>
-    /// Provides helper for <see cref="ContextMenuItemViewModel"/>
+    /// Provides extensions for <see cref="NestedElement"/>
     /// </summary>
-    public static class ContextMenuExtension
+    public static class NestedElementExtension
     {
         /// <summary>
-        /// transphorm a <see cref="ContextMenuItemViewModel"/> to a <see cref="ContextMenu"/>
+        /// Gets the associated <see cref="ElementUsage"/> of the provided nestedElement
         /// </summary>
-        /// <param name="menuItems"></param>
-        /// <returns></returns>
-        public static ContextMenu ToWindowsContextMenu(this ReactiveList<ContextMenuItemViewModel> menuItems)
+        /// <param name="nestedElement">the nested element to query on</param>
+        /// <returns>An <see cref="ElementUsage"/> instance</returns>
+        public static ElementUsage GetElementUsage(this NestedElement nestedElement)
         {
-            var contextMenu = new  ContextMenu();
-
-            foreach (var item in menuItems)
-            {
-                contextMenu.Items.Add(item);
-            }
-
-            return contextMenu;
+            return nestedElement.ElementUsage.Any() ?  nestedElement.ElementUsage.LastOrDefault() : null;
         }
     }
 }

@@ -48,5 +48,10 @@ namespace CDP4Grapher.Behaviors
         /// </summary>
         /// <param name="format">the format to export the diagram to</param>
         void ExportGraph(DiagramExportFormat format);
+
+        /// <summary>
+        /// Delete all connectors on the <see cref="DiagramControl"/>
+        /// </summary>
+        void ClearConnectors();
     }
 }

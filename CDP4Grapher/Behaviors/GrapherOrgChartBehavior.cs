@@ -40,6 +40,7 @@ namespace CDP4Grapher.Behaviors
     using CDP4Grapher.ViewModels;
 
     using DevExpress.Diagram.Core;
+    using DevExpress.Diagram.Core.Layout;
     using DevExpress.Mvvm.Native;
     using DevExpress.Xpf.Diagram;
 
@@ -69,13 +70,23 @@ namespace CDP4Grapher.Behaviors
         {
             base.OnAttached();
 
-            this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
-           
-            this.CustomLayoutItems += this.OnCustomLayoutItems;
-
-            this.AssociatedObject.ItemsChanged += this.ItemsChanged;
-
             this.AssociatedObject.AllowApplyAutomaticLayout = true;
+            this.AssociatedObject.AllowApplyAutomaticLayoutForSubordinates = true;
+
+            this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
+            this.CustomLayoutItems += this.OnCustomLayoutItems;
+            this.AssociatedObject.ItemsChanged += this.ItemsChanged;
+            this.AssociatedObject.Loaded += this.Loaded;
+        }
+
+        /// <summary>
+        /// Fires when the canvas is ready for interaction. It is uses to apply the auto layout
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Loaded(object sender, RoutedEventArgs e)
+        {
+            this.ApplySpecifiedAutoLayout();
         }
 
         /// <summary>
@@ -83,8 +94,10 @@ namespace CDP4Grapher.Behaviors
         /// </summary>
         public void ApplySpecifiedAutoLayout()
         {
-            this.AssociatedObject.ApplyMindMapTreeLayout(OrientationKind.Vertical);
-            this.AssociatedObject.ApplyMindMapTreeLayoutForSubordinates(this.AssociatedObject.Items.OfType<DiagramContentItem>());
+            //this.AssociatedObject.ApplyTreeLayout(DevExpress.Diagram.Core.Layout.LayoutDirection.LeftToRight, this.AssociatedObject.Items);
+
+            this.AssociatedObject.ApplySugiyamaLayout(Direction.Right);
+            
         }
 
         private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
@@ -178,7 +191,7 @@ namespace CDP4Grapher.Behaviors
                     CanEdit = false,
                     CanDelete = false,
                     CanDragBeginPoint = false,
-                    CanDragEndPoint = false,
+                    CanDragEndPoint = false
                 });
             }
         }
@@ -196,7 +209,7 @@ namespace CDP4Grapher.Behaviors
             if (thing.ElementUsage.Any())
             {
                 theThingElementUsageParent = thing.ElementUsage.Count < 2 ? thing.ElementUsage.Last().Container as ElementDefinition : thing.ElementUsage[thing.ElementUsage.Count - 2].ElementDefinition;
-                result = AssociatedObject.Items.OfType<DiagramContentItem>().FirstOrDefault(e => GetShortName(e) == theThingElementUsageParent?.ShortName);
+                result = this.AssociatedObject.Items.OfType<DiagramContentItem>().FirstOrDefault(e => GetShortName(e) == theThingElementUsageParent?.ShortName);
             }
 
             return result;
@@ -231,6 +244,14 @@ namespace CDP4Grapher.Behaviors
                 using var fileStream = dialog.OpenFile();
                 this.AssociatedObject.ExportDiagram(fileStream, format, 300, 0.5);
             }
+        }
+
+        /// <summary>
+        /// Delete all connectors on the <see cref="DiagramControl"/>
+        /// </summary>
+        public void ClearConnectors()
+        {
+            //do shit
         }
     }
 }

@@ -57,6 +57,7 @@ namespace CDP4Grapher.ViewModels
 
     using DevExpress.CodeParser;
     using DevExpress.Diagram.Core;
+    using DevExpress.Mvvm.Native;
 
     using ReactiveUI;
 
@@ -68,16 +69,16 @@ namespace CDP4Grapher.ViewModels
         /// <summary>
         /// Gets or sets the collection of <see cref="Thing"/> to display.
         /// </summary>
-        public ReactiveList<NestedElement> ThingDiagramItems
+        public ReactiveList<NestedElement> NestedElements
         {
-            get => this.thingDiagramItems;
-            set => this.RaiseAndSetIfChanged(ref this.thingDiagramItems, value);
+            get => this.nestedElements;
+            set => this.RaiseAndSetIfChanged(ref this.nestedElements, value);
         }
 
         /// <summary>
-        /// Backing field for <see cref="ThingDiagramItems"/>
+        /// Backing field for <see cref="NestedElements"/>
         /// </summary>
-        private ReactiveList<NestedElement> thingDiagramItems = new ReactiveList<NestedElement>();
+        private ReactiveList<NestedElement> nestedElements = new ReactiveList<NestedElement>();
 
         /// <summary>
         /// Gets or sets the attached behavior
@@ -129,6 +130,8 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private readonly DomainOfExpertise currentDomainOfExpertise;
 
+        private Dictionary<NestedElement, IDisposable> elementSubscription = new Dictionary<NestedElement, IDisposable>();
+
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -154,29 +157,13 @@ namespace CDP4Grapher.ViewModels
             this.currentDomainOfExpertise = this.Session.QueryCurrentDomainOfExpertise();
             this.option = option;
 
-            this.TopElement = new DisposableReactiveList<ElementDefinition>();
-            var model = (EngineeringModel)this.Thing.TopContainer;
-            this.modelSetup = model.EngineeringModelSetup;
+            this.modelSetup = ((EngineeringModel)this.Thing.TopContainer).EngineeringModelSetup;
 
-            var iteration = (Iteration)this.Thing.Container;
-            this.iterationSetup = iteration.IterationSetup;
+            this.iterationSetup = ((Iteration)this.Thing.Container).IterationSetup;
 
             this.ActiveParticipant = this.modelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
-
-            var iterationSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(iteration)
-                .Where(
-                    objectChange =>
-                        (objectChange.EventKind == EventKind.Updated) &&
-                        (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
-                .Select(x => x.ChangedThing as Iteration)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.SetTopElement);
-            
-            this.Disposables.Add(iterationSubscription);
             
             this.AddSubscriptions();
-
-            this.SetTopElement(iteration);
 
             this.UpdateProperties();
         }
@@ -226,14 +213,6 @@ namespace CDP4Grapher.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as pdf
         /// </summary>
         public ReactiveCommand<object> ExportGraphAsPdf { get; private set; }
-        
-        /// <summary>
-        /// Gets the Top <see cref="ElementDefinition"/> for this <see cref="Option"/>
-        /// </summary>
-        /// <remarks>
-        /// This has to be a list in order to display the tree
-        /// </remarks>
-        public DisposableReactiveList<ElementDefinition> TopElement { get; private set; }
 
         /// <summary>
         /// Initialize the <see cref="ReactiveCommand"/>
@@ -248,19 +227,6 @@ namespace CDP4Grapher.ViewModels
             this.ExportGraphAsPng.Subscribe(_ => this.ExecuteExportGraphAsPng());
             this.ExportGraphAsPdf = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram));
             this.ExportGraphAsPdf.Subscribe(_ => this.ExecuteExportGraphAsPdf());
-
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
-        }
-
-        /// <summary>
-        /// Handles the <see cref="DomainChangedEvent"/>
-        /// </summary>
-        /// <param name="domainChangeEvent">The <see cref="DomainChangedEvent"/></param>
-        protected override void UpdateDomain(DomainChangedEvent domainChangeEvent)
-        {
-            base.UpdateDomain(domainChangeEvent);
-            this.TopElement.ClearAndDispose();
-            this.SetTopElement(this.Thing.Container as Iteration);
         }
 
         /// <summary>
@@ -276,18 +242,6 @@ namespace CDP4Grapher.ViewModels
             this.CurrentOption = this.Thing.Name;
         }
         
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <param name="disposing">
-        /// a value indicating whether the class is being disposed of
-        /// </param>
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            this.TopElement.SingleOrDefault()?.Dispose();
-        }
-
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -313,35 +267,28 @@ namespace CDP4Grapher.ViewModels
                     .Subscribe(_ => this.UpdateProperties());
             
             this.Disposables.Add(iterationSetupSubscription);
-        }
 
-        /// <summary>
-        /// Sets the top element for this Grapher
-        /// </summary>
-        /// <param name="iteration">The <see cref="Iteration"/> associated to this <see cref="Option"/></param>
-        private void SetTopElement(Iteration iteration)
-        {
-            if (iteration == null)
-            {
-                throw new ArgumentNullException(nameof(iteration));
-            }
+            var iterationSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>((Iteration)this.Thing.Container)
+                .Where(
+                    objectChange =>
+                        (objectChange.EventKind == EventKind.Updated) &&
+                        (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                .Select(x => x.ChangedThing as Iteration)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
 
-            var existingTopElement = this.TopElement.SingleOrDefault();
-            var topElement = iteration.TopElement;
+            this.Disposables.Add(iterationSubscription);
+            
+            var optionSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+                .Where(
+                    objectChange =>
+                        (objectChange.EventKind == EventKind.Updated) &&
+                        (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                .Select(x => x.ChangedThing as Iteration)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
 
-            if ((topElement == null) && (existingTopElement != null))
-            {
-                this.TopElement.ClearAndDispose();
-            }
-            else if ((topElement != null) && ((existingTopElement == null) || (existingTopElement != topElement)))
-            {
-                if (existingTopElement != null)
-                {
-                    this.TopElement.ClearAndDispose();
-                }
-
-                this.TopElement.Add(iteration.TopElement);
-            }
+            this.Disposables.Add(optionSubscription);
         }
         
         /// <summary>
@@ -349,9 +296,52 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void PopulateElementUsages()
         {
-            this.ThingDiagramItems.AddRange(new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count));
+            var elements = new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ToList();
+
+            foreach (var nestedElement in elements)
+            {
+                IDisposable listener = null;
+                if (nestedElement.IsRootElement)
+                {
+                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(nestedElement.Container)
+                        .Where(
+                            objectChange =>
+                                objectChange.EventKind == EventKind.Updated &&
+                                objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(x => this.UpdateProperties());
+                }
+                else
+                {
+                    var elementUsage = nestedElement.GetElementUsage();
+                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(elementUsage)
+                        .Where(
+                            objectChange =>
+                                objectChange.EventKind == EventKind.Updated &&
+                                objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(this.UpdateElementUsage);
+                }
+
+                this.elementSubscription[nestedElement] = listener;
+            }
+
+            this.NestedElements.AddRange(elements);
         }
-        
+
+        /// <summary>
+        /// Use to update only one Element usage properties
+        /// </summary>
+        /// <param name="objectChangedEvent"></param>
+        private void UpdateElementUsage(ObjectChangedEvent objectChangedEvent)
+        {
+            var elementUsage = this.NestedElements.Select(e => e.GetElementUsage());
+            var elementToUpdate = elementUsage.FirstOrDefault(e => e == objectChangedEvent.ChangedThing);
+            
+            //var elementToUpdate = this.NestedElements.FirstOrDefault(e => e.GetElementUsage() == objectChangedEvent.ChangedThing).GetElementUsage();
+            elementToUpdate = objectChangedEvent.ChangedThing as ElementUsage;
+        }
+
         /// <summary>
         /// Update the properties of this view-model
         /// </summary>
@@ -374,7 +364,20 @@ namespace CDP4Grapher.ViewModels
                                         : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
             }
 
+            this.ClearNestedElementsAndDisposeSubscriptions();
+
             this.PopulateElementUsages();
+        }
+
+        /// <summary>
+        /// Dispose of the subscriptions and clears up collections
+        /// </summary>
+        private void ClearNestedElementsAndDisposeSubscriptions()
+        {
+            this.elementSubscription.Values.ForEach(x => x.Dispose());
+            this.elementSubscription.Clear();
+            this.NestedElements.Clear();
+            this.Behavior?.ClearConnectors();
         }
 
         /// <summary>
@@ -383,7 +386,7 @@ namespace CDP4Grapher.ViewModels
         private void ExecuteExportGraphAsPdf()
         {
             this.canExportDiagram = false;
-            this.Behavior.ApplySpecifiedAutoLayout();
+            //this.Behavior.ApplySpecifiedAutoLayout();
             this.Behavior.ExportGraph(DiagramExportFormat.PDF);
             this.canExportDiagram = true;
         }

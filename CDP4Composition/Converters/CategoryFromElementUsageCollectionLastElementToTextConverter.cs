@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CategoryToTextConverter.cs" company="RHEA System S.A.">
+// <copyright file="CategoryFromElementUsageCollectionLastElementToTextConverter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -33,9 +33,10 @@ namespace CDP4Composition.Converters
     using System.Linq;
     using System.Windows.Data;
 
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    public class CategoryToTextConverter : IValueConverter
+    public class CategoryFromElementUsageCollectionLastElementToTextConverter : IValueConverter
     {
         /// <summary>
         /// The conversion method converts a <see cref="List{T}"/> of <see cref="Category"/> to a separated comma <see cref="string"/>
@@ -57,9 +58,9 @@ namespace CDP4Composition.Converters
         /// </returns>
         public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is List<Category> categories && categories.Any())
+            if (((IEnumerable<ElementUsage>)value)?.LastOrDefault()?.Category is IEnumerable<Category> categories && categories.Any())
             {
-                return string.Join(",", categories);
+                return string.Join(",", categories.Select(c => c.ShortName));
             }
 
             return "-";
