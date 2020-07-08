@@ -47,14 +47,18 @@ namespace CDP4PluginPackager.Tests
 
         private SdkPluginPackager sdkPluginPackager;
 
-        [OneTimeSetUp]
+        [SetUp]
         public void Setup()
         {
-            var prefix = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
+            var prefix = Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
             var testDirectory = Path.Combine(prefix, TargetProject);
             Directory.SetCurrentDirectory(testDirectory);
 
+#if DEBUG
             this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Debug", "net452", "AnyCPU");
+#else
+            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Release", "net452", "AnyCPU");
+#endif
             this.sdkPluginPackager.Start();
         }
 
