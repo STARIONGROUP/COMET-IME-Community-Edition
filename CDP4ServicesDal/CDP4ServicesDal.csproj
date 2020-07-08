@@ -6,7 +6,7 @@
     <TargetFramework>net452</TargetFramework>
    
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>CDP4ServicesDalPlugin</AssemblyTitle>
+    <AssemblyTitle>CDP4ServicesDal</AssemblyTitle>
     <Company>RHEA System S.A</Company>
     <Product>CDP4ServicesDal</Product>
     <Description>CDP4 Services DAL to be used exclusively with CDP4 Services</Description>
