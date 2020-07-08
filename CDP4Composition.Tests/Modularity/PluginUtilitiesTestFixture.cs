@@ -52,15 +52,15 @@ namespace CDP4Composition.Tests.Modularity
         private ImeAppSettings appSettings;
         private Mock<IAssemblyLocationLoader> assemblyLocationLoader;
 
-        private const string ImeFolder = @"CDP4IME\bin\Debug";
+        private string ImeFolder = $"CDP4IME{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Debug";
         private const string AppSettingsJson = "AppSettingsTest.json";
 
         [OneTimeSetUp]
         public void Setup()
         {
             var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
-            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
-            testDirectory = Path.GetFullPath(Path.Combine(testDirectory, $"{ImeFolder}\\{frameworkVersion}"));
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
+            testDirectory = Path.GetFullPath(Path.Combine(testDirectory, $"{this.ImeFolder}{Path.DirectorySeparatorChar}{frameworkVersion}"));
 
             this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
             this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(testDirectory);
@@ -70,7 +70,7 @@ namespace CDP4Composition.Tests.Modularity
 
             this.appSettingsService = new Mock<IAppSettingsService<ImeAppSettings>>();
 
-            this.appSettings = JsonConvert.DeserializeObject<ImeAppSettings>(File.ReadAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, @"../Modularity/", AppSettingsJson)));
+            this.appSettings = JsonConvert.DeserializeObject<ImeAppSettings>(File.ReadAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}Modularity{Path.DirectorySeparatorChar}", AppSettingsJson)));
             this.appSettingsService.Setup(x => x.AppSettings).Returns(this.appSettings);
 
             this.serviceLocator.Setup(x => x.GetInstance<IAppSettingsService<ImeAppSettings>>())
