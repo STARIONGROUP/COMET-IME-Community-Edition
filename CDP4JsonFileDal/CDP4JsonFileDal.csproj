@@ -6,7 +6,7 @@
     <TargetFramework>net452</TargetFramework>
    
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>CDP4JsonFileDalPlugin</AssemblyTitle>
+    <AssemblyTitle>CDP4JsonFileDal</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4JsonFileDalPlugin</Product>
     <Description>CDP4 Json File Dal Plugin</Description>

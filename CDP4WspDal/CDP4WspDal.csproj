@@ -6,7 +6,7 @@
     <TargetFramework>net452</TargetFramework>
    
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>CDP4WspDalPlugin</AssemblyTitle>
+    <AssemblyTitle>CDP4WspDal</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4WspDal</Product>
     <Description>CDP4 OCDT WSP Dal Plugin</Description>

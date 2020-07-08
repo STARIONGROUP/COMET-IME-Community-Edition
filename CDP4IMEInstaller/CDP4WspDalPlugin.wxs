@@ -11,7 +11,7 @@
       </Component>
 
       <Component Id="comp_Manifest_CDP4WspDal" Guid="{C85AD485-3992-4662-9213-1A85821471B2}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_Manifest_CDP4WspDal"  Vital="yes" Source="$(var.CDP4WspDal.TargetDir)CDP4WspDalPlugin.plugin.manifest" KeyPath="yes"></File>
+        <File Id="fil_Manifest_CDP4WspDal"  Vital="yes" Source="$(var.CDP4WspDal.TargetDir)CDP4WspDal.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
     </ComponentGroup>

@@ -67,11 +67,13 @@ namespace CDP4IME.Tests.ViewModels
 
             this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
 
-            var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
             var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
-
+#if DEBUG
+            var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
             this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetFullPath(Path.Combine(testDirectory, $@"CDP4IME\bin\Debug\{frameworkVersion}")));
-
+#else
+            this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetFullPath(testDirectory));
+#endif
             this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(this.assemblyLocationLoader.Object);
 
             this.serviceLocator.Setup(s => s.GetInstance<IAppSettingsService<ImeAppSettings>>()).Returns(this.appSettingService.Object);
