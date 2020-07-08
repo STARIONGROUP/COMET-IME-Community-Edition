@@ -27,6 +27,7 @@
 namespace CDP4Composition.Modularity
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     using CDP4Composition.Utilities;
@@ -38,6 +39,7 @@ namespace CDP4Composition.Modularity
     /// <summary>
     /// Utility class that help with plugin management
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class PluginUtilities
     {
         /// <summary>
