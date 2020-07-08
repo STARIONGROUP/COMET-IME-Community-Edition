@@ -52,15 +52,21 @@ namespace CDP4Composition.Tests.Modularity
         private ImeAppSettings appSettings;
         private Mock<IAssemblyLocationLoader> assemblyLocationLoader;
 
-        private const string ImeFolder = @"CDP4IME\bin\Debug";
+        private string BuildFolder;
         private const string AppSettingsJson = "AppSettingsTest.json";
 
-        [OneTimeSetUp]
+        [SetUp]
         public void Setup()
         {
+#if DEBUG
+            this.BuildFolder = $"CDP4IME{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Debug";
+#else
+            this.BuildFolder = $"CDP4ServicesDal{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Release";
+#endif
+
             var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
-            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
-            testDirectory = Path.GetFullPath(Path.Combine(testDirectory, $"{ImeFolder}\\{frameworkVersion}"));
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
+            testDirectory = Path.GetFullPath(Path.Combine(testDirectory, $"{this.BuildFolder}{Path.DirectorySeparatorChar}{frameworkVersion}"));
 
             this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
             this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(testDirectory);

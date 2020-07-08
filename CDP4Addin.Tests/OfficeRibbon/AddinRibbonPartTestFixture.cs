@@ -114,9 +114,13 @@ namespace CDP4Addin.Tests.OfficeRibbon
             this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
 
             var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
-            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
+            var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
 
-            this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetFullPath(Path.Combine(testDirectory, $@"CDP4IME\bin\Debug\{frameworkVersion}")));
+#if DEBUG
+            this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetFullPath(Path.Combine(testDirectory, $"CDP4IME{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Debug{Path.DirectorySeparatorChar}{frameworkVersion}")));
+#else
+            this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetFullPath(Path.Combine(testDirectory, $"CDP4ServicesDal{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Release{Path.DirectorySeparatorChar}{frameworkVersion}")));
+#endif
 
             this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(this.assemblyLocationLoader.Object);
 

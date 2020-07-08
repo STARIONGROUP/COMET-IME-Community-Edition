@@ -52,15 +52,21 @@ namespace CDP4Composition.Tests.Modularity
         private ImeAppSettings appSettings;
         private Mock<IAssemblyLocationLoader> assemblyLocationLoader;
 
-        private string ImeFolder = $"CDP4IME{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Debug";
+        private string BuildFolder;
         private const string AppSettingsJson = "AppSettingsTest.json";
 
-        [OneTimeSetUp]
+        [SetUp]
         public void Setup()
         {
+#if DEBUG
+            this.BuildFolder = $"CDP4IME{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Debug";
+#else
+            this.BuildFolder = $"CDP4ServicesDal{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Release";
+#endif
+
             var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
             var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
-            testDirectory = Path.GetFullPath(Path.Combine(testDirectory, $"{this.ImeFolder}{Path.DirectorySeparatorChar}{frameworkVersion}"));
+            testDirectory = Path.GetFullPath(Path.Combine(testDirectory, $"{this.BuildFolder}{Path.DirectorySeparatorChar}{frameworkVersion}"));
 
             this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
             this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(testDirectory);
@@ -90,13 +96,17 @@ namespace CDP4Composition.Tests.Modularity
             Assert.IsEmpty(PluginUtilities.GetPluginManifests());
         }
 
-        [Ignore("This test fails in AppVeyor due to unknown reasons")]
+        [Test]
         public void VerifyPluginDirectoryExistsWorks()
         {
             var directoryInfo = PluginUtilities.PluginDirectoryExists(out var specificPluginFolderExists);
+#if DEBUG
             Assert.IsTrue(specificPluginFolderExists);
             Assert.IsTrue(directoryInfo.FullName.EndsWith(PluginUtilities.PluginDirectoryName));
-
+#else
+            Assert.IsFalse(specificPluginFolderExists);
+            Assert.IsFalse(directoryInfo.FullName.EndsWith(PluginUtilities.PluginDirectoryName));
+#endif
             this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             directoryInfo = PluginUtilities.PluginDirectoryExists(out specificPluginFolderExists);
             Assert.IsFalse(specificPluginFolderExists);
