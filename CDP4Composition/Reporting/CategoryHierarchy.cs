@@ -9,7 +9,7 @@
     {
         internal class Builder
         {
-            private Iteration iteration;
+            private readonly Iteration iteration;
 
             private CategoryHierarchy top, current;
 
@@ -54,19 +54,19 @@
 
         #region Hierarchy
 
-        private CategoryHierarchy Parent;
+        private readonly CategoryHierarchy parent;
 
         public CategoryHierarchy Child { get; private set; }
 
         #endregion
 
-        public Category Category { get; }
+        public readonly Category Category;
 
         private CategoryHierarchy(Category category, CategoryHierarchy parent)
         {
             this.Category = category;
 
-            this.Parent = parent;
+            this.parent = parent;
         }
     }
 }

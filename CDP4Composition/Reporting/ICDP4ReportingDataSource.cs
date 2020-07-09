@@ -2,8 +2,8 @@
 {
     using CDP4Common.EngineeringModelData;
 
-    public interface ICDP4ReportingDataSource
+    public interface ICDP4ReportingDataSource<T> where T : ReportingDataSourceRowRepresentation, new()
     {
-        ReportingDataSourceClass CreateDataSource(Iteration interation);
+        ReportingDataSourceClass<T> CreateDataSource(Iteration interation);
     }
 }

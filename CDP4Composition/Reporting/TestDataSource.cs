@@ -4,39 +4,45 @@
 
     using System.Linq;
 
-    public class TestDataSource : ICDP4ReportingDataSource
+    [ParameterTypeShortName("m")]
+    public class MassParameter : ReportingDataSourceParameter
     {
-        [ParameterTypeShortName("m")]
-        public class MassParameter : ReportingDataSourceParameter
+        public double? ParseValue()
         {
-            public double? ParseValue()
+            if (double.TryParse(this.Value, out var result))
             {
-                if (double.TryParse(this.Value, out var result))
-                {
-                    return result;
-                }
-
-                return null;
+                return result;
             }
-        }
 
-        [ParameterTypeShortName("total_mass")]
-        public class TotalMassParameter : ReportingDataSourceParameter
+            return null;
+        }
+    }
+
+    [ParameterTypeShortName("total_mass")]
+    public class TotalMassParameter : ReportingDataSourceParameter
+    {
+        public double? ParseValue()
         {
-            public double? ParseValue()
+            var children = this.GetChildren<TotalMassParameter>();
+
+            if (children.Any())
             {
-                var children = this.GetChildren<TotalMassParameter>();
-
-                if (children.Any())
-                {
-                    return children.Sum(parameter => parameter.ParseValue());
-                }
-
-                return this.GetSibling<MassParameter>().ParseValue();
+                return children.Sum(parameter => parameter.ParseValue());
             }
-        }
 
-        public ReportingDataSourceClass CreateDataSource(Iteration iteration)
+            return this.GetSibling<MassParameter>().ParseValue();
+        }
+    }
+
+    public class RowRepresentation : ReportingDataSourceRowRepresentation
+    {
+        public readonly MassParameter mass;
+        public readonly TotalMassParameter totalMass;
+    }
+
+    public class TestDataSource : ICDP4ReportingDataSource<RowRepresentation>
+    {
+        public ReportingDataSourceClass<RowRepresentation> CreateDataSource(Iteration iteration)
         {
             //var categoryHierarchy = new CategoryHierarchy
             //        .Builder(iteration, "Project")
@@ -48,7 +54,14 @@
             //    .AddLevel("EQT")
             //    .Build();
 
-            var dataSource = new ReportingDataSourceClass(iteration);
+            var categoryHierarchy = new CategoryHierarchy
+                    .Builder(iteration, "SYS")
+                .Build();
+
+            var dataSource = new ReportingDataSourceClass<RowRepresentation>(
+                iteration,
+                categoryHierarchy);
+
             var rows = dataSource.GetTabularRepresentation();
 
             return dataSource;

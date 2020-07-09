@@ -19,13 +19,13 @@
         }
 
         // set with reflection to avoid the user-declared constructor having to see it
-        private readonly ReportingDataSourceRow row;
+        private readonly ReportingDataSourceRow<ReportingDataSourceRowRepresentation> row;
 
         internal readonly string ShortName;
 
-        internal string Value { get; private set; }
+        protected string Value { get; private set; }
 
-        public ReportingDataSourceParameter()
+        protected ReportingDataSourceParameter()
         {
             this.ShortName = GetParameterAttribute(this.GetType()).ShortName;
         }

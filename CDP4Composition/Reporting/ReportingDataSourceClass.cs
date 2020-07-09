@@ -4,16 +4,16 @@
 
     using System.Collections.Generic;
 
-    public class ReportingDataSourceClass
+    public class ReportingDataSourceClass<T> where T : ReportingDataSourceRowRepresentation, new()
     {
-        private readonly ReportingDataSourceRow topRow;
+        private readonly ReportingDataSourceRow<T> topRow;
 
-        public ReportingDataSourceClass(Iteration iteration)
+        public ReportingDataSourceClass(Iteration iteration, CategoryHierarchy categoryHierarchy)
         {
-            this.topRow = new ReportingDataSourceRow(iteration.TopElement);
+            this.topRow = new ReportingDataSourceRow<T>(iteration.TopElement, categoryHierarchy);
         }
 
-        public List<ReportingDataSourceRow> GetTabularRepresentation()
+        public List<T> GetTabularRepresentation()
         {
             return this.topRow.GetTabularRepresentation();
         }
