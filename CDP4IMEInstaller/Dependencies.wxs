@@ -72,10 +72,6 @@
         <File Id="fil_System_Windows_Interactivity" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Windows.Interactivity.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="comp_System_Net_Http_Formatting" Guid="{482518C9-788F-4177-B29D-23A2DC581782}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_Net_Http_Formatting" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Net.Http.Formatting.dll" KeyPath="yes" />
-      </Component>
-
     </ComponentGroup>
   </Fragment>
 </Wix>

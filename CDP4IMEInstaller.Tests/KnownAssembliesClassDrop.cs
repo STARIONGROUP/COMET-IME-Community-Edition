@@ -118,20 +118,7 @@ namespace CDP4IMEInstaller.Tests
             { "DevExpress.Xpf.Themes.VS2019Blue.{VERSION}.dll", "533DFB88-2C11-46B0-9B03-4D76BD95A65E" },
             { "DevExpress.Xpf.Themes.VS2019Dark.{VERSION}.dll", "8CD4A3DC-287E-4BF9-8B41-96C91DEB9009" },
             { "DevExpress.Xpf.Themes.VS2019Light.{VERSION}.dll", "1B2B69EF-58B5-4E69-9C6A-08A22767B37C" },
-            { "DevExpress.Xpo.{VERSION}.dll", "62646496-DC18-43D0-AE37-B94032EE1CAA"} ,
-            { "DevExpress.XtraBars.{VERSION}.dll", "5EAFD90B-7F26-4100-86B9-7116AA16559C" },
-            { "DevExpress.XtraCharts.{VERSION}.dll", "C3BD8574-1870-4780-B7D9-BF4FBB271E0D"} ,
-            { "DevExpress.XtraEditors.{VERSION}.dll", "83EF3F9A-B013-49C0-B841-C1CC8F7DCB05" },
-            { "DevExpress.XtraGauges.{VERSION}.Core.dll", "939F9678-5859-4EC9-A15B-603C4C81ECC9" },
-            { "DevExpress.XtraGrid.{VERSION}.dll", "7F7DF990-9AA1-459B-BF10-2978AA787293" },
-            { "DevExpress.XtraLayout.{VERSION}.dll", "89546FC2-40A5-4A25-9FAC-57954C4C09E8" },
-            { "DevExpress.XtraNavBar.{VERSION}.dll", "38D91884-536B-40BA-ADD7-5998F0929FE8" },
-            { "DevExpress.XtraPivotGrid.{VERSION}.dll", "C9B60BF2-D299-4AF3-8C04-0C7D56628EF1" },
-            { "DevExpress.XtraPrinting.{VERSION}.dll", "1BACC5FE-5739-4048-954E-129C536677D3" },
-            { "DevExpress.XtraReports.{VERSION}.dll", "BC95F656-BEE7-4DFA-A9D2-5569D5672272" },
-            { "DevExpress.XtraTreeList.{VERSION}.dll", "36B17D24-2AA8-4E20-8A7C-2C569452A7C7" },
-            { "DevExpress.XtraVerticalGrid.{VERSION}.dll", "F26DEBE4-6BF2-4A72-8754-FEFBE3BC62B3" },
-            { "DevExpress.XtraWizard.{VERSION}.dll", "4043AEC7-1839-4094-8C59-466F4136E0B2" }
+            { "DevExpress.Xpo.{VERSION}.dll", "62646496-DC18-43D0-AE37-B94032EE1CAA"}
         };
 
         /// <summary>
