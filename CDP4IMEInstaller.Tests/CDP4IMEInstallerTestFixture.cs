@@ -24,11 +24,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using NUnit.Framework;
-
 namespace CDP4IMEInstaller.Tests
 {
-    using System;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -37,6 +34,8 @@ namespace CDP4IMEInstaller.Tests
 
     using DotLiquid;
     using DotLiquid.NamingConventions;
+
+    using NUnit.Framework;
 
     /// <summary>
     /// Suite of tests that check the compatibility of the CDP4IMEInstaller project

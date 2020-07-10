@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
+    <Company>RHEA System S.A.</Company>
+    <Copyright>Copyright © RHEA System S.A.</Copyright>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>

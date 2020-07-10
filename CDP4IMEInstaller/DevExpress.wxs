@@ -322,58 +322,6 @@
         <File Id="_62646496" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpo.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
-      <Component Id="_7116AA16559C" Guid="{5EAFD90B-7F26-4100-86B9-7116AA16559C}" Win64="$(var.Win64)">
-        <File Id="_5EAFD90B" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraBars.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_BF4FBB271E0D" Guid="{C3BD8574-1870-4780-B7D9-BF4FBB271E0D}" Win64="$(var.Win64)">
-        <File Id="_C3BD8574" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraCharts.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_C1CC8F7DCB05" Guid="{83EF3F9A-B013-49C0-B841-C1CC8F7DCB05}" Win64="$(var.Win64)">
-        <File Id="_83EF3F9A" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraEditors.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_603C4C81ECC9" Guid="{939F9678-5859-4EC9-A15B-603C4C81ECC9}" Win64="$(var.Win64)">
-        <File Id="_939F9678" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraGauges.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_2978AA787293" Guid="{7F7DF990-9AA1-459B-BF10-2978AA787293}" Win64="$(var.Win64)">
-        <File Id="_7F7DF990" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraGrid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_57954C4C09E8" Guid="{89546FC2-40A5-4A25-9FAC-57954C4C09E8}" Win64="$(var.Win64)">
-        <File Id="_89546FC2" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraLayout.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_5998F0929FE8" Guid="{38D91884-536B-40BA-ADD7-5998F0929FE8}" Win64="$(var.Win64)">
-        <File Id="_38D91884" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraNavBar.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_0C7D56628EF1" Guid="{C9B60BF2-D299-4AF3-8C04-0C7D56628EF1}" Win64="$(var.Win64)">
-        <File Id="_C9B60BF2" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraPivotGrid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_129C536677D3" Guid="{1BACC5FE-5739-4048-954E-129C536677D3}" Win64="$(var.Win64)">
-        <File Id="_1BACC5FE" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraPrinting.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_5569D5672272" Guid="{BC95F656-BEE7-4DFA-A9D2-5569D5672272}" Win64="$(var.Win64)">
-        <File Id="_BC95F656" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraReports.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_2C569452A7C7" Guid="{36B17D24-2AA8-4E20-8A7C-2C569452A7C7}" Win64="$(var.Win64)">
-        <File Id="_36B17D24" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraTreeList.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_FEFBE3BC62B3" Guid="{F26DEBE4-6BF2-4A72-8754-FEFBE3BC62B3}" Win64="$(var.Win64)">
-        <File Id="_F26DEBE4" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraVerticalGrid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
-      <Component Id="_466F4136E0B2" Guid="{4043AEC7-1839-4094-8C59-466F4136E0B2}" Win64="$(var.Win64)">
-        <File Id="_4043AEC7" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraWizard.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
-      </Component>
-
     </ComponentGroup>
   </Fragment>
 </Wix>
