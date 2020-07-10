@@ -5,7 +5,7 @@
     using System.Linq;
 
     [ParameterTypeShortName("m")]
-    public class MassParameter : ReportingDataSourceParameter
+    public class MassParameter : ReportingDataSourceParameter<RowRepresentation>
     {
         public double? ParseValue()
         {
@@ -19,7 +19,7 @@
     }
 
     [ParameterTypeShortName("total_mass")]
-    public class TotalMassParameter : ReportingDataSourceParameter
+    public class TotalMassParameter : ReportingDataSourceParameter<RowRepresentation>
     {
         public double? ParseValue()
         {

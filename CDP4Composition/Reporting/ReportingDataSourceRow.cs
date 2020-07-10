@@ -37,10 +37,10 @@
         #region Parameters
 
         private static readonly IEnumerable<FieldInfo> ParameterFields = typeof(T).GetFields()
-            .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceParameter)));
+            .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceParameter<T>)));
 
-        private readonly Dictionary<Type, ReportingDataSourceParameter> reportedParameters =
-            new Dictionary<Type, ReportingDataSourceParameter>();
+        private readonly Dictionary<Type, ReportingDataSourceParameter<T>> reportedParameters =
+            new Dictionary<Type, ReportingDataSourceParameter<T>>();
 
         #endregion
 
@@ -71,12 +71,12 @@
             {
                 var parameter = type
                     .GetConstructor(Type.EmptyTypes)
-                    .Invoke(new object[] { }) as ReportingDataSourceParameter;
+                    .Invoke(new object[] { }) as ReportingDataSourceParameter<T>;
 
                 // set parameter row from here so no constructor declaration is needed
-                typeof(ReportingDataSourceParameter)
+                typeof(ReportingDataSourceParameter<T>)
                     .GetField("row", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .SetValue(parameter, this as ReportingDataSourceRow<ReportingDataSourceRowRepresentation>);
+                    .SetValue(parameter, this);
 
                 this.reportedParameters[type] = parameter;
 
@@ -99,7 +99,7 @@
             }
         }
 
-        private void InitializeParameter(ReportingDataSourceParameter reportedParameter)
+        private void InitializeParameter(ReportingDataSourceParameter<T> reportedParameter)
         {
             var parameter = this.ElementDefinition.Parameter
                 .SingleOrDefault(x => x.ParameterType.ShortName == reportedParameter.ShortName);
@@ -118,7 +118,7 @@
             }
         }
 
-        public TP GetParameter<TP>() where TP : ReportingDataSourceParameter
+        public TP GetParameter<TP>() where TP : ReportingDataSourceParameter<T>
         {
             return this.reportedParameters[typeof(TP)] as TP;
         }

@@ -7,7 +7,7 @@
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Types;
 
-    public class ReportingDataSourceParameter
+    public class ReportingDataSourceParameter<T> where T : ReportingDataSourceRowRepresentation, new()
     {
         public static ParameterTypeShortNameAttribute GetParameterAttribute(Type type)
         {
@@ -19,7 +19,7 @@
         }
 
         // set with reflection to avoid the user-declared constructor having to see it
-        private readonly ReportingDataSourceRow<ReportingDataSourceRowRepresentation> row;
+        private readonly ReportingDataSourceRow<T> row;
 
         internal readonly string ShortName;
 
@@ -42,14 +42,14 @@
             this.Value = valueSet.First().ActualValue.First();
         }
 
-        public T GetSibling<T>() where T : ReportingDataSourceParameter
+        public TP GetSibling<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.row.GetParameter<T>();
+            return this.row.GetParameter<TP>();
         }
 
-        public IEnumerable<T> GetChildren<T>() where T : ReportingDataSourceParameter
+        public IEnumerable<TP> GetChildren<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.row.Children.Select(child => child.GetParameter<T>());
+            return this.row.Children.Select(child => child.GetParameter<TP>());
         }
     }
 }
