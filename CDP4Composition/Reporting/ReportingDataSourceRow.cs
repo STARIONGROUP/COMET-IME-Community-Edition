@@ -14,7 +14,7 @@
 
         private readonly ReportingDataSourceRow<T> parent;
 
-        public List<ReportingDataSourceRow<T>> Children { get; } = new List<ReportingDataSourceRow<T>>();
+        internal List<ReportingDataSourceRow<T>> Children { get; } = new List<ReportingDataSourceRow<T>>();
 
         #endregion
 
@@ -143,6 +143,9 @@
 
             typeof(T).GetField("ElementName")
                 .SetValue(row, this.FullyQualifiedName);
+
+            typeof(T).GetField("IsVisible")
+                .SetValue(row, this.IsVisible);
 
             if (!this.IsVisible)
             {

@@ -3,5 +3,6 @@
     public class ReportingDataSourceRowRepresentation
     {
         public readonly string ElementName;
+        public readonly bool IsVisible;
     }
 }
