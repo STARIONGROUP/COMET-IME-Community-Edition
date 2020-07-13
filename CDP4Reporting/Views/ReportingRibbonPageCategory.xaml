@@ -5,7 +5,7 @@
                                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                    xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                    mc:Ignorable="d"
-                                   Caption="Reporting"
+                                   Caption="Reporting2"
                                    IsVisible="False"
                                    ToolTip="Reporting Controls"
                                    x:Name="ReportingCategory"

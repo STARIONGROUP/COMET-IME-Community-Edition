@@ -50,6 +50,7 @@ namespace CDP4Reporting.ViewModels
         /// </summary>
         private const string PanelCaption = "Reporting";
 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportDesignerViewModel"/> class
         /// </summary>
