@@ -12,6 +12,7 @@
     <AssemblyVersion>6.0.0.0</AssemblyVersion>
     <FileVersion>6.0.0.0</FileVersion>
     <Version>1.0.0</Version>
+    <UserSecretsId>b8d32f16-7835-4035-bf93-417f73b3c71b</UserSecretsId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -35,6 +36,7 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
+    <Compile Remove="ViewModels\MassBudgetDataSource.cs" />
     <Compile Remove="Views\CDP4Report.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -42,6 +44,7 @@
     <None Remove="Views\ReportingRibbonPageCategory.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.0.1" />
     <PackageReference Include="CDP4Common-CE" Version="6.1.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
