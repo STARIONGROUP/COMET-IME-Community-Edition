@@ -6,7 +6,7 @@
     <TargetFramework>net452</TargetFramework>
    
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>CDP4ServicesDalPlugin</AssemblyTitle>
+    <AssemblyTitle>CDP4ServicesDal</AssemblyTitle>
     <Company>RHEA System S.A</Company>
     <Product>CDP4ServicesDal</Product>
     <Description>CDP4 Services DAL to be used exclusively with CDP4 Services</Description>
@@ -36,16 +36,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="6.0.1-2020.4.23.1-pre-release">
+    <PackageReference Include="CDP4Common-CE" Version="6.1.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="6.0.1-2020.4.23.1-pre-release">
+    <PackageReference Include="CDP4Dal-CE" Version="6.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.0.0-rc02">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4ServicesDal-CE" Version="6.0.1-2020.4.23.1-pre-release">
+    <PackageReference Include="CDP4ServicesDal-CE" Version="6.1.0">
       <IncludeAssets></IncludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">

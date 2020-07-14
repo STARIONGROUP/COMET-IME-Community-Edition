@@ -5,8 +5,13 @@ environment:
   PROJECT_MAIN:   'CDP4-CE'
   TEST_RESULT:    'TestResult.xml'
   TEST_COVERAGE:  'CoverResults.xml'
-  TEST_LOG:       'TestResults'
+  SONARCLOUD_PROJECT_KEY: RHEAGROUP_CDP4-IME-Community-Edition
+  SONARCLOUD_ORGANIZATION: rheagroup
+  SONARCLOUD_URL: 'https://sonarcloud.io'
+  SONARCLOUD_TOKEN:
+    secure: SusLBtRCNeSFMhatgx83owIfxgme9yjV8PxhORbPZ0Mz/aixNIbXWZlSz4Zxc05u
 
+skip_branch_with_pr: true
 for:
 # configuration for "master" branch, build in Release mode
 -
@@ -23,12 +28,29 @@ for:
 # "fall back" configuration for all other branches
 # no "branches" section defined
 configuration: Debug
+
+install:
+  - choco install opencover.portable
+  - choco install "sonarscanner-msbuild-net46" -y
+
 before_build:
   - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
   - cmd: nuget install NUnit.Runners -Version 3.11.1 -OutputDirectory testrunner
   - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
   - cmd: nuget restore -verbosity quiet
-  - cmd: choco install opencover.portable
+  - ps: >-
+      if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+        Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
+        SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
+      } elseif ($env:APPVEYOR_REPO_BRANCH -eq "development") {
+        Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
+        SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
+      } elseif ($env:APPVEYOR_REPO_BRANCH -eq "master") {
+        Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
+        SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
+      } else {
+        Write-Host Skipping Sonar Scanning
+      }
 
 build:
   project: '%PROJECT_MAIN%.sln'
@@ -40,16 +62,17 @@ test_script:
       -log:Error
       -register
       -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools\nunit3-console.exe"
-      -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent"""
+      -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent"" --config=%CONFIGURATION%"
       -returntargetcode
       -hideskipped:All
       -output:"%TEST_COVERAGE%"
       -filter:"+[CDP4*]* -[*.Tests*]* -[*.Views]*"
+      -excludebyattribute:*.ExcludeFromCodeCoverageAttribute
 after_test:
-    - xcopy /q /Y /I "%TEST_RESULT%" "%TEST_LOG%\"
-    - xcopy /q /Y /I "%TEST_COVERAGE%" "%TEST_LOG%\"
-artifacts:
-    - path: '%TEST_LOG%'
+    - ps: >-
+        if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master") {
+          SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
+        }
 notifications:
   - provider: Email
     to:

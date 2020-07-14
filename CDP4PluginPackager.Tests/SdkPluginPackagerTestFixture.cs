@@ -47,15 +47,30 @@ namespace CDP4PluginPackager.Tests
 
         private SdkPluginPackager sdkPluginPackager;
 
-        [OneTimeSetUp]
+        [SetUp]
         public void Setup()
         {
-            var prefix = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
+            var prefix = Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
             var testDirectory = Path.Combine(prefix, TargetProject);
             Directory.SetCurrentDirectory(testDirectory);
 
-            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Debug", "net452");
+#if DEBUG
+            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Debug", "net452", "AnyCPU");
+#else
+            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Release", "net452", "AnyCPU");
+#endif
             this.sdkPluginPackager.Start();
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            var file = Path.Combine(this.sdkPluginPackager.OutputPath, $"{this.sdkPluginPackager.Manifest.Name}.cdp4ck");
+
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
         }
 
         [Test]

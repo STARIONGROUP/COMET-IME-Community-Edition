@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginLoaderTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="PluginUtilitiesTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -44,7 +44,7 @@ namespace CDP4Composition.Tests.Modularity
     using NUnit.Framework;
 
     [TestFixture]
-    public class PluginLoaderTestFixture
+    public class PluginUtilitiesTestFixture
     {
         private Mock<IServiceLocator> serviceLocator;
 
@@ -76,7 +76,7 @@ namespace CDP4Composition.Tests.Modularity
 
             this.appSettingsService = new Mock<IAppSettingsService<ImeAppSettings>>();
 
-            this.appSettings = JsonConvert.DeserializeObject<ImeAppSettings>(File.ReadAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, @"../Modularity/", AppSettingsJson)));
+            this.appSettings = JsonConvert.DeserializeObject<ImeAppSettings>(File.ReadAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}Modularity{Path.DirectorySeparatorChar}", AppSettingsJson)));
             this.appSettingsService.Setup(x => x.AppSettings).Returns(this.appSettings);
 
             this.serviceLocator.Setup(x => x.GetInstance<IAppSettingsService<ImeAppSettings>>())
@@ -87,18 +87,30 @@ namespace CDP4Composition.Tests.Modularity
         }
 
         [Test]
-        public void VerifyImeManifestAreLoaded()
+        public void VerifyImeManifestsAreReturned()
         {
-            var pluginLoader = new PluginLoader<ImeAppSettings>();
-            Assert.IsNotEmpty(pluginLoader.ManifestsList);
+            Assert.IsNotEmpty(PluginUtilities.GetPluginManifests());
+
+            this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+
+            Assert.IsEmpty(PluginUtilities.GetPluginManifests());
         }
 
         [Test]
-        public void VerifyDisabledPluginsAreNotGettingLoaded()
+        public void VerifyPluginDirectoryExistsWorks()
         {
-            var pluginLoader = new PluginLoader<ImeAppSettings>();
-            Assert.IsNotEmpty(pluginLoader.ManifestsList);
-            Assert.IsNotEmpty(pluginLoader.DisabledPlugins);
+            var directoryInfo = PluginUtilities.PluginDirectoryExists(out var specificPluginFolderExists);
+#if DEBUG
+            Assert.IsTrue(specificPluginFolderExists);
+            Assert.IsTrue(directoryInfo.FullName.EndsWith(PluginUtilities.PluginDirectoryName));
+#else
+            Assert.IsFalse(specificPluginFolderExists);
+            Assert.IsFalse(directoryInfo.FullName.EndsWith(PluginUtilities.PluginDirectoryName));
+#endif
+            this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            directoryInfo = PluginUtilities.PluginDirectoryExists(out specificPluginFolderExists);
+            Assert.IsFalse(specificPluginFolderExists);
+            Assert.AreEqual(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), directoryInfo.FullName);
         }
     }
 }

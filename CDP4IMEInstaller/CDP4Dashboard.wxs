@@ -10,6 +10,10 @@
         <File Id="fil_CDP4Dashboard"  Vital="yes" Source="$(var.CDP4Dashboard.TargetPath)" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="comp_Manifest_CDP4Dashboard" Guid="{200B1D2F-8818-4E63-A4DD-3069F37D3F84}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4Dashboard"  Vital="yes" Source="$(var.CDP4Dashboard.TargetDir)CDP4Dashboard.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>
