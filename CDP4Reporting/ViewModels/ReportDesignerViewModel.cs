@@ -24,24 +24,24 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+
+using CDP4Common.CommonData;
+using CDP4Common.EngineeringModelData;
+
+using CDP4Common.SiteDirectoryData;
+
+using CDP4Composition;
+using CDP4Composition.Mvvm;
+using CDP4Composition.Navigation;
+using CDP4Composition.Navigation.Interfaces;
+using CDP4Composition.PluginSettingService;
+
+using CDP4Dal;
+
 namespace CDP4Reporting.ViewModels
 {
-
-    using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
-
-    using CDP4Common.SiteDirectoryData;
-
-    using CDP4Composition;
-    using CDP4Composition.Mvvm;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.PluginSettingService;
-
-    using CDP4Dal;
-
     /// <summary>
-    /// The view-model for the Relationship Editor that lets users edit Relationships between any 2 objects.
+    /// The view-model for the Report Designer that lets users to create reports based on template source files.
     /// </summary>
     public class ReportDesignerViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
@@ -50,18 +50,13 @@ namespace CDP4Reporting.ViewModels
         /// </summary>
         private const string PanelCaption = "Reporting";
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportDesignerViewModel"/> class
         /// </summary>
-        /// <param name="thing">
-        /// The <see cref="Thing"/> to display
-        /// </param>
+        /// <param name="thing">The <see cref="Thing"/> to display</param>
         /// <param name="participant">The <see cref="Participant"/> that this open <see cref="Iteration"/> is tied to.</param>
-        /// <param name="session">
-        /// The session.
-        /// </param>
-        /// <param name="thingDialogNavigationService"></param>
+        /// <param name="session">The session.</param>
+        /// <param name="thingDialogNavigationService">The thing navigation service.</param>
         /// <param name="panelNavigationService">The panel navigation service.</param>
         /// <param name="dialogNavigationService">The dialog navigation service.</param>
         /// <param name="pluginSettingsService">The plugin service.</param>

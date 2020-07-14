@@ -22,7 +22,7 @@
     </dxr:RibbonPageGroup.Resources>
     <dxb:BarSplitButtonItem Name="OpenReportingRibbonBarItem"
                             ActAsDropDown="True"
-                            Content="Reporting1"
+                            Content="Reporting"
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage 'Images/Spreadsheet/ReportLayoutPivotTable_32x32.png'}"

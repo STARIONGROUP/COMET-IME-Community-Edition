@@ -24,21 +24,17 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using CDP4Common.EngineeringModelData;
+using CDP4Reporting.Views;
+using CDP4Composition.Navigation;
+using CDP4Composition.Navigation.Interfaces;
+using CDP4Composition.PluginSettingService;
+using CDP4Composition.Mvvm;
+using CDP4Dal;
+
 namespace CDP4Reporting.ViewModels
 {
-    using System;
-    using System.Windows.Input;
-    using CDP4Common.EngineeringModelData;
-    using CDP4Reporting.Views;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Services;
-    using ReactiveUI;
-    using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.PluginSettingService;
-    using CDP4Composition.Mvvm;
-    using CDP4Dal;
-    using CDP4Composition;
-
     /// <summary>
     /// The view-model for the <see cref="ReportDesignerRibbon"/> view
     /// </summary>
