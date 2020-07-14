@@ -73,8 +73,7 @@ namespace CDP4Grapher
         /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </summary>
         internal IPluginSettingsService PluginSettingsService { get; private set; }
-
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="GrapherModule"/> class.
         /// </summary>

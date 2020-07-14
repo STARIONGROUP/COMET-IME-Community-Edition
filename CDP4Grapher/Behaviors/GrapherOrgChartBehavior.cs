@@ -2,8 +2,8 @@
 // <copyright file="GrapherOrgChartBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft,
+
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -27,26 +27,17 @@
 namespace CDP4Grapher.Behaviors
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Windows;
-    using System.Windows.Controls;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-
-    using CDP4Composition.Diagram;
-    using CDP4Composition.Mvvm;
 
     using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
 
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
-    using DevExpress.Xpf.Bars;
     using DevExpress.Xpf.Diagram;
-
-    using Microsoft.Win32;
 
     using Direction = DevExpress.Diagram.Core.Direction;
 
@@ -132,6 +123,11 @@ namespace CDP4Grapher.Behaviors
             this.CurrentLayout = (layout, direction);
         }
 
+        /// <summary>
+        /// Raised when the item collection has changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
             if (e.Item is DiagramContentItem diagramContentItem && e.Action == ItemsChangedAction.Added)
@@ -168,9 +164,13 @@ namespace CDP4Grapher.Behaviors
             base.OnDetaching();
         }
 
+        /// <summary>
+        /// Adds connector to the provided <see cref="DiagramContentItem"/>
+        /// </summary>
+        /// <param name="diagramContentItemToConnectTo">the end <see cref="DiagramContentItem"/> to connect to</param>
         public void AddConnector(DiagramContentItem diagramContentItemToConnectTo)
         {
-            var thing = (diagramContentItemToConnectTo.Content as GraphElementViewModel).Thing as NestedElement;
+            var thing = (diagramContentItemToConnectTo.Content as GraphElementViewModel)?.Thing as NestedElement;
 
             if (this.DetermineBeginItemToConnectFrom(thing) is { } beginItem && beginItem != diagramContentItemToConnectTo)
             {
@@ -234,9 +234,9 @@ namespace CDP4Grapher.Behaviors
         }
 
         /// <summary>
-        /// Export the graph as the specified <see cref="DiagramExportFormat"/>
+        /// Export the graph as the <see cref="DiagramExportFormat"/>
         /// </summary>
-        /// <param name="format">the format to export the diagram to</param>
+        /// <param name="dialog">the <see cref="IGrapherSaveFileDialog"/> instance to perform the export operation</param>
         public void ExportGraph(IGrapherSaveFileDialog dialog)
         {
             if (dialog.ShowDialog() == true)
@@ -297,6 +297,5 @@ namespace CDP4Grapher.Behaviors
         {
             this.AssociatedObject.ApplyTreeLayout(direction, this.AssociatedObject.Items, SplitToConnectedComponentsMode.AllComponents);
         }
-
     }
 }

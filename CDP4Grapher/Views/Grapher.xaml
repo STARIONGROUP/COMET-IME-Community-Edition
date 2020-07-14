@@ -6,11 +6,9 @@
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:viewModels="clr-namespace:CDP4Grapher.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
-             xmlns:dxdiag="http://schemas.devexpress.com/winfx/2008/xaml/diagram"
              xmlns:behaviors="clr-namespace:CDP4Grapher.Behaviors"
              xmlns:views1="clr-namespace:CDP4Grapher.Views"
              d:DesignHeight="300"
@@ -22,9 +20,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <converters:NotConverter x:Key="NotConverter" />
-            <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
-            <converters:CategoryFromElementUsageCollectionLastElementToTextConverter x:Key="CategoryToTextConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
