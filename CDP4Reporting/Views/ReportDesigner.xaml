@@ -113,13 +113,12 @@
                             </dxb:InsertAction>
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
-                                    <dxb:BarCheckItem IsChecked="{Binding ShowDeprecatedThings}"
+                                    <dxb:BarCheckItem IsChecked="{Binding IsBuildEnabled}"
                                        x:Name="AutomaticBuildButton"
                                        Content="Toggle Auto Build"
                                        Description="Toggle Auto Build"
                                        Hint="Toggle Auto Build"
                                        ItemClick="AutomaticBuildButton_ItemClick"
-                                       IsEnabled="{Binding HasSession, UpdateSourceTrigger=PropertyChanged}"
                                        LargeGlyph="{dx:DXImage Image=Time_32x32.png}" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
@@ -128,7 +127,7 @@
                                 PropertyName="Caption"
                                 Value="File" />
                             <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.Open}" IsEnabled="True" />
-                            <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.StylesGroup }" />
+                            <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.StylesGroup}" />
                         </dxrud:ReportDesigner.RibbonCustomizationActions>
                         <dxrud:ReportDesignerClassicView/>
                     </dxrud:ReportDesigner>

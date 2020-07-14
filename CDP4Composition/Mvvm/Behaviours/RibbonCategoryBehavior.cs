@@ -23,21 +23,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Windows;
+
+using CDP4Composition.Ribbon;
+
+using DevExpress.Mvvm.UI;
+using DevExpress.Mvvm.UI.Interactivity;
+using DevExpress.Xpf.Docking;
+using DevExpress.Xpf.Ribbon;
+using Microsoft.Practices.Prism.Regions;
+using Microsoft.Practices.ServiceLocation;
+
 namespace CDP4Composition.Mvvm.Behaviours
 {
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Windows;
-
-    using CDP4Composition.Ribbon;
-
-    using DevExpress.Mvvm.UI;
-    using DevExpress.Mvvm.UI.Interactivity;
-    using DevExpress.Xpf.Docking;
-
-    using Microsoft.Practices.Prism.Regions;
-    using Microsoft.Practices.ServiceLocation;
-
     /// <summary>
     /// Allows proper callbacks on the report designer category ribbon page
     /// </summary>
@@ -120,7 +120,6 @@ namespace CDP4Composition.Mvvm.Behaviours
         private void AssociatedObject_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var category = this.RibbonRegion.Views.OfType<ExtendedRibbonPageCategory>().FirstOrDefault(view => view.Name == this.CategoryName);
-
             var hostPanel = LayoutTreeHelper.GetVisualParents(this.AssociatedObject).OfType<DocumentPanel>().FirstOrDefault();
 
             if (category == null)
@@ -135,18 +134,15 @@ namespace CDP4Composition.Mvvm.Behaviours
                 return;
             }
 
+            category.Ribbon.PageCategoryAlignment = RibbonPageCategoryCaptionAlignment.Left;
             category.IsVisible = (bool)e.NewValue;
         }
 
         /// <summary>
         /// Sets the Category name property of the target <see cref="RibbonCategoryBehavior"/>.
         /// </summary>
-        /// <param name="target">
-        /// the <see cref="RibbonCategoryBehavior"/> that has this behavior attached.
-        /// </param>
-        /// <param name="value">
-        /// The actual category name.
-        /// </param>
+        /// <param name="target">The <see cref="RibbonCategoryBehavior"/> that has this behavior attached.</param>
+        /// <param name="value">The actual category name.</param>
         public static void SetCategoryName(RibbonCategoryBehavior target, string value)
         {
             target.SetValue(CategoryNameProperty, value);
@@ -155,12 +151,8 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// <summary>
         /// Event handler for a change on the <see cref="CategoryNameProperty"/>.
         /// </summary>
-        /// <param name="d">
-        /// The source of the event.
-        /// </param>
-        /// <param name="e">
-        /// The event arguments.
-        /// </param>
+        /// <param name="d">The source of the event.</param>
+        /// <param name="e">The event arguments.</param>
         private static void CategoryNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is RibbonCategoryBehavior ribbonCategoryBehavior)

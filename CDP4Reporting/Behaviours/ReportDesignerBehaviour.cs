@@ -24,17 +24,17 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using DevExpress.Xpf.Ribbon;
+using DevExpress.Mvvm.UI;
+using DevExpress.Mvvm.UI.Interactivity;
+using DevExpress.Xpf.Reports.UserDesigner;
+using System.Diagnostics.CodeAnalysis;
+
 namespace CDP4Reporting.Behaviours
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Windows;
-    using DevExpress.Xpf.Ribbon;
-    using DevExpress.Mvvm.UI;
-    using DevExpress.Mvvm.UI.Interactivity;
-    using DevExpress.Xpf.Reports.UserDesigner;
-    using System.Diagnostics.CodeAnalysis;
-
     /// <summary>
     /// The purpose of the <see cref="ReportDesignerBehaviour"/> is to handle events from
     /// the attached view of type <see cref="ReportDesigner"/>
