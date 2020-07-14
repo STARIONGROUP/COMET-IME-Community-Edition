@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GraphElementTemplateSelector.cs" company="RHEA System S.A.">
+// <copyright file="IHaveContextMenu.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -24,44 +24,29 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Grapher.ViewModels
 {
-    using System.Windows;
-    using System.Windows.Controls;
+    using System.Collections.Generic;
 
-    using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
+    using CDP4Grapher.Behaviors;
+
+    using DevExpress.Xpf.Bars;
+    using DevExpress.Xpf.Diagram;
 
     /// <summary>
-    /// The <see cref="DataTemplateSelector"/> to select a <see cref="DataTemplate"/> depending on the kind of budget to compute
+    /// Define a class that has a <see cref="List{IBarManagerControllerAction}"/> that can be use to override DiagramControl ContextMenu.
+    /// Using <see cref="DiagramControl.CreateContextMenu"/>
     /// </summary>
-    public class GraphElementDataTemplateSelector : DataTemplateSelector
+    public interface IHaveContextMenu
     {
         /// <summary>
-        /// Selects the template for a <see cref="Thing"/>
+        /// Holds the <see cref="BarButtonItem"/> and <see cref="BarSubItem"/> representing an overridable diagram Context Menu
         /// </summary>
-        /// <param name="item">The <see cref="Thing"/></param>
-        /// <param name="container">the dependency-object</param>
-        /// <returns>The <see cref="DataTemplate"/> to use</returns>
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
-        {
-            return item switch
-            {
-                ElementDefinition _ => this.TopElementDataTemplate,
-                NestedElement _ => this.NestedElementDataTemplate,
-                _ => base.SelectTemplate(item, container)
-            };
-        }
-
+        List<IBarManagerControllerAction> ContextMenu { get; }
+        
         /// <summary>
-        /// Gets or sets the <see cref="DataTemplate"/> for the <see cref="Iteration.TopElement"/> template
+        /// Gets or sets the attached behavior
         /// </summary>
-        public DataTemplate TopElementDataTemplate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="DataTemplate"/> for an <see cref="NestedElement"/> template
-        /// </summary>
-        public DataTemplate NestedElementDataTemplate { get; set; }
+        IGrapherOrgChartBehavior Behavior { get; set; }
     }
 }

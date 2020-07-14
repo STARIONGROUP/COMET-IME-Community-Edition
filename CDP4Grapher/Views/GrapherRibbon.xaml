@@ -7,6 +7,7 @@
                                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                 xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                 xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+                                xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                                 Name="GrapherRibbonPage"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="5002"
@@ -25,7 +26,7 @@
                             Content="Grapher"
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
-                            LargeGlyph="pack://application:,,,/CDP4IME;component/cdplogo_48x48.ico"
+                            LargeGlyph="{dx:DXImage 'Images/XAF/BO_Category_32x32.png'}"
                             Hint="Open the Grapher for the selected Option">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>

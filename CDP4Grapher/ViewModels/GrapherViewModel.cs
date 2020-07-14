@@ -30,21 +30,14 @@ namespace CDP4Grapher.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Threading.Tasks;
-    using System.Windows.Controls;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Extensions;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
-
-    using CDP4CommonView;
 
     using CDP4Composition;
     using CDP4Composition.Mvvm;
-    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -55,9 +48,10 @@ namespace CDP4Grapher.ViewModels
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Utilities;
 
-    using DevExpress.CodeParser;
     using DevExpress.Diagram.Core;
+    using DevExpress.Diagram.Core.Layout;
     using DevExpress.Mvvm.Native;
+    using DevExpress.Xpf.Bars;
 
     using ReactiveUI;
 
@@ -66,25 +60,6 @@ namespace CDP4Grapher.ViewModels
     /// </summary>
     public class GrapherViewModel : BrowserViewModelBase<Option>, IPanelViewModel, IGrapherViewModel
     {
-        /// <summary>
-        /// Gets or sets the collection of <see cref="Thing"/> to display.
-        /// </summary>
-        public ReactiveList<NestedElement> NestedElements
-        {
-            get => this.nestedElements;
-            set => this.RaiseAndSetIfChanged(ref this.nestedElements, value);
-        }
-
-        /// <summary>
-        /// Backing field for <see cref="NestedElements"/>
-        /// </summary>
-        private ReactiveList<NestedElement> nestedElements = new ReactiveList<NestedElement>();
-
-        /// <summary>
-        /// Gets or sets the attached behavior
-        /// </summary>
-        public IGrapherOrgChartBehavior Behavior { get; set; }
-
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
         /// </summary>
@@ -99,11 +74,6 @@ namespace CDP4Grapher.ViewModels
         /// Backing field for <see cref="CurrentOption"/>
         /// </summary>
         private string currentOption;
-        
-        /// <summary>
-        /// The active <see cref="Participant"/>
-        /// </summary>
-        public readonly Participant ActiveParticipant;
 
         /// <summary>
         /// The <see cref="EngineeringModelSetup"/> that is referenced by the <see cref="EngineeringModel"/> that contains the current <see cref="Option"/>
@@ -116,11 +86,6 @@ namespace CDP4Grapher.ViewModels
         private readonly IterationSetup iterationSetup;
         
         /// <summary>
-        /// Backing field for <see cref="CanExportDiagram"/>
-        /// </summary>
-        private bool canExportDiagram;
-
-        /// <summary>
         /// Holds the current <see cref="Option"/>
         /// </summary>
         private readonly Option option;
@@ -130,43 +95,15 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private readonly DomainOfExpertise currentDomainOfExpertise;
 
-        private Dictionary<NestedElement, IDisposable> elementSubscription = new Dictionary<NestedElement, IDisposable>();
-
         /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Grapher";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GrapherViewModel"/> class
+        /// Holds the <see cref="IDisposable"/> subscriptions
         /// </summary>
-        /// <param name="option">The <see cref="Option"/> of which this browser is of</param>
-        /// <param name="session">The session</param>
-        /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
-        /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
-        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        /// <param name="pluginSettingsService">
-        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
-        /// </param>
-        public GrapherViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
-        {
-            this.Caption = $"{PanelCaption}, {this.Thing.Name}";
-            this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
-
-            this.currentDomainOfExpertise = this.Session.QueryCurrentDomainOfExpertise();
-            this.option = option;
-
-            this.modelSetup = ((EngineeringModel)this.Thing.TopContainer).EngineeringModelSetup;
-
-            this.iterationSetup = ((Iteration)this.Thing.Container).IterationSetup;
-
-            this.ActiveParticipant = this.modelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
-            
-            this.AddSubscriptions();
-
-            this.UpdateProperties();
-        }
+        private readonly List<IDisposable> subscriptions = new List<IDisposable>();
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
@@ -196,39 +133,51 @@ namespace CDP4Grapher.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether the diagram can be exported
+        /// The active <see cref="Participant"/>
         /// </summary>
-        public bool CanExportDiagram
+        public readonly Participant ActiveParticipant;
+
+        /// <summary>
+        /// Gets or sets the collection of <see cref="GraphElementViewModel"/> to display.
+        /// </summary>
+        public ReactiveList<GraphElementViewModel> GraphElements { get; set; } = new ReactiveList<GraphElementViewModel>();
+
+        /// <summary>
+        /// Gets or sets the custom context menu
+        /// </summary>
+        public IHaveContextMenu DiagramContextMenuViewModel { get; set; } = new DiagramControlContextMenuViewModel();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GrapherViewModel"/> class
+        /// </summary>
+        /// <param name="option">The <see cref="Option"/> of which this browser is of</param>
+        /// <param name="session">The session</param>
+        /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
+        /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
+        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
+        /// <param name="pluginSettingsService">
+        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
+        /// </param>
+        public GrapherViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            get { return this.canExportDiagram; }
-            private set { this.RaiseAndSetIfChanged(ref this.canExportDiagram, value); }
+            this.Caption = $"{PanelCaption}, {this.Thing.Name}";
+            this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+
+            this.currentDomainOfExpertise = this.Session.QueryCurrentDomainOfExpertise();
+            this.option = option;
+
+            this.modelSetup = ((EngineeringModel)this.Thing.TopContainer).EngineeringModelSetup;
+
+            this.iterationSetup = ((Iteration)this.Thing.Container).IterationSetup;
+
+            this.ActiveParticipant = this.modelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
+
+            this.AddSubscriptions();
+
+            this.UpdateProperties();
         }
-
-        /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
-        /// </summary>
-        public ReactiveCommand<object> ExportGraphAsPng { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as pdf
-        /// </summary>
-        public ReactiveCommand<object> ExportGraphAsPdf { get; private set; }
-
-        /// <summary>
-        /// Initialize the <see cref="ReactiveCommand"/>
-        /// </summary>
-        protected override void InitializeCommands()
-        {
-            base.InitializeCommands();
-            
-            this.CanExportDiagram = true;
-            
-            this.ExportGraphAsPng = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram));
-            this.ExportGraphAsPng.Subscribe(_ => this.ExecuteExportGraphAsPng());
-            this.ExportGraphAsPdf = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram));
-            this.ExportGraphAsPdf.Subscribe(_ => this.ExecuteExportGraphAsPdf());
-        }
-
+        
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -289,6 +238,17 @@ namespace CDP4Grapher.ViewModels
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(optionSubscription);
+            
+            var elementUsageSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementUsage))
+                .Where(
+                    objectChange =>
+                        (objectChange.EventKind != EventKind.Updated) &&
+                        (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                .Select(x => x.ChangedThing as ElementUsage)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
+            this.Disposables.Add(elementUsageSubscription);
         }
         
         /// <summary>
@@ -296,11 +256,12 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void PopulateElementUsages()
         {
-            var elements = new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ToList();
+            var elements = new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name).ToList();
 
             foreach (var nestedElement in elements)
             {
                 IDisposable listener = null;
+                
                 if (nestedElement.IsRootElement)
                 {
                     listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(nestedElement.Container)
@@ -311,37 +272,14 @@ namespace CDP4Grapher.ViewModels
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(x => this.UpdateProperties());
                 }
-                else
-                {
-                    var elementUsage = nestedElement.GetElementUsage();
-                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(elementUsage)
-                        .Where(
-                            objectChange =>
-                                objectChange.EventKind == EventKind.Updated &&
-                                objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                        .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(this.UpdateElementUsage);
-                }
+                this.subscriptions.Add(listener);
 
-                this.elementSubscription[nestedElement] = listener;
+                this.GraphElements.Add(new GraphElementViewModel(nestedElement));
             }
 
-            this.NestedElements.AddRange(elements);
+            //this.NestedElements.AddRange(elements);
         }
-
-        /// <summary>
-        /// Use to update only one Element usage properties
-        /// </summary>
-        /// <param name="objectChangedEvent"></param>
-        private void UpdateElementUsage(ObjectChangedEvent objectChangedEvent)
-        {
-            var elementUsage = this.NestedElements.Select(e => e.GetElementUsage());
-            var elementToUpdate = elementUsage.FirstOrDefault(e => e == objectChangedEvent.ChangedThing);
-            
-            //var elementToUpdate = this.NestedElements.FirstOrDefault(e => e.GetElementUsage() == objectChangedEvent.ChangedThing).GetElementUsage();
-            elementToUpdate = objectChangedEvent.ChangedThing as ElementUsage;
-        }
-
+        
         /// <summary>
         /// Update the properties of this view-model
         /// </summary>
@@ -374,31 +312,10 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void ClearNestedElementsAndDisposeSubscriptions()
         {
-            this.elementSubscription.Values.ForEach(x => x.Dispose());
-            this.elementSubscription.Clear();
-            this.NestedElements.Clear();
-            this.Behavior?.ClearConnectors();
-        }
-
-        /// <summary>
-        /// Executes the <see cref="ExportGraphAsPng"/> 
-        /// </summary>
-        private void ExecuteExportGraphAsPdf()
-        {
-            this.canExportDiagram = false;
-            //this.Behavior.ApplySpecifiedAutoLayout();
-            this.Behavior.ExportGraph(DiagramExportFormat.PDF);
-            this.canExportDiagram = true;
-        }
-
-        /// <summary>
-        /// Executes the <see cref="ExportGraphAsPng"/> 
-        /// </summary>
-        private void ExecuteExportGraphAsPng()
-        {
-            this.canExportDiagram = false;
-            this.Behavior.ExportGraph(DiagramExportFormat.JPEG);
-            this.canExportDiagram = true;
+            this.subscriptions.ForEach(x => x.Dispose());
+            this.GraphElements.ForEach(x => x.NestedElementElementListener.Dispose());
+            this.subscriptions.Clear();
+            this.GraphElements.Clear();
         }
     }
 }

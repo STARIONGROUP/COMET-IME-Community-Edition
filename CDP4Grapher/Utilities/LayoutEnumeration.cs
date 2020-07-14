@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IGrapherViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DiagramControlLayaoutEnumeration.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -24,22 +24,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Grapher.ViewModels
+namespace CDP4Grapher.Utilities
 {
-    using System.Collections.Generic;
+    using DevExpress.Xpf.Diagram;
 
-    using CDP4Grapher.Behaviors;
-
-    using DevExpress.Xpf.Bars;
-    
     /// <summary>
-    /// Definition of a <see cref="GrapherViewModel"/> exposing public properties and methods
+    /// Enumeration of the possible layout applicable on a <see cref="DiagramControl"/>
     /// </summary>
-    public interface IGrapherViewModel
+    public enum LayoutEnumeration
     {
-        /// <summary>
-        /// Gets or sets the custom context menu builder
-        /// </summary>
-        IHaveContextMenu DiagramContextMenuViewModel { get; set; }
+        Fugiyama = 0, 
+        TreeView = 1,
+        TipOver = 2, 
+        MindMap = 4, 
+        OrganisationalChart = 8, 
+        Circular = 16
     }
 }

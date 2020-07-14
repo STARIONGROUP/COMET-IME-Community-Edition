@@ -24,27 +24,31 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Grapher.Behaviors
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Windows;
+    using System.Windows.Controls;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Diagram;
+    using CDP4Composition.Mvvm;
 
+    using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
 
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
-    using DevExpress.Mvvm.Native;
+    using DevExpress.Xpf.Bars;
     using DevExpress.Xpf.Diagram;
 
     using Microsoft.Win32;
+
+    using Direction = DevExpress.Diagram.Core.Direction;
 
     /// <summary>
     /// Allows proper callbacks on the diagramming tool
@@ -52,29 +56,17 @@ namespace CDP4Grapher.Behaviors
     public class GrapherOrgChartBehavior : DiagramOrgChartBehavior, IGrapherOrgChartBehavior
     {
         /// <summary>
-        /// Initializes static members of the <see cref="GrapherOrgChartBehavior"/> class.
+        /// Gets or sets the current layout
         /// </summary>
-        static GrapherOrgChartBehavior()
-        {
-        }
-
-        /// <summary>
-        /// Gets a dictionary of saved diagram item positions.
-        /// </summary>
-        public Dictionary<object, Point> ItemPositions { get; } = new Dictionary<object, Point>();
-
+        public (LayoutEnumeration layout, Enum direction) CurrentLayout { get; private set; } = (LayoutEnumeration.TipOver, TipOverDirection.LeftToRight);
+        
         /// <summary>
         /// The on attached event handler
         /// </summary>
         protected override void OnAttached()
         {
             base.OnAttached();
-
-            this.AssociatedObject.AllowApplyAutomaticLayout = true;
-            this.AssociatedObject.AllowApplyAutomaticLayoutForSubordinates = true;
-
             this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
-            this.CustomLayoutItems += this.OnCustomLayoutItems;
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
             this.AssociatedObject.Loaded += this.Loaded;
         }
@@ -86,23 +78,63 @@ namespace CDP4Grapher.Behaviors
         /// <param name="e"></param>
         private void Loaded(object sender, RoutedEventArgs e)
         {
-            this.ApplySpecifiedAutoLayout();
+            this.ApplySpecifiedLayout(this.CurrentLayout.layout, this.CurrentLayout.direction);
+        }
+        
+        /// <summary>
+        /// Apply the desired layout specified
+        /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
+        /// </summary>
+        public void ApplySpecifiedLayout(LayoutEnumeration layout)
+        {
+            if (layout == LayoutEnumeration.Circular)
+            {
+                this.ApplyCircularLayout();
+            }
+            else if (layout == LayoutEnumeration.OrganisationalChart)
+            {
+                this.ApplyOrgChartLayout();
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            this.CurrentLayout = (layout, null);
         }
 
         /// <summary>
-        /// Apply the desired layout when all the element have been drawed
+        /// Apply the desired layout specified
+        /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
+        /// <param name="direction">the value holding the direction of the layout</param>
+        /// <typeparam name="T">The devexpress enum type needed by the layouts Fugiyama, TipOver, Tree and Mind map </typeparam>
         /// </summary>
-        public void ApplySpecifiedAutoLayout()
+        public void ApplySpecifiedLayout<T>(LayoutEnumeration layout, T direction) where T : Enum
         {
-            //this.AssociatedObject.ApplyTreeLayout(DevExpress.Diagram.Core.Layout.LayoutDirection.LeftToRight, this.AssociatedObject.Items);
+            switch (layout)
+            {
+                case LayoutEnumeration.Fugiyama when direction is Direction d:
+                    this.ApplySugiyamaLayout(d);
+                    break;
+                case LayoutEnumeration.TreeView when direction is LayoutDirection d:
+                    this.ApplyTreeLayout(d);
+                    break;
+                case LayoutEnumeration.TipOver when direction is TipOverDirection d:
+                    this.ApplyTipOverLayout(d);
+                    break;
+                case LayoutEnumeration.MindMap when direction is OrientationKind d:
+                    this.ApplyMindMapLayout(d);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
-            this.AssociatedObject.ApplySugiyamaLayout(Direction.Right);
-            
+            this.CurrentLayout = (layout, direction);
         }
 
         private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
-            if (e.Action == ItemsChangedAction.Added && e.Item is DiagramContentItem diagramContentItem)
+            if (e.Item is DiagramContentItem diagramContentItem && e.Action == ItemsChangedAction.Added)
             {
                 this.AddConnector(diagramContentItem);
                 e.Item.IsManipulationEnabled = false;
@@ -110,35 +142,6 @@ namespace CDP4Grapher.Behaviors
                 e.Item.CanDelete = false;
                 e.Item.CanSelect = false;
             }
-        }
-
-        /// <summary>
-        /// Overrides the automatic layout behavior of the org chart diagramming control.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The arguments.</param>
-        private void OnCustomLayoutItems(object sender, DiagramCustomLayoutItemsEventArgs e)
-        {
-            if (this.ItemPositions.Count == 0)
-            {
-                return;
-            }
-
-            foreach (var item in e.Items)
-            {
-                if (((DiagramContentItem) item).Content is NamedThingDiagramContentItem namedThingDiagramContentItem)
-                {
-                    if (this.ItemPositions.TryGetValue(namedThingDiagramContentItem, out var itemPosition))
-                    {
-                        item.Position = itemPosition;
-
-                        // remove from collection as it is not useful anymore.
-                        this.ItemPositions.Remove(namedThingDiagramContentItem);
-                    }
-                }
-            }
-
-            e.Handled = true;
         }
 
         /// <summary>
@@ -150,7 +153,7 @@ namespace CDP4Grapher.Behaviors
         {
             if (this.AssociatedObject.DataContext is IGrapherViewModel viewModel)
             {
-                viewModel.Behavior = this;
+                viewModel.DiagramContextMenuViewModel.Behavior = this;
             }
         }
         
@@ -160,23 +163,14 @@ namespace CDP4Grapher.Behaviors
         protected override void OnDetaching()
         {
             this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
-
-            this.CustomLayoutItems -= this.OnCustomLayoutItems;
-            
+            this.AssociatedObject.ItemsChanged -= this.ItemsChanged;
+            this.AssociatedObject.Loaded -= this.Loaded;
             base.OnDetaching();
-        }
-        
-        /// <summary>
-        /// Resets the active tool.
-        /// </summary>
-        public void ResetTool()
-        {
-            this.AssociatedObject.ActiveTool = null;
         }
 
         public void AddConnector(DiagramContentItem diagramContentItemToConnectTo)
         {
-            var thing = diagramContentItemToConnectTo.Content as NestedElement;
+            var thing = (diagramContentItemToConnectTo.Content as GraphElementViewModel).Thing as NestedElement;
 
             if (this.DetermineBeginItemToConnectFrom(thing) is { } beginItem && beginItem != diagramContentItemToConnectTo)
             {
@@ -222,7 +216,7 @@ namespace CDP4Grapher.Behaviors
         /// <returns> a <see cref="string"/> containing the short name</returns>
         private static string GetShortName(DiagramContentItem diagramContentItem)
         {
-            if (diagramContentItem.Content is NestedElement element)
+            if ((diagramContentItem.Content as GraphElementViewModel)?.Thing is NestedElement element)
             {
                 return element.IsRootElement ? element.ShortName : element.ElementUsage.Last().ElementDefinition.ShortName;
             }
@@ -236,22 +230,73 @@ namespace CDP4Grapher.Behaviors
         /// <param name="format">the format to export the diagram to</param>
         public void ExportGraph(DiagramExportFormat format)
         {
-            var extension = format.ToString().ToLower();
-            var dialog = new SaveFileDialog() { FileName = $"CDP4Graph-{DateTime.Now:yyyy-MM-dd_HH-mm}", OverwritePrompt = true, Filter = $"{format} file (*.{extension}) | *.{extension};", AddExtension = true, DefaultExt = extension, ValidateNames = true };
-            
+            this.ExportGraph(new GrapherSaveFileDialog(format));
+        }
+
+        /// <summary>
+        /// Export the graph as the specified <see cref="DiagramExportFormat"/>
+        /// </summary>
+        /// <param name="format">the format to export the diagram to</param>
+        public void ExportGraph(IGrapherSaveFileDialog dialog)
+        {
             if (dialog.ShowDialog() == true)
             {
                 using var fileStream = dialog.OpenFile();
-                this.AssociatedObject.ExportDiagram(fileStream, format, 300, 0.5);
+                this.AssociatedObject.ExportDiagram(fileStream, dialog.Format, 72, 0.5);
             }
         }
 
         /// <summary>
-        /// Delete all connectors on the <see cref="DiagramControl"/>
+        /// Applies the Circular Layout onto the diagram elements
         /// </summary>
-        public void ClearConnectors()
+        public void ApplyCircularLayout()
         {
-            //do shit
+            this.AssociatedObject.ApplyCircularLayout(this.AssociatedObject.Items);
         }
+
+        /// <summary>
+        /// Applies the Tip over Layout onto the diagram elements
+        /// <param name="direction">the direction of the layout</param>
+        /// </summary>
+        public void ApplyTipOverLayout(TipOverDirection direction)
+        {
+            this.AssociatedObject.ApplyTipOverTreeLayout(direction, this.AssociatedObject.Items, SplitToConnectedComponentsMode.AllComponents);
+        }
+
+        /// <summary>
+        /// Applies the Org Chart Layout onto the diagram elements
+        /// </summary>
+        public void ApplyOrgChartLayout()
+        {
+            this.AssociatedObject.ApplyOrgChartLayout(this.AssociatedObject.Items, SplitToConnectedComponentsMode.AllComponents);
+        }
+
+        /// <summary>
+        /// Applies the Mind map Layout onto the diagram elements
+        /// <param name="direction">the direction of the layout</param>
+        /// </summary>
+        public void ApplyMindMapLayout(OrientationKind direction)
+        {
+            this.AssociatedObject.ApplyMindMapTreeLayout(direction, this.AssociatedObject.Items, SplitToConnectedComponentsMode.AllComponents);
+        }
+
+        /// <summary>
+        /// Applies the Fugiyama Layout onto the diagram elements
+        /// <param name="direction">the direction of the layout</param>
+        /// </summary>
+        public void ApplySugiyamaLayout(Direction direction)
+        {
+            this.AssociatedObject.ApplySugiyamaLayout(direction, this.AssociatedObject.Items);
+        }
+
+        /// <summary>
+        /// Applies the Tree Layout onto the diagram elements
+        /// <param name="direction">the direction of the layout</param>
+        /// </summary>
+        public void ApplyTreeLayout(LayoutDirection direction)
+        {
+            this.AssociatedObject.ApplyTreeLayout(direction, this.AssociatedObject.Items, SplitToConnectedComponentsMode.AllComponents);
+        }
+
     }
 }

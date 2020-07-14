@@ -29,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Views\Grapher.xaml" />
+    <None Remove="Views\GrapherDiagramControl.xaml" />
     <None Remove="Views\GrapherRibbon.xaml" />
   </ItemGroup>
   <ItemGroup>
@@ -38,6 +39,7 @@
     <PackageReference Include="CDP4Dal-CE" Version="6.0.1-2020.4.23.1-pre-release">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
+    <PackageReference Include="DynamicLanguageRuntime" Version="1.2.2" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp">
@@ -166,6 +168,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\GrapherDiagramControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Grapher.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

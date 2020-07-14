@@ -26,11 +26,15 @@
 
 namespace CDP4Grapher.Behaviors
 {
+    using System;
     using System.Collections.Generic;
 
     using CDP4Common.CommonData;
 
+    using CDP4Grapher.Utilities;
+
     using DevExpress.Diagram.Core;
+    using DevExpress.Diagram.Core.Layout;
     using DevExpress.Xpf.Diagram;
 
     /// <summary>
@@ -39,19 +43,23 @@ namespace CDP4Grapher.Behaviors
     public interface IGrapherOrgChartBehavior
     {
         /// <summary>
-        /// Apply the desired layout when all the element have been drawed
-        /// </summary>
-        void ApplySpecifiedAutoLayout();
-
-        /// <summary>
         /// Export the graph as the specified <see cref="DiagramExportFormat"/>
         /// </summary>
         /// <param name="format">the format to export the diagram to</param>
         void ExportGraph(DiagramExportFormat format);
 
         /// <summary>
-        /// Delete all connectors on the <see cref="DiagramControl"/>
+        /// Apply the desired layout specified
+        /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
+        /// <param name="direction">the value holding the direction of the layout</param>
+        /// <typeparam name="T">The devexpress enum type needed by the layouts Fugiyama, TipOver, Tree and Mind map </typeparam>
         /// </summary>
-        void ClearConnectors();
+        void ApplySpecifiedLayout<T>(LayoutEnumeration layout, T direction) where T : Enum;
+
+        /// <summary>
+        /// Apply the desired layout specified
+        /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
+        /// </summary>
+        void ApplySpecifiedLayout(LayoutEnumeration layout);
     }
 }

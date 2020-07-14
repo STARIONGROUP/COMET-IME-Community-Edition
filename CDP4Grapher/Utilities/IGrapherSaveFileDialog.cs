@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NestedElementExtension.cs" company="RHEA System S.A.">
+// <copyright file="IGrapherSaveFileDialog.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
@@ -26,24 +26,36 @@
 
 namespace CDP4Grapher.Utilities
 {
-    using System.CodeDom;
-    using System.Linq;
+    using System;
+    using System.IO;
 
-    using CDP4Common.EngineeringModelData;
+    using DevExpress.Diagram.Core;
 
     /// <summary>
-    /// Provides extensions for <see cref="NestedElement"/>
+    /// Defines a Save File dialog that will save as the outputs of the Grapher tool
     /// </summary>
-    public static class NestedElementExtension
+    public interface IGrapherSaveFileDialog
     {
-        /// <summary>
-        /// Gets the associated <see cref="ElementUsage"/> of the provided nestedElement
+        /// <summary> 
+        /// Gets or Sets the output file extension
         /// </summary>
-        /// <param name="nestedElement">the nested element to query on</param>
-        /// <returns>An <see cref="ElementUsage"/> instance</returns>
-        public static ElementUsage GetElementUsage(this NestedElement nestedElement)
-        {
-            return nestedElement.ElementUsage.Any() ?  nestedElement.ElementUsage.LastOrDefault() : null;
-        }
+        string Extension { get; }
+
+        /// <summary>
+        /// Gets or Sets the output file format
+        /// </summary>
+        DiagramExportFormat Format { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IDisposable"/> <see cref="Stream"/> to write the output in
+        /// </summary>
+        /// <returns>A <see cref="Stream"/> to write into</returns>
+        Stream OpenFile();
+
+        /// <summary>
+        /// Shows up the save dialog
+        /// </summary>
+        /// <returns>return a assert whether the dialog is showing</returns>
+        bool ShowDialog();
     }
 }

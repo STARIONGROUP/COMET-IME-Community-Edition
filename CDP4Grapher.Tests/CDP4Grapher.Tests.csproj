@@ -79,5 +79,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
     <ProjectReference Include="..\CDP4Grapher\CDP4Grapher.csproj" />
+    <ProjectReference Include="..\CDP4SiteDirectory\CDP4SiteDirectory.csproj" />
   </ItemGroup>
 </Project>
