@@ -233,10 +233,7 @@ namespace CDP4Grapher.ViewModels
             this.Disposables.Add(optionSubscription);
             
             var elementUsageSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementUsage))
-                .Where(
-                    objectChange =>
-                        (objectChange.EventKind != EventKind.Updated) &&
-                        (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                .Where(objectChange => objectChange.EventKind != EventKind.Updated)
                 .Select(x => x.ChangedThing as ElementUsage)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
@@ -253,20 +250,18 @@ namespace CDP4Grapher.ViewModels
 
             foreach (var nestedElement in elements)
             {
-                IDisposable listener = null;
-                
                 if (nestedElement.IsRootElement)
                 {
-                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(nestedElement.Container)
+                    var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(nestedElement.Container)
                         .Where(
                             objectChange =>
                                 objectChange.EventKind == EventKind.Updated &&
                                 objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(x => this.UpdateProperties());
-                }
 
-                this.subscriptions.Add(listener);
+                    this.subscriptions.Add(listener);
+                }
 
                 this.GraphElements.Add(new GraphElementViewModel(nestedElement));
             }

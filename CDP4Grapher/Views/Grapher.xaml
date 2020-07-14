@@ -30,22 +30,6 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-       <dxlc:LayoutGroup>
-            <dxb:ToolBarControl Height="30">
-                <dxb:BarButtonItem Command="{Binding ExportGraphAsJpg}"
-                                   Glyph="{dx:DXImageOffice2013 Image=ExportToIMG_16x16.png}"
-                                   Hint="Export Graph to PNG"
-                                   Content="Export Graph to PNG"
-                                   Description="Export Graph to PNG"
-                                   ToolTip="Export Graph to PNG"/>
-                <dxb:BarButtonItem Command="{Binding ExportGraphAsPdf}"
-                                   Glyph="{dx:DXImageOffice2013 Image=ExportToPDF_16x16.png}"
-                                   Hint="Export Graph to PDF"
-                                   Content="Export Graph to PDF"
-                                   Description="Export Graph to PDF"
-                                   ToolTip="Export Graph to PDF" />
-            </dxb:ToolBarControl>
-        </dxlc:LayoutGroup>
 
         <views:BrowserHeader Grid.Row="1" IsOptionDependant="True"/>
         <views1:GrapherDiagramControl Grid.Row="2" ShowPageBreaks="True" IsManipulationEnabled="False" AllowRotateItems="False" AllowResizeItems="False" AllowApplyAutomaticLayoutForSubordinates="True" AllowApplyAutomaticLayout="True" x:Name="diagramControl" Grid.Column="0">

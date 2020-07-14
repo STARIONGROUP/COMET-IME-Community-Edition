@@ -139,13 +139,13 @@ namespace CDP4Grapher.Tests.Data
         {
             this.TopElement = new ElementDefinition(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
 
-            this.ElementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, Container = this.Option};
+            this.ElementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
             this.ElementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
             this.ElementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
 
-            this.ElementUsage1 = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition1, Container = this.ElementDefinition1 };
-            this.ElementUsage2 = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition2, Container = this.ElementDefinition2 };
-            this.ElementUsage3 = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition3, Container = this.ElementDefinition3 };
+            this.ElementUsage1 = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition1, Container = this.TopElement };
+            this.ElementUsage2 = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition2, Container = this.TopElement };
+            this.ElementUsage3 = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition3, Container = this.TopElement };
         }
     }
 }
