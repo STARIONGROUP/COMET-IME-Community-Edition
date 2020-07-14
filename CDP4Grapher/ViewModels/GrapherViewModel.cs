@@ -44,13 +44,7 @@ namespace CDP4Grapher.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using CDP4Grapher.Behaviors;
-    using CDP4Grapher.Utilities;
-
-    using DevExpress.Diagram.Core;
-    using DevExpress.Diagram.Core.Layout;
     using DevExpress.Mvvm.Native;
-    using DevExpress.Xpf.Bars;
 
     using ReactiveUI;
 

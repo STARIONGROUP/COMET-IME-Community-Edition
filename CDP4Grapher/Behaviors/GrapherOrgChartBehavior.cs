@@ -128,7 +128,7 @@ namespace CDP4Grapher.Behaviors
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
+        public void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
             if (e.Item is DiagramContentItem diagramContentItem && e.Action == ItemsChangedAction.Added)
             {

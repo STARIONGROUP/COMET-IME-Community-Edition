@@ -29,9 +29,14 @@ namespace CDP4Grapher.Tests.ViewModels
     using System.Linq;
     using System.Threading;
 
+    using CDP4Common.EngineeringModelData;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
+    using CDP4Dal;
+    using CDP4Dal.Events;
 
     using CDP4Grapher.Tests.Data;
     using CDP4Grapher.ViewModels;
@@ -50,7 +55,7 @@ namespace CDP4Grapher.Tests.ViewModels
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IPluginSettingsService> pluginSettingService;
         private Mock<IHaveContextMenu> diagramControlContextMenu;
-        
+
         [SetUp]
         public override void Setup()
         {
@@ -70,10 +75,11 @@ namespace CDP4Grapher.Tests.ViewModels
             {
                 DiagramContextMenuViewModel = this.diagramControlContextMenu.Object
             };
-            
-            Assert.IsNotEmpty(vm.GraphElements);
 
-            Assert.IsTrue(vm.GraphElements.All(x => 
+            Assert.IsNotEmpty(vm.GraphElements);
+            Assert.IsNotNull(vm.DiagramContextMenuViewModel);
+
+            Assert.IsTrue(vm.GraphElements.All(x =>
                 x.NestedElementElement.Iid == this.TopElement.Iid ||
                 x.NestedElementElement.Iid == this.ElementUsage1.Iid ||
                 x.NestedElementElement.Iid == this.ElementUsage2.Iid ||
@@ -83,6 +89,15 @@ namespace CDP4Grapher.Tests.ViewModels
             Assert.IsNotNull(vm.CurrentModel);
             Assert.IsNotNull(vm.CurrentIteration);
             Assert.IsNotNull(vm.CurrentOption);
+        }
+
+        [Test]
+        public void VerifySubscription()
+        {
+            var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
+            this.EngineeringModelSetup.ShortName = "updatedShortName";
+            CDPMessageBus.Current.SendObjectChangeEvent(((EngineeringModel)this.Option.TopContainer).EngineeringModelSetup, EventKind.Updated);
+            Assert.AreEqual(this.EngineeringModelSetup.ShortName, ((EngineeringModel)this.Option.TopContainer).EngineeringModelSetup.ShortName);
         }
     }
 }

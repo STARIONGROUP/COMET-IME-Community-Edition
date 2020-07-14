@@ -30,7 +30,9 @@ namespace CDP4Grapher.ViewModels
     using CDP4Grapher.Behaviors;
 
     using DevExpress.Xpf.Bars;
-    
+
+    using ReactiveUI;
+
     /// <summary>
     /// Definition of a <see cref="GrapherViewModel"/> exposing public properties and methods
     /// </summary>
@@ -40,5 +42,10 @@ namespace CDP4Grapher.ViewModels
         /// Gets or sets the custom context menu builder
         /// </summary>
         IHaveContextMenu DiagramContextMenuViewModel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of <see cref="GraphElementViewModel"/> to display.
+        /// </summary>
+        ReactiveList<GraphElementViewModel> GraphElements { get; set; }
     }
 }

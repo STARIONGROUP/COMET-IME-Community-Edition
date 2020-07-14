@@ -28,7 +28,9 @@ namespace CDP4Grapher.Tests.Behaviors
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading;
+    using System.Windows.Data;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Types;
@@ -41,10 +43,17 @@ namespace CDP4Grapher.Tests.Behaviors
 
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
+    using DevExpress.Mvvm.Native;
+    using DevExpress.Xpf.Charts;
+    using DevExpress.Xpf.Diagram;
 
     using Moq;
 
     using NUnit.Framework;
+
+    using ReactiveUI;
+
+    using LayoutDirection = DevExpress.Diagram.Core.Layout.LayoutDirection;
 
     [TestFixture, Apartment(ApartmentState.STA)]
     public class GrapherOrgChartBehaviorTestFixture : GrapherBaseTestData
@@ -52,6 +61,7 @@ namespace CDP4Grapher.Tests.Behaviors
         private GrapherOrgChartBehavior behavior;
         private Mock<IGrapherSaveFileDialog> saveFileDialog;
         private List<GraphElementViewModel> elementViewModels;
+        private Mock<IGrapherViewModel> grapherViewModel;
 
         [SetUp]
         public override void Setup()
@@ -60,7 +70,6 @@ namespace CDP4Grapher.Tests.Behaviors
 
             this.elementViewModels = new List<GraphElementViewModel>()
             {
-                new GraphElementViewModel(this.NestedElement),
                 new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Cache, this.Uri)
                 {
                     RootElement = this.ElementDefinition1,
@@ -81,7 +90,8 @@ namespace CDP4Grapher.Tests.Behaviors
             //var nestedElement = new NestedElementTreeGenerator().Generate(this.Option, this.Domain).Select(x => new GraphElementViewModel(x));
 
             this.behavior = new GrapherOrgChartBehavior();
-
+            this.grapherViewModel = new Mock<IGrapherViewModel>();
+            this.grapherViewModel.Setup(x => x.GraphElements).Returns(new ReactiveList<GraphElementViewModel>(this.elementViewModels));
             this.saveFileDialog = new Mock<IGrapherSaveFileDialog>();
             this.saveFileDialog.Setup(x => x.ShowDialog()).Returns(true);
             this.saveFileDialog.Setup(x => x.OpenFile()).Returns(new MemoryStream());
@@ -96,9 +106,10 @@ namespace CDP4Grapher.Tests.Behaviors
         [Test]
         public void VerifyProperties()
         {
-            this.behavior.Attach(new GrapherDiagramControl() {DataContext = new Mock<IGrapherViewModel>().Object});
+            var diagramControl = new GrapherDiagramControl() { DataContext = this.grapherViewModel.Object };
+            this.behavior.Attach(diagramControl);
             Assert.IsTrue(this.behavior.CurrentLayout != default);
-            this.behavior.ItemsSource = this.elementViewModels;
+            Assert.AreSame(this.behavior.AssociatedObject, diagramControl);
         }
 
         [Test]
@@ -145,6 +156,18 @@ namespace CDP4Grapher.Tests.Behaviors
             Assert.AreEqual(this.behavior.CurrentLayout.direction, LayoutDirection.BottomToTop);
 
             Assert.Throws(typeof(ArgumentOutOfRangeException), () => this.behavior.ApplySpecifiedLayout(LayoutEnumeration.TipOver, Direction.Right));
+        }
+
+        [Test]
+        public void VerifyItemsChanged()
+        {
+            var diagramControl = new GrapherDiagramControl() { DataContext = this.grapherViewModel.Object };
+            this.behavior.Attach(diagramControl);
+
+            foreach (var elementViewModel in this.elementViewModels)
+            {
+                this.behavior.ItemsChanged(null, new DiagramItemsChangedEventArgs(diagramControl, new DiagramContentItem() { Content = elementViewModel }, ItemsChangedAction.Added));
+            }
         }
     }
 }
