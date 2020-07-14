@@ -15,8 +15,7 @@ namespace CDP4PropertyGrid.Views
     /// Interaction logic for ModelViewRibbon.xaml
     /// </summary>
     [Export(typeof(ViewRibbonControl))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
-    public partial class ViewRibbonControl : ExtendedRibbonPageGroup, IView
+    public partial class ViewRibbonControl : IView
     {
         [ImportingConstructor]
         public ViewRibbonControl()

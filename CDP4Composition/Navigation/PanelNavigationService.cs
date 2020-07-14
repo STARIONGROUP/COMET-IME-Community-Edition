@@ -200,7 +200,7 @@ namespace CDP4Composition.Navigation
         {
             var lazyView = this.GetViewType(viewModel);
 
-            var parameters = new object[] {true};
+            var parameters = new object[] { true };
 
             if (Activator.CreateInstance(lazyView.Value.GetType(), parameters) is IPanelView view)
             {
@@ -245,6 +245,17 @@ namespace CDP4Composition.Navigation
             else
             {
                 this.ViewModelViewPairs.TryGetValue(viewModel, out var view);
+                this.CleanUpPanelsAndSendCloseEvent();
+
+                if (view != null)
+                {
+                    var regions = this.regionCollectionSearcher.GetRegionsByView(this.regionManager.Regions, view);
+                    
+                    foreach (var region in regions)
+                    {
+                        region..Items.FirstOrDefault(a => a.Equals(view));
+                    }
+                }
 
                 var regionName = string.Empty;
 

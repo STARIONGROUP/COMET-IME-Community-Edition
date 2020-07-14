@@ -1,25 +1,21 @@
-﻿<ribbon:ExtendedRibbonPageGroup x:Class="CDP4LogInfo.Views.LogInfoControls"
-                                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
-                                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                                xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-                                xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
-                                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                                xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
-                                Name="LogInfoRibbonControls"
-                                ContainerRegionName="{x:Static cdp4Composition:RegionNames.ViewRibbonPageRegion}"
-                                ShowCaptionButton="False"
-                                MergeOrder="11000"
-                                mc:Ignorable="d">
+﻿<dxb:BarCheckItem x:Class="CDP4LogInfo.Views.LogInfoControls"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                  xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+                  xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
+                  Name="OpenCloseLogPanel"
 
-    <dxb:BarCheckItem Name="OpenCloseLogPanel"
-                      Command="{Binding OpenClosePanelCommand}"
-                      Content="Show the Log Panel"
-                      Glyph="{dx:DXImage Image=info_128x128.png}"
-                      Hint="Open or Close the Log Panel"
-                      IsChecked="{Binding IsChecked,
+                  ribbon:CDP4RibbonMerge.MergePage="View"
+                  ribbon:CDP4RibbonMerge.MergePageGroup="Data Inspection"
+                  ribbon:CDP4RibbonMerge.GroupMergeOrderInPage="2000"
+                  MergeOrder="9001"
+
+                  Command="{Binding OpenClosePanelCommand}"
+                  Content="Log"
+                  Glyph="{dx:DXImage Image=info_128x128.png}"
+                  Hint="Open or close the Log"
+                  IsChecked="{Binding IsChecked,
                                           Mode=TwoWay}"
-                      RibbonStyle="Large" />
-
-</ribbon:ExtendedRibbonPageGroup>
+                  RibbonStyle="Large">
+</dxb:BarCheckItem>

@@ -1,22 +1,21 @@
-﻿<ribbon:ExtendedRibbonPageGroup
-    x:Class="CDP4PropertyGrid.Views.ViewRibbonControl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
-    xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
-    Name="PropertyGridViewRibbonPageGroup"
-    ShowCaptionButton="False"
-    MergeOrder="10000"
-    ContainerRegionName="{x:Static cdp4Composition:RegionNames.ViewRibbonPageRegion}">
+﻿<dxb:BarButtonItem x:Class="CDP4PropertyGrid.Views.ViewRibbonControl"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+                  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                  xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
 
-    <dxb:BarCheckItem Name="OpenClosePropertyGrid"
-                      Content="Show the Property Grid"
-                      Glyph="{dx:DXImage Image=InitialState_16x16.png}"
-                      LargeGlyph="{dx:DXImage Image=InitialState_32x32.png}"
-                      RibbonStyle="Large"
-                      Hint="Show or Hide the Property Grid"
-                      IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                      Command="{Binding OpenClosePanelCommand}"/>
-</ribbon:ExtendedRibbonPageGroup>
+                  Name="OpenPropertyGrid"
+
+                  ribbon:CDP4RibbonMerge.MergePage="View"
+                  ribbon:CDP4RibbonMerge.MergePageGroup="Data Inspection"
+                  ribbon:CDP4RibbonMerge.GroupMergeOrderInPage="2000"
+                  MergeOrder="9000"
+
+                  Content="Property Grid"
+                  Glyph="{dx:DXImage Image=InitialState_16x16.png}"
+                  LargeGlyph="{dx:DXImage Image=InitialState_32x32.png}"
+                  RibbonStyle="Large"
+                  Hint="Open the Property Grid"
+                  Command="{Binding OpenPanelCommand}">
+</dxb:BarButtonItem>

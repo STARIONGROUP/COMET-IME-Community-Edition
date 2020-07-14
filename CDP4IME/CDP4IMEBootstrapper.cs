@@ -42,16 +42,13 @@ namespace CDP4IME
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;
 
-    using Microsoft.Practices.Prism.MefExtensions;
-    using Microsoft.Practices.Prism.Regions;
-
     using NLog;
 
     /// <summary>
     /// The Class that provides the bootstrapping sequence that registers all the 
     /// Modules of the application and initializes the Shell
     /// </summary>
-    public class CDP4IMEBootstrapper : MefBootstrapper
+    public class CDP4IMEBootstrapper
     {
         /// <summary>
         /// A <see cref="Logger"/> instance
@@ -67,7 +64,7 @@ namespace CDP4IME
         /// Creates the shell or main window of the application.
         /// </summary>
         /// <returns>The shell of the application.</returns>
-        protected override DependencyObject CreateShell()
+        protected DependencyObject CreateShell()
         {
             logger.Trace("Creating Shell");
             return this.Container.GetExportedValue<Shell>();
@@ -76,7 +73,7 @@ namespace CDP4IME
         /// <summary>
         /// Initializes the shell.
         /// </summary>
-        protected override void InitializeShell()
+        protected void InitializeShell()
         {
             this.UpdateBootstrapperState("Loading CDP4 Plugins");
 
@@ -137,26 +134,26 @@ namespace CDP4IME
             this.UpdateBootstrapperState($"CDP4 Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
         }
 
-        /// <summary>
-        /// Register the custom Region Adapters
-        /// </summary>
-        /// <returns>
-        /// an instance of <see cref="RegionAdapterMappings"/> containing the registered Region Adapters
-        /// </returns>
-        protected override RegionAdapterMappings ConfigureRegionAdapterMappings()
-        {
-            this.UpdateBootstrapperState("Configuring Region Mappings");
+        ///// <summary>
+        ///// Register the custom Region Adapters
+        ///// </summary>
+        ///// <returns>
+        ///// an instance of <see cref="RegionAdapterMappings"/> containing the registered Region Adapters
+        ///// </returns>
+        //protected override RegionAdapterMappings ConfigureRegionAdapterMappings()
+        //{
+        //    this.UpdateBootstrapperState("Configuring Region Mappings");
 
-            var mappings = base.ConfigureRegionAdapterMappings();
+        //    var mappings = base.ConfigureRegionAdapterMappings();
 
-            mappings.RegisterMapping(typeof(LayoutPanel), this.Container.GetExportedValue<LayoutPanelAdapter>());
-            mappings.RegisterMapping(typeof(LayoutGroup), this.Container.GetExportedValue<LayoutGroupAdapter>());
-            mappings.RegisterMapping(typeof(DocumentGroup), this.Container.GetExportedValue<DocumentGroupAdapter>());
-            mappings.RegisterMapping(typeof(TabbedGroup), this.Container.GetExportedValue<TabbedGroupAdapter>());
-            mappings.RegisterMapping(typeof(RibbonControl), this.Container.GetExportedValue<RibbonAdapter>());
+        //    mappings.RegisterMapping(typeof(LayoutPanel), this.Container.GetExportedValue<LayoutPanelAdapter>());
+        //    mappings.RegisterMapping(typeof(LayoutGroup), this.Container.GetExportedValue<LayoutGroupAdapter>());
+        //    mappings.RegisterMapping(typeof(DocumentGroup), this.Container.GetExportedValue<DocumentGroupAdapter>());
+        //    mappings.RegisterMapping(typeof(TabbedGroup), this.Container.GetExportedValue<TabbedGroupAdapter>());
+        //    mappings.RegisterMapping(typeof(RibbonControl), this.Container.GetExportedValue<RibbonAdapter>());
 
-            return mappings;
-        }
+        //    return mappings;
+        //}
 
         /// <summary>
         /// Updates the state of the <see cref="CDP4IMEBootstrapper"/> and shows this on the splash screen

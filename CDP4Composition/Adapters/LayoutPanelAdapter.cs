@@ -7,7 +7,9 @@
 namespace CDP4Composition.Adapters
 {
     using System.ComponentModel.Composition;
+
     using DevExpress.Xpf.Docking;
+
     using Microsoft.Practices.Prism.Regions;
 
     /// <summary>
@@ -55,7 +57,7 @@ namespace CDP4Composition.Adapters
                 if (e.NewItems != null)
                 {
                     regionTarget.Content = e.NewItems[0];
-                }                
+                }
             };
         }
     }

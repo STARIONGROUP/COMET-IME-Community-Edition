@@ -242,7 +242,31 @@
 	<s:Boolean x:Key="/Default/CodeStyle/CSharpUsing/QualifiedUsingAtNestedScope/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/EnableStyleCopSupport/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/ShowEditorConfigStatusBarIndicator/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue"></s:String>
+	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue"> --------------------------------------------------------------------------------------------------------------------&#xD;
+ &lt;copyright file="$FILENAME$" company="RHEA System S.A."&gt;&#xD;
+    Copyright (c) 2015-$CURRENT_YEAR$ RHEA System S.A.&#xD;
+&#xD;
+    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,&#xD;
+            Nathanael Smiechowski, Kamil Wojnowski&#xD;
+&#xD;
+    This file is part of CDP4-IME Community Edition. &#xD;
+    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration&#xD;
+    compliant with ECSS-E-TM-10-25 Annex A and Annex C.&#xD;
+&#xD;
+    The CDP4-IME Community Edition is free software; you can redistribute it and/or&#xD;
+    modify it under the terms of the GNU Affero General Public&#xD;
+    License as published by the Free Software Foundation; either&#xD;
+    version 3 of the License, or any later version.&#xD;
+&#xD;
+    The CDP4-IME Community Edition is distributed in the hope that it will be useful,&#xD;
+    but WITHOUT ANY WARRANTY; without even the implied warranty of&#xD;
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the&#xD;
+    GNU Affero General Public License for more details.&#xD;
+&#xD;
+    You should have received a copy of the GNU Affero General Public License&#xD;
+    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.&#xD;
+ &lt;/copyright&gt;&#xD;
+ --------------------------------------------------------------------------------------------------------------------</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/Generate/=Implementations/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/Generate/=Implementations/Options/=Async/@EntryIndexedValue">False</s:String>
 	<s:String x:Key="/Default/CodeStyle/Generate/=Implementations/Options/=Mutable/@EntryIndexedValue">False</s:String>

@@ -296,13 +296,7 @@
 
                 <ribbon:ExtendedRibbonPage Name="ViewRibbonPage"
                                            Caption="View"
-                                           MergeOrder="2000"
-                                           RegionName="{x:Static cdp4Composition:RegionNames.ViewRibbonPageRegion}" />
-
-                <ribbon:ExtendedRibbonPage Name="ModelRibbonPage"
-                                           Caption="Model"
-                                           MergeOrder="3000"
-                                           RegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}" />
+                                           MergeOrder="1000" />
             </dxr:RibbonDefaultPageCategory>
         </dxr:RibbonControl>
 

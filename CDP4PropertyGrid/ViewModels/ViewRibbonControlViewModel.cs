@@ -1,18 +1,37 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ViewRibbonControlViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
-// </copyright>
-// -------------------------------------------------------------------------------------------------
+﻿//  --------------------------------------------------------------------------------------------------------------------
+//  <copyright file="ViewRibbonControlViewModel.cs" company="RHEA System S.A.">
+//     Copyright (c) 2015-2020 RHEA System S.A.
+// 
+//     Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//             Nathanael Smiechowski, Kamil Wojnowski
+// 
+//     This file is part of CDP4-IME Community Edition.
+//     The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//     compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//     The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//     modify it under the terms of the GNU Affero General Public
+//     License as published by the Free Software Foundation; either
+//     version 3 of the License, or any later version.
+// 
+//     The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//     GNU Affero General Public License for more details.
+// 
+//     You should have received a copy of the GNU Affero General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//  </copyright>
+//  --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4PropertyGrid.ViewModels
 {
     using System;
-    using System.Reactive.Linq;
 
     using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Events;
-    using CDP4Dal;
+
     using Microsoft.Practices.ServiceLocation;
+
     using ReactiveUI;
 
     /// <summary>
@@ -21,61 +40,27 @@ namespace CDP4PropertyGrid.ViewModels
     public class ViewRibbonControlViewModel : ReactiveObject
     {
         /// <summary>
-        /// Backing field for <see cref="IsChecked"/>
-        /// </summary>
-        private bool isChecked;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ViewRibbonControlViewModel"/> class
         /// </summary>
         public ViewRibbonControlViewModel()
         {
-            this.OpenClosePanelCommand = ReactiveCommand.Create();
-            this.OpenClosePanelCommand.Subscribe(_ => this.ExecuteOpenClosePanel());
-
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
-                .Where(x => x.ViewModel.GetType() == typeof(PropertyGridViewModel) && x.PanelStatus == PanelStatus.Closed)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.HandleClosedPanel());
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the BarCheckItem is checked
-        /// </summary>
-        public bool IsChecked
-        {
-            get { return this.isChecked; }
-            set { this.RaiseAndSetIfChanged(ref this.isChecked, value); }
+            this.OpenPanelCommand = ReactiveCommand.Create();
+            this.OpenPanelCommand.Subscribe(_ => this.ExecuteOpenPanel());
         }
 
         /// <summary>
         /// Gets the open or close Log Panel
         /// </summary>
-        public ReactiveCommand<object> OpenClosePanelCommand { get; private set; }
+        public ReactiveCommand<object> OpenPanelCommand { get; private set; }
 
         /// <summary>
         /// Executes the Open or Close panel command
         /// </summary>
-        private void ExecuteOpenClosePanel()
+        private void ExecuteOpenPanel()
         {
             var panelNavigationService = ServiceLocator.Current.GetInstance<IPanelNavigationService>();
 
-            if (this.IsChecked)
-            {
-                panelNavigationService.Open(new PropertyGridViewModel(), true);
-            }
-            else
-            {
-                panelNavigationService.Close(typeof(PropertyGridViewModel));
-            }
-        }
-
-        /// <summary>
-        /// Handles the log closed panel event
-        /// </summary>
-        private void HandleClosedPanel()
-        {
-            this.IsChecked = false;
+            panelNavigationService.Open(new PropertyGridViewModel(), true);
         }
     }
 }

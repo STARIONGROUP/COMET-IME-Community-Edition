@@ -16,7 +16,7 @@ namespace CDP4LogInfo.Views
     /// Interaction logic for LogInfoControls.xaml
     /// </summary>
     [Export(typeof(LogInfoControls))]
-    public partial class LogInfoControls : ExtendedRibbonPageGroup, IView
+    public partial class LogInfoControls : IView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LogInfoControls"/> class

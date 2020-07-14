@@ -47,12 +47,12 @@ namespace CDP4PropertyGrid.Tests
             var vm = new ViewRibbonControlViewModel();
 
             vm.IsChecked = true;
-            vm.OpenClosePanelCommand.Execute(null);
+            vm.OpenPanelCommand.Execute(null);
 
             this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true));
 
             vm.IsChecked = false;
-            vm.OpenClosePanelCommand.Execute(null);
+            vm.OpenPanelCommand.Execute(null);
             this.navigationService.Verify(x => x.Close(It.IsAny<Type>()));
 
             // Verify PanelEVentClosed
