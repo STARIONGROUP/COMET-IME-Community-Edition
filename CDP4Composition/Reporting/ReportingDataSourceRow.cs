@@ -35,15 +35,9 @@ namespace CDP4Composition.Reporting
 
     public class ReportingDataSourceRow<T> where T : ReportingDataSourceRowRepresentation, new()
     {
-        #region Hierarchy
-
         private readonly ReportingDataSourceRow<T> parent;
 
         internal List<ReportingDataSourceRow<T>> Children { get; } = new List<ReportingDataSourceRow<T>>();
-
-        #endregion
-
-        #region Associated Element
 
         private readonly ElementBase elementBase;
 
@@ -57,19 +51,11 @@ namespace CDP4Composition.Reporting
             ? this.parent.FullyQualifiedName + "." + this.ElementUsage.ShortName
             : this.ElementDefinition.ShortName;
 
-        #endregion
-
-        #region Parameters
-
         private static readonly IEnumerable<FieldInfo> ParameterFields = typeof(T).GetFields()
             .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceParameter<T>)));
 
         private readonly Dictionary<Type, ReportingDataSourceParameter<T>> reportedParameters =
             new Dictionary<Type, ReportingDataSourceParameter<T>>();
-
-        #endregion
-
-        #region Category filtering
 
         private readonly Category filterCategory;
 
@@ -78,8 +64,6 @@ namespace CDP4Composition.Reporting
 
         private bool IsRelevant =>
             this.IsVisible || this.Children.Any(child => child.IsRelevant);
-
-        #endregion
 
         public ReportingDataSourceRow(
             ElementBase elementBase,

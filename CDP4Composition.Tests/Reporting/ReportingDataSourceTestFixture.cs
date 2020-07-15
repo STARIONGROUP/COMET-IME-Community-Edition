@@ -68,8 +68,6 @@ namespace CDP4Composition.Tests.Reporting
         private ElementUsage eu2n31;
         private ElementUsage eu2n32;
 
-        #region Subclasses
-
         [ParameterTypeShortName("type1")]
         private class TestParameter1 : ReportingDataSourceParameter<RowRepresentation>
         {
@@ -93,8 +91,6 @@ namespace CDP4Composition.Tests.Reporting
             public TestParameter2 parameter2;
         }
 
-        #endregion
-
         [SetUp]
         public void SetUp()
         {
@@ -102,7 +98,7 @@ namespace CDP4Composition.Tests.Reporting
 
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, null);
 
-            #region Categories
+            // Categories
 
             this.cat1 = new Category(Guid.NewGuid(), this.cache, null)
             {
@@ -128,9 +124,7 @@ namespace CDP4Composition.Tests.Reporting
 
             this.cache.TryAdd(new CacheKey(this.cat3.Iid, null), new Lazy<Thing>(() => this.cat3));
 
-            #endregion
-
-            #region Parameter types
+            // Parameter types
 
             this.parameterType1 = new SimpleQuantityKind(Guid.NewGuid(), null, null)
             {
@@ -150,9 +144,7 @@ namespace CDP4Composition.Tests.Reporting
                 Name = "parameter type 3"
             };
 
-            #endregion
-
-            #region Element Definitions
+            // Element Definitions
 
             this.ed1 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
@@ -194,9 +186,7 @@ namespace CDP4Composition.Tests.Reporting
             this.AddParameter(this.ed3, this.parameterType2, "32");
             this.AddParameter(this.ed3, this.parameterType3, "33");
 
-            #endregion
-
-            #region Element Usages
+            // Element Usages
 
             this.eu12p1 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
@@ -258,9 +248,7 @@ namespace CDP4Composition.Tests.Reporting
                 Name = "element usage 2n->3 #2"
             };
 
-            #endregion
-
-            #region Structure
+            // Structure
 
             this.iteration.TopElement = this.ed1;
             this.ed1.Category.Add(this.cat1);
@@ -279,8 +267,6 @@ namespace CDP4Composition.Tests.Reporting
             this.eu2p31.Category.Add(this.cat3);
             this.ed2p.ContainedElement.Add(this.eu2p31);
             this.ed2p.ContainedElement.Add(this.eu2p32);
-
-            #endregion
 
             // Product tree:
             // ["cat1"] +> "ed1"
@@ -343,8 +329,6 @@ namespace CDP4Composition.Tests.Reporting
             elementUsage.ParameterOverride.Add(parameterOverride);
         }
 
-        #region Structure tests
-
         [Test]
         public void VerifyStructure()
         {
@@ -381,10 +365,6 @@ namespace CDP4Composition.Tests.Reporting
             Assert.IsNull(rows.FirstOrDefault(x => x.ElementName == "ed1.eu12n2"));
         }
 
-        #endregion
-
-        #region Row tests
-
         [Test]
         public void VerifyThatRowIdentifiesParameters()
         {
@@ -400,10 +380,6 @@ namespace CDP4Composition.Tests.Reporting
             Assert.IsNotNull(row.GetParameter<TestParameter2>());
             Assert.Throws<KeyNotFoundException>(() => row.GetParameter<TestParameter3>());
         }
-
-        #endregion
-
-        #region Parameter tests
 
         [Test]
         public void VerifyParameterShortNameInitialization()
@@ -514,7 +490,5 @@ namespace CDP4Composition.Tests.Reporting
             Assert.AreEqual("-22", children2[0].GetValue());
             Assert.AreEqual("22", children2[1].GetValue());
         }
-
-        #endregion
     }
 }

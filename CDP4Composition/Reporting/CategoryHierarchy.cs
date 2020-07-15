@@ -77,13 +77,9 @@ namespace CDP4Composition.Reporting
             }
         }
 
-        #region Hierarchy
+        public readonly Category Category;
 
         public CategoryHierarchy Child { get; private set; }
-
-        #endregion
-
-        public readonly Category Category;
 
         private CategoryHierarchy(Category category)
         {
