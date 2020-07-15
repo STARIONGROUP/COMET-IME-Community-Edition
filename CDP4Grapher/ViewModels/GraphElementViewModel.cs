@@ -116,14 +116,9 @@ namespace CDP4Grapher.ViewModels
         public IDisposable NestedElementElementListener { get; set; }
         
         /// <summary>
-        /// Gets or Sets the NestedElementElement Assiated with the <see cref="Thing"/>
+        /// Gets or Sets the NestedElementElement Associated with the <see cref="Thing"/>
         /// </summary>
         public ElementBase NestedElementElement { get; set; }
-
-        ///// <summary>
-        ///// Gets or Sets the NestedElementElement Assiated with the <see cref="Thing"/>
-        ///// </summary>
-        //public ElementBase NestedElementElement { get; set; }
 
         /// <summary>
         /// Instanciate a <see cref="GrapherViewModel"/> updating its property with the given <see cref="NestedElement"/> property

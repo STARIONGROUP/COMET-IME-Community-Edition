@@ -88,7 +88,7 @@ namespace CDP4Grapher.Behaviors
             }
             else
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(layout), layout, $"The {layout} provided must be used with a direction");
             }
 
             this.CurrentLayout = (layout, null);
@@ -117,7 +117,7 @@ namespace CDP4Grapher.Behaviors
                     this.ApplyMindMapLayout(d);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(layout), layout, $"the combination between {layout} and {direction} is invalid");
             }
 
             this.CurrentLayout = (layout, direction);
@@ -239,7 +239,7 @@ namespace CDP4Grapher.Behaviors
         /// <param name="dialog">the <see cref="IGrapherSaveFileDialog"/> instance to perform the export operation</param>
         public void ExportGraph(IGrapherSaveFileDialog dialog)
         {
-            if (dialog.ShowDialog() == true)
+            if (dialog.ShowDialog())
             {
                 using var fileStream = dialog.OpenFile();
                 this.AssociatedObject.ExportDiagram(fileStream, dialog.Format, 72, 0.5);

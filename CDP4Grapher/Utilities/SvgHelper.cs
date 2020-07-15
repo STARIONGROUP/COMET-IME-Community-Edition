@@ -41,7 +41,7 @@ namespace CDP4Grapher.Utilities
         /// <summary>
         /// Base resource path for devexpress svg
         /// </summary>
-        private const string DevExpressResourceBasePath = "pack://application:,,,/DevExpress.Images.v20.1;component/SvgImages/";
+        private const string DevExpressResourceBasePath = "DevExpress.Images.v20.1;component/SvgImages/";
 
         /// <summary>
         /// Converts Svg bytes to ImageSource
@@ -64,7 +64,7 @@ namespace CDP4Grapher.Utilities
         /// <returns>a usable <see cref="ImageSource"/></returns>
         public static ImageSource ToImageSource(string resourceName, bool isSvgFromDevepress = true)
         {
-            var uri = isSvgFromDevepress || !resourceName.StartsWith("pack://") ? new Uri(Path.Combine(DevExpressResourceBasePath, resourceName)) : new Uri(resourceName);
+            var uri = isSvgFromDevepress || !resourceName.StartsWith("pack://") ? new Uri(Path.Combine("pack://application:,,,/", DevExpressResourceBasePath, resourceName)) : new Uri(resourceName);
             return ToImageSource(uri);
         }
     }
