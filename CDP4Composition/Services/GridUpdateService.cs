@@ -1,19 +1,23 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="GridUpdateService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Services
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows;
+
     using DevExpress.Xpf.Grid;
+
     using NLog;
 
     /// <summary>
     /// The service used to lock the update of a grid view when update in the view-model are occuring
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class GridUpdateService
     {
         /// <summary>
@@ -30,7 +34,7 @@ namespace CDP4Composition.Services
         /// Sets the <see cref="UpdateStartedProperty"/> property
         /// </summary>
         /// <param name="element">The <see cref="UIElement"/> where the value is set</param>
-        /// <param name="value">The <see cref="Boolean"/> value</param>
+        /// <param name="value">The <see cref="bool"/> value</param>
         public static void SetUpdateStarted(UIElement element, bool? value)
         {
             try
@@ -40,7 +44,7 @@ namespace CDP4Composition.Services
             catch (Exception exception)
             {
                 Logger.Error(exception, $"A problem occurend when SetUpdateStarted was called");
-            }            
+            }
         }
 
         /// <summary>
@@ -61,6 +65,7 @@ namespace CDP4Composition.Services
         private static void UpdateStartedPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var grid = source as GridDataControlBase;
+
             if (grid == null)
             {
                 throw new InvalidOperationException("The Service can only be used on GridDataControlBase view elements such as GridControl or TreeListControl.");
@@ -75,15 +80,20 @@ namespace CDP4Composition.Services
                 else if ((bool?)e.NewValue == false)
                 {
                     var treeListControl = grid as TreeListControl;
+
                     if (treeListControl != null)
                     {
-                        treeListControl.EndDataUpdate(); 
+                        treeListControl.View.CancelRowEdit();
+                        treeListControl.EndDataUpdate();
                     }
                     else
                     {
                         var gridControl = grid as GridControl;
+
                         if (gridControl != null && gridControl.DataController.IsUpdateLocked)
                         {
+                            // cancel out of any active edit.
+                            gridControl.View.CancelRowEdit();
                             grid.EndDataUpdate();
                         }
                     }
