@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{7D862014-4CE6-41AC-940C-49D7DE4C485D}</ProjectGuid>
+    <MinIMEVersion>6.0.0.4</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
    
     <AssemblyTitle>CDP4BudgetViewer</AssemblyTitle>

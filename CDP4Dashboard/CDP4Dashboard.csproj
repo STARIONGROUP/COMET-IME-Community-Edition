@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{89E91585-C793-4D90-AB8C-FD295590665B}</ProjectGuid>
+    <MinIMEVersion>6.0.0.4</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
    
     <LangVersion>latest</LangVersion>
