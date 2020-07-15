@@ -56,13 +56,11 @@ namespace CDP4Composition.Reporting
 
         internal void Initialize(ContainerList<ParameterValueSet> valueSet)
         {
-            // TODO Options, Finite States, and Array parameter types
             this.Value = valueSet.First().ActualValue.First();
         }
 
         internal void Initialize(ContainerList<ParameterOverrideValueSet> valueSet)
         {
-            // TODO Options, Finite States, and Array parameter types
             this.Value = valueSet.First().ActualValue.First();
         }
 
