@@ -98,10 +98,7 @@ namespace CDP4Composition.Reporting
                     .GetConstructor(Type.EmptyTypes)
                     .Invoke(new object[] { }) as ReportingDataSourceParameter<T>;
 
-                // set parameter row from here so no constructor declaration is needed
-                typeof(ReportingDataSourceParameter<T>)
-                    .GetField("row", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .SetValue(parameter, this);
+                parameter.Row = this;
 
                 this.reportedParameters[type] = parameter;
 
@@ -150,9 +147,10 @@ namespace CDP4Composition.Reporting
 
         public List<T> GetTabularRepresentation()
         {
-            var tabularRepresentation = new List<T>();
-
-            tabularRepresentation.Add(this.GetRowTabularRepresentation());
+            var tabularRepresentation = new List<T>
+            {
+                this.GetRowTabularRepresentation()
+            };
 
             foreach (var row in this.Children)
             {
@@ -164,13 +162,11 @@ namespace CDP4Composition.Reporting
 
         private T GetRowTabularRepresentation()
         {
-            var row = new T();
-
-            typeof(T).GetField("ElementName")
-                .SetValue(row, this.FullyQualifiedName);
-
-            typeof(T).GetField("IsVisible")
-                .SetValue(row, this.IsVisible);
+            var row = new T
+            {
+                ElementName = this.FullyQualifiedName,
+                IsVisible = this.IsVisible
+            };
 
             if (!this.IsVisible)
             {

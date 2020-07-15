@@ -43,8 +43,7 @@ namespace CDP4Composition.Reporting
             return attr as ParameterTypeShortNameAttribute;
         }
 
-        // set with reflection to avoid the user-declared constructor having to see it
-        private readonly ReportingDataSourceRow<T> row;
+        internal ReportingDataSourceRow<T> Row;
 
         internal readonly string ShortName;
 
@@ -69,12 +68,12 @@ namespace CDP4Composition.Reporting
 
         public TP GetSibling<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.row.GetParameter<TP>();
+            return this.Row.GetParameter<TP>();
         }
 
         public IEnumerable<TP> GetChildren<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.row.Children.Select(child => child.GetParameter<TP>());
+            return this.Row.Children.Select(child => child.GetParameter<TP>());
         }
     }
 }
