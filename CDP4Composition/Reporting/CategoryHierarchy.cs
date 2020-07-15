@@ -56,7 +56,7 @@ namespace CDP4Composition.Reporting
             {
                 var category = this.GetCategoryByShortName(categoryShortName);
 
-                var newCategoryHierarchy = new CategoryHierarchy(category, this.current);
+                var newCategoryHierarchy = new CategoryHierarchy(category);
 
                 if (this.current == null)
                 {
@@ -79,19 +79,15 @@ namespace CDP4Composition.Reporting
 
         #region Hierarchy
 
-        private readonly CategoryHierarchy parent;
-
         public CategoryHierarchy Child { get; private set; }
 
         #endregion
 
         public readonly Category Category;
 
-        private CategoryHierarchy(Category category, CategoryHierarchy parent)
+        private CategoryHierarchy(Category category)
         {
             this.Category = category;
-
-            this.parent = parent;
         }
     }
 }
