@@ -38,7 +38,7 @@ namespace CDP4Composition.Reporting
         {
             var attr = Attribute
                 .GetCustomAttributes(type)
-                .First(attribute => attribute is ParameterTypeShortNameAttribute);
+                .SingleOrDefault(attribute => attribute is ParameterTypeShortNameAttribute);
 
             return attr as ParameterTypeShortNameAttribute;
         }
@@ -51,7 +51,7 @@ namespace CDP4Composition.Reporting
 
         protected ReportingDataSourceParameter()
         {
-            this.ShortName = GetParameterAttribute(this.GetType()).ShortName;
+            this.ShortName = GetParameterAttribute(this.GetType())?.ShortName;
         }
 
         internal void Initialize(ContainerList<ParameterValueSet> valueSet)
