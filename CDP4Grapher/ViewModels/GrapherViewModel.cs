@@ -103,8 +103,8 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -112,8 +112,8 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -121,8 +121,8 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         public string CurrentOption
         {
-            get { return this.currentOption; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentOption, value); }
+            get => this.currentOption;
+            private set => this.RaiseAndSetIfChanged(ref this.currentOption, value);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace CDP4Grapher.ViewModels
         /// <summary>
         /// Gets or sets the collection of <see cref="GraphElementViewModel"/> to display.
         /// </summary>
-        public ReactiveList<GraphElementViewModel> GraphElements { get; set; } = new ReactiveList<GraphElementViewModel>();
+        public ReactiveList<GraphElementViewModel> GraphElements { get; } = new ReactiveList<GraphElementViewModel>();
 
         /// <summary>
         /// Gets or sets the custom context menu
@@ -172,49 +172,33 @@ namespace CDP4Grapher.ViewModels
         }
         
         /// <summary>
-        /// The event-handler that is invoked by the subscription that listens for updates
-        /// on the <see cref="Thing"/> that is being represented by the view-model
-        /// </summary>
-        /// <param name="objectChange">
-        /// The payload of the event that is being handled
-        /// </param>
-        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
-        {
-            base.ObjectChangeEventHandler(objectChange);
-            this.CurrentOption = this.Thing.Name;
-        }
-        
-        /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
         private void AddSubscriptions()
         {
             var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.modelSetup)
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             
             this.Disposables.Add(engineeringModelSetupSubscription);
 
             var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             
             this.Disposables.Add(domainOfExpertiseSubscription);
 
             var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationSetup)
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             
             this.Disposables.Add(iterationSetupSubscription);
 
             var iterationSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>((Iteration)this.Thing.Container)
-                .Where(
-                    objectChange =>
-                        (objectChange.EventKind == EventKind.Updated) &&
-                        (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
                 .Select(x => x.ChangedThing as Iteration)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
@@ -226,7 +210,7 @@ namespace CDP4Grapher.ViewModels
                     objectChange =>
                         (objectChange.EventKind == EventKind.Updated) &&
                         (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
-                .Select(x => x.ChangedThing as Iteration)
+                .Select(x => x.ChangedThing as Option)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
@@ -252,11 +236,8 @@ namespace CDP4Grapher.ViewModels
             {
                 if (nestedElement.IsRootElement)
                 {
-                    var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(nestedElement.Container)
-                        .Where(
-                            objectChange =>
-                                objectChange.EventKind == EventKind.Updated &&
-                                objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                    var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(nestedElement)
+                        .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(x => this.UpdateProperties());
 
@@ -271,7 +252,7 @@ namespace CDP4Grapher.ViewModels
         /// Update the properties of this view-model
         /// </summary>
         private void UpdateProperties()
-        {
+         {
             this.CurrentModel = this.modelSetup.Name;
             this.CurrentIteration = this.iterationSetup.IterationNumber;
             this.CurrentOption = this.Thing.Name;

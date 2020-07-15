@@ -46,6 +46,6 @@ namespace CDP4Grapher.ViewModels
         /// <summary>
         /// Gets or sets the collection of <see cref="GraphElementViewModel"/> to display.
         /// </summary>
-        ReactiveList<GraphElementViewModel> GraphElements { get; set; }
+        ReactiveList<GraphElementViewModel> GraphElements { get; }
     }
 }

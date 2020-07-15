@@ -26,21 +26,13 @@
 namespace CDP4Grapher.Tests.Data
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.PluginSettingService;
-
     using CDP4Dal;
-
-    using CDP4Grapher.ViewModels;
 
     using Moq;
 
@@ -64,64 +56,66 @@ namespace CDP4Grapher.Tests.Data
         protected Iteration Iteration;
         protected ElementUsage ElementUsage;
         protected NestedElement NestedElement;
-        protected ConcurrentDictionary<CacheKey, Lazy<Thing>> Cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
         protected Uri Uri = new Uri("http://test.org");
+        protected Assembler Assembler;
 
         public Option Option;
         public Mock<ISession> Session;
 
         public virtual void Setup()
         {
-            this.Domain = new DomainOfExpertise(Guid.NewGuid(), this.Cache, this.Uri)
+            this.Assembler = new Assembler(this.Uri);
+
+            this.Domain = new DomainOfExpertise(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 ShortName = "test"
             };
 
-            this.ElementUsage = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri)
+            this.ElementUsage = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 Name = "testName",
                 ShortName = "testShortName",
                 Owner = this.Domain,
-                Category = new List<Category>() { new Category(Guid.NewGuid(), this.Cache, this.Uri) { ShortName = "Test" } }
+                Category = new List<Category>() { new Category(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { ShortName = "Test" } }
             };
 
-            this.NestedElement = new NestedElement(Guid.NewGuid(), this.Cache, this.Uri)
+            this.NestedElement = new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 RootElement = this.TopElement, Container = this.Option,
                 ElementUsage = new OrderedItemList<ElementUsage>(null) { this.ElementUsage }
             };
 
-            this.Person = new Person(Guid.NewGuid(), this.Cache, this.Uri)
+            this.Person = new Person(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 DefaultDomain = this.Domain
             };
 
-            this.Participant = new Participant(Guid.NewGuid(), this.Cache, this.Uri);
+            this.Participant = new Participant(Guid.NewGuid(), this.Assembler.Cache, this.Uri);
             
-            this.Option = new Option(Guid.NewGuid(), this.Cache, this.Uri)
+            this.Option = new Option(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 Name = "TestOption"
             };
 
             this.SetupElements();
 
-            this.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.Cache, this.Uri)
+            this.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 Name = "test",
-                Participant = { new Participant(Guid.NewGuid(), this.Cache, this.Uri) { Person = this.Person } }
+                Participant = { new Participant(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Person = this.Person } }
             };
 
-            this.EngineeringModel = new EngineeringModel(Guid.NewGuid(), this.Cache, this.Uri)
+            this.EngineeringModel = new EngineeringModel(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 EngineeringModelSetup = this.EngineeringModelSetup
             };
 
-            this.IterationSetup = new IterationSetup(Guid.NewGuid(), this.Cache, this.Uri)
+            this.IterationSetup = new IterationSetup(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 IterationNumber = int.MaxValue
             };
 
-            this.Iteration = new Iteration(Guid.NewGuid(), this.Cache, this.Uri)
+            this.Iteration = new Iteration(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 IterationSetup = this.IterationSetup,
                 TopElement = this.TopElement
@@ -130,6 +124,7 @@ namespace CDP4Grapher.Tests.Data
             this.Iteration.Option.Add(this.Option);
             this.EngineeringModel.Iteration.Add(this.Iteration);
             this.Session = new Mock<ISession>();
+            this.Session.Setup(x => x.Assembler).Returns(this.Assembler);
             this.Session.Setup(x => x.ActivePerson).Returns(this.Person);
             this.Session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(this.Domain);
             this.Session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>() { { this.Iteration, new Tuple<DomainOfExpertise, Participant>(this.Domain, this.Participant) } });
@@ -137,15 +132,15 @@ namespace CDP4Grapher.Tests.Data
 
         private void SetupElements()
         {
-            this.TopElement = new ElementDefinition(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
+            this.TopElement = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
 
-            this.ElementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
-            this.ElementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
-            this.ElementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
+            this.ElementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
+            this.ElementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
+            this.ElementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
 
-            this.ElementUsage1 = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition1, Container = this.TopElement };
-            this.ElementUsage2 = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition2, Container = this.TopElement };
-            this.ElementUsage3 = new ElementUsage(Guid.NewGuid(), this.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition3, Container = this.TopElement };
+            this.ElementUsage1 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition1, Container = this.TopElement };
+            this.ElementUsage2 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition2, Container = this.TopElement };
+            this.ElementUsage3 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition3, Container = this.TopElement };
         }
     }
 }

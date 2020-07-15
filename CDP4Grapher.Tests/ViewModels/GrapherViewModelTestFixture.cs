@@ -27,9 +27,12 @@
 namespace CDP4Grapher.Tests.ViewModels
 {
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Security.Policy;
     using System.Threading;
 
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -44,6 +47,8 @@ namespace CDP4Grapher.Tests.ViewModels
     using Moq;
 
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     using Assert = NUnit.Framework.Assert;
 
@@ -60,7 +65,7 @@ namespace CDP4Grapher.Tests.ViewModels
         public override void Setup()
         {
             base.Setup();
-
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.thingNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -95,9 +100,26 @@ namespace CDP4Grapher.Tests.ViewModels
         public void VerifySubscription()
         {
             var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
-            this.EngineeringModelSetup.ShortName = "updatedShortName";
-            CDPMessageBus.Current.SendObjectChangeEvent(((EngineeringModel)this.Option.TopContainer).EngineeringModelSetup, EventKind.Updated);
-            Assert.AreEqual(this.EngineeringModelSetup.ShortName, ((EngineeringModel)this.Option.TopContainer).EngineeringModelSetup.ShortName);
+            
+            this.EngineeringModelSetup.Name = "updatedShortName";
+            CDPMessageBus.Current.SendObjectChangeEvent(this.EngineeringModelSetup, EventKind.Updated);
+            Assert.AreEqual(this.EngineeringModelSetup.Name, vm.CurrentModel);
+
+            this.Iteration.TopElement = this.ElementDefinition1;
+            CDPMessageBus.Current.SendObjectChangeEvent(this.Iteration, EventKind.Updated);
+            Assert.AreEqual(this.Iteration.TopElement, (vm.Thing.Container as Iteration)?.TopElement);
+            
+            this.IterationSetup.Description = "updatedDescription";
+            CDPMessageBus.Current.SendObjectChangeEvent(this.IterationSetup, EventKind.Updated);
+            Assert.AreEqual(this.IterationSetup, (vm.Thing.Container as Iteration)?.IterationSetup);
+
+            this.IterationSetup.Description = "updatedDescription";
+            CDPMessageBus.Current.SendObjectChangeEvent(this.IterationSetup, EventKind.Updated);
+            Assert.AreEqual(this.IterationSetup, (vm.Thing.Container as Iteration)?.IterationSetup);
+
+            this.Option.Name = "updatedName";
+            CDPMessageBus.Current.SendObjectChangeEvent(this.Option, EventKind.Updated);
+            Assert.AreEqual(this.Option.Name, vm.Thing.Name);
         }
     }
 }

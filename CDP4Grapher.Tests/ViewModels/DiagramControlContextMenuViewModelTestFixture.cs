@@ -98,7 +98,9 @@ namespace CDP4Grapher.Tests.ViewModels
             Assert.IsTrue(vm.ExportGraphAsPdf.CanExecute(null));
             Assert.IsTrue(vm.ExportGraphAsJpg.CanExecute(null));
             vm.ExportGraphAsJpg.Execute(null);
+            vm.ExportGraphAsPdf.Execute(null);
             this.behavior.Verify(x => x.ExportGraph(DiagramExportFormat.JPEG), Times.Once);
+            this.behavior.Verify(x => x.ExportGraph(DiagramExportFormat.PDF), Times.Once);
         }
 
         [Test]

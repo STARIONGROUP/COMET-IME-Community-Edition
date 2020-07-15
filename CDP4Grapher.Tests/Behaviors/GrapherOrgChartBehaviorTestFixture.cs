@@ -70,18 +70,18 @@ namespace CDP4Grapher.Tests.Behaviors
 
             this.elementViewModels = new List<GraphElementViewModel>()
             {
-                new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Cache, this.Uri)
+                new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
                 {
                     RootElement = this.ElementDefinition1,
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage }
                 }),
 
-                new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Cache, this.Uri)
+                new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
                 {
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage, this.ElementUsage1 }
                 }),
 
-                new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Cache, this.Uri)
+                new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
                 {
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage, this.ElementUsage1, this.ElementUsage2 }
                 })
