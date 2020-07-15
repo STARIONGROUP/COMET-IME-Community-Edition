@@ -22,6 +22,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4Grapher.Views
 {
     using System.Windows.Controls;

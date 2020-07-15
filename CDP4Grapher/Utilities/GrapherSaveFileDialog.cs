@@ -55,7 +55,7 @@ namespace CDP4Grapher.Utilities
         /// <summary>
         /// Instanciate a new <see cref="GrapherSaveFileDialog"/>
         /// </summary>
-        /// <param name="format"></param>
+        /// <param name="format">the <see cref="DiagramExportFormat"/> value that specify the format of the exported diagram data</param>
         public GrapherSaveFileDialog(DiagramExportFormat format)
         {
             this.Format = format;
@@ -66,7 +66,7 @@ namespace CDP4Grapher.Utilities
         /// <summary>
         /// Shows up the save dialog
         /// </summary>
-        /// <returns>return a assert whether the dialog is showing</returns>
+        /// <returns>returns a assert whether the dialog is showing</returns>
         public bool ShowDialog()
         {
             return this.dialog.ShowDialog() == true;

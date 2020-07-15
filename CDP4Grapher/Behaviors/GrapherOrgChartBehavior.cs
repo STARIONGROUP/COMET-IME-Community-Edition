@@ -74,8 +74,8 @@ namespace CDP4Grapher.Behaviors
         
         /// <summary>
         /// Apply the desired layout specified
-        /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
         /// </summary>
+        /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
         public void ApplySpecifiedLayout(LayoutEnumeration layout)
         {
             if (layout == LayoutEnumeration.Circular)
@@ -96,10 +96,10 @@ namespace CDP4Grapher.Behaviors
 
         /// <summary>
         /// Apply the desired layout specified
+        /// </summary>
         /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
         /// <param name="direction">the value holding the direction of the layout</param>
         /// <typeparam name="T">The devexpress enum type needed by the layouts Fugiyama, TipOver, Tree and Mind map </typeparam>
-        /// </summary>
         public void ApplySpecifiedLayout<T>(LayoutEnumeration layout, T direction) where T : Enum
         {
             switch (layout)
@@ -124,10 +124,10 @@ namespace CDP4Grapher.Behaviors
         }
 
         /// <summary>
-        /// Raised when the item collection has changed
+        /// Raises when the item collection has changed
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the argument</param>
         public void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
             if (e.Item is DiagramContentItem diagramContentItem && e.Action == ItemsChangedAction.Added)
@@ -256,8 +256,8 @@ namespace CDP4Grapher.Behaviors
 
         /// <summary>
         /// Applies the Tip over Layout onto the diagram elements
-        /// <param name="direction">the direction of the layout</param>
         /// </summary>
+        /// <param name="direction">the direction of the layout</param>
         public void ApplyTipOverLayout(TipOverDirection direction)
         {
             this.AssociatedObject.ApplyTipOverTreeLayout(direction, this.AssociatedObject.Items, SplitToConnectedComponentsMode.AllComponents);
@@ -273,8 +273,8 @@ namespace CDP4Grapher.Behaviors
 
         /// <summary>
         /// Applies the Mind map Layout onto the diagram elements
-        /// <param name="direction">the direction of the layout</param>
         /// </summary>
+        /// <param name="direction">the direction of the layout</param>
         public void ApplyMindMapLayout(OrientationKind direction)
         {
             this.AssociatedObject.ApplyMindMapTreeLayout(direction, this.AssociatedObject.Items, SplitToConnectedComponentsMode.AllComponents);
@@ -282,8 +282,8 @@ namespace CDP4Grapher.Behaviors
 
         /// <summary>
         /// Applies the Fugiyama Layout onto the diagram elements
-        /// <param name="direction">the direction of the layout</param>
         /// </summary>
+        /// <param name="direction">the direction of the layout</param>
         public void ApplySugiyamaLayout(Direction direction)
         {
             this.AssociatedObject.ApplySugiyamaLayout(direction, this.AssociatedObject.Items);
@@ -291,8 +291,8 @@ namespace CDP4Grapher.Behaviors
 
         /// <summary>
         /// Applies the Tree Layout onto the diagram elements
-        /// <param name="direction">the direction of the layout</param>
         /// </summary>
+        /// <param name="direction">the direction of the layout</param>
         public void ApplyTreeLayout(LayoutDirection direction)
         {
             this.AssociatedObject.ApplyTreeLayout(direction, this.AssociatedObject.Items, SplitToConnectedComponentsMode.AllComponents);

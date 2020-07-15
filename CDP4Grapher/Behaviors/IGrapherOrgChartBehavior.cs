@@ -27,15 +27,10 @@
 namespace CDP4Grapher.Behaviors
 {
     using System;
-    using System.Collections.Generic;
-
-    using CDP4Common.CommonData;
 
     using CDP4Grapher.Utilities;
 
     using DevExpress.Diagram.Core;
-    using DevExpress.Diagram.Core.Layout;
-    using DevExpress.Xpf.Diagram;
 
     /// <summary>
     /// Definition of a <see cref="GrapherOrgChartBehavior"/> exposing public properties and methods 
@@ -50,10 +45,10 @@ namespace CDP4Grapher.Behaviors
 
         /// <summary>
         /// Apply the desired layout specified
+        /// </summary>
         /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
         /// <param name="direction">the value holding the direction of the layout</param>
         /// <typeparam name="T">The devexpress enum type needed by the layouts Fugiyama, TipOver, Tree and Mind map </typeparam>
-        /// </summary>
         void ApplySpecifiedLayout<T>(LayoutEnumeration layout, T direction) where T : Enum;
 
         /// <summary>

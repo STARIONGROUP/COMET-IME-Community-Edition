@@ -67,8 +67,8 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         public bool CanExportDiagram
         {
-            get { return this.canExportDiagram; }
-            private set { this.RaiseAndSetIfChanged(ref this.canExportDiagram, value); }
+            get => this.canExportDiagram;
+            private set => this.RaiseAndSetIfChanged(ref this.canExportDiagram, value);
         }
 
         /// <summary>
@@ -153,7 +153,6 @@ namespace CDP4Grapher.ViewModels
 
         /// <summary>
         /// Instiate a new <see cref="DiagramControlContextMenuViewModel"/>
-        /// <param name="behavior">the <see cref="IGrapherOrgChartBehavior"/> behavior</param>
         /// </summary>
         public DiagramControlContextMenuViewModel()
         {
@@ -208,6 +207,9 @@ namespace CDP4Grapher.ViewModels
             this.ApplyCircularLayout.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Circular));
         }
         
+        /// <summary>
+        /// Fills up the <see cref="ContextMenu"/> with <see cref="BarButtonItem"/> and <see cref="BarSubItem"/>
+        /// </summary>
         private void CreateContextMenu()
         {
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Export Graph as JPG", this.ExportGraphAsJpg, "XAF/Action_Export_ToImage.svg"));
