@@ -27,6 +27,7 @@ namespace CDP4Composition.Reporting
 {
     using System;
 
+    [AttributeUsage(AttributeTargets.Class)]
     public class ParameterTypeShortNameAttribute : Attribute
     {
         public string ShortName { get; }
