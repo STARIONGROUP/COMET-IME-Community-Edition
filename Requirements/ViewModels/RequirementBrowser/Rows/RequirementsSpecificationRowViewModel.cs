@@ -204,25 +204,9 @@ namespace CDP4Requirements.ViewModels
             var currentGroup = this.requirementContainerGroupCache[req];
 
             var reqRow = this.requirementCache[req];
-
-            IRowViewModelBase<Thing> currentContainerRow;
-
-            if (currentGroup != null)
-            {
-                // requirement was in a group
-                if (!this.GroupCache.TryGetValue(currentGroup, out currentContainerRow))
-                {
-                    // that group does not exist anymore
-                    currentContainerRow = null;
-                }
-            }
-            else
-            {
-                currentContainerRow = null;
-            }
+            var currentContainerRow = currentGroup != null ? this.GroupCache[currentGroup] : this;
 
             IRowViewModelBase<Thing> updatedContainerRow;
-
             if (req.Group != null)
             {
                 if (!this.GroupCache.TryGetValue(req.Group, out updatedContainerRow))
@@ -242,19 +226,7 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            if (currentContainerRow != null)
-            {
-                currentContainerRow.ContainedRows.RemoveWithoutDispose(reqRow);
-                this.GroupCache.Remove(currentGroup);
-
-                if (!currentContainerRow.ContainedRows.Any())
-                {
-                    ((IHaveContainedRows)currentContainerRow.ContainerViewModel).ContainedRows.RemoveAndDispose(currentContainerRow);
-                }
-
-                //updatedContainerRow.ContainedRows.RemoveAndDispose(currentContainerRow);
-            }
-
+            currentContainerRow.ContainedRows.RemoveWithoutDispose(reqRow);
             updatedContainerRow.ContainedRows.SortedInsert(reqRow, ChildRowComparer);
             this.requirementContainerGroupCache[req] = req.Group;
         }

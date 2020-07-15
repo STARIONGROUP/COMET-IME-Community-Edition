@@ -243,8 +243,9 @@ namespace CDP4Requirements.ViewModels
         {
             var row = this.ContainedRows.SingleOrDefault(x => x.Thing == group);
 
-            if (row != null && !row.ContainedRows.Any())
+            if (row != null)
             {
+                this.TopParentRow.GroupCache.Remove(group);
                 this.ContainedRows.RemoveAndDispose(row);
             }
         }
