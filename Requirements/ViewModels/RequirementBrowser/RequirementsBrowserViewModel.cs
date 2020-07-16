@@ -510,11 +510,11 @@ namespace CDP4Requirements.ViewModels
             this.CreateRelationshipCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRelationship));
             this.CreateRelationshipCommand.Subscribe(_ => this.ExecuteCreateCommand<BinaryRelationship>(this.Thing));
 
-            this.CreateRequirementGroupCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirement));
+            this.CreateRequirementGroupCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirementGroup));
             this.CreateRequirementGroupCommand.Subscribe(_ =>
                 this.ExecuteCreateCommand<RequirementsGroup>(this.SelectedThing.Thing));
 
-            this.CreateRequirementCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirementGroup));
+            this.CreateRequirementCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirement));
             this.CreateRequirementCommand.Subscribe(_ => this.ExecuteCreateRequirement());
 
             this.VerifyRequirementsCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanVerifyRequirements));
