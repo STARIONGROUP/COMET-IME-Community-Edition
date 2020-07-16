@@ -23,18 +23,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CDP4Dal;
-using NUnit.Framework;
-using ReactiveUI;
-using System.Reactive.Concurrency;
-using System.Threading;
-using CDP4Composition.Mvvm.Behaviours;
-using Microsoft.Practices.ServiceLocation;
-using Moq;
-using Microsoft.Practices.Prism.Regions;
-
 namespace CDP4Reporting.Tests.Behaviour
 {
+    using CDP4Dal;
+    using NUnit.Framework;
+    using ReactiveUI;
+    using System.Reactive.Concurrency;
+    using System.Threading;
+    using CDP4Composition.Mvvm.Behaviours;
+    using Microsoft.Practices.ServiceLocation;
+    using Moq;
+    using Microsoft.Practices.Prism.Regions;
+
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     public class RibbonCategoryBehaviorTextFixture

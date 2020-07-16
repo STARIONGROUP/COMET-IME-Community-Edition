@@ -26,7 +26,6 @@
 namespace CDP4Reporting.Views
 {
     using System.ComponentModel.Composition;
-
     using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>

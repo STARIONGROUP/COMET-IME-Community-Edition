@@ -25,34 +25,34 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-using CDP4Common.CommonData;
-using CDP4Common.EngineeringModelData;
-
-using CDP4Composition;
-using CDP4Composition.Mvvm;
-using CDP4Composition.Navigation;
-using CDP4Composition.Navigation.Interfaces;
-using CDP4Composition.PluginSettingService;
-
-using CDP4Dal;
-using ICSharpCode.AvalonEdit.Document;
-using Microsoft.Practices.ServiceLocation;
-using NLog;
-using ReactiveUI;
-using System;
-using System.CodeDom.Compiler;
-using System.IO;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
-
 namespace CDP4Reporting.ViewModels
 {
+    using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition;
+    using CDP4Composition.Mvvm;
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
+
+    using CDP4Dal;
+    using ICSharpCode.AvalonEdit.Document;
+    using Microsoft.Practices.ServiceLocation;
+    using NLog;
+    using ReactiveUI;
+    using System;
+    using System.CodeDom.Compiler;
+    using System.IO;
+    using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Linq;
+    using System.Reflection;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Threading;
+
     /// <summary>
     /// The view-model for the Report Designer that lets users to create reports based on template source files.
     /// </summary>

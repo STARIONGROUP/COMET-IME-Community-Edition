@@ -1,32 +1,28 @@
-﻿using Moq;
-using NUnit.Framework;
-using ReactiveUI;
-using System;
-using System.Windows;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using CDP4Reporting.ViewModels;
-using CDP4Common.CommonData;
-using CDP4Common.EngineeringModelData;
-using CDP4Common.SiteDirectoryData;
-using CDP4Common.Types;
-using CDP4Composition.Navigation;
-using CDP4Composition.Navigation.Interfaces;
-using CDP4Composition.PluginSettingService;
-using CDP4Dal;
-using CDP4Dal.Permission;
-using System.Reactive.Concurrency;
-using System.Collections.Concurrent;
-using Microsoft.Practices.ServiceLocation;
-using ICSharpCode.AvalonEdit.Document;
-using System.IO;
-using DevExpress.Mvvm.Native;
-
+﻿
 namespace CDP4Reporting.Tests.ViewModels
 {
+    using Moq;
+    using NUnit.Framework;
+    using ReactiveUI;
+    using System;
+    using System.Windows;
+    using System.Collections.Generic;
+    using System.Threading;
+    using CDP4Reporting.ViewModels;
+    using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
+    using CDP4Dal;
+    using System.Reactive.Concurrency;
+    using System.Collections.Concurrent;
+    using Microsoft.Practices.ServiceLocation;
+    using ICSharpCode.AvalonEdit.Document;
+    using System.IO;
+
     /// <summary>
     /// Suite of tests for the <see cref="ReportDesignerViewModel"/> class
     /// </summary>

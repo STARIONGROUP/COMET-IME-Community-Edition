@@ -23,15 +23,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CDP4Dal;
-using NUnit.Framework;
-using ReactiveUI;
-using System.Reactive.Concurrency;
-using System.Threading;
-using CDP4Composition.Ribbon;
-
 namespace CDP4Reporting.Tests.Behaviour
 {
+    using CDP4Dal;
+    using NUnit.Framework;
+    using ReactiveUI;
+    using System.Reactive.Concurrency;
+    using System.Threading;
+    using CDP4Composition.Ribbon;
+
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     public class ExtendedRibbonPageCategoryTextFixture

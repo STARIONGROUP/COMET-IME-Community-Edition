@@ -23,15 +23,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CDP4Dal;
-using CDP4Reporting.Behaviours;
-using NUnit.Framework;
-using ReactiveUI;
-using System.Reactive.Concurrency;
-using System.Threading;
-
 namespace CDP4Reporting.Tests.Behaviour
 {
+    using CDP4Dal;
+    using CDP4Reporting.Behaviours;
+    using NUnit.Framework;
+    using ReactiveUI;
+    using System.Reactive.Concurrency;
+    using System.Threading;
+
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     public class ReportDesignerBehaviourTextFixture

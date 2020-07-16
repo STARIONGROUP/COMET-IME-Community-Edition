@@ -24,13 +24,13 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.ComponentModel.Composition;
-using CDP4Composition.Ribbon;
-using CDP4Reporting.ViewModels;
-using Microsoft.Practices.Prism.Mvvm;
-
 namespace CDP4Reporting.Views
 {
+    using System.ComponentModel.Composition;
+    using CDP4Composition.Ribbon;
+    using CDP4Reporting.ViewModels;
+    using Microsoft.Practices.Prism.Mvvm;
+
     /// <summary>
     /// Interaction logic for ObjectBrowserRibbon
     /// </summary>
