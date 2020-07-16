@@ -198,10 +198,7 @@ namespace CDP4Reporting.ViewModels
                 this.FilePath = filePath;
             }
 
-            //if (!string.IsNullOrEmpty(this.Document.Text))
-            //{
             System.IO.File.WriteAllText(this.FilePath, this.Document.Text);
-            //}
         }
 
         /// <summary>
@@ -243,11 +240,6 @@ namespace CDP4Reporting.ViewModels
         {
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(() =>
             {
-                //if (!this.IsAutoBuildEnabled)
-                //{
-                //    return;
-                //}
-
                 this.Errors = string.Empty;
 
                 if (string.IsNullOrEmpty(this.Document.Text))
