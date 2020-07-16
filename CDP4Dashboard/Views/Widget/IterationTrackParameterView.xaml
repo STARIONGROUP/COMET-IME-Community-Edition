@@ -187,8 +187,9 @@
                 </dxch:XYDiagram2D.DefaultPane>
                 <dxch:XYDiagram2D.SeriesItemTemplate>
                     <DataTemplate>
-                        <dxch:LineSeries2D DisplayName="{Binding LineName}"
+                        <dxch:LineStepSeries2D DisplayName="{Binding LineName}"
                                           DataSource="{Binding Lines}"
+                                          
                                           ArgumentDataMember="RevisionNumber"
                                           ValueDataMember="Value"/>
                     </DataTemplate>
