@@ -14,7 +14,6 @@
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
     x:Class="CDP4Reporting.Views.ReportDesigner"
              mc:Ignorable="d"
-             dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
     <UserControl.Resources>
         <ResourceDictionary>
