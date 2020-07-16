@@ -28,8 +28,6 @@
 using CDP4Common.CommonData;
 using CDP4Common.EngineeringModelData;
 
-using CDP4Common.SiteDirectoryData;
-
 using CDP4Composition;
 using CDP4Composition.Mvvm;
 using CDP4Composition.Navigation;
@@ -37,6 +35,19 @@ using CDP4Composition.Navigation.Interfaces;
 using CDP4Composition.PluginSettingService;
 
 using CDP4Dal;
+using ICSharpCode.AvalonEdit.Document;
+using Microsoft.Practices.ServiceLocation;
+using NLog;
+using ReactiveUI;
+using System;
+using System.CodeDom.Compiler;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace CDP4Reporting.ViewModels
 {
@@ -51,20 +62,234 @@ namespace CDP4Reporting.ViewModels
         private const string PanelCaption = "Reporting";
 
         /// <summary>
+        /// The Nlog Logger
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// The <see cref="IOpenSaveFileDialogService"/> that is used to navigate to the File Open/Save dialog
+        /// </summary>
+        private readonly IOpenSaveFileDialogService openSaveFileDialogService;
+
+        /// <summary>
+        /// Open code file inside the editor
+        /// </summary>
+        public ReactiveCommand<object> OpenScriptCommand { get; set; }
+
+        /// <summary>
+        /// Saves code that has been typed in the editor
+        /// </summary>
+        public ReactiveCommand<object> SaveScriptCommand { get; set; }
+
+        /// <summary>
+        /// Build code that has been typed in the editor
+        /// </summary>
+        public ReactiveCommand<object> BuildScriptCommand { get; set; }
+
+        /// <summary>
+        /// Automatically build code that has been typed in the editor
+        /// </summary>
+        public ReactiveCommand<Unit> AutomaticBuildCommand { get; set; }
+
+        /// <summary>
+        /// Gets or sets text editor document
+        /// </summary>
+        public TextDocument Document { get; set; }
+
+        /// <summary>
+        /// Gets or sets current edited file path
+        /// </summary>
+        public string FilePath { get; set; }
+
+        /// <summary>
+        /// Backing field for <see cref="Errors" />
+        /// </summary>
+        private string errors;
+
+        /// <summary>
+        /// Gets or sets value for editor's errors
+        /// </summary>
+        public string Errors
+        {
+            get => this.errors;
+            set => this.RaiseAndSetIfChanged(ref this.errors, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="Output" />
+        /// </summary>
+        private string output;
+
+        /// <summary>
+        /// Gets or sets value for output's log messages
+        /// </summary>
+        public string Output {
+            get => this.output;
+            set => this.RaiseAndSetIfChanged(ref this.output, value);
+        }
+
+        /// <summary>
+        /// Gets or sets build output result
+        /// </summary>
+        public CompilerResults BuildResult { get; private set; }
+
+        /// <summary>
+        /// Backing field for <see cref="IsAutoBuildEnabled" />
+        /// </summary>
+        private bool isAutoBuildEnabled;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether automatically build is checked
+        /// </summary>
+        public bool IsAutoBuildEnabled
+        {
+            get => this.isAutoBuildEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isAutoBuildEnabled, value);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ReportDesignerViewModel"/> class
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> to display</param>
-        /// <param name="participant">The <see cref="Participant"/> that this open <see cref="Iteration"/> is tied to.</param>
         /// <param name="session">The session.</param>
         /// <param name="thingDialogNavigationService">The thing navigation service.</param>
         /// <param name="panelNavigationService">The panel navigation service.</param>
         /// <param name="dialogNavigationService">The dialog navigation service.</param>
         /// <param name="pluginSettingsService">The plugin service.</param>
-        public ReportDesignerViewModel(Iteration thing, Participant participant, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        public ReportDesignerViewModel(Iteration thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
+            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+
+            this.Document = new TextDocument();
+            this.Errors = string.Empty;
+            this.Output = string.Empty;
+            this.IsAutoBuildEnabled = false;
+
+            this.openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
+
+            this.SaveScriptCommand = ReactiveCommand.Create();
+            this.SaveScriptCommand.Subscribe(_ => this.SaveScript());
+
+            this.OpenScriptCommand = ReactiveCommand.Create();
+            this.OpenScriptCommand.Subscribe(_ => this.OpenScript());
+
+            this.BuildScriptCommand = ReactiveCommand.Create();
+            this.BuildScriptCommand.Subscribe(_ => this.BuildScript());
+
+            this.AutomaticBuildCommand = ReactiveCommand.CreateAsyncTask(_ => this.AutomaticBuildScript(), RxApp.MainThreadScheduler);
+        }
+
+        /// <summary>
+        /// Trigger save file operation
+        /// </summary>
+        private void SaveScript()
+        {
+            if (string.IsNullOrEmpty(this.FilePath))
+            {
+                var filePath = this.openSaveFileDialogService.GetSaveFileDialog("MassBudgetDataSource", "cs", "CS(.cs) | *.cs", string.Empty, 1);
+
+                if (filePath == null)
+                {
+                    return;
+                }
+
+                this.FilePath = filePath;
+            }
+
+            //if (!string.IsNullOrEmpty(this.Document.Text))
+            //{
+            System.IO.File.WriteAllText(this.FilePath, this.Document.Text);
+            //}
+        }
+
+        /// <summary>
+        /// Trigger open file operation
+        /// </summary>
+        private void OpenScript()
+        {
+            var filePath = this.openSaveFileDialogService.GetOpenFileDialog(true, true, false, "CS(.cs) | *.cs", ".cs", string.Empty, 1);
+
+            if (filePath == null || filePath.Length != 1)
+            {
+                return;
+            }
+
+            this.Document.Text = System.IO.File.ReadAllText(filePath.Single());
+            this.IsDirty = true;
+        }
+
+        /// <summary>
+        /// Trigger build operation
+        /// </summary>
+        private void BuildScript()
+        {
+            this.CompileAssembly();
+        }
+
+        /// <summary>
+        /// Trigger automatic build operation
+        /// </summary>
+        public async Task AutomaticBuildScript()
+        {
+            await Task.Run(this.CompileAssembly);
+        }
+
+        /// <summary>
+        /// Execute compile
+        /// </summary>
+        private void CompileAssembly()
+        {
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(() =>
+            {
+                //if (!this.IsAutoBuildEnabled)
+                //{
+                //    return;
+                //}
+
+                this.Errors = string.Empty;
+
+                if (string.IsNullOrEmpty(this.Document.Text))
+                {
+                    this.Output += $"{DateTime.Now:HH:mm:ss} Nothing to compile.{Environment.NewLine}";
+                    return;
+                }
+
+                var compiler = new Microsoft.CSharp.CSharpCodeProvider();
+                var parameters = new CompilerParameters();
+
+                parameters.ReferencedAssemblies.Add("System.dll");
+                parameters.ReferencedAssemblies.Add("System.Core.dll");
+                parameters.ReferencedAssemblies.Add("System.Collections.dll");
+                parameters.ReferencedAssemblies.Add("System.Linq.dll");
+                parameters.ReferencedAssemblies.Add("System.Windows.dll");
+
+                parameters.ReferencedAssemblies.Add("CDP4Common.dll");
+                parameters.ReferencedAssemblies.Add("CDP4Composition.dll");
+
+                parameters.GenerateInMemory = true;
+                parameters.GenerateExecutable = false;
+
+                this.BuildResult = compiler.CompileAssemblyFromSource(parameters, this.Document.Text);
+
+                if (this.BuildResult.Errors.Count == 0)
+                {
+                    this.Output += $"{DateTime.Now:HH:mm:ss} File succesfully compiled.{Environment.NewLine}";
+                    this.Errors = string.Empty;
+                    return;
+                }
+
+                var sbErrors = new StringBuilder($"{DateTime.Now:HH:mm:ss} Compilation Errors");
+
+                foreach (var error in this.BuildResult.Errors)
+                {
+                    sbErrors.AppendLine(error.ToString());
+                }
+
+                this.Errors = sbErrors.ToString();
+                Logger.Trace(sbErrors.ToString());
+            }));
         }
     }
 }
