@@ -39,6 +39,11 @@ namespace CDP4Grapher.ViewModels
     public interface IGrapherViewModel
     {
         /// <summary>
+        /// Gets or sets the attached behavior
+        /// </summary>
+        IGrapherOrgChartBehavior Behavior { get; set; }
+
+        /// <summary>
         /// Gets or sets the custom context menu builder
         /// </summary>
         IHaveContextMenu DiagramContextMenuViewModel { get; set; }

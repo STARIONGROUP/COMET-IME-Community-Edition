@@ -92,6 +92,7 @@ namespace CDP4Grapher.Tests.Behaviors
             this.behavior = new GrapherOrgChartBehavior();
             this.grapherViewModel = new Mock<IGrapherViewModel>();
             this.grapherViewModel.Setup(x => x.GraphElements).Returns(new ReactiveList<GraphElementViewModel>(this.elementViewModels));
+            this.grapherViewModel.Setup(x => x.Behavior).Returns(this.behavior);
             this.saveFileDialog = new Mock<IGrapherSaveFileDialog>();
             this.saveFileDialog.Setup(x => x.ShowDialog()).Returns(true);
             this.saveFileDialog.Setup(x => x.OpenFile()).Returns(new MemoryStream());
@@ -119,6 +120,15 @@ namespace CDP4Grapher.Tests.Behaviors
             this.behavior.ExportGraph(this.saveFileDialog.Object);
             this.saveFileDialog.Verify(x => x.ShowDialog(), Times.Once);
             this.saveFileDialog.Verify(x => x.OpenFile(), Times.Once);
+        }
+
+        [Test]
+        public void VerifyApplyPreviousLayout()
+        {
+            this.behavior.Attach(new GrapherDiagramControl());
+            this.behavior.ApplyPreviousLayout();
+            Assert.AreEqual(this.behavior.CurrentLayout.layout, this.behavior.CurrentLayout.layout);
+            Assert.AreEqual(this.behavior.CurrentLayout.direction, this.behavior.CurrentLayout.direction);
         }
 
         [Test]

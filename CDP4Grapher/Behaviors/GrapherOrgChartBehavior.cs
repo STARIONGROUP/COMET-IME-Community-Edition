@@ -38,6 +38,8 @@ namespace CDP4Grapher.Behaviors
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
     using DevExpress.Xpf.Diagram;
+    using DevExpress.XtraPrinting;
+    using DevExpress.XtraRichEdit.Model;
 
     using Direction = DevExpress.Diagram.Core.Direction;
 
@@ -50,7 +52,12 @@ namespace CDP4Grapher.Behaviors
         /// Gets or sets the current layout
         /// </summary>
         public (LayoutEnumeration layout, Enum direction) CurrentLayout { get; private set; } = (LayoutEnumeration.TipOver, TipOverDirection.LeftToRight);
-        
+
+        /// <summary>
+        /// Holds the value whether the <see cref="DiagramControl"/> has loaded for the first time
+        /// </summary>
+        private bool hasLoaded;
+
         /// <summary>
         /// The on attached event handler
         /// </summary>
@@ -69,9 +76,28 @@ namespace CDP4Grapher.Behaviors
         /// <param name="e"></param>
         private void Loaded(object sender, RoutedEventArgs e)
         {
-            this.ApplySpecifiedLayout(this.CurrentLayout.layout, this.CurrentLayout.direction);
+            if (!this.hasLoaded)
+            {
+                this.ApplyPreviousLayout();
+                this.hasLoaded = true;
+            }
         }
-        
+
+        /// <summary>
+        /// Applies the saved layout from <see cref="CurrentLayout"/>
+        /// </summary>
+        public void ApplyPreviousLayout()
+        {
+            if (this.CurrentLayout.direction is { })
+            {
+                this.ApplySpecifiedLayout(this.CurrentLayout.layout, this.CurrentLayout.direction);
+            }
+            else
+            {
+                this.ApplySpecifiedLayout(this.CurrentLayout.layout);
+            }
+        }
+
         /// <summary>
         /// Apply the desired layout specified
         /// </summary>
@@ -150,6 +176,7 @@ namespace CDP4Grapher.Behaviors
             if (this.AssociatedObject.DataContext is IGrapherViewModel viewModel)
             {
                 viewModel.DiagramContextMenuViewModel.Behavior = this;
+                viewModel.Behavior = this;
             }
         }
         
@@ -242,7 +269,7 @@ namespace CDP4Grapher.Behaviors
             if (dialog.ShowDialog())
             {
                 using var fileStream = dialog.OpenFile();
-                this.AssociatedObject.ExportDiagram(fileStream, dialog.Format, 72, 0.5);
+                this.AssociatedObject.ExportDiagram(fileStream, dialog.Format, 72, 1);
             }
         }
 

@@ -44,6 +44,8 @@ namespace CDP4Grapher.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using CDP4Grapher.Behaviors;
+
     using DevExpress.Mvvm.Native;
 
     using ReactiveUI;
@@ -92,11 +94,11 @@ namespace CDP4Grapher.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Grapher";
-
+        
         /// <summary>
-        /// Holds the <see cref="IDisposable"/> subscriptions
+        /// Gets or sets the attached behavior
         /// </summary>
-        private readonly List<IDisposable> subscriptions = new List<IDisposable>();
+        public IGrapherOrgChartBehavior Behavior { get; set; }
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
@@ -230,29 +232,15 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void PopulateElementUsages()
         {
-            var elements = new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name).ToList();
-
-            foreach (var nestedElement in elements)
-            {
-                if (nestedElement.IsRootElement)
-                {
-                    var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(nestedElement)
-                        .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                        .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(x => this.UpdateProperties());
-
-                    this.subscriptions.Add(listener);
-                }
-
-                this.GraphElements.Add(new GraphElementViewModel(nestedElement));
-            }
+            var elements = new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
+            this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e)));
         }
         
         /// <summary>
         /// Update the properties of this view-model
         /// </summary>
         private void UpdateProperties()
-         {
+        {
             this.CurrentModel = this.modelSetup.Name;
             this.CurrentIteration = this.iterationSetup.IterationNumber;
             this.CurrentOption = this.Thing.Name;
@@ -271,8 +259,8 @@ namespace CDP4Grapher.ViewModels
             }
 
             this.ClearNestedElementsAndDisposeSubscriptions();
-
             this.PopulateElementUsages();
+            this.Behavior?.ApplyPreviousLayout();
         }
 
         /// <summary>
@@ -280,9 +268,7 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void ClearNestedElementsAndDisposeSubscriptions()
         {
-            this.subscriptions.ForEach(x => x.Dispose());
             this.GraphElements.ForEach(x => x.NestedElementElementListener.Dispose());
-            this.subscriptions.Clear();
             this.GraphElements.Clear();
         }
     }

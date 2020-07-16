@@ -56,5 +56,10 @@ namespace CDP4Grapher.Behaviors
         /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
         /// </summary>
         void ApplySpecifiedLayout(LayoutEnumeration layout);
+        
+        /// <summary>
+        /// Applies the saved layout from <see cref="CurrentLayout"/>
+        /// </summary>
+        void ApplyPreviousLayout();
     }
 }
