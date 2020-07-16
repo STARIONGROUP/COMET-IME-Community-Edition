@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{7C432D61-867C-4DD2-8B14-EE8AEFD0B3A4}</ProjectGuid>
-    <MinIMEVersion>6.0.0.4</MinIMEVersion>
+    <MinIMEVersion>6.0.0</MinIMEVersion>
     <RootNamespace>CDP4JsonFileDalPlugin</RootNamespace>
     <AssemblyName>CDP4JsonFileDalPlugin</AssemblyName>
     <TargetFramework>net452</TargetFramework>

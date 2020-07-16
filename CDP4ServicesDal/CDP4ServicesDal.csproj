@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{03C264A0-398B-4C78-83BA-EDEA6BA7F679}</ProjectGuid>
-    <MinIMEVersion>6.0.0.4</MinIMEVersion>
+    <MinIMEVersion>6.0.0</MinIMEVersion>
     <RootNamespace>CDP4ServicesDalPlugin</RootNamespace>
     <AssemblyName>CDP4ServicesDalPlugin</AssemblyName>
     <TargetFramework>net452</TargetFramework>
