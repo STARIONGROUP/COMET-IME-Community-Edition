@@ -26,8 +26,8 @@
     <dxmvvm:Interaction.Behaviors>
         <behaviours:RibbonCategoryBehavior CategoryName="ReportingCategory" />
     </dxmvvm:Interaction.Behaviors>
-    <dxdo:DockLayoutManager FloatingMode="Desktop" x:Name="Manager">
-        <dxdo:LayoutGroup x:Name="layoutRoot" AllowSplitters="True" Orientation="Horizontal">
+    <dxdo:DockLayoutManager FloatingMode="Desktop">
+        <dxdo:LayoutGroup AllowSplitters="True" Orientation="Horizontal">
             <dxdo:LayoutGroup Orientation="Vertical">
                 <dxdo:LayoutPanel Caption="Code Editor"  ItemHeight="2*">
                     <avalonEdit:TextEditor
@@ -35,11 +35,11 @@
                                 FontFamily="Consolas"
                                 SyntaxHighlighting="C#"
                                 ShowLineNumbers="True"
+                                Document="{Binding Path=Document}"
                                 WordWrap="True"
                                 MinHeight="300"
                                 HorizontalScrollBarVisibility="Auto"
                                 HorizontalContentAlignment="Stretch"
-                                Visibility="Hidden"
                                 FontSize="10pt">
                     </avalonEdit:TextEditor>
                 </dxdo:LayoutPanel>
@@ -47,11 +47,11 @@
                     <dxlc:LayoutGroup VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                           Orientation="Vertical"
                           View="Tabs">
-                        <dxlc:LayoutGroup x:Name="layoutErrors" HorizontalAlignment="Stretch" Header="Errors" Orientation="Vertical">
-                            <TextBox Margin="0" Padding="0" Name="ErrorsTextBox" VerticalScrollBarVisibility="Auto" IsReadOnly="True" TextWrapping="Wrap" />
+                        <dxlc:LayoutGroup HorizontalAlignment="Stretch" Header="Errors" Orientation="Vertical">
+                            <TextBox Margin="0" Padding="0" Text="{Binding Path=Errors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" TextWrapping="Wrap" />
                         </dxlc:LayoutGroup>
-                        <dxlc:LayoutGroup x:Name="layoutOutput" HorizontalAlignment="Stretch" Header="Output" Orientation="Vertical">
-                            <TextBox Margin="0" Name="OutputTextBox" VerticalScrollBarVisibility="Auto" IsReadOnly="True" TextWrapping="Wrap" />
+                        <dxlc:LayoutGroup HorizontalAlignment="Stretch" Header="Output" Orientation="Vertical">
+                            <TextBox Margin="0" Name="OutputTextBox" Text="{Binding Path=Output, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalScrollBarVisibility="Auto" IsReadOnly="True" TextWrapping="Wrap" />
                             <dxb:BarManager.DXContextMenu>
                                 <dxb:PopupMenu>
                                     <dxb:PopupMenu.Items>
@@ -81,9 +81,7 @@
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarButtonItem
-                                        x:Name="OpenFileButton"
-                                        Command="{Binding CreateComponentCommand}"
-                                        ItemClick="OpenFileButton_ItemClick"
+                                        Command="{Binding Path=OpenScriptCommand}"
                                         LargeGlyph="{dx:DXImage Image=Open_32x32.png}"
                                         Content="Open Script"
                                         Hint="Open Script" />
@@ -92,9 +90,7 @@
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarButtonItem
-                                        x:Name="SaveFileButton"
-                                        Command="{Binding CreateComponentCommand}"
-                                        ItemClick="SaveFileButton_ItemClick"
+                                        Command="{Binding Path=SaveScriptCommand}"
                                         LargeGlyph="{dx:DXImage Image=Save_32x32.png}"
                                         Content="Save Script"
                                         Hint="Save Script" />
@@ -103,9 +99,7 @@
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarButtonItem
-                                        x:Name="BuildCodeButton"
-                                        Command="{Binding CreateComponentCommand}"
-                                        ItemClick="BuildCodeButton_ItemClick"
+                                        Command="{Binding Path=BuildScriptCommand}"
                                         LargeGlyph="{dx:DXImage Image=Build_32x32.png}"
                                         Content="Build"
                                         Hint="Build" />
@@ -113,12 +107,13 @@
                             </dxb:InsertAction>
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
-                                    <dxb:BarCheckItem IsChecked="{Binding IsBuildEnabled}"
-                                       x:Name="AutomaticBuildButton"
+                                    <dxb:BarCheckItem
+                                       IsChecked="{Binding Path=IsAutoBuildEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                       IsEnabled="True"
                                        Content="Toggle Auto Build"
                                        Description="Toggle Auto Build"
                                        Hint="Toggle Auto Build"
-                                       ItemClick="AutomaticBuildButton_ItemClick"
+                                       Command="{Binding Path=AutomaticBuildCommand}"
                                        LargeGlyph="{dx:DXImage Image=Time_32x32.png}" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>

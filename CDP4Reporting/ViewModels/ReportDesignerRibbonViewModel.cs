@@ -63,8 +63,7 @@ namespace CDP4Reporting.ViewModels
         public static ReportDesignerViewModel InstantiatePanelViewModel(Iteration iteration, ISession session,
             IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            var model = iteration.Container as EngineeringModel;
-            if (model == null)
+            if (!(iteration.Container is EngineeringModel model))
             {
                 throw new InvalidOperationException("The container of an Iteration cannot be anything else than an Engineering Model.");
             }
@@ -75,7 +74,7 @@ namespace CDP4Reporting.ViewModels
                 throw new InvalidOperationException("The Participant in an engineering model cannot be null");
             }
 
-            return new ReportDesignerViewModel(iteration, participant, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
+            return new ReportDesignerViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }
 }
