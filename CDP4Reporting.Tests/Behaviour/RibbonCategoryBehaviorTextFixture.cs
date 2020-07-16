@@ -29,6 +29,9 @@ using ReactiveUI;
 using System.Reactive.Concurrency;
 using System.Threading;
 using CDP4Composition.Mvvm.Behaviours;
+using Microsoft.Practices.ServiceLocation;
+using Moq;
+using Microsoft.Practices.Prism.Regions;
 
 namespace CDP4Reporting.Tests.Behaviour
 {
@@ -36,12 +39,20 @@ namespace CDP4Reporting.Tests.Behaviour
     [Apartment(ApartmentState.STA)]
     public class RibbonCategoryBehaviorTextFixture
     {
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IRegionManager> regionManager;
         private RibbonCategoryBehavior ribbonCategoryBehavior;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.regionManager = new Mock<IRegionManager>();
+            this.serviceLocator.Setup(x => x.GetInstance<IRegionManager>()).Returns(this.regionManager.Object);
 
             this.ribbonCategoryBehavior = new RibbonCategoryBehavior();
         }

@@ -41,9 +41,11 @@ using NLog;
 using ReactiveUI;
 using System;
 using System.CodeDom.Compiler;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -197,8 +199,10 @@ namespace CDP4Reporting.ViewModels
 
                 this.FilePath = filePath;
             }
-
-            System.IO.File.WriteAllText(this.FilePath, this.Document.Text);
+            if (!string.IsNullOrEmpty(this.FilePath))
+            {
+                System.IO.File.WriteAllText(this.FilePath, this.Document.Text);
+            }
         }
 
         /// <summary>
@@ -250,6 +254,8 @@ namespace CDP4Reporting.ViewModels
 
                 var compiler = new Microsoft.CSharp.CSharpCodeProvider();
                 var parameters = new CompilerParameters();
+                // TODO Figure out how to invoke from different paths(eg: from tests)
+                var currentFolder = System.IO.File.Exists("CDP4Common.dll") ? "." : Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 parameters.ReferencedAssemblies.Add("System.dll");
                 parameters.ReferencedAssemblies.Add("System.Core.dll");
@@ -257,8 +263,8 @@ namespace CDP4Reporting.ViewModels
                 parameters.ReferencedAssemblies.Add("System.Linq.dll");
                 parameters.ReferencedAssemblies.Add("System.Windows.dll");
 
-                parameters.ReferencedAssemblies.Add("CDP4Common.dll");
-                parameters.ReferencedAssemblies.Add("CDP4Composition.dll");
+                parameters.ReferencedAssemblies.Add($"{currentFolder}\\CDP4Common.dll");
+                parameters.ReferencedAssemblies.Add($"{currentFolder}\\CDP4Composition.dll");
 
                 parameters.GenerateInMemory = true;
                 parameters.GenerateExecutable = false;

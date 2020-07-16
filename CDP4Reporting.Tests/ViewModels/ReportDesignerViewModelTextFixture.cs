@@ -21,6 +21,9 @@ using CDP4Dal.Permission;
 using System.Reactive.Concurrency;
 using System.Collections.Concurrent;
 using Microsoft.Practices.ServiceLocation;
+using ICSharpCode.AvalonEdit.Document;
+using System.IO;
+using DevExpress.Mvvm.Native;
 
 namespace CDP4Reporting.Tests.ViewModels
 {
@@ -30,6 +33,13 @@ namespace CDP4Reporting.Tests.ViewModels
     [TestFixture, Apartment(ApartmentState.STA)]
     public class ReportDesignerViewModelTextFixture
     {
+        //private string[] FileNames = new string[] { "TestDataSource.cs" };
+        private string filePathOpen = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDataSourceOpen.cs");
+        private string filePathSave = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDataSourceSave.cs");
+
+        private const string CODE_OK = "namespace CDP4Reporting { public class TestDataSource { public TestDataSource(){} }; }";
+        private const string CODE_BAD = "namespace CDP4Reporting { public class1 TestDataSource { public TestDataSource(){} }; }";
+
         private Mock<IServiceLocator> serviceLocator;
         private Mock<ReportDesignerViewModel> reportDesignerViewModel;
         private Mock<ISession> session;
@@ -37,6 +47,7 @@ namespace CDP4Reporting.Tests.ViewModels
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
+        private Mock<IOpenSaveFileDialogService> openSaveFileDialogService;
 
         private static readonly Application application = new Application();
 
@@ -57,14 +68,16 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.serviceLocator = new Mock<IServiceLocator>();
-            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
-
             this.session = new Mock<ISession>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
+            this.openSaveFileDialogService = new Mock<IOpenSaveFileDialogService>();
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.openSaveFileDialogService.Object);
 
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
@@ -98,19 +111,73 @@ namespace CDP4Reporting.Tests.ViewModels
             this.reportDesignerViewModel = new Mock<ReportDesignerViewModel>(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingsService.Object);
         }
 
-        [Test]
-        public void VerifyThatCommandsWork()
-        {
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenScriptCommand.Execute(null));
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveScriptCommand.Execute(null));
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null));
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.AutomaticBuildCommand.Execute(null));
-        }
-
         [TearDown]
         public void TearDown()
         {
+            if (System.IO.File.Exists(filePathOpen))
+            {
+                System.IO.File.Delete(filePathOpen);
+            }
+            if (System.IO.File.Exists(filePathSave))
+            {
+                System.IO.File.Delete(filePathSave);
+            }
             CDPMessageBus.Current.ClearSubscriptions();
+        }
+
+        [Test]
+        public void VerifyThatCommandsWorkWithNoCode()
+        {
+            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns((string[])null);
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenScriptCommand.Execute(null));
+
+            this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveScriptCommand.Execute(null));
+
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null));
+
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.AutomaticBuildCommand.Execute(null));
+        }
+
+        [Test]
+        public void VerifyThatCommandsWorkWithCode()
+        {
+            System.IO.File.WriteAllText(this.filePathOpen, CODE_OK);
+            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.filePathOpen });
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenScriptCommand.Execute(null));
+
+            this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.filePathSave);
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveScriptCommand.Execute(null));
+
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null));
+
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.AutomaticBuildCommand.Execute(null));
+        }
+
+        [Test]
+        public void VerifyThatBuildPass()
+        {
+            var textDocument = new TextDocument();
+            textDocument.Text = CODE_OK;
+
+            this.reportDesignerViewModel.Object.Document = textDocument;
+            this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null);
+
+            Assert.AreEqual(0, this.reportDesignerViewModel.Object.BuildResult.Errors.Count);
+            Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Object.Errors);
+        }
+
+        [Test]
+        public void VerifyThatBuildFailed()
+        {
+            var textDocument = new TextDocument();
+            textDocument.Text = CODE_BAD;
+
+            this.reportDesignerViewModel.Object.Document = textDocument;
+            this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null);
+
+            Assert.AreNotEqual(0, this.reportDesignerViewModel.Object.BuildResult.Errors.Count);
+            Assert.AreNotEqual(string.Empty, this.reportDesignerViewModel.Object.Errors);
         }
     }
 }
