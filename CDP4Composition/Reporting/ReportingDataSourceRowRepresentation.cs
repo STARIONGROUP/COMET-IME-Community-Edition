@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterTypeShortNameAttribute.cs" company="RHEA System S.A.">
+// <copyright file="ReportingDataSourceRowRepresentation.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,31 +25,20 @@
 
 namespace CDP4Composition.Reporting
 {
-    using System;
-
-    using CDP4Common.SiteDirectoryData;
-
     /// <summary>
-    /// Attribute decorating implementations of <see cref="ReportingDataSourceParameter{T}"/> to mark
-    /// the associated <see cref="ParameterType"/> short name.
+    /// Abstract base class from which all row representations for a <see cref="ReportingDataSourceClass{T}"/> need to derive.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class ParameterTypeShortNameAttribute : Attribute
+    public abstract class ReportingDataSourceRowRepresentation
     {
         /// <summary>
-        /// The short name of the associated <see cref="ParameterType"/>.
+        /// The Element name, fully qualified with the path to the top element.
         /// </summary>
-        public readonly string ShortName;
+        internal string ElementName;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterTypeShortNameAttribute"/> class.
+        /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
+        /// Note that when this is false, all values will be null on the row.
         /// </summary>
-        /// <param name="shortName">
-        /// The short name of the associated <see cref="ParameterType"/>.
-        /// </param>
-        public ParameterTypeShortNameAttribute(string shortName)
-        {
-            this.ShortName = shortName;
-        }
+        internal bool IsVisible;
     }
 }

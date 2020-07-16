@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterTypeShortNameAttribute.cs" company="RHEA System S.A.">
+// <copyright file="ReportingDataSourceClass.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,31 +25,46 @@
 
 namespace CDP4Composition.Reporting
 {
-    using System;
+    using CDP4Common.EngineeringModelData;
 
-    using CDP4Common.SiteDirectoryData;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// Attribute decorating implementations of <see cref="ReportingDataSourceParameter{T}"/> to mark
-    /// the associated <see cref="ParameterType"/> short name.
+    /// Class representing a reporting data source.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class ParameterTypeShortNameAttribute : Attribute
+    /// <typeparam name="T">
+    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
+    /// </typeparam>
+    public class ReportingDataSourceClass<T> where T : ReportingDataSourceRowRepresentation, new()
     {
         /// <summary>
-        /// The short name of the associated <see cref="ParameterType"/>.
+        /// The <see cref="ReportingDataSourceRow{T}"/> which is the root of the hierarhical tree.
         /// </summary>
-        public readonly string ShortName;
+        private readonly ReportingDataSourceRow<T> topRow;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterTypeShortNameAttribute"/> class.
+        /// Initializes a new instance of the <see cref="ReportingDataSourceClass{T}"/> class.
         /// </summary>
-        /// <param name="shortName">
-        /// The short name of the associated <see cref="ParameterType"/>.
+        /// <param name="iteration">
+        /// The <see cref="Iteration"/> upon which the data source is based.
         /// </param>
-        public ParameterTypeShortNameAttribute(string shortName)
+        /// <param name="categoryHierarchy">
+        /// The <see cref="CategoryHierarchy"/> used for filtering the considered <see cref="ElementBase"/> items.
+        /// </param>
+        public ReportingDataSourceClass(Iteration iteration, CategoryHierarchy categoryHierarchy)
         {
-            this.ShortName = shortName;
+            this.topRow = new ReportingDataSourceRow<T>(iteration.TopElement, categoryHierarchy);
+        }
+
+        /// <summary>
+        /// Gets a tabular representation of the hierarhical tree upon which the data source is based.
+        /// </summary>
+        /// <returns>
+        /// The tabular representation.
+        /// </returns>
+        public List<T> GetTabularRepresentation()
+        {
+            return this.topRow.GetTabularRepresentation();
         }
     }
 }

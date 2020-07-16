@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterTypeShortNameAttribute.cs" company="RHEA System S.A.">
+// <copyright file="ICDP4ReportingDataSource.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,31 +25,25 @@
 
 namespace CDP4Composition.Reporting
 {
-    using System;
-
-    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.EngineeringModelData;
 
     /// <summary>
-    /// Attribute decorating implementations of <see cref="ReportingDataSourceParameter{T}"/> to mark
-    /// the associated <see cref="ParameterType"/> short name.
+    /// The interface used for creating a reporting data source.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class ParameterTypeShortNameAttribute : Attribute
+    /// <typeparam name="T">
+    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
+    /// </typeparam>
+    public interface IReportingDataSource<T> where T : ReportingDataSourceRowRepresentation, new()
     {
         /// <summary>
-        /// The short name of the associated <see cref="ParameterType"/>.
+        /// Creates a new data source instance.
         /// </summary>
-        public readonly string ShortName;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterTypeShortNameAttribute"/> class.
-        /// </summary>
-        /// <param name="shortName">
-        /// The short name of the associated <see cref="ParameterType"/>.
+        /// <param name="iteration">
+        /// The <see cref="Iteration"/> based on which the data source will be created.
         /// </param>
-        public ParameterTypeShortNameAttribute(string shortName)
-        {
-            this.ShortName = shortName;
-        }
+        /// <returns>
+        /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
+        /// </returns>
+        ReportingDataSourceClass<T> CreateDataSource(Iteration iteration);
     }
 }
