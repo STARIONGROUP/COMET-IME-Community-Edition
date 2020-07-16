@@ -27,8 +27,23 @@ namespace CDP4Composition.Reporting
 {
     using CDP4Common.EngineeringModelData;
 
+    /// <summary>
+    /// The interface used for creating a reporting data source.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
+    /// </typeparam>
     public interface IReportingDataSource<T> where T : ReportingDataSourceRowRepresentation, new()
     {
-        ReportingDataSourceClass<T> CreateDataSource(Iteration interation);
+        /// <summary>
+        /// Creates a new data source instance.
+        /// </summary>
+        /// <param name="iteration">
+        /// The <see cref="Iteration"/> based on which the data source will be created.
+        /// </param>
+        /// <returns>
+        /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
+        /// </returns>
+        ReportingDataSourceClass<T> CreateDataSource(Iteration iteration);
     }
 }

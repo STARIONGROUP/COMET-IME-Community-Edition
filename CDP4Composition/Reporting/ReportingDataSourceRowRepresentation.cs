@@ -25,9 +25,20 @@
 
 namespace CDP4Composition.Reporting
 {
-    public class ReportingDataSourceRowRepresentation
+    /// <summary>
+    /// Abstract base class from which all row representations for a <see cref="ReportingDataSourceClass{T}"/> need to derive.
+    /// </summary>
+    public abstract class ReportingDataSourceRowRepresentation
     {
+        /// <summary>
+        /// The Element name, fully qualified with the path to the top element.
+        /// </summary>
         internal string ElementName;
+
+        /// <summary>
+        /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
+        /// Note that when this is false, all values will be null on the row.
+        /// </summary>
         internal bool IsVisible;
     }
 }

@@ -29,15 +29,39 @@ namespace CDP4Composition.Reporting
 
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Class representing a reporting data source.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
+    /// </typeparam>
     public class ReportingDataSourceClass<T> where T : ReportingDataSourceRowRepresentation, new()
     {
+        /// <summary>
+        /// The <see cref="ReportingDataSourceRow{T}"/> which is the root of the hierarhical tree.
+        /// </summary>
         private readonly ReportingDataSourceRow<T> topRow;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReportingDataSourceClass{T}"/> class.
+        /// </summary>
+        /// <param name="iteration">
+        /// The <see cref="Iteration"/> upon which the data source is based.
+        /// </param>
+        /// <param name="categoryHierarchy">
+        /// The <see cref="CategoryHierarchy"/> used for filtering the considered <see cref="ElementBase"/> items.
+        /// </param>
         public ReportingDataSourceClass(Iteration iteration, CategoryHierarchy categoryHierarchy)
         {
             this.topRow = new ReportingDataSourceRow<T>(iteration.TopElement, categoryHierarchy);
         }
 
+        /// <summary>
+        /// Gets a tabular representation of the hierarhical tree upon which the data source is based.
+        /// </summary>
+        /// <returns>
+        /// The tabular representation.
+        /// </returns>
         public List<T> GetTabularRepresentation()
         {
             return this.topRow.GetTabularRepresentation();

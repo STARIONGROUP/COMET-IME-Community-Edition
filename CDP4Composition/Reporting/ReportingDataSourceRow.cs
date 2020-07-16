@@ -33,38 +33,91 @@ namespace CDP4Composition.Reporting
     using System.Linq;
     using System.Reflection;
 
-    public class ReportingDataSourceRow<T> where T : ReportingDataSourceRowRepresentation, new()
+    /// <summary>
+    /// Class representing a row associated with a node in the hierarhical tree upon which the data source is based.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
+    /// </typeparam>
+    internal class ReportingDataSourceRow<T> where T : ReportingDataSourceRowRepresentation, new()
     {
+        /// <summary>
+        /// The parent node in the hierarhical tree upon which the data source is based.
+        /// </summary>
         private readonly ReportingDataSourceRow<T> parent;
 
+        /// <summary>
+        /// The children nodes in the hierarhical tree upon which the data source is based.
+        /// </summary>
         internal List<ReportingDataSourceRow<T>> Children { get; } = new List<ReportingDataSourceRow<T>>();
 
+        /// <summary>
+        /// The <see cref="ElementBase"/> associated with this node.
+        /// </summary>
         private readonly ElementBase elementBase;
 
+        /// <summary>
+        /// The <see cref="ElementDefinition"/> representing this node.
+        /// </summary>
         private ElementDefinition ElementDefinition =>
             (this.elementBase as ElementDefinition) ?? (this.elementBase as ElementUsage)?.ElementDefinition;
 
+        /// <summary>
+        /// The <see cref="ElementUsage"/> representing this node, if it exists.
+        /// </summary>
         private ElementUsage ElementUsage =>
             this.elementBase as ElementUsage;
 
+        /// <summary>
+        /// The fully qualified (to the tree root) name of this <see cref="elementBase"/>.
+        /// </summary>
         private string FullyQualifiedName => (this.parent != null)
             ? this.parent.FullyQualifiedName + "." + this.ElementUsage.ShortName
             : this.ElementDefinition.ShortName;
 
+        /// <summary>
+        /// The list of declared <see cref="ReportingDataSourceParameter{T}"/> types on
+        /// the associated <see cref="ReportingDataSourceRowRepresentation"/>.
+        /// </summary>
         private static readonly IEnumerable<FieldInfo> ParameterFields = typeof(T).GetFields()
             .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceParameter<T>)));
 
+        /// <summary>
+        /// The <see cref="ReportingDataSourceParameter{T}"/>s associated with this row.
+        /// </summary>
         private readonly Dictionary<Type, ReportingDataSourceParameter<T>> reportedParameters =
             new Dictionary<Type, ReportingDataSourceParameter<T>>();
 
+        /// <summary>
+        /// The filtering <see cref="Category"/> that must be matched on the current <see cref="elementBase"/>.
+        /// </summary>
         private readonly Category filterCategory;
 
+        /// <summary>
+        /// Boolean flag indicating whether the current <see cref="elementBase"/> matches the <see cref="filterCategory"/>.
+        /// </summary>
         private bool IsVisible =>
             this.elementBase.Category.Contains(this.filterCategory);
 
+        /// <summary>
+        /// Boolean flag indicating whether the current node or any of its <see cref="Children"/>
+        /// match their associated <see cref="filterCategory"/>.
+        /// </summary>
         private bool IsRelevant =>
             this.IsVisible || this.Children.Any(child => child.IsRelevant);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReportingDataSourceRow{T}"/> class.
+        /// </summary>
+        /// <param name="elementBase">
+        /// The <see cref="ElementBase"/> associated with this node.
+        /// </param>
+        /// <param name="categoryHierarchy">
+        /// The <see cref="CategoryHierarchy"/> associated with this node's subtree.
+        /// </param>
+        /// <param name="parent">
+        /// The parent node in the hierarhical tree upon which the data source is based.
+        /// </param>
         public ReportingDataSourceRow(
             ElementBase elementBase,
             CategoryHierarchy categoryHierarchy,
@@ -105,6 +158,13 @@ namespace CDP4Composition.Reporting
             }
         }
 
+        /// <summary>
+        /// Initializes a reported parameter based on the corresponding <see cref="ParameterOrOverrideBase"/>
+        /// associated with the current <see cref="elementBase"/>.
+        /// </summary>
+        /// <param name="reportedParameter">
+        /// The reported parameter to be initialized.
+        /// </param>
         private void InitializeParameter(ReportingDataSourceParameter<T> reportedParameter)
         {
             var parameter = this.ElementDefinition.Parameter
@@ -124,11 +184,26 @@ namespace CDP4Composition.Reporting
             }
         }
 
+        /// <summary>
+        /// Gets the parameter of type <see cref="TP"/> associated with this node.
+        /// </summary>
+        /// <typeparam name="TP">
+        /// The desired parameter type.
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="ReportingDataSourceParameter{T}"/> of type <see cref="TP"/>.
+        /// </returns>
         public TP GetParameter<TP>() where TP : ReportingDataSourceParameter<T>
         {
             return this.reportedParameters[typeof(TP)] as TP;
         }
 
+        /// <summary>
+        /// Gets the tabular representation of this node's subtree.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="List{T}"/> of <see cref="ReportingDataSourceRowRepresentation"/>.
+        /// </returns>
         public List<T> GetTabularRepresentation()
         {
             var tabularRepresentation = new List<T>
@@ -144,6 +219,12 @@ namespace CDP4Composition.Reporting
             return tabularRepresentation;
         }
 
+        /// <summary>
+        /// Gets the tabular representation of this node.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ReportingDataSourceRowRepresentation"/>.
+        /// </returns>
         private T GetRowTabularRepresentation()
         {
             var row = new T

@@ -30,20 +30,59 @@ namespace CDP4Composition.Reporting
 
     using System.Linq;
 
+    using CDP4Common.CommonData;
+
+    /// <summary>
+    /// Class representing a linear hierarchy of <see cref="CDP4Common.SiteDirectoryData.Category"/> items.
+    /// </summary>
     public class CategoryHierarchy
     {
+        /// <summary>
+        /// Builder class for a <see cref="CategoryHierarchy"/>.
+        /// </summary>
         internal class Builder
         {
+            /// <summary>
+            /// The <see cref="Iteration"/> containing the desired <see cref="CDP4Common.SiteDirectoryData.Category"/> items.
+            /// </summary>
             private readonly Iteration iteration;
 
-            private CategoryHierarchy top, current;
+            /// <summary>
+            /// The top element of the <see cref="CategoryHierarchy"/> to be constructed.
+            /// </summary>
+            private CategoryHierarchy top;
 
+            /// <summary>
+            /// The bottom element of the <see cref="CategoryHierarchy"/> to be constructed.
+            /// </summary>
+            private CategoryHierarchy current;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Builder"/> class.
+            /// </summary>
+            /// <param name="iteration">
+            /// The <see cref="Iteration"/> containing the desired <see cref="CDP4Common.SiteDirectoryData.Category"/> items.
+            /// </param>
+            /// <param name="topLevelCategoryShortName">
+            /// The <see cref="DefinedThing.ShortName"/> of the <see cref="CDP4Common.SiteDirectoryData.Category"/> of
+            /// the top element of the <see cref="CategoryHierarchy"/> to be constructed.
+            /// </param>
             internal Builder(Iteration iteration, string topLevelCategoryShortName)
             {
                 this.iteration = iteration;
                 this.AddLevel(topLevelCategoryShortName);
             }
 
+            /// <summary>
+            /// Gets the <see cref="CDP4Common.SiteDirectoryData.Category"/> with the given <paramref name="shortName"/>
+            /// contained in the <see cref="iteration"/>.
+            /// </summary>
+            /// <param name="shortName">
+            /// The <see cref="DefinedThing.ShortName"/> of the desired <see cref="CDP4Common.SiteDirectoryData.Category"/>.
+            /// </param>
+            /// <returns>
+            /// The desired <see cref="CDP4Common.SiteDirectoryData.Category"/>.
+            /// </returns>
             private Category GetCategoryByShortName(string shortName)
             {
                 return this.iteration.Cache
@@ -52,6 +91,15 @@ namespace CDP4Composition.Reporting
                     .Single(x => x.ShortName == shortName);
             }
 
+            /// <summary>
+            /// Adds a new level to the <see cref="CategoryHierarchy"/>.
+            /// </summary>
+            /// <param name="categoryShortName">
+            /// The <see cref="DefinedThing.ShortName"/> of the to-be-added <see cref="CDP4Common.SiteDirectoryData.Category"/>.
+            /// </param>
+            /// <returns>
+            /// This <see cref="Builder"/> object.
+            /// </returns>
             public Builder AddLevel(string categoryShortName)
             {
                 var category = this.GetCategoryByShortName(categoryShortName);
@@ -71,16 +119,35 @@ namespace CDP4Composition.Reporting
                 return this;
             }
 
+            /// <summary>
+            /// Finishes building the current <see cref="CategoryHierarchy"/>.
+            /// </summary>
+            /// <returns>
+            /// The build <see cref="CategoryHierarchy"/>.
+            /// </returns>
             public CategoryHierarchy Build()
             {
                 return this.top;
             }
         }
 
+        /// <summary>
+        /// The filtering <see cref="CDP4Common.SiteDirectoryData.Category"/> that must be matched on the associated level
+        /// of the <see cref="ReportingDataSourceRow{T}"/>.
+        /// </summary>
         public readonly Category Category;
 
+        /// <summary>
+        /// The child node in this <see cref="CategoryHierarchy"/>'s linear hierarchy.
+        /// </summary>
         public CategoryHierarchy Child { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CategoryHierarchy"/> class.
+        /// </summary>
+        /// <param name="category">
+        /// This node's <see cref="Category"/>.
+        /// </param>
         private CategoryHierarchy(Category category)
         {
             this.Category = category;

@@ -27,11 +27,26 @@ namespace CDP4Composition.Reporting
 {
     using System;
 
+    using CDP4Common.SiteDirectoryData;
+
+    /// <summary>
+    /// Attribute decorating implementations of <see cref="ReportingDataSourceParameter{T}"/> to mark
+    /// the associated <see cref="ParameterType"/> short name.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class ParameterTypeShortNameAttribute : Attribute
     {
-        public string ShortName { get; }
+        /// <summary>
+        /// The short name of the associated <see cref="ParameterType"/>.
+        /// </summary>
+        public readonly string ShortName;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterTypeShortNameAttribute"/> class.
+        /// </summary>
+        /// <param name="shortName">
+        /// The short name of the associated <see cref="ParameterType"/>.
+        /// </param>
         public ParameterTypeShortNameAttribute(string shortName)
         {
             this.ShortName = shortName;
