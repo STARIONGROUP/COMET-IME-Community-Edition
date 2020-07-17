@@ -34,7 +34,8 @@ namespace CDP4Composition.Reporting
     using System.Reflection;
 
     /// <summary>
-    /// Class representing a row associated with a node in the hierarhical tree upon which the data source is based.
+    /// Class representing a node in the hierarhical tree upon which the data source is based.
+    /// Each node corresponds to a row in the data source tabular representation.
     /// </summary>
     /// <typeparam name="T">
     /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
@@ -192,9 +193,9 @@ namespace CDP4Composition.Reporting
                 this.rowRepresentation
             };
 
-            foreach (var row in this.Children)
+            foreach (var node in this.Children)
             {
-                tabularRepresentation.AddRange(row.GetTabularRepresentation());
+                tabularRepresentation.AddRange(node.GetTabularRepresentation());
             }
 
             return tabularRepresentation;

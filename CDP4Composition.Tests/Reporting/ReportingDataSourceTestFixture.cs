@@ -366,19 +366,19 @@ namespace CDP4Composition.Tests.Reporting
         }
 
         [Test]
-        public void VerifyThatRowIdentifiesParameters()
+        public void VerifyThatNodeIdentifiesParameters()
         {
             var hierarchy = new CategoryHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 
-            Assert.IsNotNull(row.GetColumn<TestParameter1>());
-            Assert.IsNotNull(row.GetColumn<TestParameter2>());
-            Assert.Throws<KeyNotFoundException>(() => row.GetColumn<TestParameter3>());
+            Assert.IsNotNull(node.GetColumn<TestParameter1>());
+            Assert.IsNotNull(node.GetColumn<TestParameter2>());
+            Assert.Throws<KeyNotFoundException>(() => node.GetColumn<TestParameter3>());
         }
 
         [Test]
@@ -388,14 +388,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 
-            var parameter1 = row.GetColumn<TestParameter1>();
+            var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("type1", parameter1.ShortName);
 
-            var parameter2 = row.GetColumn<TestParameter2>();
+            var parameter2 = node.GetColumn<TestParameter2>();
             Assert.AreEqual("type2", parameter2.ShortName);
         }
 
@@ -406,16 +406,16 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 
-            var parameter1 = row.GetColumn<TestParameter1>();
+            var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual(
                 "11",
                 parameter1.GetValue());
 
-            var parameter2 = row.GetColumn<TestParameter2>();
+            var parameter2 = node.GetColumn<TestParameter2>();
             Assert.AreEqual(
                 "12",
                 parameter2.GetValue());
@@ -428,16 +428,16 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat3.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 this.eu2p31,
                 hierarchy);
 
-            var parameter1 = row.GetColumn<TestParameter1>();
+            var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual(
                 "231",
                 parameter1.GetValue());
 
-            var parameter2 = row.GetColumn<TestParameter2>();
+            var parameter2 = node.GetColumn<TestParameter2>();
             Assert.AreEqual(
                 "232",
                 parameter2.GetValue());
@@ -450,12 +450,12 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 
-            var parameter1 = row.GetColumn<TestParameter1>();
-            var parameter2 = row.GetColumn<TestParameter2>();
+            var parameter1 = node.GetColumn<TestParameter1>();
+            var parameter2 = node.GetColumn<TestParameter2>();
 
             Assert.AreSame(
                 parameter2,
@@ -474,11 +474,11 @@ namespace CDP4Composition.Tests.Reporting
                 .AddLevel(this.cat2.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 
-            var parameter = row.GetColumn<TestParameter1>();
+            var parameter = node.GetColumn<TestParameter1>();
 
             var children1 = parameter.GetChildren<TestParameter1>().ToList();
             Assert.AreEqual(2, children1.Count);
