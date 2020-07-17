@@ -54,6 +54,7 @@
     <Compile Include="CDP4JsonFileDalPlugin.wxs" />
     <Compile Include="CDP4ServicesDal.wxs" />
     <Compile Include="CDP4Dashboard.wxs" />
+    <Compile Include="CDP4Grapher.wxs" />
     <Compile Include="Dependencies.wxs" />
     <Compile Include="DevExpress.wxs" />
     <Compile Include="EngineeringModelPlugin.wxs" />
