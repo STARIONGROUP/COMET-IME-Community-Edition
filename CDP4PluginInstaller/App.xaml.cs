@@ -1,31 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="App.xaml.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
 
 namespace CDP4PluginInstaller
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Windows;
+    using System.IO;
+    using System.IO.Compression;
+    using System.Reflection;
+
+    using CDP4Composition.Modularity;
+
+    using Newtonsoft.Json;
+
+    using NLog;
+
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        /// <summary>
-        /// Initiate a new App
-        /// </summary>
-        public App()
-        {
-                
-        }
-        public void App_Startup(object sender, StartupEventArgs e)
-        {
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            this.downloadFolder = Path.Combine(appData, "RHEA/CDP4/DownloadCache/Plugins/");
-            mainWindow.Show();
-        }
 
         /// <summary>
         /// The NLog logger
@@ -38,27 +57,36 @@ namespace CDP4PluginInstaller
         private readonly string downloadFolder;
 
         /// <summary>
+        /// Holds the path to the download folder of plugins
+        /// </summary>
+        private Version currentImeVersion;
+
+        /// <summary>
         /// Holds an <see cref="IEnumerable{T}"/> of type <code>(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)</code>
         /// of the updatable plugins
         /// </summary>
         public List<(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)> UpdatablePlugins = new List<(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)>();
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public void CheckAndRunUpdater()
-        {
-            this.GetInstallablePlugins();
 
-            try
+        /// <summary>
+        /// Initiate a new <see cref="App"/>
+        /// </summary>
+        public App()
+        {
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            this.downloadFolder = Path.Combine(appData, "RHEA/CDP4/DownloadCache/Plugins/");
+            this.currentImeVersion = Assembly.GetExecutingAssembly().GetName().Version;
+        }
+
+        /// <summary>
+        /// Fires when the <see cref="App"/> starts
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            if (this.RetrieveInstallablePlugins())
             {
-                var updater = Process.Start("", this.UpdatablePlugins);
-                updater.EnableRaisingEvents = true;
-                updater.WaitForExit();
-            }
-            catch (Exception exception)
-            {
-                this.logger.Error($"The CDP4PluginUpdater has failed to start. {exception}");
+                var mainWindow = new MainWindow();
+                mainWindow.Show();
             }
         }
 
@@ -66,16 +94,14 @@ namespace CDP4PluginInstaller
         /// Retrieve all plugin that can be installed
         /// </summary>
         /// <returns>Assert whether there is any installable plugin found</returns>
-        private bool GetInstallablePlugins()
+        private bool RetrieveInstallablePlugins()
         {
             if (!Directory.Exists(this.downloadFolder))
             {
-                this.logger.Info("Download folder not yet created, download some plugins update from the IME first");
+                this.logger.Info("Download folder is empty or inexistant, download some plugins update from the IME first");
                 return false;
             }
-
-            var currentVersionIme = Assembly.GetExecutingAssembly().GetName().Version;
-
+            
             var currentlyInstalledPluginManifests = PluginUtilities.GetPluginManifests().ToList();
 
             foreach (var downloadedPluginFolder in Directory.EnumerateDirectories(this.downloadFolder).Select(d => new DirectoryInfo(d)))

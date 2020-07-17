@@ -22,7 +22,7 @@ namespace CDP4PluginInstaller
     {
         public MainWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }
