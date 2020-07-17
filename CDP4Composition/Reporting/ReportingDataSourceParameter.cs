@@ -32,12 +32,11 @@ namespace CDP4Composition.Reporting
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
 
     /// <summary>
-    /// Abstract base class from which all parameters for a <see cref="ReportingDataSourceRow"/> need to derive.
+    /// Abstract base class from which all parameter columns for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
-    public abstract class ReportingDataSourceParameter<T> where T : ReportingDataSourceRow, new()
+    internal abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
         /// Gets the <see cref="ParameterTypeShortNameAttribute"/> decorating the class described by <paramref name="type"/>.
@@ -58,11 +57,6 @@ namespace CDP4Composition.Reporting
         }
 
         /// <summary>
-        /// The <see cref="ReportingDataSourceNode{T}"/> associated to this parameter.
-        /// </summary>
-        internal ReportingDataSourceNode<T> Node;
-
-        /// <summary>
         /// The associated <see cref="ParameterType"/> short name.
         /// </summary>
         internal readonly string ShortName;
@@ -81,25 +75,31 @@ namespace CDP4Composition.Reporting
         }
 
         /// <summary>
-        /// Initializes the <see cref="Value"/> based on a <see cref="Parameter"/>.
+        /// Initializes a reported parameter column based on the corresponding <see cref="ParameterOrOverrideBase"/>
+        /// within the associated <see cref="ReportingDataSourceNode{T}"/>.
         /// </summary>
-        /// <param name="valueSet">
-        /// The <see cref="ParameterValueSet"/>s of the <see cref="Parameter"/>.
+        /// <param name="node">
+        /// The associated <see cref="ReportingDataSourceNode{T}"/>.
         /// </param>
-        internal void Initialize(ContainerList<ParameterValueSet> valueSet)
+        internal override void Initialize(ReportingDataSourceNode<T> node)
         {
-            this.Value = valueSet.First().ActualValue.First();
-        }
+            this.Node = node;
 
-        /// <summary>
-        /// Initializes the <see cref="Value"/> based on a <see cref="ParameterOverride"/>.
-        /// </summary>
-        /// <param name="valueSet">
-        /// The <see cref="ParameterOverrideValueSet"/>s of the <see cref="ParameterOverride"/>.
-        /// </param>
-        internal void Initialize(ContainerList<ParameterOverrideValueSet> valueSet)
-        {
-            this.Value = valueSet.First().ActualValue.First();
+            var parameter = this.Node.ElementDefinition.Parameter
+                .SingleOrDefault(x => x.ParameterType.ShortName == this.ShortName);
+
+            if (parameter != null)
+            {
+                this.Value = parameter.ValueSet.First().ActualValue.First();
+            }
+
+            var parameterOverride = this.Node.ElementUsage?.ParameterOverride
+                .SingleOrDefault(x => x.Parameter.ParameterType.ShortName == this.ShortName);
+
+            if (parameterOverride != null)
+            {
+                this.Value = parameterOverride.ValueSet.First().ActualValue.First();
+            }
         }
 
         /// <summary>

@@ -59,13 +59,13 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// The <see cref="ElementDefinition"/> representing this node.
         /// </summary>
-        private ElementDefinition ElementDefinition =>
+        internal ElementDefinition ElementDefinition =>
             (this.elementBase as ElementDefinition) ?? (this.elementBase as ElementUsage)?.ElementDefinition;
 
         /// <summary>
         /// The <see cref="ElementUsage"/> representing this node, if it exists.
         /// </summary>
-        private ElementUsage ElementUsage =>
+        internal ElementUsage ElementUsage =>
             this.elementBase as ElementUsage;
 
         /// <summary>
@@ -135,11 +135,9 @@ namespace CDP4Composition.Reporting
                     .GetConstructor(Type.EmptyTypes)
                     .Invoke(new object[] { }) as ReportingDataSourceParameter<T>;
 
-                parameter.Node = this;
-
                 this.reportedParameters[type] = parameter;
 
-                this.InitializeParameter(parameter);
+                parameter.Initialize(this);
             }
 
             if (categoryHierarchy.Child == null)
@@ -155,32 +153,6 @@ namespace CDP4Composition.Reporting
                 {
                     this.Children.Add(childNode);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Initializes a reported parameter based on the corresponding <see cref="ParameterOrOverrideBase"/>
-        /// associated with the current <see cref="elementBase"/>.
-        /// </summary>
-        /// <param name="reportedParameter">
-        /// The reported parameter to be initialized.
-        /// </param>
-        private void InitializeParameter(ReportingDataSourceParameter<T> reportedParameter)
-        {
-            var parameter = this.ElementDefinition.Parameter
-                .SingleOrDefault(x => x.ParameterType.ShortName == reportedParameter.ShortName);
-
-            if (parameter != null)
-            {
-                reportedParameter.Initialize(parameter.ValueSet);
-            }
-
-            var parameterOverride = this.ElementUsage?.ParameterOverride
-                .SingleOrDefault(x => x.Parameter.ParameterType.ShortName == reportedParameter.ShortName);
-
-            if (parameterOverride != null)
-            {
-                reportedParameter.Initialize(parameterOverride.ValueSet);
             }
         }
 
