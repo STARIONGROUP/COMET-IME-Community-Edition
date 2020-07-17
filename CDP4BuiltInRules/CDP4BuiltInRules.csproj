@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{1CACEEA5-D398-419D-B88B-D4CC4EA67EED}</ProjectGuid>
+    <MinIMEVersion>6.0.0</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
    
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
