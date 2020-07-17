@@ -133,7 +133,7 @@ namespace CDP4Composition.Reporting
 
         /// <summary>
         /// The filtering <see cref="CDP4Common.SiteDirectoryData.Category"/> that must be matched on the associated level
-        /// of the <see cref="ReportingDataSourceRow{T}"/>.
+        /// of the <see cref="ReportingDataSourceNode{T}"/>.
         /// </summary>
         public readonly Category Category;
 

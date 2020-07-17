@@ -58,9 +58,9 @@ namespace CDP4Composition.Reporting
         }
 
         /// <summary>
-        /// The <see cref="ReportingDataSourceRow{T}"/> associated to this parameter.
+        /// The <see cref="ReportingDataSourceNode{T}"/> associated to this parameter.
         /// </summary>
-        internal ReportingDataSourceRow<T> Row;
+        internal ReportingDataSourceNode<T> Node;
 
         /// <summary>
         /// The associated <see cref="ParameterType"/> short name.
@@ -114,7 +114,7 @@ namespace CDP4Composition.Reporting
         /// </returns>
         public TP GetSibling<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.Row.GetParameter<TP>();
+            return this.Node.GetParameter<TP>();
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace CDP4Composition.Reporting
         /// </returns>
         public IEnumerable<TP> GetChildren<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.Row.Children.Select(child => child.GetParameter<TP>());
+            return this.Node.Children.Select(child => child.GetParameter<TP>());
         }
     }
 }

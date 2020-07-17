@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportingDataSourceRow.cs" company="RHEA System S.A.">
+// <copyright file="ReportingDataSourceNode.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -39,17 +39,17 @@ namespace CDP4Composition.Reporting
     /// <typeparam name="T">
     /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
     /// </typeparam>
-    internal class ReportingDataSourceRow<T> where T : ReportingDataSourceRowRepresentation, new()
+    internal class ReportingDataSourceNode<T> where T : ReportingDataSourceRowRepresentation, new()
     {
         /// <summary>
         /// The parent node in the hierarhical tree upon which the data source is based.
         /// </summary>
-        private readonly ReportingDataSourceRow<T> parent;
+        private readonly ReportingDataSourceNode<T> parent;
 
         /// <summary>
         /// The children nodes in the hierarhical tree upon which the data source is based.
         /// </summary>
-        internal List<ReportingDataSourceRow<T>> Children { get; } = new List<ReportingDataSourceRow<T>>();
+        internal List<ReportingDataSourceNode<T>> Children { get; } = new List<ReportingDataSourceNode<T>>();
 
         /// <summary>
         /// The <see cref="ElementBase"/> associated with this node.
@@ -107,7 +107,7 @@ namespace CDP4Composition.Reporting
             this.IsVisible || this.Children.Any(child => child.IsRelevant);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReportingDataSourceRow{T}"/> class.
+        /// Initializes a new instance of the <see cref="ReportingDataSourceNode{T}"/> class.
         /// </summary>
         /// <param name="elementBase">
         /// The <see cref="ElementBase"/> associated with this node.
@@ -118,10 +118,10 @@ namespace CDP4Composition.Reporting
         /// <param name="parent">
         /// The parent node in the hierarhical tree upon which the data source is based.
         /// </param>
-        public ReportingDataSourceRow(
+        public ReportingDataSourceNode(
             ElementBase elementBase,
             CategoryHierarchy categoryHierarchy,
-            ReportingDataSourceRow<T> parent = null)
+            ReportingDataSourceNode<T> parent = null)
         {
             this.filterCategory = categoryHierarchy.Category;
 
@@ -135,7 +135,7 @@ namespace CDP4Composition.Reporting
                     .GetConstructor(Type.EmptyTypes)
                     .Invoke(new object[] { }) as ReportingDataSourceParameter<T>;
 
-                parameter.Row = this;
+                parameter.Node = this;
 
                 this.reportedParameters[type] = parameter;
 
@@ -149,11 +149,11 @@ namespace CDP4Composition.Reporting
 
             foreach (var childUsage in this.ElementDefinition.ContainedElement)
             {
-                var childRow = new ReportingDataSourceRow<T>(childUsage, categoryHierarchy.Child, this);
+                var childNode = new ReportingDataSourceNode<T>(childUsage, categoryHierarchy.Child, this);
 
-                if (childRow.IsRelevant)
+                if (childNode.IsRelevant)
                 {
-                    this.Children.Add(childRow);
+                    this.Children.Add(childNode);
                 }
             }
         }

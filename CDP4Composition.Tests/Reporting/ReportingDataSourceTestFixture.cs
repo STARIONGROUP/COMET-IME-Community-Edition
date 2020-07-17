@@ -372,7 +372,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceRow<RowRepresentation>(
+            var row = new ReportingDataSourceNode<RowRepresentation>(
                 this.ed1,
                 hierarchy);
 
@@ -388,7 +388,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceRow<RowRepresentation>(
+            var row = new ReportingDataSourceNode<RowRepresentation>(
                 this.ed1,
                 hierarchy);
 
@@ -406,7 +406,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceRow<RowRepresentation>(
+            var row = new ReportingDataSourceNode<RowRepresentation>(
                 this.ed1,
                 hierarchy);
 
@@ -428,7 +428,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat3.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceRow<RowRepresentation>(
+            var row = new ReportingDataSourceNode<RowRepresentation>(
                 this.eu2p31,
                 hierarchy);
 
@@ -450,7 +450,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceRow<RowRepresentation>(
+            var row = new ReportingDataSourceNode<RowRepresentation>(
                 this.ed1,
                 hierarchy);
 
@@ -474,7 +474,7 @@ namespace CDP4Composition.Tests.Reporting
                 .AddLevel(this.cat2.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceRow<RowRepresentation>(
+            var row = new ReportingDataSourceNode<RowRepresentation>(
                 this.ed1,
                 hierarchy);
 
