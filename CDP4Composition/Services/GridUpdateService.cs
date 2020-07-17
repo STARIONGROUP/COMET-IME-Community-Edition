@@ -1,19 +1,43 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GridUpdateService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Services
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows;
+
     using DevExpress.Xpf.Grid;
+
     using NLog;
 
     /// <summary>
     /// The service used to lock the update of a grid view when update in the view-model are occuring
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class GridUpdateService
     {
         /// <summary>
@@ -30,7 +54,7 @@ namespace CDP4Composition.Services
         /// Sets the <see cref="UpdateStartedProperty"/> property
         /// </summary>
         /// <param name="element">The <see cref="UIElement"/> where the value is set</param>
-        /// <param name="value">The <see cref="Boolean"/> value</param>
+        /// <param name="value">The <see cref="bool"/> value</param>
         public static void SetUpdateStarted(UIElement element, bool? value)
         {
             try
@@ -40,7 +64,7 @@ namespace CDP4Composition.Services
             catch (Exception exception)
             {
                 Logger.Error(exception, $"A problem occurend when SetUpdateStarted was called");
-            }            
+            }
         }
 
         /// <summary>
@@ -61,6 +85,7 @@ namespace CDP4Composition.Services
         private static void UpdateStartedPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var grid = source as GridDataControlBase;
+
             if (grid == null)
             {
                 throw new InvalidOperationException("The Service can only be used on GridDataControlBase view elements such as GridControl or TreeListControl.");
@@ -75,15 +100,20 @@ namespace CDP4Composition.Services
                 else if ((bool?)e.NewValue == false)
                 {
                     var treeListControl = grid as TreeListControl;
+
                     if (treeListControl != null)
                     {
-                        treeListControl.EndDataUpdate(); 
+                        treeListControl.View.CancelRowEdit();
+                        treeListControl.EndDataUpdate();
                     }
                     else
                     {
                         var gridControl = grid as GridControl;
+
                         if (gridControl != null && gridControl.DataController.IsUpdateLocked)
                         {
+                            // cancel out of any active edit.
+                            gridControl.View.CancelRowEdit();
                             grid.EndDataUpdate();
                         }
                     }
