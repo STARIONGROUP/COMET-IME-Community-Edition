@@ -81,7 +81,7 @@ namespace CDP4Composition.Modularity
 
             try
             {
-                var updater = Process.Start("");
+                var updater = Process.Start("", this.UpdatablePlugins);
                 updater.EnableRaisingEvents = true;
                 updater.WaitForExit();
             }
