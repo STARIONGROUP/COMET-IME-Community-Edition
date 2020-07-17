@@ -114,7 +114,7 @@ namespace CDP4Composition.Reporting
         /// </returns>
         public TP GetSibling<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.Node.GetParameter<TP>();
+            return this.Node.GetColumn<TP>();
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace CDP4Composition.Reporting
         /// </returns>
         public IEnumerable<TP> GetChildren<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.Node.Children.Select(child => child.GetParameter<TP>());
+            return this.Node.Children.Select(child => child.GetColumn<TP>());
         }
     }
 }

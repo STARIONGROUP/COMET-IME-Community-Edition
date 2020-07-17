@@ -42,6 +42,19 @@ namespace CDP4Composition.Reporting
     internal class ReportingDataSourceNode<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
+        /// A dictionary of all the <see cref="ReportingDataSourceColumn{T}"/>s declared
+        /// as <see cref="ReportingDataSourceRow"/> fields.
+        /// </summary>
+        private static readonly Dictionary<Type, FieldInfo> RowFields = typeof(T).GetFields()
+            .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceColumn<T>)))
+            .ToDictionary(f => f.FieldType, f => f);
+
+        /// <summary>
+        /// The <see cref="ReportingDataSourceRow"/> representation of the current node.
+        /// </summary>
+        private readonly T rowRepresentation;
+
+        /// <summary>
         /// The parent node in the hierarhical tree upon which the data source is based.
         /// </summary>
         private readonly ReportingDataSourceNode<T> parent;
@@ -74,19 +87,6 @@ namespace CDP4Composition.Reporting
         private string FullyQualifiedName => (this.parent != null)
             ? this.parent.FullyQualifiedName + "." + this.ElementUsage.ShortName
             : this.ElementDefinition.ShortName;
-
-        /// <summary>
-        /// The list of declared <see cref="ReportingDataSourceParameter{T}"/> types on
-        /// the associated <see cref="ReportingDataSourceRow"/>.
-        /// </summary>
-        private static readonly IEnumerable<FieldInfo> ParameterFields = typeof(T).GetFields()
-            .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceParameter<T>)));
-
-        /// <summary>
-        /// The <see cref="ReportingDataSourceParameter{T}"/>s associated with this row.
-        /// </summary>
-        private readonly Dictionary<Type, ReportingDataSourceParameter<T>> reportedParameters =
-            new Dictionary<Type, ReportingDataSourceParameter<T>>();
 
         /// <summary>
         /// The filtering <see cref="Category"/> that must be matched on the current <see cref="elementBase"/>.
@@ -129,15 +129,24 @@ namespace CDP4Composition.Reporting
 
             this.elementBase = elementBase;
 
-            foreach (var type in ParameterFields.Select(f => f.FieldType))
+            this.rowRepresentation = new T
             {
-                var parameter = type
-                    .GetConstructor(Type.EmptyTypes)
-                    .Invoke(new object[] { }) as ReportingDataSourceParameter<T>;
+                ElementName = this.FullyQualifiedName,
+                IsVisible = this.IsVisible
+            };
 
-                this.reportedParameters[type] = parameter;
+            if (this.IsVisible)
+            {
+                foreach (var rowField in RowFields)
+                {
+                    var column = rowField.Key
+                        .GetConstructor(Type.EmptyTypes)
+                        .Invoke(new object[] { }) as ReportingDataSourceColumn<T>;
 
-                parameter.Initialize(this);
+                    column.Initialize(this);
+
+                    rowField.Value.SetValue(this.rowRepresentation, column);
+                }
             }
 
             if (categoryHierarchy.Child == null)
@@ -157,17 +166,17 @@ namespace CDP4Composition.Reporting
         }
 
         /// <summary>
-        /// Gets the parameter of type <see cref="TP"/> associated with this node.
+        /// Gets the column of type <see cref="TP"/> associated with this node.
         /// </summary>
         /// <typeparam name="TP">
-        /// The desired parameter type.
+        /// The desired column type.
         /// </typeparam>
         /// <returns>
-        /// The <see cref="ReportingDataSourceParameter{T}"/> of type <see cref="TP"/>.
+        /// The <see cref="ReportingDataSourceColumn{T}"/> of type <see cref="TP"/>.
         /// </returns>
-        public TP GetParameter<TP>() where TP : ReportingDataSourceParameter<T>
+        public TP GetColumn<TP>() where TP : ReportingDataSourceColumn<T>
         {
-            return this.reportedParameters[typeof(TP)] as TP;
+            return RowFields[typeof(TP)].GetValue(this.rowRepresentation) as TP;
         }
 
         /// <summary>
@@ -180,7 +189,7 @@ namespace CDP4Composition.Reporting
         {
             var tabularRepresentation = new List<T>
             {
-                this.GetRowTabularRepresentation()
+                this.rowRepresentation
             };
 
             foreach (var row in this.Children)
@@ -189,33 +198,6 @@ namespace CDP4Composition.Reporting
             }
 
             return tabularRepresentation;
-        }
-
-        /// <summary>
-        /// Gets the tabular representation of this node.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="ReportingDataSourceRow"/>.
-        /// </returns>
-        private T GetRowTabularRepresentation()
-        {
-            var row = new T
-            {
-                ElementName = this.FullyQualifiedName,
-                IsVisible = this.IsVisible
-            };
-
-            if (!this.IsVisible)
-            {
-                return row;
-            }
-
-            foreach (var field in ParameterFields)
-            {
-                field.SetValue(row, this.reportedParameters[field.FieldType]);
-            }
-
-            return row;
         }
     }
 }

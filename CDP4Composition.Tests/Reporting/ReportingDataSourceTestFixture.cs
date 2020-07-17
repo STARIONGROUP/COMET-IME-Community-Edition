@@ -376,9 +376,9 @@ namespace CDP4Composition.Tests.Reporting
                 this.ed1,
                 hierarchy);
 
-            Assert.IsNotNull(row.GetParameter<TestParameter1>());
-            Assert.IsNotNull(row.GetParameter<TestParameter2>());
-            Assert.Throws<KeyNotFoundException>(() => row.GetParameter<TestParameter3>());
+            Assert.IsNotNull(row.GetColumn<TestParameter1>());
+            Assert.IsNotNull(row.GetColumn<TestParameter2>());
+            Assert.Throws<KeyNotFoundException>(() => row.GetColumn<TestParameter3>());
         }
 
         [Test]
@@ -392,10 +392,10 @@ namespace CDP4Composition.Tests.Reporting
                 this.ed1,
                 hierarchy);
 
-            var parameter1 = row.GetParameter<TestParameter1>();
+            var parameter1 = row.GetColumn<TestParameter1>();
             Assert.AreEqual("type1", parameter1.ShortName);
 
-            var parameter2 = row.GetParameter<TestParameter2>();
+            var parameter2 = row.GetColumn<TestParameter2>();
             Assert.AreEqual("type2", parameter2.ShortName);
         }
 
@@ -410,12 +410,12 @@ namespace CDP4Composition.Tests.Reporting
                 this.ed1,
                 hierarchy);
 
-            var parameter1 = row.GetParameter<TestParameter1>();
+            var parameter1 = row.GetColumn<TestParameter1>();
             Assert.AreEqual(
                 "11",
                 parameter1.GetValue());
 
-            var parameter2 = row.GetParameter<TestParameter2>();
+            var parameter2 = row.GetColumn<TestParameter2>();
             Assert.AreEqual(
                 "12",
                 parameter2.GetValue());
@@ -432,12 +432,12 @@ namespace CDP4Composition.Tests.Reporting
                 this.eu2p31,
                 hierarchy);
 
-            var parameter1 = row.GetParameter<TestParameter1>();
+            var parameter1 = row.GetColumn<TestParameter1>();
             Assert.AreEqual(
                 "231",
                 parameter1.GetValue());
 
-            var parameter2 = row.GetParameter<TestParameter2>();
+            var parameter2 = row.GetColumn<TestParameter2>();
             Assert.AreEqual(
                 "232",
                 parameter2.GetValue());
@@ -454,8 +454,8 @@ namespace CDP4Composition.Tests.Reporting
                 this.ed1,
                 hierarchy);
 
-            var parameter1 = row.GetParameter<TestParameter1>();
-            var parameter2 = row.GetParameter<TestParameter2>();
+            var parameter1 = row.GetColumn<TestParameter1>();
+            var parameter2 = row.GetColumn<TestParameter2>();
 
             Assert.AreSame(
                 parameter2,
@@ -478,7 +478,7 @@ namespace CDP4Composition.Tests.Reporting
                 this.ed1,
                 hierarchy);
 
-            var parameter = row.GetParameter<TestParameter1>();
+            var parameter = row.GetColumn<TestParameter1>();
 
             var children1 = parameter.GetChildren<TestParameter1>().ToList();
             Assert.AreEqual(2, children1.Count);
