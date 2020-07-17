@@ -448,7 +448,7 @@ namespace CDP4Dashboard.ViewModels.Widget
                                     RevisionNumber = y.RevisionNumber
                                 }
                             ))
-                    .OrderBy(x => x.ParameterOrOverride)
+                    .OrderBy(x => x.ParameterOrOverride?.UserFriendlyShortName ?? "")
                     .ThenBy(x => x.RevisionNumber)
                     .ThenBy(x => x.Option?.Name ?? "")
                     .ThenBy(x => x.ActualFiniteState?.Name ?? "")
@@ -460,7 +460,7 @@ namespace CDP4Dashboard.ViewModels.Widget
                     x => new Line
                     {
                         RevisionNumber = x.RevisionNumber,
-                        Value = x.Value.First().ToString().Replace("-", "0")
+                        Value = x.Value.First().ToString() == "-" ? "0" : x.Value.First().ToString()
                     },
                     (serie, lines) => new LineSeries
                     {

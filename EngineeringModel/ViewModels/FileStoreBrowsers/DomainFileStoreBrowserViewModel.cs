@@ -486,6 +486,8 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (container is Folder folder)
             {
+                thing.ContainingFolder = folder;
+
                 var realContainer = folder.GetContainerOfType(typeof(DomainFileStore));
 
                 this.ExecuteCreateCommand(thing, realContainer);

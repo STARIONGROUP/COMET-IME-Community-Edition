@@ -1,8 +1,28 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementContainerRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
@@ -241,12 +261,33 @@ namespace CDP4Requirements.ViewModels
         /// <param name="group">The <see cref="RequirementsContainer"/> to remove</param>
         private void RemoveReqGroupRow(RequirementsGroup group)
         {
-            var row = this.ContainedRows.SingleOrDefault(x => x.Thing == group);
-
-            if (row != null)
+            if (this.ContainedRows.SingleOrDefault(x => x.Thing == @group) is RequirementsGroupRowViewModel row)
             {
                 this.TopParentRow.GroupCache.Remove(group);
+                this.RemoveRequirementRowsBeforeRequirementsGroupDisposal(row);
                 this.ContainedRows.RemoveAndDispose(row);
+            }
+        }
+
+        /// <summary>
+        /// Remove <see cref="RequirementRowViewModel"/>s from the <param name="row" />'s <see cref="IHaveContainedRows.ContainedRows"/>
+        /// and from child <see cref="IHaveContainedRows"/>'s  <see cref="IHaveContainedRows.ContainedRows"/>.
+        /// If we don't do this these <see cref="RequirementRowViewModel"/>s will be disposed and <see cref="RequirementsSpecificationRowViewModel"/>
+        /// will not be able to reuse them, which is its expected behaviour.
+        /// </summary>
+        /// <param name="row">The <see cref="IHaveContainedRows"/></param>
+        private void RemoveRequirementRowsBeforeRequirementsGroupDisposal(IHaveContainedRows row)
+        {
+            for (var i = row.ContainedRows.Count - 1; i >= 0; i--)
+            {
+                if (row.ContainedRows[i] is RequirementRowViewModel requirementRowViewModel)
+                {
+                    row.ContainedRows.RemoveWithoutDispose(requirementRowViewModel);
+                }
+                else
+                {
+                    this.RemoveRequirementRowsBeforeRequirementsGroupDisposal(row.ContainedRows[i]);
+                }
             }
         }
 
