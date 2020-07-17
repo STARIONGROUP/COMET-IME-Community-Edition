@@ -33,9 +33,9 @@ namespace CDP4Composition.Reporting
     /// Class representing a reporting data source.
     /// </summary>
     /// <typeparam name="T">
-    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
+    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
     /// </typeparam>
-    public class ReportingDataSourceClass<T> where T : ReportingDataSourceRowRepresentation, new()
+    public class ReportingDataSourceClass<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
         /// The <see cref="ReportingDataSourceNode{T}"/> which is the root of the hierarhical tree.

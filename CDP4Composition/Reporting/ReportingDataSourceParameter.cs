@@ -35,9 +35,9 @@ namespace CDP4Composition.Reporting
     using CDP4Common.Types;
 
     /// <summary>
-    /// Abstract base class from which all parameters for a <see cref="ReportingDataSourceRowRepresentation"/> need to derive.
+    /// Abstract base class from which all parameters for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
-    public abstract class ReportingDataSourceParameter<T> where T : ReportingDataSourceRowRepresentation, new()
+    public abstract class ReportingDataSourceParameter<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
         /// Gets the <see cref="ParameterTypeShortNameAttribute"/> decorating the class described by <paramref name="type"/>.

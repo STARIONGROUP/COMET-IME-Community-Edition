@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportingDataSourceRowRepresentation.cs" company="RHEA System S.A.">
+// <copyright file="ReportingDataSourceRow.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -28,7 +28,7 @@ namespace CDP4Composition.Reporting
     /// <summary>
     /// Abstract base class from which all row representations for a <see cref="ReportingDataSourceClass{T}"/> need to derive.
     /// </summary>
-    public abstract class ReportingDataSourceRowRepresentation
+    public abstract class ReportingDataSourceRow
     {
         /// <summary>
         /// The Element name, fully qualified with the path to the top element.

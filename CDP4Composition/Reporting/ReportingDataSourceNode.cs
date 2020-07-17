@@ -37,9 +37,9 @@ namespace CDP4Composition.Reporting
     /// Class representing a row associated with a node in the hierarhical tree upon which the data source is based.
     /// </summary>
     /// <typeparam name="T">
-    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
+    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
     /// </typeparam>
-    internal class ReportingDataSourceNode<T> where T : ReportingDataSourceRowRepresentation, new()
+    internal class ReportingDataSourceNode<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
         /// The parent node in the hierarhical tree upon which the data source is based.
@@ -77,7 +77,7 @@ namespace CDP4Composition.Reporting
 
         /// <summary>
         /// The list of declared <see cref="ReportingDataSourceParameter{T}"/> types on
-        /// the associated <see cref="ReportingDataSourceRowRepresentation"/>.
+        /// the associated <see cref="ReportingDataSourceRow"/>.
         /// </summary>
         private static readonly IEnumerable<FieldInfo> ParameterFields = typeof(T).GetFields()
             .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceParameter<T>)));
@@ -202,7 +202,7 @@ namespace CDP4Composition.Reporting
         /// Gets the tabular representation of this node's subtree.
         /// </summary>
         /// <returns>
-        /// A <see cref="List{T}"/> of <see cref="ReportingDataSourceRowRepresentation"/>.
+        /// A <see cref="List{T}"/> of <see cref="ReportingDataSourceRow"/>.
         /// </returns>
         public List<T> GetTabularRepresentation()
         {
@@ -223,7 +223,7 @@ namespace CDP4Composition.Reporting
         /// Gets the tabular representation of this node.
         /// </summary>
         /// <returns>
-        /// A <see cref="ReportingDataSourceRowRepresentation"/>.
+        /// A <see cref="ReportingDataSourceRow"/>.
         /// </returns>
         private T GetRowTabularRepresentation()
         {

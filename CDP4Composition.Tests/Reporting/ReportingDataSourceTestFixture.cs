@@ -69,23 +69,23 @@ namespace CDP4Composition.Tests.Reporting
         private ElementUsage eu2n32;
 
         [ParameterTypeShortName("type1")]
-        private class TestParameter1 : ReportingDataSourceParameter<RowRepresentation>
+        private class TestParameter1 : ReportingDataSourceParameter<Row>
         {
             public string GetValue() => this.Value;
         }
 
         [ParameterTypeShortName("type2")]
-        private class TestParameter2 : ReportingDataSourceParameter<RowRepresentation>
+        private class TestParameter2 : ReportingDataSourceParameter<Row>
         {
             public string GetValue() => this.Value;
         }
 
         [ParameterTypeShortName("type3")]
-        private class TestParameter3 : ReportingDataSourceParameter<RowRepresentation>
+        private class TestParameter3 : ReportingDataSourceParameter<Row>
         {
         }
 
-        private class RowRepresentation : ReportingDataSourceRowRepresentation
+        private class Row : ReportingDataSourceRow
         {
             public TestParameter1 parameter1;
             public TestParameter2 parameter2;
@@ -338,7 +338,7 @@ namespace CDP4Composition.Tests.Reporting
                 .AddLevel(this.cat3.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<RowRepresentation>(
+            var dataSource = new ReportingDataSourceClass<Row>(
                 this.iteration,
                 hierarchy);
 
@@ -372,7 +372,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<RowRepresentation>(
+            var row = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 
@@ -388,7 +388,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<RowRepresentation>(
+            var row = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 
@@ -406,7 +406,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<RowRepresentation>(
+            var row = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 
@@ -428,7 +428,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat3.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<RowRepresentation>(
+            var row = new ReportingDataSourceNode<Row>(
                 this.eu2p31,
                 hierarchy);
 
@@ -450,7 +450,7 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<RowRepresentation>(
+            var row = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 
@@ -474,7 +474,7 @@ namespace CDP4Composition.Tests.Reporting
                 .AddLevel(this.cat2.ShortName)
                 .Build();
 
-            var row = new ReportingDataSourceNode<RowRepresentation>(
+            var row = new ReportingDataSourceNode<Row>(
                 this.ed1,
                 hierarchy);
 

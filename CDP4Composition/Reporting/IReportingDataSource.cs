@@ -31,9 +31,9 @@ namespace CDP4Composition.Reporting
     /// The interface used for creating a reporting data source.
     /// </summary>
     /// <typeparam name="T">
-    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
+    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
     /// </typeparam>
-    public interface IReportingDataSource<T> where T : ReportingDataSourceRowRepresentation, new()
+    public interface IReportingDataSource<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
         /// Creates a new data source instance.
