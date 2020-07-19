@@ -1,10 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon></ApplicationIcon>
+    <Company></Company>
+    <Product>CDP4PluginInstaller</Product>
+    <Description>CDP4 Plugin Installer</Description>
+    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <Authors>RHEA System S.A.</Authors>
+    <PackageIcon>cdplogo_48x48.ico</PackageIcon>
+    <Nullable>disable</Nullable>
+    <StartupObject>CDP4PluginInstaller.App</StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>C:\CODE\CDP4-IME-Community-Edition\CDP4IME\bin\Debug\net452\CDP4PluginInstaller\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +27,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="cdplogo_48x48.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

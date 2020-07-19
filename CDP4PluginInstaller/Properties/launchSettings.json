@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CDP4PluginInstaller": {
+      "commandName": "Project",
+      "commandLineArgs": "6.0.0"
+    }
+  }
+}

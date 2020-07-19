@@ -12,6 +12,8 @@ namespace CDP4IME
     using System.Text;
     using System.Windows;
     using CDP4Composition;
+    using CDP4Composition.Modularity;
+
     using DevExpress.Xpf.Core;
     using ExceptionReporting;
     using NLog;
@@ -66,6 +68,7 @@ namespace CDP4IME
             var bootstrapper = new CDP4IMEBootstrapper();
             try
             {
+                new PluginUpdateInstaller().CheckAndRunUpdater();
                 bootstrapper.Run();
             }
             catch (ReflectionTypeLoadException ex)

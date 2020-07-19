@@ -77,13 +77,14 @@ namespace CDP4Composition.Modularity
         /// </summary>
         public void CheckAndRunUpdater()
         {
-            this.GetInstallablePlugins();
-
+            //this.GetInstallablePlugins();
             try
             {
-                var updater = Process.Start("", this.UpdatablePlugins);
-                updater.EnableRaisingEvents = true;
-                updater.WaitForExit();
+                var currentAssembly = Assembly.GetExecutingAssembly();
+                var installerLocation = Path.Combine(Directory.GetParent(currentAssembly.Location).FullName, "CDP4PluginInstaller/netcoreapp3.1/CDP4PluginInstaller.exe");
+                var installerProcess = Process.Start(installerLocation, currentAssembly.GetName().Version.ToString());
+                installerProcess.EnableRaisingEvents = true;
+                installerProcess.WaitForExit();
             }
             catch (Exception exception)
             {

@@ -33,6 +33,8 @@ namespace CDP4PluginInstaller
     using System.IO;
     using System.IO.Compression;
     using System.Reflection;
+    using System.Security.Claims;
+    using System.Security.Principal;
 
     using CDP4Composition.Modularity;
 
@@ -43,8 +45,12 @@ namespace CDP4PluginInstaller
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
+        /// <summary>
+        /// Holds the windows Elevated rights user claim value
+        /// </summary>
+        private const string AdministratorClaimsValue = "S-1-5-32-544";
 
         /// <summary>
         /// The NLog logger
@@ -68,6 +74,11 @@ namespace CDP4PluginInstaller
         public List<(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)> UpdatablePlugins = new List<(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)>();
 
         /// <summary>
+        /// Holds the main Windows instance
+        /// </summary>
+        private MainWindow mainWindow;
+
+        /// <summary>
         /// Initiate a new <see cref="App"/>
         /// </summary>
         public App()
@@ -75,6 +86,7 @@ namespace CDP4PluginInstaller
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             this.downloadFolder = Path.Combine(appData, "RHEA/CDP4/DownloadCache/Plugins/");
             this.currentImeVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            this.mainWindow = new MainWindow();
         }
 
         /// <summary>
@@ -83,11 +95,36 @@ namespace CDP4PluginInstaller
         /// <param name="e"></param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            if (this.RetrieveInstallablePlugins())
+            if (!this.IsRunningAsAdministrator)
             {
-                var mainWindow = new MainWindow();
-                mainWindow.Show();
+                var message = "The CDP4 Plugin Installer requires Administrator Rights to run.";
+                this.CloseOnError(message);
             }
+
+            if (new Version(e.Args.Single()) is { } imeVersion && this.RetrieveInstallablePlugins())
+            {
+                this.currentImeVersion = imeVersion;
+                this.mainWindow.Show();
+            }
+            else
+            {
+                this.CloseOnError(null);
+            }
+        }
+
+        /// <summary>
+        /// Closes the CDP4PluginInstaller on error and shows the reason
+        /// </summary>
+        /// <param name="message">The error message to report</param>
+        private void CloseOnError(string message)
+        {
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                MessageBox.Show(message);
+                this.logger.Error(message);
+            }
+
+            this.mainWindow.Close();
         }
 
         /// <summary>
@@ -117,7 +154,7 @@ namespace CDP4PluginInstaller
                     if (Directory.EnumerateFiles(installableCdp4ckBasePath).FirstOrDefault(f => f.EndsWith(".plugin.manifest")) is { } manifestFileName)
                     {
                         var manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(installableCdp4ckBasePath, manifestFileName)));
-                        this.UpdatablePlugins.Add((installableCdp4ckBasePath, manifest, new Version(manifest.CompatibleIMEVersion) <= currentVersionIme));
+                        this.UpdatablePlugins.Add((installableCdp4ckBasePath, manifest, new Version(manifest.CompatibleIMEVersion) <= this.currentImeVersion));
                     }
                     else
                     {
@@ -148,6 +185,18 @@ namespace CDP4PluginInstaller
             return correspondingInstalledManifest is { }
                 ? allDownloadedVersion.SkipWhile(x => new Version(x.Name) <= new Version(correspondingInstalledManifest.Version)).LastOrDefault()?.FullName
                 : allDownloadedVersion.LastOrDefault()?.FullName;
+        }
+
+        /// <summary>
+        /// Gets an Assert whether this program has been started with elevated rights 
+        /// </summary>
+        private bool IsRunningAsAdministrator
+        {
+            get
+            {
+                var administratorClaim = new WindowsPrincipal(WindowsIdentity.GetCurrent()).UserClaims.FirstOrDefault(x => x.Value.Contains(AdministratorClaimsValue));
+                return administratorClaim is { };
+            }
         }
     }
 }
