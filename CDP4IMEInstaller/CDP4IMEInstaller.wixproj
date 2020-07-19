@@ -175,6 +175,14 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
+    <ProjectReference Include="..\CDP4Grapher\CDP4Grapher.csproj">
+      <Name>CDP4Grapher</Name>
+      <Project>{7dedb709-7b9d-4cec-b98c-cc29874e357b}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
     <ProjectReference Include="..\CDP4IME\CDP4IME-CE.csproj">
       <Name>CDP4IME-CE</Name>
       <Project>{e8a6c54e-80c1-42e3-a2c2-d698b97be7c2}</Project>
