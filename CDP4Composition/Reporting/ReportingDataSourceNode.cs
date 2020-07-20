@@ -68,19 +68,19 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// The <see cref="ElementBase"/> associated with this node.
         /// </summary>
-        private readonly ElementBase elementBase;
+        internal readonly ElementBase ElementBase;
 
         /// <summary>
         /// The <see cref="ElementDefinition"/> representing this node.
         /// </summary>
         internal ElementDefinition ElementDefinition =>
-            (this.elementBase as ElementDefinition) ?? (this.elementBase as ElementUsage)?.ElementDefinition;
+            (this.ElementBase as ElementDefinition) ?? (this.ElementBase as ElementUsage)?.ElementDefinition;
 
         /// <summary>
         /// The <see cref="ElementUsage"/> representing this node, if it exists.
         /// </summary>
         internal ElementUsage ElementUsage =>
-            this.elementBase as ElementUsage;
+            this.ElementBase as ElementUsage;
 
         /// <summary>
         /// The fully qualified (to the tree root) name of this <see cref="elementBase"/>.
@@ -98,7 +98,7 @@ namespace CDP4Composition.Reporting
         /// Boolean flag indicating whether the current <see cref="elementBase"/> matches the <see cref="filterCategory"/>.
         /// </summary>
         private bool IsVisible =>
-            this.elementBase.Category.Contains(this.filterCategory);
+            this.ElementBase.Category.Contains(this.filterCategory);
 
         /// <summary>
         /// Boolean flag indicating whether the current node or any of its <see cref="Children"/>
@@ -128,11 +128,11 @@ namespace CDP4Composition.Reporting
 
             this.parent = parent;
 
-            this.elementBase = elementBase;
+            this.ElementBase = elementBase;
 
             this.rowRepresentation = new T
             {
-                ElementBase = this.elementBase,
+                ElementBase = this.ElementBase,
                 ElementName = this.FullyQualifiedName,
                 IsVisible = this.IsVisible
             };

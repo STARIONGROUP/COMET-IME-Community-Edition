@@ -47,6 +47,11 @@ namespace CDP4Composition.Reporting
         protected string Value { get; private set; }
 
         /// <summary>
+        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
+        /// </summary>
+        protected DomainOfExpertise Owner => this.Node.ElementBase.Owner;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{T}"/> class.
         /// </summary>
         protected ReportingDataSourceParameter()
