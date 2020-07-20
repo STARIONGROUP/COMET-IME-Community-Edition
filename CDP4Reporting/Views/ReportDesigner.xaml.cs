@@ -35,7 +35,6 @@ namespace CDP4Reporting.Views
 
     using CDP4Composition;
     using CDP4Composition.Attributes;
-    using CDP4Composition.Reporting;
 
     using CDP4Reporting.ViewModels;
 
@@ -129,6 +128,14 @@ namespace CDP4Reporting.Views
             }, this.cancellationToken);
         }
 
+        // TODO #480
+        ///// <summary>
+        ///// Dummy class for report row respresentation
+        ///// </summary>
+        //private class RowRepresentation : ReportingDataSourceRowRepresentation
+        //{
+        //}
+
         /// <summary>
         /// Trigger active document changed event, when a new report was loaded
         /// </summary>
@@ -157,17 +164,24 @@ namespace CDP4Reporting.Views
                 return;
             }
 
-            var inst = viewModel?.BuildResult.CompiledAssembly.CreateInstance("CDP4Reporting.MassBudgetDataSource") as ICDP4ObjectDataSource;
-
-            var dataSourceName = "MassBudgetDataSource";
-
-            var dataSource = new ObjectDataSource
+            if (viewModel.BuildResult.Errors.Count != 0)
             {
-                DataSource = inst?.CreateDataSource(viewModel.Thing),
-                Name = dataSourceName
-            };
+                return;
+            }
 
-            this.reportDesigner.ActiveDocument.Report.DataSource = dataSource;
+            // TODO #480
+            //var editorFullClassName = "CDP4Reporting.MassBudgetDataSource";
+            //var dataSourceName = "MassBudgetDataSource";
+
+            //var inst = viewModel.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName) as IReportingDataSource<RowRepresentation>;
+
+            //var dataSource = new ObjectDataSource
+            //{
+            //    DataSource = inst?.CreateDataSource(viewModel.Thing),
+            //    Name = dataSourceName
+            //};
+
+            //this.reportDesigner.ActiveDocument.Report.DataSource = dataSource;
         }
 
         /// <summary>
