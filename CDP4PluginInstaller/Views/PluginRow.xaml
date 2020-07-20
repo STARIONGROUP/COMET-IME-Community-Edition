@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CDP4PluginInstaller.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" Margin="5">
     <Grid HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="4*"></RowDefinition>
@@ -15,6 +15,6 @@
         <Label Grid.Row="0" HorizontalAlignment="Left"></Label>
         <Label Grid.Row="0" HorizontalAlignment="Right"></Label>
         <Label Grid.Row="1" HorizontalAlignment="Center"></Label>
-        <ProgressBar Grid.Row="2"></ProgressBar>
+        <ProgressBar Margin="5" Grid.Row="2"></ProgressBar>
     </Grid>
 </UserControl>

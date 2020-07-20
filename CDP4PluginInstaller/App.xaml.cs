@@ -38,6 +38,9 @@ namespace CDP4PluginInstaller
 
     using CDP4Composition.Modularity;
 
+    using CDP4PluginInstaller.ViewModels;
+    using CDP4PluginInstaller.Views;
+
     using Newtonsoft.Json;
 
     using NLog;
@@ -97,18 +100,26 @@ namespace CDP4PluginInstaller
         {
             if (!this.IsRunningAsAdministrator)
             {
-                var message = "The CDP4 Plugin Installer requires Administrator Rights to run.";
-                this.CloseOnError(message);
+                this.CloseOnError("The CDP4 Plugin Installer requires Administrator Rights to run.");
             }
 
-            if (new Version(e.Args.Single()) is { } imeVersion && this.RetrieveInstallablePlugins())
+            if (new Version(e.Args.Single()) is { } imeVersion)
             {
                 this.currentImeVersion = imeVersion;
-                this.mainWindow.Show();
+                
+                if (this.RetrieveInstallablePlugins())
+                {
+                    this.MainWindow.DataContext = new MainWindowViewModel(this.UpdatablePlugins);
+                    this.mainWindow.Show();
+                }
+                else
+                {
+                    this.logger.Debug("No update found");
+                }
             }
             else
             {
-                this.CloseOnError(null);
+                this.CloseOnError("No IME version provided, the installer cannot run without it");
             }
         }
 

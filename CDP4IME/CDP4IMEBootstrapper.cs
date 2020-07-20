@@ -78,8 +78,6 @@ namespace CDP4IME
         /// </summary>
         protected override void InitializeShell()
         {
-            this.UpdateBootstrapperState("Looking for already downloaded Plugin updates");
-            
             this.UpdateBootstrapperState("Loading CDP4 Plugins");
 
             var pluginLoader = new PluginLoader<ImeAppSettings>();

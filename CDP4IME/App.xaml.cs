@@ -40,7 +40,9 @@ namespace CDP4IME
             ThemeManager.ApplicationThemeName = Theme.SevenName;
             AppliedTheme.ThemeName = Theme.SevenName;
             base.OnStartup(e);
-            
+
+            new PluginUpdateInstaller().CheckAndRunUpdater();
+
             DXSplashScreen.Show<Views.SplashScreenView>();
             DXSplashScreen.SetState("Starting CDP4");
 
@@ -66,20 +68,21 @@ namespace CDP4IME
         private static void RunInDebugMode()
         {
             var bootstrapper = new CDP4IMEBootstrapper();
+
             try
             {
-                new PluginUpdateInstaller().CheckAndRunUpdater();
                 bootstrapper.Run();
             }
             catch (ReflectionTypeLoadException ex)
             {
                 var sb = new StringBuilder();
+
                 foreach (var loaderException in ex.LoaderExceptions)
                 {
                     sb.AppendLine(loaderException.Message);
-                    if (loaderException is FileNotFoundException)
+
+                    if (loaderException is FileNotFoundException fileNotFoundException)
                     {
-                        var fileNotFoundException = loaderException as FileNotFoundException;
                         if (!string.IsNullOrEmpty(fileNotFoundException.FusionLog))
                         {
                             sb.AppendLine("FusionLog: ");
@@ -90,7 +93,7 @@ namespace CDP4IME
                     sb.AppendLine();
                 }
 
-                string errorMessage = sb.ToString();
+                var errorMessage = sb.ToString();
                 logger.Fatal(errorMessage, ex);
                 throw new ApplicationException(errorMessage);
             }
@@ -108,6 +111,7 @@ namespace CDP4IME
         private static void RunInReleaseMode()
         {
             AppDomain.CurrentDomain.UnhandledException += AppDomainUnhandledException;
+            
             try
             {
                 var bootstrapper = new CDP4IMEBootstrapper();
