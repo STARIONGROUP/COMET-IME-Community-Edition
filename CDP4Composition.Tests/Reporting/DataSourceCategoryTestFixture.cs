@@ -45,12 +45,14 @@ namespace CDP4Composition.Tests.Reporting
 
         private Iteration iteration;
 
-        private Category rootCat;
         private Category cat1;
         private Category cat2;
         private Category cat3;
 
-        private ElementDefinition ed;
+        private ElementDefinition ed1;
+        private ElementDefinition ed2;
+
+        private ElementUsage eu;
 
         [DefinedThingShortName("cat1")]
         private class TestCategory1 : ReportingDataSourceCategory<Row>
@@ -84,16 +86,6 @@ namespace CDP4Composition.Tests.Reporting
 
             // Categories
 
-            this.rootCat = new Category(Guid.NewGuid(), this.cache, null)
-            {
-                ShortName = "rootCat",
-                Name = "rootCat"
-            };
-
-            this.cache.TryAdd(
-                new CacheKey(this.rootCat.Iid, null),
-                new Lazy<Thing>(() => this.rootCat));
-
             this.cat1 = new Category(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "cat1",
@@ -126,28 +118,45 @@ namespace CDP4Composition.Tests.Reporting
 
             // Element Definitions
 
-            this.ed = new ElementDefinition(Guid.NewGuid(), this.cache, null)
+            this.ed1 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
-                ShortName = "ed",
-                Name = "element definition"
+                ShortName = "ed1",
+                Name = "element definition 1"
+            };
+
+            this.ed2 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "ed2",
+                Name = "element definition 2"
+            };
+
+            // Element Usages
+
+            this.eu = new ElementUsage(Guid.NewGuid(), this.cache, null)
+            {
+                ElementDefinition = this.ed2,
+                ShortName = "eu",
+                Name = "element usage"
             };
 
             // Structure
 
-            this.iteration.TopElement = this.ed;
-            this.ed.Category.Add(this.rootCat);
-            this.ed.Category.Add(this.cat1);
+            this.iteration.TopElement = this.ed1;
+            this.ed1.Category.Add(this.cat1);
+
+            this.eu.Category.Add(this.cat2);
+            this.ed1.ContainedElement.Add(this.eu);
         }
 
         [Test]
         public void VerifyThatNodeIdentifiesCategories()
         {
             var hierarchy = new CategoryHierarchy
-                    .Builder(this.iteration, this.rootCat.ShortName)
+                    .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
             var node = new ReportingDataSourceNode<Row>(
-                this.ed,
+                this.ed1,
                 hierarchy);
 
             Assert.IsNotNull(node.GetColumn<TestCategory1>());
@@ -159,36 +168,54 @@ namespace CDP4Composition.Tests.Reporting
         public void VerifyCategoryShortNameInitialization()
         {
             var hierarchy = new CategoryHierarchy
-                    .Builder(this.iteration, this.rootCat.ShortName)
+                    .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
             var node = new ReportingDataSourceNode<Row>(
-                this.ed,
+                this.ed1,
                 hierarchy);
 
-            var parameter1 = node.GetColumn<TestCategory1>();
-            Assert.AreEqual("cat1", parameter1.ShortName);
+            var category1 = node.GetColumn<TestCategory1>();
+            Assert.AreEqual("cat1", category1.ShortName);
 
-            var parameter2 = node.GetColumn<TestCategory2>();
-            Assert.AreEqual("cat2", parameter2.ShortName);
+            var category2 = node.GetColumn<TestCategory2>();
+            Assert.AreEqual("cat2", category2.ShortName);
         }
 
         [Test]
-        public void VerifyCategoryValueInitialization()
+        public void VerifyElementDefinitionCategoryValueInitialization()
         {
             var hierarchy = new CategoryHierarchy
-                    .Builder(this.iteration, this.rootCat.ShortName)
+                    .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
             var node = new ReportingDataSourceNode<Row>(
-                this.ed,
+                this.ed1,
                 hierarchy);
 
-            var parameter1 = node.GetColumn<TestCategory1>();
-            Assert.AreEqual(true, parameter1.GetValue());
+            var category1 = node.GetColumn<TestCategory1>();
+            Assert.AreEqual(true, category1.GetValue());
 
-            var parameter2 = node.GetColumn<TestCategory2>();
-            Assert.AreEqual(false, parameter2.GetValue());
+            var category2 = node.GetColumn<TestCategory2>();
+            Assert.AreEqual(false, category2.GetValue());
+        }
+
+        [Test]
+        public void VerifyElementUsageCategoryValueInitialization()
+        {
+            var hierarchy = new CategoryHierarchy
+                    .Builder(this.iteration, this.cat2.ShortName)
+                .Build();
+
+            var node = new ReportingDataSourceNode<Row>(
+                this.eu,
+                hierarchy);
+
+            var category1 = node.GetColumn<TestCategory1>();
+            Assert.AreEqual(false, category1.GetValue());
+
+            var category2 = node.GetColumn<TestCategory2>();
+            Assert.AreEqual(true, category2.GetValue());
         }
     }
 }
