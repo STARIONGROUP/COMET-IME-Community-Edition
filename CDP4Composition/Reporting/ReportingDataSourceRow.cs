@@ -26,6 +26,7 @@
 namespace CDP4Composition.Reporting
 {
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// Abstract base class from which all row representations for a <see cref="ReportingDataSourceClass{T}"/> need to derive.
@@ -47,5 +48,10 @@ namespace CDP4Composition.Reporting
         /// Note that when this is false, all values will be null on the row.
         /// </summary>
         internal bool IsVisible;
+
+        /// <summary>
+        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
+        /// </summary>
+        internal DomainOfExpertise Owner => this.ElementBase.Owner;
     }
 }
