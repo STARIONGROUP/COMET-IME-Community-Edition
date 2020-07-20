@@ -27,10 +27,13 @@
 namespace CDP4Grapher.Behaviors
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Windows;
 
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.Navigation;
 
     using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
@@ -38,10 +41,14 @@ namespace CDP4Grapher.Behaviors
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
     using DevExpress.Xpf.Diagram;
+    using DevExpress.Xpf.Layout.Core;
     using DevExpress.XtraPrinting;
     using DevExpress.XtraRichEdit.Model;
 
+    using Microsoft.Practices.ServiceLocation;
+
     using Direction = DevExpress.Diagram.Core.Direction;
+    using File = CDP4Common.EngineeringModelData.File;
 
     /// <summary>
     /// Allows proper callbacks on the diagramming tool
@@ -257,20 +264,18 @@ namespace CDP4Grapher.Behaviors
         /// <param name="format">the format to export the diagram to</param>
         public void ExportGraph(DiagramExportFormat format)
         {
-            this.ExportGraph(new GrapherSaveFileDialog(format));
-        }
-
-        /// <summary>
-        /// Export the graph as the <see cref="DiagramExportFormat"/>
-        /// </summary>
-        /// <param name="dialog">the <see cref="IGrapherSaveFileDialog"/> instance to perform the export operation</param>
-        public void ExportGraph(IGrapherSaveFileDialog dialog)
-        {
-            if (dialog.ShowDialog())
+            var openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
+            var extension = format.ToString().ToLower();
+            var result = openSaveFileDialogService.GetSaveFileDialog($"CDP4Graph -{ DateTime.Now:yyyy-MM-dd_HH-mm}", $".{extension}", $"{ format } file(*.{ extension }) | *.{ extension }; ", "", 0);
+            
+            if (string.IsNullOrWhiteSpace(result))
             {
-                using var fileStream = dialog.OpenFile();
-                this.AssociatedObject.ExportDiagram(fileStream, dialog.Format, 72, 1);
+                return;
             }
+
+            using var writer = System.IO.File.Create(result);
+
+            this.AssociatedObject.ExportDiagram(writer, format, 72, 1);
         }
 
         /// <summary>

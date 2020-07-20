@@ -35,6 +35,8 @@ namespace CDP4Grapher.Tests.Behaviors
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Navigation;
+
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Tests.Data;
     using CDP4Grapher.Utilities;
@@ -46,6 +48,8 @@ namespace CDP4Grapher.Tests.Behaviors
     using DevExpress.Mvvm.Native;
     using DevExpress.Xpf.Charts;
     using DevExpress.Xpf.Diagram;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using Moq;
 
@@ -59,9 +63,10 @@ namespace CDP4Grapher.Tests.Behaviors
     public class GrapherOrgChartBehaviorTestFixture : GrapherBaseTestData
     {
         private GrapherOrgChartBehavior behavior;
-        private Mock<IGrapherSaveFileDialog> saveFileDialog;
+        private Mock<IOpenSaveFileDialogService> saveFileDialog;
         private List<GraphElementViewModel> elementViewModels;
         private Mock<IGrapherViewModel> grapherViewModel;
+        private Mock<IServiceLocator> serviceLocator;
 
         [SetUp]
         public override void Setup()
@@ -87,15 +92,15 @@ namespace CDP4Grapher.Tests.Behaviors
                 })
             };
 
-            //var nestedElement = new NestedElementTreeGenerator().Generate(this.Option, this.Domain).Select(x => new GraphElementViewModel(x));
-
             this.behavior = new GrapherOrgChartBehavior();
             this.grapherViewModel = new Mock<IGrapherViewModel>();
             this.grapherViewModel.Setup(x => x.GraphElements).Returns(new ReactiveList<GraphElementViewModel>(this.elementViewModels));
             this.grapherViewModel.Setup(x => x.Behavior).Returns(this.behavior);
-            this.saveFileDialog = new Mock<IGrapherSaveFileDialog>();
-            this.saveFileDialog.Setup(x => x.ShowDialog()).Returns(true);
-            this.saveFileDialog.Setup(x => x.OpenFile()).Returns(new MemoryStream());
+            this.saveFileDialog = new Mock<IOpenSaveFileDialogService>();
+            this.saveFileDialog.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>())).Returns(string.Empty);
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.saveFileDialog.Object);
+            ServiceLocator.SetLocatorProvider(() =>this.serviceLocator.Object);
         }
 
         [TearDown]
@@ -117,9 +122,8 @@ namespace CDP4Grapher.Tests.Behaviors
         public void VerifyExport()
         {
             this.behavior.Attach(new GrapherDiagramControl());
-            this.behavior.ExportGraph(this.saveFileDialog.Object);
-            this.saveFileDialog.Verify(x => x.ShowDialog(), Times.Once);
-            this.saveFileDialog.Verify(x => x.OpenFile(), Times.Once);
+            this.behavior.ExportGraph(DiagramExportFormat.JPEG);
+            this.saveFileDialog.Verify(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>() , It.IsAny<int>()), Times.Once);
         }
 
         [Test]
