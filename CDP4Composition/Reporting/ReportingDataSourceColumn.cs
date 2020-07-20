@@ -25,11 +25,33 @@
 
 namespace CDP4Composition.Reporting
 {
+    using System;
+    using System.Linq;
+    using System.Reflection;
+
     /// <summary>
     /// Abstract base class from which all columns for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
     internal abstract class ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
+        /// <summary>
+        /// Gets the <see cref="DefinedThingShortNameAttribute"/> decorating the class described by <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">
+        /// Describes the current parameter class.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DefinedThingShortNameAttribute"/> decorating the current parameter class.
+        /// </returns>
+        protected static DefinedThingShortNameAttribute GetParameterAttribute(MemberInfo type)
+        {
+            var attr = Attribute
+                .GetCustomAttributes(type)
+                .SingleOrDefault(attribute => attribute is DefinedThingShortNameAttribute);
+
+            return attr as DefinedThingShortNameAttribute;
+        }
+
         /// <summary>
         /// The <see cref="ReportingDataSourceNode{T}"/> associated to this parameter.
         /// </summary>

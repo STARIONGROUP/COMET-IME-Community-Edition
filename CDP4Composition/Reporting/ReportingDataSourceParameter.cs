@@ -25,10 +25,8 @@
 
 namespace CDP4Composition.Reporting
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -38,24 +36,6 @@ namespace CDP4Composition.Reporting
     /// </summary>
     internal abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
-        /// <summary>
-        /// Gets the <see cref="DefinedThingShortNameAttribute"/> decorating the class described by <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">
-        /// Describes the current parameter class.
-        /// </param>
-        /// <returns>
-        /// The <see cref="DefinedThingShortNameAttribute"/> decorating the current parameter class.
-        /// </returns>
-        private static DefinedThingShortNameAttribute GetParameterAttribute(MemberInfo type)
-        {
-            var attr = Attribute
-                .GetCustomAttributes(type)
-                .SingleOrDefault(attribute => attribute is DefinedThingShortNameAttribute);
-
-            return attr as DefinedThingShortNameAttribute;
-        }
-
         /// <summary>
         /// The associated <see cref="ParameterType"/> short name.
         /// </summary>
