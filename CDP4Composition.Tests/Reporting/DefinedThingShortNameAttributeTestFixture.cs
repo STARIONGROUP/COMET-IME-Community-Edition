@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterTypeShortNameAttributeTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="DefinedThingShortNameAttributeTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -30,12 +30,12 @@ namespace CDP4Composition.Tests.Reporting
     using NUnit.Framework;
 
     [TestFixture]
-    public class ParameterTypeShortNameAttributeTestFixture
+    public class DefinedThingShortNameAttributeTestFixture
     {
         [Test]
         public void TestParameterTypeShortNameAttribute()
         {
-            var attribute = new ParameterTypeShortNameAttribute("shortName");
+            var attribute = new DefinedThingShortNameAttribute("shortName");
             Assert.AreEqual(attribute.ShortName, "shortName");
         }
     }

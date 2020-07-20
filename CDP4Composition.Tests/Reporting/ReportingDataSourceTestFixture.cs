@@ -68,19 +68,19 @@ namespace CDP4Composition.Tests.Reporting
         private ElementUsage eu2n31;
         private ElementUsage eu2n32;
 
-        [ParameterTypeShortName("type1")]
+        [DefinedThingShortName("type1")]
         private class TestParameter1 : ReportingDataSourceParameter<Row>
         {
             public string GetValue() => this.Value;
         }
 
-        [ParameterTypeShortName("type2")]
+        [DefinedThingShortName("type2")]
         private class TestParameter2 : ReportingDataSourceParameter<Row>
         {
             public string GetValue() => this.Value;
         }
 
-        [ParameterTypeShortName("type3")]
+        [DefinedThingShortName("type3")]
         private class TestParameter3 : ReportingDataSourceParameter<Row>
         {
         }
