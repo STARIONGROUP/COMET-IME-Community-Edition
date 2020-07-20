@@ -26,6 +26,7 @@
 
 namespace CDP4PluginPackager.Models.Sdk
 {
+    using System;
     using System.Xml.Serialization;
 
     /// <summary>
@@ -75,6 +76,12 @@ namespace CDP4PluginPackager.Models.Sdk
         /// </summary>
         [XmlElement(ElementName = "AssemblyVersion")]
         public string AssemblyVersion { get; set; }
+
+        /// <summary>
+        /// Gets or Sets the minimum assembly version
+        /// </summary>
+        [XmlElement(ElementName = "MinIMEVersion")]
+        public string MinIMEVersion { get; set; }
 
         /// <summary>
         /// Gets or Sets the Output Path
