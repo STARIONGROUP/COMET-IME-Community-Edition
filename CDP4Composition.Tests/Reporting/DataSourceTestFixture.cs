@@ -243,16 +243,27 @@ namespace CDP4Composition.Tests.Reporting
 
             // tabular representation is built and category hierarchy is considered
             Assert.AreEqual(6, rows.Count);
+
+            Assert.AreSame(this.ed1, rows[0].ElementBase);
             Assert.AreEqual("ed1", rows[0].ElementName);
+
+            Assert.AreSame(this.eu12n1, rows[1].ElementBase);
             Assert.AreEqual("ed1.eu12n1", rows[1].ElementName);
+
+            Assert.AreSame(this.eu12p1, rows[2].ElementBase);
             Assert.AreEqual("ed1.eu12p1", rows[2].ElementName);
+
+            Assert.AreSame(this.eu2p31, rows[3].ElementBase);
             Assert.AreEqual("ed1.eu12p1.eu2p31", rows[3].ElementName);
+
+            Assert.AreSame(this.eu12p2, rows[4].ElementBase);
             Assert.AreEqual("ed1.eu12p2", rows[4].ElementName);
+
+            Assert.AreSame(this.eu2p31, rows[5].ElementBase);
             Assert.AreEqual("ed1.eu12p2.eu2p31", rows[5].ElementName);
 
             // skips levels (visibility)
-            var filteredRow = rows[4];
-            Assert.IsFalse(filteredRow.IsVisible);
+            Assert.IsFalse(rows.First(x => x.ElementName == "ed1.eu12p2").IsVisible);
 
             // prunes unneeded subtrees
             Assert.IsNull(rows.FirstOrDefault(x => x.ElementName == "ed1.eu12n2"));

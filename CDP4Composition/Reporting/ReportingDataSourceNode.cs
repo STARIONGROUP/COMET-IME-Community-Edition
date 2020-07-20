@@ -132,6 +132,7 @@ namespace CDP4Composition.Reporting
 
             this.rowRepresentation = new T
             {
+                ElementBase = this.elementBase,
                 ElementName = this.FullyQualifiedName,
                 IsVisible = this.IsVisible
             };

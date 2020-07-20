@@ -25,11 +25,18 @@
 
 namespace CDP4Composition.Reporting
 {
+    using CDP4Common.EngineeringModelData;
+
     /// <summary>
     /// Abstract base class from which all row representations for a <see cref="ReportingDataSourceClass{T}"/> need to derive.
     /// </summary>
     public abstract class ReportingDataSourceRow
     {
+        /// <summary>
+        /// The associated <see cref="ElementBase"/>.
+        /// </summary>
+        internal ElementBase ElementBase;
+
         /// <summary>
         /// The Element name, fully qualified with the path to the top element.
         /// </summary>
