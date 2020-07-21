@@ -2,7 +2,7 @@
 // <copyright file="RibbonCategoryBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -23,21 +23,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Windows;
-
-using CDP4Composition.Ribbon;
-
-using DevExpress.Mvvm.UI;
-using DevExpress.Mvvm.UI.Interactivity;
-using DevExpress.Xpf.Docking;
-using DevExpress.Xpf.Ribbon;
-using Microsoft.Practices.Prism.Regions;
-using Microsoft.Practices.ServiceLocation;
-
 namespace CDP4Composition.Mvvm.Behaviours
 {
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Windows;
+
+    using CDP4Composition.Ribbon;
+
+    using DevExpress.Mvvm.UI;
+    using DevExpress.Mvvm.UI.Interactivity;
+    using DevExpress.Xpf.Docking;
+    using DevExpress.Xpf.Ribbon;
+    using Microsoft.Practices.Prism.Regions;
+    using Microsoft.Practices.ServiceLocation;
+
     /// <summary>
     /// Allows proper callbacks on the report designer category ribbon page
     /// </summary>
