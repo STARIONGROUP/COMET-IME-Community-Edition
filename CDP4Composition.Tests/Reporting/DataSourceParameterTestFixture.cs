@@ -49,6 +49,9 @@ namespace CDP4Composition.Tests.Reporting
         private Category cat1;
         private Category cat2;
 
+        private DomainOfExpertise parameterOwner;
+        private DomainOfExpertise parameterOverrideOwner;
+
         private SimpleQuantityKind parameterType1;
         private SimpleQuantityKind parameterType2;
         private SimpleQuantityKind parameterType3;
@@ -110,6 +113,20 @@ namespace CDP4Composition.Tests.Reporting
             this.cache.TryAdd(
                 new CacheKey(this.cat2.Iid, null),
                 new Lazy<Thing>(() => this.cat2));
+
+            // Domains of expertise
+
+            this.parameterOwner = new DomainOfExpertise(Guid.NewGuid(), null, null)
+            {
+                ShortName = "owner1",
+                Name = "owner"
+            };
+
+            this.parameterOverrideOwner = new DomainOfExpertise(Guid.NewGuid(), null, null)
+            {
+                ShortName = "owner2",
+                Name = "override owner"
+            };
 
             // Parameter types
 
@@ -196,7 +213,8 @@ namespace CDP4Composition.Tests.Reporting
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, null)
             {
-                ParameterType = parameterType
+                ParameterType = parameterType,
+                Owner = this.parameterOwner
             };
 
             var valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, null)
@@ -220,7 +238,8 @@ namespace CDP4Composition.Tests.Reporting
 
             var parameterOverride = new ParameterOverride(Guid.NewGuid(), this.cache, null)
             {
-                Parameter = parameter
+                Parameter = parameter,
+                Owner = this.parameterOverrideOwner
             };
 
             var valueSet = new ParameterOverrideValueSet(Guid.NewGuid(), this.cache, null)
@@ -269,7 +288,7 @@ namespace CDP4Composition.Tests.Reporting
         }
 
         [Test]
-        public void VerifyParameterValueInitialization()
+        public void VerifyParameterInitialization()
         {
             var hierarchy = new CategoryHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
@@ -281,13 +300,15 @@ namespace CDP4Composition.Tests.Reporting
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("11", parameter1.GetValue());
+            Assert.AreEqual(this.parameterOwner, parameter1.Owner);
 
             var parameter2 = node.GetColumn<TestParameter2>();
             Assert.AreEqual("12", parameter2.GetValue());
+            Assert.AreEqual(this.parameterOwner, parameter2.Owner);
         }
 
         [Test]
-        public void VerifyParameterOverrideValueInitialization()
+        public void VerifyParameterOverrideInitialization()
         {
             var hierarchy = new CategoryHierarchy
                     .Builder(this.iteration, this.cat2.ShortName)
@@ -299,9 +320,11 @@ namespace CDP4Composition.Tests.Reporting
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("121", parameter1.GetValue());
+            Assert.AreEqual(this.parameterOverrideOwner, parameter1.Owner);
 
             var parameter2 = node.GetColumn<TestParameter2>();
             Assert.AreEqual("122", parameter2.GetValue());
+            Assert.AreEqual(this.parameterOverrideOwner, parameter2.Owner);
         }
 
         [Test]

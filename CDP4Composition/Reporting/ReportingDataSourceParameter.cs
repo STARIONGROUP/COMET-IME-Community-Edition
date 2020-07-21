@@ -47,9 +47,9 @@ namespace CDP4Composition.Reporting
         protected string Value { get; private set; }
 
         /// <summary>
-        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
+        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterOrOverrideBase"/>.
         /// </summary>
-        protected DomainOfExpertise Owner => this.Node.ElementBase.Owner;
+        internal DomainOfExpertise Owner;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{T}"/> class.
@@ -76,6 +76,7 @@ namespace CDP4Composition.Reporting
             if (parameter != null)
             {
                 this.Value = parameter.ValueSet.First().ActualValue.First();
+                this.Owner = parameter.Owner;
             }
 
             var parameterOverride = this.Node.ElementUsage?.ParameterOverride
@@ -84,6 +85,7 @@ namespace CDP4Composition.Reporting
             if (parameterOverride != null)
             {
                 this.Value = parameterOverride.ValueSet.First().ActualValue.First();
+                this.Owner = parameterOverride.Owner;
             }
         }
 
