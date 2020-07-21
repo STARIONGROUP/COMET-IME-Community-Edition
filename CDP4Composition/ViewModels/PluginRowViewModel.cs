@@ -23,13 +23,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-namespace CDP4PluginInstaller.ViewModels
+namespace CDP4Composition.ViewModels
 {
     using System.IO;
     using System.Threading.Tasks;
 
-    using CDP4PluginInstaller.Utilities;
-    using CDP4PluginInstaller.Views;
+    using CDP4Composition.Modularity;
+    using CDP4Composition.Views;
 
     using ReactiveUI;
 
@@ -124,13 +124,17 @@ namespace CDP4PluginInstaller.ViewModels
         public string InstallationPath { get; set; }
         
         /// <summary>
-        /// Hold
+        /// Gets the plugin download path and the new manifest
         /// </summary>
-        public (FileInfo pluginDownloadFullPath, Manifest theNewManifest) plugin;
+        public (FileInfo pluginDownloadFullPath, Manifest theNewManifest) Plugin { get; private set; }
 
+        /// <summary>
+        /// Instanciate a new <see cref="PluginRowViewModel"/>
+        /// </summary>
+        /// <param name="plugin"></param>
         public PluginRowViewModel((FileInfo pluginDownloadFullPath, Manifest theNewManifest) plugin)
         {
-            this.plugin = plugin;
+            this.Plugin = plugin;
             this.UpdateProperties();
         }
 
@@ -139,10 +143,10 @@ namespace CDP4PluginInstaller.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.Name = this.plugin.theNewManifest.Name;
-            this.Description = this.plugin.theNewManifest.Description;
-            this.Version = this.plugin.theNewManifest.Version;
-            this.Author = this.plugin.theNewManifest.Author;
+            this.Name = this.Plugin.theNewManifest.Name;
+            this.Description = this.Plugin.theNewManifest.Description;
+            this.Version = this.Plugin.theNewManifest.Version;
+            this.Author = this.Plugin.theNewManifest.Author;
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainWindow.xaml.cs" company="RHEA System S.A.">
+// <copyright file="PluginInstaller.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -22,20 +22,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4PluginInstaller.Views
+namespace CDP4Composition.Views
 {
-    using System.ComponentModel.Composition;
     using System.Windows;
 
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for PluginInstaller.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class PluginInstaller : Window
     {
         /// <summary>
         /// Instanciate a new <see cref="MainWindow"/>
         /// </summary>
-        public MainWindow()
+        public PluginInstaller()
         {
             this.InitializeComponent();
         }

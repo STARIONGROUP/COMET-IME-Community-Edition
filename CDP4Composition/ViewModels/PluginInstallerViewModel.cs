@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainWindowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="PluginInstallerViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -22,39 +22,39 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4PluginInstaller.ViewModels
+namespace CDP4Composition.ViewModels
 {
     using System.Collections.Generic;
     using System.IO;
-    
-    using CDP4PluginInstaller.Utilities;
-    using CDP4PluginInstaller.Views;
+
+    using CDP4Composition.Modularity;
+    using CDP4Composition.Views;
 
     using ReactiveUI;
 
     /// <summary>
-    /// The <see cref="MainWindowViewModel"/> is the view model of the <see cref="MainWindow"/> holding it properties its properties and interaction logic
+    /// The <see cref="PluginInstallerViewModel"/> is the view model of the <see cref="PluginInstallerViewModel"/> holding it properties its properties and interaction logic
     /// </summary>
-    public class MainWindowViewModel : ReactiveObject
+    public class PluginInstallerViewModel : ReactiveObject
     {
         /// <summary>
         /// Gets a <see cref="ReactiveList{T}"/> of type <see cref="PluginRowViewModel"/> that holds the properties for <see cref="PluginRow"/>
         /// </summary>
-        public List<PluginRowViewModel> AvailablePlugins { get;  } = new List<PluginRowViewModel>();
+        public List<PluginRowViewModel> AvailablePlugins { get; } = new List<PluginRowViewModel>();
 
         /// <summary>
         /// Gets an <see cref="IEnumerable{T}"/> of type <code>(FileInfo pluginDownloadFullPath, Manifest theNewManifest)</code>
         /// of the updatable plugins
         /// </summary>
-        public List<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> UpdatablePlugins { get; } = new List<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)>();
+        public IEnumerable<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> UpdatablePlugins { get; } 
 
         /// <summary>
-        /// Instanciate a new <see cref="MainWindowViewModel"/>
+        /// Instanciate a new <see cref="PluginInstallerViewModel"/>
         /// </summary>
         /// <param name="updatablePlugins"></param>
-        public MainWindowViewModel(List<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> updatablePlugins)
+        public PluginInstallerViewModel(IEnumerable<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> updatablePlugins)
         {
-            this.UpdatablePlugins.AddRange(updatablePlugins);
+            this.UpdatablePlugins = updatablePlugins;
             this.UpdateProperties();
         }
 

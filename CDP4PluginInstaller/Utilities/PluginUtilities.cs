@@ -24,23 +24,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Modularity
+namespace CDP4PluginInstaller.Utilities
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
-    using System.IO.Compression;
-    using System.Linq;
     using System.Reflection;
 
-    using CDP4Composition.Utilities;
-
-    using Microsoft.Practices.ServiceLocation;
-
     using Newtonsoft.Json;
-
-    using NLog;
 
     /// <summary>
     /// Utility class that help with plugin management
@@ -52,8 +43,6 @@ namespace CDP4Composition.Modularity
         /// The name of the plugin directory
         /// </summary>
         public const string PluginDirectoryName = "plugins";
-
-        public const string DownloadDirectory = "RHEA/CDP4/DownloadCache/Plugins/";
 
         /// <summary>
         /// Gets the plugin <see cref="Manifest"/> present in the IME plugin folder
@@ -98,7 +87,7 @@ namespace CDP4Composition.Modularity
         /// <returns>The <see cref="DirectoryInfo"/></returns>
         public static DirectoryInfo PluginDirectoryExists(out bool specificPluginFolderExists)
         {
-            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
+            var currentPath = Assembly.GetCallingAssembly().Location;
 
             var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
             specificPluginFolderExists = directoryInfo.Exists;
@@ -109,62 +98,6 @@ namespace CDP4Composition.Modularity
             }
 
             return directoryInfo;
-        }
-
-        /// <summary>
-        /// Retrieve all plugin that can be installed
-        /// </summary>
-        /// <returns>Returns a <see cref="IEnumerable{T}"/> of type <code>(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)</code>of the updatable plugins</returns>
-        public static IEnumerable<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> GetDownloadedInstallablePluginUpdate()
-        {
-            var logger = LogManager.GetCurrentClassLogger();
-
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var downloadPath = Path.Combine(appData, DownloadDirectory);
-
-            if (!Directory.Exists(downloadPath))
-            {
-                logger.Info("Download folder is empty or inexistant, download some plugins update from the IME first");
-                return default;
-            }
-
-            var updatablePlugins = new List<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)>();
-
-            var currentPlateformVersion = Assembly.GetExecutingAssembly().GetName().Version;
-
-            // Loop through all existing download plugin folders
-            foreach (var downloadedPluginFolder in Directory.EnumerateDirectories(downloadPath).Select(d => new DirectoryInfo(d)))
-            {
-                if (downloadedPluginFolder.EnumerateFiles().FirstOrDefault(f => f.Name.EndsWith(".cdp4ck")) is { } installableCdp4CkFullPath && installableCdp4CkFullPath.Directory is { } installableCdp4CkBasePath)
-                {
-                    ZipFile.ExtractToDirectory(installableCdp4CkFullPath.FullName, installableCdp4CkBasePath.FullName);
-
-                    if (installableCdp4CkBasePath.EnumerateFiles().FirstOrDefault(f => f.Name.EndsWith(".plugin.manifest")) is { } manifestFile)
-                    {
-                        var manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(manifestFile.FullName)));
-
-                        if (new Version(manifest.CompatibleIMEVersion) <= currentPlateformVersion)
-                        {
-                            updatablePlugins.Add((installableCdp4CkFullPath, manifest));
-                        }
-                        else
-                        {
-                            logger.Debug($"{manifest.CompatibleIMEVersion} is higher than the current IME version please update before installing this plugin update {currentPlateformVersion}");
-                        }
-                    }
-                    else
-                    {
-                        logger.Error($"{downloadedPluginFolder.Name} does not contain any manifest. skipping plugin: {downloadedPluginFolder.Name}");
-                    }
-                }
-                else
-                {
-                    logger.Error($"{downloadedPluginFolder.Name} does not contain any package candidate. skipping plugin: {downloadedPluginFolder.Name}");
-                }
-            }
-
-            logger.Debug($"Found {updatablePlugins.Count} installable plugins");
-            return updatablePlugins;
         }
     }
 }

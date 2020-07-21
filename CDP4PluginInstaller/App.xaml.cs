@@ -28,6 +28,8 @@ namespace CDP4PluginInstaller
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.Composition;
+    using System.ComponentModel.Composition.Hosting;
     using System.Linq;
     using System.Windows;
     using System.IO;
@@ -36,10 +38,11 @@ namespace CDP4PluginInstaller
     using System.Security.Claims;
     using System.Security.Principal;
 
-    using CDP4Composition.Modularity;
-
+    using CDP4PluginInstaller.Utilities;
     using CDP4PluginInstaller.ViewModels;
     using CDP4PluginInstaller.Views;
+
+    using CommonServiceLocator;
 
     using Newtonsoft.Json;
 
@@ -74,7 +77,7 @@ namespace CDP4PluginInstaller
         /// Holds an <see cref="IEnumerable{T}"/> of type <code>(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)</code>
         /// of the updatable plugins
         /// </summary>
-        public List<(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)> UpdatablePlugins = new List<(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)>();
+        public List<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> UpdatablePlugins = new List<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)>();
 
         /// <summary>
         /// Holds the main Windows instance
@@ -88,7 +91,6 @@ namespace CDP4PluginInstaller
         {
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             this.downloadFolder = Path.Combine(appData, "RHEA/CDP4/DownloadCache/Plugins/");
-            this.currentImeVersion = Assembly.GetExecutingAssembly().GetName().Version;
             this.mainWindow = new MainWindow();
         }
 
@@ -103,23 +105,26 @@ namespace CDP4PluginInstaller
                 this.CloseOnError("The CDP4 Plugin Installer requires Administrator Rights to run.");
             }
 
-            if (new Version(e.Args.Single()) is { } imeVersion)
+            try
             {
-                this.currentImeVersion = imeVersion;
-                
-                if (this.RetrieveInstallablePlugins())
+                if (new Version(e.Args.Single()) is { } imeVersion)
                 {
-                    this.MainWindow.DataContext = new MainWindowViewModel(this.UpdatablePlugins);
-                    this.mainWindow.Show();
-                }
-                else
-                {
-                    this.logger.Debug("No update found");
+                    this.currentImeVersion = imeVersion;
+
+                    if (this.RetrieveInstallablePlugins())
+                    {
+                        this.MainWindow.DataContext = new MainWindowViewModel(this.UpdatablePlugins);
+                        this.mainWindow.Show();
+                    }
+                    else
+                    {
+                        this.logger.Debug("No update found");
+                    }
                 }
             }
-            else
+            catch (Exception exception)
             {
-                this.CloseOnError("No IME version provided, the installer cannot run without it");
+                this.CloseOnError($"No IME version provided, the installer cannot run without it. Exception thrown: {exception}");
             }
         }
 
@@ -150,22 +155,29 @@ namespace CDP4PluginInstaller
                 return false;
             }
             
-            var currentlyInstalledPluginManifests = PluginUtilities.GetPluginManifests().ToList();
-
+            //var currentlyInstalledPluginManifests = PluginUtilities.GetPluginManifests().ToList();
+            
+            // Loop through all existing download plugin folders
             foreach (var downloadedPluginFolder in Directory.EnumerateDirectories(this.downloadFolder).Select(d => new DirectoryInfo(d)))
             {
-                var correspondingInstalledManifest = currentlyInstalledPluginManifests.SingleOrDefault(p => p.Name == downloadedPluginFolder.Name);
+                //var correspondingInstalledManifest = currentlyInstalledPluginManifests.SingleOrDefault(p => p.Name == downloadedPluginFolder.Name);
 
-                var installableCdp4ckBasePath = this.GetInstallableCdp4ckBasePath(downloadedPluginFolder, correspondingInstalledManifest);
-
-                if (installableCdp4ckBasePath is { } && Directory.EnumerateFiles(installableCdp4ckBasePath).FirstOrDefault(f => f.EndsWith(".cdp4ck")) is { } installableCdp4ckFullPath)
+                if (downloadedPluginFolder.EnumerateFiles().FirstOrDefault(f => f.Name.EndsWith(".cdp4ck")) is { } installableCdp4ckFullPath  && installableCdp4ckFullPath.Directory is { } installableCdp4ckBasePath)
                 {
-                    ZipFile.ExtractToDirectory(installableCdp4ckFullPath, installableCdp4ckBasePath);
+                    ZipFile.ExtractToDirectory(installableCdp4ckFullPath.FullName, installableCdp4ckBasePath.FullName, true);
 
-                    if (Directory.EnumerateFiles(installableCdp4ckBasePath).FirstOrDefault(f => f.EndsWith(".plugin.manifest")) is { } manifestFileName)
+                    if (installableCdp4ckBasePath.EnumerateFiles().FirstOrDefault(f => f.Name.EndsWith(".plugin.manifest")) is { } manifestFile)
                     {
-                        var manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(installableCdp4ckBasePath, manifestFileName)));
-                        this.UpdatablePlugins.Add((installableCdp4ckBasePath, manifest, new Version(manifest.CompatibleIMEVersion) <= this.currentImeVersion));
+                        var manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(manifestFile.FullName)));
+
+                        if (new Version(manifest.CompatibleIMEVersion) <= this.currentImeVersion)
+                        {
+                            this.UpdatablePlugins.Add((installableCdp4ckFullPath, manifest));
+                        }
+                        else
+                        {
+                            this.logger.Debug($"{manifest.CompatibleIMEVersion} is higher than the current IME version please update before installing this plugin update {this.currentImeVersion}");
+                        }
                     }
                     else
                     {

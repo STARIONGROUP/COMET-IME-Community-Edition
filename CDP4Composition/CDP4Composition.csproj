@@ -228,6 +228,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\PluginInstaller.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PluginRow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\SessionHeader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -266,5 +272,9 @@
     <Compile Remove="obj\x64\Release\Views\InformationDialog.g.cs" />
     <Compile Remove="obj\x64\Release\Views\LoadingControl.g.cs" />
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Views\PluginInstaller.xaml" />
+    <None Remove="Views\PluginRow.xaml" />
   </ItemGroup>
 </Project>
