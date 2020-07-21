@@ -79,6 +79,7 @@ namespace CDP4PluginPackager
 
             this.Manifest.Name = this.PluginName;
             this.Manifest.Version = this.Csproj.PropertyGroup.First(d => !string.IsNullOrWhiteSpace(d.AssemblyVersion))?.AssemblyVersion ?? "";
+            this.Manifest.MinIMEVersion = this.Csproj.PropertyGroup.First(d => !string.IsNullOrWhiteSpace(d.MinIMEVersion))?.MinIMEVersion ?? "";
             this.Manifest.ProjectGuid = Guid.Parse(this.Csproj.PropertyGroup.FirstOrDefault(p => p.ProjectGuid != string.Empty)?.ProjectGuid ?? "");
             this.Manifest.TargetFramework = this.Csproj.PropertyGroup.First(p => !string.IsNullOrWhiteSpace(p.TargetFramework)).TargetFramework;
             this.Manifest.Description = this.Csproj.PropertyGroup.First(d => !string.IsNullOrWhiteSpace(d.Description))?.Description ?? "";

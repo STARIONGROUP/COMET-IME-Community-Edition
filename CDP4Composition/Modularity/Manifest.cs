@@ -54,9 +54,9 @@ namespace CDP4Composition.Modularity
         public string Version { get; set; }
 
         /// <summary>
-        /// Gets or set the IME version with which the plugin is compatible
+        /// Gets or set the minimum IME version with which the plugin is compatible
         /// </summary>
-        public string CompatibleIMEVersion { get; set; }
+        public string MinIMEVersion { get; set; }
 
         /// <summary>
         /// Gets or set the target framework of the Plugin
