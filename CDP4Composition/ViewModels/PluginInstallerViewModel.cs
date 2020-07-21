@@ -24,9 +24,11 @@
 
 namespace CDP4Composition.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
 
+    using CDP4Composition.Behaviors;
     using CDP4Composition.Modularity;
     using CDP4Composition.Views;
 
@@ -35,8 +37,18 @@ namespace CDP4Composition.ViewModels
     /// <summary>
     /// The <see cref="PluginInstallerViewModel"/> is the view model of the <see cref="PluginInstallerViewModel"/> holding it properties its properties and interaction logic
     /// </summary>
-    public class PluginInstallerViewModel : ReactiveObject
+    public class PluginInstallerViewModel : ReactiveObject, IPluginInstallerViewModel
     {
+        /// <summary>
+        /// The attached Behavior
+        /// </summary>
+        public IPluginUpdateInstallerBehavior Behavior { get; set; }
+
+        /// <summary>
+        /// Gets the Command that will cancel the update operation if any and close the view
+        /// </summary>
+        public ReactiveCommand<object> CancelCommand { get; private set; }
+
         /// <summary>
         /// Gets a <see cref="ReactiveList{T}"/> of type <see cref="PluginRowViewModel"/> that holds the properties for <see cref="PluginRow"/>
         /// </summary>
@@ -46,7 +58,7 @@ namespace CDP4Composition.ViewModels
         /// Gets an <see cref="IEnumerable{T}"/> of type <code>(FileInfo pluginDownloadFullPath, Manifest theNewManifest)</code>
         /// of the updatable plugins
         /// </summary>
-        public IEnumerable<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> UpdatablePlugins { get; } 
+        public IEnumerable<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> UpdatablePlugins { get; }
 
         /// <summary>
         /// Instanciate a new <see cref="PluginInstallerViewModel"/>
@@ -56,6 +68,22 @@ namespace CDP4Composition.ViewModels
         {
             this.UpdatablePlugins = updatablePlugins;
             this.UpdateProperties();
+
+            this.InitializeCommand();
+        }
+        
+        /// <summary>
+        /// Initialize the <see cref="IReactiveCommand"/>
+        /// </summary>
+        private void InitializeCommand()
+        {
+            this.CancelCommand = ReactiveCommand.Create();
+            this.CancelCommand.Subscribe(_ => this.CancelCommandExecute());
+        }
+
+        private void CancelCommandExecute()
+        {
+            this.Behavior.Close();
         }
 
         /// <summary>

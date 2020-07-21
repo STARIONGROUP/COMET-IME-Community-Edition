@@ -62,7 +62,7 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         public string Version
         {
-            get => this.name;
+            get => this.version;
             set => this.RaiseAndSetIfChanged(ref this.version, value);
         }
 

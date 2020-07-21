@@ -35,12 +35,16 @@ namespace CDP4Composition.Modularity
 
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Utilities;
+    using CDP4Composition.ViewModels;
+    using CDP4Composition.Views;
 
     using Microsoft.Practices.ServiceLocation;
 
     using Newtonsoft.Json;
 
     using NLog;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The <see cref="PluginUpdateInstaller"/> is responsible to check all the CDP4 download folders and to install/update the availables user-selected plugins 
@@ -63,13 +67,12 @@ namespace CDP4Composition.Modularity
         /// </summary>
         public PluginUpdateInstaller()
         {
-            this.UpdatablePlugins = PluginUtilities.GetDownloadedInstallablePluginUpdate();
+            this.UpdatablePlugins = PluginUtilities.GetDownloadedInstallablePluginUpdate().ToList();
 
             if (this.UpdatablePlugins.Any())
             {
-                new PluginUpdateWindow() {DataContext = new }.Show()
+                new PluginInstaller() { DataContext = new PluginInstallerViewModel(this.UpdatablePlugins) }.ShowDialog();
             }
         }
     }
 }
-o

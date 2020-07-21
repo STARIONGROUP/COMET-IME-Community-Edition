@@ -6,26 +6,36 @@
         xmlns:local="clr-namespace:CDP4Composition.Views"
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         mc:Ignorable="d"
-        Title="CDP4-Plugin-Installer" Icon="../../Resources/Images/cdplogo3d_32x32.png" Height="800" Width="800" ResizeMode="NoResize" BorderThickness="0" Background="White">
+        Title="CDP4-Plugin-Installer" Height="600" Width="600" ResizeMode="NoResize" BorderThickness="0" Background="White">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="3*"></RowDefinition>
-            <RowDefinition Height="6*"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="8*"></RowDefinition>
+            <RowDefinition Height="1.5*"></RowDefinition>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Image VerticalAlignment="Bottom" Margin="10" Height="70" HorizontalAlignment="Center" Source="../Resources/cdp4logo_brand_textonly.png"></Image>
-            <Label VerticalContentAlignment="Bottom" FontSize="70" HorizontalAlignment="Center" Content="Plugin Installer"></Label>
-        </StackPanel>
-        <ListView Grid.Row="1" ItemsSource="{Binding AvailablePlugins}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="59*"></ColumnDefinition>
+                <ColumnDefinition Width="238*"></ColumnDefinition>
+                <ColumnDefinition Width="270*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Image VerticalAlignment="Bottom" Grid.RowSpan="2" Margin="10,0,9.2,4.8" Height="40" HorizontalAlignment="Center" Source="../Resources/Images/cdplogo3d_32x32.png" Width="40"></Image>
+            <Label Grid.Row="0" VerticalContentAlignment="Bottom"  FontSize="30" HorizontalAlignment="Right" Content="Plugin Installer" Margin="0,5,0.2,-0.2" Width="249" Grid.Column="1"/>
+            <CheckBox FlowDirection="RightToLeft" Grid.Column="2" Margin="136.8,23,9.6,-0.2" Grid.RowSpan="2">
+                <TextBlock FlowDirection="LeftToRight" Text="Select all updates" />
+            </CheckBox>
+        </Grid>
+
+        <ListView HorizontalContentAlignment="Stretch" x:Name="AvailablePluginsContainer" SelectionMode="Multiple" HorizontalAlignment="Stretch" Grid.Row="1" ItemsSource="{Binding AvailablePlugins}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <local:PluginRow/>
+                    <local:PluginRow HorizontalAlignment="Center" HorizontalContentAlignment="Left"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <StackPanel Margin="5" Grid.Row="2" HorizontalAlignment="Stretch">
-            <Button Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding CancelCommand}" Background="White" Content="Cancel" Foreground="Black" Width="100" Height="50" ></Button>
+        <StackPanel Margin="5" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding CancelCommand}" Background="White" Content="Cancel" Foreground="Black" Width="100" Height="40" ></Button>
+            <Button Margin="5" IsEnabled="{Binding ElementName=AvailablePluginsContainer, Path=SelectedItems}" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding InstallCommand}" Background="White" Content="Install" Foreground="Black" Width="100" Height="40" ></Button>
         </StackPanel>
     </Grid>
 </Window>

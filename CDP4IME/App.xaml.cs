@@ -8,6 +8,7 @@ namespace CDP4IME
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Text;
 
@@ -15,6 +16,7 @@ namespace CDP4IME
     using CDP4Composition;
     using CDP4Composition.Modularity;
 
+    using DevExpress.Mvvm;
     using DevExpress.Xpf.Core;
     using ExceptionReporting;
     using NLog;
@@ -42,10 +44,11 @@ namespace CDP4IME
             AppliedTheme.ThemeName = Theme.SevenName;
             base.OnStartup(e);
 
-            new PluginUpdateInstaller();
-
+            _ = new PluginUpdateInstaller();
             DXSplashScreen.Show<Views.SplashScreenView>();
             DXSplashScreen.SetState("Starting CDP4");
+
+            //_ = new PluginUpdateInstaller();
 
 #if (DEBUG)
             RunInDebugMode();

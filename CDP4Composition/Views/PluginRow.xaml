@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CDP4Composition.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Margin="5" HorizontalAlignment="Stretch">
+             d:DesignHeight="450" d:DesignWidth="800" Margin="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
     <Grid HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="4*"></RowDefinition>

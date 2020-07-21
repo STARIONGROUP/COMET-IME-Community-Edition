@@ -143,13 +143,13 @@ namespace CDP4Composition.Modularity
                     {
                         var manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(manifestFile.FullName)));
 
-                        if (new Version(manifest.CompatibleIMEVersion) <= currentPlateformVersion)
+                        if (manifest.MinIMEVersion is null || new Version(manifest.MinIMEVersion) <= currentPlateformVersion)
                         {
                             updatablePlugins.Add((installableCdp4CkFullPath, manifest));
                         }
                         else
                         {
-                            logger.Debug($"{manifest.CompatibleIMEVersion} is higher than the current IME version please update before installing this plugin update {currentPlateformVersion}");
+                            logger.Debug($"{manifest.MinIMEVersion} is higher than the current IME version please update before installing this plugin update {currentPlateformVersion}");
                         }
                     }
                     else
