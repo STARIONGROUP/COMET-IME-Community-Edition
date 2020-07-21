@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{DA9183AB-D060-488F-89E9-DEC1F0177B1E}</ProjectGuid>
+    <MinIMEVersion>6.0.0</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
    
     <AssemblyTitle>CDP4Scripting</AssemblyTitle>

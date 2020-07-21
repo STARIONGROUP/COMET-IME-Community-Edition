@@ -43,7 +43,7 @@ namespace CDP4PluginPackager.Tests
     [TestFixture]
     public class SdkPluginPackagerTestFixture
     {
-        private const string TargetProject = "CDP4WspDal";
+        private const string TargetProject = "CDP4Dashboard";
 
         private SdkPluginPackager sdkPluginPackager;
 
@@ -91,6 +91,7 @@ namespace CDP4PluginPackager.Tests
             Assert.AreEqual(this.sdkPluginPackager.Manifest.Description, json.Description);
             Assert.AreEqual(this.sdkPluginPackager.Manifest.ReleaseNote, json.ReleaseNote);
             Assert.AreEqual(this.sdkPluginPackager.Manifest.Version, json.Version);
+            Assert.AreEqual(this.sdkPluginPackager.Manifest.MinIMEVersion, json.MinIMEVersion);
         }
 
         [Test]
@@ -98,10 +99,9 @@ namespace CDP4PluginPackager.Tests
         {
             Assert.IsNotNull(Directory.EnumerateFiles(this.sdkPluginPackager.OutputPath).First(f => Path.GetFileName(f) == $"{this.sdkPluginPackager.Manifest.Name}.cdp4ck"));
 
-            using (var zipFile = ZipFile.OpenRead(Path.Combine(this.sdkPluginPackager.OutputPath, $"{this.sdkPluginPackager.Manifest.Name}.cdp4ck")))
-            {
-                Assert.AreEqual(zipFile.Entries.Count, Directory.EnumerateFiles(this.sdkPluginPackager.OutputPath).Count(f => !f.EndsWith(".pdb") && !f.EndsWith(".cdp4ck")));
-            }
+            using var zipFile = ZipFile.OpenRead(Path.Combine(this.sdkPluginPackager.OutputPath, $"{this.sdkPluginPackager.Manifest.Name}.cdp4ck"));
+
+            Assert.AreEqual(zipFile.Entries.Count, Directory.EnumerateFiles(this.sdkPluginPackager.OutputPath).Count(f => !f.EndsWith(".pdb") && !f.EndsWith(".cdp4ck")));
         }
 
         [Test]
