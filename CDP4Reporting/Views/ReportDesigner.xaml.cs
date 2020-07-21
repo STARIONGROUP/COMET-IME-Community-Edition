@@ -51,7 +51,7 @@ namespace CDP4Reporting.Views
     public partial class ReportDesigner : IPanelView
     {
         /// <summary>
-        /// The <see cref="Task"/> that executes compile command
+        /// The <see cref="Task"/> that executes the compile command
         /// </summary>
         private Task compileTask;
 
