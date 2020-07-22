@@ -36,7 +36,7 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// The associated <see cref="ElementBase"/>.
         /// </summary>
-        public ElementBase ElementBase { get; internal set; }
+        protected internal ElementBase ElementBase { get; internal set; }
 
         /// <summary>
         /// The Element name, fully qualified with the path to the top element.
@@ -52,6 +52,6 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
         /// </summary>
-        public DomainOfExpertise Owner => this.ElementBase.Owner;
+        protected DomainOfExpertise Owner => this.ElementBase.Owner;
     }
 }
