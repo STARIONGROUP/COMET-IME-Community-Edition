@@ -33,14 +33,14 @@ namespace CDP4Composition.Reporting
     /// Class representing a reporting data source.
     /// </summary>
     /// <typeparam name="T">
-    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
+    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
     /// </typeparam>
-    public class ReportingDataSourceClass<T> where T : ReportingDataSourceRowRepresentation, new()
+    public class ReportingDataSourceClass<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
-        /// The <see cref="ReportingDataSourceRow{T}"/> which is the root of the hierarhical tree.
+        /// The <see cref="ReportingDataSourceNode{T}"/> which is the root of the hierarhical tree.
         /// </summary>
-        private readonly ReportingDataSourceRow<T> topRow;
+        private readonly ReportingDataSourceNode<T> topNode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceClass{T}"/> class.
@@ -53,7 +53,7 @@ namespace CDP4Composition.Reporting
         /// </param>
         public ReportingDataSourceClass(Iteration iteration, CategoryHierarchy categoryHierarchy)
         {
-            this.topRow = new ReportingDataSourceRow<T>(iteration.TopElement, categoryHierarchy);
+            this.topNode = new ReportingDataSourceNode<T>(iteration.TopElement, categoryHierarchy);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace CDP4Composition.Reporting
         /// </returns>
         public List<T> GetTabularRepresentation()
         {
-            return this.topRow.GetTabularRepresentation();
+            return this.topNode.GetTabularRepresentation();
         }
     }
 }

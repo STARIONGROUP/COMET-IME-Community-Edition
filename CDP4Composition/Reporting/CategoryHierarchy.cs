@@ -40,7 +40,7 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// Builder class for a <see cref="CategoryHierarchy"/>.
         /// </summary>
-        internal class Builder
+        public class Builder
         {
             /// <summary>
             /// The <see cref="Iteration"/> containing the desired <see cref="CDP4Common.SiteDirectoryData.Category"/> items.
@@ -67,7 +67,7 @@ namespace CDP4Composition.Reporting
             /// The <see cref="DefinedThing.ShortName"/> of the <see cref="CDP4Common.SiteDirectoryData.Category"/> of
             /// the top element of the <see cref="CategoryHierarchy"/> to be constructed.
             /// </param>
-            internal Builder(Iteration iteration, string topLevelCategoryShortName)
+            public Builder(Iteration iteration, string topLevelCategoryShortName)
             {
                 this.iteration = iteration;
                 this.AddLevel(topLevelCategoryShortName);
@@ -133,7 +133,7 @@ namespace CDP4Composition.Reporting
 
         /// <summary>
         /// The filtering <see cref="CDP4Common.SiteDirectoryData.Category"/> that must be matched on the associated level
-        /// of the <see cref="ReportingDataSourceRow{T}"/>.
+        /// of the <see cref="ReportingDataSourceNode{T}"/>.
         /// </summary>
         public readonly Category Category;
 

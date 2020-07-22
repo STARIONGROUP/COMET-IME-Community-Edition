@@ -28,222 +28,30 @@ namespace CDP4Composition.Reporting
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-
     /// <summary>
-    /// Class representing a row associated with a node in the hierarhical tree upon which the data source is based.
+    /// Abstract base class from which all row representations for a <see cref="ReportingDataSourceClass{T}"/> need to derive.
     /// </summary>
-    /// <typeparam name="T">
-    /// The <see cref="ReportingDataSourceRowRepresentation"/> representing the data source rows.
-    /// </typeparam>
-    internal class ReportingDataSourceRow<T> where T : ReportingDataSourceRowRepresentation, new()
+    public abstract class ReportingDataSourceRow
     {
         /// <summary>
-        /// The parent node in the hierarhical tree upon which the data source is based.
+        /// The associated <see cref="ElementBase"/>.
         /// </summary>
-        private readonly ReportingDataSourceRow<T> parent;
+        protected internal ElementBase ElementBase { get; internal set; }
 
         /// <summary>
-        /// The children nodes in the hierarhical tree upon which the data source is based.
+        /// The Element name, fully qualified with the path to the top element.
         /// </summary>
-        internal List<ReportingDataSourceRow<T>> Children { get; } = new List<ReportingDataSourceRow<T>>();
+        public string ElementName { get; internal set; }
 
         /// <summary>
-        /// The <see cref="ElementBase"/> associated with this node.
+        /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
+        /// Note that when this is false, all values will be null on the row.
         /// </summary>
-        private readonly ElementBase elementBase;
+        public bool IsVisible { get; internal set; }
 
         /// <summary>
-        /// The <see cref="ElementDefinition"/> representing this node.
+        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
         /// </summary>
-        private ElementDefinition ElementDefinition =>
-            (this.elementBase as ElementDefinition) ?? (this.elementBase as ElementUsage)?.ElementDefinition;
-
-        /// <summary>
-        /// The <see cref="ElementUsage"/> representing this node, if it exists.
-        /// </summary>
-        private ElementUsage ElementUsage =>
-            this.elementBase as ElementUsage;
-
-        /// <summary>
-        /// The fully qualified (to the tree root) name of this <see cref="elementBase"/>.
-        /// </summary>
-        private string FullyQualifiedName => (this.parent != null)
-            ? this.parent.FullyQualifiedName + "." + this.ElementUsage.ShortName
-            : this.ElementDefinition.ShortName;
-
-        /// <summary>
-        /// The list of declared <see cref="ReportingDataSourceParameter{T}"/> types on
-        /// the associated <see cref="ReportingDataSourceRowRepresentation"/>.
-        /// </summary>
-        private static readonly IEnumerable<FieldInfo> ParameterFields = typeof(T).GetFields()
-            .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceParameter<T>)));
-
-        /// <summary>
-        /// The <see cref="ReportingDataSourceParameter{T}"/>s associated with this row.
-        /// </summary>
-        private readonly Dictionary<Type, ReportingDataSourceParameter<T>> reportedParameters =
-            new Dictionary<Type, ReportingDataSourceParameter<T>>();
-
-        /// <summary>
-        /// The filtering <see cref="Category"/> that must be matched on the current <see cref="elementBase"/>.
-        /// </summary>
-        private readonly Category filterCategory;
-
-        /// <summary>
-        /// Boolean flag indicating whether the current <see cref="elementBase"/> matches the <see cref="filterCategory"/>.
-        /// </summary>
-        private bool IsVisible =>
-            this.elementBase.Category.Contains(this.filterCategory);
-
-        /// <summary>
-        /// Boolean flag indicating whether the current node or any of its <see cref="Children"/>
-        /// match their associated <see cref="filterCategory"/>.
-        /// </summary>
-        private bool IsRelevant =>
-            this.IsVisible || this.Children.Any(child => child.IsRelevant);
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReportingDataSourceRow{T}"/> class.
-        /// </summary>
-        /// <param name="elementBase">
-        /// The <see cref="ElementBase"/> associated with this node.
-        /// </param>
-        /// <param name="categoryHierarchy">
-        /// The <see cref="CategoryHierarchy"/> associated with this node's subtree.
-        /// </param>
-        /// <param name="parent">
-        /// The parent node in the hierarhical tree upon which the data source is based.
-        /// </param>
-        public ReportingDataSourceRow(
-            ElementBase elementBase,
-            CategoryHierarchy categoryHierarchy,
-            ReportingDataSourceRow<T> parent = null)
-        {
-            this.filterCategory = categoryHierarchy.Category;
-
-            this.parent = parent;
-
-            this.elementBase = elementBase;
-
-            foreach (var type in ParameterFields.Select(f => f.FieldType))
-            {
-                var parameter = type
-                    .GetConstructor(Type.EmptyTypes)
-                    .Invoke(new object[] { }) as ReportingDataSourceParameter<T>;
-
-                parameter.Row = this;
-
-                this.reportedParameters[type] = parameter;
-
-                this.InitializeParameter(parameter);
-            }
-
-            if (categoryHierarchy.Child == null)
-            {
-                return;
-            }
-
-            foreach (var childUsage in this.ElementDefinition.ContainedElement)
-            {
-                var childRow = new ReportingDataSourceRow<T>(childUsage, categoryHierarchy.Child, this);
-
-                if (childRow.IsRelevant)
-                {
-                    this.Children.Add(childRow);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Initializes a reported parameter based on the corresponding <see cref="ParameterOrOverrideBase"/>
-        /// associated with the current <see cref="elementBase"/>.
-        /// </summary>
-        /// <param name="reportedParameter">
-        /// The reported parameter to be initialized.
-        /// </param>
-        private void InitializeParameter(ReportingDataSourceParameter<T> reportedParameter)
-        {
-            var parameter = this.ElementDefinition.Parameter
-                .SingleOrDefault(x => x.ParameterType.ShortName == reportedParameter.ShortName);
-
-            if (parameter != null)
-            {
-                reportedParameter.Initialize(parameter.ValueSet);
-            }
-
-            var parameterOverride = this.ElementUsage?.ParameterOverride
-                .SingleOrDefault(x => x.Parameter.ParameterType.ShortName == reportedParameter.ShortName);
-
-            if (parameterOverride != null)
-            {
-                reportedParameter.Initialize(parameterOverride.ValueSet);
-            }
-        }
-
-        /// <summary>
-        /// Gets the parameter of type <see cref="TP"/> associated with this node.
-        /// </summary>
-        /// <typeparam name="TP">
-        /// The desired parameter type.
-        /// </typeparam>
-        /// <returns>
-        /// The <see cref="ReportingDataSourceParameter{T}"/> of type <see cref="TP"/>.
-        /// </returns>
-        public TP GetParameter<TP>() where TP : ReportingDataSourceParameter<T>
-        {
-            return this.reportedParameters[typeof(TP)] as TP;
-        }
-
-        /// <summary>
-        /// Gets the tabular representation of this node's subtree.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="List{T}"/> of <see cref="ReportingDataSourceRowRepresentation"/>.
-        /// </returns>
-        public List<T> GetTabularRepresentation()
-        {
-            var tabularRepresentation = new List<T>
-            {
-                this.GetRowTabularRepresentation()
-            };
-
-            foreach (var row in this.Children)
-            {
-                tabularRepresentation.AddRange(row.GetTabularRepresentation());
-            }
-
-            return tabularRepresentation;
-        }
-
-        /// <summary>
-        /// Gets the tabular representation of this node.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="ReportingDataSourceRowRepresentation"/>.
-        /// </returns>
-        private T GetRowTabularRepresentation()
-        {
-            var row = new T
-            {
-                ElementName = this.FullyQualifiedName,
-                IsVisible = this.IsVisible
-            };
-
-            if (!this.IsVisible)
-            {
-                return row;
-            }
-
-            foreach (var field in ParameterFields)
-            {
-                field.SetValue(row, this.reportedParameters[field.FieldType]);
-            }
-
-            return row;
-        }
+        protected DomainOfExpertise Owner => this.ElementBase.Owner;
     }
 }
