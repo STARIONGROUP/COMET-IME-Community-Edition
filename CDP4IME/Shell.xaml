@@ -53,12 +53,10 @@
                            regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.RibbonRegion}" Padding="0">
 
             <dxr:RibbonControl.PageHeaderItems>
-
                 <dxb:BarButtonItem Name="bAbout"
                                    Content="-"
                                    Glyph="{dxc:DXImage Image=Info_16x16.png}"
                                    LargeGlyph="{dxc:DXImage Image=Info_16x16.png}" />
-
             </dxr:RibbonControl.PageHeaderItems>
 
             <dxr:RibbonDefaultPageCategory Name="default" MergeOrder="0">
