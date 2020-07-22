@@ -25,42 +25,21 @@
 
 namespace CDP4Composition.Reporting
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
 
     /// <summary>
-    /// Abstract base class from which all parameters for a <see cref="ReportingDataSourceRowRepresentation"/> need to derive.
+    /// Abstract base class from which all parameter columns for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
-    public abstract class ReportingDataSourceParameter<T> where T : ReportingDataSourceRowRepresentation, new()
+    internal abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
-        /// Gets the <see cref="ParameterTypeShortNameAttribute"/> decorating the class described by <paramref name="type"/>.
+        /// The associated <see cref="ParameterOrOverrideBase"/>.
         /// </summary>
-        /// <param name="type">
-        /// Describes the current parameter class.
-        /// </param>
-        /// <returns>
-        /// The <see cref="ParameterTypeShortNameAttribute"/> decorating the current parameter class.
-        /// </returns>
-        private static ParameterTypeShortNameAttribute GetParameterAttribute(MemberInfo type)
-        {
-            var attr = Attribute
-                .GetCustomAttributes(type)
-                .SingleOrDefault(attribute => attribute is ParameterTypeShortNameAttribute);
-
-            return attr as ParameterTypeShortNameAttribute;
-        }
-
-        /// <summary>
-        /// The <see cref="ReportingDataSourceRow{T}"/> associated to this parameter.
-        /// </summary>
-        internal ReportingDataSourceRow<T> Row;
+        protected ParameterOrOverrideBase ParameterOrOverrideBase { get; private set; }
 
         /// <summary>
         /// The associated <see cref="ParameterType"/> short name.
@@ -73,6 +52,11 @@ namespace CDP4Composition.Reporting
         protected string Value { get; private set; }
 
         /// <summary>
+        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterOrOverrideBase"/>.
+        /// </summary>
+        protected DomainOfExpertise Owner => this.ParameterOrOverrideBase.Owner;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{T}"/> class.
         /// </summary>
         protected ReportingDataSourceParameter()
@@ -81,25 +65,33 @@ namespace CDP4Composition.Reporting
         }
 
         /// <summary>
-        /// Initializes the <see cref="Value"/> based on a <see cref="Parameter"/>.
+        /// Initializes a reported parameter column based on the corresponding <see cref="ParameterOrOverrideBase"/>
+        /// within the associated <see cref="ReportingDataSourceNode{T}"/>.
         /// </summary>
-        /// <param name="valueSet">
-        /// The <see cref="ParameterValueSet"/>s of the <see cref="Parameter"/>.
+        /// <param name="node">
+        /// The associated <see cref="ReportingDataSourceNode{T}"/>.
         /// </param>
-        internal void Initialize(ContainerList<ParameterValueSet> valueSet)
+        internal override void Initialize(ReportingDataSourceNode<T> node)
         {
-            this.Value = valueSet.First().ActualValue.First();
-        }
+            this.Node = node;
 
-        /// <summary>
-        /// Initializes the <see cref="Value"/> based on a <see cref="ParameterOverride"/>.
-        /// </summary>
-        /// <param name="valueSet">
-        /// The <see cref="ParameterOverrideValueSet"/>s of the <see cref="ParameterOverride"/>.
-        /// </param>
-        internal void Initialize(ContainerList<ParameterOverrideValueSet> valueSet)
-        {
-            this.Value = valueSet.First().ActualValue.First();
+            var parameter = this.Node.ElementDefinition.Parameter
+                .SingleOrDefault(x => x.ParameterType.ShortName == this.ShortName);
+
+            if (parameter != null)
+            {
+                this.ParameterOrOverrideBase = parameter;
+                this.Value = parameter.ValueSet.First().ActualValue.First();
+            }
+
+            var parameterOverride = this.Node.ElementUsage?.ParameterOverride
+                .SingleOrDefault(x => x.Parameter.ParameterType.ShortName == this.ShortName);
+
+            if (parameterOverride != null)
+            {
+                this.ParameterOrOverrideBase = parameterOverride;
+                this.Value = parameterOverride.ValueSet.First().ActualValue.First();
+            }
         }
 
         /// <summary>
@@ -114,7 +106,7 @@ namespace CDP4Composition.Reporting
         /// </returns>
         public TP GetSibling<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.Row.GetParameter<TP>();
+            return this.Node.GetColumn<TP>();
         }
 
         /// <summary>
@@ -129,7 +121,7 @@ namespace CDP4Composition.Reporting
         /// </returns>
         public IEnumerable<TP> GetChildren<TP>() where TP : ReportingDataSourceParameter<T>
         {
-            return this.Row.Children.Select(child => child.GetParameter<TP>());
+            return this.Node.Children.Select(child => child.GetColumn<TP>());
         }
     }
 }
