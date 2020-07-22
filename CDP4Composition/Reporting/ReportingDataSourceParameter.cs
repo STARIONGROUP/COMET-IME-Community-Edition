@@ -49,7 +49,7 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterOrOverrideBase"/>.
         /// </summary>
-        internal DomainOfExpertise Owner;
+        public DomainOfExpertise Owner { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{T}"/> class.

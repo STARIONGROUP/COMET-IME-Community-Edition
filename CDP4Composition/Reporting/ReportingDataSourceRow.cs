@@ -36,22 +36,22 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// The associated <see cref="ElementBase"/>.
         /// </summary>
-        internal ElementBase ElementBase;
+        public ElementBase ElementBase { get; internal set; }
 
         /// <summary>
         /// The Element name, fully qualified with the path to the top element.
         /// </summary>
-        internal string ElementName;
+        public string ElementName { get; internal set; }
 
         /// <summary>
         /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
         /// Note that when this is false, all values will be null on the row.
         /// </summary>
-        internal bool IsVisible;
+        public bool IsVisible { get; internal set; }
 
         /// <summary>
         /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
         /// </summary>
-        internal DomainOfExpertise Owner => this.ElementBase.Owner;
+        public DomainOfExpertise Owner => this.ElementBase.Owner;
     }
 }
