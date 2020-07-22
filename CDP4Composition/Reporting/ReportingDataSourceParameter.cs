@@ -37,6 +37,11 @@ namespace CDP4Composition.Reporting
     internal abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
+        /// The associated <see cref="ParameterOrOverrideBase"/>.
+        /// </summary>
+        protected ParameterOrOverrideBase ParameterOrOverrideBase { get; private set; }
+
+        /// <summary>
         /// The associated <see cref="ParameterType"/> short name.
         /// </summary>
         internal readonly string ShortName;
@@ -49,7 +54,7 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterOrOverrideBase"/>.
         /// </summary>
-        protected DomainOfExpertise Owner { get; private set; }
+        protected DomainOfExpertise Owner => this.ParameterOrOverrideBase.Owner;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{T}"/> class.
@@ -75,8 +80,8 @@ namespace CDP4Composition.Reporting
 
             if (parameter != null)
             {
+                this.ParameterOrOverrideBase = parameter;
                 this.Value = parameter.ValueSet.First().ActualValue.First();
-                this.Owner = parameter.Owner;
             }
 
             var parameterOverride = this.Node.ElementUsage?.ParameterOverride
@@ -84,8 +89,8 @@ namespace CDP4Composition.Reporting
 
             if (parameterOverride != null)
             {
+                this.ParameterOrOverrideBase = parameterOverride;
                 this.Value = parameterOverride.ValueSet.First().ActualValue.First();
-                this.Owner = parameterOverride.Owner;
             }
         }
 
