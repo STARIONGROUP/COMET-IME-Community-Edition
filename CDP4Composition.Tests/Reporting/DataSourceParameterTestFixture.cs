@@ -66,12 +66,16 @@ namespace CDP4Composition.Tests.Reporting
         private class TestParameter1 : ReportingDataSourceParameter<Row>
         {
             public string GetValue() => this.Value;
+
+            public DomainOfExpertise GetOwner() => this.Owner;
         }
 
         [DefinedThingShortName("type2")]
         private class TestParameter2 : ReportingDataSourceParameter<Row>
         {
             public string GetValue() => this.Value;
+
+            public DomainOfExpertise GetOwner() => this.Owner;
         }
 
         [DefinedThingShortName("type3")]
@@ -300,11 +304,11 @@ namespace CDP4Composition.Tests.Reporting
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("11", parameter1.GetValue());
-            Assert.AreEqual(this.parameterOwner, parameter1.Owner);
+            Assert.AreEqual(this.parameterOwner, parameter1.GetOwner());
 
             var parameter2 = node.GetColumn<TestParameter2>();
             Assert.AreEqual("12", parameter2.GetValue());
-            Assert.AreEqual(this.parameterOwner, parameter2.Owner);
+            Assert.AreEqual(this.parameterOwner, parameter2.GetOwner());
         }
 
         [Test]
@@ -320,11 +324,11 @@ namespace CDP4Composition.Tests.Reporting
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("121", parameter1.GetValue());
-            Assert.AreEqual(this.parameterOverrideOwner, parameter1.Owner);
+            Assert.AreEqual(this.parameterOverrideOwner, parameter1.GetOwner());
 
             var parameter2 = node.GetColumn<TestParameter2>();
             Assert.AreEqual("122", parameter2.GetValue());
-            Assert.AreEqual(this.parameterOverrideOwner, parameter2.Owner);
+            Assert.AreEqual(this.parameterOverrideOwner, parameter2.GetOwner());
         }
 
         [Test]
