@@ -1,0 +1,5 @@
+﻿<ribbonxml>
+  <group id="CDP4Grapher" label="Grpaher">
+    <dynamicMenu id="ShowGrapher_" size="large" label="Browser" screentip="Show or Hide the Grapher"  imageMso="ServerConnection" getEnabled="GetEnabled" getContent="GetContent"/>
+  </group>
+</ribbonxml>

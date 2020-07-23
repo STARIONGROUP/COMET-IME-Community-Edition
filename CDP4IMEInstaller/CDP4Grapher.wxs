@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
+  <Fragment>
+    <ComponentGroup Id="CDP4GRAPHER_CG" Directory="GRAPHER">
+      
+      <Component Id="comp_CDP4Grapher" Guid="{5492A4B6-3A49-4980-9DDF-CFA59B57CCA9}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4Grapher"  Vital="yes" Source="$(var.CDP4Grapher.TargetPath)" KeyPath="yes"></File>
+      </Component>
+      
+      <Component Id="comp_Manifest_CDP4Grapher" Guid="{857F7E95-BD84-43D0-A7A4-67D510E6D961}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4Grapher"  Vital="yes" Source="$(var.CDP4Grapher.TargetDir)CDP4Grapher.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -121,5 +121,8 @@
       <ComponentGroupRef Id="BUDGET_CG" />
     </Feature>
 
+    <Feature Id="GRAPHERPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Grapher Plugin" Level="1">
+      <ComponentGroupRef Id="CDP4GRAPHER_CG" />
+    </Feature>
   </Product>
 </Wix>
