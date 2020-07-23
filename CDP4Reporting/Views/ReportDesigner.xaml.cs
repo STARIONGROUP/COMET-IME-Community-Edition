@@ -84,7 +84,7 @@ namespace CDP4Reporting.Views
         {
             if (this.reportDesigner.ActiveDocument == null)
             {
-                (this.DataContext as ReportDesignerViewModel).Output += $"{DateTime.Now:HH:mm:ss} Report not found";
+                (this.DataContext as ReportDesignerViewModel).Output += $"{DateTime.Now:HH:mm:ss} Report not found{Environment.NewLine}";
                 return;
             }
 
@@ -121,12 +121,18 @@ namespace CDP4Reporting.Views
         {
             var viewModel = this.DataContext as ReportDesignerViewModel;
 
+            if (viewModel.BuildResult == null)
+            {
+                viewModel.Output += $"{DateTime.Now:HH:mm:ss} Build data source code first{Environment.NewLine}";
+                return null;
+            }
+
             var editorFullClassName = viewModel.BuildResult.CompiledAssembly.GetTypes().FirstOrDefault(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IReportingDataSource<>))).FullName;
             var instObj = viewModel.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName);
 
             if (instObj == null)
             {
-                viewModel.Output += $"{DateTime.Now:HH:mm:ss} Data source class not found";
+                viewModel.Output += $"{DateTime.Now:HH:mm:ss} Data source class not found{Environment.NewLine}";
                 return null;
             }
 
