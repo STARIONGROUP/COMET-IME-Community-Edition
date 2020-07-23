@@ -69,7 +69,7 @@
             </dxdo:LayoutGroup>
             <dxdo:LayoutGroup ItemWidth="3*">
                 <dxdo:LayoutPanel Caption="Report Designer" AllowClose="False" MDIMergeStyle="Always">
-                    <dxrud:ReportDesigner x:Name ="reportDesigner" dxb:MergingProperties.ElementMergingBehavior="All">
+                    <dxrud:ReportDesigner x:Name="reportDesigner" dxb:MergingProperties.ElementMergingBehavior="All">
                         <dxmvvm:Interaction.Behaviors>
                             <localBehaviour:ReportDesignerBehaviour RibbonMergeCategoryName="ReportingCategory" />
                         </dxmvvm:Interaction.Behaviors>
@@ -114,6 +114,15 @@
                                        Hint="Toggle Auto Build"
                                        Command="{Binding Path=AutomaticBuildCommand}"
                                        LargeGlyph="{dx:DXImage Image=Time_32x32.png}" />
+                                </dxb:InsertAction.Element>
+                            </dxb:InsertAction>
+                            <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
+                                <dxb:InsertAction.Element>
+                                    <dxb:BarButtonItem
+                                        ItemClick="BarButtonItem_ItemClick"
+                                        LargeGlyph="{dx:DXImage Image=ManageDatasource_32x32.png}"
+                                        Content="Rebuild Schema"
+                                        Hint="Rebuild Schema" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
                             <dxb:UpdateAction
