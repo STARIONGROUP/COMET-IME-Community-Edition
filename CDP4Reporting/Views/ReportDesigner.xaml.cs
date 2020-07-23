@@ -76,5 +76,63 @@ namespace CDP4Reporting.Views
                 this.lgTabs.SelectTab(this.lgErrors);
             }
         }
+
+        /// <summary>
+        /// Set report datasource
+        /// </summary>
+        private void SetDataSource()
+        {
+            if (this.reportDesigner.ActiveDocument == null)
+            {
+                (this.DataContext as ReportDesignerViewModel).Output += $"{DateTime.Now:HH:mm:ss} Report not found";
+                return;
+            }
+
+            var dataSourceName = "ReportBudgetDataSource";
+            var localReport = this.reportDesigner.ActiveDocument.Report;
+            var dataSource = localReport.ComponentStorage.OfType<ObjectDataSource>().ToList().FirstOrDefault(x => x.Name.Equals(dataSourceName));
+
+            if (dataSource == null)
+            {
+                // Create new datasource
+                dataSource = new ObjectDataSource
+                {
+                    DataSource = this.GetDataSource(),
+                    Name = dataSourceName
+                };
+                localReport.ComponentStorage.Add(dataSource);
+                localReport.DataSource = dataSource;
+            }
+            else
+            {
+                // Use existing datasource
+                dataSource.DataSource = this.GetDataSource();
+            }
+
+            // Rebuild datasource schema always
+            dataSource.RebuildResultSchema();
+        }
+
+        /// <summary>
+        /// Get tabular data representation for the report
+        /// </summary>
+        /// <returns></returns>
+        private object GetDataSource()
+        {
+            var viewModel = this.DataContext as ReportDesignerViewModel;
+
+            var editorFullClassName = viewModel.BuildResult.CompiledAssembly.GetTypes().FirstOrDefault(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IReportingDataSource<>))).FullName;
+            var instObj = viewModel.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName);
+
+            if (instObj == null)
+            {
+                viewModel.Output += $"{DateTime.Now:HH:mm:ss} Data source class not found";
+                return null;
+            }
+
+            var dsObj = instObj.GetType().GetMethod("CreateDataSource").Invoke(instObj, new object[] { viewModel.Thing });
+
+            return dsObj?.GetType().GetMethod("GetTabularRepresentation").Invoke(dsObj, new object[] { });
+        }
     }
 }
