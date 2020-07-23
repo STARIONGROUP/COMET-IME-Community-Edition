@@ -30,6 +30,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition;
+    using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -93,6 +94,16 @@ namespace CDP4Reporting.ViewModels
         public ReactiveCommand<Unit> AutomaticBuildCommand { get; set; }
 
         /// <summary>
+        /// Open rep4 zip archive which consists in datasource code file and report designer file
+        /// </summary>
+        public ReactiveCommand<object> OpenReportCommand { get; set; }
+
+        /// <summary>
+        /// Save editor code and report designer to rep4 zip archive
+        /// </summary>
+        public ReactiveCommand<object> SaveReportCommand { get; set; }
+
+        /// <summary>
         /// Gets or sets text editor document
         /// </summary>
         public TextDocument Document { get; set; }
@@ -100,7 +111,12 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Gets or sets current edited file path
         /// </summary>
-        public string FilePath { get; set; }
+        public string CodeFilePath { get; set; }
+
+        /// <summary>
+        /// Gets or sets current archive zip file path that contains resx report designer file and datasource c# file
+        /// </summary>
+        public string ZipFilePath { get; set; }
 
         /// <summary>
         /// Backing field for <see cref="Errors" />
@@ -180,6 +196,13 @@ namespace CDP4Reporting.ViewModels
             this.BuildScriptCommand.Subscribe(_ => this.BuildScript());
 
             this.AutomaticBuildCommand = ReactiveCommand.CreateAsyncTask(_ => this.AutomaticBuildScript(), RxApp.MainThreadScheduler);
+
+            this.OpenReportCommand = ReactiveCommand.Create();
+            this.OpenReportCommand.Subscribe(_ => this.OpenReport());
+
+            this.SaveReportCommand = ReactiveCommand.Create();
+            this.SaveReportCommand.Subscribe(_ => this.SaveReport());
+
         }
 
         /// <summary>
@@ -187,7 +210,7 @@ namespace CDP4Reporting.ViewModels
         /// </summary>
         private void SaveScript()
         {
-            if (string.IsNullOrEmpty(this.FilePath))
+            if (string.IsNullOrEmpty(this.CodeFilePath))
             {
                 var filePath = this.openSaveFileDialogService.GetSaveFileDialog("MassBudgetDataSource", "cs", "CS(.cs) | *.cs", string.Empty, 1);
 
@@ -196,11 +219,11 @@ namespace CDP4Reporting.ViewModels
                     return;
                 }
 
-                this.FilePath = filePath;
+                this.CodeFilePath = filePath;
             }
-            if (!string.IsNullOrEmpty(this.FilePath))
+            if (!string.IsNullOrEmpty(this.CodeFilePath))
             {
-                System.IO.File.WriteAllText(this.FilePath, this.Document.Text);
+                System.IO.File.WriteAllText(this.CodeFilePath, this.Document.Text);
             }
         }
 
@@ -209,16 +232,16 @@ namespace CDP4Reporting.ViewModels
         /// </summary>
         private void OpenScript()
         {
-            var filePath = this.openSaveFileDialogService.GetOpenFileDialog(true, true, false, "CS(.cs) | *.cs", ".cs", string.Empty, 1);
+            var filePath = this.openSaveFileDialogService.GetOpenFileDialog(true, true, false, "CS(.cs)|*.cs", ".cs", string.Empty, 1);
 
             if (filePath == null || filePath.Length != 1)
             {
                 return;
             }
 
-            this.FilePath = filePath.Single();
+            this.CodeFilePath = filePath.Single();
 
-            this.Document.Text = System.IO.File.ReadAllText(this.FilePath);
+            this.Document.Text = System.IO.File.ReadAllText(this.CodeFilePath);
             this.IsDirty = true;
         }
 
@@ -236,6 +259,46 @@ namespace CDP4Reporting.ViewModels
         public async Task AutomaticBuildScript()
         {
             await Task.Run(this.CompileAssembly);
+        }
+
+        /// <summary>
+        /// Trigger open report command
+        /// </summary>
+        private void OpenReport()
+        {
+            var filePath = this.openSaveFileDialogService.GetOpenFileDialog(true, true, false, "Report files (*.rep4)|*.rep4|All files (*.*)|*.*", ".rep4", string.Empty, 1);
+
+            if (filePath == null || filePath.Length != 1)
+            {
+                return;
+            }
+
+            this.ZipFilePath = filePath.Single();
+
+            CDPMessageBus.Current.SendMessage(new ReportDesignerEvent(this.ZipFilePath, ReportNotificationKind.REPORT_OPEN));
+        }
+
+        /// <summary>
+        /// Trigger save report command
+        /// </summary>
+        private void SaveReport()
+        {
+            if (string.IsNullOrEmpty(this.ZipFilePath))
+            {
+                this.Output += $"{DateTime.Now:HH:mm:ss} Report not found.{Environment.NewLine}";
+                return;
+            }
+
+            var filePath = this.openSaveFileDialogService.GetSaveFileDialog("ReportArchive", "rep4", "Report files (*.rep4)|*.rep4|All files (*.*)|*.*", string.Empty, 1);
+
+            if (filePath == null)
+            {
+                return;
+            }
+
+            this.ZipFilePath = filePath;
+
+            CDPMessageBus.Current.SendMessage(new ReportDesignerEvent(this.ZipFilePath, ReportNotificationKind.REPORT_SAVE));
         }
 
         /// <summary>
@@ -279,7 +342,7 @@ namespace CDP4Reporting.ViewModels
                     return;
                 }
 
-                var sbErrors = new StringBuilder($"{DateTime.Now:HH:mm:ss} Compilation Errors");
+                var sbErrors = new StringBuilder($"{DateTime.Now:HH:mm:ss} Compilation Errors.");
 
                 foreach (var error in this.BuildResult.Errors)
                 {
