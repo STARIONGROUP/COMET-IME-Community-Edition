@@ -74,9 +74,31 @@
                             <localBehaviour:ReportDesignerBehaviour RibbonMergeCategoryName="ReportingCategory" />
                         </dxmvvm:Interaction.Behaviors>
                         <dxrud:ReportDesigner.RibbonCustomizationActions>
+                            <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.Open}" />
+                            <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.New}" />
+                            <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.Save}" />
+                            <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.SaveAs}" />
                             <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.AddCalculatedFields}" />
                             <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.AddNewDataSource}" />
                             <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.AddParameter}" />
+                            <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.ReportGroup}">
+                                <dxb:InsertAction.Element>
+                                    <dxb:BarButtonItem
+                                        Command="{Binding Path=OpenReportCommand}"
+                                        LargeGlyph="{dx:DXImage Image=Open_32x32.png}"
+                                        Content="Open Report"
+                                        Hint="Open Report" />
+                                </dxb:InsertAction.Element>
+                            </dxb:InsertAction>
+                            <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.ReportGroup}">
+                                <dxb:InsertAction.Element>
+                                    <dxb:BarButtonItem
+                                        Command="{Binding Path=SaveReportCommand}"
+                                        LargeGlyph="{dx:DXImage Image=Save_32x32.png}"
+                                        Content="Save Report"
+                                        Hint="Save Report" />
+                                </dxb:InsertAction.Element>
+                            </dxb:InsertAction>
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarButtonItem
@@ -125,10 +147,7 @@
                                         Hint="Rebuild Schema" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
-                            <dxb:UpdateAction
-                                ElementName="{x:Static dxrud:DefaultBarItemNames.DesignerHomePage}"
-                                PropertyName="Caption"
-                                Value="File" />
+                            <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.DesignerHomePage}" PropertyName="Caption" Value="File" />
                             <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.Open}" IsEnabled="True" />
                             <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.StylesGroup}" />
                         </dxrud:ReportDesigner.RibbonCustomizationActions>
