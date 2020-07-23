@@ -34,12 +34,11 @@ namespace CDP4Reporting.Views
 
     using CDP4Composition;
     using CDP4Composition.Attributes;
-
+    using CDP4Composition.Reporting;
     using CDP4Reporting.ViewModels;
 
     using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Bars;
-    using DevExpress.Xpf.Reports.UserDesigner;
     using DevExpress.XtraReports.Security;
 
     /// <summary>
@@ -127,14 +126,6 @@ namespace CDP4Reporting.Views
             }, this.cancellationToken);
         }
 
-        // TODO #480
-        ///// <summary>
-        ///// Dummy class for report row respresentation
-        ///// </summary>
-        //private class RowRepresentation : ReportingDataSourceRowRepresentation
-        //{
-        //}
-
         /// <summary>
         /// Trigger active document changed event, when a new report was loaded
         /// </summary>
@@ -147,17 +138,8 @@ namespace CDP4Reporting.Views
                 return;
             }
 
-            var localReport = ((ReportDesignerDocument)e.NewValue).Report;
             var viewModel = this.DataContext as ReportDesignerViewModel;
 
-            // Remove previous data sources attached
-            foreach (var component in localReport.ComponentStorage.OfType<ObjectDataSource>().ToList())
-            {
-                localReport.ComponentStorage.Remove(component);
-                localReport.Container?.Remove(component);
-            }
-
-            // Set new datasource
             if (viewModel != null && (viewModel.Thing == null || viewModel.BuildResult == null))
             {
                 return;
@@ -168,19 +150,7 @@ namespace CDP4Reporting.Views
                 return;
             }
 
-            // TODO #480
-            //var editorFullClassName = "CDP4Reporting.MassBudgetDataSource";
-            //var dataSourceName = "MassBudgetDataSource";
-
-            //var inst = viewModel.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName) as IReportingDataSource<RowRepresentation>;
-
-            //var dataSource = new ObjectDataSource
-            //{
-            //    DataSource = inst?.CreateDataSource(viewModel.Thing),
-            //    Name = dataSourceName
-            //};
-
-            //this.reportDesigner.ActiveDocument.Report.DataSource = dataSource;
+            SetDataSource();
         }
 
         /// <summary>
@@ -200,6 +170,64 @@ namespace CDP4Reporting.Views
                     ((ReportDesignerViewModel) this.DataContext).Output = string.Empty;
                     break;
             }
+        }
+
+        /// <summary>
+        /// Set report datasource
+        /// </summary>
+        private void SetDataSource()
+        {
+            if (this.reportDesigner.ActiveDocument == null)
+            {
+                (this.DataContext as ReportDesignerViewModel).Output += $"{DateTime.Now:HH:mm:ss} Report not found";
+                return;
+            }
+
+            var dataSourceName = "ReportBudgetDataSource";
+            var localReport = this.reportDesigner.ActiveDocument.Report;
+            var dataSource = localReport.ComponentStorage.OfType<ObjectDataSource>().ToList().FirstOrDefault(x => x.Name.Equals(dataSourceName));
+
+            if (dataSource == null)
+            {
+                // Create new datasource
+                dataSource = new ObjectDataSource
+                {
+                    DataSource = this.GetDataSource(),
+                    Name = dataSourceName
+                };
+                localReport.ComponentStorage.Add(dataSource);
+                localReport.DataSource = dataSource;
+            }
+            else
+            {
+                // Use existing datasource
+                dataSource.DataSource = this.GetDataSource();
+            }
+
+            // Rebuild datasource schema always
+            dataSource.RebuildResultSchema();
+        }
+
+        /// <summary>
+        /// Get tabular data representation for the report
+        /// </summary>
+        /// <returns></returns>
+        private object GetDataSource()
+        {
+            var viewModel = this.DataContext as ReportDesignerViewModel;
+
+            var editorFullClassName = viewModel.BuildResult.CompiledAssembly.GetTypes().FirstOrDefault(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IReportingDataSource<>))).FullName;
+            var instObj = viewModel.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName);
+
+            if (instObj == null)
+            {
+                viewModel.Output += $"{DateTime.Now:HH:mm:ss} Data source class not found";
+                return null;
+            }
+
+            var dsObj = instObj.GetType().GetMethod("CreateDataSource").Invoke(instObj, new object[] { viewModel.Thing });
+
+            return dsObj?.GetType().GetMethod("GetTabularRepresentation").Invoke(dsObj, new object[] { });
         }
     }
 }
