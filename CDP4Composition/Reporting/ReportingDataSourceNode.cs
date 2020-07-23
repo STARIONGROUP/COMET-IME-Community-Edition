@@ -83,19 +83,19 @@ namespace CDP4Composition.Reporting
             this.ElementBase as ElementUsage;
 
         /// <summary>
-        /// The fully qualified (to the tree root) name of this <see cref="elementBase"/>.
+        /// The fully qualified (to the tree root) name of this <see cref="ElementBase"/>.
         /// </summary>
         private string FullyQualifiedName => (this.parent != null)
             ? this.parent.FullyQualifiedName + "." + this.ElementUsage.ShortName
             : this.ElementDefinition.ShortName;
 
         /// <summary>
-        /// The filtering <see cref="Category"/> that must be matched on the current <see cref="elementBase"/>.
+        /// The filtering <see cref="Category"/> that must be matched on the current <see cref="ElementBase"/>.
         /// </summary>
         private readonly Category filterCategory;
 
         /// <summary>
-        /// Boolean flag indicating whether the current <see cref="elementBase"/> matches the <see cref="filterCategory"/>.
+        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
         /// </summary>
         private bool IsVisible =>
             this.ElementBase.Category.Contains(this.filterCategory);
