@@ -216,7 +216,9 @@ namespace CDP4Reporting.ViewModels
                 return;
             }
 
-            this.Document.Text = System.IO.File.ReadAllText(filePath.Single());
+            this.FilePath = filePath.Single();
+
+            this.Document.Text = System.IO.File.ReadAllText(this.FilePath);
             this.IsDirty = true;
         }
 
