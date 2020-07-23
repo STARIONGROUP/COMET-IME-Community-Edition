@@ -34,7 +34,7 @@ namespace CDP4Composition.Reporting
     /// <summary>
     /// Abstract base class from which all parameter columns for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
-    internal abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
+    public abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
         /// The associated <see cref="ParameterOrOverrideBase"/>.
