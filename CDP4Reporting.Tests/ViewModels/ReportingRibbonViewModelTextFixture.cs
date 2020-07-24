@@ -27,6 +27,7 @@ namespace CDP4Reporting.Tests.ViewModels
 {
     using System;
     using System.Collections.Concurrent;
+    using Microsoft.Practices.ServiceLocation;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
     using CDP4Common.CommonData;
@@ -49,6 +50,7 @@ namespace CDP4Reporting.Tests.ViewModels
     [TestFixture]
     public class ReportingRibbonViewModelTextFixture
     {
+        private Mock<IServiceLocator> serviceLocator;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -80,6 +82,9 @@ namespace CDP4Reporting.Tests.ViewModels
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
