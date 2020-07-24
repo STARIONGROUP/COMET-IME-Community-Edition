@@ -32,7 +32,7 @@ namespace CDP4Composition.Views
     public partial class PluginInstaller : Window
     {
         /// <summary>
-        /// Instanciate a new <see cref="MainWindow"/>
+        /// Instanciate a new <see cref="PluginInstaller"/>
         /// </summary>
         public PluginInstaller()
         {

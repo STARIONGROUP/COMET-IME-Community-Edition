@@ -26,11 +26,19 @@ namespace CDP4Composition.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.IO;
+    using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Windows.Threading;
 
     using CDP4Composition.Behaviors;
     using CDP4Composition.Modularity;
     using CDP4Composition.Views;
+
+    using DevExpress.XtraPrinting.Native;
 
     using ReactiveUI;
 
@@ -40,9 +48,38 @@ namespace CDP4Composition.ViewModels
     public class PluginInstallerViewModel : ReactiveObject, IPluginInstallerViewModel
     {
         /// <summary>
+        ///  Assert whether any plugin are selected
+        /// </summary>
+        private IObservable<bool> areThereAnyPluginSelected;
+
+        /// <summary>
+        /// Observable of the field <see cref="thereIsNoInstallationInProgress"/>
+        /// </summary>
+        private IObservable<bool> thereIsNoInstallationInProgressObservable;
+
+        /// <summary>
+        /// Backing field for the <see cref="ThereIsNoInstallationInProgress"/> property
+        /// </summary>
+        private bool thereIsNoInstallationInProgress = true;
+
+        /// <summary>
+        /// Gets or sets an assert whether ther is any installation in progress
+        /// </summary>
+        public bool ThereIsNoInstallationInProgress
+        {
+            get => this.thereIsNoInstallationInProgress;
+            set => this.RaiseAndSetIfChanged(ref this.thereIsNoInstallationInProgress, value);
+        }
+        
+        /// <summary>
         /// The attached Behavior
         /// </summary>
         public IPluginUpdateInstallerBehavior Behavior { get; set; }
+        
+        /// <summary>
+        /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 
+        /// </summary>
+        public CancellationTokenSource CancellationTokenSource { get; private set; }
 
         /// <summary>
         /// Gets the Command that will cancel the update operation if any and close the view
@@ -50,21 +87,31 @@ namespace CDP4Composition.ViewModels
         public ReactiveCommand<object> CancelCommand { get; private set; }
 
         /// <summary>
-        /// Gets a <see cref="ReactiveList{T}"/> of type <see cref="PluginRowViewModel"/> that holds the properties for <see cref="PluginRow"/>
+        /// Gets the Command that will install all plugin selected for installation
+        /// </summary>
+        public ReactiveCommand<object> InstallCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the Command to select/unselect all available updates
+        /// </summary>
+        public ReactiveCommand<object> SelectAllUpdateCheckBoxCommand { get; private set; }
+        
+        /// <summary>
+        /// Gets a <see cref="List{T}"/> of type <see cref="PluginRowViewModel"/> that holds the properties for <see cref="PluginRow"/>
         /// </summary>
         public List<PluginRowViewModel> AvailablePlugins { get; } = new List<PluginRowViewModel>();
 
         /// <summary>
-        /// Gets an <see cref="IEnumerable{T}"/> of type <code>(FileInfo pluginDownloadFullPath, Manifest theNewManifest)</code>
+        /// Gets an <see cref="IEnumerable{T}"/> of type <code>(FileInfo cdp4ckFile, Manifest manifest)</code>
         /// of the updatable plugins
         /// </summary>
-        public IEnumerable<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> UpdatablePlugins { get; }
+        public IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> UpdatablePlugins { get; }
 
         /// <summary>
         /// Instanciate a new <see cref="PluginInstallerViewModel"/>
         /// </summary>
         /// <param name="updatablePlugins"></param>
-        public PluginInstallerViewModel(IEnumerable<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> updatablePlugins)
+        public PluginInstallerViewModel(IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> updatablePlugins)
         {
             this.UpdatablePlugins = updatablePlugins;
             this.UpdateProperties();
@@ -77,12 +124,91 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         private void InitializeCommand()
         {
+            this.thereIsNoInstallationInProgressObservable = this.WhenAnyValue(x => x.thereIsNoInstallationInProgress);
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.CancelCommandExecute());
+
+            this.areThereAnyPluginSelected = this.AvailablePlugins.WhenAnyValue(p => p).SelectMany(p => p.Select(x => x.IsSelectedForInstallation));
+            this.areThereAnyPluginSelected.Subscribe(_ => System.Windows.MessageBox.Show("It's on fire"));
+
+            this.InstallCommand = ReactiveCommand.Create(this.thereIsNoInstallationInProgressObservable);
+            
+            var currentDispatcher = Dispatcher.CurrentDispatcher;
+            
+            this.InstallCommand.Subscribe(async _ => await this.InstallCommandExecute().ContinueWith(
+                t =>
+                { 
+                    if (!t.IsCanceled && !t.IsFaulted)
+                    {
+                        currentDispatcher.InvokeAsync(this.Behavior.Close, DispatcherPriority.Background);
+                    }
+                }));
+
+            this.SelectAllUpdateCheckBoxCommand = ReactiveCommand.Create(this.thereIsNoInstallationInProgressObservable);
+            this.SelectAllUpdateCheckBoxCommand.Subscribe(_ => this.SelectDeselectAllPluginCommandExecute());
         }
 
+        /// <summary>
+        /// Execute the Install command that will run the installation of the plugins
+        /// </summary>
+        /// <returns>A new <see cref="Task"/></returns>
+        private async Task InstallCommandExecute()
+        {
+            try
+            {
+                this.ThereIsNoInstallationInProgress = false;
+
+                if (!this.AvailablePlugins.Any(p => p.IsSelectedForInstallation))
+                {
+                    return;
+                }
+
+                this.CancellationTokenSource = new CancellationTokenSource();
+                this.CancellationTokenSource.Token.Register(async () => await this.CancelInstallationsCommandExecute());
+
+                await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelectedForInstallation).Select(plugin => Task.Run(plugin.Install, this.CancellationTokenSource.Token)).ToArray());
+            }
+            catch (Exception exception)
+            {
+                if (!(exception is TaskCanceledException))
+                {
+                    this.CancellationTokenSource.Cancel();
+                }
+            }
+            finally
+            {
+                this.ThereIsNoInstallationInProgress = true;
+                this.CancellationTokenSource = null;
+            }
+        }
+        
+        /// <summary>
+        /// Execute the Install command that will run the installation of the plugins
+        /// </summary>
+        private async Task CancelInstallationsCommandExecute()
+        {
+            await Task.WhenAll(this.AvailablePlugins.Select(plugin => Task.Run(plugin.HandlingCancelation, this.CancellationTokenSource.Token)).ToArray());
+        }
+        
+        /// <summary>
+        /// Execute the SelectDeselectAllPluginCommand selecting or deselecting all plugin row
+        /// </summary>
+        private void SelectDeselectAllPluginCommandExecute()
+        {
+            var shouldAllBeSelected = !this.AvailablePlugins.All(p => p.IsSelectedForInstallation);
+            
+            foreach (var plugin in this.AvailablePlugins)
+            {
+                plugin.IsSelectedForInstallation = shouldAllBeSelected;
+            }
+        }
+
+        /// <summary>
+        /// Execute the cancel command
+        /// </summary>
         private void CancelCommandExecute()
         {
+            this.CancellationTokenSource?.Cancel();
             this.Behavior.Close();
         }
 
@@ -93,7 +219,8 @@ namespace CDP4Composition.ViewModels
         {
             foreach (var plugin in this.UpdatablePlugins)
             {
-                this.AvailablePlugins.Add(new PluginRowViewModel(plugin));
+                var pluginRow = new PluginRowViewModel(plugin);
+                this.AvailablePlugins.Add(pluginRow);
             }
         }
     }

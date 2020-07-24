@@ -25,6 +25,8 @@
 
 namespace CDP4Composition.Behaviors
 {
+    using System.Windows.Controls;
+
     public interface IPluginUpdateInstallerBehavior
     {
         /// <summary>

@@ -4,11 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CDP4Composition.Views"
+             xmlns:converters="clr-namespace:CDP4Composition.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:DoubleToVisibilityConverter x:Key="DoubleToVisibilityConverter"></converters:DoubleToVisibilityConverter>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="4*"></RowDefinition>
+            <RowDefinition Height="3*"></RowDefinition>
             <RowDefinition Height="3*"></RowDefinition>
             <RowDefinition Height="3*"></RowDefinition>
         </Grid.RowDefinitions>
@@ -17,11 +24,23 @@
             <ColumnDefinition Width="2*"></ColumnDefinition>
             <ColumnDefinition Width="0.5*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Label Content="{Binding Name}" Grid.Row="0" HorizontalAlignment="Left"></Label>
-        <Label Grid.Column="1" Content="{Binding Author}" Grid.Row="0" HorizontalAlignment="Right"></Label>
-        <Label Content="{Binding Description}" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center"></Label>
-        <Label Grid.Column="1" Content="{Binding Version}" Grid.Row="1" HorizontalAlignment="Right"></Label>
-        <ProgressBar Visibility="{Binding Progress}" Grid.Column="0" Value="{Binding Progress}" Grid.ColumnSpan="2" Margin="5" Grid.Row="2"></ProgressBar>
-        <CheckBox Grid.Column="2" Grid.RowSpan="3" Margin="5" Grid.Row="0" VerticalContentAlignment="Center" IsChecked="{Binding IsMarkedForInstallation}"></CheckBox>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
+            <Label Content="{Binding Name}" VerticalContentAlignment="Bottom" FontSize="20" HorizontalAlignment="Left"></Label>
+            <Label Content="{Binding Version}" Margin="10,0,0,0" VerticalContentAlignment="Bottom" FontSize="14" HorizontalAlignment="Right"></Label>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
+            <Image Margin="3" VerticalAlignment="Center" Source="../Resources/Images/rhea.png" Height="18"></Image>
+            <Label VerticalAlignment="Center" Content="{Binding Author}" HorizontalAlignment="Right"></Label>
+        </StackPanel>
+        <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom">
+            <Hyperlink TextDecorations="Underline" Cursor="Hand" x:Name="LinkToStore" NavigateUri="{Binding Website}" Command="{Binding WebsiteCommand}">
+                <Run Text="{Binding Website}" />
+            </Hyperlink>
+        </TextBlock>
+        <Label Content="{Binding Description}" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left"></Label>
+        <Label Content="{Binding ReleaseNote}" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left"></Label>
+        <ProgressBar Minimum="0" Maximum="100" Height="25" Visibility="{Binding InstallationProgress, Converter={StaticResource DoubleToVisibilityConverter}}" Grid.Column="0" Value="{Binding InstallationProgress}" Grid.ColumnSpan="2" Margin="5" Grid.Row="3"></ProgressBar>
+        <CheckBox Grid.Column="2" Grid.RowSpan="4" Margin="5" Grid.Row="0" VerticalContentAlignment="Center" IsChecked="{Binding IsSelectedForInstall}"></CheckBox>
     </Grid>
 </UserControl>

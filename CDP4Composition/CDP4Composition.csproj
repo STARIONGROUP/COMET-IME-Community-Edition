@@ -141,6 +141,7 @@
     <Resource Include="Resources\Images\Log\Error_16x16.png" />
     <Resource Include="Resources\Images\Log\Info_16x16.png" />
     <Resource Include="Resources\Images\Log\Warning_16x16.png" />
+    <Resource Include="Resources\Images\rhea.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\Thing\naturallanguage.png" />
@@ -274,6 +275,7 @@
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Resources\Images\rhea.png" />
     <None Remove="Views\PluginInstaller.xaml" />
     <None Remove="Views\PluginRow.xaml" />
   </ItemGroup>

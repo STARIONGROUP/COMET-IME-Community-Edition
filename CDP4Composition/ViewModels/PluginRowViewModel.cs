@@ -25,11 +25,22 @@
 
 namespace CDP4Composition.ViewModels
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
+    using System.IO.Compression;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
     using CDP4Composition.Views;
+
+    using DevExpress.CodeParser.Diagnostics;
+
+    using Microsoft.Practices.ServiceLocation;
+
+    using NLog;
 
     using ReactiveUI;
 
@@ -38,6 +49,8 @@ namespace CDP4Composition.ViewModels
     /// </summary>
     public class PluginRowViewModel : ReactiveObject
     {
+        private Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Backing field for the property <see cref="Name"/>
         /// </summary>
@@ -64,6 +77,20 @@ namespace CDP4Composition.ViewModels
         {
             get => this.version;
             set => this.RaiseAndSetIfChanged(ref this.version, value);
+        }
+
+        /// <summary>
+        /// Backing field for the property <see cref="Website"/>
+        /// </summary>
+        private string website;
+
+        /// <summary>
+        /// Gets or Sets the <see cref="website"/> name of the represented object
+        /// </summary>
+        public string Website
+        {
+            get => this.website;
+            set => this.RaiseAndSetIfChanged(ref this.website, value);
         }
 
         /// <summary>
@@ -95,6 +122,20 @@ namespace CDP4Composition.ViewModels
         }
 
         /// <summary>
+        /// Backing field for the property <see cref="ReleaseNote"/>
+        /// </summary>
+        private string releaseNote;
+
+        /// <summary>
+        /// Gets or Sets the <see cref="author"/> name of the represented object
+        /// </summary>
+        public string ReleaseNote
+        {
+            get => this.releaseNote;
+            set => this.RaiseAndSetIfChanged(ref this.releaseNote, value);
+        }
+
+        /// <summary>
         /// Backing field for the property <see cref="InstallationProgress"/>
         /// </summary>
         private double installationProgress;
@@ -109,30 +150,46 @@ namespace CDP4Composition.ViewModels
         }
 
         /// <summary>
+        /// Backing field for the property <see cref="IsSelectedForInstallation"/>
+        /// </summary>
+        private bool isSelectedForInstallation;
+
+        /// <summary>
+        /// Gets or sets the assert <see cref="isSelectedForInstallation"/> whether the represented plugin will be installed
+        /// </summary>
+        public bool IsSelectedForInstallation
+        {
+            get => this.isSelectedForInstallation;
+            set => this.RaiseAndSetIfChanged(ref this.isSelectedForInstallation, value);
+        }
+
+        public ReactiveCommand<object> WebsiteCommand { get; private set; }
+
+        /// <summary>
         /// Gets or sets the path were the cdp4ck to be installed sits 
         /// </summary>
-        public string UpdatePath { get; set; }
+        public FileInfo UpdateCdp4CkFileInfo { get; set; }
 
         /// <summary>
         /// Gets or sets the path where the old version of the plugin will be temporaly kept in case anything goes wrong with the installation
         /// </summary>
-        public string TemporaryPath { get; set; }
+        public DirectoryInfo TemporaryPath { get; set; }
 
         /// <summary>
         /// Gets or sets the path where the updated plugin should be installed
         /// </summary>
-        public string InstallationPath { get; set; }
+        public DirectoryInfo InstallationPath { get; set; }
         
         /// <summary>
         /// Gets the plugin download path and the new manifest
         /// </summary>
-        public (FileInfo pluginDownloadFullPath, Manifest theNewManifest) Plugin { get; private set; }
+        public (FileInfo cdp4ckFile, Manifest manifest) Plugin { get; private set; }
 
         /// <summary>
         /// Instanciate a new <see cref="PluginRowViewModel"/>
         /// </summary>
         /// <param name="plugin"></param>
-        public PluginRowViewModel((FileInfo pluginDownloadFullPath, Manifest theNewManifest) plugin)
+        public PluginRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin)
         {
             this.Plugin = plugin;
             this.UpdateProperties();
@@ -143,19 +200,104 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.Name = this.Plugin.theNewManifest.Name;
-            this.Description = this.Plugin.theNewManifest.Description;
-            this.Version = this.Plugin.theNewManifest.Version;
-            this.Author = this.Plugin.theNewManifest.Author;
+            this.UpdateCdp4CkFileInfo = this.Plugin.cdp4ckFile;
+            this.InstallationPath = PluginUtilities.GetPluginDirectory(this.Plugin.manifest.Name);
+            this.TemporaryPath = PluginUtilities.GetTempDirectoryInfo(this.Plugin.manifest.Name);
+
+            this.WebsiteCommand = ReactiveCommand.Create();
+            this.WebsiteCommand.Subscribe(_ => Process.Start(new ProcessStartInfo(this.Website)));
+
+            this.Name = this.Plugin.manifest.Name;
+            this.Description = this.Plugin.manifest.Description;
+            this.Version = $"version {this.Plugin.manifest.Version}";
+            this.Author = this.Plugin.manifest.Author;
+            this.Website = this.Plugin.manifest.Website;
+            this.ReleaseNote = this.Plugin.manifest.ReleaseNote;
         }
 
         /// <summary>
         /// Make the installation of the new Plugin
         /// </summary>
-        public async Task Install()
+        public void Install()
         {
-            this.installationProgress = 12;
-            await Task.Run(() => { Task.Delay(1200);});
+            try
+            {
+                var existingFiles = this.InstallationPath.EnumerateFiles("*", SearchOption.AllDirectories).ToList();
+                
+                using var zip = ZipFile.OpenRead(this.UpdateCdp4CkFileInfo.FullName);
+                var stepping = 100 / ((existingFiles.Count() * 2) + zip.Entries.Count + 2);
+
+                this.MoveExistingFiles(existingFiles, stepping);
+                
+                //Install the new version
+                foreach (var zipArchiveEntry in zip.Entries)
+                {
+                    zipArchiveEntry.ExtractToFile(Path.Combine(this.InstallationPath.FullName, zipArchiveEntry.FullName));
+                    this.InstallationProgress += stepping;
+                }
+                
+                zip.Dispose();
+
+                //Cleanup
+                foreach (var oldFile in this.TemporaryPath.EnumerateFiles("*", SearchOption.AllDirectories))
+                {
+                    File.Delete(Path.Combine(this.TemporaryPath.FullName, oldFile.Name));
+                    this.InstallationProgress += stepping;
+                }
+
+                Directory.Delete(this.TemporaryPath.FullName);
+                
+                //Cleanup the download file
+                if (this.UpdateCdp4CkFileInfo.Directory?.Exists == true)
+                {
+                    foreach (var oldFile in this.UpdateCdp4CkFileInfo.Directory.EnumerateFiles())
+                    {
+                        File.Delete(Path.Combine(this.UpdateCdp4CkFileInfo.Directory.FullName, oldFile.Name));
+                        this.InstallationProgress += stepping;
+                    }
+
+                    Directory.Delete(this.UpdateCdp4CkFileInfo.Directory.FullName);
+                }
+
+                this.InstallationProgress = 100;
+            }
+            catch (Exception exception)
+            {
+                this.logger.Error($"An exception occured: {exception}");
+            }
+        }
+
+        /// <summary>
+        /// Move the old version to a temporary folder
+        /// </summary>
+        /// <param name="fileInfos">An <see cref="IEnumerable{T}"/> of <see cref="FileInfo"/></param>
+        /// <param name="stepping">the progress stepping</param>
+        private void MoveExistingFiles(IEnumerable<FileInfo> fileInfos, int stepping)
+        {
+            foreach (var oldFile in fileInfos)
+            {
+                File.Move(oldFile.FullName, Path.Combine(this.TemporaryPath.FullName, oldFile.Name));
+                this.InstallationProgress += stepping;
+            }
+        }
+
+        /// <summary>
+        /// Called when the install gets canceled
+        /// </summary>
+        public void HandlingCancelation()
+        {
+            try
+            {
+                foreach (var oldFile in this.TemporaryPath.EnumerateFiles("*", SearchOption.AllDirectories))
+                {
+                    File.Move(Path.Combine(this.TemporaryPath.FullName, oldFile.Name), this.InstallationPath.FullName);
+                    this.InstallationProgress = 0;
+                }
+            }
+            catch (Exception exception)
+            {
+                this.logger.Error($"An exception occured: {exception}");
+            }
         }
     }
 }

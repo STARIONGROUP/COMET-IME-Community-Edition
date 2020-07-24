@@ -54,6 +54,7 @@ namespace CDP4Composition.Tests.Modularity
 
         private string BuildFolder;
         private const string AppSettingsJson = "AppSettingsTest.json";
+        private const string PluginName = "CDP4ServicesDal";
 
         [SetUp]
         public void Setup()
@@ -111,6 +112,15 @@ namespace CDP4Composition.Tests.Modularity
             directoryInfo = PluginUtilities.PluginDirectoryExists(out specificPluginFolderExists);
             Assert.IsFalse(specificPluginFolderExists);
             Assert.AreEqual(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), directoryInfo.FullName);
+        }
+
+        [Test]
+        public void VerifyTemporaryDirectoryExists()
+        {
+            var directoryInfo = PluginUtilities.GetTempDirectoryInfo(PluginName);
+
+            Assert.IsNotNull(directoryInfo);
+            Assert.IsTrue(directoryInfo.Exists);
         }
     }
 }

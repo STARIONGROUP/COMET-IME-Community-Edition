@@ -7,18 +7,21 @@
 namespace CDP4IME
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Text;
-
     using System.Windows;
+
     using CDP4Composition;
     using CDP4Composition.Modularity;
 
     using DevExpress.Mvvm;
     using DevExpress.Xpf.Core;
+
     using ExceptionReporting;
+
     using NLog;
 
     /// <summary>
@@ -30,7 +33,7 @@ namespace CDP4IME
         /// A NLog logger
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        
+
         /// <summary>
         /// Called when the applications starts. Makes a distinction between debug and release mode
         /// </summary>
@@ -44,12 +47,13 @@ namespace CDP4IME
             AppliedTheme.ThemeName = Theme.SevenName;
             base.OnStartup(e);
 
-            _ = new PluginUpdateInstaller();
+            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+            UpdateInstaller.CheckAndInstall();
+
             DXSplashScreen.Show<Views.SplashScreenView>();
             DXSplashScreen.SetState("Starting CDP4");
-
-            //_ = new PluginUpdateInstaller();
-
+            
 #if (DEBUG)
             RunInDebugMode();
 #else
@@ -57,14 +61,12 @@ namespace CDP4IME
 #endif
             
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
-
+            
             DXSplashScreen.SetState("Preparing Main Window");
             
             Current.MainWindow.Show();
-
             DXSplashScreen.Close();
         }
-        
         /// <summary>
         /// Run the application in debug mode. Unhandled Exceptions are not caught.
         /// The application will crash

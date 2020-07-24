@@ -26,6 +26,13 @@
 
 namespace CDP4Composition.Behaviors
 {
+    using System;
+    using System.Collections.Specialized;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Windows.Documents;
+
     using CDP4Composition.ViewModels;
     using CDP4Composition.Views;
 
@@ -38,12 +45,41 @@ namespace CDP4Composition.Behaviors
     /// </summary>
     public class PluginUpdateInstallerBehavior : Behavior<PluginInstaller>, IPluginUpdateInstallerBehavior
     {
+        /// <summary>
+        /// Register event handlers
+        /// </summary>
         protected override void OnAttached()
         {
             base.OnAttached();
-            this.AssociatedObject.DataContextChanged += OnDataContextChanged;
+            this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
+            this.AssociatedObject.Closing += this.OnClosing;
+        }
+        
+        /// <summary>
+        /// Unregister event handlers
+        /// </summary>
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+            this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
+            this.AssociatedObject.Closing -= this.OnClosing;
         }
 
+        /// <summary>
+        /// Occurs when the user request the <see cref="PluginInstaller"/> view to close
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            (this.AssociatedObject.DataContext as IPluginInstallerViewModel)?.CancellationTokenSource?.Cancel();
+        }
+
+        /// <summary>
+        /// Fires whenever the Data contex changes
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the arguments <see cref="System.Windows.DependencyPropertyChangedEventArgs"/></param>
         private void OnDataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
             if (e.NewValue is IPluginInstallerViewModel viewModel)

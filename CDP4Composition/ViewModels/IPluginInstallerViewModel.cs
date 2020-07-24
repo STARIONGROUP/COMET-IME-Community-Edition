@@ -25,6 +25,8 @@
 
 namespace CDP4Composition.ViewModels
 {
+    using System.Threading;
+
     using CDP4Composition.Behaviors;
 
     public interface IPluginInstallerViewModel
@@ -33,5 +35,10 @@ namespace CDP4Composition.ViewModels
         /// The attached Behavior
         /// </summary>
         IPluginUpdateInstallerBehavior Behavior { get; set; }
+
+        /// <summary>
+        /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 
+        /// </summary>
+        CancellationTokenSource CancellationTokenSource { get; }
     }
 }

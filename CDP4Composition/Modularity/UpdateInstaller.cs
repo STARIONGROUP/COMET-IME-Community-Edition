@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginUpdateInstaller.cs" company="RHEA System S.A.">
+// <copyright file="UpdateInstaller.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -32,11 +32,14 @@ namespace CDP4Composition.Modularity
     using System.IO.Compression;
     using System.Linq;
     using System.Reflection;
+    using System.Windows;
 
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Utilities;
     using CDP4Composition.ViewModels;
     using CDP4Composition.Views;
+
+    using DevExpress.Xpf.Core;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -47,32 +50,37 @@ namespace CDP4Composition.Modularity
     using ReactiveUI;
 
     /// <summary>
-    /// The <see cref="PluginUpdateInstaller"/> is responsible to check all the CDP4 download folders and to install/update the availables user-selected plugins 
+    /// The <see cref="UpdateInstaller"/> is responsible to check all the CDP4 download folders and to install/update the availables user-selected plugins 
     /// </summary>
-    public class PluginUpdateInstaller
+    public class UpdateInstaller
     {
         /// <summary>
-        /// The NLog logger
+        /// Check for any update available and run the plugin installer
         /// </summary>
-        private Logger logger = LogManager.GetCurrentClassLogger();
-        
-        /// <summary>
-        /// Holds an <see cref="IEnumerable{T}"/> of type <code>(string pluginDownloadFullPath, Manifest theNewManifest, bool isImeCompatible)</code>
-        /// of the updatable plugins
-        /// </summary>
-        public IEnumerable<(FileInfo pluginDownloadFullPath, Manifest theNewManifest)> UpdatablePlugins { get; }
-
-        /// <summary>
-        /// Instantiate a new <see cref="PluginUpdateInstaller"/>
-        /// </summary>
-        public PluginUpdateInstaller()
+        public static void CheckAndInstall()
         {
-            this.UpdatablePlugins = PluginUtilities.GetDownloadedInstallablePluginUpdate().ToList();
+            var updatablePlugins = PluginUtilities.GetDownloadedInstallablePluginUpdate().ToList();
 
-            if (this.UpdatablePlugins.Any())
+            if (updatablePlugins.Any())
             {
-                new PluginInstaller() { DataContext = new PluginInstallerViewModel(this.UpdatablePlugins) }.ShowDialog();
+                new PluginInstaller() { DataContext = new PluginInstallerViewModel(updatablePlugins) }.ShowDialog();
             }
+        }
+
+        /// <summary>
+        /// Closes the IME and run MSI in order to install the new version
+        /// </summary>
+        private void UpdateIme()
+        {
+            var process = new Process();
+            process.StartInfo.FileName = "msiexec";
+            process.StartInfo.WorkingDirectory = Path.GetTempPath();
+            process.StartInfo.Arguments = $" /i \"{@"C:\Users\avandelft\source\repos\CDP4-IME-Community-Edition-2\CDP4IME\CDP4IME-CE.x86.msi"}\" ALLUSERS=1";
+            process.StartInfo.Verb = "runas";
+            process.Start();
+
+            DXSplashScreen.Close();
+            Application.Current.Shutdown();
         }
     }
 }
