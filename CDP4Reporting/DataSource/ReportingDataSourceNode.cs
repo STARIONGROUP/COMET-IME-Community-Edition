@@ -303,5 +303,39 @@ namespace CDP4Reporting.DataSource
 
             row[this.filterCategory.ShortName] = this.ElementBase.Name;
         }
+
+        /// <summary>
+        /// Gets the tabular representation of this node.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ReportingDataSourceRow"/>.
+        /// </returns>
+        private T GetRowRepresentation()
+        {
+            var row = new T
+            {
+                ElementBase = this.ElementBase,
+                ElementName = this.FullyQualifiedName,
+                IsVisible = this.IsVisible
+            };
+
+            if (!this.IsVisible)
+            {
+                return row;
+            }
+
+            foreach (var rowField in RowFields)
+            {
+                var column = rowField.Key
+                    .GetConstructor(Type.EmptyTypes)
+                    .Invoke(new object[] { }) as ReportingDataSourceColumn<T>;
+
+                column.Initialize(this);
+
+                rowField.Value.SetValue(row, column);
+            }
+
+            return row;
+        }
     }
 }
