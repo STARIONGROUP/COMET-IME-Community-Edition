@@ -316,16 +316,16 @@ namespace CDP4Reporting.Views
                 File.Delete(reportArchiveFile);
             }
 
-            var memoryStream = new MemoryStream();
-            this.reportDesigner.ActiveDocument.Report.SaveLayoutToXml(memoryStream);
+            var reportStream = new MemoryStream();
+            this.reportDesigner.ActiveDocument.Report.SaveLayoutToXml(reportStream);
             var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(this.textEditor.Text));
 
             using (var zipFile = ZipFile.Open(reportArchiveFile, ZipArchiveMode.Create))
             {
                 using (var reportEntry = zipFile.CreateEntry("Report.repx").Open())
                 {
-                    memoryStream.Position = 0;
-                    memoryStream.CopyTo(reportEntry);
+                    reportStream.Position = 0;
+                    reportStream.CopyTo(reportEntry);
                 }
 
                 using (var reportEntry = zipFile.CreateEntry("Datasource.cs").Open())
