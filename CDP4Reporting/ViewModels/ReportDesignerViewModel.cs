@@ -214,7 +214,7 @@ namespace CDP4Reporting.ViewModels
             {
                 var filePath = this.openSaveFileDialogService.GetSaveFileDialog("MassBudgetDataSource", "cs", "CS(.cs) | *.cs", string.Empty, 1);
 
-                if (filePath == null)
+                if (string.IsNullOrEmpty(filePath))
                 {
                     return;
                 }
@@ -291,7 +291,7 @@ namespace CDP4Reporting.ViewModels
 
             var filePath = this.openSaveFileDialogService.GetSaveFileDialog("ReportArchive", "rep4", "Report files (*.rep4)|*.rep4|All files (*.*)|*.*", string.Empty, 1);
 
-            if (filePath == null)
+            if (string.IsNullOrEmpty(filePath))
             {
                 return;
             }
