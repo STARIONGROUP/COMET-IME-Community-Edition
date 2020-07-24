@@ -48,6 +48,7 @@ namespace CDP4Reporting.Tests.ViewModels
     using System.IO;
     using System.Text;
     using System.IO.Compression;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Suite of tests for the <see cref="ReportDesignerViewModel"/> class
@@ -55,8 +56,8 @@ namespace CDP4Reporting.Tests.ViewModels
     [TestFixture, Apartment(ApartmentState.STA)]
     public class ReportDesignerViewModelTextFixture
     {
-        private string filePathOpen = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDataSourceOpen.cs");
-        private string filePathSave = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDataSourceSave.cs");
+        private string dsPathOpen = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDataSourceOpen.cs");
+        private string dsPathSave = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDataSourceSave.cs");
 
         private string zipPathOpen = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportArchiveOpen.rep4");
         private string zipPathSave = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportArchiveSave.rep4");
@@ -139,13 +140,13 @@ namespace CDP4Reporting.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            if (System.IO.File.Exists(filePathOpen))
+            if (System.IO.File.Exists(dsPathOpen))
             {
-                System.IO.File.Delete(filePathOpen);
+                System.IO.File.Delete(dsPathOpen);
             }
-            if (System.IO.File.Exists(filePathSave))
+            if (System.IO.File.Exists(dsPathSave))
             {
-                System.IO.File.Delete(filePathSave);
+                System.IO.File.Delete(dsPathSave);
             }
             if (System.IO.File.Exists(zipPathOpen))
             {
@@ -164,15 +165,17 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveScriptCommand.Execute(null));
+            Assert.AreEqual(this.reportDesignerViewModel.Object.CodeFilePath, null);
 
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveReportCommand.Execute(null));
+            Assert.AreEqual(this.reportDesignerViewModel.Object.ZipFilePath, null);
         }
 
         [Test]
-        public void VerifyThatSaveCommandWorksBySavingFile()
+        public async Task VerifyThatSaveCommandWorksBySavingFile()
         {
-            System.IO.File.WriteAllText(this.filePathSave, DATASOURCE_CODE);
+            System.IO.File.WriteAllText(this.dsPathSave, DATASOURCE_CODE);
 
             var reportStream = new MemoryStream(Encoding.ASCII.GetBytes(REPORT_CODE));
             var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(DATASOURCE_CODE));
@@ -191,28 +194,32 @@ namespace CDP4Reporting.Tests.ViewModels
                     dataSourceStream.CopyTo(reportEntry);
                 }
             }
+            await Task.Run(() =>
+            {
+                this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.dsPathSave);
+                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveScriptCommand.Execute(null));
 
-            this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.filePathSave);
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveScriptCommand.Execute(null));
-
-            this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.zipPathSave);
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveReportCommand.Execute(null));
+                this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.zipPathSave);
+                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveReportCommand.Execute(null));
+            });
         }
 
         [Test]
         public void VerifyThatOpenCommandWorksWithoutOpeningFile()
         {
-            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.filePathOpen });
+            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { });
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenScriptCommand.Execute(null));
+            Assert.AreEqual(this.reportDesignerViewModel.Object.CodeFilePath, null);
 
-            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
+            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { });
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
+            Assert.AreEqual(this.reportDesignerViewModel.Object.ZipFilePath, null);
         }
 
         [Test]
-        public void VerifyThatOpenCommandWorksByOpeningFile()
+        public async Task VerifyThatOpenCommandWorksByOpeningFile()
         {
-            System.IO.File.WriteAllText(this.filePathOpen, DATASOURCE_CODE);
+            System.IO.File.WriteAllText(this.dsPathOpen, DATASOURCE_CODE);
 
             var reportStream = new MemoryStream(Encoding.ASCII.GetBytes(REPORT_CODE));
             var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(DATASOURCE_CODE));
@@ -231,13 +238,15 @@ namespace CDP4Reporting.Tests.ViewModels
                     dataSourceStream.CopyTo(reportEntry);
                 }
             }
-            System.IO.File.Copy(this.zipPathOpen, this.zipPathSave);
+            await Task.Run(() =>
+            {
+                this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.dsPathOpen });
+                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenScriptCommand.Execute(null));
 
-            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.filePathOpen });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenScriptCommand.Execute(null));
+                this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
+                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
+            });
 
-            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
         }
 
         [Test]
