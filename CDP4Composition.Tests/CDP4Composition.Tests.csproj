@@ -125,4 +125,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\RibbonXml\testribbon.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="ViewModels\PluginMockData\CDP4BasicRdl.cdp4ck">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ViewModels\PluginMockData\CDP4BasicRdl.plugin.manifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

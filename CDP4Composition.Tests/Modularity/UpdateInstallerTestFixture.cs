@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UpdateInstaller.cs" company="RHEA System S.A.">
+// <copyright file="UpdateInstallerTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,48 +23,30 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Modularity
+
+namespace CDP4Composition.Tests.Modularity
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.IO.Compression;
-    using System.Linq;
-    using System.Reflection;
-    using System.Windows;
+    using System.Threading;
 
-    using CDP4Composition.PluginSettingService;
-    using CDP4Composition.Utilities;
-    using CDP4Composition.ViewModels;
-    using CDP4Composition.Views;
+    using CDP4Composition.Modularity;
 
-    using DevExpress.Xpf.Core;
+    using NLog.Config;
 
-    using Microsoft.Practices.ServiceLocation;
+    using NUnit.Framework;
 
-    using Newtonsoft.Json;
-
-    using NLog;
-
-    using ReactiveUI;
-
-    /// <summary>
-    /// The <see cref="UpdateInstaller"/> is responsible to check all the CDP4 download folders and to install/update the availables user-selected plugins 
-    /// </summary>
-    public class UpdateInstaller
+    [TestFixture]
+    public class UpdateInstallerTestFixture
     {
-        /// <summary>
-        /// Check for any update available and run the plugin installer
-        /// </summary>
-        public static void CheckAndInstall()
+        [SetUp]
+        public void Setup()
         {
-            var updatablePlugins = PluginUtilities.GetDownloadedInstallablePluginUpdate().ToList();
+        }
 
-            if (updatablePlugins.Any())
-            {
-                new PluginInstaller() { DataContext = new PluginInstallerViewModel(updatablePlugins) }.ShowDialog();
-            }
+        [Test]
+        public void Verify()
+        {
+            Assert.Throws<InvalidOperationException>(UpdateInstaller.CheckAndInstall);
         }
     }
 }

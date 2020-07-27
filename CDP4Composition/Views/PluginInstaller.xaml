@@ -34,7 +34,7 @@
         <ListView IsEnabled="{Binding ThereIsNoInstallationInProgress}" HorizontalContentAlignment="Stretch" x:Name="AvailablePluginsContainer" SelectionMode="Multiple" Grid.Row="1" ItemsSource="{Binding AvailablePlugins}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
-                    <Setter Property="IsSelected" Value="{Binding IsMarkedForInstallation}"/>
+                    <Setter Property="IsSelected" Value="{Binding IsSelectedForInstallation}"/>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>

@@ -34,6 +34,7 @@ namespace CDP4Composition.ViewModels
     using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
+    using CDP4Composition.Services.PluginFileSystemService;
     using CDP4Composition.Views;
 
     using DevExpress.CodeParser.Diagnostics;
@@ -57,7 +58,7 @@ namespace CDP4Composition.ViewModels
         private string name;
 
         /// <summary>
-        /// Gets or Sets the <see cref="name"/> name of the represented object
+        /// Gets or Sets the <see cref="name"/> of the represented plugin
         /// </summary>
         public string Name
         {
@@ -71,7 +72,7 @@ namespace CDP4Composition.ViewModels
         private string version;
 
         /// <summary>
-        /// Gets or Sets the <see cref="name"/> name of the represented object
+        /// Gets or Sets the <see cref="version"/> of the represented plugin
         /// </summary>
         public string Version
         {
@@ -85,7 +86,7 @@ namespace CDP4Composition.ViewModels
         private string website;
 
         /// <summary>
-        /// Gets or Sets the <see cref="website"/> name of the represented object
+        /// Gets or Sets the <see cref="website"/> page link of the represented plugin
         /// </summary>
         public string Website
         {
@@ -99,7 +100,7 @@ namespace CDP4Composition.ViewModels
         private string description;
 
         /// <summary>
-        /// Gets or Sets the <see cref="description"/> name of the represented object
+        /// Gets or Sets the <see cref="description"/> of the represented plugin
         /// </summary>
         public string Description
         {
@@ -113,7 +114,7 @@ namespace CDP4Composition.ViewModels
         private string author;
 
         /// <summary>
-        /// Gets or Sets the <see cref="author"/> name of the represented object
+        /// Gets or Sets the <see cref="author"/> of the represented plugin
         /// </summary>
         public string Author
         {
@@ -127,7 +128,7 @@ namespace CDP4Composition.ViewModels
         private string releaseNote;
 
         /// <summary>
-        /// Gets or Sets the <see cref="author"/> name of the represented object
+        /// Gets or Sets the <see cref="author"/> of the represented plugin
         /// </summary>
         public string ReleaseNote
         {
@@ -141,7 +142,7 @@ namespace CDP4Composition.ViewModels
         private double installationProgress;
 
         /// <summary>
-        /// Gets or Sets the <see cref="installationProgress"/> name of the represented object
+        /// Gets or Sets the <see cref="installationProgress"/> of the represented plugin
         /// </summary>
         public double InstallationProgress
         {
@@ -153,7 +154,7 @@ namespace CDP4Composition.ViewModels
         /// Backing field for the property <see cref="IsSelectedForInstallation"/>
         /// </summary>
         private bool isSelectedForInstallation;
-
+        
         /// <summary>
         /// Gets or sets the assert <see cref="isSelectedForInstallation"/> whether the represented plugin will be installed
         /// </summary>
@@ -162,23 +163,16 @@ namespace CDP4Composition.ViewModels
             get => this.isSelectedForInstallation;
             set => this.RaiseAndSetIfChanged(ref this.isSelectedForInstallation, value);
         }
+        
+        /// <summary>
+        /// Gets the <see cref="IPluginFileSystemService"/> to operate on
+        /// </summary>
+        public IPluginFileSystemService FileSystem { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Command that open the plugin store web page relative to this represented plugin
+        /// </summary>
         public ReactiveCommand<object> WebsiteCommand { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the path were the cdp4ck to be installed sits 
-        /// </summary>
-        public FileInfo UpdateCdp4CkFileInfo { get; set; }
-
-        /// <summary>
-        /// Gets or sets the path where the old version of the plugin will be temporaly kept in case anything goes wrong with the installation
-        /// </summary>
-        public DirectoryInfo TemporaryPath { get; set; }
-
-        /// <summary>
-        /// Gets or sets the path where the updated plugin should be installed
-        /// </summary>
-        public DirectoryInfo InstallationPath { get; set; }
         
         /// <summary>
         /// Gets the plugin download path and the new manifest
@@ -188,11 +182,23 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// Instanciate a new <see cref="PluginRowViewModel"/>
         /// </summary>
-        /// <param name="plugin"></param>
-        public PluginRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin)
+        /// <param name="plugin">The represented plugin</param>
+        /// <param name="pluginFileSystemService">The file system to operate on</param>
+        public PluginRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin, IPluginFileSystemService pluginFileSystemService = null)
         {
             this.Plugin = plugin;
+            this.FileSystem = pluginFileSystemService ?? new PluginFileSystemService(plugin);
             this.UpdateProperties();
+            this.InitializeCommands();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="ReactiveCommand"/>
+        /// </summary>
+        private void InitializeCommands()
+        {
+            this.WebsiteCommand = ReactiveCommand.Create();
+            this.WebsiteCommand.Subscribe(_ => Process.Start(new ProcessStartInfo(this.Website)));
         }
 
         /// <summary>
@@ -200,13 +206,6 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.UpdateCdp4CkFileInfo = this.Plugin.cdp4ckFile;
-            this.InstallationPath = PluginUtilities.GetPluginDirectory(this.Plugin.manifest.Name);
-            this.TemporaryPath = PluginUtilities.GetTempDirectoryInfo(this.Plugin.manifest.Name);
-
-            this.WebsiteCommand = ReactiveCommand.Create();
-            this.WebsiteCommand.Subscribe(_ => Process.Start(new ProcessStartInfo(this.Website)));
-
             this.Name = this.Plugin.manifest.Name;
             this.Description = this.Plugin.manifest.Description;
             this.Version = $"version {this.Plugin.manifest.Version}";
@@ -222,62 +221,19 @@ namespace CDP4Composition.ViewModels
         {
             try
             {
-                var existingFiles = this.InstallationPath.EnumerateFiles("*", SearchOption.AllDirectories).ToList();
-                
-                using var zip = ZipFile.OpenRead(this.UpdateCdp4CkFileInfo.FullName);
-                var stepping = 100 / ((existingFiles.Count() * 2) + zip.Entries.Count + 2);
+                this.InstallationProgress += 33;
+                this.FileSystem.BackUpOldVersion();
 
-                this.MoveExistingFiles(existingFiles, stepping);
-                
-                //Install the new version
-                foreach (var zipArchiveEntry in zip.Entries)
-                {
-                    zipArchiveEntry.ExtractToFile(Path.Combine(this.InstallationPath.FullName, zipArchiveEntry.FullName));
-                    this.InstallationProgress += stepping;
-                }
-                
-                zip.Dispose();
+                this.InstallationProgress += 33;
+                this.FileSystem.InstallNewVersion();
 
-                //Cleanup
-                foreach (var oldFile in this.TemporaryPath.EnumerateFiles("*", SearchOption.AllDirectories))
-                {
-                    File.Delete(Path.Combine(this.TemporaryPath.FullName, oldFile.Name));
-                    this.InstallationProgress += stepping;
-                }
-
-                Directory.Delete(this.TemporaryPath.FullName);
-                
-                //Cleanup the download file
-                if (this.UpdateCdp4CkFileInfo.Directory?.Exists == true)
-                {
-                    foreach (var oldFile in this.UpdateCdp4CkFileInfo.Directory.EnumerateFiles())
-                    {
-                        File.Delete(Path.Combine(this.UpdateCdp4CkFileInfo.Directory.FullName, oldFile.Name));
-                        this.InstallationProgress += stepping;
-                    }
-
-                    Directory.Delete(this.UpdateCdp4CkFileInfo.Directory.FullName);
-                }
-
+                this.InstallationProgress += 33;
+                this.FileSystem.CleanUp();
                 this.InstallationProgress = 100;
             }
             catch (Exception exception)
             {
                 this.logger.Error($"An exception occured: {exception}");
-            }
-        }
-
-        /// <summary>
-        /// Move the old version to a temporary folder
-        /// </summary>
-        /// <param name="fileInfos">An <see cref="IEnumerable{T}"/> of <see cref="FileInfo"/></param>
-        /// <param name="stepping">the progress stepping</param>
-        private void MoveExistingFiles(IEnumerable<FileInfo> fileInfos, int stepping)
-        {
-            foreach (var oldFile in fileInfos)
-            {
-                File.Move(oldFile.FullName, Path.Combine(this.TemporaryPath.FullName, oldFile.Name));
-                this.InstallationProgress += stepping;
             }
         }
 
@@ -288,11 +244,9 @@ namespace CDP4Composition.ViewModels
         {
             try
             {
-                foreach (var oldFile in this.TemporaryPath.EnumerateFiles("*", SearchOption.AllDirectories))
-                {
-                    File.Move(Path.Combine(this.TemporaryPath.FullName, oldFile.Name), this.InstallationPath.FullName);
-                    this.InstallationProgress = 0;
-                }
+                this.FileSystem.Restore();
+
+                this.InstallationProgress = 0;
             }
             catch (Exception exception)
             {

@@ -93,7 +93,7 @@ namespace CDP4Composition.Behaviors
         /// </summary>
         public void Close()
         {
-            this.AssociatedObject.Close();
+            this.AssociatedObject?.Close();
         }
     }
 }

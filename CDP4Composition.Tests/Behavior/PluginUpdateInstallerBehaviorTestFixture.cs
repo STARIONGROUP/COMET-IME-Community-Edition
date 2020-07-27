@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UpdateInstaller.cs" company="RHEA System S.A.">
+// <copyright file="PluginUpdateInstallerBehaviorTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,48 +23,25 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Modularity
+namespace CDP4Composition.Tests.Behavior
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-    using System.IO.Compression;
-    using System.Linq;
-    using System.Reflection;
-    using System.Windows;
 
-    using CDP4Composition.PluginSettingService;
-    using CDP4Composition.Utilities;
+    using CDP4Composition.Behaviors;
+    using CDP4Composition.Modularity;
     using CDP4Composition.ViewModels;
     using CDP4Composition.Views;
 
-    using DevExpress.Xpf.Core;
+    using NUnit.Framework;
 
-    using Microsoft.Practices.ServiceLocation;
-
-    using Newtonsoft.Json;
-
-    using NLog;
-
-    using ReactiveUI;
-
-    /// <summary>
-    /// The <see cref="UpdateInstaller"/> is responsible to check all the CDP4 download folders and to install/update the availables user-selected plugins 
-    /// </summary>
-    public class UpdateInstaller
+    [TestFixture]
+    public class PluginUpdateInstallerBehaviorTestFixture
     {
-        /// <summary>
-        /// Check for any update available and run the plugin installer
-        /// </summary>
-        public static void CheckAndInstall()
+        [Test]
+        public void VerifyClose()
         {
-            var updatablePlugins = PluginUtilities.GetDownloadedInstallablePluginUpdate().ToList();
-
-            if (updatablePlugins.Any())
-            {
-                new PluginInstaller() { DataContext = new PluginInstallerViewModel(updatablePlugins) }.ShowDialog();
-            }
+            var behavior = new PluginUpdateInstallerBehavior();
+            behavior.Close();
         }
     }
 }

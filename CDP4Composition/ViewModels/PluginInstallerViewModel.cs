@@ -40,6 +40,8 @@ namespace CDP4Composition.ViewModels
 
     using DevExpress.XtraPrinting.Native;
 
+    using NLog;
+
     using ReactiveUI;
 
     /// <summary>
@@ -110,12 +112,11 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// Instanciate a new <see cref="PluginInstallerViewModel"/>
         /// </summary>
-        /// <param name="updatablePlugins"></param>
+        /// <param name="updatablePlugins">the <see cref="IEnumerable{T}"/> of updatable plugins</param>
         public PluginInstallerViewModel(IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> updatablePlugins)
         {
             this.UpdatablePlugins = updatablePlugins;
             this.UpdateProperties();
-
             this.InitializeCommand();
         }
         
@@ -135,7 +136,8 @@ namespace CDP4Composition.ViewModels
             
             var currentDispatcher = Dispatcher.CurrentDispatcher;
             
-            this.InstallCommand.Subscribe(async _ => await this.InstallCommandExecute().ContinueWith(
+            this.InstallCommand.Subscribe(
+                async _ => await this.InstallCommandExecute().ContinueWith(
                 t =>
                 { 
                     if (!t.IsCanceled && !t.IsFaulted)
@@ -174,6 +176,8 @@ namespace CDP4Composition.ViewModels
                 {
                     this.CancellationTokenSource.Cancel();
                 }
+
+                LogManager.GetCurrentClassLogger().Error($"{exception} has occured while trying to install new plugin versions");
             }
             finally
             {
@@ -187,7 +191,7 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         private async Task CancelInstallationsCommandExecute()
         {
-            await Task.WhenAll(this.AvailablePlugins.Select(plugin => Task.Run(plugin.HandlingCancelation, this.CancellationTokenSource.Token)).ToArray());
+            await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelectedForInstallation).Select(plugin => Task.Run(plugin.HandlingCancelation, this.CancellationTokenSource.Token)).ToArray());
         }
         
         /// <summary>
