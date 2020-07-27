@@ -74,7 +74,7 @@ namespace CDP4Composition.Reporting
 
             for (var hierarchy = categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
             {
-                table.Columns.Add(hierarchy.Category.Name, typeof(string));
+                table.Columns.Add(hierarchy.Category.ShortName, typeof(string));
             }
 
             foreach (var publicGetter in PublicGetters)
@@ -274,7 +274,7 @@ namespace CDP4Composition.Reporting
         {
             this.parent?.InitializeCategoryColumns(row);
 
-            row[this.filterCategory.Name] = this.ElementBase.Name;
+            row[this.filterCategory.ShortName] = this.ElementBase.Name;
         }
     }
 }
