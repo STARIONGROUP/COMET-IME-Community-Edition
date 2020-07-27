@@ -30,6 +30,7 @@ namespace CDP4Composition.Reporting
 
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using System.Reflection;
 
@@ -42,6 +43,9 @@ namespace CDP4Composition.Reporting
     /// </typeparam>
     internal class ReportingDataSourceNode<T> where T : ReportingDataSourceRow, new()
     {
+        internal static readonly IEnumerable<PropertyInfo> PublicGetters = typeof(T).GetProperties()
+            .Where(p => p.GetMethod?.IsPublic != null);
+
         /// <summary>
         /// A dictionary of all the <see cref="ReportingDataSourceColumn{T}"/>s declared
         /// as <see cref="ReportingDataSourceRow"/> fields.
@@ -215,6 +219,39 @@ namespace CDP4Composition.Reporting
             }
 
             return row;
+        }
+
+        internal void AddDataRows(DataTable table)
+        {
+            table.Rows.Add(this.GetDataRow(table));
+
+            foreach (var child in this.Children)
+            {
+                child.AddDataRows(table);
+            }
+        }
+
+        private DataRow GetDataRow(DataTable table)
+        {
+            var row = table.NewRow();
+
+            this.InitializeCategoryColumns(row);
+
+            foreach (var publicGetter in PublicGetters)
+            {
+                row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
+                    this.rowRepresentation,
+                    new object[] { });
+            }
+
+            return row;
+        }
+
+        private void InitializeCategoryColumns(DataRow row)
+        {
+            this.parent?.InitializeCategoryColumns(row);
+
+            row[this.filterCategory.Name] = this.ElementBase.Name;
         }
     }
 }
