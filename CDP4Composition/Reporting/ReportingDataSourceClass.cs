@@ -27,7 +27,6 @@ namespace CDP4Composition.Reporting
 {
     using CDP4Common.EngineeringModelData;
 
-    using System.Collections.Generic;
     using System.Data;
 
     /// <summary>
@@ -38,6 +37,9 @@ namespace CDP4Composition.Reporting
     /// </typeparam>
     public class ReportingDataSourceClass<T> where T : ReportingDataSourceRow, new()
     {
+        /// <summary>
+        /// The <see cref="CategoryHierarchy"/> used for filtering the considered <see cref="ElementBase"/> items.
+        /// </summary>
         private readonly CategoryHierarchy categoryHierarchy;
 
         /// <summary>
@@ -62,16 +64,11 @@ namespace CDP4Composition.Reporting
         }
 
         /// <summary>
-        /// Gets a tabular representation of the hierarhical tree upon which the data source is based.
+        /// Gets a <see cref="DataTable"/> representation of the hierarhical tree upon which the data source is based.
         /// </summary>
         /// <returns>
-        /// The tabular representation.
+        /// The <see cref="DataTable"/>.
         /// </returns>
-        public List<T> GetTabularRepresentation()
-        {
-            return this.topNode.GetTabularRepresentation();
-        }
-
         public DataTable GetTable()
         {
             var table = ReportingDataSourceNode<T>.GetTable(this.categoryHierarchy);
