@@ -43,9 +43,6 @@ namespace CDP4Composition.Reporting
     /// </typeparam>
     internal class ReportingDataSourceNode<T> where T : ReportingDataSourceRow, new()
     {
-        internal static readonly IEnumerable<PropertyInfo> PublicGetters = typeof(T).GetProperties()
-            .Where(p => p.GetMethod?.IsPublic != null);
-
         /// <summary>
         /// A dictionary of all the <see cref="ReportingDataSourceColumn{T}"/>s declared
         /// as <see cref="ReportingDataSourceRow"/> fields.
@@ -53,6 +50,26 @@ namespace CDP4Composition.Reporting
         private static readonly Dictionary<Type, FieldInfo> RowFields = typeof(T).GetFields()
             .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceColumn<T>)))
             .ToDictionary(f => f.FieldType, f => f);
+
+        private static readonly IEnumerable<PropertyInfo> PublicGetters = typeof(T).GetProperties()
+            .Where(p => p.GetMethod?.IsPublic == true);
+
+        internal static DataTable GetTable(CategoryHierarchy categoryHierarchy)
+        {
+            var table = new DataTable();
+
+            for (var hierarchy = categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
+            {
+                table.Columns.Add(hierarchy.Category.Name, typeof(string));
+            }
+
+            foreach (var publicGetter in PublicGetters)
+            {
+                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
+            }
+
+            return table;
+        }
 
         /// <summary>
         /// The <see cref="ReportingDataSourceRow"/> representation of the current node.
