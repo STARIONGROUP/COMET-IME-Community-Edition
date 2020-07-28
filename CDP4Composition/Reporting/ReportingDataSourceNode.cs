@@ -30,6 +30,7 @@ namespace CDP4Composition.Reporting
 
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using System.Reflection;
 
@@ -43,12 +44,46 @@ namespace CDP4Composition.Reporting
     internal class ReportingDataSourceNode<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
-        /// A dictionary of all the <see cref="ReportingDataSourceColumn{T}"/>s declared
-        /// as <see cref="ReportingDataSourceRow"/> fields.
+        /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="ReportingDataSourceColumn{T}"/>s
+        /// declared as <see cref="ReportingDataSourceRow"/> fields.
         /// </summary>
         private static readonly Dictionary<Type, FieldInfo> RowFields = typeof(T).GetFields()
             .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceColumn<T>)))
             .ToDictionary(f => f.FieldType, f => f);
+
+        /// <summary>
+        /// A <see cref="IEnumerable{T}"/> of all the public getters on the <see cref="ReportingDataSourceRow"/>
+        /// representation.
+        /// </summary>
+        private static readonly IEnumerable<PropertyInfo> PublicGetters = typeof(T).GetProperties()
+            .Where(p => p.GetMethod?.IsPublic == true);
+
+        /// <summary>
+        /// Creates a <see cref="DataTable"/> representation based on the <see cref="ReportingDataSourceRow"/>
+        /// representation.
+        /// </summary>
+        /// <param name="categoryHierarchy">
+        /// The <see cref="CategoryHierarchy"/> based on which to construct the column definitions.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DataTable"/> representation.
+        /// </returns>
+        internal static DataTable GetTable(CategoryHierarchy categoryHierarchy)
+        {
+            var table = new DataTable();
+
+            for (var hierarchy = categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
+            {
+                table.Columns.Add(hierarchy.Category.ShortName, typeof(string));
+            }
+
+            foreach (var publicGetter in PublicGetters)
+            {
+                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
+            }
+
+            return table;
+        }
 
         /// <summary>
         /// The <see cref="ReportingDataSourceRow"/> representation of the current node.
@@ -83,19 +118,12 @@ namespace CDP4Composition.Reporting
             this.ElementBase as ElementUsage;
 
         /// <summary>
-        /// The fully qualified (to the tree root) name of this <see cref="elementBase"/>.
-        /// </summary>
-        private string FullyQualifiedName => (this.parent != null)
-            ? this.parent.FullyQualifiedName + "." + this.ElementUsage.ShortName
-            : this.ElementDefinition.ShortName;
-
-        /// <summary>
-        /// The filtering <see cref="Category"/> that must be matched on the current <see cref="elementBase"/>.
+        /// The filtering <see cref="Category"/> that must be matched on the current <see cref="ElementBase"/>.
         /// </summary>
         private readonly Category filterCategory;
 
         /// <summary>
-        /// Boolean flag indicating whether the current <see cref="elementBase"/> matches the <see cref="filterCategory"/>.
+        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
         /// </summary>
         private bool IsVisible =>
             this.ElementBase.Category.Contains(this.filterCategory);
@@ -130,26 +158,7 @@ namespace CDP4Composition.Reporting
 
             this.ElementBase = elementBase;
 
-            this.rowRepresentation = new T
-            {
-                ElementBase = this.ElementBase,
-                ElementName = this.FullyQualifiedName,
-                IsVisible = this.IsVisible
-            };
-
-            if (this.IsVisible)
-            {
-                foreach (var rowField in RowFields)
-                {
-                    var column = rowField.Key
-                        .GetConstructor(Type.EmptyTypes)
-                        .Invoke(new object[] { }) as ReportingDataSourceColumn<T>;
-
-                    column.Initialize(this);
-
-                    rowField.Value.SetValue(this.rowRepresentation, column);
-                }
-            }
+            this.rowRepresentation = this.GetRowRepresentation();
 
             if (categoryHierarchy.Child == null)
             {
@@ -182,24 +191,90 @@ namespace CDP4Composition.Reporting
         }
 
         /// <summary>
-        /// Gets the tabular representation of this node's subtree.
+        /// Gets the row representation of this node.
         /// </summary>
         /// <returns>
-        /// A <see cref="List{T}"/> of <see cref="ReportingDataSourceRow"/>.
+        /// A <see cref="ReportingDataSourceRow"/>.
         /// </returns>
-        public List<T> GetTabularRepresentation()
+        private T GetRowRepresentation()
         {
-            var tabularRepresentation = new List<T>
+            var row = new T
             {
-                this.rowRepresentation
+                ElementBase = this.ElementBase,
+                IsVisible = this.IsVisible
             };
 
-            foreach (var node in this.Children)
+            if (!this.IsVisible)
             {
-                tabularRepresentation.AddRange(node.GetTabularRepresentation());
+                return row;
             }
 
-            return tabularRepresentation;
+            foreach (var rowField in RowFields)
+            {
+                var column = rowField.Key
+                    .GetConstructor(Type.EmptyTypes)
+                    .Invoke(new object[] { }) as ReportingDataSourceColumn<T>;
+
+                column.Initialize(this);
+
+                rowField.Value.SetValue(row, column);
+            }
+
+            return row;
+        }
+
+        /// <summary>
+        /// Adds to the <paramref name="table"/> the <see cref="DataRow"/> representations
+        /// of this node's subtree.
+        /// </summary>
+        /// <param name="table"></param>
+        internal void AddDataRows(DataTable table)
+        {
+            table.Rows.Add(this.GetDataRow(table));
+
+            foreach (var child in this.Children)
+            {
+                child.AddDataRows(table);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DataRow"/> representation of this node.
+        /// </summary>
+        /// <param name="table">
+        /// The associated <see cref="DataTable"/>.
+        /// </param>
+        /// <returns>
+        /// A <see cref="DataRow"/>.
+        /// </returns>
+        private DataRow GetDataRow(DataTable table)
+        {
+            var row = table.NewRow();
+
+            this.InitializeCategoryColumns(row);
+
+            foreach (var publicGetter in PublicGetters)
+            {
+                row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
+                    this.rowRepresentation,
+                    new object[] { });
+            }
+
+            return row;
+        }
+
+        /// <summary>
+        /// Initializes the category columns for the given <paramref name="row"/>
+        /// with values from the current node.
+        /// </summary>
+        /// <param name="row">
+        /// The <see cref="DataRow"/> to initialize.
+        /// </param>
+        private void InitializeCategoryColumns(DataRow row)
+        {
+            this.parent?.InitializeCategoryColumns(row);
+
+            row[this.filterCategory.ShortName] = this.ElementBase.Name;
         }
     }
 }
