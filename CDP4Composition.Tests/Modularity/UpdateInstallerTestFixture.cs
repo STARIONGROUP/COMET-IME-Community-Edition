@@ -50,12 +50,12 @@ namespace CDP4Composition.Tests.Modularity
             this.viewInvoker = new Mock<IPluginInstallerViewInvokerService>();
             this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<PluginInstaller>()));
         }
-            
+
         [Test]
         public void VerifyCheckAndInstall()
         {
             UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
-            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Once);
+            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Never);
         }
     }
 }
