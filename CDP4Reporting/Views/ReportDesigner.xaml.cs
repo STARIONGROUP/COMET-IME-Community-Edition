@@ -45,6 +45,7 @@ namespace CDP4Reporting.Views
 
     using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Bars;
+    using DevExpress.XtraReports.Parameters;
     using DevExpress.XtraReports.Security;
     using DevExpress.XtraReports.UI;
     using ReactiveUI;
@@ -176,17 +177,10 @@ namespace CDP4Reporting.Views
                 return;
             }
 
-            var localReport = this.reportDesigner.ActiveDocument.Report;
-
-            // Remove previous data sources attached
-            foreach (var component in localReport.ComponentStorage.OfType<ObjectDataSource>().ToList())
-            {
-                localReport.ComponentStorage.Remove(component);
-                localReport.Container?.Remove(component);
-            }
-
             this.Dispatcher.InvokeAsync(this.SetDataSource, DispatcherPriority.ApplicationIdle);
         }
+
+
 
         /// <summary>
         /// Trigger context menu action
@@ -206,6 +200,23 @@ namespace CDP4Reporting.Views
                 case "Rebuild Schema":
                     this.Dispatcher.InvokeAsync(this.SetDataSource, DispatcherPriority.ApplicationIdle);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Trigger textboxes text changed event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (e.Source == this.OutputTextBox)
+            {
+                this.lgTabs.SelectTab(this.lgOutput);
+            }
+            else if (e.Source == this.ErrorTextBox && !string.IsNullOrEmpty(this.ErrorTextBox.Text))
+            {
+                this.lgTabs.SelectTab(this.lgErrors);
             }
         }
 
@@ -270,7 +281,7 @@ namespace CDP4Reporting.Views
 
             var dsObj = instObj.GetType().GetMethod("CreateDataSource").Invoke(instObj, new object[] { viewModel.Thing });
 
-            return dsObj?.GetType().GetMethod("GetTabularRepresentation").Invoke(dsObj, new object[] { });
+            return dsObj?.GetType().GetMethod("GetTable").Invoke(dsObj, new object[] { });
         }
 
         /// <summary>
@@ -304,7 +315,11 @@ namespace CDP4Reporting.Views
             report.LoadLayoutFromXml(reportStream.Repx);
 
             this.reportDesigner.OpenDocument(report);
-            this.textEditor.Text = new StreamReader(reportStream.DataSource).ReadToEnd();
+
+            if (reportStream.DataSource != null)
+            {
+                this.textEditor.Text = new StreamReader(reportStream.DataSource).ReadToEnd();
+            }
         }
 
         /// <summary>
