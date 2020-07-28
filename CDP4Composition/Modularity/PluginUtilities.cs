@@ -160,14 +160,14 @@ namespace CDP4Composition.Modularity
             var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
             var downloadPath = Path.Combine(path1: appData, path2: DownloadDirectory, PluginDirectoryName);
 
+            var updatablePlugins = new List<(FileInfo cdp4ckFile, Manifest manifest)>();
+
             if (!Directory.Exists(path: downloadPath))
             {
                 logger.Info(message: "Download folder is empty or inexistant, download some plugins update from the IME first");
-                return default;
+                return updatablePlugins;
             }
-
-            var updatablePlugins = new List<(FileInfo cdp4ckFile, Manifest manifest)>();
-
+            
             var currentPlateformVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
             // Loop through all existing download plugin folders
