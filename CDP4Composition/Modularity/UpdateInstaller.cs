@@ -53,7 +53,7 @@ namespace CDP4Composition.Modularity
     /// <summary>
     /// The <see cref="UpdateInstaller"/> is responsible to check all the CDP4 download folders and to install/update the availables user-selected plugins 
     /// </summary>
-    public class UpdateInstaller
+    public static class UpdateInstaller
     {
         /// <summary>
         /// Check for any update available and run the plugin installer

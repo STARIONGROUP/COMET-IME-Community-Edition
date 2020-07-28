@@ -48,11 +48,16 @@ namespace CDP4Composition.Modularity
     [ExcludeFromCodeCoverage]
     public static class PluginUtilities
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger(typeof(PluginUtilities));
+
         /// <summary>
         /// The name of the plugin directory
         /// </summary>
         public const string PluginDirectoryName = "plugins";
 
+        /// <summary>
+        /// The directory of the downloaded plugin
+        /// </summary>
         public const string DownloadDirectory = "RHEA/CDP4/DownloadCache/";
 
         /// <summary>
@@ -155,8 +160,6 @@ namespace CDP4Composition.Modularity
         /// <returns>Returns a <see cref="IEnumerable{T}"/> of type <code>(FileInfo cdp4ckFile, Manifest manifest)</code> of the updatable plugins</returns>
         public static IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> GetDownloadedInstallablePluginUpdate()
         {
-            var logger = LogManager.GetCurrentClassLogger();
-
             var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
             var downloadPath = Path.Combine(path1: appData, path2: DownloadDirectory, PluginDirectoryName);
 
@@ -164,7 +167,7 @@ namespace CDP4Composition.Modularity
 
             if (!Directory.Exists(path: downloadPath))
             {
-                logger.Info(message: "Download folder is empty or inexistant, download some plugins update from the IME first");
+                Logger.Info(message: "Download folder is empty or inexistant, download some plugins update from the IME first");
                 return updatablePlugins;
             }
             
@@ -173,29 +176,43 @@ namespace CDP4Composition.Modularity
             // Loop through all existing download plugin folders
             foreach (var downloadedPluginFolder in Directory.EnumerateDirectories(path: downloadPath).Select(selector: d => new DirectoryInfo(path: d)))
             {
-                if (downloadedPluginFolder.EnumerateFiles().FirstOrDefault(predicate: f => f.Name.EndsWith(value: ".cdp4ck")) is { } installableCdp4CkFullPath && installableCdp4CkFullPath.Directory is { } installableCdp4CkBasePath)
+                if (GetPlugin(currentPlateformVersion, downloadedPluginFolder) is { manifest: { }, cdp4ckFile: { } } plugin)
                 {
-                    var manifest = DeserializeManifestFromCdp4Ck(installableCdp4CkFullPath, downloadedPluginFolder);
-
-                    if (manifest is { } && (manifest.MinIMEVersion is null || new Version(version: manifest.MinIMEVersion) <= currentPlateformVersion))
-                    {
-                        updatablePlugins.Add(item: (installableCdp4CkFullPath, manifest));
-                    }
-                    else
-                    {
-                        logger.Debug(message: manifest is { } 
-                            ? $"{manifest.MinIMEVersion} is higher than the current IME version please update before installing this plugin update {currentPlateformVersion}"
-                            : $"{downloadedPluginFolder.Name} does not contain any manifest. skipping plugin: {downloadedPluginFolder.Name}");
-                    }
-                }
-                else
-                {
-                    logger.Error(message: $"{downloadedPluginFolder.Name} does not contain any package candidate. skipping plugin: {downloadedPluginFolder.Name}");
+                    updatablePlugins.Add(plugin);
                 }
             }
 
-            logger.Debug(message: $"Found {updatablePlugins.Count} installable plugins");
+            Logger.Debug(message: $"Found {updatablePlugins.Count} installable plugins");
             return updatablePlugins;
+        }
+
+        ///<summary>
+        /// Check if the found plugin can be installed
+        /// </summary>
+        /// <param name="currentPlateformVersion">the IME version</param>
+        /// <param name="downloadedPluginFolder">the found folder of downloaded plugin</param>
+        /// <returns>Returns a represented plugin by a <code>(FileInfo cdp4ckFile, Manifest manifest)</code> </returns></returns>
+        private static (FileInfo cdp4ckFile, Manifest manifest) GetPlugin(Version currentPlateformVersion, DirectoryInfo downloadedPluginFolder)
+        {
+            if (downloadedPluginFolder.EnumerateFiles().FirstOrDefault(predicate: f => f.Name.EndsWith(value: ".cdp4ck")) is { } installableCdp4CkFullPath && installableCdp4CkFullPath.Directory is { } installableCdp4CkBasePath)
+            {
+                var manifest = DeserializeManifestFromCdp4Ck(installableCdp4CkFullPath, downloadedPluginFolder);
+
+                if (manifest is { } && (manifest.MinIMEVersion is null || new Version(version: manifest.MinIMEVersion) <= currentPlateformVersion))
+                {
+                    return (installableCdp4CkFullPath, manifest);
+                }
+
+                Logger.Debug(message: manifest is { }
+                    ? $"{manifest.MinIMEVersion} is higher than the current IME version please update before installing this plugin update {currentPlateformVersion}"
+                    : $"{downloadedPluginFolder.Name} does not contain any manifest. skipping plugin: {downloadedPluginFolder.Name}");
+            }
+            else
+            {
+                Logger.Error(message: $"{downloadedPluginFolder.Name} does not contain any package candidate. skipping plugin: {downloadedPluginFolder.Name}");
+            }
+
+            return default;
         }
 
         /// <summary>

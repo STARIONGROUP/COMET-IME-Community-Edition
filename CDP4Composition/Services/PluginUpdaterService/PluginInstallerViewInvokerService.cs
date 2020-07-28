@@ -34,7 +34,6 @@ namespace CDP4Composition.Services.PluginUpdaterService
     /// The <see cref="PluginInstallerViewInvokerService"/> is responsible to display the instanciated view <see cref="PluginInstaller"/>
     /// </summary>
     [Export(typeof(IPluginInstallerViewInvokerService))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class PluginInstallerViewInvokerService : IPluginInstallerViewInvokerService
     {
         /// <summary>

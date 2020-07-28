@@ -50,16 +50,6 @@ namespace CDP4Composition.ViewModels
     public class PluginInstallerViewModel : ReactiveObject, IPluginInstallerViewModel
     {
         /// <summary>
-        ///  Assert whether any plugin are selected
-        /// </summary>
-        private IObservable<bool> areThereAnyPluginSelected;
-
-        /// <summary>
-        /// Observable of the field <see cref="thereIsNoInstallationInProgress"/>
-        /// </summary>
-        private IObservable<bool> thereIsNoInstallationInProgressObservable;
-
-        /// <summary>
         /// Backing field for the <see cref="ThereIsNoInstallationInProgress"/> property
         /// </summary>
         private bool thereIsNoInstallationInProgress = true;
@@ -125,14 +115,11 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         private void InitializeCommand()
         {
-            this.thereIsNoInstallationInProgressObservable = this.WhenAnyValue(x => x.thereIsNoInstallationInProgress);
+            var thereIsNoInstallationInProgressObservable = this.WhenAnyValue(x => x.thereIsNoInstallationInProgress);
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.CancelCommandExecute());
 
-            this.areThereAnyPluginSelected = this.AvailablePlugins.WhenAnyValue(p => p).SelectMany(p => p.Select(x => x.IsSelectedForInstallation));
-            this.areThereAnyPluginSelected.Subscribe(_ => System.Windows.MessageBox.Show("It's on fire"));
-
-            this.InstallCommand = ReactiveCommand.Create(this.thereIsNoInstallationInProgressObservable);
+            this.InstallCommand = ReactiveCommand.Create(thereIsNoInstallationInProgressObservable);
             
             var currentDispatcher = Dispatcher.CurrentDispatcher;
             
@@ -146,7 +133,7 @@ namespace CDP4Composition.ViewModels
                     }
                 }));
 
-            this.SelectAllUpdateCheckBoxCommand = ReactiveCommand.Create(this.thereIsNoInstallationInProgressObservable);
+            this.SelectAllUpdateCheckBoxCommand = ReactiveCommand.Create(thereIsNoInstallationInProgressObservable);
             this.SelectAllUpdateCheckBoxCommand.Subscribe(_ => this.SelectDeselectAllPluginCommandExecute());
         }
 

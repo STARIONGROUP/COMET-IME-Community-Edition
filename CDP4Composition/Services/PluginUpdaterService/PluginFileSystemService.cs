@@ -37,13 +37,12 @@ namespace CDP4Composition.Services.PluginUpdaterService
     /// The purpose of the <see cref="PluginFileSystemService"/> is to provide operations appliable on a file system
     /// </summary>
     [Export(typeof(IPluginFileSystemService))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class PluginFileSystemService : IPluginFileSystemService
     {
         /// <summary>
         /// The NLog logger
         /// </summary>
-        protected static Logger Logger = LogManager.GetLogger(typeof(PluginFileSystemService).FullName);
+        private static readonly Logger Logger = LogManager.GetLogger(typeof(PluginFileSystemService).FullName);
 
         /// <summary>
         /// Gets or sets the path were the cdp4ck to be installed sits 

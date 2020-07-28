@@ -26,20 +26,12 @@
 namespace CDP4Composition.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.IO.Compression;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
     using CDP4Composition.Services.PluginUpdaterService;
     using CDP4Composition.Views;
-
-    using DevExpress.CodeParser.Diagnostics;
-
-    using Microsoft.Practices.ServiceLocation;
 
     using NLog;
 
@@ -50,7 +42,10 @@ namespace CDP4Composition.ViewModels
     /// </summary>
     public class PluginRowViewModel : ReactiveObject
     {
-        private Logger logger = LogManager.GetCurrentClassLogger();
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Backing field for the property <see cref="Name"/>
@@ -234,6 +229,7 @@ namespace CDP4Composition.ViewModels
             catch (Exception exception)
             {
                 this.logger.Error($"An exception occured: {exception}");
+                throw;
             }
         }
 
@@ -251,6 +247,7 @@ namespace CDP4Composition.ViewModels
             catch (Exception exception)
             {
                 this.logger.Error($"An exception occured: {exception}");
+                throw;
             }
         }
     }
