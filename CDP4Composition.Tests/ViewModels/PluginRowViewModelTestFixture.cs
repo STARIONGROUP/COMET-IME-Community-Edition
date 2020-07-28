@@ -32,7 +32,6 @@ namespace CDP4Composition.Tests.ViewModels
     using System.Reactive.Concurrency;
 
     using CDP4Composition.Modularity;
-    using CDP4Composition.Services.PluginFileSystemService;
     using CDP4Composition.ViewModels;
 
     using Newtonsoft.Json;
@@ -44,7 +43,7 @@ namespace CDP4Composition.Tests.ViewModels
     [TestFixture]
     public class PluginRowViewModelTestFixture : PluginUpdateDataSetup
     {
-        [SetUp]
+        [OneTimeSetUp]
         public override void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
@@ -52,7 +51,7 @@ namespace CDP4Composition.Tests.ViewModels
             base.Setup();
         }
 
-        [TearDown]
+        [OneTimeTearDown]
         public void Teardown()
         {
             if (Directory.Exists(this.BasePath))

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UpdateInstallerTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="IPluginInstallerViewInvokerService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,39 +23,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-namespace CDP4Composition.Tests.Modularity
+namespace CDP4Composition.Services.PluginUpdaterService
 {
-    using System;
-    using System.Threading;
-
-    using CDP4Composition.Modularity;
-    using CDP4Composition.Services.PluginUpdaterService;
     using CDP4Composition.Views;
-
-    using Moq;
-
-    using NLog.Config;
-
-    using NUnit.Framework;
-
-    [TestFixture, Apartment(ApartmentState.STA)]
-    public class UpdateInstallerTestFixture
+    
+    /// <summary>
+    /// Defines the <see cref="PluginInstallerViewInvokerService"/> which is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// </summary>
+    public interface IPluginInstallerViewInvokerService
     {
-        private Mock<IPluginInstallerViewInvokerService> viewInvoker;
-
-        [SetUp]
-        public void Setup()
-        {
-            this.viewInvoker = new Mock<IPluginInstallerViewInvokerService>();
-            this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<PluginInstaller>()));
-        }
-            
-        [Test]
-        public void VerifyCheckAndInstall()
-        {
-            UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
-            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Once);
-        }
+        /// <summary>
+        /// Brings the view to the user sight
+        /// </summary>
+        /// <param name="viewInstance">the view to show up</param>
+        void ShowDialog(PluginInstaller viewInstance);
     }
 }

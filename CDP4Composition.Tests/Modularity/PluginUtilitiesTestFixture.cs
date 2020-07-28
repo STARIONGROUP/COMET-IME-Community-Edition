@@ -91,10 +91,6 @@ namespace CDP4Composition.Tests.Modularity
         public void VerifyImeManifestsAreReturned()
         {
             Assert.IsNotEmpty(PluginUtilities.GetPluginManifests());
-
-            this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-
-            Assert.IsEmpty(PluginUtilities.GetPluginManifests());
         }
 
         [Test]

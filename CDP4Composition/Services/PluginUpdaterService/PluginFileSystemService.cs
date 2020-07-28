@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services.PluginFileSystemService
+namespace CDP4Composition.Services.PluginUpdaterService
 {
     using System.ComponentModel.Composition;
     using System.IO;
@@ -127,7 +127,7 @@ namespace CDP4Composition.Services.PluginFileSystemService
         }
 
         /// <summary>
-        /// Restores the olde version
+        /// Restores the old version
         /// </summary>
         public void Restore()
         {

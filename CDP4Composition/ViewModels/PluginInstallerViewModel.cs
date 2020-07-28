@@ -140,7 +140,7 @@ namespace CDP4Composition.ViewModels
                 async _ => await this.InstallCommandExecute().ContinueWith(
                 t =>
                 { 
-                    if (!t.IsCanceled && !t.IsFaulted)
+                    if (!t.IsCanceled && !t.IsFaulted && this.AvailablePlugins.Any(p => p.IsSelectedForInstallation))
                     {
                         currentDispatcher.InvokeAsync(this.Behavior.Close, DispatcherPriority.Background);
                     }

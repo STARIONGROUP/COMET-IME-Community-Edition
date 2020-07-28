@@ -34,7 +34,7 @@ namespace CDP4Composition.ViewModels
     using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
-    using CDP4Composition.Services.PluginFileSystemService;
+    using CDP4Composition.Services.PluginUpdaterService;
     using CDP4Composition.Views;
 
     using DevExpress.CodeParser.Diagnostics;

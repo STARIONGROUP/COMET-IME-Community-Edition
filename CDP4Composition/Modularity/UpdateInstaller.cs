@@ -35,6 +35,7 @@ namespace CDP4Composition.Modularity
     using System.Windows;
 
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services.PluginUpdaterService;
     using CDP4Composition.Utilities;
     using CDP4Composition.ViewModels;
     using CDP4Composition.Views;
@@ -57,13 +58,14 @@ namespace CDP4Composition.Modularity
         /// <summary>
         /// Check for any update available and run the plugin installer
         /// </summary>
-        public static void CheckAndInstall()
+        public static void CheckAndInstall(IPluginInstallerViewInvokerService viewInvoker = null)
         {
             var updatablePlugins = PluginUtilities.GetDownloadedInstallablePluginUpdate().ToList();
 
             if (updatablePlugins.Any())
             {
-                new PluginInstaller() { DataContext = new PluginInstallerViewModel(updatablePlugins) }.ShowDialog();
+                var pluginInstallerView = new PluginInstaller() { DataContext = new PluginInstallerViewModel(updatablePlugins) };
+                (viewInvoker ?? new PluginInstallerViewInvokerService()).ShowDialog(pluginInstallerView);
             }
         }
     }

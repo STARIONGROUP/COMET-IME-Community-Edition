@@ -1,9 +1,10 @@
 ﻿namespace CDP4Composition.Tests.ViewModels
 {
     using System.IO;
+    using System.Security.AccessControl;
 
     using CDP4Composition.Modularity;
-    using CDP4Composition.Services.PluginFileSystemService;
+    using CDP4Composition.Services.PluginUpdaterService;
 
     using Newtonsoft.Json;
 
@@ -22,7 +23,7 @@
 
         public virtual void Setup()
         {
-            this.BasePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginUpdateTestFixture");
+            this.BasePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginUpdateTestFixture", this.GetType().Name);
             this.TempPath = Path.Combine(this.BasePath, "Temp");
             this.InstallPath = Path.Combine(this.BasePath, "Plugins");
             this.UpdatePath = Path.Combine(this.BasePath, "Download");
@@ -36,7 +37,7 @@
 
             foreach (var file in dataPath.EnumerateFiles())
             {
-                File.Copy(file.FullName, Path.Combine(this.UpdatePath, file.Name));
+                File.Copy(file.FullName, Path.Combine(this.UpdatePath, file.Name), true);
             }
 
             if (!Directory.Exists(this.InstallPath))

@@ -48,8 +48,9 @@ namespace CDP4Composition.Tests.ViewModels
     {
         private IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> updatablePlugins;
         private Mock<IPluginUpdateInstallerBehavior> behavior;
+        private PluginInstallerViewModel viewModel;
 
-        [SetUp]
+        [OneTimeSetUp]
         public override void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
@@ -62,9 +63,11 @@ namespace CDP4Composition.Tests.ViewModels
 
             this.behavior = new Mock<IPluginUpdateInstallerBehavior>();
             this.behavior.Setup(x => x.Close());
+
+            this.viewModel = new PluginInstallerViewModel(this.updatablePlugins);
         }
 
-        [TearDown]
+        [OneTimeTearDown]
         public void Teardown()
         {
             if (Directory.Exists(this.BasePath))
@@ -77,47 +80,50 @@ namespace CDP4Composition.Tests.ViewModels
         [Test]
         public void VerifyPropertiesAreSet()
         {
-            var viewModel = new PluginInstallerViewModel(this.updatablePlugins);
-            Assert.IsNotEmpty(viewModel.AvailablePlugins);
-            Assert.AreSame(viewModel.UpdatablePlugins, this.updatablePlugins);
-            Assert.IsTrue(viewModel.ThereIsNoInstallationInProgress);
-            Assert.IsNull(viewModel.CancellationTokenSource);
+            var vm = new PluginInstallerViewModel(this.updatablePlugins);
+            Assert.IsNotEmpty(vm.AvailablePlugins);
+            Assert.AreSame(vm.UpdatablePlugins, this.updatablePlugins);
+            Assert.IsTrue(vm.ThereIsNoInstallationInProgress);
+            Assert.IsNull(vm.CancellationTokenSource);
         }
         
         [Test]
         public void VerifySelectAllUpdateCheckBoxCommand()
-        { 
-            var viewModel = new PluginInstallerViewModel(this.updatablePlugins);
-            Assert.IsTrue(viewModel.SelectAllUpdateCheckBoxCommand.CanExecute(null));
+        {
+            var vm = new PluginInstallerViewModel(this.updatablePlugins);
+            Assert.IsTrue(vm.SelectAllUpdateCheckBoxCommand.CanExecute(null));
 
-            viewModel.SelectAllUpdateCheckBoxCommand.Execute(null);
-            Assert.IsTrue(viewModel.AvailablePlugins.All(p => p.IsSelectedForInstallation));
+            vm.SelectAllUpdateCheckBoxCommand.Execute(null);
+            Assert.IsTrue(vm.AvailablePlugins.All(p => p.IsSelectedForInstallation));
 
-            viewModel.SelectAllUpdateCheckBoxCommand.Execute(null);
-            Assert.IsTrue(viewModel.AvailablePlugins.All(p => !p.IsSelectedForInstallation));
+            vm.SelectAllUpdateCheckBoxCommand.Execute(null);
+            Assert.IsTrue(vm.AvailablePlugins.All(p => !p.IsSelectedForInstallation));
         }
         
         [Test]
         public async Task VerifyCancelCommand()
         {
-            var viewModel = new PluginInstallerViewModel(this.updatablePlugins) { Behavior = this.behavior.Object };
-            Assert.IsTrue(viewModel.CancelCommand.CanExecute(null));
-            viewModel.ThereIsNoInstallationInProgress = false;
-            await viewModel.CancelCommand.ExecuteAsyncTask(null);
+            this.viewModel.Behavior = this.behavior.Object;
+
+            Assert.IsTrue(this.viewModel.CancelCommand.CanExecute(null));
+            this.viewModel.ThereIsNoInstallationInProgress = false;
+            await this.viewModel.CancelCommand.ExecuteAsyncTask(null);
             this.behavior.Verify(x => x.Close(), Times.Once);
+            this.viewModel.ThereIsNoInstallationInProgress = true;
         }
 
         [Test]
         public async Task VerifyInstallCommand()
         {
-            var viewModel = new PluginInstallerViewModel(this.updatablePlugins) { Behavior = this.behavior.Object };
-            viewModel.AvailablePlugins.First().FileSystem = this.PluginFileSystem;
-            Assert.IsTrue(viewModel.InstallCommand.CanExecute(null));
-            await viewModel.InstallCommand.ExecuteAsyncTask(null);
-            this.behavior.Verify(x => x.Close(), Times.Never);
-            viewModel.AvailablePlugins.First().IsSelectedForInstallation = true;
-            await viewModel.InstallCommand.ExecuteAsyncTask(null);
+            this.viewModel.Behavior = this.behavior.Object;
+            this.viewModel.AvailablePlugins.First().FileSystem = this.PluginFileSystem;
+            Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
+            this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = false;
+            await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
+            this.behavior.Verify(x => x.Close(), Times.Once);
 
+            this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = true;
+            await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
         }
     }
 }

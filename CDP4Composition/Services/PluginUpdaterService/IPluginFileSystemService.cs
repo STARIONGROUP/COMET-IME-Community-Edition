@@ -24,7 +24,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services.PluginFileSystemService
+namespace CDP4Composition.Services.PluginUpdaterService
 {
     using System.IO;
 
