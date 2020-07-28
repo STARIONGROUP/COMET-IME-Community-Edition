@@ -39,11 +39,6 @@ namespace CDP4Composition.Reporting
         protected internal ElementBase ElementBase { get; internal set; }
 
         /// <summary>
-        /// The Element name, fully qualified with the path to the top element.
-        /// </summary>
-        public string ElementName { get; internal set; }
-
-        /// <summary>
         /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
         /// Note that when this is false, all values will be null on the row.
         /// </summary>
