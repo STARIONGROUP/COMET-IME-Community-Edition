@@ -30,8 +30,6 @@ namespace CDP4ShellDialogs.ViewModels
 
     using CDP4Composition.Modularity;
 
-    using Microsoft.Practices.Prism.Modularity;
-
     using ReactiveUI;
 
     /// <summary>

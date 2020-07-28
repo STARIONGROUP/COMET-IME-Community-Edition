@@ -179,7 +179,7 @@ namespace CDP4Composition.Mvvm
                     throw new InvalidOperationException("The view-model to navigate to is null.");
                 }
 
-                this.PanelNavigationServive.Open(this.PanelViewModel, true);
+                this.PanelNavigationServive.Open(this.PanelViewModel);
             }
             else
             {
@@ -194,7 +194,7 @@ namespace CDP4Composition.Mvvm
                     var result = this.DialogNavigationService.NavigateModal(confirmation);
                     if (result != null && result.Result.HasValue && result.Result.Value)
                     {
-                        this.PanelNavigationServive.Close(this.PanelViewModel, true);
+                        this.PanelNavigationServive.Close(this.PanelViewModel);
                     }
                     else
                     {
@@ -203,7 +203,7 @@ namespace CDP4Composition.Mvvm
                 }
                 else
                 {
-                    this.PanelNavigationServive.Close(this.PanelViewModel, true);
+                    this.PanelNavigationServive.Close(this.PanelViewModel);
                 }
             }
         }

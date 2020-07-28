@@ -7,7 +7,6 @@
 namespace CDP4Composition.Ribbon
 {
     using System.Windows;
-    using CDP4Composition.Adapters;
     using DevExpress.Xpf.Ribbon;
 
     /// <summary>

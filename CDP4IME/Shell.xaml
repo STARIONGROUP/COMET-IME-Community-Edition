@@ -43,14 +43,13 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxr:RibbonControl x:Name="Ribbon"
+        <dxr:RibbonControl x:Name="IMERibbon"
                            Grid.Row="0"
                            ApplicationButtonLargeIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48p10.png"
                            ApplicationButtonSmallIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_16x16.png"
                            ApplicationButtonText="CDP4-CE"
                            PageCategoryAlignment="Right"
-                           RibbonStyle="Office2007"
-                           regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.RibbonRegion}" Padding="0">
+                           RibbonStyle="Office2007" Padding="0">
 
             <dxr:RibbonControl.PageHeaderItems>
 
@@ -302,23 +301,9 @@
 
         <dxdo:DockLayoutManager x:Name="DockManager"
                                 Grid.Row="1"
+                                ItemsSource="{Binding Panels, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                 ClosingBehavior="ImmediatelyRemove"
                                 FloatingMode="Desktop">
-            <dxdo:LayoutGroup ItemHeight="0.7*" DestroyOnClosingChildren="False" Orientation="Horizontal">
-                <dxdo:TabbedGroup Name="LeftGroup"
-                                  DestroyOnClosingChildren="False"
-                                  ItemWidth="0.2*"
-                                  regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.LeftPanel}" />
-                <dxdo:DocumentGroup Name="DocumentContainer"
-                                    ClosePageButtonShowMode="InAllTabPagesAndTabControlHeader"
-                                    DestroyOnClosingChildren="False"
-                                    ItemWidth="0.6*"
-                                    regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.EditorPanel}" />
-                <dxdo:TabbedGroup Name="RightGroup"
-                                  DestroyOnClosingChildren="False"
-                                  ItemWidth="0.2*"
-                                  regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.RightPanel}" />
-            </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>
         <dxr:RibbonStatusBarControl Grid.Row="2" Height="20">
             <dxr:RibbonStatusBarControl.LeftItems>

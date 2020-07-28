@@ -1,8 +1,8 @@
 ﻿//  --------------------------------------------------------------------------------------------------------------------
-//  <copyright file="ModuleExportNameAttribute.cs" company="RHEA System S.A.">
+//  <copyright file="IModule.cs" company="RHEA System S.A.">
 //     Copyright (c) 2015-2020 RHEA System S.A.
 // 
-//     Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//     Author: Sam Gerené, Alex Vorobiev, Alexander van Delft,
 //             Nathanael Smiechowski, Kamil Wojnowski
 // 
 //     This file is part of CDP4-IME Community Edition.
@@ -24,38 +24,13 @@
 //  </copyright>
 //  --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Attributes
+namespace CDP4Composition.Mvvm
 {
-    using System;
-    using System.ComponentModel.Composition;
-
     /// <summary>
-    /// The purpose of the <see cref="ModuleExportAttribute"/> is to decorate <see cref="IModule"/> implementations
+    /// Defines a module interface used for plugins.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    [MetadataAttribute]
-    public class ModuleExportNameAttribute : Attribute
+    /// <remarks>Replaces PRISM IModule</remarks>
+    public interface IModule
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ModuleExportNameAttribute"/> class.
-        /// </summary>
-        /// <param name="type">
-        /// The <see cref="Type"/> of the module to be exported.
-        /// </param>
-        /// <param name="name">
-        /// The human readable name of the <see cref="IModule"/> implementation that is being decorated
-        /// </param>
-        /// <param name="isMandatory">
-        ///Specifies if the plugin should be mandatory for the application
-        /// </param>
-        public ModuleExportNameAttribute(Type type, string name)
-        {
-            this.Name = name;
-        }
-
-        /// <summary>
-        /// Gets the human readable name of the exported <see cref="IModule"/>
-        /// </summary>
-        public string Name { get; private set; }
     }
 }

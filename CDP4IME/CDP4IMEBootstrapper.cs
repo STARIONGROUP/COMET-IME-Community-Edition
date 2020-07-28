@@ -32,7 +32,6 @@ namespace CDP4IME
     using System.Reflection;
     using System.Windows;
 
-    using CDP4Composition.Adapters;
     using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
 

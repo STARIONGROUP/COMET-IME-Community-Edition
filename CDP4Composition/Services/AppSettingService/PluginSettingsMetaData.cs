@@ -31,9 +31,8 @@ namespace CDP4Composition.Services.AppSettingService
     using System.Reflection;
 
     using CDP4Composition.Attributes;
- 
-    using Microsoft.Practices.Prism.Modularity;
- 
+    using CDP4Composition.Mvvm;
+
     /// <summary>
     /// The purpose of the <see cref="PluginSettingsMetaData"/> is to serialize/deserialize plugin configurations
     /// </summary>
@@ -67,7 +66,6 @@ namespace CDP4Composition.Services.AppSettingService
                 var assemblyName = ((AssemblyTitleAttribute)moduleAssembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
                 var nameAttribute = (ModuleExportNameAttribute)Attribute.GetCustomAttribute(module.GetType(), typeof(ModuleExportNameAttribute));
                 var name = nameAttribute == null ? string.Empty : nameAttribute.Name;
-                var isMandatory = nameAttribute?.IsMandatory ?? false;
                 var description = ((AssemblyDescriptionAttribute) moduleAssembly.GetCustomAttribute(typeof(AssemblyDescriptionAttribute))).Description;
                 var version = ((AssemblyFileVersionAttribute) moduleAssembly.GetCustomAttribute(typeof(AssemblyFileVersionAttribute))).Version;
                 var company = ((AssemblyCompanyAttribute) moduleAssembly.GetCustomAttribute(typeof(AssemblyCompanyAttribute))).Company;
@@ -78,7 +76,6 @@ namespace CDP4Composition.Services.AppSettingService
                 this.Description = description;
                 this.Version = version;
                 this.Company = company;
-                this.IsMandatory = isMandatory;
             }
         }
 
@@ -116,10 +113,5 @@ namespace CDP4Composition.Services.AppSettingService
         /// Gets or sets if the plugin is enabled
         /// </summary>
         public bool IsEnabled { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets if the plugin is mandatory
-        /// </summary>
-        public bool IsMandatory { get; set; } = false;
     }
 }

@@ -127,11 +127,11 @@ namespace CDP4Composition.Mvvm
                     throw new InvalidOperationException("The view-model to navigate to is null.");
                 }
 
-                this.PanelNavigationServive.Open(this.PanelViewModel, true);
+                this.PanelNavigationServive.Open(this.PanelViewModel);
             }
             else
             {
-                this.PanelNavigationServive.Close(this.PanelViewModel, true);
+                this.PanelNavigationServive.Close(this.PanelViewModel);
             }
         }
 
