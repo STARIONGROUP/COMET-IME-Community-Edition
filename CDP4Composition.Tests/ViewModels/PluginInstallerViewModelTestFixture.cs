@@ -29,7 +29,7 @@ namespace CDP4Composition.Tests.ViewModels
     using System.IO;
     using System.Linq;
     using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using CDP4Composition.Behaviors;
@@ -43,14 +43,14 @@ namespace CDP4Composition.Tests.ViewModels
 
     using ReactiveUI;
 
-    [TestFixture]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class PluginInstallerViewModelTestFixture : PluginUpdateDataSetup
     {
         private IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> updatablePlugins;
         private Mock<IPluginUpdateInstallerBehavior> behavior;
         private PluginInstallerViewModel viewModel;
 
-        [OneTimeSetUp]
+        [SetUp]
         public override void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
@@ -66,8 +66,8 @@ namespace CDP4Composition.Tests.ViewModels
 
             this.viewModel = new PluginInstallerViewModel(this.updatablePlugins);
         }
-
-        [OneTimeTearDown]
+        
+        [TearDown]
         public void Teardown()
         {
             if (Directory.Exists(this.BasePath))
@@ -75,6 +75,8 @@ namespace CDP4Composition.Tests.ViewModels
                 File.SetAttributes(this.BasePath, FileAttributes.Normal);
                 Directory.Delete(this.BasePath, true);
             }
+
+            Task.Delay(1);
         }
 
         [Test]
@@ -120,7 +122,7 @@ namespace CDP4Composition.Tests.ViewModels
             Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
             this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = false;
             await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
-            this.behavior.Verify(x => x.Close(), Times.Once);
+            this.behavior.Verify(x => x.Close(), Times.Never);
 
             this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = true;
             await this.viewModel.InstallCommand.ExecuteAsyncTask(null);

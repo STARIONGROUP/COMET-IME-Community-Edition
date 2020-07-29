@@ -7,6 +7,7 @@
     <Product>CDP4Composition.Tests</Product>
     <Description>CDP4 Composition and Infrastructure library unit tests</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

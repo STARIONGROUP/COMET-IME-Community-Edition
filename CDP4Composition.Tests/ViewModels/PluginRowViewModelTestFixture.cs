@@ -30,6 +30,8 @@ namespace CDP4Composition.Tests.ViewModels
     using System.IO.Compression;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
     using CDP4Composition.ViewModels;
@@ -43,7 +45,7 @@ namespace CDP4Composition.Tests.ViewModels
     [TestFixture]
     public class PluginRowViewModelTestFixture : PluginUpdateDataSetup
     {
-        [OneTimeSetUp]
+        [SetUp]
         public override void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
@@ -51,9 +53,11 @@ namespace CDP4Composition.Tests.ViewModels
             base.Setup();
         }
 
-        [OneTimeTearDown]
+        [TearDown]
         public void Teardown()
         {
+            Task.Delay(1);
+
             if (Directory.Exists(this.BasePath))
             {
                 File.SetAttributes(this.BasePath, FileAttributes.Normal);
@@ -96,6 +100,32 @@ namespace CDP4Composition.Tests.ViewModels
             var newVersionManifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(this.PluginFileSystem.InstallationPath.FullName, "CDP4BasicRdl.plugin.manifest")));
             Assert.AreEqual(new Version("5.5.5.5"), new Version(newVersionManifest.Version));
             Assert.AreEqual(this.Manifest.Description, newVersionManifest.Description);
+            Thread.Sleep(1);
+        }
+
+        [Test]
+        public void VerifyCancelation()
+        {
+            const string testContent = "test";
+            const string testFileName = "TESTCONTENT";
+
+            this.PluginFileSystem.TemporaryPath.Create();
+            this.PluginFileSystem.InstallationPath.Create();
+
+            var testFileFullName = Path.Combine(this.PluginFileSystem.TemporaryPath.FullName, testFileName);
+            
+            using (var testFileWriter = File.CreateText(testFileFullName))
+            {
+                testFileWriter.Write(testContent);
+            }
+
+            var viewModel = new PluginRowViewModel(this.Plugin, this.PluginFileSystem);
+            viewModel.HandlingCancelation();
+
+            //Assert.IsFalse(this.PluginFileSystem.TemporaryPath.Exists);
+            var restoredFile = new FileInfo(Path.Combine(this.PluginFileSystem.InstallationPath.FullName, testFileName));
+            Assert.IsTrue(restoredFile.Exists);
+            Assert.AreEqual(File.ReadAllText(restoredFile.FullName), testContent);
         }
 
         [Test]

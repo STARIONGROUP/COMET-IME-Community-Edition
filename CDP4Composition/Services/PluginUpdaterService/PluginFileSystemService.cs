@@ -40,11 +40,6 @@ namespace CDP4Composition.Services.PluginUpdaterService
     public class PluginFileSystemService : IPluginFileSystemService
     {
         /// <summary>
-        /// The NLog logger
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetLogger(typeof(PluginFileSystemService).FullName);
-
-        /// <summary>
         /// Gets or sets the path were the cdp4ck to be installed sits 
         /// </summary>
         public FileInfo UpdateCdp4CkFileInfo { get; set; }
