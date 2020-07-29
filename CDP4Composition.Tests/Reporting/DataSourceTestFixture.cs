@@ -27,7 +27,7 @@ namespace CDP4Composition.Tests.Reporting
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Linq;
+    using System.Data;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -239,34 +239,29 @@ namespace CDP4Composition.Tests.Reporting
                 this.iteration,
                 hierarchy);
 
-            var rows = dataSource.GetTabularRepresentation();
-
-            // tabular representation is built and category hierarchy is considered
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned
+            var rows = dataSource.GetTable().Rows;
             Assert.AreEqual(6, rows.Count);
 
-            Assert.AreSame(this.ed1, rows[0].ElementBase);
-            Assert.AreEqual("ed1", rows[0].ElementName);
+            ValidateRow(rows[0], true, this.ed1);
+            ValidateRow(rows[1], true, this.ed1, this.eu12n1);
+            ValidateRow(rows[2], true, this.ed1, this.eu12p1);
+            ValidateRow(rows[3], true, this.ed1, this.eu12p1, this.eu2p31);
+            ValidateRow(rows[4], false, this.ed1, this.eu12p2);
+            ValidateRow(rows[5], true, this.ed1, this.eu12p2, this.eu2p31);
+        }
 
-            Assert.AreSame(this.eu12n1, rows[1].ElementBase);
-            Assert.AreEqual("ed1.eu12n1", rows[1].ElementName);
-
-            Assert.AreSame(this.eu12p1, rows[2].ElementBase);
-            Assert.AreEqual("ed1.eu12p1", rows[2].ElementName);
-
-            Assert.AreSame(this.eu2p31, rows[3].ElementBase);
-            Assert.AreEqual("ed1.eu12p1.eu2p31", rows[3].ElementName);
-
-            Assert.AreSame(this.eu12p2, rows[4].ElementBase);
-            Assert.AreEqual("ed1.eu12p2", rows[4].ElementName);
-
-            Assert.AreSame(this.eu2p31, rows[5].ElementBase);
-            Assert.AreEqual("ed1.eu12p2.eu2p31", rows[5].ElementName);
-
-            // skips levels (visibility)
-            Assert.IsFalse(rows.First(x => x.ElementName == "ed1.eu12p2").IsVisible);
-
-            // prunes unneeded subtrees
-            Assert.IsNull(rows.FirstOrDefault(x => x.ElementName == "ed1.eu12n2"));
+        private static void ValidateRow(
+            DataRow row,
+            bool isVisible,
+            ElementBase level0 = null,
+            ElementBase level1 = null,
+            ElementBase level2 = null)
+        {
+            Assert.AreEqual(level0?.Name, row.Field<string>(0));
+            Assert.AreEqual(level1?.Name, row.Field<string>(1));
+            Assert.AreEqual(level2?.Name, row.Field<string>(2));
+            Assert.AreEqual(isVisible, row.Field<bool>(3));
         }
     }
 }
