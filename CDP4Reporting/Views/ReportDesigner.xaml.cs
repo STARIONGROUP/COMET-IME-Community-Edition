@@ -45,7 +45,6 @@ namespace CDP4Reporting.Views
 
     using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Bars;
-    using DevExpress.XtraReports.Parameters;
     using DevExpress.XtraReports.Security;
     using DevExpress.XtraReports.UI;
     using ReactiveUI;
@@ -91,9 +90,6 @@ namespace CDP4Reporting.Views
         /// </summary>
         public ReportDesigner()
         {
-            this.InitializeComponent();
-
-            ScriptPermissionManager.GlobalInstance = new ScriptPermissionManager(ExecutionMode.Deny);
         }
 
         /// <summary>
@@ -105,6 +101,8 @@ namespace CDP4Reporting.Views
         /// </remarks>
         public ReportDesigner(bool initializeComponent)
         {
+            ScriptPermissionManager.GlobalInstance = new ScriptPermissionManager(ExecutionMode.Deny);
+
             if (initializeComponent)
             {
                 this.InitializeComponent();
@@ -160,12 +158,12 @@ namespace CDP4Reporting.Views
         /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/></param>
         private void ReportDesigner_ActiveDocumentChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue == null)
+            var viewModel = this.DataContext as ReportDesignerViewModel;
+
+            if (viewModel == null || e.NewValue == null)
             {
                 return;
             }
-
-            var viewModel = this.DataContext as ReportDesignerViewModel;
 
             if (viewModel != null && (viewModel.Thing == null || viewModel.BuildResult == null))
             {
@@ -177,7 +175,7 @@ namespace CDP4Reporting.Views
                 return;
             }
 
-            this.Dispatcher.InvokeAsync(this.SetDataSource, DispatcherPriority.ApplicationIdle);
+            this.Dispatcher.InvokeAsync(this.SetDataSource, DispatcherPriority.Normal);
         }
 
 
@@ -197,8 +195,8 @@ namespace CDP4Reporting.Views
                 case "Clear":
                     (this.DataContext as ReportDesignerViewModel).Output = string.Empty;
                     break;
-                case "Rebuild Schema":
-                    this.Dispatcher.InvokeAsync(this.SetDataSource, DispatcherPriority.ApplicationIdle);
+                case "Rebuild Datasource":
+                    this.Dispatcher.InvokeAsync(this.SetDataSource, DispatcherPriority.Normal);
                     break;
             }
         }
@@ -299,8 +297,6 @@ namespace CDP4Reporting.Views
                     SaveReportStream(notificationEvent.Rep4File);
                     break;
             }
-
-            this.Dispatcher.InvokeAsync(this.SetDataSource, DispatcherPriority.ApplicationIdle);
         }
 
         /// <summary>
@@ -318,7 +314,15 @@ namespace CDP4Reporting.Views
 
             if (reportStream.DataSource != null)
             {
-                this.textEditor.Text = new StreamReader(reportStream.DataSource).ReadToEnd();
+                using (var streamReader = new StreamReader(reportStream.DataSource))
+                {
+                    if (this.textEditor.Document == null)
+                    {
+                        this.textEditor.Document = new ICSharpCode.AvalonEdit.Document.TextDocument();
+                    }
+                    this.textEditor.Text = streamReader.ReadToEnd();
+                    this.Dispatcher.InvokeAsync(this.SetDataSource, DispatcherPriority.Normal);
+                }
             }
         }
 
@@ -331,22 +335,25 @@ namespace CDP4Reporting.Views
                 File.Delete(reportArchiveFile);
             }
 
-            var reportStream = new MemoryStream();
-            this.reportDesigner.ActiveDocument.Report.SaveLayoutToXml(reportStream);
-            var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(this.textEditor.Text));
-
-            using (var zipFile = ZipFile.Open(reportArchiveFile, ZipArchiveMode.Create))
+            using (var reportStream = new MemoryStream())
             {
-                using (var reportEntry = zipFile.CreateEntry("Report.repx").Open())
+                this.reportDesigner.ActiveDocument.Report.SaveLayoutToXml(reportStream);
+                using (var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(this.textEditor.Text)))
                 {
-                    reportStream.Position = 0;
-                    reportStream.CopyTo(reportEntry);
-                }
+                    using (var zipFile = ZipFile.Open(reportArchiveFile, ZipArchiveMode.Create))
+                    {
+                        using (var reportEntry = zipFile.CreateEntry("Report.repx").Open())
+                        {
+                            reportStream.Position = 0;
+                            reportStream.CopyTo(reportEntry);
+                        }
 
-                using (var reportEntry = zipFile.CreateEntry("Datasource.cs").Open())
-                {
-                    dataSourceStream.Position = 0;
-                    dataSourceStream.CopyTo(reportEntry);
+                        using (var reportEntry = zipFile.CreateEntry("Datasource.cs").Open())
+                        {
+                            dataSourceStream.Position = 0;
+                            dataSourceStream.CopyTo(reportEntry);
+                        }
+                    }
                 }
             }
         }
