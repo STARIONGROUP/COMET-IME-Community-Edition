@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginUpdateInstallerBehavior.cs" company="RHEA System S.A.">
+// <copyright file="PluginInstallerBehaviorTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,15 +23,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Behaviors
+namespace CDP4Composition.Tests.Behavior
 {
-    using System.Windows.Controls;
+    using CDP4Composition.Behaviors;
 
-    public interface IPluginUpdateInstallerBehavior
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class PluginInstallerBehaviorTestFixture
     {
-        /// <summary>
-        /// Closes the Window
-        /// </summary>
-        void Close();
+        [Test]
+        public void VerifyClose()
+        {
+            var behavior = new PluginInstallerBehavior();
+            behavior.Close();
+        }
     }
 }

@@ -1,7 +1,32 @@
-﻿namespace CDP4Composition.Tests.ViewModels
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="PluginUpdateDataSetup.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace CDP4Composition.Tests.ViewModels
 {
+    using System;
     using System.IO;
-    using System.Security.AccessControl;
 
     using CDP4Composition.Modularity;
     using CDP4Composition.Services.PluginUpdaterService;
@@ -10,8 +35,14 @@
 
     using NUnit.Framework;
 
+    /// <summary>
+    /// Base class for unit test related to Plugin installation 
+    /// </summary>
     public class PluginUpdateDataSetup
     {
+        private const string TestContent = "TESTCONTENT";
+        private const string TestFileName = "test";
+
         protected (FileInfo, Manifest) Plugin;
 
         protected Manifest Manifest;
@@ -21,9 +52,12 @@
         protected string InstallPath;
         protected string UpdatePath;
 
+        /// <summary>
+        /// Base setup wich sets up the file environnement
+        /// </summary>
         public virtual void Setup()
         {
-            this.BasePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginUpdateTestFixture", this.GetType().Name);
+            this.BasePath = Path.Combine(Path.GetTempPath(), "PluginUpdateTestFixture", Guid.NewGuid().ToString());
             this.TempPath = Path.Combine(this.BasePath, "Temp");
             this.InstallPath = Path.Combine(this.BasePath, "Plugins");
             this.UpdatePath = Path.Combine(this.BasePath, "Download");
@@ -72,5 +106,29 @@
             this.Plugin = (new FileInfo("test"), this.Manifest);
         }
 
+        /// <summary>
+        /// Create a test file in the <see cref="destinationPathFullName"/> path
+        /// </summary>
+        /// <param name="destinationPathFullName">the path where to put the test file</param>
+        protected void SetupTestContentForCancellationPurpose(string destinationPathFullName)
+        {
+            this.PluginFileSystem.TemporaryPath.Create();
+            this.PluginFileSystem.InstallationPath.Create();
+
+            var testFileFullName = Path.Combine(destinationPathFullName, TestFileName);
+
+            using var testFileWriter = File.CreateText(testFileFullName);
+            testFileWriter.Write(TestContent);
+        }
+
+        /// <summary>
+        /// Asserts that the file create by <see cref="SetupTestContentForCancellationPurpose"/> is at the intented location
+        /// </summary>
+        protected void AssertCreatedTestFileHasBeenRestored()
+        {
+            var restoredFile = new FileInfo(Path.Combine(this.PluginFileSystem.InstallationPath.FullName, TestFileName));
+            Assert.IsTrue(restoredFile.Exists);
+            Assert.AreEqual(File.ReadAllText(restoredFile.FullName), TestContent);
+        }
     }
 }

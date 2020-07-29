@@ -66,7 +66,7 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// The attached Behavior
         /// </summary>
-        public IPluginUpdateInstallerBehavior Behavior { get; set; }
+        public IPluginInstallerBehavior Behavior { get; set; }
         
         /// <summary>
         /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 

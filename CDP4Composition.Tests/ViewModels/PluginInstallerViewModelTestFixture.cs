@@ -25,6 +25,7 @@
 
 namespace CDP4Composition.Tests.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -39,6 +40,8 @@ namespace CDP4Composition.Tests.ViewModels
     using CDP4Composition.Modularity;
     using CDP4Composition.ViewModels;
 
+    using DevExpress.CodeParser;
+
     using Moq;
 
     using ReactiveUI;
@@ -47,7 +50,7 @@ namespace CDP4Composition.Tests.ViewModels
     public class PluginInstallerViewModelTestFixture : PluginUpdateDataSetup
     {
         private IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> updatablePlugins;
-        private Mock<IPluginUpdateInstallerBehavior> behavior;
+        private Mock<IPluginInstallerBehavior> behavior;
         private PluginInstallerViewModel viewModel;
 
         [SetUp]
@@ -61,7 +64,7 @@ namespace CDP4Composition.Tests.ViewModels
                 this.Plugin
             };
 
-            this.behavior = new Mock<IPluginUpdateInstallerBehavior>();
+            this.behavior = new Mock<IPluginInstallerBehavior>();
             this.behavior.Setup(x => x.Close());
 
             this.viewModel = new PluginInstallerViewModel(this.updatablePlugins);
@@ -75,8 +78,6 @@ namespace CDP4Composition.Tests.ViewModels
                 File.SetAttributes(this.BasePath, FileAttributes.Normal);
                 Directory.Delete(this.BasePath, true);
             }
-
-            Task.Delay(1);
         }
 
         [Test]
@@ -107,8 +108,8 @@ namespace CDP4Composition.Tests.ViewModels
         {
             this.viewModel.Behavior = this.behavior.Object;
 
-            Assert.IsTrue(this.viewModel.CancelCommand.CanExecute(null));
             this.viewModel.ThereIsNoInstallationInProgress = false;
+            Assert.IsTrue(this.viewModel.CancelCommand.CanExecute(null));
             await this.viewModel.CancelCommand.ExecuteAsyncTask(null);
             this.behavior.Verify(x => x.Close(), Times.Once);
             this.viewModel.ThereIsNoInstallationInProgress = true;
@@ -126,6 +127,47 @@ namespace CDP4Composition.Tests.ViewModels
 
             this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = true;
             await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
+        }
+        
+        [Test]
+        public async Task VerifyFailingInstallCommand()
+        {
+            this.PluginFileSystem.UpdateCdp4CkFileInfo.Delete();
+            this.viewModel.Behavior = this.behavior.Object;
+            this.viewModel.AvailablePlugins.First().FileSystem = this.PluginFileSystem;
+            Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
+            this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = true;
+            await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
+            this.behavior.Verify(x => x.Close(), Times.Never);
+        }
+
+        [Test]
+        public async Task VerifyCancellationToken()
+        {
+            File.Delete(this.PluginFileSystem.UpdateCdp4CkFileInfo.FullName);
+            this.SetupTestContentForCancellationPurpose(this.PluginFileSystem.InstallationPath.FullName);
+
+            using (var largeFile = new FileStream(this.PluginFileSystem.UpdateCdp4CkFileInfo.FullName, FileMode.CreateNew))
+            {
+                largeFile.Seek(100L * 1024 * 1024, SeekOrigin.Begin);
+                largeFile.WriteByte(0);
+                largeFile.Close();
+            }
+
+            this.viewModel.Behavior = this.behavior.Object;
+            this.viewModel.AvailablePlugins.First().FileSystem = this.PluginFileSystem;
+            Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
+            this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = true;
+
+            await Task.WhenAll(
+                this.viewModel.InstallCommand.ExecuteAsyncTask(null),
+                Task.Run(() =>
+                {
+                    Task.Delay(1);
+                    return this.viewModel.CancelCommand.ExecuteAsyncTask(null);
+                }));
+
+            this.AssertCreatedTestFileHasBeenRestored();
         }
     }
 }

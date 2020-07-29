@@ -27,6 +27,7 @@
 namespace CDP4Composition.Tests.Modularity
 {
     using System;
+    using System.IO;
     using System.Threading;
 
     using CDP4Composition.Modularity;
@@ -43,12 +44,30 @@ namespace CDP4Composition.Tests.Modularity
     public class UpdateInstallerTestFixture
     {
         private Mock<IPluginInstallerViewInvokerService> viewInvoker;
+        private string downloadPath;
 
         [SetUp]
         public void Setup()
         {
             this.viewInvoker = new Mock<IPluginInstallerViewInvokerService>();
             this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<PluginInstaller>()));
+
+            var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
+            this.downloadPath = Path.Combine(path1: appData, path2: "RHEA/CDP4/DownloadCache/plugins");
+
+            if (!Directory.Exists(this.downloadPath))
+            {
+                Directory.CreateDirectory(this.downloadPath);
+            }
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            if (Directory.Exists(this.downloadPath))
+            {
+                Directory.Delete(this.downloadPath, true);
+            }
         }
 
         [Test]
@@ -56,6 +75,23 @@ namespace CDP4Composition.Tests.Modularity
         {
             UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
             this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Never);
+            
+            var dataPath = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ViewModels/PluginMockData/"));
+
+            foreach (var file in dataPath.EnumerateFiles())
+            {
+                var destination = Path.Combine(this.downloadPath, Path.GetFileNameWithoutExtension(file.Name));
+
+                if (!Directory.Exists(destination))
+                {
+                    Directory.CreateDirectory(destination);
+                }
+                
+                File.Copy(file.FullName, Path.Combine(destination, file.Name), true);
+            }
+
+            UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
+            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Once);
         }
     }
 }

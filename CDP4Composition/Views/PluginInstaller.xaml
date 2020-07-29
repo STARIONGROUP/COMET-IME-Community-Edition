@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         Title="CDP4-Plugin-Installer" Height="600" Width="600" ResizeMode="NoResize" BorderThickness="0" Background="White">
     <dxmvvm:Interaction.Behaviors>
-        <behaviors:PluginUpdateInstallerBehavior></behaviors:PluginUpdateInstallerBehavior>
+        <behaviors:PluginInstallerBehavior></behaviors:PluginInstallerBehavior>
     </dxmvvm:Interaction.Behaviors>
     <Grid>
         <Grid.RowDefinitions>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginUpdateInstallerBehavior.cs" company="RHEA System S.A.">
+// <copyright file="PluginInstallerBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -26,24 +26,17 @@
 
 namespace CDP4Composition.Behaviors
 {
-    using System;
-    using System.Collections.Specialized;
     using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Windows.Documents;
 
     using CDP4Composition.ViewModels;
     using CDP4Composition.Views;
 
     using DevExpress.Mvvm.UI.Interactivity;
 
-    using ReactiveUI;
-
     /// <summary>
     /// Behavior of the e<see cref="PluginInstaller"/> used to handle the interactions between <see cref="PluginInstallerViewModel"/> and the view
     /// </summary>
-    public class PluginUpdateInstallerBehavior : Behavior<PluginInstaller>, IPluginUpdateInstallerBehavior
+    public class PluginInstallerBehavior : Behavior<PluginInstaller>, IPluginInstallerBehavior
     {
         /// <summary>
         /// Register event handlers

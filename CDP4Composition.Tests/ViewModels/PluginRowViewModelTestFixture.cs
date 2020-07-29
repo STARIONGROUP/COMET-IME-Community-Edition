@@ -56,8 +56,6 @@ namespace CDP4Composition.Tests.ViewModels
         [TearDown]
         public void Teardown()
         {
-            Task.Delay(1);
-
             if (Directory.Exists(this.BasePath))
             {
                 File.SetAttributes(this.BasePath, FileAttributes.Normal);
@@ -106,26 +104,12 @@ namespace CDP4Composition.Tests.ViewModels
         [Test]
         public void VerifyCancelation()
         {
-            const string testContent = "test";
-            const string testFileName = "TESTCONTENT";
-
-            this.PluginFileSystem.TemporaryPath.Create();
-            this.PluginFileSystem.InstallationPath.Create();
-
-            var testFileFullName = Path.Combine(this.PluginFileSystem.TemporaryPath.FullName, testFileName);
-            
-            using (var testFileWriter = File.CreateText(testFileFullName))
-            {
-                testFileWriter.Write(testContent);
-            }
+            this.SetupTestContentForCancellationPurpose(this.PluginFileSystem.TemporaryPath.FullName);
 
             var viewModel = new PluginRowViewModel(this.Plugin, this.PluginFileSystem);
             viewModel.HandlingCancelation();
 
-            //Assert.IsFalse(this.PluginFileSystem.TemporaryPath.Exists);
-            var restoredFile = new FileInfo(Path.Combine(this.PluginFileSystem.InstallationPath.FullName, testFileName));
-            Assert.IsTrue(restoredFile.Exists);
-            Assert.AreEqual(File.ReadAllText(restoredFile.FullName), testContent);
+            this.AssertCreatedTestFileHasBeenRestored();
         }
 
         [Test]
