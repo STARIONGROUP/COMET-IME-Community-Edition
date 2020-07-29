@@ -141,6 +141,11 @@ namespace CDP4Composition.Tests.ViewModels
             this.behavior.Verify(x => x.Close(), Times.Never);
         }
 
+        /// <summary>
+        /// This test is creating a large file (100MB) so it can have a chance to Invoke the cancellation on the CancellationToken
+        /// The Task may fail on some system.
+        /// </summary>
+        /// <returns>The Task may fail on some system</returns>
         [Test]
         public async Task VerifyCancellationToken()
         {
