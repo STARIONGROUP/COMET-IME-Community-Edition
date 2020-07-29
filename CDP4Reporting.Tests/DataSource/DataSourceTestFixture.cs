@@ -274,16 +274,16 @@ namespace CDP4Reporting.Tests.DataSource
                 this.option,
                 this.domain);
 
-            //// tabular representation built, category hierarchy considered, unneeded subtrees pruned
-            //var rows = dataSource.GetTable().Rows;
-            //Assert.AreEqual(6, rows.Count);
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned
+            var rows = dataSource.GetTable().Rows;
+            Assert.AreEqual(6, rows.Count);
 
-            //ValidateRow(rows[0], true, this.ed1);
-            //ValidateRow(rows[1], true, this.ed1, this.eu12n1);
-            //ValidateRow(rows[2], true, this.ed1, this.eu12p1);
-            //ValidateRow(rows[3], true, this.ed1, this.eu12p1, this.eu2p31);
-            //ValidateRow(rows[4], false, this.ed1, this.eu12p2);
-            //ValidateRow(rows[5], true, this.ed1, this.eu12p2, this.eu2p31);
+            ValidateRow(rows[0], true, this.ed1);
+            ValidateRow(rows[1], true, this.ed1, this.eu12n1);
+            ValidateRow(rows[2], true, this.ed1, this.eu12p1);
+            ValidateRow(rows[3], true, this.ed1, this.eu12p1, this.eu2p31);
+            ValidateRow(rows[4], false, this.ed1, this.eu12p2);
+            ValidateRow(rows[5], true, this.ed1, this.eu12p2, this.eu2p31);
         }
 
         private static void ValidateRow(
