@@ -91,6 +91,11 @@ namespace CDP4Composition.Reporting
         private readonly T rowRepresentation;
 
         /// <summary>
+        /// TODO
+        /// </summary>
+        private readonly int level;
+
+        /// <summary>
         /// The parent node in the hierarhical tree upon which the data source is based.
         /// </summary>
         private readonly ReportingDataSourceNode<T> parent;
@@ -101,9 +106,17 @@ namespace CDP4Composition.Reporting
         internal List<ReportingDataSourceNode<T>> Children { get; } = new List<ReportingDataSourceNode<T>>();
 
         /// <summary>
+        /// TODO
+        /// </summary>
+        internal readonly NestedElement NestedElement;
+
+        /// <summary>
         /// The <see cref="ElementBase"/> associated with this node.
         /// </summary>
-        internal readonly ElementBase ElementBase;
+        internal ElementBase ElementBase =>
+            this.NestedElement.IsRootElement
+                ? (ElementBase)this.NestedElement.RootElement
+                : this.NestedElement.ElementUsage.Last();
 
         /// <summary>
         /// The <see cref="ElementDefinition"/> representing this node.
@@ -138,25 +151,31 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceNode{T}"/> class.
         /// </summary>
-        /// <param name="elementBase">
-        /// The <see cref="ElementBase"/> associated with this node.
-        /// </param>
         /// <param name="categoryHierarchy">
         /// The <see cref="CategoryHierarchy"/> associated with this node's subtree.
+        /// </param>
+        /// <param name="topElement">
+        /// TODO
+        /// </param>
+        /// <param name="nestedElements">
+        /// TODO
         /// </param>
         /// <param name="parent">
         /// The parent node in the hierarhical tree upon which the data source is based.
         /// </param>
         public ReportingDataSourceNode(
-            ElementBase elementBase,
             CategoryHierarchy categoryHierarchy,
+            NestedElement topElement,
+            List<NestedElement> nestedElements,
             ReportingDataSourceNode<T> parent = null)
         {
             this.filterCategory = categoryHierarchy.Category;
 
+            this.NestedElement = topElement;
+
             this.parent = parent;
 
-            this.ElementBase = elementBase;
+            this.level = parent?.level + 1 ?? 0;
 
             this.rowRepresentation = this.GetRowRepresentation();
 
@@ -165,9 +184,21 @@ namespace CDP4Composition.Reporting
                 return;
             }
 
-            foreach (var childUsage in this.ElementDefinition.ContainedElement)
+            var children = nestedElements.Where(ne => ne.ElementUsage.Count == this.level + 1);
+
+            if (this.parent != null)
             {
-                var childNode = new ReportingDataSourceNode<T>(childUsage, categoryHierarchy.Child, this);
+                children = children.Where(ne =>
+                    ne.ElementUsage[this.level - 1] == this.NestedElement.ElementUsage.Last());
+            }
+
+            foreach (var child in children)
+            {
+                var childNode = new ReportingDataSourceNode<T>(
+                    categoryHierarchy.Child,
+                    child,
+                    nestedElements,
+                    this);
 
                 if (childNode.IsRelevant)
                 {

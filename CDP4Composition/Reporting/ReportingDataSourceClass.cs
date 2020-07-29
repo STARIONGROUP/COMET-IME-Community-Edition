@@ -28,6 +28,11 @@ namespace CDP4Composition.Reporting
     using CDP4Common.EngineeringModelData;
 
     using System.Data;
+    using System.Linq;
+
+    using CDP4Common.Helpers;
+
+    using CDP4Dal;
 
     /// <summary>
     /// Class representing a reporting data source.
@@ -50,17 +55,31 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceClass{T}"/> class.
         /// </summary>
-        /// <param name="iteration">
-        /// The <see cref="Iteration"/> upon which the data source is based.
-        /// </param>
         /// <param name="categoryHierarchy">
         /// The <see cref="CategoryHierarchy"/> used for filtering the considered <see cref="ElementBase"/> items.
         /// </param>
-        public ReportingDataSourceClass(Iteration iteration, CategoryHierarchy categoryHierarchy)
+        /// <param name="option">
+        /// TODO
+        /// </param>
+        /// <param name="session">
+        /// TODO
+        /// </param>
+        public ReportingDataSourceClass(CategoryHierarchy categoryHierarchy, Option option, ISession session)
         {
             this.categoryHierarchy = categoryHierarchy;
 
-            this.topNode = new ReportingDataSourceNode<T>(iteration.TopElement, categoryHierarchy);
+            var model = (EngineeringModel)option.TopContainer;
+            var modelSetup = model.EngineeringModelSetup;
+
+            var activeParticipant = modelSetup.Participant.Single(x => x.Person == session.ActivePerson);
+
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(option, activeParticipant.SelectedDomain)
+                .ToList();
+
+            var topElement = nestedElements.First(ne => ne.IsRootElement);
+
+            this.topNode = new ReportingDataSourceNode<T>(categoryHierarchy, topElement, nestedElements);
         }
 
         /// <summary>

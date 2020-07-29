@@ -27,6 +27,8 @@ namespace CDP4Composition.Reporting
 {
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Dal;
+
     /// <summary>
     /// The interface used for creating a reporting data source.
     /// </summary>
@@ -38,12 +40,15 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// Creates a new data source instance.
         /// </summary>
-        /// <param name="iteration">
-        /// The <see cref="Iteration"/> based on which the data source will be created.
+        /// <param name="option">
+        /// TODO
+        /// </param>
+        /// <param name="session">
+        /// TODO
         /// </param>
         /// <returns>
         /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
         /// </returns>
-        ReportingDataSourceClass<T> CreateDataSource(Iteration iteration);
+        ReportingDataSourceClass<T> CreateDataSource(Option option, ISession session);
     }
 }
