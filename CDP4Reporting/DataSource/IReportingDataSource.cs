@@ -36,6 +36,8 @@ namespace CDP4Reporting.DataSource
     /// </typeparam>
     public interface IReportingDataSource<T> where T : ReportingDataSourceRow, new()
     {
+        private readonly CategoryHierarchy categoryHierarchy;
+
         /// <summary>
         /// Creates a new data source instance.
         /// </summary>
