@@ -28,26 +28,26 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Dal;
+
     /// <summary>
     /// The interface used for creating a reporting data source.
     /// </summary>
     /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
     public interface IReportingDataSource
     {
-        private readonly CategoryHierarchy categoryHierarchy;
-
         /// <summary>
         /// Creates a new data source instance.
         /// </summary>
         /// <param name="option">
-        /// The <see cref="Option"/> for which the data source is built.
+        /// TODO
         /// </param>
-        /// <param name="domainOfExpertise">
-        /// The <see cref="DomainOfExpertise"/> for which the data source is built.
+        /// <param name="session">
+        /// TODO
         /// </param>
         /// <returns>
-        /// An object instance.
+        /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
         /// </returns>
-        ReportingDataSourceClass<T> CreateDataSource(Option option, DomainOfExpertise domainOfExpertise);
+        ReportingDataSourceClass<T> CreateDataSource(Option option, ISession session);
     }
 }

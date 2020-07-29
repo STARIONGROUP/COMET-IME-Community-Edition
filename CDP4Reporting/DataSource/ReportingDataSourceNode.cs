@@ -91,6 +91,11 @@ namespace CDP4Reporting.DataSource
         private readonly T rowRepresentation;
 
         /// <summary>
+        /// TODO
+        /// </summary>
+        private readonly int level;
+
+        /// <summary>
         /// The parent node in the hierarhical tree upon which the data source is based.
         /// </summary>
         private readonly ReportingDataSourceNode<T> parent;
