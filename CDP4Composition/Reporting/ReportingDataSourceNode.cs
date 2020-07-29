@@ -126,7 +126,7 @@ namespace CDP4Composition.Reporting
         /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
         /// </summary>
         private bool IsVisible =>
-            this.ElementBase.Category.Contains(this.filterCategory);
+             (this.ElementDefinition?.Category.Contains(this.filterCategory) ?? false) || (this.ElementUsage?.Category.Contains(this.filterCategory) ?? false);
 
         /// <summary>
         /// Boolean flag indicating whether the current node or any of its <see cref="Children"/>
