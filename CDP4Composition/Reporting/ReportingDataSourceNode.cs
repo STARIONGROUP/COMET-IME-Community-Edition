@@ -43,9 +43,6 @@ namespace CDP4Composition.Reporting
     /// </typeparam>
     internal class ReportingDataSourceNode<T> where T : ReportingDataSourceRow, new()
     {
-        internal static readonly IEnumerable<PropertyInfo> PublicGetters = typeof(T).GetProperties()
-            .Where(p => p.GetMethod?.IsPublic != null);
-
         /// <summary>
         /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="ReportingDataSourceColumn{T}"/>s
         /// declared as <see cref="ReportingDataSourceRow"/> fields.
@@ -119,13 +116,6 @@ namespace CDP4Composition.Reporting
         /// </summary>
         internal ElementUsage ElementUsage =>
             this.ElementBase as ElementUsage;
-
-        /// <summary>
-        /// The fully qualified (to the tree root) name of this <see cref="ElementBase"/>.
-        /// </summary>
-        private string FullyQualifiedName => (this.parent != null)
-            ? this.parent.FullyQualifiedName + "." + this.ElementUsage.ShortName
-            : this.ElementDefinition.ShortName;
 
         /// <summary>
         /// The filtering <see cref="Category"/> that must be matched on the current <see cref="ElementBase"/>.
@@ -285,73 +275,6 @@ namespace CDP4Composition.Reporting
             this.parent?.InitializeCategoryColumns(row);
 
             row[this.filterCategory.ShortName] = this.ElementBase.Name;
-        }
-
-        /// <summary>
-        /// Gets the tabular representation of this node.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="ReportingDataSourceRow"/>.
-        /// </returns>
-        private T GetRowRepresentation()
-        {
-            var row = new T
-            {
-                ElementBase = this.ElementBase,
-                ElementName = this.FullyQualifiedName,
-                IsVisible = this.IsVisible
-            };
-
-            if (!this.IsVisible)
-            {
-                return row;
-            }
-
-            foreach (var rowField in RowFields)
-            {
-                var column = rowField.Key
-                    .GetConstructor(Type.EmptyTypes)
-                    .Invoke(new object[] { }) as ReportingDataSourceColumn<T>;
-
-                column.Initialize(this);
-
-                rowField.Value.SetValue(row, column);
-            }
-
-            return row;
-        }
-
-        internal void AddDataRows(DataTable table)
-        {
-            table.Rows.Add(this.GetDataRow(table));
-
-            foreach (var child in this.Children)
-            {
-                child.AddDataRows(table);
-            }
-        }
-
-        private DataRow GetDataRow(DataTable table)
-        {
-            var row = table.NewRow();
-
-            this.InitializeCategoryColumns(row);
-
-            foreach (var publicGetter in PublicGetters)
-            {
-                row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
-                    this.rowRepresentation,
-                    new object[] { });
-            }
-
-            return row;
-        }
-
-        private void InitializeCategoryColumns(DataRow row)
-        {
-            this.parent?.InitializeCategoryColumns(row);
-
-            row[this.filterCategory.Name] = this.ElementBase.Name;
         }
     }
 }
