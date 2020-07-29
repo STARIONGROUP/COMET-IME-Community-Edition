@@ -143,8 +143,8 @@
                                     <dxb:BarButtonItem
                                         ItemClick="BarButtonItem_ItemClick"
                                         LargeGlyph="{dx:DXImage Image=ManageDatasource_32x32.png}"
-                                        Content="Rebuild Schema"
-                                        Hint="Rebuild Schema" />
+                                        Content="Rebuild Datasource"
+                                        Hint="Rebuild Datasource" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
                             <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.DesignerHomePage}" PropertyName="Caption" Value="File" />
