@@ -28,6 +28,7 @@ namespace CDP4Composition.Reporting
     using CDP4Common.EngineeringModelData;
 
     using System.Collections.Generic;
+    using System.Data;
 
     /// <summary>
     /// Class representing a reporting data source.
@@ -37,6 +38,8 @@ namespace CDP4Composition.Reporting
     /// </typeparam>
     public class ReportingDataSourceClass<T> where T : ReportingDataSourceRow, new()
     {
+        private readonly CategoryHierarchy categoryHierarchy;
+
         /// <summary>
         /// The <see cref="ReportingDataSourceNode{T}"/> which is the root of the hierarhical tree.
         /// </summary>
@@ -53,6 +56,8 @@ namespace CDP4Composition.Reporting
         /// </param>
         public ReportingDataSourceClass(Iteration iteration, CategoryHierarchy categoryHierarchy)
         {
+            this.categoryHierarchy = categoryHierarchy;
+
             this.topNode = new ReportingDataSourceNode<T>(iteration.TopElement, categoryHierarchy);
         }
 
@@ -65,6 +70,25 @@ namespace CDP4Composition.Reporting
         public List<T> GetTabularRepresentation()
         {
             return this.topNode.GetTabularRepresentation();
+        }
+
+        public DataTable GetTable()
+        {
+            var table = new DataTable();
+
+            for (var hierarchy = this.categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
+            {
+                table.Columns.Add(hierarchy.Category.Name, typeof(string));
+            }
+
+            foreach (var publicGetter in ReportingDataSourceNode<T>.PublicGetters)
+            {
+                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
+            }
+
+            this.topNode.AddDataRows(table);
+
+            return table;
         }
     }
 }
