@@ -116,7 +116,9 @@ namespace CDP4Composition.Tests.Modularity
             var directoryInfo = PluginUtilities.GetTempDirectoryInfo(PluginName);
 
             Assert.IsNotNull(directoryInfo);
-            Assert.IsTrue(directoryInfo.Exists);
+            Assert.IsNotNull(directoryInfo.Parent);
+            Assert.IsTrue(directoryInfo.Parent.Exists);
+            Assert.IsFalse(directoryInfo.Exists);
         }
     }
 }
