@@ -23,15 +23,16 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-namespace CDP4Composition.ViewModels
+namespace CDP4IME.ViewModels
 {
     using System;
     using System.Diagnostics;
     using System.IO;
 
     using CDP4Composition.Modularity;
-    using CDP4Composition.Services.PluginUpdaterService;
-    using CDP4Composition.Views;
+
+    using CDP4IME.Services;
+    using CDP4IME.Views;
 
     using NLog;
 

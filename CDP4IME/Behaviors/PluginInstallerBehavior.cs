@@ -23,13 +23,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-namespace CDP4Composition.Behaviors
+namespace CDP4IME.Behaviors
 {
     using System.ComponentModel;
-
-    using CDP4Composition.ViewModels;
-    using CDP4Composition.Views;
+    
+    using CDP4IME.ViewModels;
+    using CDP4IME.Views;
 
     using DevExpress.Mvvm.UI.Interactivity;
 

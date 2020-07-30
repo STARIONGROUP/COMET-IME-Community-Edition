@@ -1,19 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginInstallerViewInvokerService.cs" company="RHEA System S.A.">
+// <copyright file="PluginInstaller.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
-//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//    This file is part of CDP4-Plugin Installer Community Edition. 
+//    The CDP4-Plugin Installer Community Edition is the RHEA Plugin Installer for the CDP4-IME Community Edition.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-Plugin Installer Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-Plugin Installer Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -23,19 +22,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services.PluginUpdaterService
+namespace CDP4IME.Views
 {
-    using CDP4Composition.Views;
-    
+    using System.Windows;
+
     /// <summary>
-    /// Defines the <see cref="PluginInstallerViewInvokerService"/> which is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// Interaction logic for PluginInstaller.xaml
     /// </summary>
-    public interface IPluginInstallerViewInvokerService
+    public partial class PluginInstaller : Window
     {
         /// <summary>
-        /// Brings the view to the user sight
+        /// Instanciate a new <see cref="PluginInstaller"/>
         /// </summary>
-        /// <param name="viewInstance">the view to show up</param>
-        void ShowDialog(PluginInstaller viewInstance);
+        public PluginInstaller()
+        {
+            this.InitializeComponent();
+        }
     }
 }

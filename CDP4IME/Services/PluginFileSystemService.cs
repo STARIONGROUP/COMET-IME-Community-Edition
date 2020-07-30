@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services.PluginUpdaterService
+namespace CDP4IME.Services
 {
     using System.ComponentModel.Composition;
     using System.IO;
@@ -31,12 +31,9 @@ namespace CDP4Composition.Services.PluginUpdaterService
 
     using CDP4Composition.Modularity;
 
-    using NLog;
-
     /// <summary>
     /// The purpose of the <see cref="PluginFileSystemService"/> is to provide operations appliable on a file system
     /// </summary>
-    [Export(typeof(IPluginFileSystemService))]
     public class PluginFileSystemService : IPluginFileSystemService
     {
         /// <summary>

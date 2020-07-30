@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginRow.xaml.cs" company="RHEA System S.A.">
+// <copyright file="PluginInstallerBehaviorTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,21 +23,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Views
+namespace CDP4IME.Tests.Behaviors
 {
-    using System.Windows.Controls;
+    using CDP4IME.Behaviors;
 
-    /// <summary>
-    /// Interaction logic for PluginRow.xaml
-    /// </summary>
-    public partial class PluginRow
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class PluginInstallerBehaviorTestFixture
     {
-        /// <summary>
-        /// Instanciate a new <see cref="PluginRow"/>
-        /// </summary>
-        public PluginRow()
+        [Test]
+        public void VerifyClose()
         {
-            this.InitializeComponent();
+            var behavior = new PluginInstallerBehavior();
+            behavior.Close();
         }
     }
 }

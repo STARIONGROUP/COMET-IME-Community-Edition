@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginInstallerViewModel.cs" company="RHEA System S.A.">
+// <copyright file="PluginInstallerViewInvokerServiceTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,22 +23,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.ViewModels
+
+namespace CDP4IME.Tests.Services
 {
+    using System;
     using System.Threading;
 
-    using CDP4Composition.Behaviors;
+    using CDP4IME.Services;
 
-    public interface IPluginInstallerViewModel
+    using NUnit.Framework;
+
+    [TestFixture, Apartment(ApartmentState.STA)]
+    public class PluginInstallerViewInvokerServiceTestFixture
     {
-        /// <summary>
-        /// The attached Behavior
-        /// </summary>
-        IPluginInstallerBehavior Behavior { get; set; }
-
-        /// <summary>
-        /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 
-        /// </summary>
-        CancellationTokenSource CancellationTokenSource { get; }
+        [Test]
+        public void VerifyViewShowsUp()
+        {
+            Assert.Throws<NullReferenceException>(() =>
+            {
+                new PluginInstallerViewInvokerService().ShowDialog(null);
+            });
+        }
     }
 }

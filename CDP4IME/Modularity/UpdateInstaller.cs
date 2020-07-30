@@ -23,32 +23,17 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Modularity
+namespace CDP4IME.Modularity
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.IO.Compression;
     using System.Linq;
-    using System.Reflection;
-    using System.Windows;
 
-    using CDP4Composition.PluginSettingService;
-    using CDP4Composition.Services.PluginUpdaterService;
-    using CDP4Composition.Utilities;
+    using CDP4Composition.Modularity;
     using CDP4Composition.ViewModels;
     using CDP4Composition.Views;
 
-    using DevExpress.Xpf.Core;
-
-    using Microsoft.Practices.ServiceLocation;
-
-    using Newtonsoft.Json;
-
-    using NLog;
-
-    using ReactiveUI;
+    using CDP4IME.Services;
+    using CDP4IME.ViewModels;
+    using CDP4IME.Views;
 
     /// <summary>
     /// The <see cref="UpdateInstaller"/> is responsible to check all the CDP4 download folders and to install/update the availables user-selected plugins 

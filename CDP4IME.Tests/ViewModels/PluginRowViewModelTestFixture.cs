@@ -23,18 +23,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.ViewModels
+namespace CDP4IME.Tests.ViewModels
 {
     using System;
     using System.IO;
-    using System.IO.Compression;
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading;
-    using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
     using CDP4Composition.ViewModels;
+
+    using CDP4IME.ViewModels;
 
     using Newtonsoft.Json;
 

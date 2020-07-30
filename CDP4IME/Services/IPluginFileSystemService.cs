@@ -24,7 +24,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services.PluginUpdaterService
+namespace CDP4IME.Services
 {
     using System.IO;
 

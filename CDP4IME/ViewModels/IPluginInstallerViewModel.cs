@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginInstallerBehavior.cs" company="RHEA System S.A.">
+// <copyright file="IPluginInstallerViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,15 +23,22 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Behaviors
+namespace CDP4IME.ViewModels
 {
-    using System.Windows.Controls;
+    using System.Threading;
 
-    public interface IPluginInstallerBehavior
+    using CDP4IME.Behaviors;
+
+    public interface IPluginInstallerViewModel
     {
         /// <summary>
-        /// Closes the Window
+        /// The attached Behavior
         /// </summary>
-        void Close();
+        IPluginInstallerBehavior Behavior { get; set; }
+
+        /// <summary>
+        /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 
+        /// </summary>
+        CancellationTokenSource CancellationTokenSource { get; }
     }
 }

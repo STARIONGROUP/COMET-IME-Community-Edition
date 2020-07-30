@@ -141,7 +141,6 @@
     <Resource Include="Resources\Images\Log\Error_16x16.png" />
     <Resource Include="Resources\Images\Log\Info_16x16.png" />
     <Resource Include="Resources\Images\Log\Warning_16x16.png" />
-    <Resource Include="Resources\Images\rhea.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\Thing\naturallanguage.png" />
@@ -229,12 +228,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\PluginInstaller.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\PluginRow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\SessionHeader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -273,10 +266,5 @@
     <Compile Remove="obj\x64\Release\Views\InformationDialog.g.cs" />
     <Compile Remove="obj\x64\Release\Views\LoadingControl.g.cs" />
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Resources\Images\rhea.png" />
-    <None Remove="Views\PluginInstaller.xaml" />
-    <None Remove="Views\PluginRow.xaml" />
   </ItemGroup>
 </Project>

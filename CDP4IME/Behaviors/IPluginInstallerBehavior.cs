@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginInstallerViewInvokerService.cs" company="RHEA System S.A.">
+// <copyright file="IPluginInstallerBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,26 +23,13 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-namespace CDP4Composition.Services.PluginUpdaterService
+namespace CDP4IME.Behaviors
 {
-    using System.ComponentModel.Composition;
-
-    using CDP4Composition.Views;
-
-    /// <summary>
-    /// The <see cref="PluginInstallerViewInvokerService"/> is responsible to display the instanciated view <see cref="PluginInstaller"/>
-    /// </summary>
-    [Export(typeof(IPluginInstallerViewInvokerService))]
-    public class PluginInstallerViewInvokerService : IPluginInstallerViewInvokerService
+    public interface IPluginInstallerBehavior
     {
         /// <summary>
-        /// Brings the view to the user sight
+        /// Closes the Window
         /// </summary>
-        /// <param name="viewInstance">the view to show up</param>
-        public void ShowDialog(PluginInstaller viewInstance)
-        {
-            viewInstance.ShowDialog();
-        }
+        void Close();
     }
 }

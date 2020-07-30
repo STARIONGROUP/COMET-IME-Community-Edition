@@ -23,9 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.ViewModels
+namespace CDP4IME.Tests.ViewModels
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -33,16 +32,15 @@ namespace CDP4Composition.Tests.ViewModels
     using System.Threading;
     using System.Threading.Tasks;
 
-    using CDP4Composition.Behaviors;
-
-    using NUnit.Framework;
-
     using CDP4Composition.Modularity;
     using CDP4Composition.ViewModels;
 
-    using DevExpress.CodeParser;
+    using CDP4IME.Behaviors;
+    using CDP4IME.ViewModels;
 
     using Moq;
+
+    using NUnit.Framework;
 
     using ReactiveUI;
 

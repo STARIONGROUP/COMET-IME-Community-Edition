@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginInstallerBehaviorTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="PluginInstallerViewInvokerService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,20 +23,25 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.Behavior
+
+namespace CDP4IME.Services
 {
-    using CDP4Composition.Behaviors;
+    using System.ComponentModel.Composition;
 
-    using NUnit.Framework;
+    using CDP4IME.Views;
 
-    [TestFixture]
-    public class PluginInstallerBehaviorTestFixture
+    /// <summary>
+    /// The <see cref="PluginInstallerViewInvokerService"/> is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// </summary>
+    public class PluginInstallerViewInvokerService : IPluginInstallerViewInvokerService
     {
-        [Test]
-        public void VerifyClose()
+        /// <summary>
+        /// Brings the view to the user sight
+        /// </summary>
+        /// <param name="viewInstance">the view to show up</param>
+        public void ShowDialog(PluginInstaller viewInstance)
         {
-            var behavior = new PluginInstallerBehavior();
-            behavior.Close();
+            viewInstance.ShowDialog();
         }
     }
 }

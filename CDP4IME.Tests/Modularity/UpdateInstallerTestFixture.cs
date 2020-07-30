@@ -24,19 +24,17 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-namespace CDP4Composition.Tests.Modularity
+namespace CDP4IME.Tests.Modularity
 {
     using System;
     using System.IO;
     using System.Threading;
 
-    using CDP4Composition.Modularity;
-    using CDP4Composition.Services.PluginUpdaterService;
-    using CDP4Composition.Views;
+    using CDP4IME.Modularity;
+    using CDP4IME.Services;
+    using CDP4IME.Views;
 
     using Moq;
-
-    using NLog.Config;
 
     using NUnit.Framework;
 

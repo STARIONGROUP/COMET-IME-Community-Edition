@@ -22,23 +22,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.ViewModels
+namespace CDP4IME.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
-    using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Threading;
 
-    using CDP4Composition.Behaviors;
     using CDP4Composition.Modularity;
-    using CDP4Composition.Views;
+    using CDP4Composition.ViewModels;
 
-    using DevExpress.XtraPrinting.Native;
+    using CDP4IME.Behaviors;
+    using CDP4IME.Views;
 
     using NLog;
 

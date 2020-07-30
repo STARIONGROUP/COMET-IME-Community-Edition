@@ -23,13 +23,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.ViewModels
+namespace CDP4IME.Tests.ViewModels
 {
     using System;
     using System.IO;
 
     using CDP4Composition.Modularity;
-    using CDP4Composition.Services.PluginUpdaterService;
+
+    using CDP4IME.Services;
 
     using Newtonsoft.Json;
 

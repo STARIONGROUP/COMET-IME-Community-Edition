@@ -25,6 +25,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>cdplogo_48x48.ico</ApplicationIcon>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugType>full</DebugType>
@@ -174,6 +175,8 @@
     <None Include="license.rtf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Views\PluginInstaller.xaml.cs" />
+    <None Include="Views\PluginRow.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ExceptionReporter.WinForms.xml" />
@@ -192,9 +195,15 @@
     <Resource Include="Resources\cdp4logo_brand_textonly.png" />
     <Resource Include="cdplogo_48x48.ico" />
     <Resource Include="markdown.xaml License.txt" />
+    <Resource Include="Resources\rhea.png" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" Exclude="App.xaml" />
+    <Compile Remove="Views\PluginInstaller.xaml.cs" />
+    <Compile Remove="Views\PluginRow.xaml.cs" />
+    <None Remove="Resources\rhea.png" />
+    <None Remove="Views\PluginInstaller.xaml" />
+    <None Remove="Views\PluginRow.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
 
     <ApplicationDefinition Include="App.xaml">
