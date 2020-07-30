@@ -175,8 +175,6 @@
     <None Include="license.rtf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Views\PluginInstaller.xaml.cs" />
-    <None Include="Views\PluginRow.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ExceptionReporter.WinForms.xml" />
@@ -199,8 +197,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" Exclude="App.xaml" />
-    <Compile Remove="Views\PluginInstaller.xaml.cs" />
-    <Compile Remove="Views\PluginRow.xaml.cs" />
     <None Remove="Resources\rhea.png" />
     <None Remove="Views\PluginInstaller.xaml" />
     <None Remove="Views\PluginRow.xaml" />

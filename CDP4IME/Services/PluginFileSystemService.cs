@@ -51,16 +51,22 @@ namespace CDP4IME.Services
         public DirectoryInfo InstallationPath { get; set; }
 
         /// <summary>
+        /// holds the plugin name whose belong to this <see cref="PluginFileSystemService"/> instance
+        /// </summary>
+        private string pluginName;
+
+        /// <summary>
         /// Instanciate a new <see cref="PluginFileSystemService"/>
         /// </summary>
         /// <param name="plugin"></param>
         public PluginFileSystemService((FileInfo cdp4ckFile, Manifest manifest) plugin)
         {
             var (cdp4CkFile, manifest) = plugin;
+            this.pluginName = manifest.Name;
 
             this.UpdateCdp4CkFileInfo = cdp4CkFile;
-            this.InstallationPath = PluginUtilities.GetPluginDirectory(manifest.Name);
-            this.TemporaryPath = PluginUtilities.GetTempDirectoryInfo(manifest.Name);
+            this.InstallationPath = PluginUtilities.GetPluginDirectory(this.pluginName);
+            this.TemporaryPath = PluginUtilities.GetTempDirectoryInfo(this.pluginName);
         }
 
         /// <summary>
@@ -73,29 +79,33 @@ namespace CDP4IME.Services
                 this.InstallationPath.Create();
             }
 
-            using var zip = ZipFile.OpenRead(this.UpdateCdp4CkFileInfo.FullName);
-
-            foreach (var zipArchiveEntry in zip.Entries)
+            using (var zip = ZipFile.OpenRead(this.UpdateCdp4CkFileInfo.FullName))
             {
-                var newFile = new FileInfo(Path.Combine(this.InstallationPath.FullName, zipArchiveEntry.FullName));
-
-                if (newFile.Directory is { } && !newFile.Directory.Exists)
+                foreach (var zipArchiveEntry in zip.Entries)
                 {
-                    newFile.Directory.Create();
-                }
+                    var newFile = new FileInfo(Path.Combine(this.InstallationPath.FullName, zipArchiveEntry.FullName));
 
-                zipArchiveEntry.ExtractToFile(newFile.FullName);
+                    if (newFile.Directory is { } && !newFile.Directory.Exists)
+                    {
+                        newFile.Directory.Create();
+                    }
+
+                    zipArchiveEntry.ExtractToFile(newFile.FullName);
+                }
             }
         }
 
         /// <summary>
         /// Move All files and sub directories from the installation directory to the temporary one
+        /// The need to set again <see cref="InstallationPath"/> comes from the <see cref="DirectoryInfo.MoveTo"/>
+        /// which path will be set to the new location: in this case the installation path becomes the tenporary path
         /// </summary>
         public void BackUpOldVersion()
         {
             if (this.InstallationPath.Exists)
             {
                 this.InstallationPath.MoveTo(this.TemporaryPath.FullName);
+                this.InstallationPath = PluginUtilities.GetPluginDirectory(this.pluginName);
             }
         }
 

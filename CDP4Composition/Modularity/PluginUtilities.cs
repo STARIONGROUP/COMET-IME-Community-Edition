@@ -58,7 +58,7 @@ namespace CDP4Composition.Modularity
         /// <summary>
         /// The directory of the downloaded plugin
         /// </summary>
-        public const string DownloadDirectory = "RHEA/CDP4/DownloadCache/";
+        public const string DownloadDirectory = @"RHEA\CDP4\DownloadCache\";
 
         /// <summary>
         /// Gets the plugin <see cref="Manifest"/> present in the IME plugin folder
@@ -144,12 +144,14 @@ namespace CDP4Composition.Modularity
             }
 
             var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
-            var temporaryFolder = Path.Combine(appData, DownloadDirectory, "Temp", pluginName);
+            var temporaryFolder = Path.Combine(appData, DownloadDirectory, "Temp");
 
             if (!Directory.Exists(temporaryFolder))
             {
                 Directory.CreateDirectory(temporaryFolder);
             }
+
+            temporaryFolder = Path.Combine(temporaryFolder, pluginName);
 
             return new DirectoryInfo(temporaryFolder);
         }
