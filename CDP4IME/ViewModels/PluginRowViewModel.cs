@@ -22,7 +22,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4IME.ViewModels
 {
     using System;
@@ -176,7 +175,7 @@ namespace CDP4IME.ViewModels
         public (FileInfo cdp4ckFile, Manifest manifest) Plugin { get; private set; }
 
         /// <summary>
-        /// Instanciate a new <see cref="PluginRowViewModel"/>
+        /// Initializes a new instance of the <see cref="PluginRowViewModel"/> class
         /// </summary>
         /// <param name="plugin">The represented plugin</param>
         /// <param name="pluginFileSystemService">The file system to operate on</param>

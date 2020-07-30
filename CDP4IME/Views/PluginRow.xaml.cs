@@ -33,7 +33,7 @@ namespace CDP4IME.Views
     public partial class PluginRow
     {
         /// <summary>
-        /// Instanciate a new <see cref="PluginRow"/>
+        /// Initializes a new instance of the <see cref="PluginRow"/> class
         /// </summary>
         public PluginRow()
         {

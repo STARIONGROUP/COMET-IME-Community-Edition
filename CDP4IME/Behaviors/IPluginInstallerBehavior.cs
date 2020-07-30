@@ -25,6 +25,9 @@
 
 namespace CDP4IME.Behaviors
 {
+    /// <summary>
+    /// Definition of the behavior <see cref="PluginInstallerBehavior"/> used to handle the interactions between <see cref="CDP4IME.ViewModels.PluginInstallerViewModel"/> and the view <see cref="CDP4IME.Views.PluginInstaller"/>
+    /// </summary>
     public interface IPluginInstallerBehavior
     {
         /// <summary>

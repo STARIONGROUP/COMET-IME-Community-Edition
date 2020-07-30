@@ -32,7 +32,7 @@ namespace CDP4IME.Views
     public partial class PluginInstaller : Window
     {
         /// <summary>
-        /// Instanciate a new <see cref="PluginInstaller"/>
+        /// Initializes a new instance of the <see cref="PluginInstaller"/> class
         /// </summary>
         public PluginInstaller()
         {

@@ -35,8 +35,11 @@ namespace CDP4IME.Tests.Behaviors
         [Test]
         public void VerifyClose()
         {
-            var behavior = new PluginInstallerBehavior();
-            behavior.Close();
+            Assert.DoesNotThrow(() =>
+            { 
+                var behavior = new PluginInstallerBehavior();
+                behavior.Close();
+            });
         }
     }
 }

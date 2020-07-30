@@ -23,11 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4IME.Services
 {
-    using System.ComponentModel.Composition;
-
     using CDP4IME.Views;
 
     /// <summary>

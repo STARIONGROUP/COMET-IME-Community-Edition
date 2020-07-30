@@ -60,8 +60,8 @@ namespace CDP4IME.Behaviors
         /// <summary>
         /// Occurs when the user request the <see cref="PluginInstaller"/> view to close
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the arguments</param>
         private void OnClosing(object sender, CancelEventArgs e)
         {
             (this.AssociatedObject.DataContext as IPluginInstallerViewModel)?.CancellationTokenSource?.Cancel();

@@ -98,7 +98,7 @@ namespace CDP4IME.ViewModels
         public IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> UpdatablePlugins { get; }
 
         /// <summary>
-        /// Instanciate a new <see cref="PluginInstallerViewModel"/>
+        /// Initializes a new instance of the <see cref="PluginInstallerViewModel"/> class
         /// </summary>
         /// <param name="updatablePlugins">the <see cref="IEnumerable{T}"/> of updatable plugins</param>
         public PluginInstallerViewModel(IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> updatablePlugins)

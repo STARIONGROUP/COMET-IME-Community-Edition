@@ -29,6 +29,9 @@ namespace CDP4IME.ViewModels
 
     using CDP4IME.Behaviors;
 
+    /// <summary>
+    /// Definition of the <see cref="PluginInstallerViewModel"/> providing properties and methods the implementing class has to implement
+    /// </summary>
     public interface IPluginInstallerViewModel
     {
         /// <summary>

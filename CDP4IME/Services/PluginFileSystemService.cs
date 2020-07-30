@@ -25,7 +25,6 @@
 
 namespace CDP4IME.Services
 {
-    using System.ComponentModel.Composition;
     using System.IO;
     using System.IO.Compression;
 
