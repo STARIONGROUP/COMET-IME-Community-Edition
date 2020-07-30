@@ -58,7 +58,7 @@ namespace CDP4Composition.Modularity
         /// <summary>
         /// The directory of the downloaded plugin
         /// </summary>
-        public const string DownloadDirectory = @"RHEA\CDP4\DownloadCache\";
+        public const string DownloadDirectory = "DownloadCache";
 
         /// <summary>
         /// Gets the plugin <see cref="Manifest"/> present in the IME plugin folder
@@ -143,8 +143,7 @@ namespace CDP4Composition.Modularity
                 return null;
             }
 
-            var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
-            var temporaryFolder = Path.Combine(appData, DownloadDirectory, "Temp");
+            var temporaryFolder = Path.Combine(GetAppDataPath(), DownloadDirectory, "Temp");
 
             if (!Directory.Exists(temporaryFolder))
             {
@@ -162,8 +161,7 @@ namespace CDP4Composition.Modularity
         /// <returns>Returns a <see cref="IEnumerable{T}"/> of type <code>(FileInfo cdp4ckFile, Manifest manifest)</code> of the updatable plugins</returns>
         public static IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> GetDownloadedInstallablePluginUpdate()
         {
-            var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
-            var downloadPath = Path.Combine(path1: appData, path2: DownloadDirectory, PluginDirectoryName);
+            var downloadPath = Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, PluginDirectoryName);
 
             var updatablePlugins = new List<(FileInfo cdp4ckFile, Manifest manifest)>();
 
@@ -193,7 +191,7 @@ namespace CDP4Composition.Modularity
         /// </summary>
         /// <param name="currentPlateformVersion">the IME version</param>
         /// <param name="downloadedPluginFolder">the found folder of downloaded plugin</param>
-        /// <returns>Returns a represented plugin by a <code>(FileInfo cdp4ckFile, Manifest manifest)</code> </returns></returns>
+        /// <returns>Returns a represented plugin by a <code>(FileInfo cdp4ckFile, Manifest manifest)</code> </returns>
         private static (FileInfo cdp4ckFile, Manifest manifest) GetPlugin(Version currentPlateformVersion, DirectoryInfo downloadedPluginFolder)
         {
             if (downloadedPluginFolder.EnumerateFiles().FirstOrDefault(predicate: f => f.Name.EndsWith(value: ".cdp4ck")) is { } installableCdp4CkFullPath && installableCdp4CkFullPath.Directory is { } installableCdp4CkBasePath)
@@ -236,6 +234,22 @@ namespace CDP4Composition.Modularity
             }
 
             return manifest;
+        }
+
+        /// <summary>
+        /// Gets the path of the AppData directory
+        /// </summary>
+        /// <returns>the Path the AppData folder</returns>
+        public static string GetAppDataPath()
+        {
+            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "RHEA", "CDP4");
+
+            if (!Directory.Exists(appDataPath))
+            {
+                Directory.CreateDirectory(appDataPath);
+            }
+
+            return appDataPath;
         }
     }
 }

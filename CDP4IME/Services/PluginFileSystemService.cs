@@ -53,7 +53,7 @@ namespace CDP4IME.Services
         /// <summary>
         /// holds the plugin name whose belong to this <see cref="PluginFileSystemService"/> instance
         /// </summary>
-        private string pluginName;
+        private readonly string pluginName;
 
         /// <summary>
         /// Instanciate a new <see cref="PluginFileSystemService"/>
