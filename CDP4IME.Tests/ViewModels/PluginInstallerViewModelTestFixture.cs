@@ -148,6 +148,7 @@ namespace CDP4IME.Tests.ViewModels
         public async Task VerifyCancellationToken()
         {
             File.Delete(this.PluginFileSystem.UpdateCdp4CkFileInfo.FullName);
+
             this.SetupTestContentForCancellationPurpose(this.PluginFileSystem.InstallationPath.FullName);
 
             using (var largeFile = new FileStream(this.PluginFileSystem.UpdateCdp4CkFileInfo.FullName, FileMode.CreateNew))

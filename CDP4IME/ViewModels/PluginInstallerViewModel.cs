@@ -176,7 +176,7 @@ namespace CDP4IME.ViewModels
         /// </summary>
         private async Task CancelInstallationsCommandExecute()
         {
-            await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelectedForInstallation).Select(plugin => Task.Run(plugin.HandlingCancelation, this.CancellationTokenSource.Token)).ToArray());
+            await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelectedForInstallation).Select(plugin => Task.Run(plugin.HandlingCancelation)).ToArray());
         }
         
         /// <summary>
