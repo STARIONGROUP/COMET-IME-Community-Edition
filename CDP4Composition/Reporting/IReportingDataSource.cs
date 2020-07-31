@@ -26,8 +26,7 @@
 namespace CDP4Composition.Reporting
 {
     using CDP4Common.EngineeringModelData;
-
-    using CDP4Dal;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// The interface used for creating a reporting data source.
@@ -43,12 +42,12 @@ namespace CDP4Composition.Reporting
         /// <param name="option">
         /// TODO
         /// </param>
-        /// <param name="session">
+        /// <param name="domainOfExpertise">
         /// TODO
         /// </param>
         /// <returns>
         /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
         /// </returns>
-        ReportingDataSourceClass<T> CreateDataSource(Option option, ISession session);
+        ReportingDataSourceClass<T> CreateDataSource(Option option, DomainOfExpertise domainOfExpertise);
     }
 }

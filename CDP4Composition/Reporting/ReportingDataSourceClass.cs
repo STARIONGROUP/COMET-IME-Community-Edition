@@ -31,8 +31,7 @@ namespace CDP4Composition.Reporting
     using System.Linq;
 
     using CDP4Common.Helpers;
-
-    using CDP4Dal;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// Class representing a reporting data source.
@@ -61,20 +60,18 @@ namespace CDP4Composition.Reporting
         /// <param name="option">
         /// TODO
         /// </param>
-        /// <param name="session">
+        /// <param name="domainOfExpertise">
         /// TODO
         /// </param>
-        public ReportingDataSourceClass(CategoryHierarchy categoryHierarchy, Option option, ISession session)
+        public ReportingDataSourceClass(
+            CategoryHierarchy categoryHierarchy,
+            Option option,
+            DomainOfExpertise domainOfExpertise)
         {
             this.categoryHierarchy = categoryHierarchy;
 
-            var model = (EngineeringModel)option.TopContainer;
-            var modelSetup = model.EngineeringModelSetup;
-
-            var activeParticipant = modelSetup.Participant.Single(x => x.Person == session.ActivePerson);
-
             var nestedElements = new NestedElementTreeGenerator()
-                .Generate(option, activeParticipant.SelectedDomain)
+                .Generate(option, domainOfExpertise)
                 .ToList();
 
             var topElement = nestedElements.First(ne => ne.IsRootElement);
