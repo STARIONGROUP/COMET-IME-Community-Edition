@@ -32,6 +32,7 @@ namespace CDP4Composition.Tests.Reporting
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
@@ -46,9 +47,12 @@ namespace CDP4Composition.Tests.Reporting
 
         private Iteration iteration;
 
+        private Option option;
+
         private Category cat1;
         private Category cat2;
 
+        private DomainOfExpertise elementOwner;
         private DomainOfExpertise parameterOwner;
         private DomainOfExpertise parameterOverrideOwner;
 
@@ -96,6 +100,16 @@ namespace CDP4Composition.Tests.Reporting
 
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, null);
 
+            // Option
+
+            this.option = new Option(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "option1",
+                Name = "option1"
+            };
+
+            this.iteration.Option.Add(this.option);
+
             // Categories
 
             this.cat1 = new Category(Guid.NewGuid(), this.cache, null)
@@ -120,16 +134,22 @@ namespace CDP4Composition.Tests.Reporting
 
             // Domains of expertise
 
+            this.elementOwner = new DomainOfExpertise(Guid.NewGuid(), null, null)
+            {
+                ShortName = "owner",
+                Name = "element owner"
+            };
+
             this.parameterOwner = new DomainOfExpertise(Guid.NewGuid(), null, null)
             {
                 ShortName = "owner1",
-                Name = "owner"
+                Name = "parameter owner"
             };
 
             this.parameterOverrideOwner = new DomainOfExpertise(Guid.NewGuid(), null, null)
             {
                 ShortName = "owner2",
-                Name = "override owner"
+                Name = "parameter override owner"
             };
 
             // Parameter types
@@ -157,7 +177,8 @@ namespace CDP4Composition.Tests.Reporting
             this.ed1 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed1",
-                Name = "element definition 1"
+                Name = "element definition 1",
+                Owner = this.elementOwner
             };
 
             this.AddParameter(this.ed1, this.parameterType1, "11");
@@ -167,7 +188,8 @@ namespace CDP4Composition.Tests.Reporting
             this.ed2 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed2",
-                Name = "element definition 2"
+                Name = "element definition 2",
+                Owner = this.elementOwner
             };
 
             this.AddParameter(this.ed2, this.parameterType1, "21");
@@ -180,7 +202,8 @@ namespace CDP4Composition.Tests.Reporting
             {
                 ElementDefinition = this.ed2,
                 ShortName = "eu1",
-                Name = "element usage 1"
+                Name = "element usage 1",
+                Owner = this.elementOwner
             };
 
             this.AddParameterOverride(this.eu1, this.parameterType1, "121");
@@ -191,7 +214,8 @@ namespace CDP4Composition.Tests.Reporting
             {
                 ElementDefinition = this.ed2,
                 ShortName = "eu2",
-                Name = "element usage 2"
+                Name = "element usage 2",
+                Owner = this.elementOwner
             };
 
             this.AddParameterOverride(this.eu2, this.parameterType1, "221");
@@ -264,9 +288,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.ed1,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             Assert.IsNotNull(node.GetColumn<TestParameter1>());
             Assert.IsNotNull(node.GetColumn<TestParameter2>());
@@ -280,9 +309,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.ed1,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("type1", parameter1.ShortName);
@@ -298,9 +332,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.ed1,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("11", parameter1.GetValue());
@@ -318,9 +357,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.eu1,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.Name == this.eu1.Name),
+                nestedElements);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("121", parameter1.GetValue());
@@ -338,9 +382,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.ed1,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             var parameter2 = node.GetColumn<TestParameter2>();
@@ -362,9 +411,14 @@ namespace CDP4Composition.Tests.Reporting
                 .AddLevel(this.cat2.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.ed1,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var parameter = node.GetColumn<TestParameter1>();
 

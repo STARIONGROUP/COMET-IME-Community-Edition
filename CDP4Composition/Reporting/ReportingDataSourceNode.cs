@@ -91,11 +91,6 @@ namespace CDP4Composition.Reporting
         private readonly T rowRepresentation;
 
         /// <summary>
-        /// TODO
-        /// </summary>
-        private readonly int level;
-
-        /// <summary>
         /// The parent node in the hierarhical tree upon which the data source is based.
         /// </summary>
         private readonly ReportingDataSourceNode<T> parent;
@@ -175,8 +170,6 @@ namespace CDP4Composition.Reporting
 
             this.parent = parent;
 
-            this.level = parent?.level + 1 ?? 0;
-
             this.rowRepresentation = this.GetRowRepresentation();
 
             if (categoryHierarchy.Child == null)
@@ -184,12 +177,14 @@ namespace CDP4Composition.Reporting
                 return;
             }
 
-            var children = nestedElements.Where(ne => ne.ElementUsage.Count == this.level + 1);
+            var level = topElement.ElementUsage.Count;
 
-            if (this.parent != null)
+            var children = nestedElements.Where(ne => ne.ElementUsage.Count == level + 1);
+
+            if (level > 0)
             {
                 children = children.Where(ne =>
-                    ne.ElementUsage[this.level - 1] == this.NestedElement.ElementUsage.Last());
+                    ne.ElementUsage[level - 1] == this.NestedElement.ElementUsage.Last());
             }
 
             foreach (var child in children)
