@@ -101,12 +101,12 @@ namespace CDP4Composition.Reporting
         internal List<ReportingDataSourceNode<T>> Children { get; } = new List<ReportingDataSourceNode<T>>();
 
         /// <summary>
-        /// TODO
+        /// The <see cref="CDP4Common.EngineeringModelData.NestedElement"/> associated with this node.
         /// </summary>
         internal readonly NestedElement NestedElement;
 
         /// <summary>
-        /// The <see cref="ElementBase"/> associated with this node.
+        /// The <see cref="CDP4Common.EngineeringModelData.ElementBase"/> associated with this node.
         /// </summary>
         internal ElementBase ElementBase =>
             this.NestedElement.IsRootElement
@@ -114,7 +114,7 @@ namespace CDP4Composition.Reporting
                 : this.NestedElement.ElementUsage.Last();
 
         /// <summary>
-        /// The <see cref="ElementDefinition"/> representing this node.
+        /// The <see cref="CDP4Common.EngineeringModelData.ElementDefinition"/> representing this node.
         /// </summary>
         internal ElementDefinition ElementDefinition =>
             (this.ElementBase as ElementDefinition) ?? (this.ElementBase as ElementUsage)?.ElementDefinition;
@@ -150,10 +150,11 @@ namespace CDP4Composition.Reporting
         /// The <see cref="CategoryHierarchy"/> associated with this node's subtree.
         /// </param>
         /// <param name="topElement">
-        /// TODO
+        /// The <see cref="CDP4Common.EngineeringModelData.NestedElement"/> associated with this node.
         /// </param>
         /// <param name="nestedElements">
-        /// TODO
+        /// All <see cref="CDP4Common.EngineeringModelData.NestedElement"/>s associated with the current
+        /// <see cref="ReportingDataSourceClass{T}"/>.
         /// </param>
         /// <param name="parent">
         /// The parent node in the hierarhical tree upon which the data source is based.

@@ -58,10 +58,10 @@ namespace CDP4Composition.Reporting
         /// The <see cref="CategoryHierarchy"/> used for filtering the considered <see cref="ElementBase"/> items.
         /// </param>
         /// <param name="option">
-        /// TODO
+        /// The <see cref="Option"/> for which the data source is built.
         /// </param>
         /// <param name="domainOfExpertise">
-        /// TODO
+        /// The <see cref="DomainOfExpertise"/> for which the data source is built.
         /// </param>
         public ReportingDataSourceClass(
             CategoryHierarchy categoryHierarchy,

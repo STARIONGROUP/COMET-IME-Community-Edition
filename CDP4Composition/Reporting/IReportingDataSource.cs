@@ -40,10 +40,10 @@ namespace CDP4Composition.Reporting
         /// Creates a new data source instance.
         /// </summary>
         /// <param name="option">
-        /// TODO
+        /// The <see cref="Option"/> for which the data source is built.
         /// </param>
         /// <param name="domainOfExpertise">
-        /// TODO
+        /// The <see cref="DomainOfExpertise"/> for which the data source is built.
         /// </param>
         /// <returns>
         /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
