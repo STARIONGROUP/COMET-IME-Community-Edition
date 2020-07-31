@@ -26,7 +26,7 @@
                 <ColumnDefinition Width="309*"></ColumnDefinition>
                 <ColumnDefinition Width="222*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Image VerticalAlignment="Bottom" Margin="11,0,11.4,4.4" Height="40" HorizontalAlignment="Center" Source="../Resources/Images/cdplogo3d_32x32.png" Width="40"/>
+            <Image VerticalAlignment="Bottom" Margin="11,0,11.4,4.4" Height="40" HorizontalAlignment="Center" Source="Resources/cdplogo3d_48x48.png" Width="40"/>
             <Label Grid.Row="0" VerticalContentAlignment="Bottom"  FontSize="30" HorizontalAlignment="Left" Content="Plugin Installer" Margin="9.6,4,0,0.4" Width="249" RenderTransformOrigin="0.227,0.56" Grid.Column="1"/>
             <Button BorderThickness="0" Grid.Column="2" x:Name="SelectAllUpdateCheckBox" Command="{Binding SelectAllUpdateCheckBoxCommand}" Margin="0,22,10,10" HorizontalAlignment="Right" Width="131">
                 Select/Deselect all

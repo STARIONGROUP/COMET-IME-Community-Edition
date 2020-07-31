@@ -76,20 +76,6 @@ namespace CDP4IME.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the property <see cref="Website"/>
-        /// </summary>
-        private string website;
-
-        /// <summary>
-        /// Gets or Sets the <see cref="website"/> page link of the represented plugin
-        /// </summary>
-        public string Website
-        {
-            get => this.website;
-            set => this.RaiseAndSetIfChanged(ref this.website, value);
-        }
-
-        /// <summary>
         /// Backing field for the property <see cref="Description"/>
         /// </summary>
         private string description;
@@ -165,11 +151,6 @@ namespace CDP4IME.ViewModels
         public IPluginFileSystemService FileSystem { get; set; }
 
         /// <summary>
-        /// Gets or sets the Command that open the plugin store web page relative to this represented plugin
-        /// </summary>
-        public ReactiveCommand<object> WebsiteCommand { get; private set; }
-        
-        /// <summary>
         /// Gets the plugin download path and the new manifest
         /// </summary>
         public (FileInfo cdp4ckFile, Manifest manifest) Plugin { get; private set; }
@@ -184,16 +165,6 @@ namespace CDP4IME.ViewModels
             this.Plugin = plugin;
             this.FileSystem = pluginFileSystemService ?? new PluginFileSystemService(plugin);
             this.UpdateProperties();
-            this.InitializeCommands();
-        }
-
-        /// <summary>
-        /// Initializes the <see cref="ReactiveCommand"/>
-        /// </summary>
-        private void InitializeCommands()
-        {
-            this.WebsiteCommand = ReactiveCommand.Create();
-            this.WebsiteCommand.Subscribe(_ => Process.Start(new ProcessStartInfo(this.Website)));
         }
 
         /// <summary>
@@ -205,7 +176,6 @@ namespace CDP4IME.ViewModels
             this.Description = this.Plugin.manifest.Description;
             this.Version = $"version {this.Plugin.manifest.Version}";
             this.Author = this.Plugin.manifest.Author;
-            this.Website = this.Plugin.manifest.Website;
             this.ReleaseNote = this.Plugin.manifest.ReleaseNote;
         }
 

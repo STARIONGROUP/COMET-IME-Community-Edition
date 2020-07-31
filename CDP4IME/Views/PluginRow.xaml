@@ -30,14 +30,8 @@
             <Label Content="{Binding Version}" Margin="10,0,0,0" VerticalContentAlignment="Bottom" FontSize="14" HorizontalAlignment="Right"></Label>
         </StackPanel>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
-            <Image Margin="3" VerticalAlignment="Center" Source="../Resources/rhea.png" Height="18"></Image>
             <Label VerticalAlignment="Center" Content="{Binding Author}" HorizontalAlignment="Right"></Label>
         </StackPanel>
-        <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom">
-            <Hyperlink TextDecorations="Underline" Cursor="Hand" x:Name="LinkToStore" NavigateUri="{Binding Website}" Command="{Binding WebsiteCommand}">
-                <Run Text="{Binding Website}" />
-            </Hyperlink>
-        </TextBlock>
         <Label Content="{Binding Description}" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left"></Label>
         <Label Content="{Binding ReleaseNote}" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left"></Label>
         <ProgressBar Minimum="0" Maximum="100" Height="25" Visibility="{Binding InstallationProgress, Converter={StaticResource DoubleToVisibilityConverter}}" Grid.Column="0" Value="{Binding InstallationProgress}" Grid.ColumnSpan="2" Margin="5" Grid.Row="3"></ProgressBar>

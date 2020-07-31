@@ -193,11 +193,11 @@
     <Resource Include="Resources\cdp4logo_brand_textonly.png" />
     <Resource Include="cdplogo_48x48.ico" />
     <Resource Include="markdown.xaml License.txt" />
-    <Resource Include="Resources\rhea.png" />
+    <Resource Include="Resources\cdplogo3d_48x48.png" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" Exclude="App.xaml" />
-    <None Remove="Resources\rhea.png" />
+    <None Remove="Resources\cdplogo3d_48x48.png" />
     <None Remove="Views\PluginInstaller.xaml" />
     <None Remove="Views\PluginRow.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />

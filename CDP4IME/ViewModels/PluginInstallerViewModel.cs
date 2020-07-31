@@ -154,6 +154,7 @@ namespace CDP4IME.ViewModels
                 this.CancellationTokenSource.Token.Register(async () => await this.CancelInstallationsCommandExecute());
 
                 await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelectedForInstallation).Select(plugin => Task.Run(plugin.Install, this.CancellationTokenSource.Token)).ToArray());
+                await Task.Delay(1000);
             }
             catch (Exception exception)
             {

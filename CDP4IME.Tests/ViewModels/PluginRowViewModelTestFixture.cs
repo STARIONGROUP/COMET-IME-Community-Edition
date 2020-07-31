@@ -72,7 +72,6 @@ namespace CDP4IME.Tests.ViewModels
             Assert.AreEqual(viewModel.Version, $"version {this.Manifest.Version}");
             Assert.AreEqual(viewModel.Description, this.Manifest.Description);
             Assert.AreEqual(viewModel.Author, this.Manifest.Author);
-            Assert.AreEqual(viewModel.Website, this.Manifest.Website);
             Assert.AreEqual(viewModel.ReleaseNote, this.Manifest.ReleaseNote);
 
             Assert.IsNotNull(viewModel.FileSystem.UpdateCdp4CkFileInfo);
@@ -110,13 +109,6 @@ namespace CDP4IME.Tests.ViewModels
             viewModel.HandlingCancelation();
 
             this.AssertCreatedTestFileHasBeenRestored();
-        }
-
-        [Test]
-        public void VerifyCommand()
-        {
-            var viewModel = new PluginRowViewModel(this.Plugin, this.PluginFileSystem);
-            Assert.IsNotNull(viewModel.WebsiteCommand);
         }
     }
 }
