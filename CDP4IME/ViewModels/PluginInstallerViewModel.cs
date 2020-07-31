@@ -48,17 +48,17 @@ namespace CDP4IME.ViewModels
     public class PluginInstallerViewModel : ReactiveObject, IPluginInstallerViewModel
     {
         /// <summary>
-        /// Backing field for the <see cref="ThereIsNoInstallationInProgress"/> property
+        /// Backing field for the <see cref="IsInstallationInProgress"/> property
         /// </summary>
-        private bool thereIsNoInstallationInProgress = true;
+        private bool isInstallationInProgress;
 
         /// <summary>
         /// Gets or sets an assert whether ther is any installation in progress
         /// </summary>
-        public bool ThereIsNoInstallationInProgress
+        public bool IsInstallationInProgress
         {
-            get => this.thereIsNoInstallationInProgress;
-            set => this.RaiseAndSetIfChanged(ref this.thereIsNoInstallationInProgress, value);
+            get => this.isInstallationInProgress;
+            set => this.RaiseAndSetIfChanged(ref this.isInstallationInProgress, value);
         }
         
         /// <summary>
@@ -113,12 +113,12 @@ namespace CDP4IME.ViewModels
         /// </summary>
         private void InitializeCommand()
         {
-            var thereIsNoInstallationInProgressObservable = this.WhenAnyValue(x => x.thereIsNoInstallationInProgress);
+            var isInstallationInProgressObservable = this.WhenAny(x => x.isInstallationInProgress, b => !b.Value);
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.CancelCommandExecute());
-
-            this.InstallCommand = ReactiveCommand.Create(thereIsNoInstallationInProgressObservable);
             
+            this.InstallCommand = ReactiveCommand.Create(isInstallationInProgressObservable);
+
             var currentDispatcher = Dispatcher.CurrentDispatcher;
             
             this.InstallCommand.Subscribe(
@@ -131,7 +131,7 @@ namespace CDP4IME.ViewModels
                     }
                 }));
 
-            this.SelectAllUpdateCheckBoxCommand = ReactiveCommand.Create(thereIsNoInstallationInProgressObservable);
+            this.SelectAllUpdateCheckBoxCommand = ReactiveCommand.Create(isInstallationInProgressObservable );
             this.SelectAllUpdateCheckBoxCommand.Subscribe(_ => this.SelectDeselectAllPluginCommandExecute());
         }
 
@@ -143,7 +143,7 @@ namespace CDP4IME.ViewModels
         {
             try
             {
-                this.ThereIsNoInstallationInProgress = false;
+                this.IsInstallationInProgress = true;
 
                 if (!this.AvailablePlugins.Any(p => p.IsSelectedForInstallation))
                 {
@@ -166,7 +166,7 @@ namespace CDP4IME.ViewModels
             }
             finally
             {
-                this.ThereIsNoInstallationInProgress = true;
+                this.IsInstallationInProgress = false;
                 this.CancellationTokenSource = null;
             }
         }

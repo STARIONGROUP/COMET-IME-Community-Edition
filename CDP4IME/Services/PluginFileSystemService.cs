@@ -85,7 +85,7 @@ namespace CDP4IME.Services
                 {
                     var newFile = new FileInfo(Path.Combine(this.InstallationPath.FullName, zipArchiveEntry.FullName));
 
-                    if (newFile.Directory is { } && !newFile.Directory.Exists)
+                    if (newFile.Directory?.Exists == false)
                     {
                         newFile.Directory.Create();
                     }

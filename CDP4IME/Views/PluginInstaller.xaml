@@ -8,6 +8,9 @@
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
         mc:Ignorable="d"
         Title="CDP4-Plugin-Installer" Height="600" Width="600" ResizeMode="NoResize" BorderThickness="0" Background="White">
+    <Window.Resources>
+        <dxmvvm:BooleanNegationConverter x:Key="BooleanNegationConverter"></dxmvvm:BooleanNegationConverter>
+    </Window.Resources>
     <dxmvvm:Interaction.Behaviors>
         <behaviors:PluginInstallerBehavior></behaviors:PluginInstallerBehavior>
     </dxmvvm:Interaction.Behaviors>
@@ -25,12 +28,12 @@
             </Grid.ColumnDefinitions>
             <Image VerticalAlignment="Bottom" Margin="11,0,11.4,4.4" Height="40" HorizontalAlignment="Center" Source="../Resources/Images/cdplogo3d_32x32.png" Width="40"/>
             <Label Grid.Row="0" VerticalContentAlignment="Bottom"  FontSize="30" HorizontalAlignment="Left" Content="Plugin Installer" Margin="9.6,4,0,0.4" Width="249" RenderTransformOrigin="0.227,0.56" Grid.Column="1"/>
-            <Button IsEnabled="{Binding ThereIsNoInstallationInProgress}"  BorderThickness="0" Grid.Column="2" x:Name="SelectAllUpdateCheckBox" Command="{Binding SelectAllUpdateCheckBoxCommand}" Margin="0,22,10,10" HorizontalAlignment="Right" Width="131">
+            <Button BorderThickness="0" Grid.Column="2" x:Name="SelectAllUpdateCheckBox" Command="{Binding SelectAllUpdateCheckBoxCommand}" Margin="0,22,10,10" HorizontalAlignment="Right" Width="131">
                 Select/Deselect all
             </Button>
         </Grid>
 
-        <ListView IsEnabled="{Binding ThereIsNoInstallationInProgress}" HorizontalContentAlignment="Stretch" x:Name="AvailablePluginsContainer" SelectionMode="Multiple" Grid.Row="1" ItemsSource="{Binding AvailablePlugins}">
+        <ListView IsEnabled="{Binding Path=IsInstallationInProgress, Converter={StaticResource BooleanNegationConverter}}" HorizontalContentAlignment="Stretch" x:Name="AvailablePluginsContainer" SelectionMode="Multiple" Grid.Row="1" ItemsSource="{Binding AvailablePlugins}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="IsSelected" Value="{Binding IsSelectedForInstallation}"/>
@@ -44,7 +47,7 @@
         </ListView>
         <StackPanel Margin="5" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding CancelCommand}" Background="White" Content="Cancel" Foreground="Black" Width="100" Height="40" ></Button>
-            <Button Margin="5" IsEnabled="{Binding ThereIsNoInstallationInProgress}" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding InstallCommand}" Background="White" Content="Install" Foreground="Black" Width="100" Height="40" ></Button>
+            <Button Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding InstallCommand}" Background="White" Content="Install" Foreground="Black" Width="100" Height="40" ></Button>
         </StackPanel>
     </Grid>
 </Window>

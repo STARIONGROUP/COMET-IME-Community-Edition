@@ -167,7 +167,6 @@ namespace CDP4Composition.Modularity
 
             if (!Directory.Exists(path: downloadPath))
             {
-                Logger.Info(message: "Download folder is empty or inexistant, download some plugins update from the IME first");
                 return updatablePlugins;
             }
             
@@ -189,22 +188,23 @@ namespace CDP4Composition.Modularity
         ///<summary>
         /// Check if the found plugin can be installed
         /// </summary>
-        /// <param name="currentPlateformVersion">the IME version</param>
+        /// <param name="imeVersion">the IME version</param>
         /// <param name="downloadedPluginFolder">the found folder of downloaded plugin</param>
         /// <returns>Returns a represented plugin by a <code>(FileInfo cdp4ckFile, Manifest manifest)</code> </returns>
-        private static (FileInfo cdp4ckFile, Manifest manifest) GetPlugin(Version currentPlateformVersion, DirectoryInfo downloadedPluginFolder)
+        private static (FileInfo cdp4ckFile, Manifest manifest) GetPlugin(Version imeVersion, DirectoryInfo downloadedPluginFolder)
         {
             if (downloadedPluginFolder.EnumerateFiles().FirstOrDefault(predicate: f => f.Name.EndsWith(value: ".cdp4ck")) is { } installableCdp4CkFullPath && installableCdp4CkFullPath.Directory is { } installableCdp4CkBasePath)
             {
                 var manifest = DeserializeManifestFromCdp4Ck(installableCdp4CkFullPath, downloadedPluginFolder);
 
-                if (manifest is { } && (manifest.MinIMEVersion is null || new Version(version: manifest.MinIMEVersion) <= currentPlateformVersion))
+                if (manifest is { } && (manifest.MinIMEVersion is null || new Version(version: manifest.MinIMEVersion) <= imeVersion))
                 {
                     return (installableCdp4CkFullPath, manifest);
                 }
 
-                Logger.Debug(message: manifest is { }
-                    ? $"{manifest.MinIMEVersion} is higher than the current IME version please update before installing this plugin update {currentPlateformVersion}"
+                Logger.Debug(
+                    manifest is { }
+                    ? $"{manifest.MinIMEVersion} is higher than the current IME version please update before installing this plugin update {imeVersion}"
                     : $"{downloadedPluginFolder.Name} does not contain any manifest. skipping plugin: {downloadedPluginFolder.Name}");
             }
             else

@@ -84,7 +84,7 @@ namespace CDP4IME.Tests.ViewModels
             var vm = new PluginInstallerViewModel(this.updatablePlugins);
             Assert.IsNotEmpty(vm.AvailablePlugins);
             Assert.AreSame(vm.UpdatablePlugins, this.updatablePlugins);
-            Assert.IsTrue(vm.ThereIsNoInstallationInProgress);
+            Assert.IsFalse(vm.IsInstallationInProgress);
             Assert.IsNull(vm.CancellationTokenSource);
         }
         
@@ -106,11 +106,11 @@ namespace CDP4IME.Tests.ViewModels
         {
             this.viewModel.Behavior = this.behavior.Object;
 
-            this.viewModel.ThereIsNoInstallationInProgress = false;
+            this.viewModel.IsInstallationInProgress = true;
             Assert.IsTrue(this.viewModel.CancelCommand.CanExecute(null));
             await this.viewModel.CancelCommand.ExecuteAsyncTask(null);
             this.behavior.Verify(x => x.Close(), Times.Once);
-            this.viewModel.ThereIsNoInstallationInProgress = true;
+            this.viewModel.IsInstallationInProgress = false;
         }
 
         [Test]
