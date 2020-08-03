@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICDP4ReportingDataSource.cs" company="RHEA System S.A.">
+// <copyright file="IReportingParameters.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -19,35 +19,24 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Reporting
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// The interface used for creating a reporting data source.
+    /// Interface to be used in the Code editor of <see cref="Views.ReportDesigner"/>
     /// </summary>
-    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
-    public interface IReportingDataSource
+    public interface IReportingParameters
     {
-        private readonly CategoryHierarchy categoryHierarchy;
-
         /// <summary>
-        /// Creates a new data source instance.
+        /// Create a list of <see cref="IReportingParameter"/>s
         /// </summary>
-        /// <param name="option">
-        /// The <see cref="Option"/> for which the data source is built.
-        /// </param>
-        /// <param name="domainOfExpertise">
-        /// The <see cref="DomainOfExpertise"/> for which the data source is built.
-        /// </param>
-        /// <returns>
-        /// An object instance.
-        /// </returns>
-        ReportingDataSourceClass<T> CreateDataSource(Option option, DomainOfExpertise domainOfExpertise);
+        /// <param name="dataSource">The datasource</param>
+        /// <returns>A list of <see cref="IReportingParameter"/>s</returns>
+        IEnumerable<IReportingParameter> CreateParameters(object dataSource);
     }
 }

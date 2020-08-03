@@ -12,6 +12,7 @@
     xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     x:Class="CDP4Reporting.Views.ReportDesigner"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="650">
@@ -34,12 +35,17 @@
                                 FontFamily="Consolas"
                                 SyntaxHighlighting="C#"
                                 ShowLineNumbers="True"
-                                Document="{Binding Path=Document}"
+                                Document="{Binding Path=Document, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 WordWrap="True"
                                 MinHeight="300"
                                 HorizontalScrollBarVisibility="Auto"
                                 HorizontalContentAlignment="Stretch"
                                 FontSize="10pt">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="TextChanged">
+                                <i:InvokeCommandAction Command="{Binding Path=DataSourceTextChangedCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                     </avalonEdit:TextEditor>
                 </dxdo:LayoutPanel>
                 <dxdo:LayoutPanel>
@@ -55,11 +61,10 @@
                                 <dxb:PopupMenu>
                                     <dxb:PopupMenu.Items>
                                         <dxb:BarButtonItem
-                                            Content="Copy"
-                                            Glyph="{dx:DXImage Image=Copy_16x16.png}" ItemClick="BarButtonItem_ItemClick" />
-                                        <dxb:BarButtonItem
                                             Content="Clear"
-                                            Glyph="{dx:DXImage Image=RemovePivotField_16x16.png}" ItemClick="BarButtonItem_ItemClick" />
+                                            Glyph="{dx:DXImage Image=RemovePivotField_16x16.png}" 
+                                            Command="{Binding Path=ClearOutputCommand}">
+                                            </dxb:BarButtonItem>
                                     </dxb:PopupMenu.Items>
                                 </dxb:PopupMenu>
                             </dxb:BarManager.DXContextMenu>
@@ -69,8 +74,12 @@
             </dxdo:LayoutGroup>
             <dxdo:LayoutGroup ItemWidth="3*">
                 <dxdo:LayoutPanel Caption="Report Designer" AllowClose="False" MDIMergeStyle="Always">
-                    <dxrud:ReportDesigner x:Name="reportDesigner" dxb:MergingProperties.ElementMergingBehavior="All">
+                    <dxrud:ReportDesigner 
+                        x:Name="reportDesigner" 
+                        dxb:MergingProperties.ElementMergingBehavior="All" 
+                        DocumentSource="{Binding Path=CurrentReport}">
                         <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:EventToCommand Command="{Binding ActiveDocumentChangedCommand}" PassEventArgsToCommand="True" EventName="ActiveDocumentChanged" />
                             <localBehaviour:ReportDesignerBehaviour RibbonMergeCategoryName="ReportingCategory" />
                         </dxmvvm:Interaction.Behaviors>
                         <dxrud:ReportDesigner.RibbonCustomizationActions>
@@ -78,9 +87,16 @@
                             <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.New}" />
                             <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.Save}" />
                             <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.SaveAs}" />
-                            <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.AddCalculatedFields}" />
                             <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.AddNewDataSource}" />
-                            <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.AddParameter}" />
+                            <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.ReportGroup}">
+                                <dxb:InsertAction.Element>
+                                    <dxb:BarButtonItem
+                                        Command="{Binding Path=NewReportCommand}"
+                                        LargeGlyph="{dx:DXImage Image=New_32x32.png}"
+                                        Content="New Report"
+                                        Hint="New Report" />
+                                </dxb:InsertAction.Element>
+                            </dxb:InsertAction>
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.ReportGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarButtonItem
@@ -97,6 +113,15 @@
                                         LargeGlyph="{dx:DXImage Image=Save_32x32.png}"
                                         Content="Save Report"
                                         Hint="Save Report" />
+                                </dxb:InsertAction.Element>
+                            </dxb:InsertAction>
+                            <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.ReportGroup}">
+                                <dxb:InsertAction.Element>
+                                    <dxb:BarButtonItem
+                                        Command="{Binding Path=SaveReportAsCommand}"
+                                        LargeGlyph="{dx:DXImage Image=SaveAs_32x32.png}"
+                                        Content="Save Report As"
+                                        Hint="Save Report As" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
@@ -134,17 +159,17 @@
                                        Content="Toggle Auto Build"
                                        Description="Toggle Auto Build"
                                        Hint="Toggle Auto Build"
-                                       Command="{Binding Path=AutomaticBuildCommand}"
                                        LargeGlyph="{dx:DXImage Image=Time_32x32.png}" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarButtonItem
-                                        ItemClick="BarButtonItem_ItemClick"
                                         LargeGlyph="{dx:DXImage Image=ManageDatasource_32x32.png}"
+                                        Command="{Binding Path=RebuildDatasourceCommand}"
                                         Content="Rebuild Datasource"
-                                        Hint="Rebuild Datasource" />
+                                        Hint="Rebuild Datasource" >
+                                    </dxb:BarButtonItem>
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
                             <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.DesignerHomePage}" PropertyName="Caption" Value="File" />
