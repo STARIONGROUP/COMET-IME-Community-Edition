@@ -26,9 +26,13 @@
 
 namespace CDP4Composition.Modularity
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
+    using System.IO.Compression;
+    using System.Linq;
+    using System.Reflection;
 
     using CDP4Composition.Utilities;
 
@@ -36,16 +40,25 @@ namespace CDP4Composition.Modularity
 
     using Newtonsoft.Json;
 
+    using NLog;
+
     /// <summary>
     /// Utility class that help with plugin management
     /// </summary>
     [ExcludeFromCodeCoverage]
     public static class PluginUtilities
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger(typeof(PluginUtilities));
+
         /// <summary>
         /// The name of the plugin directory
         /// </summary>
         public const string PluginDirectoryName = "plugins";
+
+        /// <summary>
+        /// The directory of the downloaded plugin
+        /// </summary>
+        public const string DownloadDirectory = "DownloadCache";
 
         /// <summary>
         /// Gets the plugin <see cref="Manifest"/> present in the IME plugin folder
@@ -84,6 +97,21 @@ namespace CDP4Composition.Modularity
         }
 
         /// <summary>
+        /// Retrieves the Plugins directory of the current target plateform 
+        /// </summary>
+        /// <returns>a <see cref="DirectoryInfo"/></returns>
+        public static DirectoryInfo GetPluginDirectory(string pluginName)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName))
+            {
+                return null;
+            }
+
+            var directoryInfo = new DirectoryInfo(Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, PluginDirectoryName, pluginName));
+            return directoryInfo;
+        }
+
+        /// <summary>
         /// Returns a <see cref="DirectoryInfo"/> object tha contains the root folder where to search for .manifest files
         /// </summary>
         /// <param name="specificPluginFolderExists">States if a specific plugin directory exists</param>
@@ -101,6 +129,127 @@ namespace CDP4Composition.Modularity
             }
 
             return directoryInfo;
+        }
+
+        /// <summary>
+        /// Compute and return the <see cref="DirectoryInfo"/> of the temporary folder of the specified plugin
+        /// </summary>
+        /// <param name="pluginName">the name of the plugin</param>
+        /// <returns>a <see cref="DirectoryInfo"/></returns>
+        public static DirectoryInfo GetTempDirectoryInfo(string pluginName)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName))
+            {
+                return null;
+            }
+
+            var temporaryFolder = Path.Combine(GetAppDataPath(), DownloadDirectory, "Temp");
+
+            if (!Directory.Exists(temporaryFolder))
+            {
+                Directory.CreateDirectory(temporaryFolder);
+            }
+
+            temporaryFolder = Path.Combine(temporaryFolder, pluginName);
+
+            return new DirectoryInfo(temporaryFolder);
+        }
+
+        /// <summary>
+        /// Retrieve all plugin that can be installed
+        /// </summary>
+        /// <returns>Returns a <see cref="IEnumerable{T}"/> of type <code>(FileInfo cdp4ckFile, Manifest manifest)</code> of the updatable plugins</returns>
+        public static IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> GetDownloadedInstallablePluginUpdate()
+        {
+            var downloadPath = Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, PluginDirectoryName);
+
+            var updatablePlugins = new List<(FileInfo cdp4ckFile, Manifest manifest)>();
+
+            if (!Directory.Exists(path: downloadPath))
+            {
+                return updatablePlugins;
+            }
+            
+            var currentPlateformVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+            // Loop through all existing download plugin folders
+            foreach (var downloadedPluginFolder in Directory.EnumerateDirectories(path: downloadPath).Select(selector: d => new DirectoryInfo(path: d)))
+            {
+                if (GetPlugin(currentPlateformVersion, downloadedPluginFolder) is { manifest: { }, cdp4ckFile: { } } plugin)
+                {
+                    updatablePlugins.Add(plugin);
+                }
+            }
+
+            Logger.Debug(message: $"Found {updatablePlugins.Count} installable plugins");
+            return updatablePlugins;
+        }
+
+        ///<summary>
+        /// Check if the found plugin can be installed
+        /// </summary>
+        /// <param name="imeVersion">the IME version</param>
+        /// <param name="downloadedPluginFolder">the found folder of downloaded plugin</param>
+        /// <returns>Returns a represented plugin by a <code>(FileInfo cdp4ckFile, Manifest manifest)</code> </returns>
+        private static (FileInfo cdp4ckFile, Manifest manifest) GetPlugin(Version imeVersion, DirectoryInfo downloadedPluginFolder)
+        {
+            if (downloadedPluginFolder.EnumerateFiles().FirstOrDefault(predicate: f => f.Name.EndsWith(value: ".cdp4ck")) is { } installableCdp4CkFullPath && installableCdp4CkFullPath.Directory is { } installableCdp4CkBasePath)
+            {
+                var manifest = DeserializeManifestFromCdp4Ck(installableCdp4CkFullPath, downloadedPluginFolder);
+
+                if (manifest is { } && (manifest.MinIMEVersion is null || new Version(version: manifest.MinIMEVersion) <= imeVersion))
+                {
+                    return (installableCdp4CkFullPath, manifest);
+                }
+
+                Logger.Debug(
+                    manifest is { }
+                    ? $"{manifest.MinIMEVersion} is higher than the current IME version please update before installing this plugin update {imeVersion}"
+                    : $"{downloadedPluginFolder.Name} does not contain any manifest. skipping plugin: {downloadedPluginFolder.Name}");
+            }
+            else
+            {
+                Logger.Error(message: $"{downloadedPluginFolder.Name} does not contain any package candidate. skipping plugin: {downloadedPluginFolder.Name}");
+            }
+
+            return default;
+        }
+
+        /// <summary>
+        /// Retrive and deserialize the manifest from the provided cdp4ck
+        /// </summary>
+        /// <param name="cdp4CkPath">The <see cref="FileInfo"/> of the current plugin cdp4ck file</param>
+        /// <param name="downloadedPluginFolder">the current folder containing the plugin update</param>
+        /// <returns>the deserialized <see cref="Manifest"/></returns>
+        private static Manifest DeserializeManifestFromCdp4Ck(FileInfo cdp4CkPath, DirectoryInfo downloadedPluginFolder)
+        {
+            using var openArchive = ZipFile.OpenRead(cdp4CkPath.FullName);
+            var manifestEntry = openArchive.Entries.FirstOrDefault(z => z.Name.EndsWith(".plugin.manifest"));
+            manifestEntry.ExtractToFile(Path.Combine(downloadedPluginFolder.FullName, manifestEntry.Name), true);
+            Manifest manifest = null;
+
+            if (downloadedPluginFolder.EnumerateFiles().FirstOrDefault(f => f.Name.EndsWith(".plugin.manifest")) is { } manifestFile)
+            {
+                manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(manifestFile.FullName)));
+            }
+
+            return manifest;
+        }
+
+        /// <summary>
+        /// Gets the path of the AppData directory
+        /// </summary>
+        /// <returns>the Path the AppData folder</returns>
+        public static string GetAppDataPath()
+        {
+            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "RHEA", "CDP4");
+
+            if (!Directory.Exists(appDataPath))
+            {
+                Directory.CreateDirectory(appDataPath);
+            }
+
+            return appDataPath;
         }
     }
 }

@@ -1,8 +1,28 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="App.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 
 namespace CDP4IME
 {
@@ -11,9 +31,15 @@ namespace CDP4IME
     using System.Reflection;
     using System.Text;
     using System.Windows;
+
     using CDP4Composition;
+
+    using CDP4IME.Modularity;
+
     using DevExpress.Xpf.Core;
+
     using ExceptionReporting;
+
     using NLog;
 
     /// <summary>
@@ -25,7 +51,7 @@ namespace CDP4IME
         /// A NLog logger
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        
+
         /// <summary>
         /// Called when the applications starts. Makes a distinction between debug and release mode
         /// </summary>
@@ -38,10 +64,14 @@ namespace CDP4IME
             ThemeManager.ApplicationThemeName = Theme.SevenName;
             AppliedTheme.ThemeName = Theme.SevenName;
             base.OnStartup(e);
-            
+
+            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+            UpdateInstaller.CheckAndInstall();
+
             DXSplashScreen.Show<Views.SplashScreenView>();
             DXSplashScreen.SetState("Starting CDP4");
-
+            
 #if (DEBUG)
             RunInDebugMode();
 #else
@@ -49,14 +79,12 @@ namespace CDP4IME
 #endif
             
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
-
+            
             DXSplashScreen.SetState("Preparing Main Window");
             
             Current.MainWindow.Show();
-
             DXSplashScreen.Close();
         }
-        
         /// <summary>
         /// Run the application in debug mode. Unhandled Exceptions are not caught.
         /// The application will crash
@@ -64,6 +92,7 @@ namespace CDP4IME
         private static void RunInDebugMode()
         {
             var bootstrapper = new CDP4IMEBootstrapper();
+
             try
             {
                 bootstrapper.Run();
@@ -71,12 +100,13 @@ namespace CDP4IME
             catch (ReflectionTypeLoadException ex)
             {
                 var sb = new StringBuilder();
+
                 foreach (var loaderException in ex.LoaderExceptions)
                 {
                     sb.AppendLine(loaderException.Message);
-                    if (loaderException is FileNotFoundException)
+
+                    if (loaderException is FileNotFoundException fileNotFoundException)
                     {
-                        var fileNotFoundException = loaderException as FileNotFoundException;
                         if (!string.IsNullOrEmpty(fileNotFoundException.FusionLog))
                         {
                             sb.AppendLine("FusionLog: ");
@@ -87,7 +117,7 @@ namespace CDP4IME
                     sb.AppendLine();
                 }
 
-                string errorMessage = sb.ToString();
+                var errorMessage = sb.ToString();
                 logger.Fatal(errorMessage, ex);
                 throw new ApplicationException(errorMessage);
             }
@@ -105,6 +135,7 @@ namespace CDP4IME
         private static void RunInReleaseMode()
         {
             AppDomain.CurrentDomain.UnhandledException += AppDomainUnhandledException;
+            
             try
             {
                 var bootstrapper = new CDP4IMEBootstrapper();
