@@ -89,10 +89,18 @@ namespace CDP4Composition.Tests.Reporting
         {
         }
 
+        private class ComputedTestParameter : ReportingDataSourceParameter<Row>
+        {
+            public string GetValue() => this.Value;
+
+            public DomainOfExpertise GetOwner() => this.Owner;
+        }
+
         private class Row : ReportingDataSourceRow
         {
             public TestParameter1 parameter1;
             public TestParameter2 parameter2;
+            public ComputedTestParameter ComputedParameter;
         }
 
         [SetUp]
@@ -316,6 +324,7 @@ namespace CDP4Composition.Tests.Reporting
             Assert.IsNotNull(node.GetColumn<TestParameter1>());
             Assert.IsNotNull(node.GetColumn<TestParameter2>());
             Assert.Throws<KeyNotFoundException>(() => node.GetColumn<TestParameter3>());
+            Assert.IsNotNull(node.GetColumn<ComputedTestParameter>());
         }
 
         [Test]
@@ -339,6 +348,30 @@ namespace CDP4Composition.Tests.Reporting
 
             var parameter2 = node.GetColumn<TestParameter2>();
             Assert.AreEqual("type2", parameter2.ShortName);
+
+            var computedParameter = node.GetColumn<ComputedTestParameter>();
+            Assert.IsNull(computedParameter.ShortName);
+        }
+
+        [Test]
+        public void VerifyComputedParameterInitialization()
+        {
+            var hierarchy = new CategoryHierarchy
+                    .Builder(this.iteration, this.cat1.ShortName)
+                .Build();
+
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
+
+            var node = new ReportingDataSourceNode<Row>(
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
+
+            var computedParameter = node.GetColumn<ComputedTestParameter>();
+            Assert.IsNull(computedParameter.GetValue());
+            Assert.IsNull(computedParameter.GetOwner());
         }
 
         [Test]

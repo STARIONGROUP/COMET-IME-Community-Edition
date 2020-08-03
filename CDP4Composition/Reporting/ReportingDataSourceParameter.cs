@@ -54,7 +54,7 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterBase"/>.
         /// </summary>
-        protected DomainOfExpertise Owner => this.ParameterBase.Owner;
+        protected DomainOfExpertise Owner => this.ParameterBase?.Owner;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{T}"/> class.
