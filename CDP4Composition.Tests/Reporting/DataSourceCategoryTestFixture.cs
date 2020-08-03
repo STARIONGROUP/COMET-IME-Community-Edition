@@ -28,9 +28,10 @@ namespace CDP4Composition.Tests.Reporting
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-
+    using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
@@ -45,9 +46,13 @@ namespace CDP4Composition.Tests.Reporting
 
         private Iteration iteration;
 
+        private Option option;
+
         private Category cat1;
         private Category cat2;
         private Category cat3;
+
+        private DomainOfExpertise domain;
 
         private ElementDefinition ed1;
         private ElementDefinition ed2;
@@ -84,6 +89,16 @@ namespace CDP4Composition.Tests.Reporting
 
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, null);
 
+            // Option
+
+            this.option = new Option(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "option1",
+                Name = "option1"
+            };
+
+            this.iteration.Option.Add(this.option);
+
             // Categories
 
             this.cat1 = new Category(Guid.NewGuid(), this.cache, null)
@@ -116,18 +131,28 @@ namespace CDP4Composition.Tests.Reporting
                 new CacheKey(this.cat3.Iid, null),
                 new Lazy<Thing>(() => this.cat3));
 
+            // Domain of expertise
+
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "domain",
+                Name = "domain"
+            };
+
             // Element Definitions
 
             this.ed1 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed1",
-                Name = "element definition 1"
+                Name = "element definition 1",
+                Owner = this.domain
             };
 
             this.ed2 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed2",
-                Name = "element definition 2"
+                Name = "element definition 2",
+                Owner = this.domain
             };
 
             // Element Usages
@@ -136,7 +161,8 @@ namespace CDP4Composition.Tests.Reporting
             {
                 ElementDefinition = this.ed2,
                 ShortName = "eu",
-                Name = "element usage"
+                Name = "element usage",
+                Owner = this.domain
             };
 
             // Structure
@@ -155,9 +181,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.domain)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.ed1,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             Assert.IsNotNull(node.GetColumn<TestCategory1>());
             Assert.IsNotNull(node.GetColumn<TestCategory2>());
@@ -171,9 +202,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.domain)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.ed1,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var category1 = node.GetColumn<TestCategory1>();
             Assert.AreEqual("cat1", category1.ShortName);
@@ -189,9 +225,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.domain)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.ed1,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var category1 = node.GetColumn<TestCategory1>();
             Assert.AreEqual(true, category1.GetValue());
@@ -207,9 +248,14 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.domain)
+                .ToList();
+
             var node = new ReportingDataSourceNode<Row>(
-                this.eu,
-                hierarchy);
+                hierarchy,
+                nestedElements.First(ne => ne.Name == this.eu.Name),
+                nestedElements);
 
             var category1 = node.GetColumn<TestCategory1>();
             Assert.AreEqual(false, category1.GetValue());

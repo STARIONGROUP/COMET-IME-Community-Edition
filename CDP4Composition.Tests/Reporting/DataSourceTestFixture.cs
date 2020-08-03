@@ -45,9 +45,13 @@ namespace CDP4Composition.Tests.Reporting
 
         private Iteration iteration;
 
+        private Option option;
+
         private Category cat1;
         private Category cat2;
         private Category cat3;
+
+        private DomainOfExpertise domain;
 
         private ElementDefinition ed1;
         private ElementDefinition ed2p;
@@ -73,6 +77,16 @@ namespace CDP4Composition.Tests.Reporting
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, null);
+
+            // Option
+
+            this.option = new Option(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "option1",
+                Name = "option1"
+            };
+
+            this.iteration.Option.Add(this.option);
 
             // Categories
 
@@ -106,30 +120,42 @@ namespace CDP4Composition.Tests.Reporting
                 new CacheKey(this.cat3.Iid, null),
                 new Lazy<Thing>(() => this.cat3));
 
+            // Domain of expertise
+
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "domain",
+                Name = "domain"
+            };
+
             // Element Definitions
 
             this.ed1 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed1",
-                Name = "element definition 1"
+                Name = "element definition 1",
+                Owner = this.domain
             };
 
             this.ed2p = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed2p",
-                Name = "element definition 2p"
+                Name = "element definition 2p",
+                Owner = this.domain
             };
 
             this.ed2n = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed2n",
-                Name = "element definition 2n"
+                Name = "element definition 2n",
+                Owner = this.domain
             };
 
             this.ed3 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed3",
-                Name = "element definition 3"
+                Name = "element definition 3",
+                Owner = this.domain
             };
 
             // Element Usages
@@ -138,56 +164,64 @@ namespace CDP4Composition.Tests.Reporting
             {
                 ElementDefinition = this.ed2p,
                 ShortName = "eu12p1",
-                Name = "element usage 1->2p #1"
+                Name = "element usage 1->2p #1",
+                Owner = this.domain
             };
 
             this.eu12p2 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
                 ElementDefinition = this.ed2p,
                 ShortName = "eu12p2",
-                Name = "element usage 1->2p #2"
+                Name = "element usage 1->2p #2",
+                Owner = this.domain
             };
 
             this.eu12n1 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
                 ElementDefinition = this.ed2n,
                 ShortName = "eu12n1",
-                Name = "element usage 1->2n #1"
+                Name = "element usage 1->2n #1",
+                Owner = this.domain
             };
 
             this.eu12n2 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
                 ElementDefinition = this.ed2n,
                 ShortName = "eu12n2",
-                Name = "element usage 1->2n #2"
+                Name = "element usage 1->2n #2",
+                Owner = this.domain
             };
 
             this.eu2p31 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
                 ElementDefinition = this.ed3,
                 ShortName = "eu2p31",
-                Name = "element usage 2p->3 #1"
+                Name = "element usage 2p->3 #1",
+                Owner = this.domain
             };
 
             this.eu2p32 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
                 ElementDefinition = this.ed3,
                 ShortName = "eu2p32",
-                Name = "element usage 2p->3 #2"
+                Name = "element usage 2p->3 #2",
+                Owner = this.domain
             };
 
             this.eu2n31 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
                 ElementDefinition = this.ed3,
                 ShortName = "eu2n31",
-                Name = "element usage 2n->3 #1"
+                Name = "element usage 2n->3 #1",
+                Owner = this.domain
             };
 
             this.eu2n32 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
                 ElementDefinition = this.ed3,
                 ShortName = "eu2n32",
-                Name = "element usage 2n->3 #2"
+                Name = "element usage 2n->3 #2",
+                Owner = this.domain
             };
 
             // Structure
@@ -236,8 +270,9 @@ namespace CDP4Composition.Tests.Reporting
                 .Build();
 
             var dataSource = new ReportingDataSourceClass<Row>(
-                this.iteration,
-                hierarchy);
+                hierarchy,
+                this.option,
+                this.domain);
 
             // tabular representation built, category hierarchy considered, unneeded subtrees pruned
             var rows = dataSource.GetTable().Rows;
