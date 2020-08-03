@@ -26,13 +26,17 @@
 namespace CDP4Reporting.ViewModels
 {
     using System;
+
     using CDP4Common.EngineeringModelData;
-    using CDP4Reporting.Views;
+
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
+
+    using CDP4Reporting.Views;
 
     /// <summary>
     /// The view-model for the <see cref="ReportDesignerRibbon"/> view
@@ -68,6 +72,7 @@ namespace CDP4Reporting.ViewModels
             }
 
             var participant = model.GetActiveParticipant(session.ActivePerson);
+
             if (participant == null)
             {
                 throw new InvalidOperationException("The Participant in an engineering model cannot be null");

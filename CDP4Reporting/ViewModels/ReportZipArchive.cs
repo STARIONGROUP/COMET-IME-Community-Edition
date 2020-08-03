@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportDesignerViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ReportZipArchive.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,48 +23,24 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Events
+
+namespace CDP4Reporting.ViewModels
 {
-    /// <summary>
-    /// Assertions that determine the kind of notification to trigger/subscribe
-    /// </summary>
-    public enum ReportNotificationKind
-    {
-        /// <summary>
-        /// Notification raised when report archive file is opened
-        /// </summary>
-        REPORT_OPEN = 0,
-
-        /// <summary>
-        /// Notification raised when report archive file is saved
-        /// </summary>
-        REPORT_SAVE = 1,
-    }
+    using System.IO;
 
     /// <summary>
-    /// The event that is used to bind different report notifications
+    /// Struct that maps streams on archive zip file path
     /// </summary>
-    public class ReportDesignerEvent
+    public struct ReportZipArchive
     {
         /// <summary>
-        /// Get sets report archive file of the notification
+        /// The report file <see cref="Stream"/>
         /// </summary>
-        public string Rep4File { get; private set; }
+        public Stream Repx;
 
         /// <summary>
-        /// Gets the <see cref="ReportNotificationKind"/> of the notification
+        /// The datasource <see cref="Stream"/>
         /// </summary>
-        public ReportNotificationKind NotificationKind { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReportDesignerEvent"/> class
-        /// </summary>
-        /// <param name="rep4File">The report archive file for which the notification is created</param>
-        /// <param name="kind">The <see cref="ReportNotificationKind"/></param>
-        public ReportDesignerEvent(string rep4File, ReportNotificationKind kind)
-        {
-            Rep4File = rep4File;
-            NotificationKind = kind;
-        }
+        public Stream DataSource;
     }
 }
