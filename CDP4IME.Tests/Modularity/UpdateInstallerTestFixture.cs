@@ -111,7 +111,7 @@ namespace CDP4IME.Tests.Modularity
             Assert.IsFalse(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object));
             
             this.viewInvoker.Verify(x => x.ShowMessageBox(
-                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information));
+                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information), Times.Never);
         }
 
         private void SetupInstallerFile(bool shouldItBeCompatible)
