@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="UpdateInstallerTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -130,9 +130,7 @@ namespace CDP4IME.Tests.Modularity
                 Directory.CreateDirectory(UpdateInstaller.ImeDownloadDirectoryInfo.FullName);
             }
 
-            using (File.Create(this.installerFile))
-            {
-            }
+            File.Create(this.installerFile).Dispose();
         }
     }
 }

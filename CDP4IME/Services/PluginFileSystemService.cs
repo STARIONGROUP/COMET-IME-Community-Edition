@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginFileSystemService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -104,8 +104,9 @@ namespace CDP4IME.Services
         {
             if (this.InstallationPath.Exists)
             {
+                var installationFullPath = this.InstallationPath.FullName;
                 this.InstallationPath.MoveTo(this.TemporaryPath.FullName);
-                this.InstallationPath = PluginUtilities.GetPluginDirectory(this.pluginName);
+                this.InstallationPath = new DirectoryInfo(installationFullPath);
             }
         }
 
