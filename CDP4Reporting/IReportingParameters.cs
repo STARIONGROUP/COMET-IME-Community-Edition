@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICDP4ReportingDataSource.cs" company="RHEA System S.A.">
+// <copyright file="IReportingParameters.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -19,29 +19,24 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Reporting
+namespace CDP4Reporting
 {
-    using CDP4Common.EngineeringModelData;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// The interface used for creating a reporting data source.
+    /// Interface to be used in the Code editor of <see cref="Views.ReportDesigner"/>
     /// </summary>
-    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
-    public interface IReportingDataSource
+    public interface IReportingParameters
     {
         /// <summary>
-        /// Creates a new data source instance.
+        /// Create a list of <see cref="IReportingParameter"/>s
         /// </summary>
-        /// <param name="iteration">
-        /// The <see cref="Iteration"/> based on which the data source will be created.
-        /// </param>
-        /// <returns>
-        /// An object instance.
-        /// </returns>
-        object CreateDataSource(Iteration iteration);
+        /// <param name="dataSource">The datasource</param>
+        /// <returns>A list of <see cref="IReportingParameter"/>s</returns>
+        IEnumerable<IReportingParameter> CreateParameters(object dataSource);
     }
 }

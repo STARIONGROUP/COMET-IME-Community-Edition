@@ -25,35 +25,45 @@
 
 namespace CDP4Reporting.Tests.ViewModels
 {
-    using Moq;
-    using NUnit.Framework;
-    using ReactiveUI;
     using System;
-    using System.Windows;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.IO;
+    using System.IO.Compression;
+    using System.Reactive.Concurrency;
+    using System.Text;
     using System.Threading;
-    using CDP4Reporting.ViewModels;
+    using System.Threading.Tasks;
+    using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
-    using System.Reactive.Concurrency;
-    using System.Collections.Concurrent;
-    using Microsoft.Practices.ServiceLocation;
+
+    using CDP4Reporting.ViewModels;
+
     using ICSharpCode.AvalonEdit.Document;
-    using System.IO;
-    using System.Text;
-    using System.IO.Compression;
-    using System.Threading.Tasks;
+
+    using Microsoft.Practices.ServiceLocation;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="ReportDesignerViewModel"/> class
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class ReportDesignerViewModelTextFixture
     {
         private string dsPathOpen = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDataSourceOpen.cs");
@@ -140,21 +150,24 @@ namespace CDP4Reporting.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            if (System.IO.File.Exists(dsPathOpen))
+            if (System.IO.File.Exists(this.dsPathOpen))
             {
-                System.IO.File.Delete(dsPathOpen);
+                System.IO.File.Delete(this.dsPathOpen);
             }
-            if (System.IO.File.Exists(dsPathSave))
+
+            if (System.IO.File.Exists(this.dsPathSave))
             {
-                System.IO.File.Delete(dsPathSave);
+                System.IO.File.Delete(this.dsPathSave);
             }
-            if (System.IO.File.Exists(zipPathOpen))
+
+            if (System.IO.File.Exists(this.zipPathOpen))
             {
-                System.IO.File.Delete(zipPathOpen);
+                System.IO.File.Delete(this.zipPathOpen);
             }
-            if (System.IO.File.Exists(zipPathSave))
+
+            if (System.IO.File.Exists(this.zipPathSave))
             {
-                System.IO.File.Delete(zipPathSave);
+                System.IO.File.Delete(this.zipPathSave);
             }
 
             CDPMessageBus.Current.ClearSubscriptions();
@@ -169,7 +182,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveReportCommand.Execute(null));
-            Assert.AreEqual(this.reportDesignerViewModel.Object.ZipFilePath, null);
+            Assert.AreEqual(this.reportDesignerViewModel.Object.currentReportProjectFilePath, null);
         }
 
         [Test]
@@ -194,6 +207,7 @@ namespace CDP4Reporting.Tests.ViewModels
                     dataSourceStream.CopyTo(reportEntry);
                 }
             }
+
             await Task.Run(() =>
             {
                 this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.dsPathSave);
@@ -213,7 +227,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { });
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
-            Assert.AreEqual(this.reportDesignerViewModel.Object.ZipFilePath, null);
+            Assert.AreEqual(this.reportDesignerViewModel.Object.currentReportProjectFilePath, null);
         }
 
         [Test]
@@ -238,6 +252,7 @@ namespace CDP4Reporting.Tests.ViewModels
                     dataSourceStream.CopyTo(reportEntry);
                 }
             }
+
             await Task.Run(() =>
             {
                 this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.dsPathOpen });
@@ -246,18 +261,16 @@ namespace CDP4Reporting.Tests.ViewModels
                 this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
                 Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
             });
-
         }
 
         [Test]
         public void VerifyBuildCommands()
         {
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null));
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.AutomaticBuildCommand.Execute(null));
         }
 
         [Test]
-        public void VerifyThatBuildCommandPass()
+        public async Task VerifyThatBuildCommandPass()
         {
             var textDocument = new TextDocument();
             textDocument.Text = DATASOURCE_CODE;
@@ -265,18 +278,22 @@ namespace CDP4Reporting.Tests.ViewModels
             this.reportDesignerViewModel.Object.Document = textDocument;
             this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null);
 
+            await Task.Delay(3000);
+
             Assert.AreEqual(0, this.reportDesignerViewModel.Object.BuildResult.Errors.Count);
             Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Object.Errors);
         }
 
         [Test]
-        public void VerifyThatBuildCommandFailed()
+        public async Task VerifyThatBuildCommandFailed()
         {
             var textDocument = new TextDocument();
             textDocument.Text = DATASOURCE_CODE_NOT_COMPILE;
 
             this.reportDesignerViewModel.Object.Document = textDocument;
             this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null);
+
+            await Task.Delay(3000);
 
             Assert.AreNotEqual(0, this.reportDesignerViewModel.Object.BuildResult.Errors.Count);
             Assert.AreNotEqual(string.Empty, this.reportDesignerViewModel.Object.Errors);
