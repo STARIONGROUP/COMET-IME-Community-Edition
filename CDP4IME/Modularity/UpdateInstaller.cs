@@ -88,9 +88,9 @@ namespace CDP4IME.Modularity
         private static string CheckForImeUpdate()
         {
             var downloadDirectory = ImeDownloadDirectoryInfo;
-            var installers = downloadDirectory.EnumerateFiles().ToArray();
+            var installers = downloadDirectory.Exists ? downloadDirectory.EnumerateFiles().ToArray() : null;
 
-            if (!downloadDirectory.Exists || !installers.Any())
+            if (installers?.Any() != true)
             {
                 return null;
             }
