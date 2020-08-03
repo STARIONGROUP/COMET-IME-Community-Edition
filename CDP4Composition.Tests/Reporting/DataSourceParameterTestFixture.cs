@@ -56,6 +56,8 @@ namespace CDP4Composition.Tests.Reporting
         private DomainOfExpertise parameterOwner;
         private DomainOfExpertise parameterOverrideOwner;
 
+        private RatioScale scale;
+
         private SimpleQuantityKind parameterType1;
         private SimpleQuantityKind parameterType2;
         private SimpleQuantityKind parameterType3;
@@ -152,6 +154,14 @@ namespace CDP4Composition.Tests.Reporting
                 Name = "parameter override owner"
             };
 
+            // Scale
+
+            this.scale = new RatioScale(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "scale",
+                Name = "scale"
+            };
+
             // Parameter types
 
             this.parameterType1 = new SimpleQuantityKind(Guid.NewGuid(), null, null)
@@ -181,9 +191,9 @@ namespace CDP4Composition.Tests.Reporting
                 Owner = this.elementOwner
             };
 
-            this.AddParameter(this.ed1, this.parameterType1, "11");
-            this.AddParameter(this.ed1, this.parameterType2, "12");
-            this.AddParameter(this.ed1, this.parameterType3, "13");
+            this.AddParameter(this.ed1, this.parameterType1, this.parameterOwner, "11");
+            this.AddParameter(this.ed1, this.parameterType2, this.parameterOwner, "12");
+            this.AddParameter(this.ed1, this.parameterType3, this.parameterOwner, "13");
 
             this.ed2 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
@@ -192,9 +202,9 @@ namespace CDP4Composition.Tests.Reporting
                 Owner = this.elementOwner
             };
 
-            this.AddParameter(this.ed2, this.parameterType1, "21");
-            this.AddParameter(this.ed2, this.parameterType2, "22");
-            this.AddParameter(this.ed2, this.parameterType3, "23");
+            this.AddParameter(this.ed2, this.parameterType1, this.elementOwner, "-21");
+            this.AddParameter(this.ed2, this.parameterType2, this.elementOwner, "-22");
+            this.AddParameter(this.ed2, this.parameterType3, this.elementOwner, "-23");
 
             // Element Usages
 
@@ -206,9 +216,9 @@ namespace CDP4Composition.Tests.Reporting
                 Owner = this.elementOwner
             };
 
-            this.AddParameterOverride(this.eu1, this.parameterType1, "121");
-            this.AddParameterOverride(this.eu1, this.parameterType2, "122");
-            this.AddParameterOverride(this.eu1, this.parameterType3, "123");
+            this.AddParameterOverride(this.eu1, this.parameterType1, this.parameterOverrideOwner, "121");
+            this.AddParameterOverride(this.eu1, this.parameterType2, this.parameterOverrideOwner, "122");
+            this.AddParameterOverride(this.eu1, this.parameterType3, this.parameterOverrideOwner, "123");
 
             this.eu2 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
@@ -217,10 +227,6 @@ namespace CDP4Composition.Tests.Reporting
                 Name = "element usage 2",
                 Owner = this.elementOwner
             };
-
-            this.AddParameterOverride(this.eu2, this.parameterType1, "221");
-            this.AddParameterOverride(this.eu2, this.parameterType2, "222");
-            this.AddParameterOverride(this.eu2, this.parameterType3, "223");
 
             // Structure
 
@@ -232,22 +238,29 @@ namespace CDP4Composition.Tests.Reporting
 
             this.eu2.Category.Add(this.cat2);
             this.ed1.ContainedElement.Add(this.eu2);
+
+            this.iteration.Element.Add(this.ed1);
+            this.iteration.Element.Add(this.ed2);
         }
 
         private void AddParameter(
             ElementDefinition elementDefinition,
             ParameterType parameterType,
+            DomainOfExpertise owner,
             string value)
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, null)
             {
                 ParameterType = parameterType,
-                Owner = this.parameterOwner
-            };
+                Owner = owner,
+                Scale = this.scale
+        };
 
             var valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, null)
             {
                 Manual = new ValueArray<string>(new List<string> { value }),
+                Computed = new ValueArray<string>(new List<string> { value }),
+                Formula = new ValueArray<string>(new List<string> { value }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
 
@@ -259,6 +272,7 @@ namespace CDP4Composition.Tests.Reporting
         private void AddParameterOverride(
             ElementUsage elementUsage,
             ParameterType parameterType,
+            DomainOfExpertise owner,
             string value)
         {
             var parameter = elementUsage.ElementDefinition.Parameter
@@ -267,12 +281,14 @@ namespace CDP4Composition.Tests.Reporting
             var parameterOverride = new ParameterOverride(Guid.NewGuid(), this.cache, null)
             {
                 Parameter = parameter,
-                Owner = this.parameterOverrideOwner
+                Owner = owner
             };
 
             var valueSet = new ParameterOverrideValueSet(Guid.NewGuid(), this.cache, null)
             {
                 Manual = new ValueArray<string>(new List<string> { value }),
+                Computed = new ValueArray<string>(new List<string> { value }),
+                Formula = new ValueArray<string>(new List<string> { value }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
 
@@ -376,6 +392,31 @@ namespace CDP4Composition.Tests.Reporting
         }
 
         [Test]
+        public void VerifyNestedParameterInitialization()
+        {
+            var hierarchy = new CategoryHierarchy
+                    .Builder(this.iteration, this.cat2.ShortName)
+                .Build();
+
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
+
+            var node = new ReportingDataSourceNode<Row>(
+                hierarchy,
+                nestedElements.First(ne => ne.Name == this.eu2.Name),
+                nestedElements);
+
+            var parameter1 = node.GetColumn<TestParameter1>();
+            Assert.AreEqual("-21", parameter1.GetValue());
+            Assert.AreEqual(this.elementOwner, parameter1.GetOwner());
+
+            var parameter2 = node.GetColumn<TestParameter2>();
+            Assert.AreEqual("-22", parameter2.GetValue());
+            Assert.AreEqual(this.elementOwner, parameter2.GetOwner());
+        }
+
+        [Test]
         public void VerifyParameterSiblings()
         {
             var hierarchy = new CategoryHierarchy
@@ -425,12 +466,12 @@ namespace CDP4Composition.Tests.Reporting
             var children1 = parameter.GetChildren<TestParameter1>().ToList();
             Assert.AreEqual(2, children1.Count);
             Assert.AreEqual("121", children1[0].GetValue());
-            Assert.AreEqual("221", children1[1].GetValue());
+            Assert.AreEqual("-21", children1[1].GetValue());
 
             var children2 = parameter.GetChildren<TestParameter2>().ToList();
             Assert.AreEqual(2, children2.Count);
             Assert.AreEqual("122", children2[0].GetValue());
-            Assert.AreEqual("222", children2[1].GetValue());
+            Assert.AreEqual("-22", children2[1].GetValue());
         }
     }
 }
