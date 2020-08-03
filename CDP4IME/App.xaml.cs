@@ -67,7 +67,11 @@ namespace CDP4IME
 
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            UpdateInstaller.CheckAndInstall();
+            
+            if (UpdateInstaller.CheckAndInstall())
+            {
+                return;
+            }
 
             DXSplashScreen.Show<Views.SplashScreenView>();
             DXSplashScreen.SetState("Starting CDP4");

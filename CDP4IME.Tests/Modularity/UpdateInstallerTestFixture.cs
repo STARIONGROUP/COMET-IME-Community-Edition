@@ -90,5 +90,10 @@ namespace CDP4IME.Tests.Modularity
             UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
             this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Once);
         }
+
+        [Test]
+        public void Verify()
+        {
+        }
     }
 }
