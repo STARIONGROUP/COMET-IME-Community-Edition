@@ -25,17 +25,29 @@
 
 namespace CDP4IME.Services
 {
+    using System.Windows;
+
     using CDP4IME.Views;
 
     /// <summary>
-    /// Defines the <see cref="PluginInstallerViewInvokerService"/> which is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// Defines the <see cref="ViewInvokerService"/> which is responsible to display the instanciated view <see cref="PluginInstaller"/>
     /// </summary>
-    public interface IPluginInstallerViewInvokerService
+    public interface IViewInvokerService
     {
         /// <summary>
         /// Brings the view to the user sight
         /// </summary>
         /// <param name="viewInstance">the view to show up</param>
         void ShowDialog(PluginInstaller viewInstance);
+
+        /// <summary>
+        /// Pops up a message box
+        /// </summary>
+        /// <param name="message">the message</param>
+        /// <param name="title">the box title</param>
+        /// <param name="button">the button configuration</param>
+        /// <param name="image">the image</param>
+        /// <returns>a <see cref="MessageBoxResult"/></returns>
+        MessageBoxResult ShowMessageBox(string message, string title, MessageBoxButton button, MessageBoxImage image);
     }
 }

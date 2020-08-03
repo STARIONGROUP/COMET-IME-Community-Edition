@@ -53,18 +53,18 @@ namespace CDP4IME.Modularity
         /// <summary>
         /// The Ime Download directory
         /// </summary>
-        private static readonly DirectoryInfo ImeDownloadDirectoryInfo = new DirectoryInfo(Path.Combine(PluginUtilities.GetAppDataPath(), PluginUtilities.DownloadDirectory, "IME"));
+        public static readonly DirectoryInfo ImeDownloadDirectoryInfo = new DirectoryInfo(Path.Combine(PluginUtilities.GetAppDataPath(), PluginUtilities.DownloadDirectory, "IME"));
 
         /// <summary>
         /// Check for any update available and run the plugin installer
         /// </summary>
-        /// <param name="viewInvoker">An <see cref="IPluginInstallerViewInvokerService"/></param>
+        /// <param name="viewInvoker">An <see cref="IViewInvokerService"/></param>
         /// <returns>An Assert whether the IME have to shut down</returns>
-        public static bool CheckInstallAndVerifyIfTheImeShallShutdown(IPluginInstallerViewInvokerService viewInvoker = null)
+        public static bool CheckInstallAndVerifyIfTheImeShallShutdown(IViewInvokerService viewInvoker = null)
         {
             var imeUpdate = CheckForImeUpdate();
 
-            if (imeUpdate != null && MessageBox.Show(ImeNewVersionMessage, "IME Update", MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.No) == MessageBoxResult.Yes)
+            if (imeUpdate != null && (viewInvoker ?? new ViewInvokerService()).ShowMessageBox(ImeNewVersionMessage, "IME Update", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
             {
                 RunInstaller(imeUpdate);
                 return true;
@@ -75,7 +75,7 @@ namespace CDP4IME.Modularity
             if (updatablePlugins.Any())
             {
                 var pluginInstallerView = new PluginInstaller() { DataContext = new PluginInstallerViewModel(updatablePlugins) };
-                (viewInvoker ?? new PluginInstallerViewInvokerService()).ShowDialog(pluginInstallerView);
+                (viewInvoker ?? new ViewInvokerService()).ShowDialog(pluginInstallerView);
             }
 
             return false;

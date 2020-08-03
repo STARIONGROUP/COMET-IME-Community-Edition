@@ -27,7 +27,11 @@ namespace CDP4IME.Tests.Modularity
 {
     using System;
     using System.IO;
+    using System.Reflection;
     using System.Threading;
+    using System.Windows;
+
+    using CDP4Composition.Modularity;
 
     using CDP4IME.Modularity;
     using CDP4IME.Services;
@@ -40,17 +44,21 @@ namespace CDP4IME.Tests.Modularity
     [TestFixture, Apartment(ApartmentState.STA)]
     public class UpdateInstallerTestFixture
     {
-        private Mock<IPluginInstallerViewInvokerService> viewInvoker;
+        private Mock<IViewInvokerService> viewInvoker;
+        private string installerFile;
         private string downloadPath;
 
         [SetUp]
         public void Setup()
         {
-            this.viewInvoker = new Mock<IPluginInstallerViewInvokerService>();
+            this.viewInvoker = new Mock<IViewInvokerService>();
             this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<PluginInstaller>()));
 
+            this.viewInvoker.Setup(x => x.ShowMessageBox(
+                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information)).Returns(MessageBoxResult.No);
+                
             var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
-            this.downloadPath = Path.Combine(path1: appData, path2: "RHEA/CDP4/DownloadCache/plugins");
+            this.downloadPath = Path.Combine(appData, "RHEA", "CDP4", "DownloadCache", "plugins");
 
             if (!Directory.Exists(this.downloadPath))
             {
@@ -65,15 +73,20 @@ namespace CDP4IME.Tests.Modularity
             {
                 Directory.Delete(this.downloadPath, true);
             }
+
+            if (File.Exists(this.installerFile))
+            {
+                File.Delete(this.installerFile);
+            }
         }
 
         [Test]
-        public void VerifyCheckAndInstall()
+        public void VerifyCheckInstallAndVerifyIfTheImeShallShutdown()
         {
-            UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
+            Assert.IsFalse(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object));
             this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Never);
             
-            var dataPath = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ViewModels/PluginMockData/"));
+            var dataPath = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ViewModels", "PluginMockData"));
 
             foreach (var file in dataPath.EnumerateFiles())
             {
@@ -87,13 +100,39 @@ namespace CDP4IME.Tests.Modularity
                 File.Copy(file.FullName, Path.Combine(destination, file.Name), true);
             }
 
-            UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
+            UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object);
             this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Once);
         }
 
         [Test]
-        public void Verify()
+        public void VerifyIncompatibleIMEUpdate()
         {
+            this.SetupInstallerFile(false);
+            Assert.IsFalse(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object));
+            
+            this.viewInvoker.Verify(x => x.ShowMessageBox(
+                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information));
+        }
+
+        private void SetupInstallerFile(bool shouldItBeCompatible)
+        {
+            var majorVersion = PluginUtilities.GetVersion().Major;
+
+            if (shouldItBeCompatible)
+            {
+                majorVersion += 1;
+            }
+
+            this.installerFile = Path.Combine(UpdateInstaller.ImeDownloadDirectoryInfo.FullName, $"CDP4IME-CE.x64-{majorVersion}.0.0.msi");
+
+            if (!Directory.Exists(UpdateInstaller.ImeDownloadDirectoryInfo.FullName))
+            {
+                Directory.CreateDirectory(UpdateInstaller.ImeDownloadDirectoryInfo.FullName);
+            }
+
+            using (File.Create(this.installerFile))
+            {
+            }
         }
     }
 }

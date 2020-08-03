@@ -40,7 +40,7 @@ namespace CDP4IME.Tests.Services
         {
             Assert.Throws<NullReferenceException>(() =>
             {
-                new PluginInstallerViewInvokerService().ShowDialog(null);
+                new ViewInvokerService().ShowDialog(null);
             });
         }
     }
