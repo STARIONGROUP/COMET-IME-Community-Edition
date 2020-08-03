@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="App.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -66,9 +66,8 @@ namespace CDP4IME
             base.OnStartup(e);
 
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
             
-            if (UpdateInstaller.CheckAndInstall())
+            if (UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown())
             {
                 return;
             }
