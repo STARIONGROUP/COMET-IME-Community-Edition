@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.Tests.DataSource
+namespace CDP4Composition.Tests.Reporting
 {
     using System;
     using System.Collections.Concurrent;
@@ -36,7 +36,7 @@ namespace CDP4Reporting.Tests.DataSource
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Reporting.DataSource;
+    using CDP4Composition.Reporting;
 
     using NUnit.Framework;
 
@@ -316,12 +316,10 @@ namespace CDP4Reporting.Tests.DataSource
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
-
-            var node = dataSource.topNodes.First();
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             Assert.IsNotNull(node.GetColumn<TestParameter1>());
             Assert.IsNotNull(node.GetColumn<TestParameter2>());
@@ -340,12 +338,10 @@ namespace CDP4Reporting.Tests.DataSource
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
-
-            var node = dataSource.topNodes.First();
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("type1", parameter1.ShortName);
@@ -368,12 +364,10 @@ namespace CDP4Reporting.Tests.DataSource
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
-
-            var node = dataSource.topNodes.First();
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var computedParameter = node.GetColumn<ComputedTestParameter>();
             Assert.IsNull(computedParameter.GetValue());
@@ -391,12 +385,10 @@ namespace CDP4Reporting.Tests.DataSource
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
-
-            var node = dataSource.topNodes.First();
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("11", parameter1.GetValue());
@@ -418,12 +410,10 @@ namespace CDP4Reporting.Tests.DataSource
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var node = new ReportingDataSourceNode<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
-
-            var node = dataSource.topNodes.First();
+                nestedElements.First(ne => ne.Name == this.eu1.Name),
+                nestedElements);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("121", parameter1.GetValue());
@@ -441,12 +431,14 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
-                hierarchy,
-                this.option,
-                this.elementOwner);
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
 
-            var node = dataSource.topNodes.First(x => x.ElementBase.Iid == this.eu2.Iid);
+            var node = new ReportingDataSourceNode<Row>(
+                hierarchy,
+                nestedElements.First(ne => ne.Name == this.eu2.Name),
+                nestedElements);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("-21", parameter1.GetValue());
@@ -464,12 +456,14 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
-                hierarchy,
-                this.option,
-                this.elementOwner);
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
 
-            var node = dataSource.topNodes.First();
+            var node = new ReportingDataSourceNode<Row>(
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             var parameter2 = node.GetColumn<TestParameter2>();
@@ -491,12 +485,16 @@ namespace CDP4Reporting.Tests.DataSource
                 .AddLevel(this.cat2.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
-                hierarchy,
-                this.option,
-                this.elementOwner);
+            var nestedElements = new NestedElementTreeGenerator()
+                .Generate(this.option, this.elementOwner)
+                .ToList();
 
-            var parameter = dataSource.topNodes.First().GetColumn<TestParameter1>();
+            var node = new ReportingDataSourceNode<Row>(
+                hierarchy,
+                nestedElements.First(ne => ne.IsRootElement),
+                nestedElements);
+
+            var parameter = node.GetColumn<TestParameter1>();
 
             var children1 = parameter.GetChildren<TestParameter1>().ToList();
             Assert.AreEqual(2, children1.Count);
