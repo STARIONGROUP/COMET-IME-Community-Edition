@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginInstallerViewInvokerServiceTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="ICommandRunnerService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,33 +23,17 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Tests.Services
+namespace CDP4IME.Services
 {
-    using System;
-    using System.Threading;
-    using System.Windows;
-
-    using CDP4IME.Services;
-
-    using NUnit.Framework;
-
-    [TestFixture]
-    public class PluginInstallerViewInvokerServiceTestFixture
+    /// <summary>
+    /// Definition of <see cref="CommandRunnerService"/> Abstracting invoking commands on conhost
+    /// </summary>
+    public interface ICommandRunnerService
     {
-        [Test]
-        public void VerifyViewShowsUp()
-        {
-            Assert.Throws<NullReferenceException>(() =>
-            {
-                new ViewInvokerService().ShowDialog(null);
-            });
-        }
-
-        [Test]
-        public void VerifyMessageBoxShowsUp()
-        {
-            var messageBoxResult = new ViewInvokerService().ShowMessageBox(null,null, MessageBoxButton.YesNo, MessageBoxImage.Information);
-            Assert.AreEqual(messageBoxResult, MessageBoxResult.None);
-        }
+        /// <summary>
+        /// Runs the provided <see cref="executable"/> with elevated rights
+        /// </summary>
+        /// <param name="executable">The executable command path</param>
+        void RunAsAdmin(string executable);
     }
 }

@@ -53,6 +53,11 @@ namespace CDP4IME.Services
         /// <returns>a <see cref="MessageBoxResult"/></returns>
         public MessageBoxResult ShowMessageBox(string message, string title, MessageBoxButton button, MessageBoxImage image)
         {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return MessageBoxResult.None;
+            }
+            
             return MessageBox.Show(message, title, button, image);
         }
     }

@@ -23,7 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4IME
 {
     using System;
@@ -69,6 +68,7 @@ namespace CDP4IME
             
             if (UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown())
             {
+                Current.Shutdown();
                 return;
             }
 

@@ -53,20 +53,21 @@ namespace CDP4IME.Modularity
         /// <summary>
         /// The Ime Download directory
         /// </summary>
-        public static readonly DirectoryInfo ImeDownloadDirectoryInfo = new DirectoryInfo(Path.Combine(PluginUtilities.GetAppDataPath(), PluginUtilities.DownloadDirectory, "IME"));
+        public static DirectoryInfo ImeDownloadDirectoryInfo = new DirectoryInfo(Path.Combine(PluginUtilities.GetAppDataPath(), PluginUtilities.DownloadDirectory, "IME"));
 
         /// <summary>
         /// Check for any update available and run the plugin installer
         /// </summary>
         /// <param name="viewInvoker">An <see cref="IViewInvokerService"/></param>
+        /// <param name="commandRunner">An <see cref="ICommandRunnerService"/></param>
         /// <returns>An Assert whether the IME have to shut down</returns>
-        public static bool CheckInstallAndVerifyIfTheImeShallShutdown(IViewInvokerService viewInvoker = null)
+        public static bool CheckInstallAndVerifyIfTheImeShallShutdown(IViewInvokerService viewInvoker = null, ICommandRunnerService commandRunner = null)
         {
             var imeUpdate = CheckForImeUpdate();
 
             if (imeUpdate != null && (viewInvoker ?? new ViewInvokerService()).ShowMessageBox(ImeNewVersionMessage, "IME Update", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
             {
-                RunInstaller(imeUpdate);
+                RunInstaller(imeUpdate, commandRunner);
                 return true;
             }
 
@@ -123,7 +124,7 @@ namespace CDP4IME.Modularity
             var isThePlatformCompatible = currentAssembly.ProcessorArchitecture == ProcessorArchitecture.MSIL
                                            || currentAssembly.ProcessorArchitecture == platform;
 
-            return isItANewerVersion & isThePlatformCompatible & isTheNameCompliant;
+            return isItANewerVersion && isThePlatformCompatible && isTheNameCompliant;
         }
 
         /// <summary>
@@ -154,22 +155,12 @@ namespace CDP4IME.Modularity
         /// <summary>
         /// Closes the IME and run MSI in order to install the new version
         /// </summary>
-        private static void RunInstaller(string installerPath)
+        /// <param name="installerPath">The path to the msi</param>
+        /// <param name="commandRunner">The <see cref="ICommandRunnerService"/></param>
+        private static void RunInstaller(string installerPath, ICommandRunnerService commandRunner)
         {
-            var process = new Process
-            {
-                StartInfo =
-                {
-                    FileName = "msiexec",
-                    WorkingDirectory = Path.GetTempPath(),
-                    Arguments = $" /i \"{installerPath}\" ALLUSERS=1",
-                    Verb = "runas"
-                }
-            };
-
-            process.Start();
-
-            Application.Current.Shutdown();
+            var runner = commandRunner ?? new CommandRunnerService();
+            runner.RunAsAdmin(installerPath);
         }
     }
 }

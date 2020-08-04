@@ -48,6 +48,9 @@ namespace CDP4Composition.Modularity
     [ExcludeFromCodeCoverage]
     public static class PluginUtilities
     {
+        /// <summary>
+        /// The NLog Logger
+        /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger(typeof(PluginUtilities));
 
         /// <summary>

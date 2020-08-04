@@ -29,6 +29,7 @@ namespace CDP4IME.Tests.Modularity
     using System.IO;
     using System.Reflection;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Composition.Modularity;
@@ -45,20 +46,26 @@ namespace CDP4IME.Tests.Modularity
     public class UpdateInstallerTestFixture
     {
         private Mock<IViewInvokerService> viewInvoker;
+        private Mock<ICommandRunnerService> commandRunner;
         private string installerFile;
         private string downloadPath;
+        private string imeDownloadTestPath;
 
         [SetUp]
         public void Setup()
         {
+            this.imeDownloadTestPath = Path.Combine(Path.GetTempPath(), "UpdateInstaller", "ImeDownload", Guid.NewGuid().ToString());
+            
+            this.commandRunner = new Mock<ICommandRunnerService>();
+            this.commandRunner.Setup(x => x.RunAsAdmin(It.IsAny<string>()));
+
             this.viewInvoker = new Mock<IViewInvokerService>();
             this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<PluginInstaller>()));
 
             this.viewInvoker.Setup(x => x.ShowMessageBox(
                 It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information)).Returns(MessageBoxResult.No);
                 
-            var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
-            this.downloadPath = Path.Combine(appData, "RHEA", "CDP4", "DownloadCache", "plugins");
+            this.downloadPath = Path.Combine(PluginUtilities.GetAppDataPath(), "DownloadCache", "plugins");
 
             if (!Directory.Exists(this.downloadPath))
             {
@@ -74,9 +81,9 @@ namespace CDP4IME.Tests.Modularity
                 Directory.Delete(this.downloadPath, true);
             }
 
-            if (File.Exists(this.installerFile))
+            if (Directory.Exists(this.imeDownloadTestPath))
             {
-                File.Delete(this.installerFile);
+                Directory.Delete(this.imeDownloadTestPath, true);
             }
         }
 
@@ -108,10 +115,31 @@ namespace CDP4IME.Tests.Modularity
         public void VerifyIncompatibleIMEUpdate()
         {
             this.SetupInstallerFile(false);
+
+            UpdateInstaller.ImeDownloadDirectoryInfo = new DirectoryInfo(this.imeDownloadTestPath);
             Assert.IsFalse(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object));
             
             this.viewInvoker.Verify(x => x.ShowMessageBox(
                 It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information), Times.Never);
+
+            this.commandRunner.Verify(x => x.RunAsAdmin(It.IsAny<string>()), Times.Never);
+        }
+        
+        [Test]
+        public void VerifyIMEUpdate()
+        {
+            this.viewInvoker.Setup(x => x.ShowMessageBox(
+                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information)).Returns(MessageBoxResult.Yes);
+
+            this.SetupInstallerFile(true);
+
+            UpdateInstaller.ImeDownloadDirectoryInfo = new DirectoryInfo(this.imeDownloadTestPath);
+            Assert.IsTrue(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object, this.commandRunner.Object));
+
+            this.viewInvoker.Verify(x => x.ShowMessageBox(
+                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information), Times.Once);
+
+            this.commandRunner.Verify(x => x.RunAsAdmin(It.IsAny<string>()), Times.Once);
         }
 
         private void SetupInstallerFile(bool shouldItBeCompatible)
@@ -123,11 +151,11 @@ namespace CDP4IME.Tests.Modularity
                 majorVersion += 1;
             }
 
-            this.installerFile = Path.Combine(UpdateInstaller.ImeDownloadDirectoryInfo.FullName, $"CDP4IME-CE.x64-{majorVersion}.0.0.msi");
+            this.installerFile = Path.Combine(this.imeDownloadTestPath, $"CDP4IME-CE.x64-{majorVersion}.0.0.msi");
 
-            if (!Directory.Exists(UpdateInstaller.ImeDownloadDirectoryInfo.FullName))
+            if (!Directory.Exists(this.imeDownloadTestPath))
             {
-                Directory.CreateDirectory(UpdateInstaller.ImeDownloadDirectoryInfo.FullName);
+                Directory.CreateDirectory(this.imeDownloadTestPath);
             }
 
             File.Create(this.installerFile).Dispose();
