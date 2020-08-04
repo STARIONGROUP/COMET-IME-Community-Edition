@@ -53,7 +53,7 @@ namespace CDP4IME.Modularity
         /// <summary>
         /// The Ime Download directory
         /// </summary>
-        public static DirectoryInfo ImeDownloadDirectoryInfo = new DirectoryInfo(Path.Combine(PluginUtilities.GetAppDataPath(), PluginUtilities.DownloadDirectory, "IME"));
+        public static DirectoryInfo ImeDownloadDirectoryInfo { get; set; } = new DirectoryInfo(Path.Combine(PluginUtilities.GetAppDataPath(), PluginUtilities.DownloadDirectory, "IME"));
 
         /// <summary>
         /// Check for any update available and run the plugin installer
