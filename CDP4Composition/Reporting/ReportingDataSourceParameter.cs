@@ -37,9 +37,9 @@ namespace CDP4Composition.Reporting
     internal abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
-        /// The associated <see cref="ParameterOrOverrideBase"/>.
+        /// The associated <see cref="CDP4Common.EngineeringModelData.ParameterBase"/>.
         /// </summary>
-        protected ParameterOrOverrideBase ParameterOrOverrideBase { get; private set; }
+        protected ParameterBase ParameterBase { get; private set; }
 
         /// <summary>
         /// The associated <see cref="ParameterType"/> short name.
@@ -52,9 +52,9 @@ namespace CDP4Composition.Reporting
         protected string Value { get; private set; }
 
         /// <summary>
-        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterOrOverrideBase"/>.
+        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterBase"/>.
         /// </summary>
-        protected DomainOfExpertise Owner => this.ParameterOrOverrideBase.Owner;
+        protected DomainOfExpertise Owner => this.ParameterBase?.Owner;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{T}"/> class.
@@ -65,8 +65,9 @@ namespace CDP4Composition.Reporting
         }
 
         /// <summary>
-        /// Initializes a reported parameter column based on the corresponding <see cref="ParameterOrOverrideBase"/>
-        /// within the associated <see cref="ReportingDataSourceNode{T}"/>.
+        /// Initializes a reported parameter column based on the corresponding
+        /// <see cref="CDP4Common.EngineeringModelData.ParameterBase"/> within the associated
+        /// <see cref="ReportingDataSourceNode{T}"/>.
         /// </summary>
         /// <param name="node">
         /// The associated <see cref="ReportingDataSourceNode{T}"/>.
@@ -75,23 +76,19 @@ namespace CDP4Composition.Reporting
         {
             this.Node = node;
 
-            var parameter = this.Node.ElementDefinition.Parameter
-                .SingleOrDefault(x => x.ParameterType.ShortName == this.ShortName);
+            this.ParameterBase = this.ParameterBase ??
+                                 this.Node.NestedElement.NestedParameter.SingleOrDefault(
+                                     x => x.AssociatedParameter.ParameterType.ShortName == this.ShortName)?.AssociatedParameter;
 
-            if (parameter != null)
-            {
-                this.ParameterOrOverrideBase = parameter;
-                this.Value = parameter.ValueSet.First().ActualValue.First();
-            }
+            this.ParameterBase = this.ParameterBase ??
+                                 this.Node.ElementUsage?.ParameterOverride.SingleOrDefault(
+                                     x => x.Parameter.ParameterType.ShortName == this.ShortName);
 
-            var parameterOverride = this.Node.ElementUsage?.ParameterOverride
-                .SingleOrDefault(x => x.Parameter.ParameterType.ShortName == this.ShortName);
+            this.ParameterBase = this.ParameterBase ??
+                                 this.Node.ElementDefinition.Parameter.SingleOrDefault(
+                                     x => x.ParameterType.ShortName == this.ShortName);
 
-            if (parameterOverride != null)
-            {
-                this.ParameterOrOverrideBase = parameterOverride;
-                this.Value = parameterOverride.ValueSet.First().ActualValue.First();
-            }
+            this.Value = this.ParameterBase?.ValueSets.First().ActualValue.First();
         }
 
         /// <summary>
