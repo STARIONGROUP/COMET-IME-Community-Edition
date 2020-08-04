@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Reporting
+namespace CDP4Reporting.DataSource
 {
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.EngineeringModelData;

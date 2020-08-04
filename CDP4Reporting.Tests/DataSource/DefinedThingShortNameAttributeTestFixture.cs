@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICDP4ReportingDataSource.cs" company="RHEA System S.A.">
+// <copyright file="DefinedThingShortNameAttributeTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,31 +23,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Reporting
+namespace CDP4Reporting.Tests.DataSource
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
+    using CDP4Reporting.DataSource;
 
-    /// <summary>
-    /// The interface used for creating a reporting data source.
-    /// </summary>
-    /// <typeparam name="T">
-    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
-    /// </typeparam>
-    public interface IReportingDataSource<T> where T : ReportingDataSourceRow, new()
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class DefinedThingShortNameAttributeTestFixture
     {
-        /// <summary>
-        /// Creates a new data source instance.
-        /// </summary>
-        /// <param name="option">
-        /// The <see cref="Option"/> for which the data source is built.
-        /// </param>
-        /// <param name="domainOfExpertise">
-        /// The <see cref="DomainOfExpertise"/> for which the data source is built.
-        /// </param>
-        /// <returns>
-        /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
-        /// </returns>
-        ReportingDataSourceClass<T> CreateDataSource(Option option, DomainOfExpertise domainOfExpertise);
+        [Test]
+        public void TestParameterTypeShortNameAttribute()
+        {
+            var attribute = new DefinedThingShortNameAttribute("shortName");
+            Assert.AreEqual(attribute.ShortName, "shortName");
+        }
     }
 }
