@@ -26,6 +26,7 @@
 namespace CDP4Composition.Reporting
 {
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// The interface used for creating a reporting data source.
@@ -38,12 +39,15 @@ namespace CDP4Composition.Reporting
         /// <summary>
         /// Creates a new data source instance.
         /// </summary>
-        /// <param name="iteration">
-        /// The <see cref="Iteration"/> based on which the data source will be created.
+        /// <param name="option">
+        /// The <see cref="Option"/> for which the data source is built.
+        /// </param>
+        /// <param name="domainOfExpertise">
+        /// The <see cref="DomainOfExpertise"/> for which the data source is built.
         /// </param>
         /// <returns>
         /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
         /// </returns>
-        ReportingDataSourceClass<T> CreateDataSource(Iteration iteration);
+        ReportingDataSourceClass<T> CreateDataSource(Option option, DomainOfExpertise domainOfExpertise);
     }
 }
