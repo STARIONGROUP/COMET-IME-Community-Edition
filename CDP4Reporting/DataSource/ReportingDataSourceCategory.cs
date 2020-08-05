@@ -39,12 +39,12 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// Gets or sets the associated <see cref="Category"/> short name.
         /// </summary>
-        protected string ShortName { get; private set; }
+        public string ShortName { get; private set; }
 
         /// <summary>
         /// Flag indicating whether the associated <see cref="Category"/> is present.
         /// </summary>
-        protected bool Value { get; private set; }
+        public bool Value { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceCategory{T}"/> class.

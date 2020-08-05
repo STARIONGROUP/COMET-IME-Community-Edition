@@ -36,7 +36,7 @@ namespace CDP4Reporting.Parameters
         /// <summary>
         /// The name prefix that every report parameter gets in the report designer.
         /// </summary>
-        public const string parameterNamePrefix = "dyn_";
+        public const string NamePrefix = "dyn_";
 
         /// <summary>
         /// Gets or sets the name of the <see cref="IReportingParameter"/>
@@ -46,7 +46,7 @@ namespace CDP4Reporting.Parameters
         /// <summary>
         /// Gets the "calculated" parameter name to be used in the <see cref="Views.ReportDesigner"/>
         /// </summary>
-        public string ParameterName => $"{parameterNamePrefix}{this.Name}";
+        public string ParameterName => $"{NamePrefix}{this.Name}";
 
         /// <summary>
         /// Gets or sets the <see cref="Type"/> of the parameter
@@ -86,6 +86,13 @@ namespace CDP4Reporting.Parameters
             return this;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="ReportingParameter"/>
+        /// </summary>
+        /// <param name="name">The name of the parameter</param>
+        /// <param name="type">The data <see cref="Type"/> of the parameter</param>
+        /// <param name="defaultValue">The default value of the parameter</param>
+        /// <param name="filterExpression">a filter expression to be used on the report's DataSource</param>
         public ReportingParameter(string name, Type type, object defaultValue, string filterExpression = "")
         {
             this.Name = name;

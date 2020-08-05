@@ -33,7 +33,6 @@ namespace CDP4Reporting.DataSource
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
 
     /// <summary>
     /// Class representing a node in the hierarhical tree upon which the data source is based.
