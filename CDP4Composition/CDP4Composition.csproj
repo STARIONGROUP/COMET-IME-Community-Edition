@@ -266,7 +266,4 @@
     <Compile Remove="obj\x64\Release\Views\LoadingControl.g.cs" />
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Reporting\" />
-  </ItemGroup>
 </Project>

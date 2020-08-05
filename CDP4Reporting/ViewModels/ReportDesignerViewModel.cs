@@ -604,7 +604,7 @@ namespace CDP4Reporting.ViewModels
             //Find existing dynamic parameters
             foreach (var reportParameter in this.CurrentReport.Parameters)
             {
-                if (reportParameter.Name.StartsWith(ReportingParameter.parameterNamePrefix))
+                if (reportParameter.Name.StartsWith(ReportingParameter.NamePrefix))
                 {
                     defaultValues.Add(reportParameter.Name, reportParameter.Value);
                     toBeRemoved.Add(reportParameter);
