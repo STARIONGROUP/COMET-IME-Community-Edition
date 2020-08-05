@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IReportingParameter.cs" company="RHEA System S.A.">
+// <copyright file="ReportingParameters.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,59 +23,75 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting
+namespace CDP4Reporting.Parameters
 {
     using System;
     using System.Collections.Generic;
 
     /// <summary>
-    /// Interface to be used in the Code editor of <see cref="Views.ReportDesigner"/>.
+    /// class to be used to define dynamic report parameters in the Code editor of <see cref="Views.ReportDesigner"/>
     /// </summary>
-    public interface IReportingParameter
+    public class ReportingParameter : IReportingParameter
     {
+        /// <summary>
+        /// The name prefix that every report parameter gets in the report designer.
+        /// </summary>
+        public const string parameterNamePrefix = "dyn_";
+
         /// <summary>
         /// Gets or sets the name of the <see cref="IReportingParameter"/>
         /// </summary>
-        string Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets the "calculated" parameter name to be used in the <see cref="Views.ReportDesigner"/>
         /// </summary>
-        string ParameterName { get; }
+        public string ParameterName => $"{parameterNamePrefix}{this.Name}";
 
         /// <summary>
         /// Gets or sets the <see cref="Type"/> of the parameter
         /// </summary>
-        Type Type { get; set; }
+        public Type Type { get; set; }
 
         /// <summary>
         /// Gets or sets the visibility of the report parameter
         /// </summary>
-        bool Visible { get; set; }
+        public bool Visible { get; set; } = true;
 
         /// <summary>
         /// Gets a <see cref="Dictionary{TKey,TValue}"/> that contains lookup values for a drop down report parameter
         /// </summary>
-        Dictionary<object, string> LookUpValues { get; }
+        public Dictionary<object, string> LookUpValues { get; } = new Dictionary<object, string>();
 
         /// <summary>
         /// Gets or sets the default value of the report parameter
         /// </summary>
-        object DefaultValue { get; set; }
+        public object DefaultValue { get; set; }
 
         /// <summary>
         /// Gets or sets the filterexpression to be used for this report parameter
         /// </summary>
-        string FilterExpression { get; set; }
+        public string FilterExpression { get; set; }
 
         /// <summary>
         /// Adds a lookup value to the <see cref="LookUpValues"/> property
         /// </summary>
         /// <param name="value">The value. Could be any data type.</param>
         /// <param name="displayValue">The display value in the report designer</param>
-        /// <param name="isDefault"><see cref="bool"/> that defines whether this lookupvalue
-        /// is the default value for the parameter during report execution (preview).</param>
         /// <returns>The <see cref="IReportingParameter"/></returns>
-        IReportingParameter AddLookupValue(object value, string displayValue, bool isDefault = false);
+        public IReportingParameter AddLookupValue(object value, string displayValue)
+        {
+            this.LookUpValues.Add(value, displayValue);
+
+            return this;
+        }
+
+        public ReportingParameter(string name, Type type, object defaultValue, string filterExpression = "")
+        {
+            this.Name = name;
+            this.Type = type;
+            this.DefaultValue = defaultValue;
+            this.FilterExpression = filterExpression;
+        }
     }
 }
