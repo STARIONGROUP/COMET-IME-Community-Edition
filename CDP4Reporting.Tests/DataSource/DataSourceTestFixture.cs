@@ -57,6 +57,10 @@ namespace CDP4Reporting.Tests.DataSource
         private ElementDefinition ed2p;
         private ElementDefinition ed2n;
         private ElementDefinition ed3;
+        private ElementDefinition ed4;
+        private ElementDefinition ed5;
+        private ElementDefinition ed6;
+        private ElementDefinition ed7;
 
         private ElementUsage eu12p1;
         private ElementUsage eu12p2;
@@ -66,6 +70,10 @@ namespace CDP4Reporting.Tests.DataSource
         private ElementUsage eu2p32;
         private ElementUsage eu2n31;
         private ElementUsage eu2n32;
+        private ElementUsage eu4;
+        private ElementUsage eu5;
+        private ElementUsage eu6;
+        private ElementUsage eu7;
 
         private class Row : ReportingDataSourceRow
         {
@@ -158,6 +166,34 @@ namespace CDP4Reporting.Tests.DataSource
                 Owner = this.domain
             };
 
+            this.ed4 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "ed4",
+                Name = "element definition 4",
+                Owner = this.domain
+            };
+
+            this.ed5 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "ed5",
+                Name = "element definition 5 same category",
+                Owner = this.domain
+            };
+
+            this.ed6 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "ed6",
+                Name = "element definition 6 no category",
+                Owner = this.domain
+            };
+
+            this.ed7 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "ed7",
+                Name = "element definition 7 ",
+                Owner = this.domain
+            };
+
             // Element Usages
 
             this.eu12p1 = new ElementUsage(Guid.NewGuid(), this.cache, null)
@@ -224,6 +260,38 @@ namespace CDP4Reporting.Tests.DataSource
                 Owner = this.domain
             };
 
+            this.eu4 = new ElementUsage(Guid.NewGuid(), this.cache, null)
+            {
+                ElementDefinition = this.ed4,
+                ShortName = "eu4",
+                Name = "element usage 1->4",
+                Owner = this.domain
+            };
+
+            this.eu5 = new ElementUsage(Guid.NewGuid(), this.cache, null)
+            {
+                ElementDefinition = this.ed5,
+                ShortName = "eu5",
+                Name = "element usage 4->5",
+                Owner = this.domain
+            };
+
+            this.eu6 = new ElementUsage(Guid.NewGuid(), this.cache, null)
+            {
+                ElementDefinition = this.ed6,
+                ShortName = "eu6",
+                Name = "element usage 5->6",
+                Owner = this.domain
+            };
+
+            this.eu7 = new ElementUsage(Guid.NewGuid(), this.cache, null)
+            {
+                ElementDefinition = this.ed7,
+                ShortName = "eu7",
+                Name = "element usage 6->7",
+                Owner = this.domain
+            };
+
             // Structure
 
             this.iteration.TopElement = this.ed1;
@@ -244,24 +312,96 @@ namespace CDP4Reporting.Tests.DataSource
             this.ed2p.ContainedElement.Add(this.eu2p31);
             this.ed2p.ContainedElement.Add(this.eu2p32);
 
+            this.eu4.Category.Add(this.cat2);
+            this.ed1.ContainedElement.Add(this.eu4);
+
+            this.ed4.ContainedElement.Add(this.eu5);
+
+            this.ed5.ContainedElement.Add(this.eu6);
+
+            this.ed7.Category.Add(this.cat3);
+            this.ed6.ContainedElement.Add(this.eu7);
+
             // Product tree:
-            // ["cat1"] +> "ed1"
-            // ["cat2"] +-+> "ed1.eu12n1"
-            // [      ] | +--> "ed1.eu12n1.eu2n31"
-            // [      ] | +--> "ed1.eu12n1.eu2n32"
-            // [      ] +-+> "ed1.eu12n2"
-            // [      ] | +--> "ed1.eu12n2.eu2n31"
-            // [      ] | +--> "ed1.eu12n2.eu2n32"
-            // ["cat2"] +-+> "ed1.eu12p1"
-            // ["cat3"] | +--> "ed1.eu12p1.eu2p31"
-            // [      ] | +--> "ed1.eu12p1.eu2p32"
-            // [      ] +-+> "ed1.eu12p2"
-            // ["cat3"] | +--> "ed1.eu12p2.eu2p31"
-            // [      ] | +--> "ed1.eu12p2.eu2p32"
+            // ["cat1"] --> "ed1"
+            // ["cat2"] +--> "ed1.eu12n1"
+            // [      ]   +--> "ed1.eu12n1.eu2n31"
+            // [      ]   +--> "ed1.eu12n1.eu2n32"
+            // [      ] + +> "ed1.eu12n2"
+            // [      ]   +--> "ed1.eu12n2.eu2n31"
+            // [      ]   +--> "ed1.eu12n2.eu2n32"
+            // ["cat2"] +--> "ed1.eu12p1"
+            // ["cat3"]   +--> "ed1.eu12p1.eu2p31"
+            // [      ]   +--> "ed1.eu12p1.eu2p32"
+            // [      ] + --> "ed1.eu12p2"
+            // ["cat3"]   +--> "ed1.eu12p2.eu2p31"
+            // [      ]   +--> "ed1.eu12p2.eu2p32"
+            // ["cat2"] +--> "ed1.eu4"
+            // [      ]   +--> "ed1.eu4.eu5"
+            // [      ]     +--> "ed1.eu4.eu5.eu6"
+            // ["cat3"]       +--> "ed1.eu4.eu5.eu6.eu7"
         }
 
         [Test]
-        public void VerifyStructure()
+        public void VerifyStructure1()
+        {
+            // second row structure
+            // ["cat2"] +--> "ed1.eu4"
+            // [      ]   +--> "ed1.eu4.eu5"
+            // [      ]     +--> "ed1.eu4.eu5.eu6"
+            // ["cat3"]       +--> "ed1.eu4.eu5.eu6.eu7"
+            this.VerifyStructure(this.eu4);
+        }
+
+        [Test]
+        public void VerifyStructure2()
+        {
+            // second row structure
+            // ["cat2"] +--> "ed1.eu4"
+            // ["cat2"]   +--> "ed1.eu4.eu5"
+            // [      ]     +--> "ed1.eu4.eu5.eu6"
+            // ["cat3"]       +--> "ed1.eu4.eu5.eu6.eu7"
+
+            this.ed5.Category.Add(this.cat2);
+            this.VerifyStructure(this.eu5);
+        }
+
+        [Test]
+        public void VerifyStructure3()
+        {
+            // second row structure
+            // ["cat2"] +--> "ed1.eu4"
+            // ["cat2"]   +--> "ed1.eu4.eu5"
+            // ["cat2"]     +--> "ed1.eu4.eu5.eu6"
+            // ["cat3"]       +--> "ed1.eu4.eu5.eu6.eu7"
+
+            this.ed5.Category.Add(this.cat2);
+            this.ed6.Category.Add(this.cat2);
+            this.VerifyStructure(this.eu6);
+        }
+
+        [Test]
+        public void VerifyMultiRootStructure()
+        {
+            var hierarchy = new CategoryHierarchy
+                    .Builder(this.iteration, this.cat2.ShortName)
+                .AddLevel(this.cat3.ShortName)
+                .Build();
+
+            var dataSource = new ReportingDataSourceClass<Row>(
+                hierarchy,
+                this.option,
+                this.domain);
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned
+            var rows = dataSource.GetTable().Rows;
+            Assert.AreEqual(2, rows.Count);
+
+            ValidateRow(rows[0], this.eu12p1, this.eu2p31);
+            ValidateRow(rows[1],  this.eu4, this.eu7);
+        }
+
+        private void VerifyStructure(ElementUsage row2Result)
         {
             var hierarchy = new CategoryHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
@@ -276,27 +416,25 @@ namespace CDP4Reporting.Tests.DataSource
 
             // tabular representation built, category hierarchy considered, unneeded subtrees pruned
             var rows = dataSource.GetTable().Rows;
-            Assert.AreEqual(6, rows.Count);
+            Assert.AreEqual(2, rows.Count);
 
-            ValidateRow(rows[0], true, this.ed1);
-            ValidateRow(rows[1], true, this.ed1, this.eu12n1);
-            ValidateRow(rows[2], true, this.ed1, this.eu12p1);
-            ValidateRow(rows[3], true, this.ed1, this.eu12p1, this.eu2p31);
-            ValidateRow(rows[4], false, this.ed1, this.eu12p2);
-            ValidateRow(rows[5], true, this.ed1, this.eu12p2, this.eu2p31);
+            ValidateRow(rows[0], this.ed1, this.eu12p1, this.eu2p31);
+            ValidateRow(rows[1], this.ed1, row2Result, this.eu7);
         }
 
         private static void ValidateRow(
             DataRow row,
-            bool isVisible,
             ElementBase level0 = null,
             ElementBase level1 = null,
             ElementBase level2 = null)
         {
             Assert.AreEqual(level0?.Name, row.Field<string>(0));
             Assert.AreEqual(level1?.Name, row.Field<string>(1));
-            Assert.AreEqual(level2?.Name, row.Field<string>(2));
-            Assert.AreEqual(isVisible, row.Field<bool>(3));
+
+            if (row.ItemArray.Length > 3)
+            {
+                Assert.AreEqual(level2?.Name, row.Field<string>(2));
+            }
         }
     }
 }
