@@ -182,14 +182,12 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var nestedElements = new NestedElementTreeGenerator()
-                .Generate(this.option, this.domain)
-                .ToList();
-
-            var node = new ReportingDataSourceNode<Row>(
+            var dataSource = new ReportingDataSourceClass<Row>(
                 hierarchy,
-                nestedElements.First(ne => ne.IsRootElement),
-                nestedElements);
+                this.option,
+                this.domain);
+
+            var node = dataSource.topNodes.First();
 
             Assert.IsNotNull(node.GetColumn<TestCategory1>());
             Assert.IsNotNull(node.GetColumn<TestCategory2>());
@@ -203,14 +201,12 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var nestedElements = new NestedElementTreeGenerator()
-                .Generate(this.option, this.domain)
-                .ToList();
-
-            var node = new ReportingDataSourceNode<Row>(
+            var dataSource = new ReportingDataSourceClass<Row>(
                 hierarchy,
-                nestedElements.First(ne => ne.IsRootElement),
-                nestedElements);
+                this.option,
+                this.domain);
+
+            var node = dataSource.topNodes.First();
 
             var category1 = node.GetColumn<TestCategory1>();
             Assert.AreEqual("cat1", category1.ShortName);
@@ -226,14 +222,12 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var nestedElements = new NestedElementTreeGenerator()
-                .Generate(this.option, this.domain)
-                .ToList();
-
-            var node = new ReportingDataSourceNode<Row>(
+            var dataSource = new ReportingDataSourceClass<Row>(
                 hierarchy,
-                nestedElements.First(ne => ne.IsRootElement),
-                nestedElements);
+                this.option,
+                this.domain);
+
+            var node = dataSource.topNodes.First();
 
             var category1 = node.GetColumn<TestCategory1>();
             Assert.AreEqual(true, category1.GetValue());
@@ -249,14 +243,12 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
-            var nestedElements = new NestedElementTreeGenerator()
-                .Generate(this.option, this.domain)
-                .ToList();
-
-            var node = new ReportingDataSourceNode<Row>(
+            var dataSource = new ReportingDataSourceClass<Row>(
                 hierarchy,
-                nestedElements.First(ne => ne.Name == this.eu.Name),
-                nestedElements);
+                this.option,
+                this.domain);
+
+            var node = dataSource.topNodes.First();
 
             var category1 = node.GetColumn<TestCategory1>();
             Assert.AreEqual(false, category1.GetValue());

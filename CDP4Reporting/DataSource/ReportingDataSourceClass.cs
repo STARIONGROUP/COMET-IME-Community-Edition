@@ -25,12 +25,9 @@
 
 namespace CDP4Reporting.DataSource
 {
+    using System.Collections.Generic;
     using System.Data;
     using System.Linq;
-
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.Helpers;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
@@ -50,9 +47,9 @@ namespace CDP4Reporting.DataSource
         private readonly CategoryHierarchy categoryHierarchy;
 
         /// <summary>
-        /// The <see cref="ReportingDataSourceNode{T}"/> which is the root of the hierarhical tree.
+        /// The <see cref="ReportingDataSourceNode{T}"/>'s which are the root elements of the hierarhical tree.
         /// </summary>
-        private readonly ReportingDataSourceNode<T> topNode;
+        internal readonly IEnumerable<ReportingDataSourceNode<T>> topNodes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceClass{T}"/> class.
@@ -77,9 +74,7 @@ namespace CDP4Reporting.DataSource
                 .Generate(option, domainOfExpertise)
                 .ToList();
 
-            var topElement = nestedElements.First(ne => ne.IsRootElement);
-
-            this.topNode = new ReportingDataSourceNode<T>(categoryHierarchy, topElement, nestedElements);
+            this.topNodes = new ReportingDataSourceNodeTreeGenerator<T>().Generate(categoryHierarchy, nestedElements);
         }
 
         /// <summary>
@@ -92,7 +87,10 @@ namespace CDP4Reporting.DataSource
         {
             var table = ReportingDataSourceNode<T>.GetTable(this.categoryHierarchy);
 
-            this.topNode.AddDataRows(table);
+            foreach (var topNode in this.topNodes)
+            {
+                topNode.AddDataRows(table);
+            }
 
             return table;
         }
