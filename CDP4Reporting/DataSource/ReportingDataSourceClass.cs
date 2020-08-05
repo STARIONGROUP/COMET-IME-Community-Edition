@@ -26,6 +26,11 @@
 namespace CDP4Reporting.DataSource
 {
     using System.Data;
+    using System.Linq;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;

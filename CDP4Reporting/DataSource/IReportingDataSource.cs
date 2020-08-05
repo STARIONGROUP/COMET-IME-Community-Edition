@@ -39,7 +39,7 @@ namespace CDP4Reporting.DataSource
         /// Creates a new data source instance.
         /// </summary>
         /// <returns>
-        /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
+        /// An object instance.
         /// </returns>
         object CreateDataSource();
     }
