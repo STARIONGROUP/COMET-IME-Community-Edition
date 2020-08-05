@@ -25,14 +25,15 @@
 
 namespace CDP4Reporting.DataSource
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
     using System;
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
     using System.Reflection;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     /// <summary>
     /// Class representing a node in the hierarhical tree upon which the data source is based.
@@ -74,7 +75,7 @@ namespace CDP4Reporting.DataSource
 
             for (var hierarchy = categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
             {
-                table.Columns.Add(hierarchy.Category.ShortName, typeof(string));
+                table.Columns.Add(hierarchy.FieldName, typeof(string));
             }
 
             foreach (var publicGetter in PublicGetters)
@@ -131,6 +132,11 @@ namespace CDP4Reporting.DataSource
         private readonly Category filterCategory;
 
         /// <summary>
+        /// The name of the field/column when the data is transfered to a <see cref="DataRow"/>.
+        /// </summary>
+        private readonly string fieldname;
+
+        /// <summary>
         /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
         /// </summary>
         private bool IsVisible =>
@@ -166,6 +172,7 @@ namespace CDP4Reporting.DataSource
             ReportingDataSourceNode<T> parent = null)
         {
             this.filterCategory = categoryHierarchy.Category;
+            this.fieldname = categoryHierarchy.FieldName;
 
             this.NestedElement = topElement;
 
@@ -173,11 +180,17 @@ namespace CDP4Reporting.DataSource
 
             this.rowRepresentation = this.GetRowRepresentation();
 
-            if (categoryHierarchy.Child == null)
-            {
-                return;
-            }
+            var children = this.GetChildren(topElement, nestedElements).ToList();
 
+            while (categoryHierarchy != null)
+            {
+                this.AddNestedUsages(categoryHierarchy, nestedElements, children);
+                categoryHierarchy = categoryHierarchy.Child;
+            }
+        }
+
+        private IEnumerable<NestedElement> GetChildren(NestedElement topElement, List<NestedElement> nestedElements)
+        {
             var level = topElement.ElementUsage.Count;
 
             var children = nestedElements.Where(ne => ne.ElementUsage.Count == level + 1);
@@ -185,20 +198,37 @@ namespace CDP4Reporting.DataSource
             if (level > 0)
             {
                 children = children.Where(ne =>
-                    ne.ElementUsage[level - 1] == this.NestedElement.ElementUsage.Last());
+                    ne.ElementUsage[level - 1] == this.NestedElement.ElementUsage.LastOrDefault());
             }
 
+            return children;
+        }
+
+        private void AddNestedUsages(CategoryHierarchy categoryHierarchy, List<NestedElement> nestedElements, IEnumerable<NestedElement> children)
+        {
             foreach (var child in children)
             {
-                var childNode = new ReportingDataSourceNode<T>(
-                    categoryHierarchy.Child,
-                    child,
-                    nestedElements,
-                    this);
-
-                if (childNode.IsRelevant)
+                if (this.Children.All(x => x.NestedElement != child))
                 {
-                    this.Children.Add(childNode);
+                    var childNode = new ReportingDataSourceNode<T>(
+                        categoryHierarchy,
+                        child,
+                        nestedElements,
+                        this);
+
+                    if (childNode.IsRelevant)
+                    {
+                        this.Children.Add(childNode);
+                    }
+                    else
+                    {
+                        var nestedChildren = this.GetChildren(child, nestedElements).ToList();
+
+                        if (nestedChildren.Any())
+                        {
+                            this.AddNestedUsages(categoryHierarchy, nestedElements, nestedChildren);
+                        }
+                    }
                 }
             }
         }
@@ -233,7 +263,7 @@ namespace CDP4Reporting.DataSource
 
             if (!this.IsVisible)
             {
-                return row;
+                return null;
             }
 
             foreach (var rowField in RowFields)
@@ -257,7 +287,10 @@ namespace CDP4Reporting.DataSource
         /// <param name="table"></param>
         internal void AddDataRows(DataTable table)
         {
-            table.Rows.Add(this.GetDataRow(table));
+            if (this.rowRepresentation != null)
+            {
+                table.Rows.Add(this.GetDataRow(table));
+            }
 
             foreach (var child in this.Children)
             {
@@ -301,7 +334,7 @@ namespace CDP4Reporting.DataSource
         {
             this.parent?.InitializeCategoryColumns(row);
 
-            row[this.filterCategory.ShortName] = this.ElementBase.Name;
+            row[this.fieldname] = this.ElementBase.Name;
         }
     }
 }
