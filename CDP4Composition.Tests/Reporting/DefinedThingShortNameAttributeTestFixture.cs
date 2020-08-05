@@ -25,8 +25,6 @@
 
 namespace CDP4Composition.Tests.Reporting
 {
-    using CDP4Composition.Reporting;
-
     using NUnit.Framework;
 
     [TestFixture]

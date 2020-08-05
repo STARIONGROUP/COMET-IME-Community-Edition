@@ -34,8 +34,6 @@ namespace CDP4Composition.Tests.Reporting
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Composition.Reporting;
-
     using NUnit.Framework;
 
     [TestFixture]

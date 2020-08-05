@@ -24,7 +24,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-namespace CDP4Reporting.ViewModels
+namespace CDP4Reporting.Utilities
 {
     using System.IO;
 

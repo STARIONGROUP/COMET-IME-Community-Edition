@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinedThingShortNameAttribute.cs" company="RHEA System S.A.">
+// <copyright file="ICDP4ReportingDataSource.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,33 +23,46 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Reporting
+namespace CDP4Reporting.DataSource
 {
-    using System;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
-    using CDP4Common.CommonData;
+    using CDP4Dal;
 
     /// <summary>
-    /// Attribute decorating implementations of <see cref="ReportingDataSourceParameter{T}"/> to mark
-    /// the associated <see cref="DefinedThing"/> short name.
+    /// The interface used for creating a reporting data source.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class DefinedThingShortNameAttribute : Attribute
+    internal interface IReportingDataSource
     {
         /// <summary>
-        /// The short name of the associated <see cref="DefinedThing"/>.
+        /// Creates a new data source instance.
         /// </summary>
-        public readonly string ShortName;
+        /// <returns>
+        /// An object instance.
+        /// </returns>
+        object CreateDataSource();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefinedThingShortNameAttribute"/> class.
-        /// </summary>
-        /// <param name="shortName">
-        /// The short name of the associated <see cref="DefinedThing"/>.
-        /// </param>
-        public DefinedThingShortNameAttribute(string shortName)
+    public abstract class ReportingDataSource : IReportingDataSource
+    {
+        public Iteration Iteration { get; private set; }
+
+        public ISession Session { get; private set; }
+
+        public DomainOfExpertise DomainOfExpertise { get; private set; }
+
+        protected ReportingDataSource()
         {
-            this.ShortName = shortName;
         }
+
+        internal void Initialize(Iteration iteration, ISession session)
+        {
+            this.Iteration = iteration;
+            this.Session = session;
+            this.DomainOfExpertise = session.QueryCurrentDomainOfExpertise();
+        }
+
+        public abstract object CreateDataSource();
     }
 }

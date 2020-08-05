@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IReportingParameters.cs" company="RHEA System S.A.">
+// <copyright file="ReportingDataSourceRow.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -19,24 +19,34 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting
+namespace CDP4Reporting.DataSource
 {
-    using System.Collections.Generic;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Interface to be used in the Code editor of <see cref="Views.ReportDesigner"/>
+    /// Abstract base class from which all row representations for a <see cref="ReportingDataSourceClass{T}"/> need to derive.
     /// </summary>
-    public interface IReportingParameters
+    public abstract class ReportingDataSourceRow
     {
         /// <summary>
-        /// Create a list of <see cref="IReportingParameter"/>s
+        /// The associated <see cref="ElementBase"/>.
         /// </summary>
-        /// <param name="dataSource">The datasource</param>
-        /// <returns>A list of <see cref="IReportingParameter"/>s</returns>
-        IEnumerable<IReportingParameter> CreateParameters(object dataSource);
+        protected internal ElementBase ElementBase { get; internal set; }
+
+        /// <summary>
+        /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
+        /// Note that when this is false, all values will be null on the row.
+        /// </summary>
+        public bool IsVisible { get; internal set; }
+
+        /// <summary>
+        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
+        /// </summary>
+        protected DomainOfExpertise Owner => this.ElementBase.Owner;
     }
 }

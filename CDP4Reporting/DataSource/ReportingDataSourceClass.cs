@@ -23,13 +23,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Reporting
+namespace CDP4Reporting.DataSource
 {
-    using CDP4Common.EngineeringModelData;
-
     using System.Data;
     using System.Linq;
 
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
 

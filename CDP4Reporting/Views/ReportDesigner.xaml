@@ -174,7 +174,6 @@
                             </dxb:InsertAction>
                             <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.DesignerHomePage}" PropertyName="Caption" Value="File" />
                             <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.Open}" IsEnabled="True" />
-                            <dxb:RemoveAction ElementName="{x:Static dxrud:DefaultBarItemNames.StylesGroup}" />
                         </dxrud:ReportDesigner.RibbonCustomizationActions>
                         <dxrud:ReportDesignerClassicView/>
                     </dxrud:ReportDesigner>
