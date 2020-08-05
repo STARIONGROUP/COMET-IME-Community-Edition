@@ -68,6 +68,22 @@ namespace CDP4Reporting.DataSource
             }
 
             /// <summary>
+            /// Initializes a new instance of the <see cref="Builder"/> class.
+            /// </summary>
+            /// <param name="iteration">
+            /// The <see cref="Iteration"/> containing the desired <see cref="CDP4Common.SiteDirectoryData.Category"/> items.
+            /// </param>
+            /// <param name="topLevelCategoryShortName">
+            /// The <see cref="DefinedThing.ShortName"/> of the <see cref="CDP4Common.SiteDirectoryData.Category"/> of
+            /// the top element of the <see cref="CategoryHierarchy"/> to be constructed.
+            /// </param>
+            public Builder(Iteration iteration, string topLevelCategoryShortName)
+            {
+                this.iteration = iteration;
+                this.AddLevel(topLevelCategoryShortName);
+            }
+
+            /// <summary>
             /// Gets the <see cref="CDP4Common.SiteDirectoryData.Category"/> with the given <paramref name="shortName"/>
             /// contained in the <see cref="iteration"/>.
             /// </summary>
