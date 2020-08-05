@@ -25,6 +25,7 @@
 
 namespace CDP4Reporting.DataSource
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -36,9 +37,9 @@ namespace CDP4Reporting.DataSource
     public abstract class ReportingDataSourceCategory<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
-        /// The associated <see cref="Category"/> short name.
+        /// Gets or sets the associated <see cref="Category"/> short name.
         /// </summary>
-        internal readonly string ShortName;
+        protected string ShortName { get; private set; }
 
         /// <summary>
         /// Flag indicating whether the associated <see cref="Category"/> is present.
@@ -63,22 +64,80 @@ namespace CDP4Reporting.DataSource
         internal override void Initialize(ReportingDataSourceNode<T> node)
         {
             this.Node = node;
+            this.Value = this.HasCategory();
+        }
 
+        /// <summary>
+        /// Checks if the <see cref="ElementDefinition.Category"/>, or <see cref="ElementUsage.Category"/> contains a <see cref="Category"/>
+        /// that has <see cref="ReportingDataSourceCategory{T}.ShortName"/> as its <see cref="Category.ShortName"/>, or somewhere in the
+        /// <see cref="Category.SuperCategory"/> hierarchy.
+        /// </summary>
+        /// <returns>true if <see cref="Category.ShortName"/> was found, otherwise false.</returns>
+        private bool HasCategory()
+        {
             var definitionCategory = this.Node.ElementDefinition.Category
                 .SingleOrDefault(x => x.ShortName == this.ShortName);
 
             if (definitionCategory != null)
             {
-                this.Value = true;
+                return true;
             }
 
-            var usageCategory = this.Node.ElementUsage?.Category
-                .SingleOrDefault(x => x.ShortName == this.ShortName);
-
-            if (usageCategory != null)
+            foreach (var category in this.Node.ElementDefinition.Category)
             {
-                this.Value = true;
+                if (this.ExistsInSuperCategory(category, null))
+                {
+                    return true;
+                }
             }
+
+            if (this.Node.ElementUsage != null)
+            {
+                var usageCategory = this.Node.ElementUsage.Category
+                    .SingleOrDefault(x => x.ShortName == this.ShortName);
+
+                if (usageCategory != null)
+                {
+                    return true;
+                }
+
+                foreach (var category in this.Node.ElementUsage.Category)
+                {
+                    if (this.ExistsInSuperCategory(category, null))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if a <see cref="Category"/> has has <see cref="ReportingDataSourceCategory{T}.ShortName"/> as its <see cref="Category.ShortName"/>
+        /// in its  <see cref="Category.SuperCategory"/> hierarchy.
+        /// </summary>
+        /// <returns>true if <see cref="Category.ShortName"/> was found, otherwise false.</returns>
+        private bool ExistsInSuperCategory(Category category, List<Category> checkedCategories)
+        {
+            if (checkedCategories == null)
+            {
+                checkedCategories = new List<Category>();
+            }
+
+            foreach (var superCategory in category.SuperCategory.Except(checkedCategories))
+            {
+                if (superCategory.ShortName.Equals(this.ShortName))
+                {
+                    return true;
+                }
+
+                checkedCategories.Add(superCategory);
+
+                return this.ExistsInSuperCategory(superCategory, checkedCategories);
+            }
+
+            return false;
         }
     }
 }

@@ -45,10 +45,13 @@ namespace CDP4Reporting.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    using CDP4Composition.Reporting;
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
+
+    using CDP4Reporting.DataSource;
+    using CDP4Reporting.Parameters;
+    using CDP4Reporting.Utilities;
 
     using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Reports.UserDesigner;
@@ -526,7 +529,12 @@ namespace CDP4Reporting.ViewModels
                 dataSource.DataSource = this.GetDataSource();
             }
 
-            this.CheckParameters(dataSource.DataSource);
+            var parameters = this.GetParameters(dataSource.DataSource).ToList();
+            var filterString = this.GetFilterString(parameters);
+
+            this.currentReport.FilterString = filterString;
+
+            this.CheckParameters(parameters);
 
             // Always rebuild datasource schema 
             dataSource.RebuildResultSchema();
@@ -552,17 +560,16 @@ namespace CDP4Reporting.ViewModels
                     this.BuildResult
                         .CompiledAssembly
                         .GetTypes()
-                        .FirstOrDefault(t => t.GetInterfaces()
-                            .Any(i => i == typeof(IReportingDataSource))
+                        .FirstOrDefault(t => t.IsSubclassOf(typeof(ReportingDataSource))
                         )?.FullName;
 
                 if (editorFullClassName == null)
                 {
-                    this.AddOutput("No class that implements IReportingDataSource was found.");
+                    this.AddOutput($"No class that inherits from {typeof(ReportingDataSource)} was found.");
                     return null;
                 }
 
-                var instObj = this.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName) as IReportingDataSource;
+                var instObj = this.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName) as ReportingDataSource;
 
                 if (instObj == null)
                 {
@@ -570,7 +577,9 @@ namespace CDP4Reporting.ViewModels
                     return null;
                 }
 
-                return instObj.CreateDataSource(this.Thing);
+                instObj.Initialize(this.Thing, this.Session);
+
+                return instObj.CreateDataSource();
             }
             finally
             {
@@ -582,21 +591,27 @@ namespace CDP4Reporting.ViewModels
         /// Check if the compiled assembly built from the code editor contains a class that implements the <see cref="IReportingParameters"/> interface
         /// If true, then create report parameters using that class.
         /// </summary>
-        /// <param name="dataSource">The datasource that is present in the assembly built from the code editor</param>
-        private void CheckParameters(object dataSource)
+        /// <param name="parameters">
+        /// The <see cref="IEnumerable{IReportingParameter}"/> that contains the report's parameters
+        /// </param>
+        private void CheckParameters(IEnumerable<IReportingParameter> parameters)
         {
-            var reportingParameters = this.GetParameters(dataSource)?.ToList();
+            var reportingParameters = parameters.ToList();
 
             var toBeRemoved = new List<Parameter>();
+            var defaultValues = new Dictionary<string, object>();
 
+            //Find existing dynamic parameters
             foreach (var reportParameter in this.CurrentReport.Parameters)
             {
                 if (reportParameter.Name.StartsWith(ReportingParameter.parameterNamePrefix))
                 {
+                    defaultValues.Add(reportParameter.Name, reportParameter.Value);
                     toBeRemoved.Add(reportParameter);
                 }
             }
 
+            // Remove old dynamic parameters
             if (toBeRemoved.Any())
             {
                 foreach (var reportParameter in toBeRemoved)
@@ -611,19 +626,16 @@ namespace CDP4Reporting.ViewModels
                 return;
             }
 
+            // Create new dynamic parameters
             foreach (var reportingParameter in reportingParameters)
             {
                 var newReportParameter = new Parameter
                 {
                     Name = reportingParameter.ParameterName,
+                    Description = reportingParameter.Name,
                     Type = reportingParameter.Type,
                     Visible = true
                 };
-
-                if (reportingParameter.DefaultValue != null)
-                {
-                    newReportParameter.Value = reportingParameter.DefaultValue;
-                }
 
                 if (reportingParameter.LookUpValues.Any())
                 {
@@ -636,6 +648,13 @@ namespace CDP4Reporting.ViewModels
                     }
                 }
 
+                // Restore default values
+                if (defaultValues.ContainsKey(reportingParameter.ParameterName))
+                {
+                    newReportParameter.Value = defaultValues[reportingParameter.ParameterName];
+                }
+
+                // Add dynamic parameter to report definition
                 this.currentReportDesignerDocument.MakeChanges(
                     changes => { changes.AddItem(newReportParameter); });
             }
@@ -679,6 +698,51 @@ namespace CDP4Reporting.ViewModels
                 }
 
                 return instObj.CreateParameters(dataSource);
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
+            }
+        }
+
+        /// <summary>
+        /// Check if the compiled assembly built from the code editor contains a class that implements the <see cref="IReportingParameters"/> interface
+        /// If true, then execute the class' <see cref="IReportingParameters.CreateFilterString"/> method.
+        /// </summary>
+        /// <param name="parameters">The <see cref="IEnumerable{IReportingParameter}"/>, which could be used to create a filter string</param>
+        /// <returns>The create Filter string in <see cref="IReportingParameters.CreateFilterString"/></returns>.
+        private string GetFilterString(IEnumerable<IReportingParameter> parameters)
+        {
+            if (this.BuildResult == null)
+            {
+                this.AddOutput("Build data source code first.");
+                return null;
+            }
+
+            AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolver;
+
+            try
+            {
+                var editorFullClassName =
+                    this.BuildResult
+                        .CompiledAssembly
+                        .GetTypes()
+                        .FirstOrDefault(t => t.GetInterfaces()
+                            .Any(i => i == typeof(IReportingParameters))
+                        )?.FullName;
+
+                if (editorFullClassName == null)
+                {
+                    return null;
+                }
+
+                if (!(this.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
+                {
+                    this.AddOutput("Report parameter class not found.");
+                    return null;
+                }
+
+                return instObj.CreateFilterString(parameters);
             }
             finally
             {

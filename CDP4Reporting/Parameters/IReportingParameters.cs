@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting
+namespace CDP4Reporting.Parameters
 {
     using System.Collections.Generic;
 
@@ -38,5 +38,16 @@ namespace CDP4Reporting
         /// <param name="dataSource">The datasource</param>
         /// <returns>A list of <see cref="IReportingParameter"/>s</returns>
         IEnumerable<IReportingParameter> CreateParameters(object dataSource);
+
+        /// <summary>
+        /// Creates a filterString to be user as a report filter expression
+        /// </summary>
+        /// <param name="reportingParameters">
+        /// The <see cref="IEnumerable{IReportingParameter}"/>
+        /// </param>
+        /// <returns>
+        /// The filter expression.
+        /// </returns>
+        string CreateFilterString(IEnumerable<IReportingParameter> reportingParameters);
     }
 }

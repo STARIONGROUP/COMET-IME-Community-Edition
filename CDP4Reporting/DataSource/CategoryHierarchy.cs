@@ -25,12 +25,11 @@
 
 namespace CDP4Reporting.DataSource
 {
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Common.EngineeringModelData;
-
     using System.Linq;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// Class representing a linear hierarchy of <see cref="CDP4Common.SiteDirectoryData.Category"/> items.
@@ -63,14 +62,9 @@ namespace CDP4Reporting.DataSource
             /// <param name="iteration">
             /// The <see cref="Iteration"/> containing the desired <see cref="CDP4Common.SiteDirectoryData.Category"/> items.
             /// </param>
-            /// <param name="topLevelCategoryShortName">
-            /// The <see cref="DefinedThing.ShortName"/> of the <see cref="CDP4Common.SiteDirectoryData.Category"/> of
-            /// the top element of the <see cref="CategoryHierarchy"/> to be constructed.
-            /// </param>
-            public Builder(Iteration iteration, string topLevelCategoryShortName)
+            public Builder(Iteration iteration)
             {
                 this.iteration = iteration;
-                this.AddLevel(topLevelCategoryShortName);
             }
 
             /// <summary>
@@ -103,8 +97,42 @@ namespace CDP4Reporting.DataSource
             public Builder AddLevel(string categoryShortName)
             {
                 var category = this.GetCategoryByShortName(categoryShortName);
+                return this.AddlevelImpl(category, category.ShortName);
+            }
 
-                var newCategoryHierarchy = new CategoryHierarchy(category);
+            /// <summary>
+            /// Adds a new level to the <see cref="CategoryHierarchy"/>.
+            /// </summary>
+            /// <param name="categoryShortName">
+            /// The <see cref="DefinedThing.ShortName"/> of the to-be-added <see cref="CDP4Common.SiteDirectoryData.Category"/>.
+            /// </param>
+            /// <param name="fieldName">
+            /// The fieldname to be used in the result table
+            /// </param>
+            /// <returns>
+            /// This <see cref="Builder"/> object.
+            /// </returns>
+            public Builder AddLevel(string categoryShortName, string fieldName)
+            {
+                var category = this.GetCategoryByShortName(categoryShortName);
+                return this.AddlevelImpl(category, fieldName);
+            }
+
+            /// <summary>
+            /// Adds a new level to the <see cref="CategoryHierarchy"/>.
+            /// </summary>
+            /// <param name="category">
+            /// The to-be-added <see cref="CDP4Common.SiteDirectoryData.Category"/>.
+            /// </param>
+            /// <param name="fieldName">
+            /// The fieldname to be used in the result table
+            /// </param>
+            /// <returns>
+            /// This <see cref="Builder"/> object.
+            /// </returns>
+            private Builder AddlevelImpl(Category category, string fieldName)
+            {
+                var newCategoryHierarchy = new CategoryHierarchy(category, fieldName);
 
                 if (this.current == null)
                 {
@@ -138,6 +166,11 @@ namespace CDP4Reporting.DataSource
         public readonly Category Category;
 
         /// <summary>
+        /// Gets or sets the fieldname to be used in the result table
+        /// </summary>
+        public string FieldName { get; private set; }
+
+        /// <summary>
         /// The child node in this <see cref="CategoryHierarchy"/>'s linear hierarchy.
         /// </summary>
         public CategoryHierarchy Child { get; private set; }
@@ -148,9 +181,13 @@ namespace CDP4Reporting.DataSource
         /// <param name="category">
         /// This node's <see cref="Category"/>.
         /// </param>
-        private CategoryHierarchy(Category category)
+        /// <param name="fieldName">
+        /// The fieldname to be used in the result table
+        /// </param>
+        private CategoryHierarchy(Category category, string fieldName)
         {
             this.Category = category;
+            this.FieldName = fieldName;
         }
     }
 }
