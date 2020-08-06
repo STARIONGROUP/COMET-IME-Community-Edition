@@ -139,7 +139,8 @@ namespace CDP4Reporting.DataSource
         /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
         /// </summary>
         private bool IsVisible =>
-             (this.ElementDefinition?.Category.Contains(this.filterCategory.Category) ?? false) || (this.ElementUsage?.Category.Contains(this.filterCategory.Category) ?? false);
+             (this.ElementDefinition?.Category.Contains(this.filterCategory.Category) ?? false) ||
+             (this.ElementUsage?.Category.Contains(this.filterCategory.Category) ?? false);
 
         /// <summary>
         /// Boolean flag indicating whether the current node or any of its <see cref="Children"/>
@@ -180,20 +181,28 @@ namespace CDP4Reporting.DataSource
         }
 
         /// <summary>
-        /// Checks if a category wasa found in this instance or up its parent tree
+        /// Checks if a category was found in this instance or up its parent tree.
         /// </summary>
-        /// <param name="category">The <see cref="Category"/></param>
-        /// <returns>true if found, otherwise false</returns>
+        /// <param name="category">
+        /// The <see cref="Category"/>.
+        /// </param>
+        /// <returns>
+        /// True if found, otherwise false.
+        /// </returns>
         internal bool HadCategoryUpTree(Category category)
         {
             return this.HasCategory(category) || (this.parent?.HadCategoryUpTree(category) ?? false);
         }
 
         /// <summary>
-        /// Checks if the a specific <see cref="Category"/> is found for this instance
+        /// Checks if the a specific <see cref="Category"/> is found for this instance.
         /// </summary>
-        /// <param name="category">The <see cref="Category"/></param>
-        /// <returns></returns>
+        /// <param name="category">
+        /// The <see cref="Category"/>.
+        /// </param>
+        /// <returns>
+        /// True if found, otherwise false.
+        /// </returns>
         private bool HasCategory(Category category)
         {
             return (this.ElementDefinition?.Category.Contains(category) ?? false)
@@ -251,7 +260,9 @@ namespace CDP4Reporting.DataSource
         /// Adds to the <paramref name="table"/> the <see cref="DataRow"/> representations
         /// of this node's subtree.
         /// </summary>
-        /// <param name="table"></param>
+        /// <param name="table">
+        /// The associated <see cref="DataTable"/>.
+        /// </param>
         internal void AddDataRows(DataTable table)
         {
             if (this.IsVisible && this.filterCategory.Child == null)

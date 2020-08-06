@@ -72,7 +72,9 @@ namespace CDP4Reporting.DataSource
         /// that has <see cref="ReportingDataSourceCategory{T}.ShortName"/> as its <see cref="Category.ShortName"/>, or somewhere in the
         /// <see cref="Category.SuperCategory"/> hierarchy.
         /// </summary>
-        /// <returns>true if <see cref="Category.ShortName"/> was found, otherwise false.</returns>
+        /// <returns>
+        /// True if <see cref="Category.ShortName"/> was found, otherwise false.
+        /// </returns>
         private bool HasCategory()
         {
             var definitionCategory = this.Node.ElementDefinition.Category
@@ -115,9 +117,11 @@ namespace CDP4Reporting.DataSource
 
         /// <summary>
         /// Checks if a <see cref="Category"/> has has <see cref="ReportingDataSourceCategory{T}.ShortName"/> as its <see cref="Category.ShortName"/>
-        /// in its  <see cref="Category.SuperCategory"/> hierarchy.
+        /// in its <see cref="Category.SuperCategory"/> hierarchy.
         /// </summary>
-        /// <returns>true if <see cref="Category.ShortName"/> was found, otherwise false.</returns>
+        /// <returns>
+        /// True if <see cref="Category.ShortName"/> was found, otherwise false.
+        /// </returns>
         private bool ExistsInSuperCategory(Category category, List<Category> checkedCategories)
         {
             if (checkedCategories == null)
