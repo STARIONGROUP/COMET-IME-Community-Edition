@@ -107,17 +107,17 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Open code file inside the editor
         /// </summary>
-        public ReactiveCommand<object> OpenScriptCommand { get; set; }
+        public ReactiveCommand<object> ImportScriptCommand { get; set; }
 
         /// <summary>
         /// Saves code that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<object> SaveScriptCommand { get; set; }
+        public ReactiveCommand<object> ExportScriptCommand { get; set; }
 
         /// <summary>
         /// Build code that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<object> BuildScriptCommand { get; set; }
+        public ReactiveCommand<object> CompileScriptCommand { get; set; }
 
         /// <summary>
         /// Create a new Report 
@@ -218,12 +218,12 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Gets or sets build output result
         /// </summary>
-        public CompilerResults BuildResult { get; private set; }
+        public CompilerResults CompileResult { get; private set; }
 
         /// <summary>
-        /// Backing field for <see cref="IsAutoBuildEnabled" />
+        /// Backing field for <see cref="IsAutoCompileEnabled" />
         /// </summary>
-        private bool isAutoBuildEnabled;
+        private bool isAutoCompileEnabled;
 
         /// <summary>
         /// The last saved datasource text
@@ -233,10 +233,10 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Gets or sets a value indicating whether automatically build is checked
         /// </summary>
-        public bool IsAutoBuildEnabled
+        public bool IsAutoCompileEnabled
         {
-            get => this.isAutoBuildEnabled;
-            set => this.RaiseAndSetIfChanged(ref this.isAutoBuildEnabled, value);
+            get => this.isAutoCompileEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isAutoCompileEnabled, value);
         }
 
         /// <summary>
@@ -257,22 +257,22 @@ namespace CDP4Reporting.ViewModels
             this.Document = new TextDocument();
             this.Errors = string.Empty;
             this.Output = string.Empty;
-            this.IsAutoBuildEnabled = false;
+            this.IsAutoCompileEnabled = false;
 
             this.openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 
-            this.SaveScriptCommand = ReactiveCommand.Create();
-            this.SaveScriptCommand.Subscribe(_ => this.SaveScript());
+            this.ExportScriptCommand = ReactiveCommand.Create();
+            this.ExportScriptCommand.Subscribe(_ => this.ExportScript());
 
-            this.OpenScriptCommand = ReactiveCommand.Create();
-            this.OpenScriptCommand.Subscribe(_ => this.OpenScript());
+            this.ImportScriptCommand = ReactiveCommand.Create();
+            this.ImportScriptCommand.Subscribe(_ => this.ImportScript());
 
-            this.BuildScriptCommand = ReactiveCommand.Create();
+            this.CompileScriptCommand = ReactiveCommand.Create();
 
-            this.BuildScriptCommand.Subscribe(_ =>
+            this.CompileScriptCommand.Subscribe(async _ =>
             {
                 var source = this.Document.Text;
-                this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+                await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
             });
 
             this.NewReportCommand = ReactiveCommand.Create();
@@ -288,10 +288,20 @@ namespace CDP4Reporting.ViewModels
             this.SaveReportAsCommand.Subscribe(_ => this.SaveReportProject(true));
 
             this.DataSourceTextChangedCommand = ReactiveCommand.Create();
-            this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoBuildScript());
+            this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoCompileScript());
 
             this.RebuildDatasourceCommand = ReactiveCommand.Create();
-            this.RebuildDatasourceCommand.Subscribe(_ => this.RebuildDataSource());
+
+            this.RebuildDatasourceCommand.Subscribe(async _ =>
+            {
+                var source = this.Document.Text;
+                await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+
+                if (!this.CompileResult?.Errors.HasErrors ?? false)
+                {
+                    this.RebuildDataSource();
+                }
+            });
 
             this.ClearOutputCommand = ReactiveCommand.Create();
             this.ClearOutputCommand.Subscribe(_ => { this.Output = string.Empty; });
@@ -313,7 +323,7 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Trigger open script file operation
         /// </summary>
-        private void OpenScript()
+        private void ImportScript()
         {
             var filePath = this.openSaveFileDialogService.GetOpenFileDialog(true, true, false, "CS(.cs)|*.cs", ".cs", string.Empty, 1);
 
@@ -331,19 +341,21 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Trigger save script file operation
         /// </summary>
-        private void SaveScript()
+        private void ExportScript()
         {
             if (string.IsNullOrEmpty(this.CodeFilePath))
             {
-                var filePath = this.openSaveFileDialogService.GetSaveFileDialog("ReportDataSource", "cs", "CS(.cs) | *.cs", string.Empty, 1);
-
-                if (string.IsNullOrEmpty(filePath))
-                {
-                    return;
-                }
-
-                this.CodeFilePath = filePath;
+                this.CodeFilePath = "ReportDataSource.cs";
             }
+
+            var filePath = this.openSaveFileDialogService.GetSaveFileDialog(Path.GetFileName(this.CodeFilePath), "cs", "CS(.cs) | *.cs", this.CodeFilePath, 1);
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return;
+            }
+
+            this.CodeFilePath = filePath;
 
             if (!string.IsNullOrEmpty(this.CodeFilePath))
             {
@@ -352,11 +364,11 @@ namespace CDP4Reporting.ViewModels
         }
 
         /// <summary>
-        /// Checks if AutoBuild script is active and start compilation accordingly.
+        /// Checks if AutoCompile script is active and start compilation accordingly.
         /// </summary>
-        private void CheckAutoBuildScript()
+        private void CheckAutoCompileScript()
         {
-            if (!this.IsAutoBuildEnabled)
+            if (!this.IsAutoCompileEnabled)
             {
                 return;
             }
@@ -509,35 +521,43 @@ namespace CDP4Reporting.ViewModels
         private void RebuildDataSource()
         {
             var dataSourceName = "ReportDataSource";
-            var dataSource = this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>().ToList().FirstOrDefault(x => x.Name.Equals(dataSourceName));
+            var reportDataSource = this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>().ToList().FirstOrDefault(x => x.Name.Equals(dataSourceName));
 
-            if (dataSource == null)
+            var dataSource = this.GetDataSource();
+
+            var parameters = this.GetParameters(dataSource);
+
+            if (parameters?.Any() ?? false)
+            {
+                var filterString = this.GetFilterString(parameters);
+
+                this.currentReport.FilterString = filterString;
+
+                this.CheckParameters(parameters);
+            }
+
+            if (reportDataSource == null)
             {
                 // Create new datasource
-                dataSource = new ObjectDataSource
+                reportDataSource = new ObjectDataSource
                 {
                     DataSource = this.GetDataSource(),
                     Name = dataSourceName
                 };
 
-                this.CurrentReport.ComponentStorage.Add(dataSource);
-                this.CurrentReport.DataSource = dataSource;
+                this.CurrentReport.ComponentStorage.Add(reportDataSource);
+                this.CurrentReport.DataSource = reportDataSource;
+
+                // Add dynamic parameter to report definition
+                this.currentReportDesignerDocument.MakeChanges(
+                    changes => { changes.AddItem(reportDataSource); });
             }
             else
             {
                 // Use existing datasource
-                dataSource.DataSource = this.GetDataSource();
+                reportDataSource.DataSource = this.GetDataSource();
+                reportDataSource.RebuildResultSchema();
             }
-
-            var parameters = this.GetParameters(dataSource.DataSource).ToList();
-            var filterString = this.GetFilterString(parameters);
-
-            this.currentReport.FilterString = filterString;
-
-            this.CheckParameters(parameters);
-
-            // Always rebuild datasource schema 
-            dataSource.RebuildResultSchema();
         }
 
         /// <summary>
@@ -546,7 +566,7 @@ namespace CDP4Reporting.ViewModels
         /// <returns>The datasource as an <see cref="object"/></returns>
         private object GetDataSource()
         {
-            if (this.BuildResult == null)
+            if (this.CompileResult == null)
             {
                 this.AddOutput("Build data source code first.");
                 return null;
@@ -557,7 +577,7 @@ namespace CDP4Reporting.ViewModels
             try
             {
                 var editorFullClassName =
-                    this.BuildResult
+                    this.CompileResult
                         .CompiledAssembly
                         .GetTypes()
                         .FirstOrDefault(t => t.IsSubclassOf(typeof(ReportingDataSource))
@@ -569,7 +589,7 @@ namespace CDP4Reporting.ViewModels
                     return null;
                 }
 
-                var instObj = this.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName) as ReportingDataSource;
+                var instObj = this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) as ReportingDataSource;
 
                 if (instObj == null)
                 {
@@ -666,11 +686,11 @@ namespace CDP4Reporting.ViewModels
         /// </summary>
         /// <param name="dataSource">The datasource, which could be used to create parameters</param>
         /// <returns>The <see cref="IEnumerable{IReportingParameter}"/></returns>
-        private IEnumerable<IReportingParameter> GetParameters(object dataSource)
+        private IReadOnlyList<IReportingParameter> GetParameters(object dataSource)
         {
-            if (this.BuildResult == null)
+            if (this.CompileResult == null)
             {
-                this.AddOutput("Build data source code first.");
+                this.AddOutput("Compile data source code first.");
                 return null;
             }
 
@@ -679,7 +699,7 @@ namespace CDP4Reporting.ViewModels
             try
             {
                 var editorFullClassName =
-                    this.BuildResult
+                    this.CompileResult
                         .CompiledAssembly
                         .GetTypes()
                         .FirstOrDefault(t => t.GetInterfaces()
@@ -691,13 +711,13 @@ namespace CDP4Reporting.ViewModels
                     return null;
                 }
 
-                if (!(this.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
+                if (!(this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
                 {
                     this.AddOutput("Report parameter class not found.");
                     return null;
                 }
 
-                return instObj.CreateParameters(dataSource);
+                return instObj.CreateParameters(dataSource)?.ToList();
             }
             finally
             {
@@ -713,9 +733,9 @@ namespace CDP4Reporting.ViewModels
         /// <returns>The create Filter string in <see cref="IReportingParameters.CreateFilterString"/></returns>.
         private string GetFilterString(IEnumerable<IReportingParameter> parameters)
         {
-            if (this.BuildResult == null)
+            if (this.CompileResult == null)
             {
-                this.AddOutput("Build data source code first.");
+                this.AddOutput("Compile data source code first.");
                 return null;
             }
 
@@ -724,7 +744,7 @@ namespace CDP4Reporting.ViewModels
             try
             {
                 var editorFullClassName =
-                    this.BuildResult
+                    this.CompileResult
                         .CompiledAssembly
                         .GetTypes()
                         .FirstOrDefault(t => t.GetInterfaces()
@@ -736,7 +756,7 @@ namespace CDP4Reporting.ViewModels
                     return null;
                 }
 
-                if (!(this.BuildResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
+                if (!(this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
                 {
                     this.AddOutput("Report parameter class not found.");
                     return null;
@@ -822,9 +842,9 @@ namespace CDP4Reporting.ViewModels
 
                 parameters.ReferencedAssemblies.AddRange(currentAssemblies);
 
-                this.BuildResult = compiler.CompileAssemblyFromSource(parameters, source);
+                this.CompileResult = compiler.CompileAssemblyFromSource(parameters, source);
 
-                if (this.BuildResult.Errors.Count == 0)
+                if (this.CompileResult.Errors.Count == 0)
                 {
                     this.AddOutput("File succesfully compiled.");
                     this.Errors = string.Empty;
@@ -833,7 +853,7 @@ namespace CDP4Reporting.ViewModels
 
                 var sbErrors = new StringBuilder($"{DateTime.Now:HH:mm:ss} Compilation Errors:");
 
-                foreach (var error in this.BuildResult.Errors)
+                foreach (var error in this.CompileResult.Errors)
                 {
                     sbErrors.AppendLine(error.ToString());
                 }

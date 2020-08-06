@@ -88,9 +88,14 @@ namespace CDP4Reporting.Utilities
         /// Executes the <see cref="Action"/> immediately
         /// </summary>
         /// <param name="action">The <see cref="Action"/></param>
-        public void RunAction(Action action)
+        public async Task RunAction(Action action)
         {
-            this.DelayRunAction(action, 0);
+            this.CancelCurrentTask();
+
+            this.cancellationTokenSource = new CancellationTokenSource();
+            this.cancellationToken = this.cancellationTokenSource.Token;
+
+            await Task.Run(action.Invoke, this.cancellationToken);
         }
     }
 }
