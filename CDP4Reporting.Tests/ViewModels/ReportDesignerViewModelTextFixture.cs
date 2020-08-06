@@ -177,7 +177,7 @@ namespace CDP4Reporting.Tests.ViewModels
         public void VerifyThatSaveCommandWorksWithoutSavingFile()
         {
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveScriptCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.ExportScriptCommand.Execute(null));
             Assert.AreEqual(this.reportDesignerViewModel.Object.CodeFilePath, null);
 
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
@@ -211,7 +211,7 @@ namespace CDP4Reporting.Tests.ViewModels
             await Task.Run(() =>
             {
                 this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.dsPathSave);
-                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveScriptCommand.Execute(null));
+                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.ExportScriptCommand.Execute(null));
 
                 this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.zipPathSave);
                 Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.SaveReportCommand.Execute(null));
@@ -222,7 +222,7 @@ namespace CDP4Reporting.Tests.ViewModels
         public void VerifyThatOpenCommandWorksWithoutOpeningFile()
         {
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenScriptCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.ImportScriptCommand.Execute(null));
             Assert.AreEqual(this.reportDesignerViewModel.Object.CodeFilePath, null);
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { });
@@ -256,7 +256,7 @@ namespace CDP4Reporting.Tests.ViewModels
             await Task.Run(() =>
             {
                 this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.dsPathOpen });
-                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenScriptCommand.Execute(null));
+                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.ImportScriptCommand.Execute(null));
 
                 this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
                 Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
@@ -266,7 +266,7 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public void VerifyBuildCommands()
         {
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.CompileScriptCommand.Execute(null));
         }
 
         [Test]
@@ -276,11 +276,11 @@ namespace CDP4Reporting.Tests.ViewModels
             textDocument.Text = DATASOURCE_CODE;
 
             this.reportDesignerViewModel.Object.Document = textDocument;
-            this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null);
+            this.reportDesignerViewModel.Object.CompileScriptCommand.Execute(null);
 
             await Task.Delay(3000);
 
-            Assert.AreEqual(0, this.reportDesignerViewModel.Object.BuildResult.Errors.Count);
+            Assert.AreEqual(0, this.reportDesignerViewModel.Object.CompileResult.Errors.Count);
             Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Object.Errors);
         }
 
@@ -291,11 +291,11 @@ namespace CDP4Reporting.Tests.ViewModels
             textDocument.Text = DATASOURCE_CODE_NOT_COMPILE;
 
             this.reportDesignerViewModel.Object.Document = textDocument;
-            this.reportDesignerViewModel.Object.BuildScriptCommand.Execute(null);
+            this.reportDesignerViewModel.Object.CompileScriptCommand.Execute(null);
 
             await Task.Delay(3000);
 
-            Assert.AreNotEqual(0, this.reportDesignerViewModel.Object.BuildResult.Errors.Count);
+            Assert.AreNotEqual(0, this.reportDesignerViewModel.Object.CompileResult.Errors.Count);
             Assert.AreNotEqual(string.Empty, this.reportDesignerViewModel.Object.Errors);
         }
     }

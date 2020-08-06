@@ -127,38 +127,38 @@
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarButtonItem
-                                        Command="{Binding Path=OpenScriptCommand}"
-                                        LargeGlyph="{dx:DXImage Image=Open_32x32.png}"
-                                        Content="Open Script"
-                                        Hint="Open Script" />
+                                        Command="{Binding Path=ImportScriptCommand}"
+                                        LargeGlyph="{dx:DXImage Image=AddFile_32x32.png}"
+                                        Content="Import Script"
+                                        Hint="Import Script" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarButtonItem
-                                        Command="{Binding Path=SaveScriptCommand}"
-                                        LargeGlyph="{dx:DXImage Image=Save_32x32.png}"
-                                        Content="Save Script"
-                                        Hint="Save Script" />
+                                        Command="{Binding Path=ExportScriptCommand}"
+                                        LargeGlyph="{dx:DXImage Image=Export_32x32.png}"
+                                        Content="Export Script"
+                                        Hint="Export Script" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarButtonItem
-                                        Command="{Binding Path=BuildScriptCommand}"
+                                        Command="{Binding Path=CompileScriptCommand}"
                                         LargeGlyph="{dx:DXImage Image=Build_32x32.png}"
-                                        Content="Build"
-                                        Hint="Build" />
+                                        Content="Compile"
+                                        Hint="Compile" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
                             <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.DataGroup}">
                                 <dxb:InsertAction.Element>
                                     <dxb:BarCheckItem
-                                       IsChecked="{Binding Path=IsAutoBuildEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                       IsChecked="{Binding Path=IsAutoCompileEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                        IsEnabled="True"
-                                       Content="Toggle Auto Build"
-                                       Description="Toggle Auto Build"
-                                       Hint="Toggle Auto Build"
+                                       Content="Toggle Auto Compile"
+                                       Description="Toggle Auto Compile"
+                                       Hint="Toggle Auto Compile"
                                        LargeGlyph="{dx:DXImage Image=Time_32x32.png}" />
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
@@ -173,7 +173,7 @@
                                 </dxb:InsertAction.Element>
                             </dxb:InsertAction>
                             <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.DesignerHomePage}" PropertyName="Caption" Value="File" />
-                            <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.Open}" IsEnabled="True" />
+
                         </dxrud:ReportDesigner.RibbonCustomizationActions>
                         <dxrud:ReportDesignerClassicView/>
                     </dxrud:ReportDesigner>
