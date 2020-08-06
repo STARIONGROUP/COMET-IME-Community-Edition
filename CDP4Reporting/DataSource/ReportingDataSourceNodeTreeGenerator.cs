@@ -32,7 +32,7 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// A builder that builds a tree of <see cref="IEnumerable{ReportingDataSourceNode{T}}"/> instances
+    /// A builder that builds a tree of <see cref="IEnumerable{ReportingDataSourceNode{T}}"/> instances.
     /// </summary>
     /// <typeparam name="T">
     /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
@@ -93,8 +93,12 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// The <see cref="ElementBase"/> representing a <see cref="NestedElement"/>.
         /// </summary>
-        /// <param name="nestedElement">The <see cref="NestedElement"/></param>
-        /// <returns>The <see cref="ElementBase"/></returns>
+        /// <param name="nestedElement">
+        /// The <see cref="NestedElement"/>.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ElementBase"/>.
+        /// </returns>
         private ElementBase GetElementBase(NestedElement nestedElement)
         {
             return nestedElement.IsRootElement ? (ElementBase)nestedElement.RootElement
@@ -104,8 +108,12 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// The <see cref="ElementDefinition"/> representing a <see cref="NestedElement"/>, if it exists.
         /// </summary>
-        /// <param name="nestedElement">The <see cref="NestedElement"/></param>
-        /// <returns>The <see cref="ElementDefinition"/></returns>
+        /// <param name="nestedElement">
+        /// The <see cref="NestedElement"/>.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ElementDefinition"/>.
+        /// </returns>
         private ElementDefinition GetElementDefinition(NestedElement nestedElement)
         {
             var elementBase = this.GetElementBase(nestedElement);
@@ -116,19 +124,29 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// The <see cref="ElementUsage"/> representing a <see cref="NestedElement"/>, if it exists.
         /// </summary>
-        /// <param name="nestedElement">The <see cref="NestedElement"/></param>
-        /// <returns>The <see cref="ElementUsage"/></returns>
+        /// <param name="nestedElement">
+        /// The <see cref="NestedElement"/>.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ElementUsage"/>.
+        /// </returns>
         private ElementUsage GetElementUsage(NestedElement nestedElement)
         {
             return this.GetElementBase(nestedElement) as ElementUsage;
         }
 
         /// <summary>
-        /// Checks if a <see cref="NestedElement"/> contains a specific <see cref="Category"/>
+        /// Checks if a <see cref="NestedElement"/> contains a specific <see cref="Category"/>.
         /// </summary>
-        /// <param name="nestedElement">The <see cref="NestedElement"/></param>
-        /// <param name="category">The <see cref="Category"/></param>
-        /// <returns></returns>
+        /// <param name="nestedElement">
+        /// The <see cref="NestedElement"/>.
+        /// </param>
+        /// <param name="category">
+        /// The <see cref="Category"/>.
+        /// </param>
+        /// <returns>
+        /// True if the <paramref name="category"/> is found, otherwise false.
+        /// </returns>
         private bool HasCategory(NestedElement nestedElement, Category category)
         {
             return (this.GetElementDefinition(nestedElement)?.Category.Contains(category) ?? false)
@@ -136,11 +154,17 @@ namespace CDP4Reporting.DataSource
         }
 
         /// <summary>
-        /// Get the children of a <see cref="NestedElement"/>
+        /// Get the children of a <see cref="NestedElement"/>.
         /// </summary>
-        /// <param name="parentElement">The parent <see cref="NestedElement"/></param>
-        /// <param name="nestedElements">A list containing all <see cref="NestedElement"/>s</param>
-        /// <returns>An <see cref="IEnumerable{NestedElement}"/> contianing all children <see cref="NestedElement"/>s.</returns>
+        /// <param name="parentElement">
+        /// The parent <see cref="NestedElement"/>.
+        /// </param>
+        /// <param name="nestedElements">
+        /// A list containing all <see cref="NestedElement"/>s.
+        /// </param>
+        /// <returns>
+        /// An <see cref="IEnumerable{NestedElement}"/> contianing all children <see cref="NestedElement"/>s.
+        /// </returns>
         private IEnumerable<NestedElement> GetChildren(NestedElement parentElement, List<NestedElement> nestedElements)
         {
             var level = parentElement.ElementUsage.Count;

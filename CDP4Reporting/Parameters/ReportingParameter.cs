@@ -29,7 +29,7 @@ namespace CDP4Reporting.Parameters
     using System.Collections.Generic;
 
     /// <summary>
-    /// class to be used to define dynamic report parameters in the Code editor of <see cref="Views.ReportDesigner"/>
+    /// class to be used to define dynamic report parameters in the Code editor of <see cref="Views.ReportDesigner"/>.
     /// </summary>
     public class ReportingParameter : IReportingParameter
     {
@@ -39,46 +39,52 @@ namespace CDP4Reporting.Parameters
         public const string NamePrefix = "dyn_";
 
         /// <summary>
-        /// Gets or sets the name of the <see cref="IReportingParameter"/>
+        /// Gets or sets the name of the <see cref="IReportingParameter"/>.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets the "calculated" parameter name to be used in the <see cref="Views.ReportDesigner"/>
+        /// Gets the "calculated" parameter name to be used in the <see cref="Views.ReportDesigner"/>.
         /// </summary>
         public string ParameterName => $"{NamePrefix}{this.Name}";
 
         /// <summary>
-        /// Gets or sets the <see cref="Type"/> of the parameter
+        /// Gets or sets the <see cref="Type"/> of the parameter.
         /// </summary>
         public Type Type { get; set; }
 
         /// <summary>
-        /// Gets or sets the visibility of the report parameter
+        /// Gets or sets the visibility of the report parameter.
         /// </summary>
         public bool Visible { get; set; } = true;
 
         /// <summary>
-        /// Gets a <see cref="Dictionary{TKey,TValue}"/> that contains lookup values for a drop down report parameter
+        /// Gets a <see cref="Dictionary{TKey,TValue}"/> that contains lookup values for a drop down report parameter.
         /// </summary>
         public Dictionary<object, string> LookUpValues { get; } = new Dictionary<object, string>();
 
         /// <summary>
-        /// Gets or sets the default value of the report parameter
+        /// Gets or sets the default value of the report parameter.
         /// </summary>
         public object DefaultValue { get; set; }
 
         /// <summary>
-        /// Gets or sets the filterexpression to be used for this report parameter
+        /// Gets or sets the filterexpression to be used for this report parameter.
         /// </summary>
         public string FilterExpression { get; set; }
 
         /// <summary>
-        /// Adds a lookup value to the <see cref="LookUpValues"/> property
+        /// Adds a lookup value to the <see cref="LookUpValues"/> property.
         /// </summary>
-        /// <param name="value">The value. Could be any data type.</param>
-        /// <param name="displayValue">The display value in the report designer</param>
-        /// <returns>The <see cref="IReportingParameter"/></returns>
+        /// <param name="value">
+        /// The value. Could be any data type.
+        /// </param>
+        /// <param name="displayValue">
+        /// The display value in the report designer.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IReportingParameter"/>.
+        /// </returns>
         public IReportingParameter AddLookupValue(object value, string displayValue)
         {
             this.LookUpValues.Add(value, displayValue);
@@ -87,12 +93,20 @@ namespace CDP4Reporting.Parameters
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="ReportingParameter"/>
+        /// Creates a new instance of <see cref="ReportingParameter"/>.
         /// </summary>
-        /// <param name="name">The name of the parameter</param>
-        /// <param name="type">The data <see cref="Type"/> of the parameter</param>
-        /// <param name="defaultValue">The default value of the parameter</param>
-        /// <param name="filterExpression">a filter expression to be used on the report's DataSource</param>
+        /// <param name="name">
+        /// The name of the parameter.
+        /// </param>
+        /// <param name="type">
+        /// The data <see cref="Type"/> of the parameter.
+        /// </param>
+        /// <param name="defaultValue">
+        /// The default value of the parameter.
+        /// </param>
+        /// <param name="filterExpression">
+        /// A filter expression to be used on the report's DataSource.
+        /// </param>
         public ReportingParameter(string name, Type type, object defaultValue, string filterExpression = "")
         {
             this.Name = name;

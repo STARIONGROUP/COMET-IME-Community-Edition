@@ -350,6 +350,7 @@ namespace CDP4Reporting.Tests.DataSource
             // [      ]   +--> "ed1.eu4.eu5"
             // [      ]     +--> "ed1.eu4.eu5.eu6"
             // ["cat3"]       +--> "ed1.eu4.eu5.eu6.eu7"
+
             this.VerifyStructure(this.eu4);
         }
 
@@ -398,7 +399,7 @@ namespace CDP4Reporting.Tests.DataSource
             Assert.AreEqual(2, rows.Count);
 
             ValidateRow(rows[0], this.eu12p1, this.eu2p31);
-            ValidateRow(rows[1],  this.eu4, this.eu7);
+            ValidateRow(rows[1], this.eu4, this.eu7);
         }
 
         private void VerifyStructure(ElementUsage row2Result)
