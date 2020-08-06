@@ -34,46 +34,52 @@ namespace CDP4Reporting.Parameters
     public interface IReportingParameter
     {
         /// <summary>
-        /// Gets or sets the name of the <see cref="IReportingParameter"/>
+        /// Gets or sets the name of the <see cref="IReportingParameter"/>.
         /// </summary>
         string Name { get; set; }
 
         /// <summary>
-        /// Gets the "calculated" parameter name to be used in the <see cref="Views.ReportDesigner"/>
+        /// Gets the "calculated" parameter name to be used in the <see cref="Views.ReportDesigner"/>.
         /// </summary>
         string ParameterName { get; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Type"/> of the parameter
+        /// Gets or sets the <see cref="Type"/> of the parameter.
         /// </summary>
         Type Type { get; set; }
 
         /// <summary>
-        /// Gets or sets the visibility of the report parameter
+        /// Gets or sets the visibility of the report parameter.
         /// </summary>
         bool Visible { get; set; }
 
         /// <summary>
-        /// Gets a <see cref="Dictionary{TKey,TValue}"/> that contains lookup values for a drop down report parameter
+        /// Gets a <see cref="Dictionary{TKey,TValue}"/> that contains lookup values for a drop down report parameter.
         /// </summary>
         Dictionary<object, string> LookUpValues { get; }
 
         /// <summary>
-        /// Gets or sets the default value of the report parameter
+        /// Gets or sets the default value of the report parameter.
         /// </summary>
         object DefaultValue { get; set; }
 
         /// <summary>
-        /// Gets or sets the filterexpression to be used for this report parameter
+        /// Gets or sets the filterexpression to be used for this report parameter.
         /// </summary>
         string FilterExpression { get; set; }
 
         /// <summary>
-        /// Adds a lookup value to the <see cref="LookUpValues"/> property
+        /// Adds a lookup value to the <see cref="LookUpValues"/> property.
         /// </summary>
-        /// <param name="value">The value. Could be any data type.</param>
-        /// <param name="displayValue">The display value in the report designer</param>
-        /// <returns>The <see cref="IReportingParameter"/></returns>
+        /// <param name="value">
+        /// The value. Could be any data type.
+        /// </param>
+        /// <param name="displayValue"
+        /// >The display value in the report designer.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IReportingParameter"/>.
+        /// </returns>
         IReportingParameter AddLookupValue(object value, string displayValue);
     }
 }

@@ -123,7 +123,7 @@ namespace CDP4Reporting.DataSource
             /// The <see cref="DefinedThing.ShortName"/> of the to-be-added <see cref="CDP4Common.SiteDirectoryData.Category"/>.
             /// </param>
             /// <param name="fieldName">
-            /// The fieldname to be used in the result table
+            /// The fieldname to be used in the result table.
             /// </param>
             /// <returns>
             /// This <see cref="Builder"/> object.
@@ -141,7 +141,7 @@ namespace CDP4Reporting.DataSource
             /// The to-be-added <see cref="CDP4Common.SiteDirectoryData.Category"/>.
             /// </param>
             /// <param name="fieldName">
-            /// The fieldname to be used in the result table
+            /// The field name to be used in the result table.
             /// </param>
             /// <returns>
             /// This <see cref="Builder"/> object.
@@ -167,7 +167,7 @@ namespace CDP4Reporting.DataSource
             /// Finishes building the current <see cref="CategoryHierarchy"/>.
             /// </summary>
             /// <returns>
-            /// The build <see cref="CategoryHierarchy"/>.
+            /// The built <see cref="CategoryHierarchy"/>.
             /// </returns>
             public CategoryHierarchy Build()
             {
@@ -182,7 +182,7 @@ namespace CDP4Reporting.DataSource
         public readonly Category Category;
 
         /// <summary>
-        /// Gets or sets the fieldname to be used in the result table
+        /// Gets or sets the field name to be used in the result table.
         /// </summary>
         public string FieldName { get; private set; }
 
@@ -198,7 +198,7 @@ namespace CDP4Reporting.DataSource
         /// This node's <see cref="Category"/>.
         /// </param>
         /// <param name="fieldName">
-        /// The fieldname to be used in the result table
+        /// The field name to be used in the result table.
         /// </param>
         private CategoryHierarchy(Category category, string fieldName)
         {

@@ -28,22 +28,26 @@ namespace CDP4Reporting.Parameters
     using System.Collections.Generic;
 
     /// <summary>
-    /// Interface to be used in the Code editor of <see cref="Views.ReportDesigner"/>
+    /// Interface to be used in the Code editor of <see cref="Views.ReportDesigner"/>.
     /// </summary>
     public interface IReportingParameters
     {
         /// <summary>
-        /// Create a list of <see cref="IReportingParameter"/>s
+        /// Create a list of <see cref="IReportingParameter"/>s.
         /// </summary>
-        /// <param name="dataSource">The datasource</param>
-        /// <returns>A list of <see cref="IReportingParameter"/>s</returns>
+        /// <param name="dataSource">
+        /// The datasource.
+        /// </param>
+        /// <returns>
+        /// A list of <see cref="IReportingParameter"/>s.
+        /// </returns>
         IEnumerable<IReportingParameter> CreateParameters(object dataSource);
 
         /// <summary>
-        /// Creates a filterString to be user as a report filter expression
+        /// Creates a filterString to be user as a report filter expression.
         /// </summary>
         /// <param name="reportingParameters">
-        /// The <see cref="IEnumerable{IReportingParameter}"/>
+        /// The <see cref="IEnumerable{IReportingParameter}"/>.
         /// </param>
         /// <returns>
         /// The filter expression.
