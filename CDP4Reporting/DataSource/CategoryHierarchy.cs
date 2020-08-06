@@ -25,12 +25,11 @@
 
 namespace CDP4Reporting.DataSource
 {
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Common.EngineeringModelData;
-
     using System.Linq;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// Class representing a linear hierarchy of <see cref="CDP4Common.SiteDirectoryData.Category"/> items.
