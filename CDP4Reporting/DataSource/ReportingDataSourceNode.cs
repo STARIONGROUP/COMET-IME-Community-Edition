@@ -77,6 +77,16 @@ namespace CDP4Reporting.DataSource
                 table.Columns.Add(hierarchy.Category.ShortName, typeof(string));
             }
 
+            foreach (var fieldInfo in RowFields.Values
+                .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceParameter<T>))))
+            {
+                var parameterName = fieldInfo.Name;
+
+                // TODO column type should be determined from field type if we get rid of class declaration
+                table.Columns.Add(parameterName, typeof(string));
+                table.Columns.Add($"{parameterName} state", typeof(string));
+            }
+
             foreach (var publicGetter in PublicGetters)
             {
                 table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
@@ -231,11 +241,6 @@ namespace CDP4Reporting.DataSource
                 IsVisible = this.IsVisible
             };
 
-            if (!this.IsVisible)
-            {
-                return row;
-            }
-
             foreach (var rowField in RowFields)
             {
                 var column = rowField.Key
@@ -254,31 +259,61 @@ namespace CDP4Reporting.DataSource
         /// Adds to the <paramref name="table"/> the <see cref="DataRow"/> representations
         /// of this node's subtree.
         /// </summary>
-        /// <param name="table"></param>
-        internal void AddDataRows(DataTable table)
+        /// <param name="table">
+        /// The associated <see cref="DataTable"/>.
+        /// </param>
+        internal void AddHierarchyDataRows(DataTable table)
         {
-            table.Rows.Add(this.GetDataRow(table));
+            this.AddNodeDataRows(table);
 
             foreach (var child in this.Children)
             {
-                child.AddDataRows(table);
+                child.AddHierarchyDataRows(table);
             }
         }
 
         /// <summary>
-        /// Gets the <see cref="DataRow"/> representation of this node.
+        /// Adds to the <paramref name="table"/> the <see cref="DataRow"/> representations
+        /// of this node.
         /// </summary>
         /// <param name="table">
         /// The associated <see cref="DataTable"/>.
         /// </param>
-        /// <returns>
-        /// A <see cref="DataRow"/>.
-        /// </returns>
-        private DataRow GetDataRow(DataTable table)
+        private void AddNodeDataRows(DataTable table)
+        {
+            var parameterFields = RowFields.Values
+                .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceParameter<T>)))
+                .ToList();
+
+            var stateDependentFields = parameterFields
+                .Where(f => (f.GetValue(this.rowRepresentation) as ReportingDataSourceParameter<T>).IsStateDependent)
+                .ToList();
+
+            var stateIndependentFields = parameterFields.Except(stateDependentFields).ToList();
+
+            if (stateIndependentFields.Count != 0 || parameterFields.Count == 0)
+            {
+                this.AddStateIndependentDataRow(table, stateIndependentFields);
+            }
+
+            foreach (var stateDependentField in stateDependentFields)
+            {
+                this.AddStateDependentDataRows(table, stateDependentField);
+            }
+        }
+
+        private void AddStateIndependentDataRow(DataTable table, List<FieldInfo> fields)
         {
             var row = table.NewRow();
 
             this.InitializeCategoryColumns(row);
+
+            foreach (var field in fields)
+            {
+                var parameter = field.GetValue(this.rowRepresentation) as ReportingDataSourceParameter<T>;
+
+                row[field.Name] = parameter.ValueSets.First().ActualValue.First();
+            }
 
             foreach (var publicGetter in PublicGetters)
             {
@@ -287,7 +322,38 @@ namespace CDP4Reporting.DataSource
                     new object[] { });
             }
 
-            return row;
+            table.Rows.Add(row);
+        }
+
+        private void AddStateDependentDataRows(DataTable table, FieldInfo field)
+        {
+            var parameter = field.GetValue(this.rowRepresentation) as ReportingDataSourceParameter<T>;
+
+            foreach (var valueSet in parameter.ValueSets)
+            {
+                this.AddStateDataRow(table, field, valueSet);
+            }
+        }
+
+        private void AddStateDataRow(DataTable table, FieldInfo field, IValueSet valueSet)
+        {
+            var row = table.NewRow();
+
+            this.InitializeCategoryColumns(row);
+
+            var parameterName = field.Name;
+
+            row[parameterName] = valueSet.ActualValue.First();
+            row[$"{parameterName} state"] = valueSet.ActualState.Name;
+
+            foreach (var publicGetter in PublicGetters)
+            {
+                row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
+                    this.rowRepresentation,
+                    new object[] { });
+            }
+
+            table.Rows.Add(row);
         }
 
         /// <summary>

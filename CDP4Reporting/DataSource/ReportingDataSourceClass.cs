@@ -89,7 +89,7 @@ namespace CDP4Reporting.DataSource
         {
             var table = ReportingDataSourceNode<T>.GetTable(this.categoryHierarchy);
 
-            this.topNode.AddDataRows(table);
+            this.topNode.AddHierarchyDataRows(table);
 
             return table;
         }

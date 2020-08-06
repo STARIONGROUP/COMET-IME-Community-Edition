@@ -47,9 +47,17 @@ namespace CDP4Reporting.DataSource
         internal readonly string ShortName;
 
         /// <summary>
-        /// The value of the associated <see cref="ParameterOrOverrideBase"/>.
+        /// TODO
         /// </summary>
-        protected string Value { get; private set; }
+        protected internal bool IsStateDependent => this.ParameterBase?.StateDependence != null;
+
+        /// <summary>
+        /// A <see cref="Dictionary{TKey,TValue}"/> of all <see cref="IValueSet"/>s on the
+        /// <see cref="ParameterBase"/> keyed by <see cref="ActualFiniteState.Name"/>.
+        /// </summary>
+        //protected internal Dictionary<string, IValueSet> Values = new Dictionary<string, IValueSet>();
+
+        protected internal IEnumerable<IValueSet> ValueSets => this.ParameterBase?.ValueSets;
 
         /// <summary>
         /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterBase"/>.
@@ -87,8 +95,6 @@ namespace CDP4Reporting.DataSource
             this.ParameterBase = this.ParameterBase ??
                                  this.Node.ElementDefinition.Parameter.SingleOrDefault(
                                      x => x.ParameterType.ShortName == this.ShortName);
-
-            this.Value = this.ParameterBase?.ValueSets.First().ActualValue.First();
         }
 
         /// <summary>
