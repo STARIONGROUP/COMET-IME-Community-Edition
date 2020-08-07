@@ -50,9 +50,9 @@ namespace CDP4Reporting.DataSource
         /// </summary>
         /// <param name="nestedElement">The <see cref="NestedElement"/></param>
         /// <param name="categoryHierarchy">The <see cref="CategoryHierarchy"/></param>
-        /// <param name="nestedElements">The <see cref="List{NestedElement{>}"/>s</param>
+        /// <param name="nestedElements">The <see cref="List{NestedElement}"/>s</param>
         /// <param name="parentNode">The <see cref=" ReportingDataSourceNode{T}"/> that is the parent of new nodes.</param>
-        /// <returns>An <see cref="IEnumerable{ReportingDataSourceNode{T}}"/></returns>
+        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="ReportingDataSourceNode{T}"/></returns>
         private IEnumerable<ReportingDataSourceNode<T>> GetDataSourceNodes(NestedElement nestedElement, CategoryHierarchy categoryHierarchy, List<NestedElement> nestedElements, ReportingDataSourceNode<T> parentNode)
         {
             var resultNodes = new List<ReportingDataSourceNode<T>>();
@@ -67,7 +67,6 @@ namespace CDP4Reporting.DataSource
             }
             else if ((parentNode?.HadCategoryUpTree(categoryHierarchy.Category) ?? false) && categoryHierarchy.Child != null && this.HasCategory(nestedElement, categoryHierarchy.Child.Category))
             {
-                //if parent was found somewhere up the tree
                 searchCategory = categoryHierarchy.Child;
 
                 newNode = new ReportingDataSourceNode<T>(searchCategory, nestedElement, parentNode);

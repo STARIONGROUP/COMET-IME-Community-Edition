@@ -87,7 +87,7 @@ namespace CDP4Reporting.DataSource
 
             foreach (var category in this.Node.ElementDefinition.Category)
             {
-                if (this.ExistsInSuperCategory(category, null))
+                if (this.ExistsInSuperCategory(category))
                 {
                     return true;
                 }
@@ -105,7 +105,7 @@ namespace CDP4Reporting.DataSource
 
                 foreach (var category in this.Node.ElementUsage.Category)
                 {
-                    if (this.ExistsInSuperCategory(category, null))
+                    if (this.ExistsInSuperCategory(category))
                     {
                         return true;
                     }
@@ -119,29 +119,29 @@ namespace CDP4Reporting.DataSource
         /// Checks if a <see cref="Category"/> has has <see cref="ReportingDataSourceCategory{T}.ShortName"/> as its <see cref="Category.ShortName"/>
         /// in its <see cref="Category.SuperCategory"/> hierarchy.
         /// </summary>
+        /// <param name="category">
+        /// The <see cref="Category"/>
+        /// </param>
         /// <returns>
         /// True if <see cref="Category.ShortName"/> was found, otherwise false.
         /// </returns>
-        private bool ExistsInSuperCategory(Category category, List<Category> checkedCategories)
+        private bool ExistsInSuperCategory(Category category)
         {
-            if (checkedCategories == null)
-            {
-                checkedCategories = new List<Category>();
-            }
+            var exists = false;
+            var currentCategories = new List<Category>{category};
 
-            foreach (var superCategory in category.SuperCategory.Except(checkedCategories))
+            while (currentCategories.Any())
             {
-                if (superCategory.ShortName.Equals(this.ShortName))
+                if (currentCategories.Any(x => x.ShortName.Equals(this.ShortName)))
                 {
-                    return true;
+                    exists = true;
+                    break;
                 }
 
-                checkedCategories.Add(superCategory);
-
-                return this.ExistsInSuperCategory(superCategory, checkedCategories);
+                currentCategories = currentCategories.SelectMany(x => x.SuperCategory).ToList();
             }
 
-            return false;
+            return exists;
         }
     }
 }

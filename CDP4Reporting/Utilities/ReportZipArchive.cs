@@ -26,12 +26,13 @@
 
 namespace CDP4Reporting.Utilities
 {
+    using System;
     using System.IO;
 
     /// <summary>
     /// Struct that maps streams on archive zip file path
     /// </summary>
-    public struct ReportZipArchive
+    public struct ReportZipArchive : IDisposable
     {
         /// <summary>
         /// The report file <see cref="Stream"/>
@@ -42,5 +43,14 @@ namespace CDP4Reporting.Utilities
         /// The datasource <see cref="Stream"/>
         /// </summary>
         public Stream DataSource;
+
+        /// <summary>
+        /// Dispose the containing streams
+        /// </summary>
+        public void Dispose()
+        {
+            this.Repx.Dispose();
+            this.DataSource.Dispose();
+        }
     }
 }
