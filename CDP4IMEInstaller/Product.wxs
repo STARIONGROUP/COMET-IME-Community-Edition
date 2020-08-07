@@ -121,5 +121,9 @@
       <ComponentGroupRef Id="BUDGET_CG" />
     </Feature>
 
+    <Feature Id="CDP4REPORTINGPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Reporting Plugin" Level="1">
+      <ComponentGroupRef Id="CDP4REPORTING_CG" />
+    </Feature>
+
   </Product>
 </Wix>
