@@ -33,6 +33,7 @@
                 <Directory Id="WSPDAL" Name ="CDP4WspDal"/>
                 <Directory Id="CDP4SERVICESDAL" Name ="CDP4ServicesDal"/>                
                 <Directory Id="JSONFILEDAL" Name ="CDP4JsonFileDal"/>
+                <Directory Id="REPORTING" Name ="CDP4Reporting"/>
               </Directory>
               <Directory Id="RESOURCES" Name="Resources">
                 <Directory Id="IMAGES" Name="Images" />
