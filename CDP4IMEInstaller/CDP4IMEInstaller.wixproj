@@ -54,6 +54,7 @@
     <Compile Include="CDP4JsonFileDalPlugin.wxs" />
     <Compile Include="CDP4ServicesDal.wxs" />
     <Compile Include="CDP4Dashboard.wxs" />
+    <Compile Include="CDP4Reporting.wxs" />
     <Compile Include="CDP4Grapher.wxs" />
     <Compile Include="Dependencies.wxs" />
     <Compile Include="DevExpress.wxs" />
@@ -226,6 +227,14 @@
     <ProjectReference Include="..\CDP4RelationshipEditor\CDP4RelationshipEditor.csproj">
       <Name>CDP4RelationshipEditor</Name>
       <Project>{e8bef8ce-68cb-4ab7-93c9-70679b9b4d83}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4Reporting\CDP4Reporting.csproj">
+      <Name>CDP4Reporting</Name>
+      <Project>{c31ff150-e45c-4136-96cd-58fbf9b00c08}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
