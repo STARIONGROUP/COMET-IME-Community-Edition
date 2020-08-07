@@ -343,12 +343,9 @@ namespace CDP4Reporting.ViewModels
         /// </summary>
         private void ExportScript()
         {
-            if (string.IsNullOrEmpty(this.CodeFilePath))
-            {
-                this.CodeFilePath = "ReportDataSource.cs";
-            }
+            var codeFilePath = this.CodeFilePath ?? "ReportDataSource.cs";
 
-            var filePath = this.openSaveFileDialogService.GetSaveFileDialog(Path.GetFileName(this.CodeFilePath), "cs", "CS(.cs) | *.cs", this.CodeFilePath, 1);
+            var filePath = this.openSaveFileDialogService.GetSaveFileDialog(Path.GetFileName(codeFilePath), "cs", "CS(.cs) | *.cs", codeFilePath, 1);
 
             if (string.IsNullOrEmpty(filePath))
             {

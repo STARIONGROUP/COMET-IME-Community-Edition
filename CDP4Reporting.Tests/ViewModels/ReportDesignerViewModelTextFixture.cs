@@ -174,7 +174,7 @@ namespace CDP4Reporting.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatSaveCommandWorksWithoutSavingFile()
+        public void VerifyThatExportCommandWorksWithoutSavingFile()
         {
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.ExportScriptCommand.Execute(null));
@@ -186,7 +186,7 @@ namespace CDP4Reporting.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatSaveCommandWorksBySavingFile()
+        public async Task VerifyThatExportCommandWorksBySavingFile()
         {
             System.IO.File.WriteAllText(this.dsPathSave, DATASOURCE_CODE);
 
@@ -219,7 +219,7 @@ namespace CDP4Reporting.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatOpenCommandWorksWithoutOpeningFile()
+        public void VerifyThatImportCommandWorksWithoutOpeningFile()
         {
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { });
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.ImportScriptCommand.Execute(null));
@@ -231,7 +231,7 @@ namespace CDP4Reporting.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatOpenCommandWorksByOpeningFile()
+        public async Task VerifyThatImportCommandWorksByOpeningFile()
         {
             System.IO.File.WriteAllText(this.dsPathOpen, DATASOURCE_CODE);
 
