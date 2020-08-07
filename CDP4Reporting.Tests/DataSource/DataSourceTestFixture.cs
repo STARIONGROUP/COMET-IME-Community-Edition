@@ -242,6 +242,8 @@ namespace CDP4Reporting.Tests.DataSource
 
             this.eu2p31.Category.Add(this.cat3);
             this.ed2p.ContainedElement.Add(this.eu2p31);
+
+            this.eu2p32.Category.Add(this.cat2);
             this.ed2p.ContainedElement.Add(this.eu2p32);
 
             // Product tree:
@@ -249,15 +251,15 @@ namespace CDP4Reporting.Tests.DataSource
             // ["cat2"] +-+> "ed1.eu12n1"
             // [      ] | +--> "ed1.eu12n1.eu2n31"
             // [      ] | +--> "ed1.eu12n1.eu2n32"
-            // [      ] +-+> "ed1.eu12n2"
+            // [      ] +-+> "ed1.eu12n2"          // pruned
             // [      ] | +--> "ed1.eu12n2.eu2n31"
             // [      ] | +--> "ed1.eu12n2.eu2n32"
             // ["cat2"] +-+> "ed1.eu12p1"
             // ["cat3"] | +--> "ed1.eu12p1.eu2p31"
-            // [      ] | +--> "ed1.eu12p1.eu2p32"
-            // [      ] +-+> "ed1.eu12p2"
-            // ["cat3"] | +--> "ed1.eu12p2.eu2p31"
-            // [      ] | +--> "ed1.eu12p2.eu2p32"
+            // ["cat2"] | +--> "ed1.eu12p1.eu2p32" // double match
+            // [      ] +-+> "ed1.eu12p2"          // not visible
+            // ["cat3"] | +--> "ed1.eu12p2.eu2p31" // ignored, still looking for cat2
+            // ["cat2"] | +--> "ed1.eu12p2.eu2p32" // skipping match
         }
 
         [Test]
@@ -276,14 +278,15 @@ namespace CDP4Reporting.Tests.DataSource
 
             // tabular representation built, category hierarchy considered, unneeded subtrees pruned
             var rows = dataSource.GetTable().Rows;
-            Assert.AreEqual(6, rows.Count);
+            Assert.AreEqual(7, rows.Count);
 
             ValidateRow(rows[0], true, this.ed1);
             ValidateRow(rows[1], true, this.ed1, this.eu12n1);
             ValidateRow(rows[2], true, this.ed1, this.eu12p1);
             ValidateRow(rows[3], true, this.ed1, this.eu12p1, this.eu2p31);
-            ValidateRow(rows[4], false, this.ed1, this.eu12p2);
-            ValidateRow(rows[5], true, this.ed1, this.eu12p2, this.eu2p31);
+            ValidateRow(rows[4], true, this.ed1, this.eu2p32); // double match with eu12p1
+            ValidateRow(rows[5], false);
+            ValidateRow(rows[6], true, this.ed1, this.eu2p32); // skipping match on eu12p2
         }
 
         private static void ValidateRow(
@@ -293,10 +296,10 @@ namespace CDP4Reporting.Tests.DataSource
             ElementBase level1 = null,
             ElementBase level2 = null)
         {
+            Assert.AreEqual(isVisible, row.Field<bool>(3));
             Assert.AreEqual(level0?.Name, row.Field<string>(0));
             Assert.AreEqual(level1?.Name, row.Field<string>(1));
             Assert.AreEqual(level2?.Name, row.Field<string>(2));
-            Assert.AreEqual(isVisible, row.Field<bool>(3));
         }
     }
 }

@@ -133,15 +133,13 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
         /// </summary>
-        private bool IsVisible =>
-            this.ElementBase.Category.Contains(this.filterCategory);
+        private bool IsVisible => this.MatchesCategory(this.filterCategory);
 
         /// <summary>
         /// Boolean flag indicating whether the current node or any of its <see cref="Children"/>
         /// match their associated <see cref="filterCategory"/>.
         /// </summary>
-        private bool IsRelevant =>
-            this.IsVisible || this.Children.Any(child => child.IsRelevant);
+        private bool IsRelevant => this.IsVisible || this.Children.Any(child => child.IsRelevant);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceNode{T}"/> class.
@@ -165,18 +163,25 @@ namespace CDP4Reporting.DataSource
             List<NestedElement> nestedElements,
             ReportingDataSourceNode<T> parent = null)
         {
-            this.filterCategory = categoryHierarchy.Category;
-
             this.NestedElement = topElement;
 
             this.parent = parent;
 
-            this.rowRepresentation = this.GetRowRepresentation();
+            // allow reapeted category matches on consecutive levels (with gaps)
+            var continuingHierarchy = categoryHierarchy;
 
-            if (categoryHierarchy.Child == null)
+            if (this.MatchesCategory(categoryHierarchy.Category))
             {
-                return;
+                this.filterCategory = categoryHierarchy.Category;
             }
+            else if (categoryHierarchy.Child != null &&
+                     this.MatchesCategory(categoryHierarchy.Child.Category))
+            {
+                continuingHierarchy = categoryHierarchy.Child;
+                this.filterCategory = categoryHierarchy.Child.Category;
+            }
+
+            this.rowRepresentation = this.GetRowRepresentation();
 
             var level = topElement.ElementUsage.Count;
 
@@ -191,7 +196,7 @@ namespace CDP4Reporting.DataSource
             foreach (var child in children)
             {
                 var childNode = new ReportingDataSourceNode<T>(
-                    categoryHierarchy.Child,
+                    continuingHierarchy,
                     child,
                     nestedElements,
                     this);
@@ -201,6 +206,22 @@ namespace CDP4Reporting.DataSource
                     this.Children.Add(childNode);
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks if the associated <see cref="ElementBase"/> matches the given <see cref="Category"/>.
+        /// TODO check in supercategories also
+        /// </summary>
+        /// <param name="category">
+        /// The <see cref="Category"/> to be matched.
+        /// </param>
+        /// <returns>
+        /// True if the <see cref="Category"/> is matched, false otherwise.
+        /// </returns>
+        private bool MatchesCategory(Category category)
+        {
+            return category != null &&
+                   this.ElementBase.Category.Contains(category);
         }
 
         /// <summary>
@@ -278,7 +299,10 @@ namespace CDP4Reporting.DataSource
         {
             var row = table.NewRow();
 
-            this.InitializeCategoryColumns(row);
+            if (this.IsVisible)
+            {
+                this.InitializeCategoryColumns(row);
+            }
 
             foreach (var publicGetter in PublicGetters)
             {
@@ -301,7 +325,11 @@ namespace CDP4Reporting.DataSource
         {
             this.parent?.InitializeCategoryColumns(row);
 
-            row[this.filterCategory.ShortName] = this.ElementBase.Name;
+            if (this.filterCategory != null)
+            {
+                // if repeated match only consider the last one
+                row[this.filterCategory.ShortName] = this.ElementBase.Name;
+            }
         }
     }
 }
