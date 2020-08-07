@@ -403,11 +403,15 @@ namespace CDP4Reporting.ViewModels
 
             var reportProjectFilePath = filePath?.SingleOrDefault();
 
-            if (reportProjectFilePath != null)
+            if (reportProjectFilePath == null)
             {
-                var report = new XtraReport();
-                var reportStream = this.GetReportStream(reportProjectFilePath);
+                return;
+            }
 
+            var report = new XtraReport();
+
+            using (var reportStream = this.GetReportStream(reportProjectFilePath))
+            {
                 report.LoadLayoutFromXml(reportStream.Repx);
 
                 this.Document = new TextDocument();
@@ -422,13 +426,15 @@ namespace CDP4Reporting.ViewModels
 
                     this.CompileAssembly(this.Document.Text);
                 }
-
-                this.CurrentReport = report;
-                this.currentReportProjectFilePath = reportProjectFilePath;
-                this.lastSavedDataSourceText = this.Document.Text;
-
-                this.RebuildDataSource();
             }
+
+            this.CurrentReport = report;
+            this.currentReportProjectFilePath = reportProjectFilePath;
+
+            this.RebuildDataSource();
+
+            this.lastSavedDataSourceText = this.Document.Text;
+            this.currentReportDesignerDocument?.SetValue(ReportDesignerDocument.HasChangesProperty, false);
         }
 
         /// <summary>
@@ -519,8 +525,17 @@ namespace CDP4Reporting.ViewModels
         {
             var dataSourceName = "ReportDataSource";
             var reportDataSource = this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>().ToList().FirstOrDefault(x => x.Name.Equals(dataSourceName));
+            object dataSource;
 
-            var dataSource = this.GetDataSource();
+            try
+            {
+                dataSource = this.GetDataSource();
+            }
+            catch (Exception ex)
+            {
+                this.Errors = $"{ex.Message}\n{ex.StackTrace}";
+                return;
+            }
 
             var parameters = this.GetParameters(dataSource);
 
@@ -538,7 +553,7 @@ namespace CDP4Reporting.ViewModels
                 // Create new datasource
                 reportDataSource = new ObjectDataSource
                 {
-                    DataSource = this.GetDataSource(),
+                    DataSource = dataSource,
                     Name = dataSourceName
                 };
 
@@ -552,7 +567,7 @@ namespace CDP4Reporting.ViewModels
             else
             {
                 // Use existing datasource
-                reportDataSource.DataSource = this.GetDataSource();
+                reportDataSource.DataSource = dataSource;
                 reportDataSource.RebuildResultSchema();
             }
         }
@@ -799,13 +814,22 @@ namespace CDP4Reporting.ViewModels
         /// <returns>The <see cref="ReportZipArchive"/></returns>
         private ReportZipArchive GetReportStream(string rep4File)
         {
-            var zipFile = ZipFile.OpenRead(rep4File);
-
-            return new ReportZipArchive()
+            using (var zipFile = ZipFile.OpenRead(rep4File))
             {
-                Repx = zipFile.Entries.FirstOrDefault(x => x.Name.EndsWith(".repx"))?.Open(),
-                DataSource = zipFile.Entries.FirstOrDefault(x => x.Name.EndsWith(".cs"))?.Open()
-            };
+                var repxStream = new MemoryStream();
+                var dataSourceStream = new MemoryStream();
+
+                zipFile.Entries.FirstOrDefault(x => x.Name.EndsWith(".repx"))?.Open().CopyTo(repxStream);
+                repxStream.Position = 0;
+                zipFile.Entries.FirstOrDefault(x => x.Name.EndsWith(".cs"))?.Open().CopyTo(dataSourceStream);
+                dataSourceStream.Position = 0;
+
+                return new ReportZipArchive
+                {
+                    Repx = repxStream,
+                    DataSource = dataSourceStream
+                };
+            }
         }
 
         /// <summary>
