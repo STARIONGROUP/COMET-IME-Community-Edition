@@ -14,6 +14,7 @@
                     xmlns:tb="http://www.hardcodet.net/taskbar"
                     xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
                     xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+                    xmlns:views1="clr-namespace:CDP4IME.Views"
                     Title="{Binding Path=Title}"
                     Width="774.254"
                     Height="441.045"
@@ -268,9 +269,9 @@
 
                     </dxr:RibbonPageGroup>
 
-                    <dxr:RibbonPageGroup Name="AboutGroup"
-                                         Caption="Info"
-                                         MergeOrder="10000"
+                    <dxr:RibbonPageGroup Name="PluginsAndUpdateGroup"
+                                         Caption="Plugins and updates"
+                                         MergeOrder="9000"
                                          ShowCaptionButton="False">
 
                         <dxb:BarButtonItem Name="bPluginManager"
@@ -281,6 +282,32 @@
                                            Hint="Plugin Manager"
                                            LargeGlyph="{dxc:DXImage Image=BOProductGroup_32x32.png}"
                                            RibbonStyle="Large" />
+
+                        <dxb:BarButtonItem Name="CheckApi"
+                                           Command="{Binding CheckApiCommand}"
+                                           Content="Plugins"
+                                           Description="Check for update"
+                                           Glyph="{dxc:DXImage 'Office2013/Actions/Refresh2_16x16.png'}"
+                                           Hint="Check for update"
+                                           LargeGlyph="{dxc:DXImage 'Office2013/Actions/Refresh2_32x32.png'}"
+                                           RibbonStyle="Large" />
+
+                        <dxb:BarButtonItem Name="DownloadButton"
+                                           Command="{Binding OpenAboutCommand}"
+                                           Description="Open Download Manager"
+                                           Hint="Open Download Manager">
+                            <dxb:BarButtonItem.ContentTemplate>
+                                <DataTemplate>
+                                    <views1:DownloadManagerBarItem></views1:DownloadManagerBarItem>
+                                </DataTemplate>
+                            </dxb:BarButtonItem.ContentTemplate>
+                        </dxb:BarButtonItem>
+                    </dxr:RibbonPageGroup>
+
+                    <dxr:RibbonPageGroup Name="AboutGroup"
+                                         Caption="Info"
+                                         MergeOrder="10000"
+                                         ShowCaptionButton="False">
 
                         <dxb:BarButtonItem Name="AboutButton"
                                            Command="{Binding OpenAboutCommand}"

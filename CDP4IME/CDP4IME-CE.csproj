@@ -198,6 +198,7 @@
   <ItemGroup>
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" Exclude="App.xaml" />
     <None Remove="Resources\cdplogo3d_48x48.png" />
+    <None Remove="Views\DownloadManagerBarItem.xaml" />
     <None Remove="Views\PluginInstaller.xaml" />
     <None Remove="Views\PluginRow.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
@@ -206,5 +207,10 @@
       <Generator>MsBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\DownloadManager.xaml.cs">
+      <DependentUpon>DownloadManagerBarItem.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
