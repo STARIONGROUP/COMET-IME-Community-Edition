@@ -72,9 +72,75 @@ namespace CDP4Reporting.Tests.ViewModels
         private string zipPathOpen = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportArchiveOpen.rep4");
         private string zipPathSave = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReportArchiveSave.rep4");
 
-        private const string DATASOURCE_CODE = "namespace CDP4Reporting { using CDP4Reporting.DataSource; public class TestDataSource : ReportingDataSource { public TestDataSource(){} public override object CreateDataSource(){ return null; } }; }";
-        private const string DATASOURCE_CODE_NOT_COMPILE = "namespace CDP4Reporting { using CDP4Reporting.DataSource; public class1 TestDataSource : ReportingDataSource { public TestDataSource(){} }; }";
-        private const string REPORT_CODE = "<?xml version=\"1.0\" encoding=\"utf-8\"?><XtraReportsLayoutSerializer ControlType=\"DevExpress.XtraReports.UI.XtraReport\"><Bands></Bands></XtraReportsLayoutSerializer>";
+        private const string DATASOURCE_CODE = @"namespace CDP4Reporting
+        {
+            using CDP4Reporting.DataSource;
+            public class TestDataSource : ReportingDataSource
+            {
+                public TestDataSource()
+                {
+                }
+
+                public override object CreateDataSource()
+                {
+                    return null;
+                }
+            };
+        }";
+
+        private const string DATASOURCE_CODE_WITH_PARAMS = @"namespace CDP4Reporting
+        {
+	        using CDP4Reporting.DataSource;
+	        using CDP4Reporting.Parameters;
+	        using System.Collections.Generic;
+
+	        public class TestReportingParameters: IReportingParameters
+	        {
+		        public IEnumerable<IReportingParameter> CreateParameters(object dataSource)
+		        {
+			        List<IReportingParameter> paramsList = new List<IReportingParameter>();
+			        paramsList.Add(new ReportingParameter(""param1"", typeof(int), 0));
+			        paramsList.Add(new ReportingParameter(""param2"", typeof(string), string.Empty));
+
+			        return paramsList;
+		        }
+                public string CreateFilterString(IEnumerable<IReportingParameter> reportingParameters)
+                {
+                    return string.Empty;
+                }
+            }
+            public class TestDataSource : ReportingDataSource
+            {
+                public TestDataSource()
+                {
+                }
+
+                public override object CreateDataSource()
+                {
+                    return null;
+                }
+            }
+        }";
+
+        private const string DATASOURCE_CODE_INVALID = @"namespace CDP4Reporting
+        {
+            using CDP4Reporting.DataSource;
+            public1 class TestDataSource : ReportingDataSource
+            {
+                public TestDataSource()
+                {
+                }
+
+                public override object CreateDataSource()
+                {
+                    return null;
+                }
+            };
+        }";
+
+        private const string REPORT_CODE = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            <XtraReportsLayoutSerializer ControlType=""DevExpress.XtraReports.UI.XtraReport""><Bands></Bands>
+        </XtraReportsLayoutSerializer>";
 
         private Mock<IServiceLocator> serviceLocator;
         private Mock<ReportDesignerViewModel> reportDesignerViewModel;
@@ -264,7 +330,7 @@ namespace CDP4Reporting.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyCompileScriptCommand()
+        public void VerifyThatCompileScriptCommandWorks()
         {
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.CompileScriptCommand.Execute(null));
         }
@@ -288,7 +354,7 @@ namespace CDP4Reporting.Tests.ViewModels
         public async Task VerifyThaCompileScriptCommandFailed()
         {
             var textDocument = new TextDocument();
-            textDocument.Text = DATASOURCE_CODE_NOT_COMPILE;
+            textDocument.Text = DATASOURCE_CODE_INVALID;
 
             this.reportDesignerViewModel.Object.Document = textDocument;
             this.reportDesignerViewModel.Object.CompileScriptCommand.Execute(null);
@@ -300,41 +366,42 @@ namespace CDP4Reporting.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyNewReportCommand()
+        public void VerifyThatNewReportCommandWorks()
         {
-            this.reportDesignerViewModel.Object.NewReportCommand.Execute(null);
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.NewReportCommand.Execute(null));
             Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Object.Document.Text);
         }
 
         [Test]
-        public void VerifiyNewReportCommandSwitch()
+        public void VerifyThatNewReportCommandWorksWithSwitchReport()
         {
             var textDocument = new TextDocument();
             textDocument.Text = DATASOURCE_CODE;
             this.reportDesignerViewModel.Object.Document = textDocument;
 
-            this.reportDesignerViewModel.Object.NewReportCommand.Execute(null);
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.NewReportCommand.Execute(null));
+            Assert.AreEqual(DATASOURCE_CODE, this.reportDesignerViewModel.Object.Document.Text);
         }
 
         [Test]
-        public void VerifyAutoCompileScriptWorksWithoutAutoCompile()
+        public void VerifyThatAutoCompileScriptWorks()
         {
             Assert.AreEqual(false, this.reportDesignerViewModel.Object.IsAutoCompileEnabled);
 
-            this.reportDesignerViewModel.Object.DataSourceTextChangedCommand.Execute(null);
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.DataSourceTextChangedCommand.Execute(null));
         }
 
         [Test]
-        public void VerifyAutoCompileScriptWorksWithAutoCompile()
+        public void VerifyThatAutoCompileScriptWorksWithAutoCompile()
         {
             this.reportDesignerViewModel.Object.IsAutoCompileEnabled = true;
             Assert.AreEqual(true, this.reportDesignerViewModel.Object.IsAutoCompileEnabled);
 
-            this.reportDesignerViewModel.Object.DataSourceTextChangedCommand.Execute(null);
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.DataSourceTextChangedCommand.Execute(null));
         }
 
         [Test]
-        public async Task VerifyRebuildDatasourceCommand()
+        public async Task VerifyThatRebuildDataSourceCommandWorks()
         {
             System.IO.File.WriteAllText(this.dsPathOpen, DATASOURCE_CODE);
 
@@ -361,10 +428,64 @@ namespace CDP4Reporting.Tests.ViewModels
                 this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
                 Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
 
-                this.reportDesignerViewModel.Object.RebuildDatasourceCommand.Execute(null);
+                Task.Delay(3000);
+            });
+
+            Assert.AreEqual(true, this.reportDesignerViewModel.Object.Output.Contains("File succesfully compiled"));
+
+            await Task.Run(() =>
+            {
+                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.RebuildDatasourceCommand.Execute(null));
+            });
+        }
+
+        [Test]
+        public async Task VerifyThatRebuildDataSourceWithParamsCommandWorks()
+        {
+            System.IO.File.WriteAllText(this.dsPathOpen, DATASOURCE_CODE_WITH_PARAMS);
+
+            var reportStream = new MemoryStream(Encoding.ASCII.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(DATASOURCE_CODE_WITH_PARAMS));
+
+            using (var zipFile = ZipFile.Open(this.zipPathOpen, ZipArchiveMode.Create))
+            {
+                using (var reportEntry = zipFile.CreateEntry("Report.repx").Open())
+                {
+                    reportStream.Position = 0;
+                    reportStream.CopyTo(reportEntry);
+                }
+
+                using (var reportEntry = zipFile.CreateEntry("Datasource.cs").Open())
+                {
+                    dataSourceStream.Position = 0;
+                    dataSourceStream.CopyTo(reportEntry);
+                }
+            }
+
+            await Task.Run(() =>
+            {
+                this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
+                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
 
                 Task.Delay(3000);
             });
+
+            Assert.AreEqual(true, this.reportDesignerViewModel.Object.Output.Contains("File succesfully compiled"));
+
+            await Task.Run(() =>
+            {
+                Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.RebuildDatasourceCommand.Execute(null));
+            });
+        }
+
+        [Test]
+        public async Task VerifyThatRebuildDataSourceCommandWorksWithNoDataSource()
+        {
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.RebuildDatasourceCommand.Execute(null));
+
+            await Task.Delay(3000);
+
+            Assert.AreEqual(true, this.reportDesignerViewModel.Object.Output.Contains("Nothing to compile"));
         }
     }
 }
