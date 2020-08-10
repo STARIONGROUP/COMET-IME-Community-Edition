@@ -101,6 +101,7 @@ namespace CDP4Reporting.Tests.ViewModels
 			        List<IReportingParameter> paramsList = new List<IReportingParameter>();
 			        paramsList.Add(new ReportingParameter(""param1"", typeof(int), 0));
 			        paramsList.Add(new ReportingParameter(""param2"", typeof(string), string.Empty));
+                    paramsList[1].AddLookupValue(""1"", ""one"");
 
 			        return paramsList;
 		        }
