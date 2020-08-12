@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMEDto.cs" company="RHEA System S.A.">
+// <copyright file="IConsolidateIMECommand.cs" company="RHEA System S.A.">
 //   Copyright (c) 2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
@@ -23,26 +23,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4UpdateServerDal.Dto
+namespace CDP4UpdateServerDal.Command
 {
-    using System.Collections.Generic;
+    using CDP4UpdateServerDal.Dto;
 
     /// <summary>
-    /// The Data Transfer Object representation of the <see cref="IMEDto"/> class.
+    /// The ConsolidateIMECommand interface.
     /// </summary>
-    public class IMEDto
+    public interface IConsolidateIMECommand
     {
         /// <summary>
-        /// Gets or sets the list of the <see cref="IMEVersionDto"/> class
+        /// Gets or sets the <see cref="ClientIMEDto"/> that storage client IME data. 
         /// </summary>
-        public List<IMEVersionDto> Versions { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="IMEDto"/> class.
-        /// </summary>
-        public IMEDto()
-        {
-            this.Versions = new List<IMEVersionDto>();
-        }
+        ClientIMEDto ClientIME { get; set; }
     }
 }

@@ -1,18 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DownloadManagerBarItem.xaml.cs" company="RHEA System S.A.">
+// <copyright file="DownloadManager.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
-//    This file is part of CDP4-Plugin Installer Community Edition. 
-//    The CDP4-Plugin Installer Community Edition is the RHEA Plugin Installer for the CDP4-IME Community Edition.
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-Plugin Installer Community Edition is free software; you can redistribute it and/or
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-Plugin Installer Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -24,19 +25,39 @@
 
 namespace CDP4IME.Views
 {
-    using System.Windows.Controls;
+    using CDP4Composition.Attributes;
+    using CDP4Composition.Navigation.Interfaces;
+
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for DownloadManager.xaml
     /// </summary>
-    public partial class DownloadManagerBarItem : UserControl
+    [DialogViewExport("DownloadManager", "The Download Manager window")]
+    public partial class DownloadManager : IDialogView
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DownloadManagerBarItem"/> class
+        /// Initializes a new instance of the <see cref="DownloadManager"/> class
         /// </summary>
-        public DownloadManagerBarItem()
+        public DownloadManager()
         {
-            this.InitializeComponent();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DownloadManager"/> class.
+        /// </summary>
+        /// <param name="initializeComponent">
+        /// a value indicating whether the contained Components shall be loaded
+        /// </param>
+        /// <remarks>
+        /// This constructor is called by the navigation service
+        /// </remarks>
+        public DownloadManager(bool initializeComponent)
+        {
+            if (initializeComponent)
+            {
+                this.InitializeComponent();
+            }
         }
     }
 }

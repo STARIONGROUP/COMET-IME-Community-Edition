@@ -58,7 +58,7 @@ namespace CDP4UpdateServerDal
         /// <returns>Http request string</returns>
         private string BuildRequest<TDto>(string action)
         {
-            return $"{nameof(TDto).Replace("Dto", string.Empty).ToLower()}{(action is null ? string.Empty : $"/{action}")}";
+            return $"api/{typeof(TDto).Name.Replace("Dto", string.Empty).ToLower()}{(action is null ? string.Empty : $"/{action}")}";
         }
 
         /// <summary>
@@ -68,6 +68,17 @@ namespace CDP4UpdateServerDal
         internal BaseClient(Uri serverBaseAddress)
         {
             this.baseAddress = serverBaseAddress;
+        }
+        
+        /// <summary>
+        /// Serializes the provided object instance and wrap it so it can be sent through a Http Request
+        /// </summary>
+        /// <param name="instance">The instance to be serialised</param>
+        /// <returns>A <see cref="HttpContent"/></returns>
+        protected HttpContent WrapContent(object instance)
+        {
+            var json = JsonConvert.SerializeObject(instance);
+           return new StringContent(json, Encoding.UTF8, "application/json");
         }
 
         /// <summary>
@@ -130,12 +141,14 @@ namespace CDP4UpdateServerDal
 
             using (var client = new HttpClient() { BaseAddress = this.baseAddress })
             {
+                var request = this.BuildRequest<TDto>(action);
+                
                 response = method switch
                 {
-                    HttpVerbs.Get => await client.GetAsync(this.BuildRequest<TDto>(action)),
-                    HttpVerbs.Post => await client.PostAsync(this.BuildRequest<TDto>(action), content),
-                    HttpVerbs.Put => await client.PutAsync(this.BuildRequest<TDto>(action), content),
-                    HttpVerbs.Delete => await client.DeleteAsync(this.BuildRequest<TDto>(action)),
+                    HttpVerbs.Get => await client.GetAsync(request),
+                    HttpVerbs.Post => await client.PostAsync(request, content),
+                    HttpVerbs.Put => await client.PutAsync(request, content),
+                    HttpVerbs.Delete => await client.DeleteAsync(request),
                     HttpVerbs.Head => throw new NotSupportedException($"Method {nameof(HttpVerbs.Head)} is not yet supported"),
                     HttpVerbs.Patch => throw new NotSupportedException($"Method {nameof(HttpVerbs.Patch)} is not yet supported"),
                     HttpVerbs.Options => throw new NotSupportedException($"Method {nameof(HttpVerbs.Options)} is not yet supported"),

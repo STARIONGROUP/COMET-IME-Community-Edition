@@ -25,13 +25,40 @@
 
 namespace CDP4IME.ViewModels
 {
+    using CDP4Common.CommonData;
+
+    using CDP4Composition.Attributes;
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+
     using ReactiveUI;
 
     /// <summary>
     /// The View Model of the <see cref="Views.DownloadManagerBarItem"/> Bar item
     /// </summary>
-    public class DownloadManagerViewModel : ReactiveObject
+    [DialogViewModelExport("DownloadManager", "The download manager window")]
+    public class DownloadManagerViewModel : ReactiveObject, IFloatingDialogViewModel<Thing>
     {
+        /// <summary>
+        /// Backing field for <see cref="DialogResult"/> Property
+        /// </summary>
+        private IDialogResult dialogResult;
+
+        /// <summary>
+        /// Backing field for <see cref="IsBusy"/> Property
+        /// </summary>
+        private bool isBusy;
+
+        /// <summary>
+        /// Backing field for <see cref="LoadingMessage"/> Property
+        /// </summary>
+        private string loadingMessage;
+
+        /// <summary>
+        /// Backing field for <see cref="Thing"/> Property
+        /// </summary>
+        private Thing thing;
+        
         /// <summary>
         /// Backing field for the <see cref="OverallProgressValue"/> property
         /// </summary>
@@ -43,7 +70,32 @@ namespace CDP4IME.ViewModels
         public double OverallProgressValue
         {
             get => this.overallProgressValue;
-            private set => this.RaiseAndSetIfChanged(ref this.overallProgressValue, value);
+            set => this.RaiseAndSetIfChanged(ref this.overallProgressValue, value);
         }
+
+        public void Dispose()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IDialogResult DialogResult
+        {
+            get => this.dialogResult;
+            set => this.RaiseAndSetIfChanged(ref this.dialogResult, value);
+        }
+
+        public bool IsBusy
+        {
+            get => this.isBusy;
+            set => this.RaiseAndSetIfChanged(ref this.isBusy, value);
+        }
+
+        public string LoadingMessage
+        {
+            get => this.loadingMessage;
+            set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
+        }
+
+        public Thing Thing => this.thing;
     }
 }

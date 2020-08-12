@@ -50,7 +50,7 @@ namespace CDP4Composition.Tests.Modularity
 
         private Mock<IAppSettingsService<ImeAppSettings>> appSettingsService;
         private ImeAppSettings appSettings;
-        private Mock<IAssemblyLocationLoader> assemblyLocationLoader;
+        private Mock<IAssemblyInformationService> assemblyLocationLoader;
 
         private string BuildFolder;
         private const string AppSettingsJson = "AppSettingsTest.json";
@@ -69,11 +69,11 @@ namespace CDP4Composition.Tests.Modularity
             var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
             testDirectory = Path.GetFullPath(Path.Combine(testDirectory, $"{this.BuildFolder}{Path.DirectorySeparatorChar}{frameworkVersion}"));
 
-            this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
+            this.assemblyLocationLoader = new Mock<IAssemblyInformationService>();
             this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(testDirectory);
 
             this.serviceLocator = new Mock<IServiceLocator>();
-            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(this.assemblyLocationLoader.Object);
+            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyInformationService>()).Returns(this.assemblyLocationLoader.Object);
 
             this.appSettingsService = new Mock<IAppSettingsService<ImeAppSettings>>();
 

@@ -50,7 +50,14 @@ namespace CDP4Composition.Converters
                 return Visibility.Collapsed;
             }
 
-            return (double)value > 0 ? Visibility.Visible : Visibility.Collapsed;
+            var result = (double)value > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+            if (parameter is string stringParamater && stringParamater == "Invert")
+            {
+                result = result != Visibility.Visible ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            return result;
         }
         
         /// <summary>

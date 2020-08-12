@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShellViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,18 +28,33 @@ namespace CDP4IME
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks;
+
     using CDP4Composition.Events;
     using CDP4Composition.Log;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.Utilities;
+    using CDP4Composition.ViewModels;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4IME.Settings;
+
     using CDP4ShellDialogs.ViewModels;
+
     using Microsoft.Practices.ServiceLocation;
+    
     using NLog;
+    
     using ReactiveUI;
-    using ViewModels;
+    
+    using CDP4IME.ViewModels;
+
+    using CDP4UpdateServerDal;
 
     /// <summary>
     /// The View Model of the <see cref="Shell"/>
@@ -46,6 +80,7 @@ namespace CDP4IME
         /// Backing field for <see cref="HasOpenIterations"/>
         /// </summary>
         private bool hasOpenIterations;
+        
         /// <summary>
         /// The CDP4 custom Log Target
         /// </summary>
@@ -90,6 +125,21 @@ namespace CDP4IME
         /// The subscription for the IsBusy status
         /// </summary>
         private IDisposable subscription;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedUpdateServer"/> property
+        /// </summary>
+        private string selectedUpdateServer;
+
+        /// <summary>
+        /// Holds the App Settings Service instance
+        /// </summary>
+        private IAppSettingsService<ImeAppSettings> appSettingsService;
+
+        /// <summary>
+        /// Backing field for <see cref="IsFreeToCheckApi"/> property
+        /// </summary>
+        private bool isFreeToCheckApi = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellViewModel"/> class.
@@ -174,7 +224,54 @@ namespace CDP4IME
                     this.LoadingMessage = x.Message;
                 });
 
+            this.CheckApiCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsFreeToCheckApi));
+            this.CheckApiCommand.Subscribe(async _ => await this.ExecuteCheckApiCommand());
+
             logger.Info("Welcome in the CDP4 Application");
+        }
+        
+        /// <summary>
+        /// Executes the <see cref="CheckApiCommand"/>
+        /// </summary>
+        private async Task ExecuteCheckApiCommand()
+        {
+            this.IsFreeToCheckApi = false;
+            var appSettingService = ServiceLocator.Current.GetInstance<IAppSettingsService<ImeAppSettings>>();
+            var serverAddress = appSettingService.AppSettings.UpdateServerAddresses.Last();
+            appSettingService.Save();
+
+            if (Uri.TryCreate(serverAddress, UriKind.Absolute, out var url))
+            {
+                var assemblyInfo = ServiceLocator.Current.GetInstance<IAssemblyInformationService>();
+
+                try
+                {
+                    var client = new UpdateServerClient(url);
+                    var availableUpdates = await client.CheckForUpdate(PluginUtilities.GetPluginManifests().ToList(), assemblyInfo.GetVersion(), assemblyInfo.GetProcessorArchitecture());
+                    await Task.Delay(10000);
+                    
+                    if (availableUpdates.Any())
+                    {
+                        var confirmPopup = new GenericConfirmationDialogViewModel($"{availableUpdates.Count} updates are available!", "Would you like to download them now?");
+                        var result = this.dialogNavigationService.NavigateModal(confirmPopup);
+                        
+                        if (result.Result == true)
+                        {
+                            this.dialogNavigationService.NavigateModal(new DownloadManagerViewModel());
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            else
+            {
+                logger.Info($"The value {this.selectedUpdateServer} is not a valid URI");
+            }
+
+            this.IsFreeToCheckApi = true;
         }
 
         /// <summary>
@@ -200,7 +297,7 @@ namespace CDP4IME
         /// Gets the <see cref="ReactiveCommand"/> to open the web-proxy configuration
         /// </summary>
         public ReactiveCommand<object> OpenProxyConfigurationCommand { get; private set; }
-
+        
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to manage the configured uris
         /// </summary>
@@ -241,6 +338,11 @@ namespace CDP4IME
         /// </summary>
         public ReactiveCommand<object> OpenAboutCommand { get; private set; }
 
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to verify last versions on the update server
+        /// </summary>
+        public ReactiveCommand<object> CheckApiCommand { get; private set; }
+        
         /// <summary>
         /// Gets the <see cref="SessionViewModel"/>s that represent the currently loaded <see cref="Session"/>s
         /// </summary>
@@ -328,6 +430,15 @@ namespace CDP4IME
             {
                 this.RaiseAndSetIfChanged(ref this.title, value);
             }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the <see cref="CheckApiCommand"/> can execute
+        /// </summary>
+        public bool IsFreeToCheckApi
+        {
+            get => this.isFreeToCheckApi;
+            set => this.RaiseAndSetIfChanged(ref this.isFreeToCheckApi, value);
         }
 
         public void Dispose()

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMEDto.cs" company="RHEA System S.A.">
+// <copyright file="ConsolidatePluginCommand.cs" company="RHEA System S.A.">
 //   Copyright (c) 2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
@@ -23,26 +23,34 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4UpdateServerDal.Dto
+namespace CDP4UpdateServerDal.Command
 {
+    using System;
+
+    using CDP4UpdateServerDal.Dto;
     using System.Collections.Generic;
 
     /// <summary>
-    /// The Data Transfer Object representation of the <see cref="IMEDto"/> class.
+    /// The plugin command 
     /// </summary>
-    public class IMEDto
+    public class ConsolidatePluginCommand : IConsolidatePluginCommand
     {
         /// <summary>
-        /// Gets or sets the list of the <see cref="IMEVersionDto"/> class
+        /// Gets or sets the plugin IME version. 
         /// </summary>
-        public List<IMEVersionDto> Versions { get; set; }
+        public string IMEVersion { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IMEDto"/> class.
+        /// Gets or sets the list of client plugins
         /// </summary>
-        public IMEDto()
+        public IList<ClientPluginDto> ClientPlugins { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConsolidatePluginCommand"/> class.
+        /// </summary>
+        public ConsolidatePluginCommand()
         {
-            this.Versions = new List<IMEVersionDto>();
+            this.ClientPlugins = new List<ClientPluginDto>();
         }
     }
 }

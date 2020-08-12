@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IAssemblyLocationLoader.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="IConsolidatePluginCommand.cs" company="RHEA System S.A.">
+//   Copyright (c) 2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -16,25 +15,34 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//    GNU Affero General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Utilities
+namespace CDP4UpdateServerDal.Command
 {
+    using System;
+    using System.Collections.Generic;
+
+    using CDP4UpdateServerDal.Dto;
+
     /// <summary>
-    /// The interface that defines members of implementing classes of <see cref="IAssemblyLocationLoader"/>
+    /// The ConsolidatePluginCommand interface.
     /// </summary>
-    public interface IAssemblyLocationLoader
+    public interface IConsolidatePluginCommand
     {
         /// <summary>
-        /// Gets the path of the executing assembly
+        /// Gets or sets the plugin IME version. 
         /// </summary>
-        /// <returns>the path of the assembly</returns>
-        string GetLocation();
+        string IMEVersion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of client plugins
+        /// </summary>
+        IList<ClientPluginDto> ClientPlugins { get; set; }
     }
 }

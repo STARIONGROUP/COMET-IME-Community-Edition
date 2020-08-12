@@ -25,6 +25,11 @@
 
 namespace CDP4UpdateServerDal.Dto
 {
+    using System;
+
+    using CDP4UpdateServerDal.Enumerators;
+    using System.Reflection;
+
     /// <summary>
     /// The Data Transfer Object representation of the <see cref="ClientIMEDto"/> class.
     /// </summary>

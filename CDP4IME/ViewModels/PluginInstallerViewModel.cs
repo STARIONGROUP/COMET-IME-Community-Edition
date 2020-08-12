@@ -26,13 +26,17 @@ namespace CDP4IME.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.Composition;
     using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Threading;
 
+    using CDP4Composition.Attributes;
     using CDP4Composition.Modularity;
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.ViewModels;
 
     using CDP4IME.Behaviors;
@@ -45,12 +49,28 @@ namespace CDP4IME.ViewModels
     /// <summary>
     /// The <see cref="PluginInstallerViewModel"/> is the view model of the <see cref="PluginInstallerViewModel"/> holding it properties its properties and interaction logic
     /// </summary>
-    public class PluginInstallerViewModel : ReactiveObject, IPluginInstallerViewModel
+    [DialogViewModelExport(nameof(PluginInstaller), "Plugin Installer")]
+    public class PluginInstallerViewModel : ReactiveObject, IPluginInstallerViewModel, IDialogViewModel
     {
         /// <summary>
         /// Backing field for the <see cref="IsInstallationInProgress"/> property
         /// </summary>
         private bool isInstallationInProgress;
+
+        /// <summary>
+        /// Gets or Sets the <see cref="IDialogResult"/>
+        /// </summary>
+        public IDialogResult DialogResult { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this dialog is busy
+        /// </summary>
+        public bool IsBusy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the loading message
+        /// </summary>
+        public string LoadingMessage { get; set; }
 
         /// <summary>
         /// Gets or sets an assert whether ther is any installation in progress
@@ -101,6 +121,7 @@ namespace CDP4IME.ViewModels
         /// Initializes a new instance of the <see cref="PluginInstallerViewModel"/> class
         /// </summary>
         /// <param name="updatablePlugins">the <see cref="IEnumerable{T}"/> of updatable plugins</param>
+        [ImportingConstructor]
         public PluginInstallerViewModel(IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> updatablePlugins)
         {
             this.UpdatablePlugins = updatablePlugins;
@@ -213,5 +234,15 @@ namespace CDP4IME.ViewModels
                 this.AvailablePlugins.Add(pluginRow);
             }
         }
+
+        /// <summary>
+        /// Disposes of the <see cref="IDisposable"/>
+        /// </summary>
+        public void Dispose()
+        {
+            this.InstallCommand.Dispose();
+            this.CancelCommand.Dispose();
+        }
+
     }
 }

@@ -282,14 +282,14 @@
                                            Hint="Plugin Manager"
                                            LargeGlyph="{dxc:DXImage Image=BOProductGroup_32x32.png}"
                                            RibbonStyle="Large" />
-
                         <dxb:BarButtonItem Name="CheckApi"
                                            Command="{Binding CheckApiCommand}"
-                                           Content="Plugins"
+                                           IsEnabled="{Binding IsFreeToCheckApi}"
+                                           Content="Check for update"
                                            Description="Check for update"
-                                           Glyph="{dxc:DXImage 'Office2013/Actions/Refresh2_16x16.png'}"
+                                           Glyph="{dxc:DXImage 'Office2013/Actions/Refresh_16x16.png'}"
                                            Hint="Check for update"
-                                           LargeGlyph="{dxc:DXImage 'Office2013/Actions/Refresh2_32x32.png'}"
+                                           LargeGlyph="{dxc:DXImage 'Office2013/Actions/Refresh_32x32.png'}"
                                            RibbonStyle="Large" />
 
                         <dxb:BarButtonItem Name="DownloadButton"

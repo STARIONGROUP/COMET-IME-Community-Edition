@@ -118,7 +118,7 @@ namespace CDP4Composition.Modularity
         /// <returns>The <see cref="DirectoryInfo"/></returns>
         public static DirectoryInfo PluginDirectoryExists(out bool specificPluginFolderExists)
         {
-            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
+            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyInformationService>().GetLocation();
 
             var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
             specificPluginFolderExists = directoryInfo.Exists;

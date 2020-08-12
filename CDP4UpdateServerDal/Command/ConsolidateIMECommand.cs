@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AssemblyLocationLoader.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="ConsolidateIMECommand.cs" company="RHEA System S.A.">
+//   Copyright (c) 2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -16,34 +15,26 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//    GNU Affero General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Utilities
+namespace CDP4UpdateServerDal.Command
 {
-    using System.ComponentModel.Composition;
-    using System.IO;
-    using System.Reflection;
+    using CDP4UpdateServerDal.Dto;
 
     /// <summary>
-    /// The helper class that make method that uses <code>Assembly.GetExecutingAssembly().Location</code>
-    /// testable, in order to find plugins
+    /// The IME command 
     /// </summary>
-    [Export(typeof(IAssemblyLocationLoader))]
-    public class AssemblyLocationLoader : IAssemblyLocationLoader
+    public class ConsolidateIMECommand : IConsolidateIMECommand
     {
         /// <summary>
-        /// Gets the path of the executing assembly
+        /// Gets or sets the <see cref="ClientIMEDto"/> that storage client IME data. 
         /// </summary>
-        /// <returns>the path of the assembly</returns>
-        public string GetLocation()
-        {
-            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        }
+        public ClientIMEDto ClientIME { get; set; }
     }
 }
