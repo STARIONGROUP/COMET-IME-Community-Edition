@@ -47,7 +47,7 @@ namespace CDP4IME.Tests.Modularity
         public void Setup()
         {
             this.viewInvoker = new Mock<IPluginInstallerViewInvokerService>();
-            this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<PluginInstaller>()));
+            this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<UpdateDownloaderInstaller>()));
 
             var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
             this.downloadPath = Path.Combine(path1: appData, path2: "RHEA/CDP4/DownloadCache/plugins");
@@ -71,7 +71,7 @@ namespace CDP4IME.Tests.Modularity
         public void VerifyCheckAndInstall()
         {
             UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
-            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Never);
+            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<UpdateDownloaderInstaller>()), Times.Never);
             
             var dataPath = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ViewModels/PluginMockData/"));
 
@@ -88,7 +88,7 @@ namespace CDP4IME.Tests.Modularity
             }
 
             UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
-            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Once);
+            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<UpdateDownloaderInstaller>()), Times.Once);
         }
     }
 }

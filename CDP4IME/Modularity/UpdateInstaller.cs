@@ -49,7 +49,7 @@ namespace CDP4IME.Modularity
 
             if (updatablePlugins.Any())
             {
-                var pluginInstallerView = new PluginInstaller() { DataContext = new PluginInstallerViewModel(updatablePlugins) };
+                var pluginInstallerView = new UpdateDownloaderInstaller() { DataContext = new UpdateDownloaderInstallerViewModel(updatablePlugins) };
                 (viewInvoker ?? new PluginInstallerViewInvokerService()).ShowDialog(pluginInstallerView);
             }
         }

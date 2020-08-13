@@ -53,6 +53,7 @@ namespace CDP4IME
     using ReactiveUI;
     
     using CDP4IME.ViewModels;
+    using CDP4IME.Views;
 
     using CDP4UpdateServerDal;
 
@@ -125,21 +126,6 @@ namespace CDP4IME
         /// The subscription for the IsBusy status
         /// </summary>
         private IDisposable subscription;
-
-        /// <summary>
-        /// Backing field for <see cref="SelectedUpdateServer"/> property
-        /// </summary>
-        private string selectedUpdateServer;
-
-        /// <summary>
-        /// Holds the App Settings Service instance
-        /// </summary>
-        private IAppSettingsService<ImeAppSettings> appSettingsService;
-
-        /// <summary>
-        /// Backing field for <see cref="IsFreeToCheckApi"/> property
-        /// </summary>
-        private bool isFreeToCheckApi = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellViewModel"/> class.
@@ -224,8 +210,8 @@ namespace CDP4IME
                     this.LoadingMessage = x.Message;
                 });
 
-            this.CheckApiCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsFreeToCheckApi));
-            this.CheckApiCommand.Subscribe(async _ => await this.ExecuteCheckApiCommand());
+            this.CheckApiCommand = ReactiveCommand.Create();
+            this.CheckApiCommand.Subscribe(_ => this.ExecuteCheckApiCommand());
 
             logger.Info("Welcome in the CDP4 Application");
         }
@@ -233,45 +219,10 @@ namespace CDP4IME
         /// <summary>
         /// Executes the <see cref="CheckApiCommand"/>
         /// </summary>
-        private async Task ExecuteCheckApiCommand()
+        private void ExecuteCheckApiCommand()
         {
-            this.IsFreeToCheckApi = false;
-            var appSettingService = ServiceLocator.Current.GetInstance<IAppSettingsService<ImeAppSettings>>();
-            var serverAddress = appSettingService.AppSettings.UpdateServerAddresses.Last();
-            appSettingService.Save();
-
-            if (Uri.TryCreate(serverAddress, UriKind.Absolute, out var url))
-            {
-                var assemblyInfo = ServiceLocator.Current.GetInstance<IAssemblyInformationService>();
-
-                try
-                {
-                    var client = new UpdateServerClient(url);
-                    var availableUpdates = await client.CheckForUpdate(PluginUtilities.GetPluginManifests().ToList(), assemblyInfo.GetVersion(), assemblyInfo.GetProcessorArchitecture());
-                    await Task.Delay(10000);
-                    
-                    if (availableUpdates.Any())
-                    {
-                        var confirmPopup = new GenericConfirmationDialogViewModel($"{availableUpdates.Count} updates are available!", "Would you like to download them now?");
-                        var result = this.dialogNavigationService.NavigateModal(confirmPopup);
-                        
-                        if (result.Result == true)
-                        {
-                            this.dialogNavigationService.NavigateModal(new DownloadManagerViewModel());
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            else
-            {
-                logger.Info($"The value {this.selectedUpdateServer} is not a valid URI");
-            }
-
-            this.IsFreeToCheckApi = true;
+            //this.dialogNavigationService.NavigateModal(nameof(UpdateDownloaderInstaller));
+            new UpdateDownloaderInstaller(true) { DataContext = new UpdateDownloaderInstallerViewModel() }.ShowDialog();
         }
 
         /// <summary>
@@ -430,15 +381,6 @@ namespace CDP4IME
             {
                 this.RaiseAndSetIfChanged(ref this.title, value);
             }
-        }
-
-        /// <summary>
-        /// Gets or sets whether the <see cref="CheckApiCommand"/> can execute
-        /// </summary>
-        public bool IsFreeToCheckApi
-        {
-            get => this.isFreeToCheckApi;
-            set => this.RaiseAndSetIfChanged(ref this.isFreeToCheckApi, value);
         }
 
         public void Dispose()

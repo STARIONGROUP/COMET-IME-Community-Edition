@@ -28,7 +28,7 @@ namespace CDP4IME.Services
     using CDP4IME.Views;
 
     /// <summary>
-    /// Defines the <see cref="PluginInstallerViewInvokerService"/> which is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// Defines the <see cref="PluginInstallerViewInvokerService"/> which is responsible to display the instanciated view <see cref="UpdateDownloaderInstaller"/>
     /// </summary>
     public interface IPluginInstallerViewInvokerService
     {
@@ -36,6 +36,6 @@ namespace CDP4IME.Services
         /// Brings the view to the user sight
         /// </summary>
         /// <param name="viewInstance">the view to show up</param>
-        void ShowDialog(PluginInstaller viewInstance);
+        void ShowDialog(UpdateDownloaderInstaller viewInstance);
     }
 }

@@ -43,7 +43,7 @@ namespace CDP4IME.Tests.ViewModels
     using ReactiveUI;
 
     [TestFixture]
-    public class PluginRowViewModelTestFixture : PluginUpdateDataSetup
+    public class RowViewModelTestFixture : UpdateDownloaderInstallerDataSetup
     {
         [SetUp]
         public override void Setup()

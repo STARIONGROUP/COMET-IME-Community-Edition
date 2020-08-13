@@ -39,7 +39,7 @@ namespace CDP4IME.Tests.ViewModels
     /// <summary>
     /// Base class for unit test related to Plugin installation 
     /// </summary>
-    public class PluginUpdateDataSetup
+    public class UpdateDownloaderInstallerDataSetup
     {
         private const string TestContent = "TESTCONTENT";
         private const string TestFileName = "test";

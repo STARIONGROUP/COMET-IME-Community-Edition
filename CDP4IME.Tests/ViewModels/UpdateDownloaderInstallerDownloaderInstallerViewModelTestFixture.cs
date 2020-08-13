@@ -45,11 +45,11 @@ namespace CDP4IME.Tests.ViewModels
     using ReactiveUI;
 
     [TestFixture, Apartment(ApartmentState.STA)]
-    public class PluginInstallerViewModelTestFixture : PluginUpdateDataSetup
+    public class UpdateDownloaderInstallerDownloaderInstallerViewModelTestFixture : UpdateDownloaderInstallerDataSetup
     {
         private IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> updatablePlugins;
         private Mock<IPluginInstallerBehavior> behavior;
-        private PluginInstallerViewModel viewModel;
+        private UpdateDownloaderInstallerViewModel viewModel;
 
         [SetUp]
         public override void Setup()
@@ -65,7 +65,7 @@ namespace CDP4IME.Tests.ViewModels
             this.behavior = new Mock<IPluginInstallerBehavior>();
             this.behavior.Setup(x => x.Close());
 
-            this.viewModel = new PluginInstallerViewModel(this.updatablePlugins);
+            this.viewModel = new UpdateDownloaderInstallerViewModel(this.updatablePlugins);
         }
         
         [TearDown]
@@ -81,24 +81,24 @@ namespace CDP4IME.Tests.ViewModels
         [Test]
         public void VerifyPropertiesAreSet()
         {
-            var vm = new PluginInstallerViewModel(this.updatablePlugins);
+            var vm = new UpdateDownloaderInstallerViewModel(this.updatablePlugins);
             Assert.IsNotEmpty(vm.AvailablePlugins);
             Assert.AreSame(vm.UpdatablePlugins, this.updatablePlugins);
-            Assert.IsFalse(vm.IsInstallationInProgress);
+            Assert.IsFalse(vm.IsInstallationOrDownloadInProgress);
             Assert.IsNull(vm.CancellationTokenSource);
         }
         
         [Test]
         public void VerifySelectAllUpdateCheckBoxCommand()
         {
-            var vm = new PluginInstallerViewModel(this.updatablePlugins);
+            var vm = new UpdateDownloaderInstallerViewModel(this.updatablePlugins);
             Assert.IsTrue(vm.SelectAllUpdateCheckBoxCommand.CanExecute(null));
 
             vm.SelectAllUpdateCheckBoxCommand.Execute(null);
-            Assert.IsTrue(vm.AvailablePlugins.All(p => p.IsSelectedForInstallation));
+            Assert.IsTrue(vm.AvailablePlugins.All(p => p.IsSelected));
 
             vm.SelectAllUpdateCheckBoxCommand.Execute(null);
-            Assert.IsTrue(vm.AvailablePlugins.All(p => !p.IsSelectedForInstallation));
+            Assert.IsTrue(vm.AvailablePlugins.All(p => !p.IsSelected));
         }
         
         [Test]
@@ -106,11 +106,11 @@ namespace CDP4IME.Tests.ViewModels
         {
             this.viewModel.Behavior = this.behavior.Object;
 
-            this.viewModel.IsInstallationInProgress = true;
+            this.viewModel.IsInstallationOrDownloadInProgress = true;
             Assert.IsTrue(this.viewModel.CancelCommand.CanExecute(null));
             await this.viewModel.CancelCommand.ExecuteAsyncTask(null);
             this.behavior.Verify(x => x.Close(), Times.Once);
-            this.viewModel.IsInstallationInProgress = false;
+            this.viewModel.IsInstallationOrDownloadInProgress = false;
         }
 
         [Test]
@@ -119,11 +119,11 @@ namespace CDP4IME.Tests.ViewModels
             this.viewModel.Behavior = this.behavior.Object;
             this.viewModel.AvailablePlugins.First().FileSystem = this.PluginFileSystem;
             Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
-            this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = false;
+            this.viewModel.AvailablePlugins.First().IsSelected = false;
             await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
             this.behavior.Verify(x => x.Close(), Times.Never);
 
-            this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = true;
+            this.viewModel.AvailablePlugins.First().IsSelected = true;
             await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
         }
         
@@ -134,7 +134,7 @@ namespace CDP4IME.Tests.ViewModels
             this.viewModel.Behavior = this.behavior.Object;
             this.viewModel.AvailablePlugins.First().FileSystem = this.PluginFileSystem;
             Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
-            this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = true;
+            this.viewModel.AvailablePlugins.First().IsSelected = true;
             await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
             this.behavior.Verify(x => x.Close(), Times.Never);
         }
@@ -161,7 +161,7 @@ namespace CDP4IME.Tests.ViewModels
             this.viewModel.Behavior = this.behavior.Object;
             this.viewModel.AvailablePlugins.First().FileSystem = this.PluginFileSystem;
             Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
-            this.viewModel.AvailablePlugins.First().IsSelectedForInstallation = true;
+            this.viewModel.AvailablePlugins.First().IsSelected = true;
 
             await Task.WhenAll(
                 this.viewModel.InstallCommand.ExecuteAsyncTask(null),

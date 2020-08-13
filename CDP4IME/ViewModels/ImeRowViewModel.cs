@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ImeRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -41,7 +41,7 @@ namespace CDP4IME.ViewModels
     /// <summary>
     /// Represents a <see cref="PluginRow"/> holding its properties and interaction logic
     /// </summary>
-    public class PluginRowViewModel : ReactiveObject
+    public class ImeRowViewModel : ReactiveObject
     {
         /// <summary>
         /// The NLog logger
@@ -136,12 +136,7 @@ namespace CDP4IME.ViewModels
         /// Backing field for the property <see cref="IsSelected"/>
         /// </summary>
         private bool isSelected;
-
-        /// <summary>
-        /// Holds the plugin name and version
-        /// </summary>
-        private KeyValuePair<string, string> thing;
-
+        
         /// <summary>
         /// Gets or sets the assert <see cref="isSelected"/> whether the represented plugin will be installed
         /// </summary>
@@ -162,32 +157,24 @@ namespace CDP4IME.ViewModels
         public (FileInfo cdp4ckFile, Manifest manifest) Plugin { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PluginRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="ImeRowViewModel"/> class
         /// </summary>
         /// <param name="plugin">The represented plugin</param>
         /// <param name="pluginFileSystemService">The file system to operate on</param>
-        public PluginRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin, IPluginFileSystemService pluginFileSystemService = null)
+        public ImeRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin, IPluginFileSystemService pluginFileSystemService = null)
         {
             this.Plugin = plugin;
             this.FileSystem = pluginFileSystemService ?? new PluginFileSystemService(plugin);
             this.UpdateProperties();
         }
 
-        /// <summary>
-        /// Initalizes a new instance of the <see cref="PluginRowViewModel"/> class
-        /// </summary>
-        /// <param name="thing">A <see cref="KeyValuePair{TKey,TValue}"/> Containing the Name and the Version</param>
-        /// <param name="pluginFileSystemService">The file system to operate on</param>
-        public PluginRowViewModel(KeyValuePair<string, string> thing, IPluginFileSystemService pluginFileSystemService = null)
+        public ImeRowViewModel(string version)
         {
-            this.thing = thing; 
-            this.Name = this.thing.Key;
-            this.Version = $"version {this.thing.Value}";
-            //this.FileSystem = pluginFileSystemService ?? new PluginFileSystemService();
+            this.Version = version;
         }
 
         /// <summary>
-        /// Update this <see cref="PluginRowViewModel"/> Properties
+        /// Update this <see cref="ImeRowViewModel"/> Properties
         /// </summary>
         private void UpdateProperties()
         {

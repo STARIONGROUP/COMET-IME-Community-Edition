@@ -284,24 +284,12 @@
                                            RibbonStyle="Large" />
                         <dxb:BarButtonItem Name="CheckApi"
                                            Command="{Binding CheckApiCommand}"
-                                           IsEnabled="{Binding IsFreeToCheckApi}"
-                                           Content="Check for update"
-                                           Description="Check for update"
+                                           Content="Check for Update"
+                                           Description="Check for Update"
                                            Glyph="{dxc:DXImage 'Office2013/Actions/Refresh_16x16.png'}"
                                            Hint="Check for update"
                                            LargeGlyph="{dxc:DXImage 'Office2013/Actions/Refresh_32x32.png'}"
                                            RibbonStyle="Large" />
-
-                        <dxb:BarButtonItem Name="DownloadButton"
-                                           Command="{Binding OpenAboutCommand}"
-                                           Description="Open Download Manager"
-                                           Hint="Open Download Manager">
-                            <dxb:BarButtonItem.ContentTemplate>
-                                <DataTemplate>
-                                    <views1:DownloadManagerBarItem></views1:DownloadManagerBarItem>
-                                </DataTemplate>
-                            </dxb:BarButtonItem.ContentTemplate>
-                        </dxb:BarButtonItem>
                     </dxr:RibbonPageGroup>
 
                     <dxr:RibbonPageGroup Name="AboutGroup"

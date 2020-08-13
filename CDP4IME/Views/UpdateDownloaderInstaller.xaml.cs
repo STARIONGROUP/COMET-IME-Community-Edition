@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DownloadManagerBarItem.xaml.cs" company="RHEA System S.A.">
+// <copyright file="PluginInstaller.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -24,19 +24,35 @@
 
 namespace CDP4IME.Views
 {
-    using System.Windows.Controls;
+    using System.Windows;
+
+    using CDP4Composition.Attributes;
+    using CDP4Composition.Navigation.Interfaces;
 
     /// <summary>
-    /// Interaction logic for DownloadManager.xaml
+    /// Interaction logic for PluginInstaller.xaml
     /// </summary>
-    public partial class DownloadManagerBarItem : UserControl
+    //[DialogViewExport(nameof(UpdateDownloaderInstaller), "Update Downloader and Installer")] 
+    public partial class UpdateDownloaderInstaller : Window, IDialogView
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DownloadManagerBarItem"/> class
+        /// Initializes a new instance of the <see cref="UpdateDownloaderInstaller"/> class
         /// </summary>
-        public DownloadManagerBarItem()
+        public UpdateDownloaderInstaller()
         {
             this.InitializeComponent();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateDownloaderInstaller"/> class
+        /// </summary>
+        /// <param name="initializeComponent">Assert whether the view components should be initialized</param>
+        public UpdateDownloaderInstaller(bool initializeComponent = true)
+        {
+            if (initializeComponent)
+            {
+                this.InitializeComponent();
+            }
         }
     }
 }

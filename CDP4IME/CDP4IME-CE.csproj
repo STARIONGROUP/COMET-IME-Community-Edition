@@ -200,9 +200,9 @@
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" Exclude="App.xaml" />
     <None Remove="Resources\cdplogo3d_48x48.png" />
     <None Remove="Views\About - Copy.xaml" />
-    <None Remove="Views\DownloadManagerBarItem.xaml" />
-    <None Remove="Views\PluginInstaller.xaml" />
+    <None Remove="Views\ImeRow.xaml" />
     <None Remove="Views\PluginRow.xaml" />
+    <None Remove="Views\UpdateDownloaderInstaller.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
 
     <ApplicationDefinition Include="App.xaml">
@@ -214,14 +214,14 @@
     <Compile Update="Views\About - Copy.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
-    <Compile Update="Views\DownloadManager.xaml.cs">
-      <DependentUpon>DownloadManagerBarItem.xaml</DependentUpon>
+    <Compile Update="Views\PluginRow - Copy.xaml.cs">
+      <DependentUpon>PluginRow.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\DownloadManager.xaml.cs">
-      <DependentUpon>DownloadManager.xaml</DependentUpon>
+    <Compile Update="Views\PluginRow.xaml.cs">
+      <DependentUpon>PluginRow.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\DownloadManagerBarItem.xaml.cs">
-      <DependentUpon>DownloadManagerBarItem.xaml</DependentUpon>
+    <Compile Update="Views\UpdateDownloaderInstaller.xaml.cs">
+      <DependentUpon>UpdateDownloaderInstaller.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

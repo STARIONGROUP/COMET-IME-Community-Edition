@@ -29,6 +29,7 @@ namespace CDP4UpdateServerDal
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
@@ -138,7 +139,8 @@ namespace CDP4UpdateServerDal
         {
             HttpContent result = null;
             HttpResponseMessage response = null;
-
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            
             using (var client = new HttpClient() { BaseAddress = this.baseAddress })
             {
                 var request = this.BuildRequest<TDto>(action);

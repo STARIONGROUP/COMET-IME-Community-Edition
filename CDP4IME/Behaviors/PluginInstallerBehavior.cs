@@ -33,9 +33,9 @@ namespace CDP4IME.Behaviors
     using DevExpress.Mvvm.UI.Interactivity;
 
     /// <summary>
-    /// Behavior of the e<see cref="PluginInstaller"/> used to handle the interactions between <see cref="PluginInstallerViewModel"/> and the view
+    /// Behavior of the e<see cref="UpdateDownloaderInstaller"/> used to handle the interactions between <see cref="UpdateDownloaderInstallerViewModel"/> and the view
     /// </summary>
-    public class PluginInstallerBehavior : Behavior<PluginInstaller>, IPluginInstallerBehavior
+    public class PluginInstallerBehavior : Behavior<UpdateDownloaderInstaller>, IPluginInstallerBehavior
     {
         /// <summary>
         /// Register event handlers
@@ -58,7 +58,7 @@ namespace CDP4IME.Behaviors
         }
 
         /// <summary>
-        /// Occurs when the user request the <see cref="PluginInstaller"/> view to close
+        /// Occurs when the user request the <see cref="UpdateDownloaderInstaller"/> view to close
         /// </summary>
         /// <param name="sender">the sender</param>
         /// <param name="e">the arguments</param>

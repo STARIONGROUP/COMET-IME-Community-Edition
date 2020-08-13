@@ -18,6 +18,6 @@ namespace CDP4IME.Settings
         /// <summary>
         /// Gets or sets the disabled Plugins
         /// </summary>
-        public List<string> UpdateServerAddresses { get; set; } = new List<string>() { "https://localhost:5001" };
+        public List<string> UpdateServerAddresses { get; set; } = new List<string>();
     }
 }
