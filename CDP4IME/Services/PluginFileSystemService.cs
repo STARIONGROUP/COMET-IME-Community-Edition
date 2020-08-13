@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginFileSystemService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -49,12 +49,7 @@ namespace CDP4IME.Services
         /// Gets or sets the path where the updated plugin should be installed
         /// </summary>
         public DirectoryInfo InstallationPath { get; set; }
-
-        /// <summary>
-        /// holds the plugin name whose belong to this <see cref="PluginFileSystemService"/> instance
-        /// </summary>
-        private readonly string pluginName;
-
+        
         /// <summary>
         /// Instanciate a new <see cref="PluginFileSystemService"/>
         /// </summary>
@@ -62,11 +57,10 @@ namespace CDP4IME.Services
         public PluginFileSystemService((FileInfo cdp4ckFile, Manifest manifest) plugin)
         {
             var (cdp4CkFile, manifest) = plugin;
-            this.pluginName = manifest.Name;
 
             this.UpdateCdp4CkFileInfo = cdp4CkFile;
-            this.InstallationPath = PluginUtilities.GetPluginDirectory(this.pluginName);
-            this.TemporaryPath = PluginUtilities.GetTempDirectoryInfo(this.pluginName);
+            this.InstallationPath = PluginUtilities.GetPluginDirectory(manifest.Name);
+            this.TemporaryPath = PluginUtilities.GetTempDirectoryInfo(manifest.Name);
         }
 
         /// <summary>
@@ -104,8 +98,9 @@ namespace CDP4IME.Services
         {
             if (this.InstallationPath.Exists)
             {
+                var installationFullPath = this.InstallationPath.FullName;
                 this.InstallationPath.MoveTo(this.TemporaryPath.FullName);
-                this.InstallationPath = PluginUtilities.GetPluginDirectory(this.pluginName);
+                this.InstallationPath = new DirectoryInfo(installationFullPath);
             }
         }
 

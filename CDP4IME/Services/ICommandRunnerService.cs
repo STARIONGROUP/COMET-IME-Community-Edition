@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginInstallerViewInvokerService.cs" company="RHEA System S.A.">
+// <copyright file="ICommandRunnerService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -25,20 +25,15 @@
 
 namespace CDP4IME.Services
 {
-    using CDP4IME.Views;
-
     /// <summary>
-    /// The <see cref="PluginInstallerViewInvokerService"/> is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// Definition of <see cref="CommandRunnerService"/> Abstracting invoking commands on conhost
     /// </summary>
-    public class PluginInstallerViewInvokerService : IPluginInstallerViewInvokerService
+    public interface ICommandRunnerService
     {
         /// <summary>
-        /// Brings the view to the user sight
+        /// Runs the provided <see cref="executable"/> with elevated rights
         /// </summary>
-        /// <param name="viewInstance">the view to show up</param>
-        public void ShowDialog(PluginInstaller viewInstance)
-        {
-            viewInstance.ShowDialog();
-        }
+        /// <param name="executable">The executable command path</param>
+        void RunAsAdmin(string executable);
     }
 }

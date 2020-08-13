@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="UpdateInstallerTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -27,7 +27,12 @@ namespace CDP4IME.Tests.Modularity
 {
     using System;
     using System.IO;
+    using System.Reflection;
     using System.Threading;
+    using System.Threading.Tasks;
+    using System.Windows;
+
+    using CDP4Composition.Modularity;
 
     using CDP4IME.Modularity;
     using CDP4IME.Services;
@@ -40,17 +45,27 @@ namespace CDP4IME.Tests.Modularity
     [TestFixture, Apartment(ApartmentState.STA)]
     public class UpdateInstallerTestFixture
     {
-        private Mock<IPluginInstallerViewInvokerService> viewInvoker;
+        private Mock<IViewInvokerService> viewInvoker;
+        private Mock<ICommandRunnerService> commandRunner;
+        private string installerFile;
         private string downloadPath;
+        private string imeDownloadTestPath;
 
         [SetUp]
         public void Setup()
         {
-            this.viewInvoker = new Mock<IPluginInstallerViewInvokerService>();
+            this.imeDownloadTestPath = Path.Combine(Path.GetTempPath(), "UpdateInstaller", "ImeDownload", Guid.NewGuid().ToString());
+            
+            this.commandRunner = new Mock<ICommandRunnerService>();
+            this.commandRunner.Setup(x => x.RunAsAdmin(It.IsAny<string>()));
+
+            this.viewInvoker = new Mock<IViewInvokerService>();
             this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<PluginInstaller>()));
 
-            var appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
-            this.downloadPath = Path.Combine(path1: appData, path2: "RHEA/CDP4/DownloadCache/plugins");
+            this.viewInvoker.Setup(x => x.ShowMessageBox(
+                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information)).Returns(MessageBoxResult.No);
+                
+            this.downloadPath = Path.Combine(PluginUtilities.GetAppDataPath(), "DownloadCache", "plugins");
 
             if (!Directory.Exists(this.downloadPath))
             {
@@ -65,15 +80,20 @@ namespace CDP4IME.Tests.Modularity
             {
                 Directory.Delete(this.downloadPath, true);
             }
+
+            if (Directory.Exists(this.imeDownloadTestPath))
+            {
+                Directory.Delete(this.imeDownloadTestPath, true);
+            }
         }
 
         [Test]
-        public void VerifyCheckAndInstall()
+        public void VerifyCheckInstallAndVerifyIfTheImeShallShutdown()
         {
-            UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
+            Assert.IsFalse(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object));
             this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Never);
             
-            var dataPath = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ViewModels/PluginMockData/"));
+            var dataPath = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ViewModels", "PluginMockData"));
 
             foreach (var file in dataPath.EnumerateFiles())
             {
@@ -87,8 +107,58 @@ namespace CDP4IME.Tests.Modularity
                 File.Copy(file.FullName, Path.Combine(destination, file.Name), true);
             }
 
-            UpdateInstaller.CheckAndInstall(this.viewInvoker.Object);
+            UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object);
             this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Once);
+        }
+
+        [Test]
+        public void VerifyIncompatibleIMEUpdate()
+        {
+            this.SetupInstallerFile(false);
+
+            UpdateInstaller.ImeDownloadDirectoryInfo = new DirectoryInfo(this.imeDownloadTestPath);
+            Assert.IsFalse(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object));
+            
+            this.viewInvoker.Verify(x => x.ShowMessageBox(
+                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information), Times.Never);
+
+            this.commandRunner.Verify(x => x.RunAsAdmin(It.IsAny<string>()), Times.Never);
+        }
+        
+        [Test]
+        public void VerifyIMEUpdate()
+        {
+            this.viewInvoker.Setup(x => x.ShowMessageBox(
+                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information)).Returns(MessageBoxResult.Yes);
+
+            this.SetupInstallerFile(true);
+
+            UpdateInstaller.ImeDownloadDirectoryInfo = new DirectoryInfo(this.imeDownloadTestPath);
+            Assert.IsTrue(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object, this.commandRunner.Object));
+
+            this.viewInvoker.Verify(x => x.ShowMessageBox(
+                It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information), Times.Once);
+
+            this.commandRunner.Verify(x => x.RunAsAdmin(It.IsAny<string>()), Times.Once);
+        }
+
+        private void SetupInstallerFile(bool shouldItBeCompatible)
+        {
+            var majorVersion = PluginUtilities.GetVersion().Major;
+
+            if (shouldItBeCompatible)
+            {
+                majorVersion += 1;
+            }
+
+            this.installerFile = Path.Combine(this.imeDownloadTestPath, $"CDP4IME-CE.x64-{majorVersion}.0.0.msi");
+
+            if (!Directory.Exists(this.imeDownloadTestPath))
+            {
+                Directory.CreateDirectory(this.imeDownloadTestPath);
+            }
+
+            File.Create(this.installerFile).Dispose();
         }
     }
 }

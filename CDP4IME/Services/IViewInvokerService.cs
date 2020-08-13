@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginInstallerViewInvokerServiceTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="IPluginInstallerViewInvokerService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,33 +23,31 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Tests.Services
+namespace CDP4IME.Services
 {
-    using System;
-    using System.Threading;
     using System.Windows;
 
-    using CDP4IME.Services;
+    using CDP4IME.Views;
 
-    using NUnit.Framework;
-
-    [TestFixture]
-    public class PluginInstallerViewInvokerServiceTestFixture
+    /// <summary>
+    /// Defines the <see cref="ViewInvokerService"/> which is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// </summary>
+    public interface IViewInvokerService
     {
-        [Test]
-        public void VerifyViewShowsUp()
-        {
-            Assert.Throws<NullReferenceException>(() =>
-            {
-                new ViewInvokerService().ShowDialog(null);
-            });
-        }
+        /// <summary>
+        /// Brings the view to the user sight
+        /// </summary>
+        /// <param name="viewInstance">the view to show up</param>
+        void ShowDialog(PluginInstaller viewInstance);
 
-        [Test]
-        public void VerifyMessageBoxShowsUp()
-        {
-            var messageBoxResult = new ViewInvokerService().ShowMessageBox(null,null, MessageBoxButton.YesNo, MessageBoxImage.Information);
-            Assert.AreEqual(messageBoxResult, MessageBoxResult.None);
-        }
+        /// <summary>
+        /// Pops up a message box
+        /// </summary>
+        /// <param name="message">the message</param>
+        /// <param name="title">the box title</param>
+        /// <param name="button">the button configuration</param>
+        /// <param name="image">the image</param>
+        /// <returns>a <see cref="MessageBoxResult"/></returns>
+        MessageBoxResult ShowMessageBox(string message, string title, MessageBoxButton button, MessageBoxImage image);
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginInstallerViewInvokerServiceTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="CommandRunnerService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,33 +23,34 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Tests.Services
+namespace CDP4IME.Services
 {
-    using System;
-    using System.Threading;
-    using System.Windows;
+    using System.Diagnostics;
+    using System.IO;
 
-    using CDP4IME.Services;
-
-    using NUnit.Framework;
-
-    [TestFixture]
-    public class PluginInstallerViewInvokerServiceTestFixture
+    /// <summary>
+    /// The <see cref="CommandRunnerService"/> provides methods that allows invoking commands on conhost
+    /// </summary>
+    public class CommandRunnerService : ICommandRunnerService
     {
-        [Test]
-        public void VerifyViewShowsUp()
+        /// <summary>
+        /// Runs the provided <see cref="executable"/> with elevated rights
+        /// </summary>
+        /// <param name="executable">The executable command path</param>
+        public void RunAsAdmin(string executable)
         {
-            Assert.Throws<NullReferenceException>(() =>
+            var process = new Process
             {
-                new ViewInvokerService().ShowDialog(null);
-            });
-        }
+                StartInfo =
+                {
+                    FileName = "msiexec",
+                    WorkingDirectory = Path.GetTempPath(),
+                    Arguments = $" /i \"{executable}\" ALLUSERS=1",
+                    Verb = "runas"
+                }
+            };
 
-        [Test]
-        public void VerifyMessageBoxShowsUp()
-        {
-            var messageBoxResult = new ViewInvokerService().ShowMessageBox(null,null, MessageBoxButton.YesNo, MessageBoxImage.Information);
-            Assert.AreEqual(messageBoxResult, MessageBoxResult.None);
+            process.Start();
         }
     }
 }
