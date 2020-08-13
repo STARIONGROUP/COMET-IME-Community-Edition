@@ -23,7 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4IME
 {
     using System;
@@ -66,8 +65,12 @@ namespace CDP4IME
             base.OnStartup(e);
 
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-            UpdateInstaller.CheckAndInstall();
+            
+            if (UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown())
+            {
+                Current.Shutdown();
+                return;
+            }
 
             DXSplashScreen.Show<Views.SplashScreenView>();
             DXSplashScreen.SetState("Starting CDP4");

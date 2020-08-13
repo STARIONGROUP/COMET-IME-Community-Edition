@@ -48,6 +48,9 @@ namespace CDP4Composition.Modularity
     [ExcludeFromCodeCoverage]
     public static class PluginUtilities
     {
+        /// <summary>
+        /// The NLog Logger
+        /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger(typeof(PluginUtilities));
 
         /// <summary>
@@ -170,7 +173,7 @@ namespace CDP4Composition.Modularity
                 return updatablePlugins;
             }
             
-            var currentPlateformVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            var currentPlateformVersion = GetVersion();
 
             // Loop through all existing download plugin folders
             foreach (var downloadedPluginFolder in Directory.EnumerateDirectories(path: downloadPath).Select(selector: d => new DirectoryInfo(path: d)))
@@ -250,6 +253,15 @@ namespace CDP4Composition.Modularity
             }
 
             return appDataPath;
+        }
+
+        /// <summary>
+        /// Gets the current assembly version (Composition) which matches the IME one
+        /// </summary>
+        /// <returns>the version</returns>
+        public static Version GetVersion()
+        {
+            return Assembly.GetExecutingAssembly().GetName().Version;
         }
     }
 }

@@ -33,7 +33,6 @@ namespace CDP4IME.Tests.ViewModels
     using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
-    using CDP4Composition.ViewModels;
 
     using CDP4IME.Behaviors;
     using CDP4IME.ViewModels;
@@ -73,7 +72,6 @@ namespace CDP4IME.Tests.ViewModels
         {
             if (Directory.Exists(this.BasePath))
             {
-                File.SetAttributes(this.BasePath, FileAttributes.Normal);
                 Directory.Delete(this.BasePath, true);
             }
         }
