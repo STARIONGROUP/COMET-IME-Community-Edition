@@ -68,9 +68,9 @@ namespace CDP4UpdateServerDal
         /// <param name="version">The queried version</param>
         /// <param name="platform">The platform</param>
         /// <returns>A <see cref="Stream"/></returns>
-        public async Task<Stream> DownloadIme(Version version, Platform platform)
+        public async Task<Stream> DownloadIme(string version, Platform platform)
         {
-            return await this.QueryStream<IMEDto>(HttpVerbs.Get, $"{version}/{platform}");
+            return await this.QueryStream<IMEDto>(HttpVerbs.Get, $"{version}/{platform}/download");
         }
 
         /// <summary>
@@ -79,9 +79,9 @@ namespace CDP4UpdateServerDal
         /// <param name="name"></param>
         /// <param name="version"></param>
         /// <returns>A <see cref="Stream"/></returns>
-        public async Task<Stream> DownloadPlugin(string name, Version version)
+        public async Task<Stream> DownloadPlugin(string name, string version)
         {
-            return await this.QueryStream<PluginDto>(HttpVerbs.Get, $"{name}/{version}");
+            return await this.QueryStream<PluginDto>(HttpVerbs.Get, $"{name}/{version}/download");
         }
 
         /// <summary>
@@ -147,15 +147,15 @@ namespace CDP4UpdateServerDal
         /// <param name="manifests">A <see cref="List{T}"/> of the currently installed plugin </param>
         /// <param name="version">The Current IME <see cref="Version"/></param>
         /// <param name="processorArchitecture">The current <see cref="ProcessorArchitecture"/> target of the currently installed IME</param>
-        /// <returns></returns>
-        public async Task<Dictionary<string, string>> CheckForUpdate(List<Manifest> manifests, Version version, ProcessorArchitecture processorArchitecture)
+        /// <returns>A <see cref="IEnumerable{T}"/> of type <code>(string ThingName, string Version)</code> containing new versions</returns>
+        public async Task<IEnumerable<(string ThingName, string Version)>> CheckForUpdate(List<Manifest> manifests, Version version, ProcessorArchitecture processorArchitecture)
         {
-            var result = new Dictionary<string, string>();
+            var result = new List<(string ThingName, string Version)>();
             var newImeVersion = await this.CompareImeVersions(version, processorArchitecture);
-
+            
             if (newImeVersion != null)
             {
-                result[ImeKey] = newImeVersion;
+                result.Add((ImeKey, newImeVersion));
             }
 
             result.AddRange(await this.ComparePluginsVersions(version, manifests));
@@ -175,17 +175,17 @@ namespace CDP4UpdateServerDal
             var latestVersion = new Version(versionSplittedUp[0]);
             return latestVersion > version ? latest.VersionNumber : null;
         }
-            
-        /// <summary>
-        /// Compares installed Plugins versions with the latest one found online
-        /// </summary>
-        /// <param name="imeVersion">The Current IME <see cref="Version"/></param>
-        /// <param name="manifests">A <see cref="List{T}"/> of the currently installed plugin </param>
-        /// <returns>A <see cref="Dictionary{TKey,TValue}"/> containing new versions</returns>
-        private async Task<Dictionary<string, string>> ComparePluginsVersions(Version imeVersion, List<Manifest> manifests)
+
+    /// <summary>
+    /// Compares installed Plugins versions with the latest one found online
+    /// </summary>
+    /// <param name="imeVersion">The Current IME <see cref="Version"/></param>
+    /// <param name="manifests">A <see cref="List{T}"/> of the currently installed plugin </param>
+    /// <returns>A <see cref="IEnumerable{T}"/> of type <code>(string ThingName, string Version)</code> containing new versions</returns>
+    private async Task<IEnumerable<(string ThingName, string Version)>> ComparePluginsVersions(Version imeVersion, List<Manifest> manifests)
         {
             var latest = (await this.GetLatestPlugin(manifests, imeVersion)).ToList();
-            var result = new Dictionary<string, string>();
+            var result = new List<(string ThingName, string Version)>();
 
             foreach (var manifest in manifests)
             {
@@ -200,7 +200,7 @@ namespace CDP4UpdateServerDal
 
                 if (new Version(manifest.Version) < newVersion)
                 {
-                    result[manifest.Name] = latestVersionFound;
+                    result.Add((manifest.Name, latestVersionFound));
                 }
             }
 

@@ -138,7 +138,7 @@ namespace CDP4Composition.Modularity
         /// Compute and return the <see cref="DirectoryInfo"/> of the temporary folder of the specified plugin
         /// </summary>
         /// <param name="pluginName">the name of the plugin</param>
-        /// <returns>a <see cref="DirectoryInfo"/></returns>
+        /// <returns>A <see cref="DirectoryInfo"/></returns>
         public static DirectoryInfo GetTempDirectoryInfo(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName))
@@ -159,24 +159,33 @@ namespace CDP4Composition.Modularity
         }
 
         /// <summary>
+        /// Compute and return the <see cref="DirectoryInfo"/> of the download folder
+        /// </summary>
+        /// <returns>A <see cref="DirectoryInfo"/></returns>
+        public static DirectoryInfo GetDownloadDirectory(string pluginName = null)
+        {
+            var downloadPath = new DirectoryInfo(Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, PluginDirectoryName, string.IsNullOrWhiteSpace(pluginName) ? string.Empty : pluginName));
+
+            if (!downloadPath.Exists)
+            {
+                downloadPath.Create();
+            }
+
+            return downloadPath;
+        }
+
+        /// <summary>
         /// Retrieve all plugin that can be installed
         /// </summary>
         /// <returns>Returns a <see cref="IEnumerable{T}"/> of type <code>(FileInfo cdp4ckFile, Manifest manifest)</code> of the updatable plugins</returns>
         public static IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> GetDownloadedInstallablePluginUpdate()
         {
-            var downloadPath = Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, PluginDirectoryName);
-
             var updatablePlugins = new List<(FileInfo cdp4ckFile, Manifest manifest)>();
 
-            if (!Directory.Exists(path: downloadPath))
-            {
-                return updatablePlugins;
-            }
-            
             var currentPlateformVersion = GetVersion();
 
             // Loop through all existing download plugin folders
-            foreach (var downloadedPluginFolder in Directory.EnumerateDirectories(path: downloadPath).Select(selector: d => new DirectoryInfo(path: d)))
+            foreach (var downloadedPluginFolder in GetDownloadDirectory().EnumerateDirectories())
             {
                 if (GetPlugin(currentPlateformVersion, downloadedPluginFolder) is { manifest: { }, cdp4ckFile: { } } plugin)
                 {

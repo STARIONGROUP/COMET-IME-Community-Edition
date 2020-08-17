@@ -28,16 +28,11 @@ namespace CDP4IME
     using System;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Reflection;
-    using System.Threading.Tasks;
 
     using CDP4Composition.Events;
     using CDP4Composition.Log;
-    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.AppSettingService;
-    using CDP4Composition.Utilities;
-    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -53,9 +48,6 @@ namespace CDP4IME
     using ReactiveUI;
     
     using CDP4IME.ViewModels;
-    using CDP4IME.Views;
-
-    using CDP4UpdateServerDal;
 
     /// <summary>
     /// The View Model of the <see cref="Shell"/>
@@ -210,19 +202,18 @@ namespace CDP4IME
                     this.LoadingMessage = x.Message;
                 });
 
-            this.CheckApiCommand = ReactiveCommand.Create();
-            this.CheckApiCommand.Subscribe(_ => this.ExecuteCheckApiCommand());
+            this.CheckForUpdateCommand = ReactiveCommand.Create();
+            this.CheckForUpdateCommand.Subscribe(_ => this.ExecuteCheckForUpdateCommand());
 
             logger.Info("Welcome in the CDP4 Application");
         }
         
         /// <summary>
-        /// Executes the <see cref="CheckApiCommand"/>
+        /// Executes the <see cref="CheckForUpdateCommand"/>
         /// </summary>
-        private void ExecuteCheckApiCommand()
+        private void ExecuteCheckForUpdateCommand()
         {
-            //this.dialogNavigationService.NavigateModal(nameof(UpdateDownloaderInstaller));
-            new UpdateDownloaderInstaller(true) { DataContext = new UpdateDownloaderInstallerViewModel() }.ShowDialog();
+            this.dialogNavigationService.NavigateModal(new UpdateDownloaderInstallerViewModel(true));
         }
 
         /// <summary>
@@ -292,7 +283,7 @@ namespace CDP4IME
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to verify last versions on the update server
         /// </summary>
-        public ReactiveCommand<object> CheckApiCommand { get; private set; }
+        public ReactiveCommand<object> CheckForUpdateCommand { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="SessionViewModel"/>s that represent the currently loaded <see cref="Session"/>s

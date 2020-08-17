@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:CDP4IME.Views"
         xmlns:behaviors="clr-namespace:CDP4IME.Behaviors"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
         mc:Ignorable="d"
         Title="CDP4-Update" Height="600" Width="600" ResizeMode="NoResize" BorderThickness="0" Background="White">
@@ -14,7 +15,7 @@
         <converters:BooleanToGridUnitConverter x:Key="BooleanToGridUnitConverter"></converters:BooleanToGridUnitConverter>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></converters:BooleanToVisibilityConverter>
         <converters:DoubleToVisibilityConverter x:Key="DoubleToVisibilityConverter"></converters:DoubleToVisibilityConverter>
-        <dxmvvm:NumericToVisibilityConverter x:Key="NumericToVisibilityConverter"></dxmvvm:NumericToVisibilityConverter>
+        <converters:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter"></converters:IntegerToVisibilityConverter>
     </Window.Resources>
     <dxmvvm:Interaction.Behaviors>
         <behaviors:PluginInstallerBehavior></behaviors:PluginInstallerBehavior>
@@ -33,13 +34,13 @@
                 <ColumnDefinition Width="222*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Image VerticalAlignment="Center" Height="48" HorizontalAlignment="Center" Source="../Resources/cdplogo3d_48x48.png" Width="48"/>
-            <Label Grid.Row="0" VerticalContentAlignment="Bottom"  FontSize="30" HorizontalAlignment="Left" Content="{Binding WindowTitle}" Grid.Column="1"/>
-            <Button BorderThickness="0" Grid.Column="2" x:Name="SelectAllUpdateCheckBox" Command="{Binding SelectAllUpdateCheckBoxCommand}" Margin="0,22,10,10" HorizontalAlignment="Right" Width="131">
+            <Label Grid.Row="0" VerticalContentAlignment="Bottom"  FontSize="30" HorizontalAlignment="Left" Content="Updates" Grid.Column="1"/>
+            <Button IsEnabled="{Binding Path=IsInstallationOrDownloadInProgress, Converter={StaticResource BooleanNegationConverter}}"  BorderThickness="0" Grid.Column="2" x:Name="SelectAllUpdateCheckBox" Command="{Binding SelectAllUpdateCheckBoxCommand}" Margin="0,44,10,10" HorizontalAlignment="Right" Width="131">
                 Select/Deselect all
             </Button>
         </Grid>
         <Grid Grid.Row="1">
-            <ListView BorderBrush="Transparent" Visibility="{Binding IsInDownloadMode, Converter={StaticResource BooleanToVisibilityConverter}}" ScrollViewer.VerticalScrollBarVisibility="Disabled" IsEnabled="{Binding Path=IsInstallationOrDownloadInProgress, Converter={StaticResource BooleanNegationConverter}}" HorizontalContentAlignment="Stretch" x:Name="AvailableImeContainer" SelectionMode="Single" ItemsSource="{Binding AvailableIme}">
+            <ListView BorderThickness="0" Visibility="{Binding IsInDownloadMode, Converter={StaticResource BooleanToVisibilityConverter}}" ScrollViewer.VerticalScrollBarVisibility="Disabled" IsEnabled="{Binding Path=IsInstallationOrDownloadInProgress, Converter={StaticResource BooleanNegationConverter}}" HorizontalContentAlignment="Stretch" x:Name="AvailableImeContainer" SelectionMode="Single" ItemsSource="{Binding AvailableIme}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
@@ -51,11 +52,11 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F6B944" FontSize="18" Text="No Ime Version To Display" Visibility="{Binding AvailableIme.Count, Converter={StaticResource NumericToVisibilityConverter}, ConverterParameter=True}"/>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F6B944" FontSize="18" Text="No Ime Version To Display" Visibility="{Binding AvailableIme.Count, Converter={StaticResource IntegerToVisibilityConverter}, ConverterParameter=Invert}"/>
         </Grid>
 
         <Grid Grid.Row="2">
-            <ListView BorderBrush="Transparent" IsEnabled="{Binding Path=IsInstallationOrDownloadInProgress, Converter={StaticResource BooleanNegationConverter}}" HorizontalContentAlignment="Stretch" x:Name="AvailablePluginsContainer" SelectionMode="Multiple" ItemsSource="{Binding AvailablePlugins}">
+            <ListView BorderThickness="0" IsEnabled="{Binding Path=IsInstallationOrDownloadInProgress, Converter={StaticResource BooleanNegationConverter}}" HorizontalContentAlignment="Stretch" x:Name="AvailablePluginsContainer" SelectionMode="Multiple" ItemsSource="{Binding AvailablePlugins}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
@@ -63,35 +64,11 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Grid HorizontalAlignment="Stretch">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="4*"></RowDefinition>
-                                <RowDefinition Height="3*"></RowDefinition>
-                                <RowDefinition Height="3*"></RowDefinition>
-                                <RowDefinition Height="3*"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="8*"></ColumnDefinition>
-                                <ColumnDefinition Width="2*"></ColumnDefinition>
-                                <ColumnDefinition Width="0.5*"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
-                                <Label Content="{Binding Name}" VerticalContentAlignment="Bottom" FontSize="20" HorizontalAlignment="Left"></Label>
-                                <Label Content="{Binding Version}" Margin="10,0,0,0" VerticalContentAlignment="Bottom" FontSize="14" HorizontalAlignment="Right"></Label>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
-                                <Label VerticalAlignment="Center" Content="{Binding Author}" HorizontalAlignment="Right"></Label>
-                            </StackPanel>
-                            <Label Content="{Binding Description}" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left"></Label>
-                            <Label Content="{Binding ReleaseNote}" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left"></Label>
-                            <ProgressBar Minimum="0" Maximum="100" Height="25" Visibility="{Binding Progress, Converter={StaticResource DoubleToVisibilityConverter}}" Grid.Column="0" Value="{Binding InstallationProgress}" Grid.ColumnSpan="2" Margin="5" Grid.Row="3"></ProgressBar>
-                            <CheckBox Grid.Column="2" Grid.RowSpan="4" Margin="5" Grid.Row="0" VerticalContentAlignment="Center" IsChecked="{Binding IsSelected}"></CheckBox>
-                        </Grid>
+                        <local:PluginRow/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Label HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F6B944" FontSize="18" Content="No Plugins To Display"  Visibility="{Binding AvailablePlugins.Count, Converter={StaticResource NumericToVisibilityConverter}, ConverterParameter=True}"/>
+            <Label HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F6B944" FontSize="18" Content="No Plugins To Display"  Visibility="{Binding AvailablePlugins.Count, Converter={StaticResource IntegerToVisibilityConverter}, ConverterParameter=Invert}"/>
         </Grid>
 
         <Grid Grid.Row="3">
@@ -105,14 +82,37 @@
             </Grid.ColumnDefinitions>
             <ProgressBar Visibility="{Binding IsCheckingApi, Converter={StaticResource BooleanToVisibilityConverter}}" Foreground="#F6B944" Height="48" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True"/>
             <Label Visibility="{Binding IsCheckingApi, Converter={StaticResource BooleanToVisibilityConverter}}" Grid.Row="1" Grid.Column="0" Content="Loading in progress" HorizontalAlignment="Center" VerticalAlignment="Center" Height="24" Width="105"/>
-        
 
-            <StackPanel Grid.Column="1" Grid.RowSpan="2" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
-
-                <Button Margin="5" VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding CancelCommand}" Background="White" Content="Cancel" Foreground="Black" Width="100" Height="40" ></Button>
-                <Button Margin="5" Visibility="{Binding IsInDownloadMode, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"  VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding InstallCommand}" Background="White" Content="Install" Foreground="Black" Width="100" Height="40" ></Button>
-                <Button Margin="5" Visibility="{Binding IsInDownloadMode, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding DownloadCommand}" Background="White" Content="Download" Foreground="Black" Width="100" Height="40" ></Button>
-            </StackPanel>
+            <Grid Grid.RowSpan="2" Grid.Row="0" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5*"></RowDefinition>
+                    <RowDefinition Height="9*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"></ColumnDefinition>
+                    <ColumnDefinition Width="3*"></ColumnDefinition>
+                    <ColumnDefinition Width="3*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <CheckBox Visibility="{Binding IsInDownloadMode, Converter={StaticResource BooleanToVisibilityConverter}}" Command="{Binding RestartAfterDownloadCommand}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" FlowDirection="RightToLeft" Margin="0,0,6.4,0.2">
+                    <TextBlock FlowDirection="LeftToRight" Text="Restart after download to install"/>
+                </CheckBox>
+                <Button Grid.Row="1" Grid.Column="0" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding CancelCommand}" Background="White" Content="Cancel" Foreground="Black" Width="100" Height="37" ></Button>
+                <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,0,5,0" Visibility="{Binding IsInDownloadMode, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"  VerticalAlignment="Center" HorizontalAlignment="Stretch" Command="{Binding InstallCommand}" Background="White" Content="Install" Foreground="Black" Height="37" ></Button>
+                <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,0,5,0" Visibility="{Binding IsInDownloadMode, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Command="{Binding DownloadCommand}" Content="{Binding DownloadButtonText}" Foreground="Black" Height="37" >
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasToRestartClientAfterDownload}" Value="True">
+                                    <Setter Property="dx:ThemeManager.ThemeName" Value="DeepBlue" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding HasToRestartClientAfterDownload}" Value="False">
+                                    <Setter Property="dx:ThemeManager.ThemeName" Value="Seven" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

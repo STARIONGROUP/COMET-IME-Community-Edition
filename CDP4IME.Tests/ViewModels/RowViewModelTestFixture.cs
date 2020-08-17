@@ -106,7 +106,7 @@ namespace CDP4IME.Tests.ViewModels
             this.SetupTestContentForCancellationPurpose(this.PluginFileSystem.TemporaryPath.FullName);
 
             var viewModel = new PluginRowViewModel(this.Plugin, this.PluginFileSystem);
-            viewModel.HandlingCancelation();
+            viewModel.HandlingCancelationOfInstallation();
 
             this.AssertCreatedTestFileHasBeenRestored();
         }

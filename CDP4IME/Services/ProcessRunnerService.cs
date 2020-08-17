@@ -25,13 +25,16 @@
 
 namespace CDP4IME.Services
 {
+    using System.ComponentModel.Composition;
     using System.Diagnostics;
     using System.IO;
+    using System.Windows;
 
     /// <summary>
-    /// The <see cref="CommandRunnerService"/> provides methods that allows invoking commands on conhost
+    /// The <see cref="ProcessRunnerService"/> provides methods that allows invoking commands on conhost
     /// </summary>
-    public class CommandRunnerService : ICommandRunnerService
+    [Export(typeof(IProcessRunnerService))]
+    public class ProcessRunnerService : IProcessRunnerService
     {
         /// <summary>
         /// Runs the provided <see cref="executable"/> with elevated rights
@@ -51,6 +54,15 @@ namespace CDP4IME.Services
             };
 
             process.Start();
+        }
+        
+        /// <summary>
+        /// Gracefully restart the IME
+        /// </summary>
+        public void Restart()
+        {
+            Process.Start(Application.ResourceAssembly.Location);
+            Application.Current.Shutdown();
         }
     }
 }

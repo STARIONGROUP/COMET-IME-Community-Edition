@@ -46,7 +46,7 @@ namespace CDP4Composition.Converters
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            var unit = parameter is int intParameter && intParameter > 0 ? intParameter : 1;
+            var unit = int.TryParse((string)parameter, out var intParameter) && intParameter > 0 ? intParameter : 1;
             return value != null && ((bool)value) ? new GridLength(unit, GridUnitType.Star) : new GridLength(0);
         }
     

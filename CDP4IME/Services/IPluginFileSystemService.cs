@@ -68,5 +68,44 @@ namespace CDP4IME.Services
         /// Restores the old version
         /// </summary>
         void Restore();
+
+        /// <summary>
+        /// Create a cdp4ck file to put the downloaded plugin into
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin</param>
+        /// <returns>A <see cref="FileStream"/></returns>
+        FileStream CreateCdp4Ck(string pluginName);
+
+        /// <summary>
+        /// Creates the msi file to put the download IME installer into
+        /// </summary>
+        /// <param name="installerName">the name of the msi file</param>
+        FileStream CreateImeMsi(string installerName);
+        
+        /// <summary>
+        /// Compute and return the Download path of the download Cdp4Ck File
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin</param>
+        /// <returns>The path as a string</returns>
+        FileInfo GetDownloadedCdp4Ck(string pluginName);
+
+        /// <summary>
+        /// Compute and return the Download path of the download IME MSI File
+        /// </summary>
+        /// <param name="installerName">The name of the installer</param>
+        /// <returns>The path as a string</returns>
+        FileInfo GetDownloadedImeMsi(string installerName);
+
+        /// <summary>
+        /// Occurs when the download has been interupted
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin</param>
+        void CleanupDownloadedPlugin(string pluginName);
+
+        /// <summary>
+        /// Occurs when the download has been interupted
+        /// </summary>
+        /// <param name="installerName">The name of the msi</param>
+        void CleanupDownloadedMsi(string installerName);
     }
 }

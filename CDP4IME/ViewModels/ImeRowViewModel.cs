@@ -25,14 +25,20 @@
 namespace CDP4IME.ViewModels
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
+    using System.Reflection;
+    using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
+    using CDP4Composition.Utilities;
 
     using CDP4IME.Services;
     using CDP4IME.Views;
+
+    using CDP4UpdateServerDal;
+    using CDP4UpdateServerDal.Enumerators;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using NLog;
 
@@ -63,61 +69,33 @@ namespace CDP4IME.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the property <see cref="Version"/>
+        /// Backing field for the property <see cref="VersionToDisplay"/>
         /// </summary>
-        private string version;
+        private string versionToDisplay;
 
         /// <summary>
-        /// Gets or Sets the <see cref="version"/> of the represented plugin
+        /// Gets or Sets the <see cref="versionToDisplay"/> of the represented plugin
         /// </summary>
-        public string Version
+        public string VersionToDisplay
         {
-            get => this.version;
-            set => this.RaiseAndSetIfChanged(ref this.version, value);
+            get => this.versionToDisplay;
+            set => this.RaiseAndSetIfChanged(ref this.versionToDisplay, value);
         }
+        
+        /// <summary>
+        /// Backing field for the property <see cref="Platform"/>
+        /// </summary>
+        private Platform platform;
 
         /// <summary>
-        /// Backing field for the property <see cref="Description"/>
+        /// Gets or Sets the <see cref="platform"/> of the represented plugin
         /// </summary>
-        private string description;
-
-        /// <summary>
-        /// Gets or Sets the <see cref="description"/> of the represented plugin
-        /// </summary>
-        public string Description
+        public Platform Platform
         {
-            get => this.description;
-            set => this.RaiseAndSetIfChanged(ref this.description, value);
+            get => this.platform;
+            set => this.RaiseAndSetIfChanged(ref this.platform, value);
         }
-
-        /// <summary>
-        /// Backing field for the property <see cref="Author"/>
-        /// </summary>
-        private string author;
-
-        /// <summary>
-        /// Gets or Sets the <see cref="author"/> of the represented plugin
-        /// </summary>
-        public string Author
-        {
-            get => this.author;
-            set => this.RaiseAndSetIfChanged(ref this.author, value);
-        }
-
-        /// <summary>
-        /// Backing field for the property <see cref="ReleaseNote"/>
-        /// </summary>
-        private string releaseNote;
-
-        /// <summary>
-        /// Gets or Sets the <see cref="author"/> of the represented plugin
-        /// </summary>
-        public string ReleaseNote
-        {
-            get => this.releaseNote;
-            set => this.RaiseAndSetIfChanged(ref this.releaseNote, value);
-        }
-
+        
         /// <summary>
         /// Backing field for the property <see cref="Progress"/>
         /// </summary>
@@ -152,6 +130,11 @@ namespace CDP4IME.ViewModels
         public IPluginFileSystemService FileSystem { get; set; }
 
         /// <summary>
+        /// Holds the version as is to be sent to the update server
+        /// </summary>
+        private string version;
+
+        /// <summary>
         /// Gets the plugin download path and the new manifest
         /// </summary>
         public (FileInfo cdp4ckFile, Manifest manifest) Plugin { get; private set; }
@@ -159,18 +142,11 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ImeRowViewModel"/> class
         /// </summary>
-        /// <param name="plugin">The represented plugin</param>
-        /// <param name="pluginFileSystemService">The file system to operate on</param>
-        public ImeRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin, IPluginFileSystemService pluginFileSystemService = null)
-        {
-            this.Plugin = plugin;
-            this.FileSystem = pluginFileSystemService ?? new PluginFileSystemService(plugin);
-            this.UpdateProperties();
-        }
-
+        /// <param name="version">The represented version</param>
         public ImeRowViewModel(string version)
         {
-            this.Version = version;
+            this.version = version;
+            this.UpdateProperties();
         }
 
         /// <summary>
@@ -178,28 +154,35 @@ namespace CDP4IME.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.Name = this.Plugin.manifest.Name;
-            this.Description = this.Plugin.manifest.Description;
-            this.Version = $"version {this.Plugin.manifest.Version}";
-            this.Author = this.Plugin.manifest.Author;
-            this.ReleaseNote = this.Plugin.manifest.ReleaseNote;
+            this.Platform = ServiceLocator.Current.GetInstance<IAssemblyInformationService>().GetProcessorArchitecture() == ProcessorArchitecture.Amd64 ? Platform.X64 : Platform.X86;
+            this.Name = $"CDP4IME-CE";
+            this.VersionToDisplay = $"{this.Platform.ToString().ToLower()}-{this.version}";
+            this.FileSystem = ServiceLocator.Current.GetInstance<IPluginFileSystemService>();
         }
 
         /// <summary>
-        /// Make the installation of the new Plugin
+        /// Downloads this represented plugin
         /// </summary>
-        public void Install()
+        /// <param name="url">the base uri of the Update Server</param>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Download(Uri url)
         {
             try
             {
-                this.Progress += 33;
-                this.FileSystem.BackUpOldVersion();
+                this.Progress = 0;
+                var client = new UpdateServerClient(url);
 
-                this.Progress += 33;
-                this.FileSystem.InstallNewVersion();
+                using (var stream = await client.DownloadIme(this.version, this.Platform))
+                {
+                    this.Progress = 50;
+                    
+                    using (var fileStream = this.FileSystem.CreateImeMsi($"{this.Name}.{this.VersionToDisplay}.msi"))
+                    {
+                        stream.Seek(0, SeekOrigin.Begin);
+                        await stream.CopyToAsync(fileStream);
+                    }
+                }
 
-                this.Progress += 33;
-                this.FileSystem.CleanUp();
                 this.Progress = 100;
             }
             catch (Exception exception)
@@ -208,16 +191,16 @@ namespace CDP4IME.ViewModels
                 throw;
             }
         }
-
+        
         /// <summary>
-        /// Called when the install gets canceled
+        /// Called when the download process gets canceled
         /// </summary>
         public void HandlingCancelation()
         {
             try
             {
-                this.FileSystem.Restore();
-
+                this.Progress = -1;
+                this.FileSystem.CleanupDownloadedMsi(this.Name);
                 this.Progress = 0;
             }
             catch (Exception exception)

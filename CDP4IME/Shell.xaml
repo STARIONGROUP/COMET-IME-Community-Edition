@@ -282,8 +282,8 @@
                                            Hint="Plugin Manager"
                                            LargeGlyph="{dxc:DXImage Image=BOProductGroup_32x32.png}"
                                            RibbonStyle="Large" />
-                        <dxb:BarButtonItem Name="CheckApi"
-                                           Command="{Binding CheckApiCommand}"
+                        <dxb:BarButtonItem Name="CheckForUpdate"
+                                           Command="{Binding CheckForUpdateCommand}"
                                            Content="Check for Update"
                                            Description="Check for Update"
                                            Glyph="{dxc:DXImage 'Office2013/Actions/Refresh_16x16.png'}"

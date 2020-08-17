@@ -25,15 +25,22 @@
 
 namespace CDP4IME.Services
 {
+    using System.ComponentModel.Composition;
+
     /// <summary>
-    /// Definition of <see cref="CommandRunnerService"/> Abstracting invoking commands on conhost
+    /// Definition of <see cref="ProcessRunnerService"/> Abstracting invoking commands on conhost
     /// </summary>
-    public interface ICommandRunnerService
+    public interface IProcessRunnerService
     {
         /// <summary>
         /// Runs the provided <see cref="executable"/> with elevated rights
         /// </summary>
         /// <param name="executable">The executable command path</param>
         void RunAsAdmin(string executable);
+
+        /// <summary>
+        /// Gracefully restart the IME
+        /// </summary>
+        void Restart();
     }
 }

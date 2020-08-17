@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginInstallerViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -27,8 +27,10 @@ namespace CDP4IME.ViewModels
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Net.Http;
     using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -47,6 +49,8 @@ namespace CDP4IME.ViewModels
     using CDP4Composition.ViewModels;
 
     using CDP4IME.Behaviors;
+    using CDP4IME.Modularity;
+    using CDP4IME.Services;
     using CDP4IME.Settings;
     using CDP4IME.Views;
 
@@ -61,14 +65,24 @@ namespace CDP4IME.ViewModels
     /// <summary>
     /// The <see cref="UpdateDownloaderInstallerViewModel"/> is the view model of the <see cref="UpdateDownloaderInstallerViewModel"/> holding it properties its properties and interaction logic
     /// </summary>
-    //[DialogViewModelExport(nameof(UpdateDownloaderInstaller), "Plugin Installer")]
+    [DialogViewModelExport(nameof(UpdateDownloaderInstaller), "Plugin Installer")]
     public class UpdateDownloaderInstallerViewModel : ReactiveObject, IPluginInstallerViewModel, IDialogViewModel
     {
         /// <summary>
         /// Holds the base Update Server Address
         /// </summary>
         private const string ImeCommunityEditionUpdateServerBaseAddress = "https://store.cdp4.org";
+
+        /// <summary>
+        /// Holds the Download button text
+        /// </summary>
+        private const string DownloadText = "Download";
         
+        /// <summary>
+        /// Holds the doownload button text when restart option is cheked
+        /// </summary>
+        private const string DownloadAndRestartText = "Download and Restart";
+
         /// <summary>
         /// The NLog logger
         /// </summary>
@@ -95,15 +109,38 @@ namespace CDP4IME.ViewModels
         private bool isCheckingApi;
 
         /// <summary>
-        /// Backing field for the <see cref="WindowTitle"/> property
-        /// </summary>
-        private string windowTitle;
-
-        /// <summary>
         /// Backing field for <see cref="IsInDownloadMode"/> property
         /// </summary>
         private bool isInDownloadMode;
 
+        /// <summary>
+        /// Backing field for the <see cref="DownloadButtonText"/>
+        /// </summary>
+        private string downloadButtonText = DownloadText;
+
+        /// <summary>
+        /// Gets or sets the text of the Download button
+        /// </summary>
+        public string DownloadButtonText
+        {
+            get => this.downloadButtonText;
+            set => this.RaiseAndSetIfChanged(ref this.downloadButtonText, value);
+        }
+        
+        /// <summary>
+        /// Backing field for the <see cref="HasToRestartClientAfterDownload"/>
+        /// </summary>
+        private bool hasToRestartClientAfterDownload;
+
+        /// <summary>
+        /// Gets or sets an assert whether the IME should restart itself in order to run the installation right away
+        /// </summary>
+        public bool HasToRestartClientAfterDownload
+        {
+            get => this.hasToRestartClientAfterDownload;
+            set => this.RaiseAndSetIfChanged(ref this.hasToRestartClientAfterDownload, value);
+        }
+        
         /// <summary>
         /// Gets or Sets the <see cref="IDialogResult"/>
         /// </summary>
@@ -152,21 +189,12 @@ namespace CDP4IME.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets the title
-        /// </summary>
-        public string WindowTitle
-        {
-            get => this.windowTitle;
-            set => this.RaiseAndSetIfChanged(ref this.windowTitle, value);
-        }
-
-        /// <summary>
         /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 
         /// </summary>
         public CancellationTokenSource CancellationTokenSource { get; private set; }
 
         /// <summary>
-        /// Gets the Command that will cancel the update operation if any and close the view
+        /// Gets the Command that will cancel the operations close the view
         /// </summary>
         public ReactiveCommand<object> CancelCommand { get; private set; }
 
@@ -181,24 +209,24 @@ namespace CDP4IME.ViewModels
         public ReactiveCommand<object> DownloadCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Command that will check the API for available update
-        /// </summary>
-        public ReactiveCommand<object> CheckApiCommand { get; private set; }
-
-        /// <summary>
         /// Gets the Command to select/unselect all available updates
         /// </summary>
         public ReactiveCommand<object> SelectAllUpdateCheckBoxCommand { get; private set; }
+        
+        /// <summary>
+        /// Gets the Command to auto restart after selected things have done downloading
+        /// </summary>
+        public ReactiveCommand<object> RestartAfterDownloadCommand { get; private set; }
 
         /// <summary>
         /// Gets a <see cref="List{T}"/> of type <see cref="PluginRowViewModel"/> that holds the properties for <see cref="PluginRow"/>
         /// </summary>
-        public List<PluginRowViewModel> AvailablePlugins { get; } = new List<PluginRowViewModel>();
+        public ReactiveList<PluginRowViewModel> AvailablePlugins { get; } = new ReactiveList<PluginRowViewModel>();
 
         /// <summary>
         /// Gets a <see cref="List{T}"/> of type <see cref="ImeRowViewModel"/> that holds the properties for <see cref="ImeRow"/>
         /// </summary>
-        public List<ImeRowViewModel> AvailableIme { get; } = new List<ImeRowViewModel>();
+        public ReactiveList<ImeRowViewModel> AvailableIme { get; } = new ReactiveList<ImeRowViewModel>();
 
         /// <summary>
         /// Gets an <see cref="IEnumerable{T}"/> of type <code>(FileInfo cdp4ckFile, Manifest manifest)</code>
@@ -207,22 +235,36 @@ namespace CDP4IME.ViewModels
         public IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> UpdatablePlugins { get; private set; }
 
         /// <summary>
-        /// Gets an <see cref="Dictionary{T,T}"/> that holds the things that the user can choose to download.
+        /// Gets <see cref="IEnumerable{T}"/> of type <code>(string ThingName, string Version)</code> containing new versions
         /// </summary>
-        public Dictionary<string, string> DownloadableThings { get; private set; } = new Dictionary<string, string>();
+        public IEnumerable<(string ThingName, string Version)> DownloadableThings { get; private set; } = new List<(string ThingName, string Version)>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateDownloaderInstallerViewModel"/> class
         /// </summary>
-        //[ImportingConstructor]
+        [ImportingConstructor]
         public UpdateDownloaderInstallerViewModel()
+        {      
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateDownloaderInstallerViewModel"/> class
+        /// </summary>
+        public UpdateDownloaderInstallerViewModel(bool shouldCheckApi)
         {
             this.appSettingService = ServiceLocator.Current.GetInstance<IAppSettingsService<ImeAppSettings>>();
             this.isInDownloadMode = true;
-            this.WindowTitle = "Update Downloader";
             this.InitializeCommand();
             this.InitializeDownloadRelativeCommand();
-            Task.Run(async () => await this.CheckApiForUpdate()).ContinueWith(_ => this.UpdateDownloaderProperties());
+
+            if (shouldCheckApi)
+            {
+                this.CheckApiForUpdate();
+            }
+            
+            this.WhenAny(x => x.IsCheckingApi, v => !v.Value)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateDownloaderProperties());
         }
 
         /// <summary>
@@ -244,9 +286,8 @@ namespace CDP4IME.ViewModels
         {
             this.DownloadCommand = ReactiveCommand.Create(this.isInstallationOrDownloadInProgressObservable);
             this.DownloadCommand.Subscribe(async _ => await this.DownloadCommandExecute());
-
-            this.CheckApiCommand = ReactiveCommand.Create();
-            this.CheckApiCommand.Subscribe(async _ => await this.CheckApiForUpdate());
+            this.RestartAfterDownloadCommand = ReactiveCommand.Create();
+            this.RestartAfterDownloadCommand.Subscribe(_ => this.RestartAfterDownloadCommandExecute());
         }
 
         /// <summary>
@@ -255,6 +296,10 @@ namespace CDP4IME.ViewModels
         private void InitializeCommand()
         {
             this.isInstallationOrDownloadInProgressObservable = this.WhenAny(x => x.isInstallationOrDownloadInProgress, b => !b.Value);
+            this.SelectAllUpdateCheckBoxCommand = ReactiveCommand.Create(this.isInstallationOrDownloadInProgressObservable);
+            this.SelectAllUpdateCheckBoxCommand.Subscribe(_ => this.SelectDeselectAllPluginCommandExecute());
+            this.CancelCommand = ReactiveCommand.Create();
+            this.CancelCommand.Subscribe(_ => this.CancelCommandExecute());
         }
 
         /// <summary>
@@ -262,9 +307,6 @@ namespace CDP4IME.ViewModels
         /// </summary>
         private void InitializeInstallationRelativeCommand()
         {
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.CancelCommandExecute());
-            
             this.InstallCommand = ReactiveCommand.Create(this.isInstallationOrDownloadInProgressObservable);
 
             var currentDispatcher = Dispatcher.CurrentDispatcher;
@@ -278,9 +320,6 @@ namespace CDP4IME.ViewModels
                         currentDispatcher.InvokeAsync(this.Behavior.Close, DispatcherPriority.Background);
                     }
                 }));
-
-            this.SelectAllUpdateCheckBoxCommand = ReactiveCommand.Create(isInstallationOrDownloadInProgressObservable );
-            this.SelectAllUpdateCheckBoxCommand.Subscribe(_ => this.SelectDeselectAllPluginCommandExecute());
         }
 
         /// <summary>
@@ -299,7 +338,7 @@ namespace CDP4IME.ViewModels
                 }
 
                 this.CancellationTokenSource = new CancellationTokenSource();
-                this.CancellationTokenSource.Token.Register(async () => await this.CancelInstallationsCommandExecute());
+                this.CancellationTokenSource.Token.Register(async () => await this.CancelInstallationsExecute());
 
                 await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(plugin.Install, this.CancellationTokenSource.Token)).ToArray());
                 await Task.Delay(1000);
@@ -324,13 +363,72 @@ namespace CDP4IME.ViewModels
         /// Execute the Install command that will run the installation of the plugins
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
-        private async Task CancelInstallationsCommandExecute()
+        private async Task CancelInstallationsExecute()
         {
-            await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(plugin.HandlingCancelation)).ToArray());
+            await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(plugin.HandlingCancelationOfInstallation)).ToArray());
+        }
+        
+        /// <summary>
+        /// Execute the <see cref="DownloadCommand"/>
+        /// </summary>
+        /// <returns>A <see cref="Task"/></returns>
+        private async Task DownloadCommandExecute()
+        {
+            try
+            {
+                this.IsInstallationOrDownloadInProgress = true;
+
+                if (!this.AvailablePlugins.Any(p => p.IsSelected) && !this.AvailableIme.Any(i => i.IsSelected))
+                {
+                    return;
+                }
+
+                this.CancellationTokenSource = new CancellationTokenSource();
+                this.CancellationTokenSource.Token.Register(async () => await this.CancelDownloadsExecute());
+
+                await Task.WhenAll(
+                    Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(() => plugin.Download(this.GetUpdateServerBaseAddress()), this.CancellationTokenSource.Token)).ToArray()),
+                    Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => Task.Run(() => ime.Download(this.GetUpdateServerBaseAddress()), this.CancellationTokenSource.Token)).ToArray()));
+
+                await Task.Delay(1000);
+
+                this.AvailableIme.RemoveAll(this.AvailableIme.Where(i => i.IsSelected).ToList());
+                this.AvailablePlugins.RemoveAll(this.AvailablePlugins.Where(i => i.IsSelected).ToList());
+
+                if (this.HasToRestartClientAfterDownload)
+                {
+                    ServiceLocator.Current.GetInstance<IProcessRunnerService>().Restart();
+                }
+            }
+            catch (Exception exception)
+            {
+                if (!(exception is TaskCanceledException))
+                {
+                    this.CancellationTokenSource.Cancel();
+                }
+
+                this.logger.Error($"{exception} has occured while trying to download new plugin versions");
+            }
+            finally
+            {
+                this.IsInstallationOrDownloadInProgress = false;
+                this.CancellationTokenSource = null;
+            }
         }
 
         /// <summary>
-        /// Execute the <see cref="CheckApiCommand"/>
+        /// Execute the Install command that will run the installation of the plugins
+        /// </summary>
+        /// <returns>A <see cref="Task"/></returns>
+        private async Task CancelDownloadsExecute()
+        {
+            await Task.WhenAll(
+                Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(plugin.HandlingCancelationOfDownload)).ToArray()),
+                Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => Task.Run(ime.HandlingCancelation)).ToArray()));
+        }
+
+        /// <summary>
+        /// Checks the Update Server Api for updates
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         private async Task CheckApiForUpdate()
@@ -338,60 +436,69 @@ namespace CDP4IME.ViewModels
             this.IsCheckingApi = true;
             var serverAddress = this.GetUpdateServerBaseAddress();
             
-            if (Uri.TryCreate(serverAddress, UriKind.Absolute, out var url))
-            {
-                var assemblyInfo = ServiceLocator.Current.GetInstance<IAssemblyInformationService>();
+            var assemblyInfo = ServiceLocator.Current.GetInstance<IAssemblyInformationService>();
 
-                try
-                {
-                    var client = new UpdateServerClient(url);
-                    var availableUpdates = await client.CheckForUpdate(PluginUtilities.GetPluginManifests().ToList(), assemblyInfo.GetVersion(), assemblyInfo.GetProcessorArchitecture());
-                    await Task.Delay(10000);
-                    this.DownloadableThings = this.SortDownloadedThingsWithAlreadyDownloadedOnes(availableUpdates);
-                }
-                catch (Exception exception)
-                {
-                    this.logger.Debug($"An exception has occured: {exception}");
-                }
-            }
-            else
+            try
             {
-                //logger.Info($"The value {this.selectedUpdateServer} is not a valid URI");
+                var client = new UpdateServerClient(serverAddress);
+                var availableUpdates = await client.CheckForUpdate(PluginUtilities.GetPluginManifests().ToList(), assemblyInfo.GetVersion(), assemblyInfo.GetProcessorArchitecture());
+                this.DownloadableThings = this.SortDownloadedThingsWithAlreadyDownloadedOnes(availableUpdates.ToList());
             }
-
-            this.IsCheckingApi = false;
+            catch (HttpRequestException httpException)
+            {
+                ServiceLocator.Current.GetInstance<IDialogNavigationService>().NavigateModal(new OkDialogViewModel("Error", httpException.GetBaseException().Message));
+            }
+            catch (Exception exception)
+            {
+                this.logger.Debug($"An exception has occured: {exception}");
+            }
+            finally
+            {
+                this.IsCheckingApi = false;
+            }
         }
 
         /// <summary>
         /// Remove from the available updates the ones that have beeen downloaded already
         /// </summary>
         /// <param name="availableUpdates">The updates found on the Update Server</param>
-        /// <returns>A <see cref="Dictionary{TKey,TValue}"/></returns>
-        private Dictionary<string, string> SortDownloadedThingsWithAlreadyDownloadedOnes(Dictionary<string, string> availableUpdates)
+        /// <returns>A <see cref="IEnumerable{T}"/> of type <code>(string ThingName, string Version)</code> containing new versions</returns>
+        private IEnumerable<(string ThingName, string Version)> SortDownloadedThingsWithAlreadyDownloadedOnes(List<(string ThingName, string Version)> availableUpdates)
         {
             foreach (var (_, manifest) in PluginUtilities.GetDownloadedInstallablePluginUpdate())
             {
-                var update = availableUpdates.FirstOrDefault(u => u.Key == manifest.Name && u.Value == manifest.Version);
+                var (thingName, version) = availableUpdates.FirstOrDefault(u => u.ThingName == manifest.Name && u.Version == manifest.Version);
 
-                if (!string.IsNullOrWhiteSpace(update.Key) && availableUpdates.TryGetValue(update.Key, out _))
+                if (!string.IsNullOrWhiteSpace(thingName) && !string.IsNullOrWhiteSpace(version))
                 {
-                    availableUpdates.Remove(update.Key);
+                    availableUpdates.Remove((thingName, version));
                 }
             }
 
-            if (availableUpdates.TryGetValue(UpdateServerClient.ImeKey, out var newImeVersion))
+            var downloadableIme = availableUpdates.FirstOrDefault(v => v.ThingName == UpdateServerClient.ImeKey);
+            var downloadDirectory = UpdateInstaller.ImeDownloadDirectoryInfo;
+            var installers = downloadDirectory.Exists ? downloadDirectory.EnumerateFiles().ToArray() : null;
+
+            if (downloadableIme == default || installers?.Any() != true)
             {
-                if (true)
-                {
-                    
-                }
+                return availableUpdates;
+            }
+
+            var lastVersion = installers.OrderBy(f => f.Name).LastOrDefault();
+
+            if (lastVersion?.Name.Contains(downloadableIme.Version) == true)
+            {
+                availableUpdates.Remove(downloadableIme);
             }
 
             return availableUpdates;
-
         }
 
-        private string GetUpdateServerBaseAddress()
+        /// <summary>
+        /// Gets the Update Server base Address
+        /// </summary>
+        /// <returns>The address</returns>
+        private Uri GetUpdateServerBaseAddress()
         {
             if (!this.appSettingService.AppSettings.UpdateServerAddresses.Any())
             {
@@ -402,18 +509,9 @@ namespace CDP4IME.ViewModels
                 this.appSettingService.Save();
             }
 
-            return this.appSettingService.AppSettings.UpdateServerAddresses.Last();
+            return new Uri(this.appSettingService.AppSettings.UpdateServerAddresses.Last(), UriKind.Absolute);
         }
-
-        /// <summary>
-        /// Execute the <see cref="DownloadCommand"/>
-        /// </summary>
-        /// <returns>A <see cref="Task"/></returns>
-        private async Task DownloadCommandExecute()
-        {
-            
-        }
-
+        
         /// <summary>
         /// Execute the SelectDeselectAllPluginCommand selecting or deselecting all plugin row
         /// </summary>
@@ -421,10 +519,24 @@ namespace CDP4IME.ViewModels
         {
             var shouldAllBeSelected = !this.AvailablePlugins.All(p => p.IsSelected);
             
-            foreach (var plugin in this.AvailablePlugins)
+            foreach (var pluginRow in this.AvailablePlugins)
             {
-                plugin.IsSelected = shouldAllBeSelected;
+                pluginRow.IsSelected = shouldAllBeSelected;
             }
+
+            foreach (var imeRow in this.AvailableIme)
+            {
+                imeRow.IsSelected = shouldAllBeSelected;
+            }
+        }
+
+        /// <summary>
+        /// Executes the <see cref="RestartAfterDownloadCommand"/>
+        /// </summary>
+        private void RestartAfterDownloadCommandExecute()
+        {
+            this.HasToRestartClientAfterDownload = !this.hasToRestartClientAfterDownload;
+            this.DownloadButtonText = this.hasToRestartClientAfterDownload ? DownloadAndRestartText : DownloadText;
         }
 
         /// <summary>
@@ -441,8 +553,6 @@ namespace CDP4IME.ViewModels
         /// </summary>
         private void UpdateInstallerProperties()
         {
-            this.WindowTitle = "Update Installer";
-
             foreach (var plugin in this.UpdatablePlugins)
             {
                 var pluginRow = new PluginRowViewModel(plugin);
@@ -457,15 +567,17 @@ namespace CDP4IME.ViewModels
         {
             if (this.DownloadableThings.Any())
             {
-                foreach (var pluginRow in this.DownloadableThings.Select(thing => new PluginRowViewModel(thing)))
+                foreach (var thing in this.DownloadableThings)
                 {
-                    this.AvailablePlugins.Add(pluginRow);
+                    if (thing.ThingName == UpdateServerClient.ImeKey)
+                    {
+                        this.AvailableIme.Add(new ImeRowViewModel(thing.Version));
+                    }
+                    else
+                    {
+                        this.AvailablePlugins.Add(new PluginRowViewModel(thing));
+                    }
                 }
-            }
-            else
-            {
-                ServiceLocator.Current.GetInstance<IDialogNavigationService>().NavigateModal(new OkDialogViewModel("Congratulations", "You are up to date"));
-                this.Behavior?.Close();
             }
         }
 
@@ -477,6 +589,8 @@ namespace CDP4IME.ViewModels
             this.DownloadCommand?.Dispose();
             this.InstallCommand?.Dispose();
             this.CancelCommand?.Dispose();
+            this.RestartAfterDownloadCommand?.Dispose();
+            this.SelectAllUpdateCheckBoxCommand?.Dispose();
         }
     }
 }

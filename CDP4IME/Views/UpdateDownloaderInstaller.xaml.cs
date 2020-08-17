@@ -32,7 +32,7 @@ namespace CDP4IME.Views
     /// <summary>
     /// Interaction logic for PluginInstaller.xaml
     /// </summary>
-    //[DialogViewExport(nameof(UpdateDownloaderInstaller), "Update Downloader and Installer")] 
+    [DialogViewExport(nameof(UpdateDownloaderInstaller), "Update Downloader and Installer")] 
     public partial class UpdateDownloaderInstaller : Window, IDialogView
     {
         /// <summary>

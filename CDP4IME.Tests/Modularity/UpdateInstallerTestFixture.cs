@@ -46,7 +46,7 @@ namespace CDP4IME.Tests.Modularity
     public class UpdateInstallerTestFixture
     {
         private Mock<IViewInvokerService> viewInvoker;
-        private Mock<ICommandRunnerService> commandRunner;
+        private Mock<IProcessRunnerService> commandRunner;
         private string installerFile;
         private string downloadPath;
         private string imeDownloadTestPath;
@@ -56,11 +56,11 @@ namespace CDP4IME.Tests.Modularity
         {
             this.imeDownloadTestPath = Path.Combine(Path.GetTempPath(), "UpdateInstaller", "ImeDownload", Guid.NewGuid().ToString());
             
-            this.commandRunner = new Mock<ICommandRunnerService>();
+            this.commandRunner = new Mock<IProcessRunnerService>();
             this.commandRunner.Setup(x => x.RunAsAdmin(It.IsAny<string>()));
 
             this.viewInvoker = new Mock<IViewInvokerService>();
-            this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<PluginInstaller>()));
+            this.viewInvoker.Setup(x => x.ShowDialog(It.IsAny<UpdateDownloaderInstaller>()));
 
             this.viewInvoker.Setup(x => x.ShowMessageBox(
                 It.IsAny<string>(), It.IsAny<string>(), MessageBoxButton.YesNo, MessageBoxImage.Information)).Returns(MessageBoxResult.No);
@@ -91,7 +91,7 @@ namespace CDP4IME.Tests.Modularity
         public void VerifyCheckInstallAndVerifyIfTheImeShallShutdown()
         {
             Assert.IsFalse(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object));
-            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Never);
+            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<UpdateDownloaderInstaller>()), Times.Never);
             
             var dataPath = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ViewModels", "PluginMockData"));
 
@@ -108,7 +108,7 @@ namespace CDP4IME.Tests.Modularity
             }
 
             UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object);
-            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<PluginInstaller>()), Times.Once);
+            this.viewInvoker.Verify(x => x.ShowDialog(It.IsAny<UpdateDownloaderInstaller>()), Times.Once);
         }
 
         [Test]

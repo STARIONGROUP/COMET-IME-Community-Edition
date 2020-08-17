@@ -105,8 +105,8 @@ namespace CDP4IME.Tests.ViewModels
             this.viewModel.Behavior = this.behavior.Object;
 
             this.viewModel.IsInstallationOrDownloadInProgress = true;
-            Assert.IsTrue(this.viewModel.CancelCommand.CanExecute(null));
-            await this.viewModel.CancelCommand.ExecuteAsyncTask(null);
+            Assert.IsTrue(this.viewModel.CancelInstallationsCommand.CanExecute(null));
+            await this.viewModel.CancelInstallationsCommand.ExecuteAsyncTask(null);
             this.behavior.Verify(x => x.Close(), Times.Once);
             this.viewModel.IsInstallationOrDownloadInProgress = false;
         }
@@ -166,7 +166,7 @@ namespace CDP4IME.Tests.ViewModels
                 Task.Run(() =>
                 {
                     Task.Delay(1);
-                    return this.viewModel.CancelCommand.ExecuteAsyncTask(null);
+                    return this.viewModel.CancelInstallationsCommand.ExecuteAsyncTask(null);
                 }));
 
             this.AssertCreatedTestFileHasBeenRestored();

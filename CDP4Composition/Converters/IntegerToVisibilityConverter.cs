@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DoubleToVisibilityConverter.cs" company="RHEA System S.A.">
+// <copyright file="IntegerToVisibilityConverter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -33,16 +33,16 @@ namespace CDP4Composition.Converters
     /// <summary>
     /// Converts Double to <see cref="Visibility"/>. x == 0 == <see cref="Visibility.Collapsed"/>, x > 0 == <see cref="Visibility.Visible"/>.
     /// </summary>
-    public class DoubleToVisibilityConverter : IValueConverter
+    public class IntegerToVisibilityConverter : IValueConverter
     {
         /// <summary>
-        /// Convert a double to <see cref="Visibility.Visible"/>.
+        /// Convert a int to <see cref="Visibility.Visible"/>.
         /// </summary>
         /// <param name="value">The incoming type.</param>
         /// <param name="targetType">The target type.</param>
         /// <param name="parameter">The converter parameter.</param>
         /// <param name="culture">The supplied culture</param>
-        /// <returns><see cref="Visibility.Visible"/> if the value is greater than 0.</returns>
+        /// <returns><see cref="Visibility.Visible"/> if the value is  is greater than 0.</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
@@ -50,7 +50,7 @@ namespace CDP4Composition.Converters
                 return Visibility.Collapsed;
             }
             
-            var result = (double)value > 0 ? Visibility.Visible : Visibility.Collapsed;
+            var result = (int)value > 0 ? Visibility.Visible : Visibility.Collapsed;
 
             if (parameter is string stringParamater && stringParamater == "Invert")
             {
