@@ -69,11 +69,6 @@ namespace CDP4IME.ViewModels
     public class UpdateDownloaderInstallerViewModel : ReactiveObject, IPluginInstallerViewModel, IDialogViewModel
     {
         /// <summary>
-        /// Holds the base Update Server Address
-        /// </summary>
-        private const string ImeCommunityEditionUpdateServerBaseAddress = "https://store.cdp4.org";
-
-        /// <summary>
         /// Holds the Download button text
         /// </summary>
         private const string DownloadText = "Download";
@@ -168,7 +163,7 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// The attached Behavior
         /// </summary>
-        public IPluginInstallerBehavior Behavior { get; set; }
+        public IUpdateDownloaderInstallerBehavior Behavior { get; set; }
 
         /// <summary>
         /// Gets or sets an assert whether this is checking API 
@@ -238,6 +233,19 @@ namespace CDP4IME.ViewModels
         /// Gets <see cref="IEnumerable{T}"/> of type <code>(string ThingName, string Version)</code> containing new versions
         /// </summary>
         public IEnumerable<(string ThingName, string Version)> DownloadableThings { get; private set; } = new List<(string ThingName, string Version)>();
+        
+        /// <summary>
+        /// Gets a instance of <see cref="IUpdateServerClient"/>
+        /// </summary>
+        private IUpdateServerClient UpdateServerClient
+        {
+            get
+            {
+                var client = ServiceLocator.Current.GetInstance<IUpdateServerClient>();
+                client.BaseAddress = this.GetUpdateServerBaseAddress();
+                return client;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateDownloaderInstallerViewModel"/> class
@@ -387,8 +395,8 @@ namespace CDP4IME.ViewModels
                 this.CancellationTokenSource.Token.Register(async () => await this.CancelDownloadsExecute());
 
                 await Task.WhenAll(
-                    Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(() => plugin.Download(this.GetUpdateServerBaseAddress()), this.CancellationTokenSource.Token)).ToArray()),
-                    Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => Task.Run(() => ime.Download(this.GetUpdateServerBaseAddress()), this.CancellationTokenSource.Token)).ToArray()));
+                    Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(() => plugin.Download(this.UpdateServerClient), this.CancellationTokenSource.Token)).ToArray()),
+                    Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => Task.Run(() => ime.Download(this.UpdateServerClient), this.CancellationTokenSource.Token)).ToArray()));
 
                 await Task.Delay(1000);
 
@@ -431,17 +439,14 @@ namespace CDP4IME.ViewModels
         /// Checks the Update Server Api for updates
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
-        private async Task CheckApiForUpdate()
+        public async Task CheckApiForUpdate()
         {
             this.IsCheckingApi = true;
-            var serverAddress = this.GetUpdateServerBaseAddress();
-            
             var assemblyInfo = ServiceLocator.Current.GetInstance<IAssemblyInformationService>();
 
             try
             {
-                var client = new UpdateServerClient(serverAddress);
-                var availableUpdates = await client.CheckForUpdate(PluginUtilities.GetPluginManifests().ToList(), assemblyInfo.GetVersion(), assemblyInfo.GetProcessorArchitecture());
+                var availableUpdates = await this.UpdateServerClient.CheckForUpdate(PluginUtilities.GetPluginManifests().ToList(), assemblyInfo.GetVersion(), assemblyInfo.GetProcessorArchitecture());
                 this.DownloadableThings = this.SortDownloadedThingsWithAlreadyDownloadedOnes(availableUpdates.ToList());
             }
             catch (HttpRequestException httpException)
@@ -475,8 +480,8 @@ namespace CDP4IME.ViewModels
                 }
             }
 
-            var downloadableIme = availableUpdates.FirstOrDefault(v => v.ThingName == UpdateServerClient.ImeKey);
-            var downloadDirectory = UpdateInstaller.ImeDownloadDirectoryInfo;
+            var downloadableIme = availableUpdates.FirstOrDefault(v => v.ThingName == CDP4UpdateServerDal.UpdateServerClient.ImeKey);
+            var downloadDirectory = ServiceLocator.Current.GetInstance<IUpdateFileSystemService>().ImeDownloadPath;
             var installers = downloadDirectory.Exists ? downloadDirectory.EnumerateFiles().ToArray() : null;
 
             if (downloadableIme == default || installers?.Any() != true)
@@ -502,7 +507,7 @@ namespace CDP4IME.ViewModels
         {
             if (!this.appSettingService.AppSettings.UpdateServerAddresses.Any())
             {
-                this.appSettingService.AppSettings.UpdateServerAddresses.Add(ImeCommunityEditionUpdateServerBaseAddress);
+                this.appSettingService.AppSettings.UpdateServerAddresses.Add(CDP4UpdateServerDal.UpdateServerClient.ImeCommunityEditionUpdateServerBaseAddress);
 #if DEBUG
                 this.appSettingService.AppSettings.UpdateServerAddresses.Add("https://localhost:5001");
 #endif
@@ -569,7 +574,7 @@ namespace CDP4IME.ViewModels
             {
                 foreach (var thing in this.DownloadableThings)
                 {
-                    if (thing.ThingName == UpdateServerClient.ImeKey)
+                    if (thing.ThingName == CDP4UpdateServerDal.UpdateServerClient.ImeKey)
                     {
                         this.AvailableIme.Add(new ImeRowViewModel(thing.Version));
                     }

@@ -31,7 +31,7 @@ namespace CDP4IME.Services
     /// <summary>
     /// Defines methods and properties to provide operations appliable on a file system
     /// </summary>
-    public interface IPluginFileSystemService
+    public interface IUpdateFileSystemService
     {
         /// <summary>
         /// Gets or sets the path were the cdp4ck to be installed sits 
@@ -47,6 +47,16 @@ namespace CDP4IME.Services
         /// Gets or sets the path where the updated plugin should be installed
         /// </summary>
         DirectoryInfo InstallationPath { get; }
+
+        /// <summary>
+        /// Gets or sets the path where the plugin should be downloaded
+        /// </summary>
+        DirectoryInfo PluginDownloadPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the path where the IME should be downloaded
+        /// </summary>
+        DirectoryInfo ImeDownloadPath { get; set; }
 
         /// <summary>
         /// Installs the new version into the <see cref="InstallationPath"/>

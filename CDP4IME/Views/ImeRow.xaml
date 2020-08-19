@@ -18,15 +18,15 @@
             <RowDefinition Height="3*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="8*"></ColumnDefinition>
-            <ColumnDefinition Width="0.5*"></ColumnDefinition>
+            <ColumnDefinition Width="5*"></ColumnDefinition>
+            <ColumnDefinition Width="3*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
+        
+        <Label Grid.Row="0" Grid.Column="0" Content="{Binding Name}" VerticalContentAlignment="Center" FontSize="20" HorizontalAlignment="Left"></Label>
+        <Label Grid.Row="0" Grid.Column="1" Content="{Binding VersionToDisplay}" VerticalContentAlignment="Center" FontSize="14" HorizontalAlignment="Center"></Label>
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
-            <Label Content="{Binding Name}" VerticalContentAlignment="Bottom" FontSize="20" HorizontalAlignment="Left"></Label>
-            <Label Content="{Binding VersionToDisplay}" Margin="10,0,0,0" VerticalContentAlignment="Bottom" FontSize="14" HorizontalAlignment="Right"></Label>
-        </StackPanel>
-        <ProgressBar Minimum="0" Maximum="100" Height="25" Visibility="{Binding Progress, Converter={StaticResource DoubleToVisibilityConverter}}" Grid.Column="0" Value="{Binding Progress}" Margin="5" Grid.Row="1"></ProgressBar>
-        <CheckBox Grid.Column="1" Grid.RowSpan="2" Margin="5" Grid.Row="0" VerticalContentAlignment="Center" IsChecked="{Binding IsSelected}"></CheckBox>
+        <ProgressBar HorizontalAlignment="Stretch" Minimum="0" Grid.ColumnSpan="2" Maximum="100" Height="25" Visibility="{Binding Progress, Converter={StaticResource DoubleToVisibilityConverter}}" Grid.Column="0" Value="{Binding Progress}" Margin="5" Grid.Row="1"></ProgressBar>
+        <CheckBox Grid.Column="2" Grid.RowSpan="2" HorizontalAlignment="Right" Margin="5" Grid.Row="0" VerticalContentAlignment="Center" IsChecked="{Binding IsSelected}"></CheckBox>
     </Grid>
 </UserControl>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Client.cs" company="RHEA System S.A.">
+// <copyright file="UpdateServerClient.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -27,6 +27,7 @@ namespace CDP4UpdateServerDal
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.Composition;
     using System.IO;
     using System.Linq;
     using System.Net.Http;
@@ -40,25 +41,36 @@ namespace CDP4UpdateServerDal
     using CDP4UpdateServerDal.Dto;
     using CDP4UpdateServerDal.Enumerators;
 
-    using DevExpress.Xpf.Core.Native;
-
-    using Newtonsoft.Json;
-
     /// <summary>
     /// The <see cref="UpdateServerClient"/> provides a set of Method to access the Update Server Api
     /// </summary>
-    public class UpdateServerClient : BaseClient
+    [Export(typeof(IUpdateServerClient))]
+    public class UpdateServerClient : BaseClient, IUpdateServerClient
     {
+        /// <summary>
+        /// Holds the base Update Server Address
+        /// </summary>
+        public const string ImeCommunityEditionUpdateServerBaseAddress = "https://store.cdp4.org";
+
         /// <summary>
         /// Constant used while checking for new version
         /// </summary>
         public const string ImeKey = "IME";
 
         /// <summary>
-        /// Initializes a new <see cref="UpdateServerClient"/>
+        /// Initializes a new <see cref="UpdateServerClient"/> Please use object initializer to set the <see cref="BaseClient.BaseAddress"/> base server address
+        /// </summary>
+        [ImportingConstructor]
+        public UpdateServerClient() : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="UpdateServerClient"/> for test purpose
         /// </summary>
         /// <param name="serverBaseAddress">The base Address of the Update Server</param>
-        public UpdateServerClient(Uri serverBaseAddress) : base(serverBaseAddress)
+        /// <param name="messageHandler">The mocked message handler</param>
+        public UpdateServerClient(Uri serverBaseAddress, HttpMessageHandler messageHandler = null) : base(serverBaseAddress, messageHandler)
         {
         }
 
@@ -101,7 +113,7 @@ namespace CDP4UpdateServerDal
                     Name = p.Name
                 }).ToList()
             };
-            
+
             return await this.GetLatest<List<PluginDto>>(requestBody);
         }
 
@@ -152,7 +164,7 @@ namespace CDP4UpdateServerDal
         {
             var result = new List<(string ThingName, string Version)>();
             var newImeVersion = await this.CompareImeVersions(version, processorArchitecture);
-            
+
             if (newImeVersion != null)
             {
                 result.Add((ImeKey, newImeVersion));
@@ -171,18 +183,18 @@ namespace CDP4UpdateServerDal
         private async Task<string> CompareImeVersions(Version version, ProcessorArchitecture processorArchitecture)
         {
             var latest = await this.GetLatestIme(version, processorArchitecture == ProcessorArchitecture.Amd64 ? Platform.X64 : Platform.X86);
-            var versionSplittedUp = latest.VersionNumber.Split(new []{'-', 'R', 'C'}, StringSplitOptions.RemoveEmptyEntries);
+            var versionSplittedUp = latest.VersionNumber.Split(new[] { '-', 'R', 'C' }, StringSplitOptions.RemoveEmptyEntries);
             var latestVersion = new Version(versionSplittedUp[0]);
             return latestVersion > version ? latest.VersionNumber : null;
         }
 
-    /// <summary>
-    /// Compares installed Plugins versions with the latest one found online
-    /// </summary>
-    /// <param name="imeVersion">The Current IME <see cref="Version"/></param>
-    /// <param name="manifests">A <see cref="List{T}"/> of the currently installed plugin </param>
-    /// <returns>A <see cref="IEnumerable{T}"/> of type <code>(string ThingName, string Version)</code> containing new versions</returns>
-    private async Task<IEnumerable<(string ThingName, string Version)>> ComparePluginsVersions(Version imeVersion, List<Manifest> manifests)
+        /// <summary>
+        /// Compares installed Plugins versions with the latest one found online
+        /// </summary>
+        /// <param name="imeVersion">The Current IME <see cref="Version"/></param>
+        /// <param name="manifests">A <see cref="List{T}"/> of the currently installed plugin </param>
+        /// <returns>A <see cref="IEnumerable{T}"/> of type <code>(string ThingName, string Version)</code> containing new versions</returns>
+        private async Task<IEnumerable<(string ThingName, string Version)>> ComparePluginsVersions(Version imeVersion, List<Manifest> manifests)
         {
             var latest = (await this.GetLatestPlugin(manifests, imeVersion)).ToList();
             var result = new List<(string ThingName, string Version)>();

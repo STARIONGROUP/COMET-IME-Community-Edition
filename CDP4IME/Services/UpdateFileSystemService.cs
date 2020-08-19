@@ -34,10 +34,10 @@ namespace CDP4IME.Services
     using CDP4IME.Modularity;
 
     /// <summary>
-    /// The purpose of the <see cref="PluginFileSystemService"/> is to provide operations appliable on a file system
+    /// The purpose of the <see cref="UpdateFileSystemService"/> is to provide operations appliable on a file system
     /// </summary>
-    [Export(typeof(IPluginFileSystemService))]
-    public class PluginFileSystemService : IPluginFileSystemService
+    [Export(typeof(IUpdateFileSystemService))]
+    public class UpdateFileSystemService : IUpdateFileSystemService
     {
         /// <summary>
         /// Gets or sets the path were the cdp4ck to be installed sits 
@@ -55,18 +55,28 @@ namespace CDP4IME.Services
         public DirectoryInfo InstallationPath { get; set; }
 
         /// <summary>
-        /// Instanciate a new <see cref="PluginFileSystemService"/>
+        /// Gets or sets the path where the plugin should be downloaded
+        /// </summary>
+        public DirectoryInfo PluginDownloadPath { get; set; } = new DirectoryInfo(Path.Combine(PluginUtilities.GetDownloadDirectory().FullName));
+
+        /// <summary>
+        /// Gets or sets the path where the IME should be downloaded
+        /// </summary>
+        public DirectoryInfo ImeDownloadPath { get; set; } = new DirectoryInfo(Path.Combine(PluginUtilities.GetDownloadDirectory(false).FullName));
+
+        /// <summary>
+        /// Instanciate a new <see cref="UpdateFileSystemService"/>
         /// </summary>
         [ImportingConstructor]
-        public PluginFileSystemService()
+        public UpdateFileSystemService()
         {
         }
 
         /// <summary>
-        /// Instanciate a new <see cref="PluginFileSystemService"/>
+        /// Instanciate a new <see cref="UpdateFileSystemService"/>
         /// </summary>
         /// <param name="plugin">A Tupple containing the cpd4ck <see cref="FileInfo"/> and the <see cref="Manifest"/></param>
-        public PluginFileSystemService((FileInfo cdp4ckFile, Manifest manifest) plugin)
+        public UpdateFileSystemService((FileInfo cdp4ckFile, Manifest manifest) plugin)
         {
             var (cdp4CkFile, manifest) = plugin;
 
@@ -160,7 +170,17 @@ namespace CDP4IME.Services
         /// </summary>
         /// <param name="pluginName">The name of the plugin</param>
         /// <returns>The path as a string</returns>
-        public FileInfo GetDownloadedCdp4Ck(string pluginName) => new FileInfo(Path.Combine(PluginUtilities.GetDownloadDirectory(pluginName).FullName, $"{pluginName}.cdp4ck"));
+        public FileInfo GetDownloadedCdp4Ck(string pluginName)
+        {
+            var directory = new DirectoryInfo(Path.Combine(this.PluginDownloadPath.FullName, pluginName));
+
+            if (!directory.Exists)
+            {
+                directory.Create();
+            }
+
+            return new FileInfo(Path.Combine(directory.FullName, $"{pluginName}.cdp4ck"));
+        }
 
         /// <summary>
         /// Creates the msi file to put the download IME installer into
@@ -178,12 +198,14 @@ namespace CDP4IME.Services
         /// <returns>The path as a string</returns>
         public FileInfo GetDownloadedImeMsi(string installerName)
         {
-            if (!UpdateInstaller.ImeDownloadDirectoryInfo.Exists)
+            var directory = new DirectoryInfo(Path.Combine(this.ImeDownloadPath.FullName, installerName));
+
+            if (!directory.Exists)
             {
-                UpdateInstaller.ImeDownloadDirectoryInfo.Create();
+                directory.Create();
             }
 
-            return new FileInfo(Path.Combine(UpdateInstaller.ImeDownloadDirectoryInfo.FullName, installerName));
+            return new FileInfo(Path.Combine(directory.FullName, installerName));
         }
         
         /// <summary>

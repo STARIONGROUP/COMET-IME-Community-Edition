@@ -47,7 +47,7 @@ namespace CDP4IME.Tests.ViewModels
         protected (FileInfo, Manifest) Plugin;
 
         protected Manifest Manifest;
-        protected IPluginFileSystemService PluginFileSystem;
+        protected IUpdateFileSystemService UpdateFileSystem;
         protected string BasePath;
         protected string TempPath;
         protected string InstallPath;
@@ -58,7 +58,7 @@ namespace CDP4IME.Tests.ViewModels
         /// </summary>
         public virtual void Setup()
         {
-            this.BasePath = Path.Combine(Path.GetTempPath(), "PluginUpdateTestFixture", Guid.NewGuid().ToString());
+            this.BasePath = Path.Combine(Path.GetTempPath(), "UpdateTestFixture", Guid.NewGuid().ToString());
             this.TempPath = Path.Combine(this.BasePath, "Temp");
             this.InstallPath = Path.Combine(this.BasePath, "Plugins");
             this.UpdatePath = Path.Combine(this.BasePath, "Download");
@@ -98,10 +98,12 @@ namespace CDP4IME.Tests.ViewModels
             var cdp4Ck = new FileInfo(Path.Combine(this.UpdatePath, "CDP4BasicRdl.cdp4ck"));
             this.Manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(this.UpdatePath, "CDP4BasicRdl.plugin.manifest")));
 
-            this.PluginFileSystem = new PluginFileSystemService((cdp4Ck, this.Manifest))
+            this.UpdateFileSystem = new UpdateFileSystemService((cdp4Ck, this.Manifest))
             {
                 TemporaryPath = new DirectoryInfo(Path.Combine(this.TempPath, this.Manifest.Name)),
-                InstallationPath = new DirectoryInfo(Path.Combine(this.InstallPath, this.Manifest.Name))
+                InstallationPath = new DirectoryInfo(Path.Combine(this.InstallPath, this.Manifest.Name)),
+                ImeDownloadPath = new DirectoryInfo(Path.Combine(this.UpdatePath, "ime")),
+                PluginDownloadPath = new DirectoryInfo(Path.Combine(this.UpdatePath, "plugins"))
             };
 
             this.Plugin = (new FileInfo("test"), this.Manifest);
@@ -111,10 +113,10 @@ namespace CDP4IME.Tests.ViewModels
         /// Create a test file in the <see cref="destinationPathFullName"/> path
         /// </summary>
         /// <param name="destinationPathFullName">the path where to put the test file</param>
-        protected void SetupTestContentForCancellationPurpose(string destinationPathFullName)
+        protected void SetupTestContentForInstallationCancellationPurpose(string destinationPathFullName)
         {
-            this.PluginFileSystem.TemporaryPath.Create();
-            this.PluginFileSystem.InstallationPath.Create();
+            this.UpdateFileSystem.TemporaryPath.Create();
+            this.UpdateFileSystem.InstallationPath.Create();
 
             var testFileFullName = Path.Combine(destinationPathFullName, TestFileName);
 
@@ -123,11 +125,11 @@ namespace CDP4IME.Tests.ViewModels
         }
 
         /// <summary>
-        /// Asserts that the file create by <see cref="SetupTestContentForCancellationPurpose"/> is at the intented location
+        /// Asserts that the file create by <see cref="SetupTestContentForInstallationCancellationPurpose"/> is at the intented location
         /// </summary>
-        protected void AssertCreatedTestFileHasBeenRestored()
+        protected void AssertInstalledTestFileHasBeenRestored()
         {
-            var restoredFile = new FileInfo(Path.Combine(this.PluginFileSystem.InstallationPath.FullName, TestFileName));
+            var restoredFile = new FileInfo(Path.Combine(this.UpdateFileSystem.InstallationPath.FullName, TestFileName));
             Assert.IsTrue(restoredFile.Exists);
             Assert.AreEqual(File.ReadAllText(restoredFile.FullName), TestContent);
         }

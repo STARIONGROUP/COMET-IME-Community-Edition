@@ -116,7 +116,7 @@ namespace CDP4IME.Tests.Modularity
         {
             this.SetupInstallerFile(false);
 
-            UpdateInstaller.ImeDownloadDirectoryInfo = new DirectoryInfo(this.imeDownloadTestPath);
+            new UpdateFileSystemService().ImeDownloadPath = new DirectoryInfo(this.imeDownloadTestPath);
             Assert.IsFalse(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object));
             
             this.viewInvoker.Verify(x => x.ShowMessageBox(
@@ -133,7 +133,7 @@ namespace CDP4IME.Tests.Modularity
 
             this.SetupInstallerFile(true);
 
-            UpdateInstaller.ImeDownloadDirectoryInfo = new DirectoryInfo(this.imeDownloadTestPath);
+            new UpdateFileSystemService().ImeDownloadPath = new DirectoryInfo(this.imeDownloadTestPath);
             Assert.IsTrue(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object, this.commandRunner.Object));
 
             this.viewInvoker.Verify(x => x.ShowMessageBox(

@@ -37,7 +37,7 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// The attached Behavior
         /// </summary>
-        IPluginInstallerBehavior Behavior { get; set; }
+        IUpdateDownloaderInstallerBehavior Behavior { get; set; }
 
         /// <summary>
         /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 

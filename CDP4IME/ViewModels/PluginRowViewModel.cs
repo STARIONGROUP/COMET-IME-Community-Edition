@@ -161,9 +161,9 @@ namespace CDP4IME.ViewModels
         }
         
         /// <summary>
-        /// Gets the <see cref="IPluginFileSystemService"/> to operate on
+        /// Gets the <see cref="IUpdateFileSystemService"/> to operate on
         /// </summary>
-        public IPluginFileSystemService FileSystem { get; set; }
+        public IUpdateFileSystemService FileSystem { get; set; }
 
         /// <summary>
         /// Gets the plugin download path and the new manifest
@@ -174,11 +174,11 @@ namespace CDP4IME.ViewModels
         /// Initializes a new instance of the <see cref="PluginRowViewModel"/> class
         /// </summary>
         /// <param name="plugin">The represented plugin</param>
-        /// <param name="pluginFileSystemService">The file system to operate on</param>
-        public PluginRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin, IPluginFileSystemService pluginFileSystemService = null)
+        /// <param name="updateFileSystemService">The file system to operate on</param>
+        public PluginRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin, IUpdateFileSystemService updateFileSystemService = null)
         {
             this.Plugin = plugin;
-            this.FileSystem = pluginFileSystemService ?? new PluginFileSystemService(plugin);
+            this.FileSystem = updateFileSystemService ?? new UpdateFileSystemService(plugin);
             this.UpdateProperties();
         }
 
@@ -191,7 +191,7 @@ namespace CDP4IME.ViewModels
             this.downloadablePlugin = plugin; 
             this.Name = this.downloadablePlugin.ThingName;
             this.Version = this.downloadablePlugin.Version;
-            this.FileSystem = ServiceLocator.Current.GetInstance<IPluginFileSystemService>();
+            this.FileSystem = ServiceLocator.Current.GetInstance<IUpdateFileSystemService>();
         }
 
         /// <summary>
@@ -233,14 +233,13 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Downloads this represented plugin
         /// </summary>
-        /// <param name="url">the base uri of the Update Server</param>
+        /// <param name="client">the Update Server Client to perform request</param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task Download(Uri url)
+        public async Task Download(IUpdateServerClient client)
         {
             try
             {
                 this.Progress = 0;
-                var client = new UpdateServerClient(url);
 
                 using (var stream = await client.DownloadPlugin(this.Name, this.Version))
                 {
@@ -253,6 +252,7 @@ namespace CDP4IME.ViewModels
                         await stream.CopyToAsync(fileStream);
                     }
                 }
+                
                 this.Progress = 100;
             }
             catch (Exception exception)

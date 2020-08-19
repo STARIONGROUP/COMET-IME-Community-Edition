@@ -51,11 +51,6 @@ namespace CDP4IME.Modularity
         private const string ImeNewVersionMessage = "A new IME version has been found! Would you like to install it now?";
 
         /// <summary>
-        /// The Ime Download directory
-        /// </summary>
-        public static DirectoryInfo ImeDownloadDirectoryInfo { get; set; } = new DirectoryInfo(Path.Combine(PluginUtilities.GetAppDataPath(), PluginUtilities.DownloadDirectory, "IME"));
-
-        /// <summary>
         /// Check for any update available and run the plugin installer
         /// </summary>
         /// <param name="viewInvoker">An <see cref="IViewInvokerService"/></param>
@@ -88,7 +83,7 @@ namespace CDP4IME.Modularity
         /// <returns>a <see cref="string"/> path to the installer</returns>
         private static string CheckForImeUpdate()
         {
-            var downloadDirectory = ImeDownloadDirectoryInfo;
+            var downloadDirectory = new UpdateFileSystemService().ImeDownloadPath;
             var installers = downloadDirectory.Exists ? downloadDirectory.EnumerateFiles().ToArray() : null;
 
             if (installers?.Any() != true)
@@ -103,7 +98,7 @@ namespace CDP4IME.Modularity
                 return lastVersion?.FullName;
             }
 
-            CleanUpDownloadedImeInstallers();
+            CleanUpDownloadedImeInstallers(downloadDirectory);
             return null;
         }
 
@@ -130,9 +125,10 @@ namespace CDP4IME.Modularity
         /// <summary>
         /// Delete any installer when no candidate are found
         /// </summary>
-        private static void CleanUpDownloadedImeInstallers()
+        /// <param name="downloadDirectory">The download directory</param>
+        private static void CleanUpDownloadedImeInstallers(DirectoryInfo downloadDirectory)
         {
-            ImeDownloadDirectoryInfo.Delete(true);
+            downloadDirectory.Delete(true);
         }
 
         /// <summary>

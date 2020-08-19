@@ -30,14 +30,14 @@ namespace CDP4IME.Tests.Behaviors
     using NUnit.Framework;
 
     [TestFixture]
-    public class PluginInstallerBehaviorTestFixture
+    public class UpdateDownloaderInstallerBehaviorTestFixture
     {
         [Test]
         public void VerifyClose()
         {
             Assert.DoesNotThrow(() =>
             { 
-                var behavior = new PluginInstallerBehavior();
+                var behavior = new UpdateDownloaderInstallerBehavior();
                 behavior.Close();
             });
         }

@@ -1,0 +1,35 @@
+[
+    {
+        "name": "Plugin0",
+        "versions": [
+            {
+                "isPreRelease": false,
+                "minIMEVersion": null,
+                "releaseDate": "0001-01-01T00:00:00",
+                "versionNumber": "6.0.1.0"
+            }
+        ]
+    },
+    {
+        "name": "Plugin1",
+        "versions": [
+            {
+                "isPreRelease": false,
+                "minIMEVersion": null,
+                "releaseDate": "0001-01-01T00:00:00",
+                "versionNumber": "6.0.1.0"
+            }
+        ]
+    },
+    {
+        "name": "Plugin2",
+        "versions": [
+            {
+                "isPreRelease": false,
+                "minIMEVersion": null,
+                "releaseDate": "0001-01-01T00:00:00",
+                "versionNumber": "6.0.1.0"
+            }
+        ]
+    }
+]

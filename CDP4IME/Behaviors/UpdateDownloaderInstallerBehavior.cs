@@ -35,7 +35,7 @@ namespace CDP4IME.Behaviors
     /// <summary>
     /// Behavior of the e<see cref="UpdateDownloaderInstaller"/> used to handle the interactions between <see cref="UpdateDownloaderInstallerViewModel"/> and the view
     /// </summary>
-    public class PluginInstallerBehavior : Behavior<UpdateDownloaderInstaller>, IPluginInstallerBehavior
+    public class UpdateDownloaderInstallerBehavior : Behavior<UpdateDownloaderInstaller>, IUpdateDownloaderInstallerBehavior
     {
         /// <summary>
         /// Register event handlers

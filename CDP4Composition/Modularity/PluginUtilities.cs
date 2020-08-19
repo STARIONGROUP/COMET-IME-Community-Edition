@@ -59,6 +59,11 @@ namespace CDP4Composition.Modularity
         public const string PluginDirectoryName = "plugins";
 
         /// <summary>
+        /// The name of the Ime msi directory
+        /// </summary>
+        public const string ImeDirectoryName = "ime";
+
+        /// <summary>
         /// The directory of the downloaded plugin
         /// </summary>
         public const string DownloadDirectory = "DownloadCache";
@@ -159,12 +164,14 @@ namespace CDP4Composition.Modularity
         }
 
         /// <summary>
-        /// Compute and return the <see cref="DirectoryInfo"/> of the download folder
+        /// Computes and returns the <see cref="DirectoryInfo"/> of the download folder
         /// </summary>
+        /// <param name="isItForPlugins">An assert whether it should return the plugin download directory or the IME msi one</param>
+        /// <param name="pluginName">The plugin name</param>
         /// <returns>A <see cref="DirectoryInfo"/></returns>
-        public static DirectoryInfo GetDownloadDirectory(string pluginName = null)
+        public static DirectoryInfo GetDownloadDirectory(bool isItForPlugins = true, string pluginName = null)
         {
-            var downloadPath = new DirectoryInfo(Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, PluginDirectoryName, string.IsNullOrWhiteSpace(pluginName) ? string.Empty : pluginName));
+            var downloadPath = new DirectoryInfo(Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, isItForPlugins ? PluginDirectoryName : ImeDirectoryName, isItForPlugins ? string.IsNullOrWhiteSpace(pluginName) ? string.Empty : pluginName : string.Empty));
 
             if (!downloadPath.Exists)
             {

@@ -45,11 +45,14 @@ namespace CDP4UpdateServerDal
     public abstract class BaseClient
     {
         /// <summary>
-        /// Holds the Base address of the target Update Server
+        /// Holds a http message handler
         /// </summary>
-        private readonly Uri baseAddress;
+        private HttpMessageHandler messageHandler;
 
-        internal HttpClient HttpClient { get; set; }
+        /// <summary>
+        /// Gets or sets the Base address of the target Update Server
+        /// </summary>
+        public Uri BaseAddress { get; set; }
 
         /// <summary>
         /// Builds the <see cref="string"/> request from the provided type
@@ -61,14 +64,23 @@ namespace CDP4UpdateServerDal
         {
             return $"api/{typeof(TDto).Name.Replace("Dto", string.Empty).ToLower()}{(action is null ? string.Empty : $"/{action}")}";
         }
+        
+        /// <summary>
+        /// Initializes a new <see cref="BaseClient"/>
+        /// </summary>
+        internal BaseClient()
+        {
+        }
 
         /// <summary>
         /// Initializes a new <see cref="BaseClient"/>
         /// </summary>
         /// <param name="serverBaseAddress">The targeted server base address</param>
-        internal BaseClient(Uri serverBaseAddress)
+        /// <param name="messageHandler">The mocked message handler</param>
+        internal BaseClient(Uri serverBaseAddress, HttpMessageHandler messageHandler = null)
         {
-            this.baseAddress = serverBaseAddress;
+            this.BaseAddress = serverBaseAddress;
+            this.messageHandler = messageHandler;
         }
         
         /// <summary>
@@ -137,11 +149,11 @@ namespace CDP4UpdateServerDal
         /// <returns>A Task of type <see cref="HttpContent"/></returns>
         internal async Task<HttpContent> Query<TDto>(HttpVerbs method, string action = null,  HttpContent content = null)
         {
-            HttpContent result = null;
-            HttpResponseMessage response = null;
+            HttpResponseMessage response;
+            HttpContent result;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             
-            using (var client = new HttpClient() { BaseAddress = this.baseAddress })
+            using (var client = this.messageHandler != null ? new HttpClient(this.messageHandler) { BaseAddress = this.BaseAddress } : new HttpClient() { BaseAddress = this.BaseAddress })
             {
                 var request = this.BuildRequest<TDto>(action);
                 
@@ -157,7 +169,7 @@ namespace CDP4UpdateServerDal
                     _ => throw new ArgumentOutOfRangeException(nameof(method), method, null)
                 };
             }
-
+            
             if (response?.IsSuccessStatusCode == true)
             {
                 result = response.Content;

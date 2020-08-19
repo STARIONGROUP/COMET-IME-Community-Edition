@@ -125,9 +125,9 @@ namespace CDP4IME.ViewModels
         }
         
         /// <summary>
-        /// Gets the <see cref="IPluginFileSystemService"/> to operate on
+        /// Gets the <see cref="IUpdateFileSystemService"/> to operate on
         /// </summary>
-        public IPluginFileSystemService FileSystem { get; set; }
+        public IUpdateFileSystemService FileSystem { get; set; }
 
         /// <summary>
         /// Holds the version as is to be sent to the update server
@@ -157,20 +157,19 @@ namespace CDP4IME.ViewModels
             this.Platform = ServiceLocator.Current.GetInstance<IAssemblyInformationService>().GetProcessorArchitecture() == ProcessorArchitecture.Amd64 ? Platform.X64 : Platform.X86;
             this.Name = $"CDP4IME-CE";
             this.VersionToDisplay = $"{this.Platform.ToString().ToLower()}-{this.version}";
-            this.FileSystem = ServiceLocator.Current.GetInstance<IPluginFileSystemService>();
+            this.FileSystem = ServiceLocator.Current.GetInstance<IUpdateFileSystemService>();
         }
 
         /// <summary>
-        /// Downloads this represented plugin
+        /// Downloads this represented IME Installer
         /// </summary>
-        /// <param name="url">the base uri of the Update Server</param>
+        /// <param name="client">the Update Server Client to perform request</param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task Download(Uri url)
+        public async Task Download(IUpdateServerClient client)
         {
             try
             {
                 this.Progress = 0;
-                var client = new UpdateServerClient(url);
 
                 using (var stream = await client.DownloadIme(this.version, this.Platform))
                 {
