@@ -5,7 +5,6 @@
     <assembly path="CDP4Addin.Tests/bin/Debug/net452/CDP4Addin.Tests.dll" />
     <assembly path="CDP4Budget.Tests/bin/Debug/net452/CDP4Budget.Tests.dll" />
     <assembly path="CDP4BuiltInRules.Tests/bin/Debug/net452/CDP4BuiltInRules.Tests.dll" />
-    <assembly path="CDP4CommonView.Tests/bin/Debug/net452/CDP4CommonView.Tests.dll" />
     <assembly path="CDP4Composition.Tests/bin/Debug/net452/CDP4Composition.Tests.dll" />
     <assembly path="CDP4Dashboard.Tests/bin/Debug/net452/CDP4Dashboard.Tests.dll" />
     <assembly path="CDP4IME.Tests/bin/Debug/net452/CDP4IME.Tests.dll" />
@@ -31,7 +30,6 @@
     <assembly path="CDP4Addin.Tests/bin/Release/net452/CDP4Addin.Tests.dll" />
     <assembly path="CDP4Budget.Tests/bin/Release/net452/CDP4Budget.Tests.dll" />
     <assembly path="CDP4BuiltInRules.Tests/bin/Release/net452/CDP4BuiltInRules.Tests.dll" />
-    <assembly path="CDP4CommonView.Tests/bin/Release/net452/CDP4CommonView.Tests.dll" />
     <assembly path="CDP4Composition.Tests/bin/Release/net452/CDP4Composition.Tests.dll" />
     <assembly path="CDP4Dashboard.Tests/bin/Release/net452/CDP4Dashboard.Tests.dll" />
     <assembly path="CDP4IME.Tests/bin/Release/net452/CDP4IME.Tests.dll" />
