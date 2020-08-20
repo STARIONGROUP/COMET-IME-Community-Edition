@@ -25,6 +25,7 @@
     <assembly path="Requirements.Tests/bin/Debug/net452/CDP4Requirements.Tests.dll" />
     <assembly path="CDP4PluginPackager.Tests/bin/Debug/net452/CDP4PluginPackager.Tests.dll" />
     <assembly path="CDP4Grapher.Tests/bin/Debug/net452/CDP4Grapher.Tests.dll" />
+    <assembly path="CDP4UpdateServerDal.Tests/bin/Debug/net452/CDP4UpdateServerDal.Tests.dll" />
   </Config>
   <Config name="Release">
     <assembly path="BasicRdl.Tests/bin/Release/net452/BasicRdl.Tests.dll" />
@@ -51,5 +52,6 @@
     <assembly path="Requirements.Tests/bin/Release/net452/CDP4Requirements.Tests.dll" />
     <assembly path="CDP4PluginPackager.Tests/bin/Release/net452/CDP4PluginPackager.Tests.dll" />
     <assembly path="CDP4Grapher.Tests/bin/Release/net452/CDP4Grapher.Tests.dll" />
+    <assembly path="CDP4UpdateServerDal.Tests/bin/Release/net452/CDP4UpdateServerDal.Tests.dll" />
   </Config>
 </NUnitProject>
