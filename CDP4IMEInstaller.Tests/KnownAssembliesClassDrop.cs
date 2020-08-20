@@ -48,6 +48,7 @@ namespace CDP4IMEInstaller.Tests
             { "DevExpress.DataAccess.{VERSION}.dll", "A159A34F-C2BC-4E62-AB7A-2992F34AA343"} ,
             { "DevExpress.Diagram.{VERSION}.Core.dll", "0D4DF5E0-C0AA-47CA-9523-F754919BF970"} ,
             { "DevExpress.Images.{VERSION}.dll", "B9BFD73B-BF82-4742-9F04-0A5F0F537F43"} ,
+            
             { "DevExpress.Mvvm.{VERSION}.dll", "0D612BC9-69A2-4237-93E4-E69CF726B87B"} ,
             { "DevExpress.Office.{VERSION}.Core.dll", "6B2516CB-D935-4E94-A2E0-CFD96232C662"} ,
             { "DevExpress.Pdf.{VERSION}.Core.dll", "BE68B644-1558-4082-A5A7-1C2754BDEF90"} ,
@@ -70,6 +71,7 @@ namespace CDP4IMEInstaller.Tests
             { "DevExpress.Xpf.Docking.{VERSION}.dll", "CED11B3D-8D6D-442E-B6EB-329DDD3B3028"} ,
             { "DevExpress.Xpf.DocumentViewer.{VERSION}.Core.dll", "A43E3DFA-5076-4D14-80D5-0C73D0B130A0"} ,
             { "DevExpress.Xpf.ExpressionEditor.{VERSION}.dll", "2D29816F-7125-438F-B36D-7F20CBB63AE3" },
+            { "DevExpress.Xpf.Gauges.{VERSION}.dll", "72C6145F-EC6A-4768-A51B-75745E08C412"},
             { "DevExpress.Xpf.Grid.{VERSION}.dll", "9B10747B-031D-4FCD-9E2D-5B4F714F0F70"} ,
             { "DevExpress.Xpf.Grid.{VERSION}.Core.dll", "4BF10AF7-46B3-470E-90C2-AEED67461EA4"} ,
             { "DevExpress.Xpf.Grid.{VERSION}.Extensions.dll", "0BA3E743-D3AC-49D6-827A-36D53730526D"} ,
@@ -118,7 +120,10 @@ namespace CDP4IMEInstaller.Tests
             { "DevExpress.Xpf.Themes.VS2019Blue.{VERSION}.dll", "533DFB88-2C11-46B0-9B03-4D76BD95A65E" },
             { "DevExpress.Xpf.Themes.VS2019Dark.{VERSION}.dll", "8CD4A3DC-287E-4BF9-8B41-96C91DEB9009" },
             { "DevExpress.Xpf.Themes.VS2019Light.{VERSION}.dll", "1B2B69EF-58B5-4E69-9C6A-08A22767B37C" },
-            { "DevExpress.Xpo.{VERSION}.dll", "62646496-DC18-43D0-AE37-B94032EE1CAA"}
+            { "DevExpress.Xpo.{VERSION}.dll", "62646496-DC18-43D0-AE37-B94032EE1CAA"},
+            { "DevExpress.XtraCharts.{VERSION}.dll","C3BD8574-1870-4780-B7D9-BF4FBB271E0D"},
+            { "DevExpress.XtraGauges.{VERSION}.Core.dll","939F9678-5859-4EC9-A15B-603C4C81ECC9"},
+            { "DevExpress.XtraReports.{VERSION}.dll","10468E7C-54AA-4DCD-A680-18F3BD9DD349"}
         };
 
         /// <summary>
@@ -147,3 +152,4 @@ namespace CDP4IMEInstaller.Tests
         }
     }
 }
+

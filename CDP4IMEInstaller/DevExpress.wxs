@@ -126,6 +126,10 @@
         <File Id="_2D29816F" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.ExpressionEditor.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
+      <Component Id="_75745E08C412" Guid="{72C6145F-EC6A-4768-A51B-75745E08C412}" Win64="$(var.Win64)">
+        <File Id="_72C6145F" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Gauges.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
       <Component Id="_5B4F714F0F70" Guid="{9B10747B-031D-4FCD-9E2D-5B4F714F0F70}" Win64="$(var.Win64)">
         <File Id="_9B10747B" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpf.Grid.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
@@ -320,6 +324,18 @@
 
       <Component Id="_B94032EE1CAA" Guid="{62646496-DC18-43D0-AE37-B94032EE1CAA}" Win64="$(var.Win64)">
         <File Id="_62646496" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.Xpo.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_BF4FBB271E0D" Guid="{C3BD8574-1870-4780-B7D9-BF4FBB271E0D}" Win64="$(var.Win64)">
+        <File Id="_C3BD8574" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraCharts.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_603C4C81ECC9" Guid="{939F9678-5859-4EC9-A15B-603C4C81ECC9}" Win64="$(var.Win64)">
+        <File Id="_939F9678" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraGauges.v20.1.Core.dll" KeyPath="yes" Assembly=".net"></File>
+      </Component>
+
+      <Component Id="_18F3BD9DD349" Guid="{10468E7C-54AA-4DCD-A680-18F3BD9DD349}" Win64="$(var.Win64)">
+        <File Id="_10468E7C" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)DevExpress.XtraReports.v20.1.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
     </ComponentGroup>

@@ -31,14 +31,11 @@
     <PackageReference Include="CDP4JsonSerializer-CE" Version="6.1.0" />
     <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.3.0" />
     <PackageReference Include="CommonServiceLocator" Version="1.3" />
-    <PackageReference Include="DevExpress.Charts" Version="20.1.3" />
-    <PackageReference Include="DevExpress.Charts.Core" Version="20.1.3" />
     <PackageReference Include="DevExpress.CodeParser" Version="20.1.3" />
     <PackageReference Include="DevExpress.Data" Version="20.1.3" />
     <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.3" />
     <PackageReference Include="DevExpress.DataAccess" Version="20.1.3" />
     <PackageReference Include="DevExpress.Diagram.Core" Version="20.1.3" />
-    <PackageReference Include="DevExpress.Gauges.Core" Version="20.1.3" />
     <PackageReference Include="DevExpress.Images" Version="20.1.3" />
     <PackageReference Include="DevExpress.Mvvm" Version="20.1.3" />
     <PackageReference Include="DevExpress.Office.Core" Version="20.1.3" />
