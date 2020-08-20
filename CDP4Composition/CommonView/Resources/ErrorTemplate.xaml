@@ -1,0 +1,41 @@
+﻿<!-->
+    TODO: Rename this to something more appropriate to indicate that these are general styles and not just Error styles
+Usage: 
+1 - Merge this ResourceDictionary in a xaml to override the default ErrorTemplate of a TextEdit element
+2 - Set the ShowError property to false to remove the default red cross
+<DXWindow..
+    <DXWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/ErrorTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </DXWindow.Resources>
+    <TextEdit .. ShowError="True"/>
+</DXWindow>
+<-->
+<av:ResourceDictionary x:Class="CDP4CommonView.Resources.ErrorTemplate" 
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                     xmlns:av="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
+                     xmlns:userControls="clr-namespace:CDP4CommonView.UserControls"
+                     xmlns:helpers="http://schemas.devexpress.com/winfx/2008/xaml/editors/internal"
+                     mc:Ignorable="d">
+    <ControlTemplate x:Key="{themes:TextEditThemeKey ResourceKey=Template, IsThemeIndependent=True}" TargetType="{x:Type dxe:TextEdit}">
+        <ContentControl Template="{TemplateBinding BorderTemplate}" x:Name="Border" Focusable="False">
+            <DockPanel LastChildFill="True" SnapsToDevicePixels="True">
+                <dxe:ErrorControl DockPanel.Dock="Right" x:Name="PART_ErrorPresenter"/>
+                <dxe:EditorControl x:Name="PART_Content" Template="{Binding Path=(dxe:BaseEdit.OwnerEdit).ActualEditorControlTemplate, RelativeSource={RelativeSource Self}}"/>
+            </DockPanel>
+        </ContentControl>
+    </ControlTemplate>
+    <ControlTemplate x:Key="{themes:TextEditThemeKey ResourceKey=EditTemplate, IsThemeIndependent=True}">
+        <userControls:CDPTextBox x:Name="PART_Editor"
+            Style="{DynamicResource {themes:TextEditThemeKey ResourceKey=TextStyle}}"
+            helpers:EditorMarginHelper.Margin="5,5,5,5,5,5,5,5"/>
+    </ControlTemplate>
+</av:ResourceDictionary>

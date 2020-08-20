@@ -1,0 +1,37 @@
+﻿<dxlc:LayoutGroup x:Class="CDP4CommonView.Items.CategoryLayoutGroup"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                  xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:converters="clr-namespace:CDP4Composition.Converters"
+                  Header="Category"
+                  Orientation="Vertical"
+                  mc:Ignorable="d"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+    <dxlc:LayoutGroup.Resources>
+        <ResourceDictionary>
+            <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
+        </ResourceDictionary>
+    </dxlc:LayoutGroup.Resources>
+    <dxlc:LayoutItem>
+        <dxe:ListBoxEdit Name="CategoriesList"
+                         MaxHeight="350"
+                         VerticalAlignment="Stretch"
+                         HorizontalAlignment="Stretch"
+                        Margin="10"
+                        IsReadOnly="{Binding IsReadOnly}"
+                        DisplayMember="Name"
+                        EditValue="{Binding Category,
+                                            Converter={StaticResource ReactiveCategoryToObjectListConverter},
+                                            UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding PossibleCategory}"
+                        SelectionMode="Multiple">
+            <dxe:ListBoxEdit.StyleSettings>
+                <dxe:CheckedListBoxEditStyleSettings />
+            </dxe:ListBoxEdit.StyleSettings>
+        </dxe:ListBoxEdit>
+    </dxlc:LayoutItem>
+</dxlc:LayoutGroup>

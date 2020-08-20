@@ -5,7 +5,7 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
-    xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+    xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
     Title="Not expression" Height="350" Width="525"
     navigation:DialogCloser.DialogResult="{Binding DialogResult}">
     <dxlc:LayoutControl Margin="5"
