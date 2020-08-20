@@ -60,7 +60,7 @@ namespace CDP4IME.Tests.ViewModels
     using ReactiveUI;
 
     [TestFixture, Apartment(ApartmentState.STA)]
-    public class UpdateDownloaderInstallerDownloaderInstallerViewModelTestFixture : UpdateDownloaderInstallerDataSetup
+    public class UpdateDownloaderInstallerViewModelTestFixture : UpdateDownloaderInstallerDataSetup
     {
         private const string PluginName0 = "plugin0";
         private const string PluginName1 = "plugin1";
@@ -125,7 +125,7 @@ namespace CDP4IME.Tests.ViewModels
                 Setup(x => x.CheckForUpdate(It.IsAny<List<Manifest>>(), It.IsAny<Version>(), It.IsAny<ProcessorArchitecture>())).
                 Returns(Task.FromResult<IEnumerable<(string ThingName, string Version)>>(this.updateResultFomApi));
             
-            this.updateServerClient.Setup(x => x.DownloadIme(Version0, this.platform)).Returns(Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes("msi"))));
+            this.updateServerClient.Setup(x => x.DownloadIme(Version1, this.platform)).Returns(Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes("msi"))));
             this.updateServerClient.Setup(x => x.DownloadPlugin(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes("plugin"))));
 
             this.assemblyInformationService = new Mock<IAssemblyInformationService>();
@@ -159,7 +159,15 @@ namespace CDP4IME.Tests.ViewModels
         {
             if (Directory.Exists(this.BasePath))
             {
-                Directory.Delete(this.BasePath, true);
+                try
+                {
+                    Directory.Delete(this.BasePath, true);
+                }
+                catch (IOException)
+                {
+                    Thread.Sleep(0);
+                    Directory.Delete(this.BasePath, true);
+                }
             }
         }
 
@@ -186,13 +194,15 @@ namespace CDP4IME.Tests.ViewModels
         [Test]
         public async Task VerifyDownload()
         {
+            Console.WriteLine($"BasePath : {this.BasePath}");
             var vm = new UpdateDownloaderInstallerViewModel(true);
             Assert.AreEqual(this.updateResultFomApi, vm.DownloadableThings);
             vm.AvailablePlugins.ForEach(p => p.IsSelected = true);
             vm.AvailableIme.ForEach(i => i.IsSelected = true);
             Assert.IsTrue(vm.DownloadCommand.CanExecute(null));
-            await vm.DownloadCommand.ExecuteAsyncTask(null);
-            
+
+            _ = await vm.DownloadCommand.ExecuteAsyncTask(null);
+            Thread.Sleep(100);
             var basePath = new DirectoryInfo(this.BasePath);
             var allCdp4Ck = basePath.EnumerateFiles("*.cdp4ck", SearchOption.AllDirectories).Select(f => f.Name).ToList();
             Assert.AreEqual(3, allCdp4Ck.Count());

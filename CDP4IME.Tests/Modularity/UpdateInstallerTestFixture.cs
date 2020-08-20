@@ -54,7 +54,7 @@ namespace CDP4IME.Tests.Modularity
         [SetUp]
         public void Setup()
         {
-            this.imeDownloadTestPath = Path.Combine(Path.GetTempPath(), "UpdateInstaller", "ImeDownload", Guid.NewGuid().ToString());
+            this.imeDownloadTestPath = new UpdateFileSystemService().ImeDownloadPath.FullName;
             
             this.commandRunner = new Mock<IProcessRunnerService>();
             this.commandRunner.Setup(x => x.RunAsAdmin(It.IsAny<string>()));
@@ -133,7 +133,6 @@ namespace CDP4IME.Tests.Modularity
 
             this.SetupInstallerFile(true);
 
-            new UpdateFileSystemService().ImeDownloadPath = new DirectoryInfo(this.imeDownloadTestPath);
             Assert.IsTrue(UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown(this.viewInvoker.Object, this.commandRunner.Object));
 
             this.viewInvoker.Verify(x => x.ShowMessageBox(

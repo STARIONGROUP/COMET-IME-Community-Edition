@@ -51,7 +51,7 @@ namespace CDP4IME.Tests.ViewModels
         protected string BasePath;
         protected string TempPath;
         protected string InstallPath;
-        protected string UpdatePath;
+        protected string DownloadPath;
 
         /// <summary>
         /// Base setup wich sets up the file environnement
@@ -61,18 +61,25 @@ namespace CDP4IME.Tests.ViewModels
             this.BasePath = Path.Combine(Path.GetTempPath(), "UpdateTestFixture", Guid.NewGuid().ToString());
             this.TempPath = Path.Combine(this.BasePath, "Temp");
             this.InstallPath = Path.Combine(this.BasePath, "Plugins");
-            this.UpdatePath = Path.Combine(this.BasePath, "Download");
+            this.DownloadPath = Path.Combine(this.BasePath, "Download");
 
-            if (!Directory.Exists(this.UpdatePath))
+            if (!Directory.Exists(this.DownloadPath))
             {
-                Directory.CreateDirectory(this.UpdatePath);
+                Directory.CreateDirectory(this.DownloadPath);
             }
-
+            
             var dataPath = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, "ViewModels/PluginMockData/"));
+
+            var testPluginDownloadPath = new DirectoryInfo(Path.Combine(this.DownloadPath, "plugins", "CDP4BasicRdl"));
+            
+            if (!testPluginDownloadPath.Exists)
+            {
+                testPluginDownloadPath.Create();
+            }
 
             foreach (var file in dataPath.EnumerateFiles())
             {
-                File.Copy(file.FullName, Path.Combine(this.UpdatePath, file.Name), true);
+                File.Copy(file.FullName, Path.Combine(testPluginDownloadPath.FullName, file.Name), true);
             }
 
             if (!Directory.Exists(this.InstallPath))
@@ -94,16 +101,22 @@ namespace CDP4IME.Tests.ViewModels
                 Version = "Version",
                 ReleaseNote = "ReleaseNote"
             };
+            
+            var cdp4Ck = new FileInfo(Path.Combine(testPluginDownloadPath.FullName, "CDP4BasicRdl.cdp4ck"));
+            this.Manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(testPluginDownloadPath.FullName, "CDP4BasicRdl.plugin.manifest")));
+            var imeDownloadPath = new DirectoryInfo(Path.Combine(this.DownloadPath, "ime"));
 
-            var cdp4Ck = new FileInfo(Path.Combine(this.UpdatePath, "CDP4BasicRdl.cdp4ck"));
-            this.Manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(this.UpdatePath, "CDP4BasicRdl.plugin.manifest")));
-
+            if (!imeDownloadPath.Exists)
+            {
+                imeDownloadPath.Create();
+            }
+            
             this.UpdateFileSystem = new UpdateFileSystemService((cdp4Ck, this.Manifest))
             {
                 TemporaryPath = new DirectoryInfo(Path.Combine(this.TempPath, this.Manifest.Name)),
                 InstallationPath = new DirectoryInfo(Path.Combine(this.InstallPath, this.Manifest.Name)),
-                ImeDownloadPath = new DirectoryInfo(Path.Combine(this.UpdatePath, "ime")),
-                PluginDownloadPath = new DirectoryInfo(Path.Combine(this.UpdatePath, "plugins"))
+                ImeDownloadPath = imeDownloadPath,
+                PluginDownloadPath = new DirectoryInfo(Path.Combine(this.DownloadPath, "plugins"))
             };
 
             this.Plugin = (new FileInfo("test"), this.Manifest);

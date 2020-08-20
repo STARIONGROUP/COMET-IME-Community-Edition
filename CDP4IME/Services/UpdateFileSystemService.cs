@@ -198,14 +198,7 @@ namespace CDP4IME.Services
         /// <returns>The path as a string</returns>
         public FileInfo GetDownloadedImeMsi(string installerName)
         {
-            var directory = new DirectoryInfo(Path.Combine(this.ImeDownloadPath.FullName, installerName));
-
-            if (!directory.Exists)
-            {
-                directory.Create();
-            }
-
-            return new FileInfo(Path.Combine(directory.FullName, installerName));
+            return new FileInfo(Path.Combine(this.ImeDownloadPath.FullName, installerName));
         }
         
         /// <summary>
