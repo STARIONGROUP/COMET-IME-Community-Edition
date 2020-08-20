@@ -35,9 +35,6 @@
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="12.3.2" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore">
@@ -63,9 +60,6 @@
     </Reference>
     <Reference Include="System.Transactions">
       <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>False</Private>
     </Reference>
     <Reference Include="System.Xaml">
       <Private>false</Private>
