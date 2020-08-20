@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClientIMEDto.cs" company="RHEA System S.A.">
+// <copyright file="ClientImeDto.cs" company="RHEA System S.A.">
 //   Copyright (c) 2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
@@ -25,15 +25,10 @@
 
 namespace CDP4UpdateServerDal.Dto
 {
-    using System;
-
-    using CDP4UpdateServerDal.Enumerators;
-    using System.Reflection;
-
     /// <summary>
-    /// The Data Transfer Object representation of the <see cref="ClientIMEDto"/> class.
+    /// The Data Transfer Object representation of the <see cref="ClientImeDto"/> class.
     /// </summary>
-    public class ClientIMEDto
+    public class ClientImeDto
     {
         /// <summary>
         /// Gets or sets the Platform.

@@ -40,7 +40,7 @@ namespace CDP4UpdateServerDal.Dto
         /// <summary>
         /// Gets or sets the MinIMEVersion.
         /// </summary>
-        public string MinIMEVersion { get; set; }
+        public string MinImeVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the Release DateTime value.
@@ -51,6 +51,5 @@ namespace CDP4UpdateServerDal.Dto
         /// Gets or sets the VersionNumber.
         /// </summary>
         public string VersionNumber { get; set; }
-
     }
 }

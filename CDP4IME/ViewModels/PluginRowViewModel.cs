@@ -25,8 +25,6 @@
 namespace CDP4IME.ViewModels
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Threading.Tasks;
 
@@ -37,15 +35,11 @@ namespace CDP4IME.ViewModels
 
     using CDP4UpdateServerDal;
 
-    using DevExpress.Xpf.Utils;
-
     using Microsoft.Practices.ServiceLocation;
 
     using NLog;
 
     using ReactiveUI;
-
-    using Void = DevExpress.DataProcessing.Void;
 
     /// <summary>
     /// Represents a <see cref="PluginRow"/> holding its properties and interaction logic
@@ -147,11 +141,6 @@ namespace CDP4IME.ViewModels
         private bool isSelected;
 
         /// <summary>
-        /// Holds the plugin name and version
-        /// </summary>
-        private (string ThingName, string Version) downloadablePlugin;
-
-        /// <summary>
         /// Gets or sets the assert <see cref="isSelected"/> whether the represented plugin will be installed
         /// </summary>
         public bool IsSelected
@@ -188,9 +177,8 @@ namespace CDP4IME.ViewModels
         /// <param name="plugin"> A <code>(string ThingName, string Version)</code> containing the name and the version</param>
         public PluginRowViewModel((string ThingName, string Version) plugin)
         {
-            this.downloadablePlugin = plugin; 
-            this.Name = this.downloadablePlugin.ThingName;
-            this.Version = this.downloadablePlugin.Version;
+            this.Name = plugin.ThingName;
+            this.Version = plugin.Version;
             this.FileSystem = ServiceLocator.Current.GetInstance<IUpdateFileSystemService>();
         }
 
@@ -244,7 +232,6 @@ namespace CDP4IME.ViewModels
                 using (var stream = await client.DownloadPlugin(this.Name, this.Version))
                 {
                     this.Progress = 50;
-                    var stepping = 100d / stream.Length;
                     
                     using (var fileStream = this.FileSystem.CreateCdp4Ck(this.Name))
                     {

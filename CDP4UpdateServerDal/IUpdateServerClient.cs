@@ -72,8 +72,8 @@ namespace CDP4UpdateServerDal
         /// </summary>
         /// <param name="version">The current version</param>
         /// <param name="platform">The compatible platform <see cref="Platform"/></param>
-        /// <returns>An <see cref="IMEVersionDto"/></returns>
-        Task<IMEVersionDto> GetLatestIme(Version version, Platform platform = Platform.X64);
+        /// <returns>An <see cref="ImeVersionDto"/></returns>
+        Task<ImeVersionDto> GetLatestIme(Version version, Platform platform = Platform.X64);
 
         /// <summary>
         /// Compares current installed plugin version, current IME version installed and what versions are available on the Update Server

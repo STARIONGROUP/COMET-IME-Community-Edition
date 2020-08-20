@@ -47,7 +47,7 @@ namespace CDP4UpdateServerDal
         /// <summary>
         /// Holds a http message handler
         /// </summary>
-        private HttpMessageHandler messageHandler;
+        private readonly HttpMessageHandler messageHandler;
 
         /// <summary>
         /// Gets or sets the Base address of the target Update Server
@@ -68,7 +68,7 @@ namespace CDP4UpdateServerDal
         /// <summary>
         /// Initializes a new <see cref="BaseClient"/>
         /// </summary>
-        internal BaseClient()
+        protected BaseClient()
         {
         }
 
@@ -77,7 +77,7 @@ namespace CDP4UpdateServerDal
         /// </summary>
         /// <param name="serverBaseAddress">The targeted server base address</param>
         /// <param name="messageHandler">The mocked message handler</param>
-        internal BaseClient(Uri serverBaseAddress, HttpMessageHandler messageHandler = null)
+        protected BaseClient(Uri serverBaseAddress, HttpMessageHandler messageHandler = null)
         {
             this.BaseAddress = serverBaseAddress;
             this.messageHandler = messageHandler;

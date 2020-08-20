@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMEDto.cs" company="RHEA System S.A.">
+// <copyright file="ImeDto.cs" company="RHEA System S.A.">
 //   Copyright (c) 2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
@@ -28,21 +28,21 @@ namespace CDP4UpdateServerDal.Dto
     using System.Collections.Generic;
 
     /// <summary>
-    /// The Data Transfer Object representation of the <see cref="IMEDto"/> class.
+    /// The Data Transfer Object representation of the <see cref="ImeDto"/> class.
     /// </summary>
-    public class IMEDto
+    public class ImeDto
     {
         /// <summary>
-        /// Gets or sets the list of the <see cref="IMEVersionDto"/> class
+        /// Gets or sets the list of the <see cref="ImeVersionDto"/> class
         /// </summary>
-        public List<IMEVersionDto> Versions { get; set; }
+        public List<ImeVersionDto> Versions { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IMEDto"/> class.
+        /// Initializes a new instance of the <see cref="ImeDto"/> class.
         /// </summary>
-        public IMEDto()
+        public ImeDto()
         {
-            this.Versions = new List<IMEVersionDto>();
+            this.Versions = new List<ImeVersionDto>();
         }
     }
 }

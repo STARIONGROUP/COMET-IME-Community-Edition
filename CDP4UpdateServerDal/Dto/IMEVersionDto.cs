@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMEVersionDto.cs" company="RHEA System S.A.">
+// <copyright file="ImeVersionDto.cs" company="RHEA System S.A.">
 //   Copyright (c) 2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
@@ -29,9 +29,9 @@ namespace CDP4UpdateServerDal.Dto
     using System.Collections.Generic;
 
     /// <summary>
-    /// The Data Transfer Object representation of the <see cref="IMEVersionDto"/> class.
+    /// The Data Transfer Object representation of the <see cref="ImeVersionDto"/> class.
     /// </summary>
-    public class IMEVersionDto
+    public class ImeVersionDto
     {
         /// <summary>
         /// Gets or sets the PreRelease value.
@@ -49,16 +49,16 @@ namespace CDP4UpdateServerDal.Dto
         public string VersionNumber { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of the <see cref="IMEVersionPlatformDto"/> class
+        /// Gets or sets the list of the <see cref="ImeVersionPlatformDto"/> class
         /// </summary>
-        public List<IMEVersionPlatformDto> Platforms { get; set; }
+        public List<ImeVersionPlatformDto> Platforms { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IMEVersionDto"/> class.
+        /// Initializes a new instance of the <see cref="ImeVersionDto"/> class.
         /// </summary>
-        public IMEVersionDto()
+        public ImeVersionDto()
         {
-            this.Platforms = new List<IMEVersionPlatformDto>();
+            this.Platforms = new List<ImeVersionPlatformDto>();
         }
     }
 }

@@ -132,7 +132,7 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Holds the version as is to be sent to the update server
         /// </summary>
-        private string version;
+        private readonly string version;
 
         /// <summary>
         /// Gets the plugin download path and the new manifest

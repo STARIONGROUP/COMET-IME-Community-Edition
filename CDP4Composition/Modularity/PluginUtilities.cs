@@ -171,7 +171,10 @@ namespace CDP4Composition.Modularity
         /// <returns>A <see cref="DirectoryInfo"/></returns>
         public static DirectoryInfo GetDownloadDirectory(bool isItForPlugins = true, string pluginName = null)
         {
-            var downloadPath = new DirectoryInfo(Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, isItForPlugins ? PluginDirectoryName : ImeDirectoryName, isItForPlugins ? string.IsNullOrWhiteSpace(pluginName) ? string.Empty : pluginName : string.Empty));
+            var path3 = isItForPlugins ? PluginDirectoryName : ImeDirectoryName;
+            var path4 = isItForPlugins && !string.IsNullOrWhiteSpace(pluginName) ? pluginName : string.Empty;
+
+            var downloadPath = new DirectoryInfo(Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, path3, path4));
 
             if (!downloadPath.Exists)
             {

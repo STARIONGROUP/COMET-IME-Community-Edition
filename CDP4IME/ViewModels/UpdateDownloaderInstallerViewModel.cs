@@ -27,18 +27,15 @@ namespace CDP4IME.ViewModels
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Net.Http;
     using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Windows;
     using System.Windows.Threading;
 
     using CDP4CommonView.ViewModels;
-    using CDP4CommonView.Views;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Modularity;
@@ -46,10 +43,8 @@ namespace CDP4IME.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services.AppSettingService;
     using CDP4Composition.Utilities;
-    using CDP4Composition.ViewModels;
 
     using CDP4IME.Behaviors;
-    using CDP4IME.Modularity;
     using CDP4IME.Services;
     using CDP4IME.Settings;
     using CDP4IME.Views;
@@ -96,7 +91,7 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Holds the app setting service instance
         /// </summary>
-        private IAppSettingsService<ImeAppSettings> appSettingService;
+        private readonly IAppSettingsService<ImeAppSettings> appSettingService;
 
         /// <summary>
         /// Backing field for the <see cref="IsCheckingApi"/> property
@@ -267,7 +262,7 @@ namespace CDP4IME.ViewModels
 
             if (shouldCheckApi)
             {
-                this.CheckApiForUpdate();
+                _ = this.CheckApiForUpdate();
             }
             
             this.WhenAny(x => x.IsCheckingApi, v => !v.Value)
@@ -590,6 +585,12 @@ namespace CDP4IME.ViewModels
         /// Disposes of the <see cref="IDisposable"/>
         /// </summary>
         public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
         {
             this.DownloadCommand?.Dispose();
             this.InstallCommand?.Dispose();

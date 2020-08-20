@@ -82,7 +82,7 @@ namespace CDP4UpdateServerDal
         /// <returns>A <see cref="Stream"/></returns>
         public async Task<Stream> DownloadIme(string version, Platform platform)
         {
-            return await this.QueryStream<IMEDto>(HttpVerbs.Get, $"{version}/{platform}/download");
+            return await this.QueryStream<ImeDto>(HttpVerbs.Get, $"{version}/{platform}/download");
         }
 
         /// <summary>
@@ -122,19 +122,19 @@ namespace CDP4UpdateServerDal
         /// </summary>
         /// <param name="version">The current version</param>
         /// <param name="platform">The compatible platform <see cref="Platform"/></param>
-        /// <returns>An <see cref="IMEVersionDto"/></returns>
-        public async Task<IMEVersionDto> GetLatestIme(Version version, Platform platform = Platform.X64)
+        /// <returns>An <see cref="ImeVersionDto"/></returns>
+        public async Task<ImeVersionDto> GetLatestIme(Version version, Platform platform = Platform.X64)
         {
-            var requestBody = new ConsolidateIMECommand()
+            var requestBody = new ConsolidateImeCommand()
             {
-                ClientIME = new ClientIMEDto()
+                ClientIME = new ClientImeDto()
                 {
                     Platform = platform.ToString(),
                     Version = version.ToString()
                 }
             };
 
-            var response = await this.GetLatest<IMEDto>(requestBody);
+            var response = await this.GetLatest<ImeDto>(requestBody);
             return response.Versions.FirstOrDefault();
         }
 

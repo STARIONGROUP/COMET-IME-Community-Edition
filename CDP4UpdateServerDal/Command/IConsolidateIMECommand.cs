@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IConsolidateIMECommand.cs" company="RHEA System S.A.">
+// <copyright file="IConsolidateImeCommand.cs" company="RHEA System S.A.">
 //   Copyright (c) 2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
@@ -30,11 +30,11 @@ namespace CDP4UpdateServerDal.Command
     /// <summary>
     /// The ConsolidateIMECommand interface.
     /// </summary>
-    public interface IConsolidateIMECommand
+    public interface IConsolidateImeCommand
     {
         /// <summary>
-        /// Gets or sets the <see cref="ClientIMEDto"/> that storage client IME data. 
+        /// Gets or sets the <see cref="ClientImeDto"/> that storage client IME data. 
         /// </summary>
-        ClientIMEDto ClientIME { get; set; }
+        ClientImeDto ClientIME { get; set; }
     }
 }
