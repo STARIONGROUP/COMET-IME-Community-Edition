@@ -150,7 +150,7 @@ namespace CDP4IME.Services
         {
             if (this.TemporaryPath.Exists)
             {
-                Directory.Delete(this.InstallationPath.FullName);
+                Directory.Delete(this.InstallationPath.FullName, true);
                 this.TemporaryPath.MoveTo(this.InstallationPath.FullName);
             }
         }
