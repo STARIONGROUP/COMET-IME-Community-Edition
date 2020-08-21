@@ -168,6 +168,11 @@ namespace CDP4IME.Tests.ViewModels
                     Thread.Sleep(0);
                     Directory.Delete(this.BasePath, true);
                 }
+                catch (UnauthorizedAccessException)
+                {
+                    Thread.Sleep(0);
+                    Directory.Delete(this.BasePath, true);
+                }
             }
         }
 
@@ -302,6 +307,35 @@ namespace CDP4IME.Tests.ViewModels
                 }));
 
             this.AssertInstalledTestFileHasBeenRestored();
+        }
+
+        [Test]
+        public void VerifyRestartAfterDownloadCommand()
+        {
+            var vm = new UpdateDownloaderInstallerViewModel(false);
+            Assert.IsTrue(vm.RestartAfterDownloadCommand.CanExecute(null));
+            Assert.IsFalse(vm.HasToRestartClientAfterDownload);
+            vm.IsInstallationOrDownloadInProgress = false;
+            vm.RestartAfterDownloadCommand.Execute(null);
+            Assert.IsTrue(vm.HasToRestartClientAfterDownload);
+        }
+
+        [Test]
+        public async Task VerifyCancelDownload()
+        {
+            var vm = new UpdateDownloaderInstallerViewModel(true);
+            vm.AvailablePlugins.First().IsSelected = true;
+            vm.AvailableIme.First().IsSelected = true;
+            Assert.IsTrue(vm.DownloadCommand.CanExecute(null));
+            await vm.DownloadCommand.ExecuteAsyncTask(null);
+            Assert.IsTrue(vm.CancelCommand.CanExecute(null));
+            vm.CancelCommand.Execute(null);
+            
+            Assert.IsFalse(this.UpdateFileSystem.ImeDownloadPath.Exists);
+
+            Assert.False(
+                this.UpdateFileSystem.PluginDownloadPath.EnumerateFiles().Any(
+                    f => f.Name == PluginName0 || f.Name == PluginName1));
         }
     }
 }

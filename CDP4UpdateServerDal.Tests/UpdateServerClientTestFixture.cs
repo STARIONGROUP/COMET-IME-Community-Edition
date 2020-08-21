@@ -52,9 +52,9 @@ namespace CDP4UpdateServerDal.Tests
         private string consolidateImeResponse;
         private string consolidatePluginResponse;
         private List<Manifest> installedManifest;
-        private const string PluginName0 = "plugin0";
-        private const string PluginName1 = "plugin1";
-        private const string PluginName2 = "plugin2";
+        private const string PluginName0 = "Plugin0";
+        private const string PluginName1 = "Plugin1";
+        private const string PluginName2 = "Plugin2";
         private const string Version0 = "0.1.0.0";
         private const string Version1 = "0.2.0.0";
         private const string BaseAddress = "http://test.test/";
@@ -157,6 +157,48 @@ namespace CDP4UpdateServerDal.Tests
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(r =>
                     r.Method == HttpMethod.Get && r.RequestUri.AbsoluteUri == $"{BaseAddress}api/ime/{Version1}/X64/download"),
+                ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Test]
+        public async Task VerifyCheckForUpdate()
+        {
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Loose);
+
+            handlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>(MethodName,
+                    ItExpr.Is<HttpRequestMessage>(r =>
+                        r.Method == HttpMethod.Post && r.RequestUri.AbsoluteUri == $"{BaseAddress}api/plugin"), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StringContent(this.consolidatePluginResponse) })
+                .Verifiable();
+
+            handlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>(MethodName,
+                    ItExpr.Is<HttpRequestMessage>(r =>
+                        r.Method == HttpMethod.Post && r.RequestUri.AbsoluteUri == $"{BaseAddress}api/ime"), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StringContent(this.consolidateImeResponse) })
+                .Verifiable();
+
+            var client = new UpdateServerClient(new Uri(BaseAddress), handlerMock.Object);
+
+            var result = await client.CheckForUpdate(this.installedManifest, new Version(Version0), ProcessorArchitecture.Amd64);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4, result.Count());
+
+            handlerMock.Protected().Verify(
+                MethodName,
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(r =>
+                    r.Method == HttpMethod.Post && r.RequestUri.AbsoluteUri == $"{BaseAddress}api/ime"),
+                ItExpr.IsAny<CancellationToken>()
+            );
+
+            handlerMock.Protected().Verify(
+                MethodName,
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(r =>
+                    r.Method == HttpMethod.Post && r.RequestUri.AbsoluteUri == $"{BaseAddress}api/plugin"),
                 ItExpr.IsAny<CancellationToken>());
         }
 
