@@ -8,7 +8,9 @@ namespace CDP4Composition.Tests.Converters
 {
     using System;
     using System.Windows;
+
     using CDP4Composition.Converters;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -29,6 +31,11 @@ namespace CDP4Composition.Tests.Converters
 
             Assert.AreEqual(Visibility.Visible, this.booleanToVisibilityConverter.Convert(true, null, null, null));
             Assert.AreEqual(Visibility.Collapsed, this.booleanToVisibilityConverter.Convert(false, null, null, null));
+            Assert.AreEqual(Visibility.Visible, this.booleanToVisibilityConverter.Convert(false, null, "Invert", null));
+            Assert.AreEqual(Visibility.Collapsed, this.booleanToVisibilityConverter.Convert(false, null, 0, null));
+            
+            Assert.Throws<InvalidCastException>(
+                () => this.booleanToVisibilityConverter.Convert(1d, null, null, null));
         }
 
         [Test]

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DoubleToVisibilityConverterTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="IntegerToVisibilityConverterTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -33,39 +33,39 @@ namespace CDP4Composition.Tests.Converters
     using NUnit.Framework;
 
     /// <summary>
-    /// Suite of tests for the <see cref="doubleToVisibilityConverter"/>
+    /// Suite of tests for the <see cref="IntegerToVisibilityConverter"/>
     /// </summary>
     [TestFixture]
-    public class DoubleToVisibilityConverterTestFixture
+    public class IntegerToVisibilityConverterTestFixture
     {
-        private DoubleToVisibilityConverter doubleToVisibilityConverter;
+        private IntegerToVisibilityConverter IntegerToVisibilityConverter;
 
         [SetUp]
         public void SetUp()
         {
-            this.doubleToVisibilityConverter = new DoubleToVisibilityConverter();
+            this.IntegerToVisibilityConverter = new IntegerToVisibilityConverter();
         }
 
         [Test]
         public void VerifyThatTheConvertMethodReturnsTheExpectedResult()
         {
-            Assert.AreEqual(Visibility.Collapsed, this.doubleToVisibilityConverter.Convert(0d, null, null, null));
-            Assert.AreEqual(Visibility.Collapsed, this.doubleToVisibilityConverter.Convert(null, null, null, null));
+            Assert.AreEqual(Visibility.Collapsed, this.IntegerToVisibilityConverter.Convert(0, null, null, null));
+            Assert.AreEqual(Visibility.Collapsed, this.IntegerToVisibilityConverter.Convert(null, null, null, null));
 
-            Assert.AreEqual(Visibility.Visible, this.doubleToVisibilityConverter.Convert(0.1, null, null, null));
-            Assert.AreEqual(Visibility.Visible, this.doubleToVisibilityConverter.Convert(98d, null, null, null));
+            Assert.AreEqual(Visibility.Visible, this.IntegerToVisibilityConverter.Convert(1, null, null, null));
+            Assert.AreEqual(Visibility.Visible, this.IntegerToVisibilityConverter.Convert(98, null, null, null));
             
-            Assert.AreEqual(Visibility.Collapsed, this.doubleToVisibilityConverter.Convert(98d, null, "Invert", null));
-            Assert.AreEqual(Visibility.Visible, this.doubleToVisibilityConverter.Convert(98d, null, 0, null));
-
+            Assert.AreEqual(Visibility.Collapsed, this.IntegerToVisibilityConverter.Convert(98, null, "Invert", null));
+            Assert.AreEqual(Visibility.Visible, this.IntegerToVisibilityConverter.Convert(98, null, 0, null));
+            
             Assert.Throws<InvalidCastException>(
-                () => this.doubleToVisibilityConverter.Convert(1, null, null, null));
+                () => this.IntegerToVisibilityConverter.Convert(1d, null, null, null));
         }
 
         [Test]
         public void VerifyThatConvertBackIsNotSupported()
         {
-            Assert.Throws<NotSupportedException>(() => this.doubleToVisibilityConverter.ConvertBack(null, null, null, null));
+            Assert.Throws<NotSupportedException>(() => this.IntegerToVisibilityConverter.ConvertBack(null, null, null, null));
         }
     }
 }

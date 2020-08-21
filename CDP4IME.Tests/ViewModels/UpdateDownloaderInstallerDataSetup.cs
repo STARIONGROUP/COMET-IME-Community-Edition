@@ -32,6 +32,8 @@ namespace CDP4IME.Tests.ViewModels
 
     using CDP4IME.Services;
 
+    using DevExpress.Mvvm.Native;
+
     using Newtonsoft.Json;
 
     using NUnit.Framework;
@@ -109,6 +111,7 @@ namespace CDP4IME.Tests.ViewModels
             if (!imeDownloadPath.Exists)
             {
                 imeDownloadPath.Create();
+                imeDownloadPath.Refresh();
             }
             
             this.UpdateFileSystem = new UpdateFileSystemService((cdp4Ck, this.Manifest))

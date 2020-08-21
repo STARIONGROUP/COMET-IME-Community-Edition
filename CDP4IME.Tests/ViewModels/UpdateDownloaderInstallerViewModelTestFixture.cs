@@ -28,7 +28,9 @@ namespace CDP4IME.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.IO.Compression;
     using System.Linq;
+    using System.Net.Http;
     using System.Reactive.Concurrency;
     using System.Reflection;
     using System.Text;
@@ -54,6 +56,8 @@ namespace CDP4IME.Tests.ViewModels
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
+
+    using Newtonsoft.Json;
 
     using NUnit.Framework;
 
@@ -82,6 +86,9 @@ namespace CDP4IME.Tests.ViewModels
         private Platform platform;
         private ImeAppSettings appSettings;
         private List<(string ThingName, string Version)> updateResultFomApi;
+        private FileInfo alreadyDownloadedMsi;
+        private FileInfo realAlreadyDownloadedplugin0;
+        private FileInfo realAlreadyDownloadedplugin1;
 
         [SetUp]
         public override void Setup()
@@ -157,6 +164,16 @@ namespace CDP4IME.Tests.ViewModels
         [TearDown]
         public void Teardown()
         {
+            if (this.realAlreadyDownloadedplugin0?.Directory?.Exists == true)
+            {
+                this.realAlreadyDownloadedplugin0.Directory.Delete(true);
+            }
+
+            if (this.realAlreadyDownloadedplugin1?.Directory?.Exists == true)
+            {
+                this.realAlreadyDownloadedplugin1.Directory.Delete(true);
+            }
+
             if (Directory.Exists(this.BasePath))
             {
                 try
@@ -186,6 +203,9 @@ namespace CDP4IME.Tests.ViewModels
             Assert.IsNull(vm.CancellationTokenSource);
             Assert.IsFalse(vm.IsInDownloadMode);
             Assert.IsFalse(vm.IsCheckingApi);
+            Assert.IsNull(vm.DialogResult);
+            Assert.IsNull(vm.LoadingMessage);
+            Assert.False(vm.IsBusy);
         }
 
         [Test]
@@ -194,6 +214,14 @@ namespace CDP4IME.Tests.ViewModels
             var vm = new UpdateDownloaderInstallerViewModel(false);
             await vm.CheckApiForUpdate().ConfigureAwait(true);
             Assert.AreEqual(vm.DownloadableThings, this.updateResultFomApi);
+
+            this.updateServerClient.Setup(x => x.CheckForUpdate(It.IsAny<List<Manifest>>(), It.IsAny<Version>(), It.IsAny<ProcessorArchitecture>())).Throws(new HttpRequestException(string.Empty));
+            await vm.CheckApiForUpdate().ConfigureAwait(true);
+            this.dialogNavigation.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
+            
+            this.updateServerClient.Setup(x => x.CheckForUpdate(It.IsAny<List<Manifest>>(), It.IsAny<Version>(), It.IsAny<ProcessorArchitecture>())).Throws(new Exception(string.Empty));
+            Assert.DoesNotThrowAsync(() => vm.CheckApiForUpdate()); 
+            this.dialogNavigation.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
         }
 
         [Test]
@@ -202,6 +230,8 @@ namespace CDP4IME.Tests.ViewModels
             Console.WriteLine($"BasePath : {this.BasePath}");
             var vm = new UpdateDownloaderInstallerViewModel(true);
             Assert.AreEqual(this.updateResultFomApi, vm.DownloadableThings);
+            _ = await vm.DownloadCommand.ExecuteAsyncTask(null);
+
             vm.AvailablePlugins.ForEach(p => p.IsSelected = true);
             vm.AvailableIme.ForEach(i => i.IsSelected = true);
             Assert.IsTrue(vm.DownloadCommand.CanExecute(null));
@@ -316,7 +346,9 @@ namespace CDP4IME.Tests.ViewModels
             Assert.IsTrue(vm.RestartAfterDownloadCommand.CanExecute(null));
             Assert.IsFalse(vm.HasToRestartClientAfterDownload);
             vm.IsInstallationOrDownloadInProgress = false;
+            var downloadText = vm.DownloadButtonText;
             vm.RestartAfterDownloadCommand.Execute(null);
+            Assert.AreNotEqual(downloadText, vm.DownloadButtonText);
             Assert.IsTrue(vm.HasToRestartClientAfterDownload);
         }
 
@@ -330,12 +362,48 @@ namespace CDP4IME.Tests.ViewModels
             await vm.DownloadCommand.ExecuteAsyncTask(null);
             Assert.IsTrue(vm.CancelCommand.CanExecute(null));
             vm.CancelCommand.Execute(null);
-            
-            Assert.IsFalse(this.UpdateFileSystem.ImeDownloadPath.Exists);
 
             Assert.False(
                 this.UpdateFileSystem.PluginDownloadPath.EnumerateFiles().Any(
                     f => f.Name == PluginName0 || f.Name == PluginName1));
+        }
+        
+        [Test]
+        public async Task VerifyCheckApiWhenAllHasBeenDownloadedAlready()
+        {
+            this.alreadyDownloadedMsi = new FileInfo(Path.Combine(this.UpdateFileSystem.ImeDownloadPath.FullName, $"CDP4{UpdateServerClient.ImeKey}-CE.x64-{Version1}.msi"));
+            File.Create(this.alreadyDownloadedMsi.FullName).Dispose();
+
+            this.realAlreadyDownloadedplugin0 = this.CreateRealCdp4Ck(PluginName0);
+            this.realAlreadyDownloadedplugin1 = this.CreateRealCdp4Ck(PluginName1);
+            
+            var vm = new UpdateDownloaderInstallerViewModel(false);
+            await vm.CheckApiForUpdate().ConfigureAwait(true);
+            Assert.IsEmpty(vm.DownloadableThings);
+        }
+
+        private FileInfo CreateRealCdp4Ck(string pluginName)
+        {
+            var cdp4CkFile = new FileInfo(Path.Combine(PluginUtilities.GetDownloadDirectory(true, pluginName).FullName, $"{pluginName}.cdp4ck"));
+            
+            var manifestBytes = Encoding.UTF8.GetBytes(
+                JsonConvert.SerializeObject(
+                    new Manifest() { Name = pluginName, Version = Version1 }));
+
+            using (var plugin0Cdp4CkFile = new FileStream(cdp4CkFile.FullName, FileMode.CreateNew))
+            {
+                using (var archive = new ZipArchive(plugin0Cdp4CkFile, ZipArchiveMode.Create, true))
+                {
+                    var entry = archive.CreateEntry($"{pluginName}.plugin.manifest", CompressionLevel.Fastest);
+
+                    using (var entryStream = entry.Open())
+                    {
+                        entryStream.Write(manifestBytes, 0, manifestBytes.Length);
+                    }
+                }
+            }
+
+            return cdp4CkFile;
         }
     }
 }

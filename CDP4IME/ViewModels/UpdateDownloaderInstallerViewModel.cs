@@ -61,7 +61,7 @@ namespace CDP4IME.ViewModels
     /// The <see cref="UpdateDownloaderInstallerViewModel"/> is the view model of the <see cref="UpdateDownloaderInstallerViewModel"/> holding it properties its properties and interaction logic
     /// </summary>
     [DialogViewModelExport(nameof(UpdateDownloaderInstaller), "Plugin Installer")]
-    public class UpdateDownloaderInstallerViewModel : ReactiveObject, IPluginInstallerViewModel, IDialogViewModel
+    public class UpdateDownloaderInstallerViewModel : ReactiveObject, IUpdateDownloaderInstallerViewModel, IDialogViewModel
     {
         /// <summary>
         /// Holds the Download button text
@@ -256,7 +256,7 @@ namespace CDP4IME.ViewModels
         public UpdateDownloaderInstallerViewModel(bool shouldCheckApi)
         {
             this.appSettingService = ServiceLocator.Current.GetInstance<IAppSettingsService<ImeAppSettings>>();
-            this.isInDownloadMode = true;
+            this.IsInDownloadMode = true;
             this.InitializeCommand();
             this.InitializeDownloadRelativeCommand();
 
@@ -465,7 +465,9 @@ namespace CDP4IME.ViewModels
         /// <returns>A <see cref="IEnumerable{T}"/> of type <code>(string ThingName, string Version)</code> containing new versions</returns>
         private IEnumerable<(string ThingName, string Version)> SortDownloadedThingsWithAlreadyDownloadedOnes(List<(string ThingName, string Version)> availableUpdates)
         {
-            foreach (var (_, manifest) in PluginUtilities.GetDownloadedInstallablePluginUpdate())
+            var downloaded = PluginUtilities.GetDownloadedInstallablePluginUpdate();
+            
+            foreach (var (_, manifest) in downloaded)
             {
                 var (thingName, version) = availableUpdates.FirstOrDefault(u => u.ThingName == manifest.Name && u.Version == manifest.Version);
 

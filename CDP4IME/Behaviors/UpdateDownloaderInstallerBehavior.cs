@@ -64,7 +64,7 @@ namespace CDP4IME.Behaviors
         /// <param name="e">the arguments</param>
         private void OnClosing(object sender, CancelEventArgs e)
         {
-            (this.AssociatedObject.DataContext as IPluginInstallerViewModel)?.CancellationTokenSource?.Cancel();
+            (this.AssociatedObject.DataContext as IUpdateDownloaderInstallerViewModel)?.CancellationTokenSource?.Cancel();
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace CDP4IME.Behaviors
         /// <param name="e">the arguments <see cref="System.Windows.DependencyPropertyChangedEventArgs"/></param>
         private void OnDataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue is IPluginInstallerViewModel viewModel)
+            if (e.NewValue is IUpdateDownloaderInstallerViewModel viewModel)
             {
                 viewModel.Behavior = this;
             }

@@ -265,6 +265,14 @@ namespace CDP4IME.Tests
             CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Closed));
             Assert.AreEqual(0, this.viewModel.OpenSessions.Count);
         }
+        
+        [Test]
+        public void VerifyCheckForUpdateCommand()
+        {
+            this.navigationService.Setup(x => x.NavigateModal(It.IsAny<UpdateDownloaderInstallerViewModel>())).Returns(null as IDialogResult);
 
+            this.viewModel.CheckForUpdateCommand.Execute(null);
+            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<UpdateDownloaderInstallerViewModel>()));
+        }
     }
 }

@@ -32,7 +32,6 @@ namespace CDP4IME.Tests.ViewModels
     using System.Threading;
 
     using CDP4Composition.Modularity;
-    using CDP4Composition.ViewModels;
 
     using CDP4IME.ViewModels;
 
@@ -43,7 +42,7 @@ namespace CDP4IME.Tests.ViewModels
     using ReactiveUI;
 
     [TestFixture]
-    public class RowViewModelTestFixture : UpdateDownloaderInstallerDataSetup
+    public class PluginRowViewModelTestFixture : UpdateDownloaderInstallerDataSetup
     {
         [SetUp]
         public override void Setup()

@@ -1,5 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginInstallerViewModel.cs" company="RHEA System S.A.">
+﻿// <copyright file="AssemblyInformationServiceTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,25 +22,38 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.ViewModels
+namespace CDP4Composition.Tests.Utilities
 {
-    using System.Threading;
+    using System.IO;
+    using System.Reflection;
 
-    using CDP4IME.Behaviors;
+    using CDP4Composition.Utilities;
 
-    /// <summary>
-    /// Definition of the <see cref="UpdateDownloaderInstallerViewModel"/> providing properties and methods the implementing class has to implement
-    /// </summary>
-    public interface IPluginInstallerViewModel
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class AssemblyInformationServiceTestFixture
     {
-        /// <summary>
-        /// The attached Behavior
-        /// </summary>
-        IUpdateDownloaderInstallerBehavior Behavior { get; set; }
+        [Test]
+        public void VerifyGetVersion()
+        {
+            Assert.IsNotNull(new AssemblyInformationService().GetVersion());
+        }
+        
+        [Test]
+        public void VerifyGetProcessorArchitecture()
+        {
+            var processorArchitecture = new AssemblyInformationService().GetProcessorArchitecture();
+            Assert.IsNotNull(processorArchitecture);
+            Assert.IsFalse(processorArchitecture == ProcessorArchitecture.None);
+        }
 
-        /// <summary>
-        /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 
-        /// </summary>
-        CancellationTokenSource CancellationTokenSource { get; }
+        [Test]
+        public void Verify()
+        {
+            var location = new AssemblyInformationService().GetLocation();
+            Assert.IsNotNull(location);
+            Assert.IsTrue(Directory.Exists(location));
+        }
     }
 }
