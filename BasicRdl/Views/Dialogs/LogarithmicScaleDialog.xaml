@@ -18,7 +18,7 @@
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
     <dx:DXWindow.Resources>
-        <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/ErrorTemplate.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/ErrorTemplate.xaml"/>
     </dx:DXWindow.Resources>
     <dxlc:LayoutControl Margin="5"
                         Orientation="Vertical"

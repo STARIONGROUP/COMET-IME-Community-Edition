@@ -12,7 +12,7 @@
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/RibbonMenuItemTemplate.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/RibbonMenuItemTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </dxr:RibbonPageGroup.Resources>

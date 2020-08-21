@@ -7,9 +7,13 @@
 namespace CDP4CommonView.Tests
 {
     using System;
+
     using CDP4Common.EngineeringModelData;
+    
     using CDP4Dal;
+    
     using Moq;
+    
     using NUnit.Framework;
 
     /// <summary>
@@ -20,7 +24,6 @@ namespace CDP4CommonView.Tests
     {
         private Mock<ISession> session;
         private BinaryRelationship binaryRelationship;
-        private BinaryRelationshipRowViewModel viewmodel;
 
         [SetUp]
         public void SetUp()

@@ -19,7 +19,7 @@
     <dx:DXWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/ErrorTemplate.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/ErrorTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:FileRevisionBackgroundConverter x:Key="FileRevisionBackgroundConverter" />
             <converters:FileRevisionOpacityConverter x:Key="FileRevisionOpacityConverter" />
