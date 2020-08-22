@@ -131,7 +131,6 @@ namespace CDP4IME.Tests.ViewModels
         /// <param name="destinationPathFullName">the path where to put the test file</param>
         protected void SetupTestContentForInstallationCancellationPurpose(string destinationPathFullName)
         {
-            this.UpdateFileSystem.TemporaryPath.Create();
             this.UpdateFileSystem.InstallationPath.Create();
 
             var testFileFullName = Path.Combine(destinationPathFullName, TestFileName);

@@ -31,8 +31,6 @@ namespace CDP4IME.Services
 
     using CDP4Composition.Modularity;
 
-    using CDP4IME.Modularity;
-
     /// <summary>
     /// The purpose of the <see cref="UpdateFileSystemService"/> is to provide operations appliable on a file system
     /// </summary>
@@ -151,7 +149,7 @@ namespace CDP4IME.Services
             if (this.TemporaryPath.Exists)
             {
                 Directory.Delete(this.InstallationPath.FullName, true);
-                this.TemporaryPath.MoveTo(this.InstallationPath.FullName);
+                Directory.Move(this.TemporaryPath.FullName, this.InstallationPath.FullName);
             }
         }
         

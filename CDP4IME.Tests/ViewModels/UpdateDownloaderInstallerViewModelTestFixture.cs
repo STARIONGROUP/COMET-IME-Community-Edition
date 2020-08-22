@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginInstallerViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -330,12 +330,9 @@ namespace CDP4IME.Tests.ViewModels
 
             await Task.WhenAll(
                 this.viewModel.InstallCommand.ExecuteAsyncTask(null),
-                Task.Run(() =>
-                {
-                    Task.Delay(1);
-                    return this.viewModel.CancelCommand.ExecuteAsyncTask(null);
-                }));
+                this.viewModel.CancelCommand.ExecuteAsyncTask(null));
 
+            File.Delete(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName);
             this.AssertInstalledTestFileHasBeenRestored();
         }
 

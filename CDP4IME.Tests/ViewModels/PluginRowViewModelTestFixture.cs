@@ -102,6 +102,12 @@ namespace CDP4IME.Tests.ViewModels
         [Test]
         public void VerifyCancelation()
         {
+            if (!this.UpdateFileSystem.TemporaryPath.Exists)
+            {
+                this.UpdateFileSystem.TemporaryPath.Create();
+                this.UpdateFileSystem.TemporaryPath.Refresh();
+            }
+
             this.SetupTestContentForInstallationCancellationPurpose(this.UpdateFileSystem.TemporaryPath.FullName);
 
             var viewModel = new PluginRowViewModel(this.Plugin, this.UpdateFileSystem);
