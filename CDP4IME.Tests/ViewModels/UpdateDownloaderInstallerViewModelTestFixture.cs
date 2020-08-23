@@ -114,9 +114,9 @@ namespace CDP4IME.Tests.ViewModels
 
             this.installedManifest = new List<Manifest>()
             {
-                new Manifest() { Name = PluginName0, Version = Version0},
-                new Manifest() { Name = PluginName1, Version = Version0},
-                new Manifest() { Name = PluginName2, Version = Version0}
+                new Manifest() { Name = PluginName0, Version = Version0 },
+                new Manifest() { Name = PluginName1, Version = Version0 },
+                new Manifest() { Name = PluginName2, Version = Version0 }
             };
 
             this.processorArchitecture = ProcessorArchitecture.Amd64;
@@ -181,15 +181,9 @@ namespace CDP4IME.Tests.ViewModels
                 {
                     Directory.Delete(this.BasePath, true);
                 }
-                catch (IOException)
+                catch (Exception)
                 {
-                    Thread.Sleep(0);
-                    Directory.Delete(this.BasePath, true);
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    Thread.Sleep(0);
-                    Directory.Delete(this.BasePath, true);
+                    File.SetAttributes(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName, FileAttributes.Temporary);
                 }
             }
         }
@@ -313,11 +307,9 @@ namespace CDP4IME.Tests.ViewModels
         [Test]
         public async Task VerifyCancellationToken()
         {
-            File.Delete(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName);
-
             this.SetupTestContentForInstallationCancellationPurpose(this.UpdateFileSystem.InstallationPath.FullName);
 
-            using (var largeFile = new FileStream(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName, FileMode.CreateNew, FileAccess.ReadWrite))
+            using (var largeFile = File.OpenWrite(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName))
             {
                 largeFile.Seek(100L * 1024 * 1024, SeekOrigin.Begin);
                 largeFile.WriteByte(0);
@@ -333,9 +325,6 @@ namespace CDP4IME.Tests.ViewModels
                 this.viewModel.InstallCommand.ExecuteAsyncTask(null),
                 this.viewModel.CancelCommand.ExecuteAsyncTask(null));
             
-            Thread.Sleep(1);
-
-            File.Delete(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName);
             this.AssertInstalledTestFileHasBeenRestored();
         }
 
