@@ -33,6 +33,7 @@ namespace CDP4IME.Tests.ViewModels
     using System.Net.Http;
     using System.Reactive.Concurrency;
     using System.Reflection;
+    using System.Security.AccessControl;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -316,7 +317,7 @@ namespace CDP4IME.Tests.ViewModels
 
             this.SetupTestContentForInstallationCancellationPurpose(this.UpdateFileSystem.InstallationPath.FullName);
 
-            using (var largeFile = new FileStream(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName, FileMode.CreateNew))
+            using (var largeFile = new FileStream(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName, FileMode.CreateNew, FileAccess.ReadWrite))
             {
                 largeFile.Seek(100L * 1024 * 1024, SeekOrigin.Begin);
                 largeFile.WriteByte(0);
@@ -331,6 +332,8 @@ namespace CDP4IME.Tests.ViewModels
             await Task.WhenAll(
                 this.viewModel.InstallCommand.ExecuteAsyncTask(null),
                 this.viewModel.CancelCommand.ExecuteAsyncTask(null));
+            
+            Thread.Sleep(1);
 
             File.Delete(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName);
             this.AssertInstalledTestFileHasBeenRestored();
