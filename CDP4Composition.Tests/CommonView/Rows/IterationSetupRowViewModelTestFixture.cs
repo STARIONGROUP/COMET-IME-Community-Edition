@@ -21,8 +21,6 @@ namespace CDP4CommonView.Tests
     {
         private Mock<ISession> session;
         private IterationSetup iterationSetup;
-        private Iteration iteration;
-        private IterationSetupRowViewModel viewmodel;
 
         [SetUp]
         public void SetUp()

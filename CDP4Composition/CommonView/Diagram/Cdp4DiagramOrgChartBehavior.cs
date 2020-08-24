@@ -13,13 +13,18 @@ namespace CDP4CommonView.Diagram
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+    
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
+    
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+    
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
+    
     using EventAggregator;
+    
     using Point = System.Windows.Point;
 
     /// <summary>
@@ -69,10 +74,8 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         static Cdp4DiagramOrgChartBehavior()
         {
-            //ItemsSourceProperty.OverrideMetadata(typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(null, (d, e) => ((Cdp4DiagramOrgChartBehavior)d).OnItemsSourceChanged(e.OldValue, e.NewValue)));
         }
 
-        #region Dependency Properties
         /// <summary>
         /// Gets or sets the <see cref="INotifyCollectionChanged"/> containing the view-momdel for the <see cref="DiagramContentItem"/>
         /// </summary>
@@ -161,6 +164,7 @@ namespace CDP4CommonView.Diagram
         {
             var oldList = oldValue as INotifyCollectionChanged;
             var newList = newValue as INotifyCollectionChanged;
+            
             if (oldList == null && newList != null)
             {
                 newList.CollectionChanged += this.OnDiagramConnectorSourceCollectionChanged;
@@ -241,12 +245,9 @@ namespace CDP4CommonView.Diagram
                 {
                     var diagramObj = new Cdp4DiagramContentItem(item, this);
                     this.AssociatedObject.Items.Add(diagramObj);
-
                 }
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Reinitializes the viewmodel selection collection when the control collection changed.
@@ -257,8 +258,7 @@ namespace CDP4CommonView.Diagram
         {
             this.EventPublisher.Publish(new DiagramSelectEvent(this.AssociatedObject.SelectedItems.Select(x => (IRowViewModelBase<DiagramElementThing>)x.DataContext).ToArray()));
         }
-
-
+        
         /// <summary>
         /// The event-handler for the <see cref="DiagramControl.Items"/> collection change
         /// </summary>
@@ -283,7 +283,6 @@ namespace CDP4CommonView.Diagram
             }
         }
 
-        #region Event-Handler setting
         /// <summary>
         /// The on attached event handler
         /// </summary>
@@ -303,7 +302,6 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.PreviewDragOver += this.PreviewDragOver;
             this.AssociatedObject.PreviewDragLeave += this.PreviewDragLeave;
             this.AssociatedObject.PreviewDrop += this.PreviewDrop;
-
         }
 
         /// <summary>
@@ -325,9 +323,7 @@ namespace CDP4CommonView.Diagram
 
             base.OnDetaching();
         }
-        #endregion
 
-        #region Drag/drop
         /// <summary>
         /// Event handler for the <see cref="PreviewMouseLeftButtonDown"/> event
         /// </summary>
@@ -519,14 +515,12 @@ namespace CDP4CommonView.Diagram
                 DiagramDropPoint = this.GetDiagramPositionFromMousePosition(this.dropInfo.DropPosition)
             };
 
-            var dropTarget = this.AssociatedObject.DataContext as IDropTarget;
-            if (dropTarget != null)
+            if (this.AssociatedObject.DataContext is IDropTarget dropTarget)
             {
                 dropTarget.Drop(this.dropInfo);
                 e.Handled = true;
             }
         }
-        #endregion
 
         /// <summary>
         /// Converts control coordinates into document coordinates.

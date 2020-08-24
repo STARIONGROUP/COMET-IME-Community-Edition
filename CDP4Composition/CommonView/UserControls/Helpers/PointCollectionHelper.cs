@@ -17,21 +17,26 @@ namespace CDP4CommonView.UserControls
     /// </summary>
     public class PointCollectionHelper
     {
-        private PointCollection pointCollection;
+        private readonly PointCollection pointCollection;
         private Point startPoint;
-        private Double[] yValues;
-        private Double[] xValues;
+        private double[] yValues;
+        private double[] xValues;
         private bool areXValuesGenerated;
         private bool areYValuesGenerated;
-        private Dictionary<double, List<Double>> xRanges = new Dictionary<double, List<Double>>();
-        private Dictionary<double, List<Double>> yRanges = new Dictionary<double, List<Double>>();
+        private readonly Dictionary<double, List<double>> xRanges = new Dictionary<double, List<double>>();
+        private readonly Dictionary<double, List<double>> yRanges = new Dictionary<double, List<double>>();
         private bool areXRangesGenerated;
         private bool areYRangesGenerated;
 
-        public PointCollectionHelper(PointCollection pointCollection, Point StartPoint)
+        /// <summary>
+        /// Initializes a new <see cref="PointCollectionHelper"/>
+        /// </summary>
+        /// <param name="pointCollection">The initial <see cref="PointCollection"/></param>
+        /// <param name="startPoint">The start <see cref="Point"/></param>
+        public PointCollectionHelper(PointCollection pointCollection, Point startPoint)
         {
             this.pointCollection = pointCollection;
-            this.startPoint = StartPoint;
+            this.startPoint = startPoint;
         }
 
         /// <summary>
@@ -43,23 +48,19 @@ namespace CDP4CommonView.UserControls
             {
                 var distinct = new HashSet<double>();
                 
-                foreach (var p in pointCollection)
+                foreach (var p in this.pointCollection)
                 {
                     distinct.Add(p.X);
                 }
 
-                if (this.startPoint != null)
-                {
-                    distinct.Add(this.startPoint.X);
-                }
+                distinct.Add(this.startPoint.X);
 
-                this.xValues = new Double[distinct.Count];
+                this.xValues = new double[distinct.Count];
                 distinct.CopyTo(this.xValues);
                 Array.Sort(this.xValues);
                 
                 this.areXValuesGenerated = true;
             }
-
         }
 
         /// <summary>
@@ -71,43 +72,21 @@ namespace CDP4CommonView.UserControls
             {
                 var distinct = new HashSet<double>();
 
-                foreach (var p in pointCollection)
+                foreach (var p in this.pointCollection)
                 {
                     distinct.Add(p.Y);
                 }
 
-                if (this.startPoint != null)
-                {
-                    distinct.Add(this.startPoint.Y);
-                }
+                distinct.Add(this.startPoint.Y);
 
-                this.yValues = new Double[distinct.Count];
+                this.yValues = new double[distinct.Count];
                 distinct.CopyTo(this.yValues);
                 Array.Sort(this.yValues);
                 
                 this.areYValuesGenerated = true;
             }
         }
-
-        /// <summary>
-        /// Generates the x ranges.
-        /// </summary>
-        private void GenerateXRanges()
-        {
-            if (!this.areXRangesGenerated)
-            {
-                this.GenerateXValues();
-                
-                foreach (var d in xValues)
-                {
-                    xRanges.Add(d, this.YAtXInternal(d));
-                }
-
-                this.areXRangesGenerated = true;
-            }
-
-        }
-
+        
         /// <summary>
         /// Calculates the y points at a given x point.
         /// </summary>
@@ -117,7 +96,7 @@ namespace CDP4CommonView.UserControls
         {
             var yVals = new List<double>();
             
-            foreach (var point in pointCollection)
+            foreach (var point in this.pointCollection)
             {
                 if (point.X == x)
                 {
@@ -125,15 +104,9 @@ namespace CDP4CommonView.UserControls
                 }
             }
 
-            if (this.startPoint != null)
+            if (this.startPoint.X == x && !yVals.Contains(this.startPoint.Y))
             {
-                if (this.startPoint.X == x)
-                {
-                    if (!yVals.Contains(this.startPoint.Y))
-                    {
-                        yVals.Add(this.startPoint.Y);
-                    }
-                }
+                yVals.Add(this.startPoint.Y);
             }
 
             yVals.Sort();
@@ -142,7 +115,7 @@ namespace CDP4CommonView.UserControls
         }
 
         /// <summary>
-        /// Generates the x ranges.
+        /// Generates the y ranges.
         /// </summary>
         private void GenerateYRanges()
         {
@@ -150,7 +123,7 @@ namespace CDP4CommonView.UserControls
             {
                 this.GenerateYValues();
                 
-                foreach (var d in yValues)
+                foreach (var d in this.yValues)
                 {
                     this.yRanges.Add(d, this.XAtYInternal(d));
                 }
@@ -164,11 +137,11 @@ namespace CDP4CommonView.UserControls
         /// </summary>
         /// <param name="y">The y coordinate used to look up the x's</param>
         /// <returns>The list of x coordinates at this y.</returns>
-        private List<double> XAtYInternal(Double y)
+        private List<double> XAtYInternal(double y)
         {
             var xVals = new List<double>();
             
-            foreach (var point in pointCollection)
+            foreach (var point in this.pointCollection)
             {
                 if (point.Y == y)
                 {
@@ -179,15 +152,9 @@ namespace CDP4CommonView.UserControls
                 }
             }
 
-            if (this.startPoint != null)
+            if (this.startPoint.Y == y && !xVals.Contains(this.startPoint.X))
             {
-                if (this.startPoint.Y == y)
-                {
-                    if (!xVals.Contains(this.startPoint.X))
-                    {
-                        xVals.Add(this.startPoint.X);
-                    }
-                }
+                xVals.Add(this.startPoint.X);
             }
 
             xVals.Sort();
@@ -204,7 +171,6 @@ namespace CDP4CommonView.UserControls
         {
             this.GenerateYRanges();
             return this.yRanges[y];
-
         }
 
         /// <summary>
@@ -223,7 +189,7 @@ namespace CDP4CommonView.UserControls
                 y1Hash.Add(d);
             }
 
-            var matches = y1Hash.Intersect(XAtY(y2));
+            var matches = y1Hash.Intersect(this.XAtY(y2));
             var matchList = new List<double>();
             
             matchList.AddRange(matches);
@@ -245,7 +211,7 @@ namespace CDP4CommonView.UserControls
                 
                 this.GenerateXValues();
                 
-                return this.xValues[xValues.Length - 1];
+                return this.xValues[this.xValues.Length - 1];
             }
         }
 
@@ -258,12 +224,12 @@ namespace CDP4CommonView.UserControls
             {
                 if (this.pointCollection.Count == 0)
                 {
-                    return Double.NaN;
+                    return double.NaN;
                 }
 
                 this.GenerateYValues();
                 
-                return this.xValues[yValues.Length - 1];
+                return this.xValues[this.yValues.Length - 1];
             }
         }
 
@@ -289,41 +255,27 @@ namespace CDP4CommonView.UserControls
                 this.GenerateXValues();
                 return this.yValues[0];
             }
-
-
         }
 
         /// <summary>
         /// Gets the height.
         /// </summary>
-        public double Height
-        {
-            get
-            {
-                return this.MaxY - this.MinY;
-            }
-        }
+        public double Height => this.MaxY - this.MinY;
 
         /// <summary>
         /// Gets the width.
         /// </summary>
-        public double Width
-        {
-            get
-            {
-                return this.MaxX - this.MinX;
-            }
-        }
+        public double Width => this.MaxX - this.MinX;
 
         /// <summary>
         /// Gets the destinct y values
         /// </summary>
-        public List<Double> DistinctY
+        public List<double> DistinctY
         {
             get
             {
                 this.GenerateYValues();
-                var distinctY = new List<Double>();
+                var distinctY = new List<double>();
                 
                 distinctY.AddRange(this.yValues);
                 return distinctY;

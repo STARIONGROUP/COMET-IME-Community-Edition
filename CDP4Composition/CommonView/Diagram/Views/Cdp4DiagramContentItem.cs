@@ -9,7 +9,9 @@ namespace CDP4CommonView.Diagram
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
+    
     using CDP4Common.CommonData;
+    
     using DevExpress.Xpf.Diagram;
 
     /// <summary>
@@ -72,7 +74,6 @@ namespace CDP4CommonView.Diagram
 
             var parent = (Cdp4DiagramControl)this.behaviour.AssociatedObject;
             this.Template = (ControlTemplate)parent.FindResource("DiagramObjectTemplate");
-            // TODO Set Style
         }
     }
 }

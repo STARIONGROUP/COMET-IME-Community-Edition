@@ -26,7 +26,6 @@ namespace CDP4CommonView.Tests
         private Folder folder;
         private File file;
         private FileRevision fileRevision;
-        private FileRevisionRowViewModel viewmodel;
 
         [SetUp]
         public void SetUp()

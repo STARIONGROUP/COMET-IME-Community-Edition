@@ -24,7 +24,6 @@ namespace CDP4CommonView.Tests
         private Participant participant;
         private Folder folder;
         private File file;
-        private FileRowViewModel viewmodel;
 
         [SetUp]
         public void SetUp()

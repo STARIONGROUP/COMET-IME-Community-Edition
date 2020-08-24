@@ -18,7 +18,7 @@ namespace CDP4CommonView.UserControls
         /// <summary>
         /// The original geometry.
         /// </summary>
-        private Geometry orginalGeometry;
+        private readonly Geometry orginalGeometry;
 
         public StackedRectangleGeometryHelper(Geometry geom)
         {

@@ -29,19 +29,21 @@ namespace CDP4CommonView
         {
             if (dataContext == null)
             {
-                throw new ArgumentNullException("dataContext", "The data-context cannot be null");
+                throw new ArgumentNullException(nameof(dataContext), "The data-context cannot be null");
             }
 
             if (string.IsNullOrWhiteSpace(path))
             {
-                throw new ArgumentNullException("path", "The path cannot be null or empty");
+                throw new ArgumentNullException(nameof(path), "The path cannot be null or empty");
             }
 
-            var myBinding = new Binding();
-            myBinding.Source = dataContext;
-            myBinding.Path = new PropertyPath(path);
-            myBinding.Mode = mode;
-            myBinding.UpdateSourceTrigger = trigger;
+            var myBinding = new Binding
+            {
+                Source = dataContext, 
+                Path = new PropertyPath(path, new object[0]), 
+                Mode = mode, 
+                UpdateSourceTrigger = trigger
+            };
 
             return myBinding;
         }

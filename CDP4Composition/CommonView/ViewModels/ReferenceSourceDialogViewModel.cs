@@ -9,14 +9,18 @@ namespace CDP4CommonView.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
-    using CDP4Common.SiteDirectoryData;    
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Utilities;
+    
     using CDP4Dal;
     using CDP4Dal.Operations;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -153,12 +157,13 @@ namespace CDP4CommonView.ViewModels
                 }
 
                 var currentReferenceSource = allPossibleReferenceSources.SingleOrDefault(x => x.Iid == this.Thing.Iid);
+                
                 if (currentReferenceSource != null)
                 {
                     allPossibleReferenceSources.Remove(currentReferenceSource);
                 }
-                
-                allPossibleReferenceSources.OrderBy(x => x.ShortName);
+
+                allPossibleReferenceSources = allPossibleReferenceSources.OrderBy(x => x.ShortName).ToList();
 
                 this.PossiblePublishedIn.AddRange(allPossibleReferenceSources);
             }

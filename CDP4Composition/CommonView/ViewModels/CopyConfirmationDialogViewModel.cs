@@ -9,9 +9,13 @@ namespace CDP4CommonView.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using System.Windows.Input;
+    
     using CDP4Common.CommonData;
+    
     using CDP4Composition.Navigation;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -19,7 +23,6 @@ namespace CDP4CommonView.ViewModels
     /// </summary>
     public class CopyConfirmationDialogViewModel : DialogViewModelBase
     {
-        #region Fields
         /// <summary>
         /// Backing field for <see cref="IsDetailVisible"/>
         /// </summary>
@@ -44,9 +47,7 @@ namespace CDP4CommonView.ViewModels
         /// Backing field for <see cref="Title"/>
         /// </summary>
         private string title;
-        #endregion
 
-        #region Constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="CopyConfirmationDialogViewModel"/> class
         /// </summary>
@@ -70,20 +71,21 @@ namespace CDP4CommonView.ViewModels
             this.CopyPermissionMessage = copyablethings.Any() ? "A partial copy will be performed." : "The copy operation cannot be performed.";
             this.CanProceed = copyablethings.Any();
 
+            var copyPermissionDetailsStringBuilder = new StringBuilder();
+
             foreach (var thing in copyablethings)
             {
-                this.CopyPermissionDetails += string.Format("The {0} with id {1} will be copied.\n", thing.ClassKind, thing.Iid);
+                copyPermissionDetailsStringBuilder.Append($"The {thing.ClassKind} with id {thing.Iid} will be copied.\n");
             }
 
             foreach (var error in errors.Values)
             {
-                this.CopyPermissionDetails += error + "\n";
+                copyPermissionDetailsStringBuilder.Append($"{error}\n");
             }
-            
-        }
-        #endregion
 
-        #region Properties
+            this.CopyPermissionDetails = copyPermissionDetailsStringBuilder.ToString();
+        }
+
         /// <summary>
         /// Gets the title for the associated dialog
         /// </summary>
@@ -138,9 +140,7 @@ namespace CDP4CommonView.ViewModels
         /// Gets the <see cref="ICommand"/> to cancel
         /// </summary>
         public ReactiveCommand<object> CancelCommand { get; private set; }
-        #endregion
 
-        #region Execute Command
         /// <summary>
         /// Executes the <see cref="ProceedCommand"/>
         /// </summary>
@@ -156,6 +156,5 @@ namespace CDP4CommonView.ViewModels
         {
             this.DialogResult = new BaseDialogResult(false);
         }
-        #endregion
     }
 }
