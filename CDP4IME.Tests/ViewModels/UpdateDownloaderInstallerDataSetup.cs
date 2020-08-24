@@ -60,7 +60,7 @@ namespace CDP4IME.Tests.ViewModels
         /// </summary>
         public virtual void Setup()
         {
-            this.BasePath = Path.Combine(Path.GetTempPath(), "UpdateTestFixture", Guid.NewGuid().ToString());
+            this.BasePath = Path.Combine(TestContext.CurrentContext.WorkDirectory, "UpdateTestFixture", Guid.NewGuid().ToString());
             this.TempPath = Path.Combine(this.BasePath, "Temp");
             this.InstallPath = Path.Combine(this.BasePath, "Plugins");
             this.DownloadPath = Path.Combine(this.BasePath, "Download");

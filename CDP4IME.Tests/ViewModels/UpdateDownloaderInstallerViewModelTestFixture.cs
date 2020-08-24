@@ -165,26 +165,26 @@ namespace CDP4IME.Tests.ViewModels
         [TearDown]
         public void Teardown()
         {
-            if (this.realAlreadyDownloadedplugin0?.Directory?.Exists == true)
+            try
             {
-                this.realAlreadyDownloadedplugin0.Directory.Delete(true);
-            }
+                if (this.realAlreadyDownloadedplugin0?.Directory?.Exists == true)
+                {
+                    this.realAlreadyDownloadedplugin0.Directory.Delete(true);
+                }
 
-            if (this.realAlreadyDownloadedplugin1?.Directory?.Exists == true)
-            {
-                this.realAlreadyDownloadedplugin1.Directory.Delete(true);
-            }
+                if (this.realAlreadyDownloadedplugin1?.Directory?.Exists == true)
+                {
+                    this.realAlreadyDownloadedplugin1.Directory.Delete(true);
+                }
 
-            if (Directory.Exists(this.BasePath))
-            {
-                try
+                if (Directory.Exists(this.BasePath))
                 {
                     Directory.Delete(this.BasePath, true);
                 }
-                catch (Exception)
-                {
-                    File.SetAttributes(this.UpdateFileSystem.UpdateCdp4CkFileInfo.FullName, FileAttributes.Temporary);
-                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
             }
         }
 
