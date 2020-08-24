@@ -202,17 +202,26 @@ namespace CDP4UpdateServerDal.Tests
                 ItExpr.IsAny<CancellationToken>());
         }
 
-        private Mock<HttpMessageHandler> SetupResponseHandler(string response)
+        private Mock<HttpMessageHandler> SetupResponseHandler(string response, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
             var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Loose);
 
             handlerMock.Protected()
                 .Setup<Task<HttpResponseMessage>>(MethodName,
                     ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage() { StatusCode = HttpStatusCode.OK, Content = new StringContent(response) })
+                .ReturnsAsync(new HttpResponseMessage() { StatusCode = statusCode, Content = new StringContent(response) })
                 .Verifiable();
 
             return handlerMock;
+        }
+
+        [Test]
+        public void VerifyServerUnreachable()
+        {
+            var client = new UpdateServerClient { BaseAddress = new Uri(BaseAddress) };
+
+            Assert.ThrowsAsync<HttpRequestException>(
+                async () => await client.GetLatestIme(new Version(Version1), Platform.X86));
         }
     }
 }

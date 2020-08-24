@@ -135,11 +135,6 @@ namespace CDP4IME.ViewModels
         private readonly string version;
 
         /// <summary>
-        /// Gets the plugin download path and the new manifest
-        /// </summary>
-        public (FileInfo cdp4ckFile, Manifest manifest) Plugin { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ImeRowViewModel"/> class
         /// </summary>
         /// <param name="version">The represented version</param>

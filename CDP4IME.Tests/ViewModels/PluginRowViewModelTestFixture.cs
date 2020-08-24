@@ -72,6 +72,7 @@ namespace CDP4IME.Tests.ViewModels
             Assert.AreEqual(viewModel.Description, this.Manifest.Description);
             Assert.AreEqual(viewModel.Author, this.Manifest.Author);
             Assert.AreEqual(viewModel.ReleaseNote, this.Manifest.ReleaseNote);
+            Assert.AreEqual(viewModel.Progress, 0);
 
             Assert.IsNotNull(viewModel.FileSystem.UpdateCdp4CkFileInfo);
 

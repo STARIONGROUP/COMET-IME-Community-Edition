@@ -222,7 +222,6 @@ namespace CDP4IME.Tests.ViewModels
         [Test]
         public async Task VerifyDownload()
         {
-            Console.WriteLine($"BasePath : {this.BasePath}");
             var vm = new UpdateDownloaderInstallerViewModel(true);
             Assert.AreEqual(this.updateResultFomApi, vm.DownloadableThings);
             _ = await vm.DownloadCommand.ExecuteAsyncTask(null);
