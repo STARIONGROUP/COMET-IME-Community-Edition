@@ -69,16 +69,16 @@
 
             <dxg:GridControl.View>
                 <dxg:TableView Name="DefinitionsView"
-                               MaxHeight="1080"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                VerticalScrollbarVisibility="Auto"
-                                AllowColumnMoving="True"
-                                AllowEditing="False"
-                                AllowGrouping="True"
+                               MaxHeight="600"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               VerticalScrollbarVisibility="Auto"
+                               AllowColumnMoving="True"
+                               AllowEditing="False"
+                               AllowGrouping="True"
                                AutoWidth="True"
-                                IsDetailButtonVisibleBinding="{x:Null}"
-                                ShowGroupPanel="False">
+                               IsDetailButtonVisibleBinding="{x:Null}"
+                               ShowGroupPanel="False">
                     <dxg:TableView.FocusedRow>
                         <dynamic:ExpandoObject />
                     </dxg:TableView.FocusedRow>
