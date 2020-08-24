@@ -66,7 +66,7 @@ namespace CDP4CommonView.Tests.ViewModels
             var dialog = new CopyConfirmationDialogViewModel(copyableThings, new Dictionary<Thing, string>());
             
             Assert.IsFalse(dialog.ProceedCommand.CanExecute(null));
-            Assert.IsNull(dialog.CopyPermissionDetails);
+            Assert.IsEmpty(dialog.CopyPermissionDetails);
             Assert.AreEqual("The copy operation cannot be performed.", dialog.CopyPermissionMessage);
         }
 
