@@ -23,9 +23,7 @@ namespace CDP4CommonView.UserControls
         private double[] xValues;
         private bool areXValuesGenerated;
         private bool areYValuesGenerated;
-        private readonly Dictionary<double, List<double>> xRanges = new Dictionary<double, List<double>>();
         private readonly Dictionary<double, List<double>> yRanges = new Dictionary<double, List<double>>();
-        private bool areXRangesGenerated;
         private bool areYRangesGenerated;
 
         /// <summary>
@@ -88,33 +86,6 @@ namespace CDP4CommonView.UserControls
         }
         
         /// <summary>
-        /// Calculates the y points at a given x point.
-        /// </summary>
-        /// <param name="x">The x coordinate used to look up the y's</param>
-        /// <returns>The list of y coordinates at this x.</returns>
-        private List<double> YAtXInternal(double x)
-        {
-            var yVals = new List<double>();
-            
-            foreach (var point in this.pointCollection)
-            {
-                if (point.X == x)
-                {
-                    yVals.Add(point.Y);
-                }
-            }
-
-            if (this.startPoint.X == x && !yVals.Contains(this.startPoint.Y))
-            {
-                yVals.Add(this.startPoint.Y);
-            }
-
-            yVals.Sort();
-            
-            return yVals;
-        }
-
-        /// <summary>
         /// Generates the y ranges.
         /// </summary>
         private void GenerateYRanges()
@@ -143,12 +114,9 @@ namespace CDP4CommonView.UserControls
             
             foreach (var point in this.pointCollection)
             {
-                if (point.Y == y)
+                if (point.Y == y && !xVals.Contains(point.X))
                 {
-                    if (!xVals.Contains(point.X))
-                    {
-                        xVals.Add(point.X);
-                    }
+                    xVals.Add(point.X);
                 }
             }
 
