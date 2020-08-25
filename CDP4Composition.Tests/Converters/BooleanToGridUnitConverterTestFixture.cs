@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BooleanToVisibilityConverterTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="BooleanToGridUnitConverterTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -33,34 +33,34 @@ namespace CDP4Composition.Tests.Converters
     using NUnit.Framework;
 
     [TestFixture]
-    public class BooleanToVisibilityConverterTestFixture
+    public class BooleanToGridUnitConverterTestFixture
     {
-        private BooleanToVisibilityConverter booleanToVisibilityConverter;
+        private BooleanToGridUnitConverter booleanToGridUnitConverter;
 
         [SetUp]
         public void SetUp()
         {
-            this.booleanToVisibilityConverter = new BooleanToVisibilityConverter();
+            this.booleanToGridUnitConverter = new BooleanToGridUnitConverter();
         }
 
         [Test]
         public void VerifyThatConvertReturnsExpectedResult()
         {
-            Assert.AreEqual(Visibility.Collapsed, this.booleanToVisibilityConverter.Convert(null, null, null, null));
+            Assert.AreEqual(new GridLength(0), this.booleanToGridUnitConverter.Convert(null, null, null, null));
 
-            Assert.AreEqual(Visibility.Visible, this.booleanToVisibilityConverter.Convert(true, null, null, null));
-            Assert.AreEqual(Visibility.Collapsed, this.booleanToVisibilityConverter.Convert(false, null, null, null));
-            Assert.AreEqual(Visibility.Visible, this.booleanToVisibilityConverter.Convert(false, null, "Invert", null));
-            Assert.AreEqual(Visibility.Collapsed, this.booleanToVisibilityConverter.Convert(false, null, 0, null));
-            
+            Assert.AreEqual(new GridLength(1, GridUnitType.Star), this.booleanToGridUnitConverter.Convert(true, null, null, null));
+            Assert.AreEqual(new GridLength(0), this.booleanToGridUnitConverter.Convert(false, null, null, null));
+            Assert.AreEqual(new GridLength(1, GridUnitType.Star), this.booleanToGridUnitConverter.Convert(true, null, "Invert", null));
+            Assert.AreEqual(new GridLength(2, GridUnitType.Star), this.booleanToGridUnitConverter.Convert(true, null, "2", null));
+
             Assert.Throws<InvalidCastException>(
-                () => this.booleanToVisibilityConverter.Convert(1d, null, null, null));
+                () => this.booleanToGridUnitConverter.Convert(1d, null, null, null));
         }
 
         [Test]
         public void VerifyThatConvertBackIsNotSupported()
         {
-            Assert.Throws<NotSupportedException>(() => this.booleanToVisibilityConverter.ConvertBack(null, null, null, null));
+            Assert.Throws<NotSupportedException>(() => this.booleanToGridUnitConverter.ConvertBack(null, null, null, null));
         }
     }
 }

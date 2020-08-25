@@ -32,6 +32,7 @@ namespace CDP4IME.Tests.ViewModels
     using System.Linq;
     using System.Net.Http;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reflection;
     using System.Security.AccessControl;
     using System.Text;
@@ -392,6 +393,55 @@ namespace CDP4IME.Tests.ViewModels
             }
 
             return cdp4CkFile;
+        }
+
+        [Test]
+        public async Task VerifyInstallThrowsException()
+        {
+            var mockedRow = new Mock<IPluginRowViewModel>();
+            mockedRow.Setup(x => x.Install(It.IsAny<CancellationToken>())).Throws<UnauthorizedAccessException>();
+            mockedRow.Setup(x => x.IsSelected).Returns(true);
+            mockedRow.Setup(x => x.HandlingCancelationOfInstallation());
+            mockedRow.Setup(x => x.FileSystem).Returns(this.UpdateFileSystem);
+
+            var vm = new UpdateDownloaderInstallerViewModel(new List<(FileInfo cdp4ckFile, Manifest manifest)>())
+            {
+                Behavior = this.behavior.Object
+            };
+
+            vm.AvailablePlugins.Add(mockedRow.Object);
+            await  vm.InstallCommand.ExecuteAsyncTask();
+            mockedRow.Verify(x => x.Install(It.IsAny<CancellationToken>()), Times.Once);
+            mockedRow.Verify(x => x.HandlingCancelationOfInstallation(), Times.Once);
+            Assert.IsNull(vm.CancellationTokenSource);
+        }
+        
+        [Test]
+        public async Task VerifyDownloadThrowsException()
+        {
+            var mockedPluginRow = new Mock<IPluginRowViewModel>();
+            mockedPluginRow.Setup(x => x.Download(this.updateServerClient.Object)).Throws<UnauthorizedAccessException>();
+            mockedPluginRow.Setup(x => x.IsSelected).Returns(true);
+            mockedPluginRow.Setup(x => x.HandlingCancelationOfDownload());
+            mockedPluginRow.Setup(x => x.FileSystem).Returns(this.UpdateFileSystem);
+
+            var mockedImeRow = new Mock<IImeRowViewModel>();
+            mockedImeRow.Setup(x => x.Download(this.updateServerClient.Object)).Throws<UnauthorizedAccessException>();
+            mockedImeRow.Setup(x => x.IsSelected).Returns(true);
+            mockedImeRow.Setup(x => x.HandlingCancelationOfDownload());
+            mockedImeRow.Setup(x => x.FileSystem).Returns(this.UpdateFileSystem);
+
+            var vm = new UpdateDownloaderInstallerViewModel(false)
+            {
+                Behavior = this.behavior.Object
+            };
+
+            vm.AvailablePlugins.Add(mockedPluginRow.Object);
+            vm.AvailableIme.Add(mockedImeRow.Object);
+            await vm.DownloadCommand.ExecuteAsyncTask();
+            mockedPluginRow.Verify(x => x.HandlingCancelationOfDownload(), Times.Once);
+            mockedImeRow.Verify(x => x.HandlingCancelationOfDownload(), Times.Once);
+            Assert.IsNull(vm.CancellationTokenSource);
         }
     }
 }

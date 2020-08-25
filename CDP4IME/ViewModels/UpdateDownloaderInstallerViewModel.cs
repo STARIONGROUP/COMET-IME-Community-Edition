@@ -211,12 +211,12 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Gets a <see cref="List{T}"/> of type <see cref="PluginRowViewModel"/> that holds the properties for <see cref="PluginRow"/>
         /// </summary>
-        public ReactiveList<PluginRowViewModel> AvailablePlugins { get; } = new ReactiveList<PluginRowViewModel>();
+        public ReactiveList<IPluginRowViewModel> AvailablePlugins { get; } = new ReactiveList<IPluginRowViewModel>();
 
         /// <summary>
         /// Gets a <see cref="List{T}"/> of type <see cref="ImeRowViewModel"/> that holds the properties for <see cref="ImeRow"/>
         /// </summary>
-        public ReactiveList<ImeRowViewModel> AvailableIme { get; } = new ReactiveList<ImeRowViewModel>();
+        public ReactiveList<IImeRowViewModel> AvailableIme { get; } = new ReactiveList<IImeRowViewModel>();
 
         /// <summary>
         /// Gets an <see cref="IEnumerable{T}"/> of type <code>(FileInfo cdp4ckFile, Manifest manifest)</code>
@@ -343,7 +343,7 @@ namespace CDP4IME.ViewModels
                 this.CancellationTokenSource = new CancellationTokenSource();
                 this.CancellationTokenSource.Token.Register(async () => await this.CancelInstallationsExecute());
 
-                await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(plugin.Install, this.CancellationTokenSource.Token)).ToArray());
+                await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => plugin.Install(this.CancellationTokenSource.Token)).ToArray());
                 await Task.Delay(1000);
             }
             catch (Exception exception)
@@ -353,7 +353,7 @@ namespace CDP4IME.ViewModels
                     this.CancellationTokenSource.Cancel();
                 }
 
-                LogManager.GetCurrentClassLogger().Error($"{exception} has occured while trying to install new plugin versions");
+                this.logger.Error($"{exception} has occured while trying to install new plugin versions");
             }
             finally
             {
@@ -390,8 +390,8 @@ namespace CDP4IME.ViewModels
                 this.CancellationTokenSource.Token.Register(async () => await this.CancelDownloadsExecute());
 
                 await Task.WhenAll(
-                    Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(() => plugin.Download(this.UpdateServerClient), this.CancellationTokenSource.Token)).ToArray()),
-                    Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => Task.Run(() => ime.Download(this.UpdateServerClient), this.CancellationTokenSource.Token)).ToArray()));
+                    Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => plugin.Download(this.UpdateServerClient)).ToArray()),
+                    Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => ime.Download(this.UpdateServerClient)).ToArray()));
 
                 await Task.Delay(1000);
 
@@ -427,7 +427,7 @@ namespace CDP4IME.ViewModels
         {
             await Task.WhenAll(
                 Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(plugin.HandlingCancelationOfDownload)).ToArray()),
-                Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => Task.Run(ime.HandlingCancelation)).ToArray()));
+                Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => Task.Run(ime.HandlingCancelationOfDownload)).ToArray()));
         }
 
         /// <summary>

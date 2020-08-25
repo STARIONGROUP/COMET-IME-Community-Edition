@@ -47,7 +47,7 @@ namespace CDP4IME.ViewModels
     /// <summary>
     /// Represents a <see cref="PluginRow"/> holding its properties and interaction logic
     /// </summary>
-    public class ImeRowViewModel : ReactiveObject
+    public class ImeRowViewModel : ReactiveObject, IImeRowViewModel
     {
         /// <summary>
         /// The NLog logger
@@ -189,7 +189,7 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Called when the download process gets canceled
         /// </summary>
-        public void HandlingCancelation()
+        public void HandlingCancelationOfDownload()
         {
             try
             {

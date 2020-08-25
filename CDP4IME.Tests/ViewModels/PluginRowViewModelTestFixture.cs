@@ -30,6 +30,7 @@ namespace CDP4IME.Tests.ViewModels
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
 
@@ -55,10 +56,16 @@ namespace CDP4IME.Tests.ViewModels
         [TearDown]
         public void Teardown()
         {
-            if (Directory.Exists(this.BasePath))
+            try
             {
-                File.SetAttributes(this.BasePath, FileAttributes.Normal);
-                Directory.Delete(this.BasePath, true);
+                if (Directory.Exists(this.BasePath))
+                {
+                    Directory.Delete(this.BasePath, true);
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
             }
         }
 
@@ -83,11 +90,11 @@ namespace CDP4IME.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyInstallation()
+        public async Task VerifyInstallation()
         {
             var viewModel = new PluginRowViewModel(this.Plugin, this.UpdateFileSystem);
             
-            viewModel.Install(); 
+            await viewModel.Install(new CancellationToken(false)); 
             
             Assert.IsTrue(new DirectoryInfo(this.InstallPath).Exists);
 

@@ -26,6 +26,7 @@ namespace CDP4IME.ViewModels
 {
     using System;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
@@ -40,11 +41,11 @@ namespace CDP4IME.ViewModels
     using NLog;
 
     using ReactiveUI;
-
+    
     /// <summary>
     /// Represents a <see cref="PluginRow"/> holding its properties and interaction logic
     /// </summary>
-    public class PluginRowViewModel : ReactiveObject
+    public class PluginRowViewModel : ReactiveObject, IPluginRowViewModel
     {
         /// <summary>
         /// The NLog logger
@@ -141,7 +142,7 @@ namespace CDP4IME.ViewModels
         private bool isSelected;
 
         /// <summary>
-        /// Gets or sets the assert <see cref="isSelected"/> whether the represented plugin will be installed
+        /// Gets or sets the assert <see cref="isSelected"/> whether the represented plugin will be installed or downloaded
         /// </summary>
         public bool IsSelected
         {
@@ -196,26 +197,32 @@ namespace CDP4IME.ViewModels
 
         /// <summary>
         /// Make the installation of the new Plugin
+        /// <param name="token">Cancelation Token</param>
         /// </summary>
-        public void Install()
+        public Task Install(CancellationToken token)
         {
-            try
+            return Task.Run(
+            () =>
             {
-                this.Progress += 33;
-                this.FileSystem.BackUpOldVersion();
+                try
+                {
+                    this.Progress += 33;
+                    this.FileSystem.BackUpOldVersion();
 
-                this.Progress += 33;
-                this.FileSystem.InstallNewVersion();
+                    this.Progress += 33;
+                    this.FileSystem.InstallNewVersion();
 
-                this.Progress += 33;
-                this.FileSystem.CleanUp();
-                this.Progress = 100;
-            }
-            catch (Exception exception)
-            {
-                this.logger.Error($"An exception occured: {exception}");
-                throw;
-            }
+                    this.Progress += 33;
+                    this.FileSystem.CleanUp();
+                    this.Progress = 100;
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Error($"An exception occured: {exception}");
+                    throw;
+                }
+            },
+            token);
         }
 
         /// <summary>
