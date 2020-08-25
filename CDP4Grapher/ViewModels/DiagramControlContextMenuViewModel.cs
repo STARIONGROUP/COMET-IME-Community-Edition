@@ -51,7 +51,12 @@ namespace CDP4Grapher.ViewModels
         /// Backing field for <see cref="CanExportDiagram"/>
         /// </summary>
         private bool canExportDiagram;
-        
+
+        /// <summary>
+        /// Backing field for <see cref="CanIsolate"/>
+        /// </summary>
+        private bool canIsolate;
+
         /// <summary>
         /// Gets or sets the attached behavior
         /// </summary>
@@ -70,7 +75,21 @@ namespace CDP4Grapher.ViewModels
             get => this.canExportDiagram;
             private set => this.RaiseAndSetIfChanged(ref this.canExportDiagram, value);
         }
+        
+        /// <summary>
+        /// Gets a value indicating whether the isolation can be applied
+        /// </summary>
+        public bool CanIsolate
+        {
+            get => this.canIsolate;
+            private set => this.RaiseAndSetIfChanged(ref this.canIsolate, value);
+        }
 
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
+        /// </summary>
+        public ReactiveCommand<object> Isolate { get; private set; }
+        
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
         /// </summary>
@@ -167,6 +186,9 @@ namespace CDP4Grapher.ViewModels
         {
             this.CanExportDiagram = true;
 
+            this.Isolate = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanIsolate).ObserveOn(RxApp.MainThreadScheduler));
+            this.Isolate.Subscribe(_ => this.ExecuteIsolate());
+
             this.ExportGraphAsJpg = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
             this.ExportGraphAsJpg.Subscribe(_ => this.ExecuteExportGraphAsPng());
             this.ExportGraphAsPdf = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
@@ -212,6 +234,7 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void CreateContextMenu()
         {
+            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Isolate Element", this.Isolate, "Office2013/Reports/None_32x32.png"));
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Export Graph as JPG", this.ExportGraphAsJpg, "XAF/Action_Export_ToImage.svg"));
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Export Graph as PDF", this.ExportGraphAsPdf, "Export/ExportToPDF.svg"));
             var layoutSubItem = this.GenerateContextMenuItem<BarSubItem>("Apply layouts", null, "DiagramIcons/Direction/re-layout.svg");
@@ -286,6 +309,18 @@ namespace CDP4Grapher.ViewModels
             this.canExportDiagram = false;
             this.Behavior.ExportGraph(DiagramExportFormat.JPEG);
             this.canExportDiagram = true;
+        }
+
+        public bool IsIsolating;
+
+        private void ExecuteIsolate()
+        {
+            this.IsIsolating = !this.IsIsolating;
+
+            if (this.IsIsolating)
+            {
+                this.Behavior.Isolate();
+            }
         }
     }
 }

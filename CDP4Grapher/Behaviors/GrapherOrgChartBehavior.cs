@@ -30,6 +30,7 @@ namespace CDP4Grapher.Behaviors
     using System.IO;
     using System.Linq;
     using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.EngineeringModelData;
 
@@ -66,6 +67,11 @@ namespace CDP4Grapher.Behaviors
         private bool hasLoaded;
 
         /// <summary>
+        /// Gets or sets the under the mouse element <see cref="DiagramItem"/>
+        /// </summary>
+        public GraphElementViewModel HoveredElement { get; set; }
+
+        /// <summary>
         /// The on attached event handler
         /// </summary>
         protected override void OnAttached()
@@ -74,6 +80,18 @@ namespace CDP4Grapher.Behaviors
             this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
             this.AssociatedObject.Loaded += this.Loaded;
+            this.AssociatedObject.MouseMove += this.MouseMoved;
+        }
+
+        /// <summary>
+        /// Occurs when the user mouse the mouse arround the <see cref="DiagramControl"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MouseMoved(object sender, MouseEventArgs e)
+        {
+            var mousePosition = e.GetPosition(this.AssociatedObject);
+            this.HoveredElement = (this.AssociatedObject.CalcHitItem(mousePosition) as DiagramContentItem)?.Content as GraphElementViewModel;
         }
 
         /// <summary>
@@ -124,7 +142,7 @@ namespace CDP4Grapher.Behaviors
                 throw new ArgumentOutOfRangeException(nameof(layout), layout, $"The {layout} provided must be used with a direction");
             }
 
-            this.CurrentLayout = (layout, null);
+            this.CurrentLayout = (layout, null);    
         }
 
         /// <summary>
@@ -328,6 +346,26 @@ namespace CDP4Grapher.Behaviors
         public void ApplyTreeLayout(LayoutDirection direction)
         {
             this.AssociatedObject.ApplyTreeLayout(direction, this.AssociatedObject.Items, SplitToConnectedComponentsMode.AllComponents);
+        }
+
+        /// <summary>
+        /// Isolate the Element under the mouse if any and display only the under it
+        /// </summary>
+        /// <returns>An assert whether isolation is on</returns>
+        public bool Isolate()
+        {
+            if (this.HoveredElement != null)
+            {
+                (this.AssociatedObject.DataContext as IGrapherViewModel)?.Isolate(this.HoveredElement);
+            
+                this.ApplyPreviousLayout();
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

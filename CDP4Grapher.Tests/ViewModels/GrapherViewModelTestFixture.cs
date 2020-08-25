@@ -121,5 +121,16 @@ namespace CDP4Grapher.Tests.ViewModels
             CDPMessageBus.Current.SendObjectChangeEvent(this.Option, EventKind.Updated);
             Assert.AreEqual(this.Option.Name, vm.Thing.Name);
         }
+
+        [Test]
+        public void VerifyIsolate()
+        {
+            var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
+
+            Assert.AreEqual(1, vm.GraphElements.Count);
+            var newTrunk = vm.GraphElements.FirstOrDefault();
+            vm.Isolate(newTrunk);
+            Assert.AreEqual(1, vm.GraphElements.Count);
+        }
     }
 }

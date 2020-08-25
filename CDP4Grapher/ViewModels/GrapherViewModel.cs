@@ -136,7 +136,7 @@ namespace CDP4Grapher.ViewModels
         /// Gets or sets the collection of <see cref="GraphElementViewModel"/> to display.
         /// </summary>
         public ReactiveList<GraphElementViewModel> GraphElements { get; } = new ReactiveList<GraphElementViewModel>();
-
+        
         /// <summary>
         /// Gets or sets the custom context menu
         /// </summary>
@@ -234,6 +234,18 @@ namespace CDP4Grapher.ViewModels
         {
             var elements = new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
             this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e)));
+        }
+        
+        /// <summary>
+        /// Calculate and update the element of the tree under the <see cref="graphElement"/>
+        /// </summary>
+        /// <param name="graphElement">The Graph Element</param>
+        public void Isolate(GraphElementViewModel graphElement)
+        {
+            var newTree = this.GraphElements.Where(e => e.Thing.IsContainedBy(graphElement.Thing));
+            this.GraphElements.Clear();
+            this.GraphElements.Add(graphElement);
+            this.GraphElements.AddRange(newTree);
         }
         
         /// <summary>

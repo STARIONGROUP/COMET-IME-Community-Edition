@@ -28,6 +28,7 @@ namespace CDP4Grapher.Tests.Data
     using System;
     using System.Collections.Generic;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -94,7 +95,7 @@ namespace CDP4Grapher.Tests.Data
             
             this.Option = new Option(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
-                Name = "TestOption"
+                Name = "TestOption", 
             };
 
             this.SetupElements();
@@ -118,10 +119,11 @@ namespace CDP4Grapher.Tests.Data
             this.Iteration = new Iteration(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 IterationSetup = this.IterationSetup,
-                TopElement = this.TopElement
+                TopElement = this.TopElement, DefaultOption = this.Option
             };
 
             this.Iteration.Option.Add(this.Option);
+            this.AddThingsToTheCache();
             this.EngineeringModel.Iteration.Add(this.Iteration);
             this.Session = new Mock<ISession>();
             this.Session.Setup(x => x.Assembler).Returns(this.Assembler);
@@ -134,13 +136,24 @@ namespace CDP4Grapher.Tests.Data
         {
             this.TopElement = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
 
-            this.ElementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
-            this.ElementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
-            this.ElementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
+            this.ElementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.TopElement };
+            this.ElementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.TopElement };
+            this.ElementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.TopElement };
 
-            this.ElementUsage1 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition1, Container = this.TopElement };
-            this.ElementUsage2 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition2, Container = this.TopElement };
-            this.ElementUsage3 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition3, Container = this.TopElement };
+            this.ElementUsage1 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.TopElement, Container = this.TopElement };
+            this.ElementUsage2 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition2, Container = this.ElementDefinition2 };
+            this.ElementUsage3 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition3, Container = this.ElementDefinition3 };
+        }
+
+        private void AddThingsToTheCache()
+        {
+            this.Assembler.Cache.TryAdd(new CacheKey(this.TopElement.Iid, this.Iteration.Iid), new Lazy<Thing>(() => this.TopElement));
+            this.Assembler.Cache.TryAdd(new CacheKey(this.ElementDefinition1.Iid, this.Iteration.Iid), new Lazy<Thing>(() => this.ElementDefinition1));
+            this.Assembler.Cache.TryAdd(new CacheKey(this.ElementDefinition2.Iid, this.Iteration.Iid), new Lazy<Thing>(() => this.ElementDefinition2));
+            this.Assembler.Cache.TryAdd(new CacheKey(this.ElementDefinition3.Iid, this.Iteration.Iid), new Lazy<Thing>(() => this.ElementDefinition3));
+            this.Assembler.Cache.TryAdd(new CacheKey(this.ElementUsage1.Iid, this.Iteration.Iid), new Lazy<Thing>(() => this.ElementUsage1));
+            this.Assembler.Cache.TryAdd(new CacheKey(this.ElementUsage2.Iid, this.Iteration.Iid), new Lazy<Thing>(() => this.ElementUsage2));
+            this.Assembler.Cache.TryAdd(new CacheKey(this.ElementUsage3.Iid, this.Iteration.Iid), new Lazy<Thing>(() => this.ElementUsage3));
         }
     }
 }

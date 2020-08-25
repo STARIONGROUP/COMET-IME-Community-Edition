@@ -96,6 +96,7 @@ namespace CDP4Grapher.Tests.Behaviors
             this.grapherViewModel = new Mock<IGrapherViewModel>();
             this.grapherViewModel.Setup(x => x.GraphElements).Returns(new ReactiveList<GraphElementViewModel>(this.elementViewModels));
             this.grapherViewModel.Setup(x => x.Behavior).Returns(this.behavior);
+            this.grapherViewModel.Setup(x => x.Isolate(It.IsAny<GraphElementViewModel>()));
             this.saveFileDialog = new Mock<IOpenSaveFileDialogService>();
             this.saveFileDialog.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>())).Returns(string.Empty);
             this.serviceLocator = new Mock<IServiceLocator>();
@@ -116,6 +117,7 @@ namespace CDP4Grapher.Tests.Behaviors
             this.behavior.Attach(diagramControl);
             Assert.IsTrue(this.behavior.CurrentLayout != default);
             Assert.AreSame(this.behavior.AssociatedObject, diagramControl);
+            Assert.IsNull(this.behavior.HoveredElement);
         }
 
         [Test]
@@ -182,6 +184,16 @@ namespace CDP4Grapher.Tests.Behaviors
             {
                 this.behavior.ItemsChanged(null, new DiagramItemsChangedEventArgs(diagramControl, new DiagramContentItem() { Content = elementViewModel }, ItemsChangedAction.Added));
             }
+        }
+        
+        [Test]
+        public void VerifyIsolate()
+        {
+            this.behavior.Attach(new GrapherDiagramControl() { DataContext = this.grapherViewModel.Object});
+            Assert.IsFalse(this.behavior.Isolate());
+            this.behavior.HoveredElement = this.elementViewModels.First();
+            Assert.IsTrue(this.behavior.Isolate());
+            this.grapherViewModel.Verify(x => x.Isolate(It.IsAny<GraphElementViewModel>()), Times.Once);
         }
     }
 }

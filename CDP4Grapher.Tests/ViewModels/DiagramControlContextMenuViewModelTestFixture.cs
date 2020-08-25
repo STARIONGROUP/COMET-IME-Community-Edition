@@ -65,10 +65,12 @@ namespace CDP4Grapher.Tests.ViewModels
         {
             var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object};
             Assert.IsNotEmpty(vm.ContextMenu);
-            Assert.AreEqual(3, vm.ContextMenu.Count);
+            Assert.AreEqual(4, vm.ContextMenu.Count);
             Assert.AreEqual(6, vm.ContextMenu.OfType<BarSubItem>().SelectMany(x => x.Items).Count());
             Assert.AreEqual(12, vm.ContextMenu.OfType<BarSubItem>().SelectMany(x => x.Items.OfType<BarSubItem>().SelectMany(s =>s.Items)).Count());
             Assert.IsNotNull(vm.Behavior);
+
+            Assert.IsNotNull(vm.Isolate);
 
             Assert.IsNotNull(vm.ApplyTreeViewLayoutRightToLeft);
             Assert.IsNotNull(vm.ApplyTreeViewLayoutLeftToRight);

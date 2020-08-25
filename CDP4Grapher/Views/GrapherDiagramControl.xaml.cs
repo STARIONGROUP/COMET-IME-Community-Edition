@@ -62,7 +62,7 @@ namespace CDP4Grapher.Views
         }
 
         /// <summary>
-        /// Override the Dev-Express context-menu
+        /// Overrides the Dev-Express context-menu
         /// </summary>
         /// <returns>The context-menu</returns>
         protected override IEnumerable<IBarManagerControllerAction> CreateContextMenu() => ((IGrapherViewModel)this.DataContext).DiagramContextMenuViewModel.ContextMenu;
