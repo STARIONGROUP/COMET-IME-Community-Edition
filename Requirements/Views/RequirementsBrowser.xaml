@@ -376,12 +376,14 @@
             </dxg:TreeListControl>
             <dxlc:LayoutGroup Grid.Row="3"
                               MinHeight="120"
+                              MaxHeight="400"
                               Header="Requirement Details"
                               View="GroupBox"
                               HorizontalAlignment="Stretch"
                               VerticalAlignment="Stretch"
                               IsCollapsible="True"
                               Orientation="Vertical"
+                              ScrollBars="Auto"
                               GroupBoxDisplayMode="Normal">
                 <dxlc:LayoutItem VerticalAlignment="Stretch">
                     <dxe:TextEdit EditValue="{Binding Path=SelectedThing.Tooltip, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
