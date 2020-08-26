@@ -90,5 +90,16 @@ namespace CDP4RelationshipMatrix.Tests.Converters
                 Assert.That(result, Is.Empty);
             });
         }
+
+        [Test]
+        public void Verify_That_when_ConvertBack_is_called_on_not_a_list_of_Categories_no_exceptions_thrown()
+        {
+            Assert.DoesNotThrow(() =>
+            {
+                var result = this.orderedCategoryListConverter.ConvertBack(this.things, null, null, null) as List<Category>;
+
+                Assert.That(result, Is.Empty);
+            });
+        }
     }
 }
