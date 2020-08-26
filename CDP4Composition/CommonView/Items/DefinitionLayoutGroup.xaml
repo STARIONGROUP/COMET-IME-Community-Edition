@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-             xmlns:cdp4Composition="clr-namespace:CDP4Composition"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition"
              mc:Ignorable="d"
              Header="Definitions" Orientation="Vertical"
              VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
@@ -16,7 +16,7 @@
     <dxlc:LayoutGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Resources/CDP4Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
         </ResourceDictionary>
@@ -69,16 +69,16 @@
 
             <dxg:GridControl.View>
                 <dxg:TableView Name="DefinitionsView"
-                               MaxHeight="1080"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                VerticalScrollbarVisibility="Auto"
-                                AllowColumnMoving="True"
-                                AllowEditing="False"
-                                AllowGrouping="True"
+                               MaxHeight="600"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               VerticalScrollbarVisibility="Auto"
+                               AllowColumnMoving="True"
+                               AllowEditing="False"
+                               AllowGrouping="True"
                                AutoWidth="True"
-                                IsDetailButtonVisibleBinding="{x:Null}"
-                                ShowGroupPanel="False">
+                               IsDetailButtonVisibleBinding="{x:Null}"
+                               ShowGroupPanel="False">
                     <dxg:TableView.FocusedRow>
                         <dynamic:ExpandoObject />
                     </dxg:TableView.FocusedRow>
