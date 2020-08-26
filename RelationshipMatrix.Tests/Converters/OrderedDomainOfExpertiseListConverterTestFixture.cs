@@ -85,7 +85,7 @@ namespace CDP4RelationshipMatrix.Tests.Converters
 
             var domains = new List<DomainOfExpertise> { domainOfExpertise_1, domainOfExpertise_2, domainOfExpertise_3 };
 
-            var result = this.orderedDomainOfExpertiseListConverter.Convert(domains, null, null, null) as List<DomainOfExpertise>;
+            var result = this.orderedDomainOfExpertiseListConverter.ConvertBack(domains, null, null, null) as List<DomainOfExpertise>;
 
             Assert.That(result[0], Is.EqualTo(domainOfExpertise_3));
             Assert.That(result[1], Is.EqualTo(domainOfExpertise_2));
