@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OrderedCategoryListConverter.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="OrderedCategoryNameListConverter.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2020 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ namespace CDP4RelationshipMatrix.Converters
     /// <summary>
     /// The converter to convert a <see cref="List{Category}"/> to a sorted <see cref="List{Category}"/> by Name
     /// </summary>
-    public class OrderedCategoryListConverter : IValueConverter
+    public class OrderedCategoryNameListConverter : IValueConverter
     {
         /// <summary>
         /// The conversion method converts a <see cref="List{T}"/> of <see cref="Category"/> to a sorted <see cref="List{Category}"/> by Name.
@@ -35,11 +35,11 @@ namespace CDP4RelationshipMatrix.Converters
         /// The culture information.
         /// </param>
         /// <returns>
-        /// The <see cref="object"/> containing the same objects as the input collection.
+        /// The <see cref="List{T}"/> of <see cref="string"/> containing the same objects name as the input collection.
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((IList)value)?.Cast<Category>().OrderBy(c => c.Name).ToList() ?? new List<Category>();
+            return ((IList)value)?.Cast<Category>().OrderBy(c => c.Name).Select(x => x.Name).ToList() ?? new List<string>();
         }
 
         /// <summary>
@@ -58,11 +58,11 @@ namespace CDP4RelationshipMatrix.Converters
         /// The culture information.
         /// </param>
         /// <returns>
-        /// The <see cref="List{T}"/> of <see cref="Category"/> containing the same objects as the input collection, but ordered.
+        /// The <see cref="List{T}"/> of <see cref="Category"/> containing the same objects name as the input collection, but ordered.
         /// </returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((IList)value)?.Cast<Category>().OrderBy(c => c.Name).ToList() ?? new List<Category>();
+            return ((IList)value)?.Cast<Category>().OrderBy(c => c.Name).Select(x => x.Name).ToList() ?? new List<string>();
         }
     }
 }
