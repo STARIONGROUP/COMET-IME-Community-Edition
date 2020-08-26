@@ -25,7 +25,6 @@
 
 namespace CDP4RelationshipMatrix.Tests.Converters
 {
-    using System;
     using System.Collections.Generic;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -77,6 +76,20 @@ namespace CDP4RelationshipMatrix.Tests.Converters
         }
 
         [Test]
+        public void Verify_That_when_ConvertBack_is_called_on_not_a_list_of_DomainOfExpertise_no_exceptions_thrown()
+        {
+            var things = new List<Thing>();
+
+            Assert.DoesNotThrow(() =>
+            {
+                var result = this.orderedDomainOfExpertiseListConverter.ConvertBack(things, null, null, null) as List<DomainOfExpertise>;
+
+                Assert.That(result, Is.Empty);
+
+            });
+        }
+
+        [Test]
         public void Verify_that_when_ConvertBack_is_called_sorted_list_of_DomainOfExpertise_is_returned()
         {
             var domainOfExpertise_1 = new DomainOfExpertise() { Name = "CCC" };
@@ -85,7 +98,7 @@ namespace CDP4RelationshipMatrix.Tests.Converters
 
             var domains = new List<DomainOfExpertise> { domainOfExpertise_1, domainOfExpertise_2, domainOfExpertise_3 };
 
-            var result = this.orderedDomainOfExpertiseListConverter.Convert(domains, null, null, null) as List<DomainOfExpertise>;
+            var result = this.orderedDomainOfExpertiseListConverter.ConvertBack(domains, null, null, null) as List<DomainOfExpertise>;
 
             Assert.That(result[0], Is.EqualTo(domainOfExpertise_3));
             Assert.That(result[1], Is.EqualTo(domainOfExpertise_2));
