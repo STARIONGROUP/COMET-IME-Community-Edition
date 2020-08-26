@@ -90,5 +90,16 @@ namespace CDP4RelationshipMatrix.Tests.Converters
             Assert.That(result[1], Is.EqualTo(this.category_2.Name));
             Assert.That(result[2], Is.EqualTo(this.category_1.Name));
         }
+
+        [Test]
+        public void Verify_That_when_ConvertBack_is_called_on_not_a_list_of_Categories_no_exceptions_thrown()
+        {
+            Assert.DoesNotThrow(() =>
+            {
+                var result = this.orderedCategoryNameListConverter.ConvertBack(this.things, null, null, null) as List<string>;
+
+                Assert.That(result, Is.Empty);
+            });
+        }
     }
 }
