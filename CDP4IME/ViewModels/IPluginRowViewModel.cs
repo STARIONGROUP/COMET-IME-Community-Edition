@@ -41,11 +41,13 @@ namespace CDP4IME.ViewModels
         /// Make the installation of the new Plugin
         /// <param name="token">The Cancelation Token</param>
         /// </summary>
+        /// <returns><see cref="Task"/></returns>
         Task Install(CancellationToken token);
 
         /// <summary>
         /// Called when the install gets canceled
         /// </summary>
-        void HandlingCancelationOfInstallation();
+        /// <returns><see cref="Task"/></returns>
+        Task HandlingCancelationOfInstallation();
     }
 }

@@ -108,7 +108,7 @@ namespace CDP4IME.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyCancelation()
+        public async Task VerifyCancelation()
         {
             if (!this.UpdateFileSystem.TemporaryPath.Exists)
             {
@@ -119,7 +119,7 @@ namespace CDP4IME.Tests.ViewModels
             this.SetupTestContentForInstallationCancellationPurpose(this.UpdateFileSystem.TemporaryPath.FullName);
 
             var viewModel = new PluginRowViewModel(this.Plugin, this.UpdateFileSystem);
-            viewModel.HandlingCancelationOfInstallation();
+            await viewModel.HandlingCancelationOfInstallation();
 
             this.AssertInstalledTestFileHasBeenRestored();
         }

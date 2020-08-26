@@ -38,13 +38,15 @@ namespace CDP4IME.ViewModels
     public interface IUpdatableThingRowViewModel
     {
         /// <summary>
-        /// Gets or sets the assert whether the represented plugin will be installed or downloaded
+        /// Gets or sets the assert whether the represented thing will be installed or downloaded
         /// </summary>
+        /// <returns>An assert whether the representent updatatable thing is selected</returns>
         bool IsSelected { get; set; }
 
         /// <summary>
         /// Gets the <see cref="IUpdateFileSystemService"/> to operate on
         /// </summary>
+        /// <returns>An <see cref="IUpdateFileSystemService"/></returns>
         IUpdateFileSystemService FileSystem { get; set; }
 
         /// <summary>
@@ -53,10 +55,11 @@ namespace CDP4IME.ViewModels
         /// <param name="client">the Update Server Client to perform request</param>
         /// <returns>A <see cref="Task"/></returns>
         Task Download(IUpdateServerClient client);
-        
+
         /// <summary>
         /// Handles the cancelation of the download process
         /// </summary>
-        void HandlingCancelationOfDownload();
+        /// <returns>A <see cref="Task"/></returns>
+        Task HandlingCancelationOfDownload();
     }
 }

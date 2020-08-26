@@ -41,7 +41,7 @@ namespace CDP4IME.ViewModels
     using NLog;
 
     using ReactiveUI;
-    
+
     /// <summary>
     /// Represents a <see cref="PluginRow"/> holding its properties and interaction logic
     /// </summary>
@@ -149,7 +149,7 @@ namespace CDP4IME.ViewModels
             get => this.isSelected;
             set => this.RaiseAndSetIfChanged(ref this.isSelected, value);
         }
-        
+
         /// <summary>
         /// Gets the <see cref="IUpdateFileSystemService"/> to operate on
         /// </summary>
@@ -199,10 +199,10 @@ namespace CDP4IME.ViewModels
         /// Make the installation of the new Plugin
         /// <param name="token">Cancelation Token</param>
         /// </summary>
+        /// <returns><see cref="Task"/></returns>
         public Task Install(CancellationToken token)
         {
-            return Task.Run(
-            () =>
+            return Task.Run(() =>
             {
                 try
                 {
@@ -239,14 +239,14 @@ namespace CDP4IME.ViewModels
                 using (var stream = await client.DownloadPlugin(this.Name, this.Version))
                 {
                     this.Progress = 50;
-                    
+
                     using (var fileStream = this.FileSystem.CreateCdp4Ck(this.Name))
                     {
                         stream.Seek(0, SeekOrigin.Begin);
                         await stream.CopyToAsync(fileStream);
                     }
                 }
-                
+
                 this.Progress = 100;
             }
             catch (Exception exception)
@@ -255,45 +255,53 @@ namespace CDP4IME.ViewModels
                 throw;
             }
         }
-        
+
         /// <summary>
         /// Called when the install gets canceled
         /// </summary>
-        public void HandlingCancelationOfInstallation()
+        /// <returns><see cref="Task"/></returns>
+        public Task HandlingCancelationOfInstallation()
         {
-            try
+            return Task.Run(() =>
             {
-                this.Progress = -1;
+                try
+                {
+                    this.Progress = -1;
 
-                this.FileSystem.Restore();
+                    this.FileSystem.Restore();
 
-                this.Progress = 0;
-            }
-            catch (Exception exception)
-            {
-                this.logger.Error($"An exception occured: {exception}");
-                throw;
-            }
+                    this.Progress = 0;
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Error($"An exception occured: {exception}");
+                    throw;
+                }
+            });
         }
 
         /// <summary>
         /// Handles the cancelation of the download process
         /// </summary>
-        public void HandlingCancelationOfDownload()
+        /// <returns><see cref="Task"/></returns>
+        public Task HandlingCancelationOfDownload()
         {
-            try
+            return Task.Run(() =>
             {
-                this.Progress = -1;
+                try
+                {
+                    this.Progress = -1;
 
-                this.FileSystem.CleanupDownloadedPlugin(this.Name);
+                    this.FileSystem.CleanupDownloadedPlugin(this.Name);
 
-                this.Progress = 0;
-            }
-            catch (Exception exception)
-            {
-                this.logger.Error($"An exception occured: {exception}");
-                throw;
-            }
+                    this.Progress = 0;
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Error($"An exception occured: {exception}");
+                    throw;
+                }
+            });
         }
     }
 }

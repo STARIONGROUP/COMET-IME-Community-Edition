@@ -368,7 +368,7 @@ namespace CDP4IME.ViewModels
         /// <returns>A <see cref="Task"/></returns>
         private async Task CancelInstallationsExecute()
         {
-            await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(plugin.HandlingCancelationOfInstallation)).ToArray());
+            await Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => plugin.HandlingCancelationOfInstallation()).ToArray());
         }
         
         /// <summary>
@@ -426,8 +426,8 @@ namespace CDP4IME.ViewModels
         private async Task CancelDownloadsExecute()
         {
             await Task.WhenAll(
-                Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => Task.Run(plugin.HandlingCancelationOfDownload)).ToArray()),
-                Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => Task.Run(ime.HandlingCancelationOfDownload)).ToArray()));
+                Task.WhenAll(this.AvailablePlugins.Where(p => p.IsSelected).Select(plugin => plugin.HandlingCancelationOfDownload()).ToArray()),
+                Task.WhenAll(this.AvailableIme.Where(p => p.IsSelected).Select(ime => ime.HandlingCancelationOfDownload()).ToArray()));
         }
 
         /// <summary>

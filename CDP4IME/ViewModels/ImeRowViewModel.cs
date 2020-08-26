@@ -185,23 +185,27 @@ namespace CDP4IME.ViewModels
                 throw;
             }
         }
-        
+
         /// <summary>
         /// Called when the download process gets canceled
         /// </summary>
-        public void HandlingCancelationOfDownload()
+        /// <returns><see cref="Task"/></returns>
+        public Task HandlingCancelationOfDownload()
         {
-            try
+            return Task.Run(() =>
             {
-                this.Progress = -1;
-                this.FileSystem.CleanupDownloadedMsi(this.Name);
-                this.Progress = 0;
-            }
-            catch (Exception exception)
-            {
-                this.logger.Error($"An exception occured: {exception}");
-                throw;
-            }
+                try
+                {
+                    this.Progress = -1;
+                    this.FileSystem.CleanupDownloadedMsi(this.Name);
+                    this.Progress = 0;
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Error($"An exception occured: {exception}");
+                    throw;
+                }
+            });
         }
     }
 }
