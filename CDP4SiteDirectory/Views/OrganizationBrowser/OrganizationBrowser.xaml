@@ -8,7 +8,7 @@
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
-             xmlns:viewModels="clr-namespace:CDP4CommonView;assembly=CDP4CommonView"
+             xmlns:viewModels="clr-namespace:CDP4CommonView;assembly=CDP4Composition"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
@@ -59,7 +59,7 @@
         </HierarchicalDataTemplate>
             
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>

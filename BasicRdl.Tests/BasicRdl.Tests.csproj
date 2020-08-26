@@ -72,7 +72,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BasicRdl\BasicRdl.csproj" />
-    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj" />
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
   </ItemGroup>
 </Project>

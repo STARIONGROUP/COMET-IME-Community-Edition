@@ -93,7 +93,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj" />
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
     <ProjectReference Include="..\RelationshipMatrix\CDP4RelationshipMatrix.csproj" />
   </ItemGroup>
