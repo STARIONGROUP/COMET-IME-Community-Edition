@@ -38,7 +38,7 @@ namespace CDP4IME.Services
         /// Brings the view to the user sight
         /// </summary>
         /// <param name="viewInstance">the view to show up</param>
-        void ShowDialog(PluginInstaller viewInstance);
+        void ShowDialog(UpdateDownloaderInstaller viewInstance);
 
         /// <summary>
         /// Pops up a message box

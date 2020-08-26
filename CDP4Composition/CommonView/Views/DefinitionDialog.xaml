@@ -1,0 +1,196 @@
+﻿<dx:DXWindow x:Class="CDP4CommonView.Views.DefinitionDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"            
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:items="clr-namespace:CDP4CommonView.Items"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:views="clr-namespace:CDP4CommonView.Views"
+             Title="DefinitionDialog"
+             Width="525"
+             Height="350"
+             navigation:DialogCloser.DialogResult="{Binding DialogResult}">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/ErrorTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+    <dxlc:LayoutControl Margin="5"
+                        Orientation="Vertical"
+                        ScrollBars="None">
+        <dxlc:LayoutGroup Margin="-10,-7,-10,-5"
+                          Orientation="Vertical"
+                          View="Tabs"
+                          dxlc:LayoutControl.AllowHorizontalSizing="True">
+            <dxlc:LayoutGroup Header="Basic" 
+                              Orientation="Vertical"
+                              Width="Auto"
+                              Height="Auto"
+                              MaxWidth="525"
+                              MaxHeight="350"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch">
+                <dxlc:LayoutItem Label="Content:"
+                                 LabelPosition="Top"
+                                 VerticalAlignment="Stretch">
+                    <views:InlineEditContentUserControl VerticalAlignment="Stretch"
+                                                        HorizontalAlignment="Stretch"
+                                                        InlineMode="False"
+                                                        StartInPreviewMode="False"
+                                                        BorderThickness="3"
+                                                        IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
+                                                        ContentText="{Binding Content, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    </views:InlineEditContentUserControl>
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutItem Label="Language Code:">
+                    <items:LanguageCodeControl EditValue="{Binding SelectedLanguageCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                               ItemsSource="{Binding PossibleLanguageCode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                               IsReadOnly="{Binding IsReadOnly, Mode=OneWay}">
+                    </items:LanguageCodeControl>
+                </dxlc:LayoutItem>
+
+            </dxlc:LayoutGroup>
+
+            <items:CitationLayoutGroup />
+
+            <dxlc:LayoutGroup Header="Note" 
+                              Orientation="Vertical" 
+                              Width="Auto"
+                              Height="Auto"
+                              MaxWidth="525"
+                              MaxHeight="350"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch">
+                <dxlc:LayoutItem>
+                    <dxb:ToolBarControl Height="30" Background="Transparent">
+                        <dxb:BarButtonItem x:Name="CreateNoteButton"
+                                               Command="{Binding CreateNoteCommand}"
+                                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                               Hint="Create a new Note" />
+                        <dxb:BarButtonItem x:Name="DeleteNoteButton"
+                                               Command="{Binding DeleteNoteCommand}"
+                                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                               Hint="Deprecate the note" />
+                        <dxb:BarButtonItem x:Name="MoveUpNoteButton"
+                                           Command="{Binding MoveUpNoteCommand}"
+                                           Glyph="{dx:DXImage Image=MoveUp_16x16.png}"
+                                           Hint="Move the selected note up" />
+                        <dxb:BarButtonItem x:Name="MoveDownNoteButton"
+                                           Command="{Binding MoveDownNoteCommand}"
+                                           Glyph="{dx:DXImage Image=MoveDown_16x16.png}"
+                                           Hint="Move the selected note down" />
+                        <dxb:BarButtonItem x:Name="HelpNoteButton"
+                                               Command="{Binding HelpNoteValueCommand}"
+                                               Glyph="{dx:DXImage Image=Info_16x16.png}"
+                                               Hint="Show Help" />
+                    </dxb:ToolBarControl>
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutItem>
+                    <dxg:GridControl Height="250" 
+                                         AllowLiveDataShaping="False"
+                                         ItemsSource="{Binding Note}"
+                                         SelectedItem="{Binding SelectedNote,
+                                                                Mode=TwoWay,
+                                                                UpdateSourceTrigger=PropertyChanged}"
+                                         SelectionMode="Row">
+
+                        <dxg:GridControl.View>
+                            <dxg:TableView Name="NoteView"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch"
+                                               VerticalScrollbarVisibility="Auto"
+                                               AllowColumnMoving="True"
+                                               AllowEditing="True"
+                                               AllowGrouping="True"
+                                               AutoWidth="true"
+                                               IsDetailButtonVisibleBinding="{x:Null}"
+                                               ShowGroupPanel="False">
+                                <dxg:TableView.FocusedRow>
+                                    <dynamic:ExpandoObject />
+                                </dxg:TableView.FocusedRow>
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn Header="Value" FieldName="Value"/>
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+
+            <dxlc:LayoutGroup Header="Example" 
+                              Orientation="Vertical" 
+                              Width="Auto"
+                              Height="Auto"
+                              MaxWidth="525"
+                              MaxHeight="350"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch">
+                <dxlc:LayoutItem>
+                    <dxb:ToolBarControl Height="30" Background="Transparent">
+                        <dxb:BarButtonItem x:Name="CreateExampleButton"
+                                               Command="{Binding CreateExampleCommand}"
+                                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                               Hint="Create a new Note" />
+                        <dxb:BarButtonItem x:Name="DeleteExampleButton"
+                                               Command="{Binding DeleteExampleCommand}"
+                                               Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                               Hint="Deprecate the note" />
+                        <dxb:BarButtonItem x:Name="MoveUpExampleButton"
+                                           Command="{Binding MoveUpExampleCommand}"
+                                           Glyph="{dx:DXImage Image=MoveUp_16x16.png}"
+                                           Hint="Move the selected note up" />
+                        <dxb:BarButtonItem x:Name="MoveDownExampleButton"
+                                           Command="{Binding MoveDownExampleCommand}"
+                                           Glyph="{dx:DXImage Image=MoveDown_16x16.png}"
+                                           Hint="Move the selected note down" />
+                        <dxb:BarButtonItem x:Name="HelpExampleButton"
+                                               Command="{Binding HelpExampleCommand}"
+                                               Glyph="{dx:DXImage Image=Info_16x16.png}"
+                                               Hint="Show Help" />
+                    </dxb:ToolBarControl>
+                </dxlc:LayoutItem>
+
+                <dxlc:LayoutItem>
+                    <dxg:GridControl Height="250" 
+                                         AllowLiveDataShaping="False"
+                                         ItemsSource="{Binding Example}"
+                                         SelectedItem="{Binding SelectedExample,
+                                                                Mode=TwoWay,
+                                                                UpdateSourceTrigger=PropertyChanged}"
+                                         SelectionMode="Row">
+
+                        <dxg:GridControl.View>
+                            <dxg:TableView Name="ExampleView"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch"
+                                               VerticalScrollbarVisibility="Auto"
+                                               AllowColumnMoving="True"
+                                               AllowEditing="True"
+                                               AllowGrouping="True"
+                                               AutoWidth="true"
+                                               IsDetailButtonVisibleBinding="{x:Null}"
+                                               ShowGroupPanel="False">
+                                <dxg:TableView.FocusedRow>
+                                    <dynamic:ExpandoObject />
+                                </dxg:TableView.FocusedRow>
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn Header="Value" FieldName="Value"/>
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>            
+            <items:AdvancedLayoutGroup MaxWidth="525"/>
+        </dxlc:LayoutGroup>
+        <items:UserValidationButtonsLayoutGroup />
+        <items:ErrorMessageLayoutGroup />
+    </dxlc:LayoutControl>
+</dx:DXWindow>

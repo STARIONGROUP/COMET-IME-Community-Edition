@@ -34,10 +34,6 @@
 
       <!-- CDP4-IME and CDP4-AddIn dependencies -->
 
-      <Component Id="_59489183D547" Guid="{0ACF100F-89CE-47D8-92F4-59489183D547}" Location="local" Win64="$(var.Win64)">
-        <File Id="_0ACF100F" Vital="yes" Source="$(var.CDP4CommonView.TargetPath)" KeyPath="yes" />
-      </Component>
-
       <Component Id="_0023C8C8A530" Guid="{2EAB5754-130B-4335-80A1-0023C8C8A530}" Location="local" Win64="$(var.Win64)">
         <File Id="_2EAB5754" Vital="yes" Source="$(var.CDP4Composition.TargetPath)" KeyPath="yes" />
       </Component>

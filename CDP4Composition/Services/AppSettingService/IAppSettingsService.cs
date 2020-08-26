@@ -19,7 +19,7 @@ namespace CDP4Composition.Services.AppSettingService
         /// Holder of application settings
         /// </summary>
         T AppSettings { get; }
-
+        
         /// <summary>
         /// Writes the <see cref="AppSettings"/> to disk
         /// </summary>

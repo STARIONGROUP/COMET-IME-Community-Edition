@@ -77,7 +77,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
         private Assembler assembler;
         private Mock<IAppSettingsService<AddinAppSettings>> appSettingService;
         private SiteDirectory siteDirectory;
-        private Mock<IAssemblyLocationLoader> assemblyLocationLoader;
+        private Mock<IAssemblyInformationService> assemblyLocationLoader;
 
         [SetUp]
         public void SetUp()
@@ -111,7 +111,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             var availableDals = new AvailableDals(dals);
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>()).Returns(availableDals);
 
-            this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
+            this.assemblyLocationLoader = new Mock<IAssemblyInformationService>();
 
             var frameworkVersion = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Name;
             var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
@@ -122,7 +122,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetFullPath(Path.Combine(testDirectory, $"CDP4ServicesDal{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}Release{Path.DirectorySeparatorChar}{frameworkVersion}")));
 #endif
 
-            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(this.assemblyLocationLoader.Object);
+            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyInformationService>()).Returns(this.assemblyLocationLoader.Object);
 
             this.amountOfRibbonControls = 9;
             this.order = 1;
