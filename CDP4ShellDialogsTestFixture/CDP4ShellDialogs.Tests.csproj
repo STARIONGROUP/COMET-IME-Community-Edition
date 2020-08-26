@@ -70,7 +70,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj" />
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
     <ProjectReference Include="..\CDP4ShellDialogs\CDP4ShellDialogs.csproj" />
   </ItemGroup>

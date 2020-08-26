@@ -1,0 +1,191 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm"
+                    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars">
+
+    <Image x:Key="EditIcon" x:Shared="False" Source="{dx:DXImage Image=EditName_16x16.png}" Height="16" Width="16"/>
+    <Image x:Key="InspectIcon" x:Shared="False" Source="{dx:DXImage Image=Find_16x16.png}" Height="16" Width="16"/>
+    <Image x:Key="CreateIcon" x:Shared="False" Source="{dx:DXImage Image=Add_16x16.png}" Height="16" Width="16"/>
+    <Image x:Key="DeleteIcon" x:Shared="False" Source="{dx:DXImage Image=Delete_16x16.png}" Height="16" Width="16"/>
+    <Image x:Key="HighlightIcon" x:Shared="False" Source="{dx:DXImage Image=HighlightField_16x16.png}" Height="16" Width="16"/>
+    <Image x:Key="CopyIcon" x:Shared="False" Source="{dx:DXImage Image=Copy_16x16.png}" Height="16" Width="16"/>
+    <Image x:Key="SaveIcon" x:Shared="False" Source="{dx:DXImage Image=Save_16x16.png}" Height="16" Width="16"/>
+    <Image x:Key="NavigateIcon" x:Shared="False" Source="{dx:DXImage Image=Redo_16x16.png}" Height="16" Width="16"/>
+    <Image x:Key="FavoriteIcon" x:Shared="False" Source="{dx:DXImage Image=NewContact_16x16.png}" Height="16" Width="16"/>
+
+    <Style TargetType="ScrollBar">
+        <!-- 
+        This style disables the context menu of the scrollbars, the scroll-menu conflicts with the ContextMenu style.
+         The ContextMenu style causes a r.m.c on a scrollbar to cause an exception on the built-in menu
+        -->
+        <Setter Property="ContextMenu" Value="{x:Null}"/>
+    </Style>
+
+    <Style TargetType ="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecated">
+        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Row.IsDeprecated}" Value="True">
+                <Setter Property="Background" Value="LightGray"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecatedHighlightedBaseQuantityKind">
+        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=Row.IsBaseQuantityKind}" Value="True">
+                <Setter Property="FontWeight" Value="Bold" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=Row.IsDeprecated}" Value="True">
+                <Setter Property="Background" Value="LightGray" />
+                <Setter Property="Opacity" Value="0.5" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
+                <Setter Property="Background" Value="Yellow" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType ="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecatedHighlighted">
+        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Row.IsDeprecated}" Value="True">
+                <Setter Property="Background" Value="LightGray"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Row.IsHighlighted}" Value="True">
+                <Setter Property="Background" Value="Yellow"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType ="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecatedHighlightedDirty">
+        <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Row.IsDeprecated}" Value="True">
+                <Setter Property="Background" Value="LightGray"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Row.IsHighlighted}" Value="True">
+                <Setter Property="Background" Value="Yellow"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Row.IsDirty}" Value="True">
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="Foreground" Value="DarkRed"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style TargetType="{x:Type ContextMenu}">
+        <Style.Triggers>
+            <Trigger Property="HasItems" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="ItemsSource" Value="{Binding ContextMenu}"/>
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type MenuItem}">
+                    <Setter Property="Header" Value="{Binding Header}" />
+                    <Setter Property="InputGestureText" Value="{Binding InputGestureText}" />
+                    <Setter Property="Command" Value="{Binding MenuCommand}" />
+                    <Setter Property="ItemsSource" Value="{Binding SubMenu}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Edit}">
+                            <Setter Property="Icon" Value="{StaticResource EditIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Inspect}">
+                            <Setter Property="Icon" Value="{StaticResource InspectIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Delete}">
+                            <Setter Property="Icon" Value="{StaticResource DeleteIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Deprecate}">
+                            <Setter Property="Icon" Value="{StaticResource DeleteIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Create}">
+                            <Setter Property="Icon" Value="{StaticResource CreateIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Highlight}">
+                            <Setter Property="Icon" Value="{StaticResource HighlightIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Copy}">
+                            <Setter Property="Icon" Value="{StaticResource CopyIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Save}">
+                            <Setter Property="Icon" Value="{StaticResource SaveIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Navigate}">
+                            <Setter Property="Icon" Value="{StaticResource NavigateIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Favorite}">
+                            <Setter Property="Icon" Value="{StaticResource FavoriteIcon}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <ControlTemplate x:Key="HidingButtonControlTemplate" TargetType="{x:Type Button}">
+        <Grid>
+            <Polygon Fill="{TemplateBinding Background}"  Points="45,0 0,0 0,25 45,25" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="0"/>
+            <Image Source="{TemplateBinding Content}" Width="15"/>
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsFocused" Value="True"/>
+            <Trigger Property="IsDefaulted" Value="True"/>
+            <Trigger Property="IsMouseOver" Value="True"/>
+            <Trigger Property="IsPressed" Value="True"/>
+            <Trigger Property="IsEnabled" Value="False"/>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Key="HidingButtonStyle" TargetType="{x:Type Button}">
+        
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="LightGray"/>
+                <Setter Property="Background" Value="DarkGray"/>
+            </Trigger>
+            <EventTrigger RoutedEvent="Control.MouseEnter">
+                <BeginStoryboard>
+                    <Storyboard >
+                        <DoubleAnimation Duration="0:0:0.5" To="1" Storyboard.TargetProperty="Opacity"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+            <EventTrigger RoutedEvent="Control.MouseLeave">
+                <BeginStoryboard>
+                    <Storyboard >
+                        <DoubleAnimation Duration="0:0:0.5" To="0.7" Storyboard.TargetProperty="Opacity"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="ThingIcon" TargetType="{x:Type Image}">
+        <Setter Property="Width" Value="28"/>
+        <Setter Property="Height" Value="16"/>
+        <Setter Property="Margin" Value="1"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+    <Style x:Key="ThingIconGridColumn" TargetType="{x:Type dxg:GridColumn}">
+        <Setter Property="AllowResizing" Value="False" />
+        <Setter Property="Width" Value="28"/>
+        <Setter Property="MinWidth" Value="28"/>
+        <Setter Property="FixedWidth" Value="True"/>
+        <Setter Property="AllowEditing" Value="False"/>
+    </Style>
+    <Style x:Key="NoBorderButton" TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+</ResourceDictionary>

@@ -6,14 +6,14 @@
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:rspe="clr-namespace:CDP4Requirements.ViewModels.RequirementsSpecificationEditor"
-             xmlns:commonViews="clr-namespace:CDP4CommonView.Views;assembly=CDP4CommonView"
+             xmlns:commonViews="clr-namespace:CDP4CommonView.Views;assembly=CDP4Composition"
              xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
