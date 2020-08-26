@@ -90,6 +90,5 @@ namespace CDP4RelationshipMatrix.Tests.Converters
             Assert.That(result[1], Is.EqualTo(this.category_2.Name));
             Assert.That(result[2], Is.EqualTo(this.category_1.Name));
         }
-
     }
 }

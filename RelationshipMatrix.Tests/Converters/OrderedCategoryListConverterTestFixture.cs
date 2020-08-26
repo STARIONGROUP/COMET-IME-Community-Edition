@@ -68,7 +68,6 @@ namespace CDP4RelationshipMatrix.Tests.Converters
             Assert.That(result[2], Is.EqualTo(this.category_1));
         }
 
-
         [Test]
         public void Verify_that_when_ConvertBack_is_called_sorted_list_of_Categories_is_returned()
         {

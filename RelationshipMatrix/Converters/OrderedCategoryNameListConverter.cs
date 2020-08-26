@@ -35,7 +35,7 @@ namespace CDP4RelationshipMatrix.Converters
         /// The culture information.
         /// </param>
         /// <returns>
-        /// The <see cref="List{T}"/> of <see cref="string"/> containing the same objects nasme as the input collection.
+        /// The <see cref="List{T}"/> of <see cref="string"/> containing the same objects name as the input collection.
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -58,7 +58,7 @@ namespace CDP4RelationshipMatrix.Converters
         /// The culture information.
         /// </param>
         /// <returns>
-        /// The <see cref="List{T}"/> of <see cref="Category"/> containing the same objects as the input collection, but ordered.
+        /// The <see cref="List{T}"/> of <see cref="Category"/> containing the same objects name as the input collection, but ordered.
         /// </returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

@@ -25,7 +25,6 @@
 
 namespace CDP4RelationshipMatrix.Tests.Converters
 {
-    using System;
     using System.Collections.Generic;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
