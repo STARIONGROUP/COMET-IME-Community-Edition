@@ -25,15 +25,17 @@
 
 namespace CDP4IME.Services
 {
+    using System.ComponentModel.Composition;
     using System.IO;
     using System.IO.Compression;
 
     using CDP4Composition.Modularity;
 
     /// <summary>
-    /// The purpose of the <see cref="PluginFileSystemService"/> is to provide operations appliable on a file system
+    /// The purpose of the <see cref="UpdateFileSystemService"/> is to provide operations appliable on a file system
     /// </summary>
-    public class PluginFileSystemService : IPluginFileSystemService
+    [Export(typeof(IUpdateFileSystemService))]
+    public class UpdateFileSystemService : IUpdateFileSystemService
     {
         /// <summary>
         /// Gets or sets the path were the cdp4ck to be installed sits 
@@ -49,12 +51,30 @@ namespace CDP4IME.Services
         /// Gets or sets the path where the updated plugin should be installed
         /// </summary>
         public DirectoryInfo InstallationPath { get; set; }
-        
+
         /// <summary>
-        /// Instanciate a new <see cref="PluginFileSystemService"/>
+        /// Gets or sets the path where the plugin should be downloaded
         /// </summary>
-        /// <param name="plugin"></param>
-        public PluginFileSystemService((FileInfo cdp4ckFile, Manifest manifest) plugin)
+        public DirectoryInfo PluginDownloadPath { get; set; } = new DirectoryInfo(Path.Combine(PluginUtilities.GetDownloadDirectory().FullName));
+
+        /// <summary>
+        /// Gets or sets the path where the IME should be downloaded
+        /// </summary>
+        public DirectoryInfo ImeDownloadPath { get; set; } = new DirectoryInfo(Path.Combine(PluginUtilities.GetDownloadDirectory(false).FullName));
+
+        /// <summary>
+        /// Instanciate a new <see cref="UpdateFileSystemService"/>
+        /// </summary>
+        [ImportingConstructor]
+        public UpdateFileSystemService()
+        {
+        }
+
+        /// <summary>
+        /// Instanciate a new <see cref="UpdateFileSystemService"/>
+        /// </summary>
+        /// <param name="plugin">A Tupple containing the cpd4ck <see cref="FileInfo"/> and the <see cref="Manifest"/></param>
+        public UpdateFileSystemService((FileInfo cdp4ckFile, Manifest manifest) plugin)
         {
             var (cdp4CkFile, manifest) = plugin;
 
@@ -128,8 +148,84 @@ namespace CDP4IME.Services
         {
             if (this.TemporaryPath.Exists)
             {
-                Directory.Delete(this.InstallationPath.FullName);
-                this.TemporaryPath.MoveTo(this.InstallationPath.FullName);
+                Directory.Delete(this.InstallationPath.FullName, true);
+                Directory.Move(this.TemporaryPath.FullName, this.InstallationPath.FullName);
+            }
+        }
+        
+        /// <summary>
+        /// Create a cdp4ck file to put the downloaded plugin into
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin</param>
+        /// <returns>A <see cref="FileStream"/></returns>
+        public FileStream CreateCdp4Ck(string pluginName)
+        {
+            return File.Create(this.GetDownloadedCdp4Ck(pluginName).FullName);
+        }
+
+        /// <summary>
+        /// Compute and return the Download path of the download Cdp4Ck File
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin</param>
+        /// <returns>The path as a string</returns>
+        public FileInfo GetDownloadedCdp4Ck(string pluginName)
+        {
+            var directory = new DirectoryInfo(Path.Combine(this.PluginDownloadPath.FullName, pluginName));
+
+            if (!directory.Exists)
+            {
+                directory.Create();
+            }
+
+            return new FileInfo(Path.Combine(directory.FullName, $"{pluginName}.cdp4ck"));
+        }
+
+        /// <summary>
+        /// Creates the msi file to put the download IME installer into
+        /// </summary>
+        /// <param name="installerName">the name of the msi file</param>
+        public FileStream CreateImeMsi(string installerName)
+        {
+            return File.Create(this.GetDownloadedImeMsi(installerName).FullName);
+        }
+        
+        /// <summary>
+        /// Compute and return the Download path of the download IME MSI File
+        /// </summary>
+        /// <param name="installerName">The name of the installer</param>
+        /// <returns>The path as a string</returns>
+        public FileInfo GetDownloadedImeMsi(string installerName)
+        {
+            return new FileInfo(Path.Combine(this.ImeDownloadPath.FullName, installerName));
+        }
+        
+        /// <summary>
+        /// Occurs when the download has been interupted
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin</param>
+        public void CleanupDownloadedPlugin(string pluginName)
+        {
+            this.CleanUpDownload(this.GetDownloadedCdp4Ck(pluginName));
+        }
+
+        /// <summary>
+        /// Occurs when the download has been interupted
+        /// </summary>
+        /// <param name="installerName">The name of the plugin</param>
+        public void CleanupDownloadedMsi(string installerName)
+        {
+            this.CleanUpDownload(this.GetDownloadedImeMsi(installerName));
+        }
+
+        /// <summary>
+        /// Deletes the specified downloaded file 
+        /// </summary>
+        /// <param name="downloadedFile">The Download <see cref="FileInfo"/></param>
+        private void CleanUpDownload(FileInfo downloadedFile)
+        {
+            if (downloadedFile.Directory?.Exists == true)
+            {
+                downloadedFile.Directory.Delete(true);
             }
         }
     }

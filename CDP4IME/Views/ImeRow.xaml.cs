@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AssemblyLocationLoader.cs" company="RHEA System S.A.">
+// <copyright file="ImeRow.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -24,26 +23,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Utilities
+namespace CDP4IME.Views
 {
-    using System.ComponentModel.Composition;
-    using System.IO;
-    using System.Reflection;
+    using System.Windows.Controls;
 
     /// <summary>
-    /// The helper class that make method that uses <code>Assembly.GetExecutingAssembly().Location</code>
-    /// testable, in order to find plugins
+    /// Interaction logic for ImeRow.xaml
     /// </summary>
-    [Export(typeof(IAssemblyLocationLoader))]
-    public class AssemblyLocationLoader : IAssemblyLocationLoader
+    public partial class ImeRow
     {
         /// <summary>
-        /// Gets the path of the executing assembly
+        /// Initializes a new instance of the <see cref="ImeRow"/> class
         /// </summary>
-        /// <returns>the path of the assembly</returns>
-        public string GetLocation()
+        public ImeRow()
         {
-            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            this.InitializeComponent();
         }
     }
 }

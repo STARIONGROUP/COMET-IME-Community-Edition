@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginInstallerBehavior.cs" company="RHEA System S.A.">
+// <copyright file="IUpdateDownloaderInstallerViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,16 +23,25 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Behaviors
+namespace CDP4IME.ViewModels
 {
+    using System.Threading;
+
+    using CDP4IME.Behaviors;
+
     /// <summary>
-    /// Definition of the behavior <see cref="PluginInstallerBehavior"/> used to handle the interactions between <see cref="CDP4IME.ViewModels.PluginInstallerViewModel"/> and the view <see cref="CDP4IME.Views.PluginInstaller"/>
+    /// Definition of the <see cref="UpdateDownloaderInstallerViewModel"/> providing properties and methods the implementing class has to implement
     /// </summary>
-    public interface IPluginInstallerBehavior
+    public interface IUpdateDownloaderInstallerViewModel
     {
         /// <summary>
-        /// Closes the Window
+        /// The attached Behavior
         /// </summary>
-        void Close();
+        IUpdateDownloaderInstallerBehavior Behavior { get; set; }
+
+        /// <summary>
+        /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 
+        /// </summary>
+        CancellationTokenSource CancellationTokenSource { get; }
     }
 }

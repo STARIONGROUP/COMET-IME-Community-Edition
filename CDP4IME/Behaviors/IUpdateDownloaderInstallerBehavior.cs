@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICommandRunnerService.cs" company="RHEA System S.A.">
+// <copyright file="IPluginInstallerBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,17 +23,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Services
+namespace CDP4IME.Behaviors
 {
+    using CDP4IME.ViewModels;
+    using CDP4IME.Views;
+
     /// <summary>
-    /// Definition of <see cref="CommandRunnerService"/> Abstracting invoking commands on conhost
+    /// Definition of the behavior <see cref="UpdateDownloaderInstallerBehavior"/> used to handle the interactions between <see cref="UpdateDownloaderInstallerViewModel"/> and the view <see cref="UpdateDownloaderInstaller"/>
     /// </summary>
-    public interface ICommandRunnerService
+    public interface IUpdateDownloaderInstallerBehavior
     {
         /// <summary>
-        /// Runs the provided <see cref="executable"/> with elevated rights
+        /// Closes the Window
         /// </summary>
-        /// <param name="executable">The executable command path</param>
-        void RunAsAdmin(string executable);
+        void Close();
     }
 }

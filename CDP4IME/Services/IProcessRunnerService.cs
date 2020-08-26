@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginInstallerViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ICommandRunnerService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,25 +23,24 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.ViewModels
+namespace CDP4IME.Services
 {
-    using System.Threading;
-
-    using CDP4IME.Behaviors;
+    using System.ComponentModel.Composition;
 
     /// <summary>
-    /// Definition of the <see cref="PluginInstallerViewModel"/> providing properties and methods the implementing class has to implement
+    /// Definition of <see cref="ProcessRunnerService"/> Abstracting invoking commands on conhost
     /// </summary>
-    public interface IPluginInstallerViewModel
+    public interface IProcessRunnerService
     {
         /// <summary>
-        /// The attached Behavior
+        /// Runs the provided <see cref="executable"/> with elevated rights
         /// </summary>
-        IPluginInstallerBehavior Behavior { get; set; }
+        /// <param name="executable">The executable command path</param>
+        void RunAsAdmin(string executable);
 
         /// <summary>
-        /// Gets the cancellation token to use whenever the installations processes goes wrong or the process is canceled 
+        /// Gracefully restart the IME
         /// </summary>
-        CancellationTokenSource CancellationTokenSource { get; }
+        void Restart();
     }
 }

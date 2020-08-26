@@ -1,8 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginInstallerViewInvokerService.cs" company="RHEA System S.A.">
+// <copyright file="IAssemblyLocationLoader.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -23,31 +24,32 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Services
+namespace CDP4Composition.Utilities
 {
-    using System.Windows;
-
-    using CDP4IME.Views;
+    using System;
+    using System.Reflection;
 
     /// <summary>
-    /// Defines the <see cref="ViewInvokerService"/> which is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// The interface that defines members of implementing classes of <see cref="IAssemblyInformationService"/>
     /// </summary>
-    public interface IViewInvokerService
+    public interface IAssemblyInformationService
     {
         /// <summary>
-        /// Brings the view to the user sight
+        /// Gets the path of the executing assembly
         /// </summary>
-        /// <param name="viewInstance">the view to show up</param>
-        void ShowDialog(UpdateDownloaderInstaller viewInstance);
+        /// <returns>the path of the assembly</returns>
+        string GetLocation();
 
         /// <summary>
-        /// Pops up a message box
+        /// Gets the Version of the executing assembly
         /// </summary>
-        /// <param name="message">the message</param>
-        /// <param name="title">the box title</param>
-        /// <param name="button">the button configuration</param>
-        /// <param name="image">the image</param>
-        /// <returns>a <see cref="MessageBoxResult"/></returns>
-        MessageBoxResult ShowMessageBox(string message, string title, MessageBoxButton button, MessageBoxImage image);
+        /// <returns>The <see cref="Version"/></returns>
+        Version GetVersion();
+
+        /// <summary>
+        /// Gets the target processor architecture of the executing assembly
+        /// </summary>
+        /// <returns>The <see cref="ProcessorArchitecture"/></returns>
+        ProcessorArchitecture GetProcessorArchitecture();
     }
 }

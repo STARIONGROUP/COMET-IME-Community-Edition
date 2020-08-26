@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginFileSystemService.cs" company="RHEA System S.A.">
+// <copyright file="IUpdatableThingRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -24,49 +23,43 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Services
+namespace CDP4IME.ViewModels
 {
-    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using CDP4IME.Services;
+
+    using CDP4UpdateServerDal;
 
     /// <summary>
-    /// Defines methods and properties to provide operations appliable on a file system
+    /// Definitions of methods <see cref="PluginRowViewModel"/> and <see cref="ImeRowViewModel"/> have to implement
     /// </summary>
-    public interface IPluginFileSystemService
+    public interface IUpdatableThingRowViewModel
     {
         /// <summary>
-        /// Gets or sets the path were the cdp4ck to be installed sits 
+        /// Gets or sets the assert whether the represented thing will be installed or downloaded
         /// </summary>
-        FileInfo UpdateCdp4CkFileInfo { get; }
+        /// <returns>An assert whether the representent updatatable thing is selected</returns>
+        bool IsSelected { get; set; }
 
         /// <summary>
-        /// Gets or sets the path where the old version of the plugin will be temporaly kept in case anything goes wrong with the installation
+        /// Gets the <see cref="IUpdateFileSystemService"/> to operate on
         /// </summary>
-        DirectoryInfo TemporaryPath { get; }
+        /// <returns>An <see cref="IUpdateFileSystemService"/></returns>
+        IUpdateFileSystemService FileSystem { get; set; }
 
         /// <summary>
-        /// Gets or sets the path where the updated plugin should be installed
+        /// Downloads this represented plugin
         /// </summary>
-        DirectoryInfo InstallationPath { get; }
+        /// <param name="client">the Update Server Client to perform request</param>
+        /// <returns>A <see cref="Task"/></returns>
+        Task Download(IUpdateServerClient client);
 
         /// <summary>
-        /// Installs the new version into the <see cref="InstallationPath"/>
+        /// Handles the cancelation of the download process
         /// </summary>
-        void InstallNewVersion();
-
-        /// <summary>
-        /// Move All files and sub directories from the installation directory to the temporary one
-        /// </summary>
-        void BackUpOldVersion();
-
-        /// <summary>
-        /// Cleanup the downloaded files
-        /// And the temporary folder
-        /// </summary>
-        void CleanUp();
-
-        /// <summary>
-        /// Restores the old version
-        /// </summary>
-        void Restore();
+        /// <returns>A <see cref="Task"/></returns>
+        Task HandlingCancelationOfDownload();
     }
 }
