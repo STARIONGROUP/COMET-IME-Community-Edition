@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BooleanToVisibilityConverter.cs" company="RHEA System S.A.">
+// <copyright file="IntegerToVisibilityConverter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -32,33 +31,33 @@ namespace CDP4Composition.Converters
     using System.Windows.Data;
 
     /// <summary>
-    /// Converts booleans to <see cref="Visibility"/>. Null and false == collapsed, true == visible.
+    /// Converts Double to <see cref="Visibility"/>. x == 0 == <see cref="Visibility.Collapsed"/>, x > 0 == <see cref="Visibility.Visible"/>.
     /// </summary>
-    public class BooleanToVisibilityConverter : IValueConverter
+    public class IntegerToVisibilityConverter : IValueConverter
     {
         /// <summary>
-        /// Convert a bool to <see cref="Visibility.Visible"/>.
+        /// Convert a int to <see cref="Visibility.Visible"/>.
         /// </summary>
         /// <param name="value">The incoming type.</param>
         /// <param name="targetType">The target type.</param>
-        /// <param name="parameter">The converter parameter. The value can be "Invert" to inverse the result</param>
+        /// <param name="parameter">The converter parameter.</param>
         /// <param name="culture">The supplied culture</param>
-        /// <returns><see cref="Visibility.Visible"/> if the value is true.</returns>
+        /// <returns><see cref="Visibility.Visible"/> if the value is  is greater than 0.</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
             {
                 return Visibility.Collapsed;
             }
+            
+            var result = (int)value > 0 ? Visibility.Visible : Visibility.Collapsed;
 
-            var visibility = (bool)value ? Visibility.Visible : Visibility.Collapsed;
-
-            if (parameter is string parameterString && parameterString == "Invert")
+            if (parameter is string stringParamater && stringParamater == "Invert")
             {
-                visibility = visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                result = result != Visibility.Visible ? Visibility.Visible : Visibility.Collapsed;
             }
 
-            return visibility;
+            return result;
         }
         
         /// <summary>

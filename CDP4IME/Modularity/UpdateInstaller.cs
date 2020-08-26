@@ -51,23 +51,18 @@ namespace CDP4IME.Modularity
         private const string ImeNewVersionMessage = "A new IME version has been found! Would you like to install it now?";
 
         /// <summary>
-        /// The Ime Download directory
-        /// </summary>
-        public static DirectoryInfo ImeDownloadDirectoryInfo { get; set; } = new DirectoryInfo(Path.Combine(PluginUtilities.GetAppDataPath(), PluginUtilities.DownloadDirectory, "IME"));
-
-        /// <summary>
         /// Check for any update available and run the plugin installer
         /// </summary>
         /// <param name="viewInvoker">An <see cref="IViewInvokerService"/></param>
-        /// <param name="commandRunner">An <see cref="ICommandRunnerService"/></param>
+        /// <param name="processRunner">An <see cref="IProcessRunnerService"/></param>
         /// <returns>An Assert whether the IME have to shut down</returns>
-        public static bool CheckInstallAndVerifyIfTheImeShallShutdown(IViewInvokerService viewInvoker = null, ICommandRunnerService commandRunner = null)
+        public static bool CheckInstallAndVerifyIfTheImeShallShutdown(IViewInvokerService viewInvoker = null, IProcessRunnerService processRunner = null)
         {
             var imeUpdate = CheckForImeUpdate();
 
             if (imeUpdate != null && (viewInvoker ?? new ViewInvokerService()).ShowMessageBox(ImeNewVersionMessage, "IME Update", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
             {
-                RunInstaller(imeUpdate, commandRunner);
+                RunInstaller(imeUpdate, processRunner);
                 return true;
             }
 
@@ -75,7 +70,7 @@ namespace CDP4IME.Modularity
 
             if (updatablePlugins.Any())
             {
-                var pluginInstallerView = new PluginInstaller() { DataContext = new PluginInstallerViewModel(updatablePlugins) };
+                var pluginInstallerView = new UpdateDownloaderInstaller() { DataContext = new UpdateDownloaderInstallerViewModel(updatablePlugins) };
                 (viewInvoker ?? new ViewInvokerService()).ShowDialog(pluginInstallerView);
             }
 
@@ -88,7 +83,7 @@ namespace CDP4IME.Modularity
         /// <returns>a <see cref="string"/> path to the installer</returns>
         private static string CheckForImeUpdate()
         {
-            var downloadDirectory = ImeDownloadDirectoryInfo;
+            var downloadDirectory = new UpdateFileSystemService().ImeDownloadPath;
             var installers = downloadDirectory.Exists ? downloadDirectory.EnumerateFiles().ToArray() : null;
 
             if (installers?.Any() != true)
@@ -103,7 +98,7 @@ namespace CDP4IME.Modularity
                 return lastVersion?.FullName;
             }
 
-            CleanUpDownloadedImeInstallers();
+            CleanUpDownloadedImeInstallers(downloadDirectory);
             return null;
         }
 
@@ -130,9 +125,10 @@ namespace CDP4IME.Modularity
         /// <summary>
         /// Delete any installer when no candidate are found
         /// </summary>
-        private static void CleanUpDownloadedImeInstallers()
+        /// <param name="downloadDirectory">The download directory</param>
+        private static void CleanUpDownloadedImeInstallers(DirectoryInfo downloadDirectory)
         {
-            ImeDownloadDirectoryInfo.Delete(true);
+            downloadDirectory.Delete(true);
         }
 
         /// <summary>
@@ -156,10 +152,10 @@ namespace CDP4IME.Modularity
         /// Closes the IME and run MSI in order to install the new version
         /// </summary>
         /// <param name="installerPath">The path to the msi</param>
-        /// <param name="commandRunner">The <see cref="ICommandRunnerService"/></param>
-        private static void RunInstaller(string installerPath, ICommandRunnerService commandRunner)
+        /// <param name="processRunner">The <see cref="IProcessRunnerService"/></param>
+        private static void RunInstaller(string installerPath, IProcessRunnerService processRunner)
         {
-            var runner = commandRunner ?? new CommandRunnerService();
+            var runner = processRunner ?? new ProcessRunnerService();
             runner.RunAsAdmin(installerPath);
         }
     }

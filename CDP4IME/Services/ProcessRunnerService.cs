@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginInstallerViewInvokerService.cs" company="RHEA System S.A.">
+// <copyright file="CommandRunnerService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -25,29 +25,44 @@
 
 namespace CDP4IME.Services
 {
+    using System.ComponentModel.Composition;
+    using System.Diagnostics;
+    using System.IO;
     using System.Windows;
 
-    using CDP4IME.Views;
-
     /// <summary>
-    /// Defines the <see cref="ViewInvokerService"/> which is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// The <see cref="ProcessRunnerService"/> provides methods that allows invoking commands on conhost
     /// </summary>
-    public interface IViewInvokerService
+    [Export(typeof(IProcessRunnerService))]
+    public class ProcessRunnerService : IProcessRunnerService
     {
         /// <summary>
-        /// Brings the view to the user sight
+        /// Runs the provided <see cref="executable"/> with elevated rights
         /// </summary>
-        /// <param name="viewInstance">the view to show up</param>
-        void ShowDialog(UpdateDownloaderInstaller viewInstance);
+        /// <param name="executable">The executable command path</param>
+        public void RunAsAdmin(string executable)
+        {
+            var process = new Process
+            {
+                StartInfo =
+                {
+                    FileName = "msiexec",
+                    WorkingDirectory = Path.GetTempPath(),
+                    Arguments = $" /i \"{executable}\" ALLUSERS=1",
+                    Verb = "runas"
+                }
+            };
 
+            process.Start();
+        }
+        
         /// <summary>
-        /// Pops up a message box
+        /// Gracefully restart the IME
         /// </summary>
-        /// <param name="message">the message</param>
-        /// <param name="title">the box title</param>
-        /// <param name="button">the button configuration</param>
-        /// <param name="image">the image</param>
-        /// <returns>a <see cref="MessageBoxResult"/></returns>
-        MessageBoxResult ShowMessageBox(string message, string title, MessageBoxButton button, MessageBoxImage image);
+        public void Restart()
+        {
+            Process.Start(Application.ResourceAssembly.Location);
+            Application.Current.Shutdown();
+        }
     }
 }

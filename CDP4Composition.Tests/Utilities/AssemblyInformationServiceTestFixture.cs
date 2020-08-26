@@ -1,9 +1,7 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IAssemblyLocationLoader.cs" company="RHEA System S.A.">
+﻿// <copyright file="AssemblyInformationServiceTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -24,17 +22,38 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Utilities
+namespace CDP4Composition.Tests.Utilities
 {
-    /// <summary>
-    /// The interface that defines members of implementing classes of <see cref="IAssemblyLocationLoader"/>
-    /// </summary>
-    public interface IAssemblyLocationLoader
+    using System.IO;
+    using System.Reflection;
+
+    using CDP4Composition.Utilities;
+
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class AssemblyInformationServiceTestFixture
     {
-        /// <summary>
-        /// Gets the path of the executing assembly
-        /// </summary>
-        /// <returns>the path of the assembly</returns>
-        string GetLocation();
+        [Test]
+        public void VerifyGetVersion()
+        {
+            Assert.IsNotNull(new AssemblyInformationService().GetVersion());
+        }
+        
+        [Test]
+        public void VerifyGetProcessorArchitecture()
+        {
+            var processorArchitecture = new AssemblyInformationService().GetProcessorArchitecture();
+            Assert.IsNotNull(processorArchitecture);
+            Assert.IsFalse(processorArchitecture == ProcessorArchitecture.None);
+        }
+
+        [Test]
+        public void Verify()
+        {
+            var location = new AssemblyInformationService().GetLocation();
+            Assert.IsNotNull(location);
+            Assert.IsTrue(Directory.Exists(location));
+        }
     }
 }

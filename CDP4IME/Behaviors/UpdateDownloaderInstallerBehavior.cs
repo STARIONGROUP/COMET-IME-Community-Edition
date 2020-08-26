@@ -33,9 +33,9 @@ namespace CDP4IME.Behaviors
     using DevExpress.Mvvm.UI.Interactivity;
 
     /// <summary>
-    /// Behavior of the e<see cref="PluginInstaller"/> used to handle the interactions between <see cref="PluginInstallerViewModel"/> and the view
+    /// Behavior of the e<see cref="UpdateDownloaderInstaller"/> used to handle the interactions between <see cref="UpdateDownloaderInstallerViewModel"/> and the view
     /// </summary>
-    public class PluginInstallerBehavior : Behavior<PluginInstaller>, IPluginInstallerBehavior
+    public class UpdateDownloaderInstallerBehavior : Behavior<UpdateDownloaderInstaller>, IUpdateDownloaderInstallerBehavior
     {
         /// <summary>
         /// Register event handlers
@@ -58,13 +58,13 @@ namespace CDP4IME.Behaviors
         }
 
         /// <summary>
-        /// Occurs when the user request the <see cref="PluginInstaller"/> view to close
+        /// Occurs when the user request the <see cref="UpdateDownloaderInstaller"/> view to close
         /// </summary>
         /// <param name="sender">the sender</param>
         /// <param name="e">the arguments</param>
         private void OnClosing(object sender, CancelEventArgs e)
         {
-            (this.AssociatedObject.DataContext as IPluginInstallerViewModel)?.CancellationTokenSource?.Cancel();
+            (this.AssociatedObject.DataContext as IUpdateDownloaderInstallerViewModel)?.CancellationTokenSource?.Cancel();
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace CDP4IME.Behaviors
         /// <param name="e">the arguments <see cref="System.Windows.DependencyPropertyChangedEventArgs"/></param>
         private void OnDataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue is IPluginInstallerViewModel viewModel)
+            if (e.NewValue is IUpdateDownloaderInstallerViewModel viewModel)
             {
                 viewModel.Behavior = this;
             }

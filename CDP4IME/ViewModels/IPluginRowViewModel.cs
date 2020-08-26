@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPluginInstallerViewInvokerService.cs" company="RHEA System S.A.">
+// <copyright file="IPluginRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,31 +23,31 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Services
+namespace CDP4IME.ViewModels
 {
-    using System.Windows;
+    using System.Threading;
+    using System.Threading.Tasks;
 
-    using CDP4IME.Views;
+    using CDP4IME.Services;
+
+    using CDP4UpdateServerDal;
 
     /// <summary>
-    /// Defines the <see cref="ViewInvokerService"/> which is responsible to display the instanciated view <see cref="PluginInstaller"/>
+    /// Definition of methods <see cref="PluginRowViewModel"/> has to implement
     /// </summary>
-    public interface IViewInvokerService
+    public interface IPluginRowViewModel : IUpdatableThingRowViewModel
     {
         /// <summary>
-        /// Brings the view to the user sight
+        /// Make the installation of the new Plugin
+        /// <param name="token">The Cancelation Token</param>
         /// </summary>
-        /// <param name="viewInstance">the view to show up</param>
-        void ShowDialog(UpdateDownloaderInstaller viewInstance);
+        /// <returns><see cref="Task"/></returns>
+        Task Install(CancellationToken token);
 
         /// <summary>
-        /// Pops up a message box
+        /// Called when the install gets canceled
         /// </summary>
-        /// <param name="message">the message</param>
-        /// <param name="title">the box title</param>
-        /// <param name="button">the button configuration</param>
-        /// <param name="image">the image</param>
-        /// <returns>a <see cref="MessageBoxResult"/></returns>
-        MessageBoxResult ShowMessageBox(string message, string title, MessageBoxButton button, MessageBoxImage image);
+        /// <returns><see cref="Task"/></returns>
+        Task HandlingCancelationOfInstallation();
     }
 }
