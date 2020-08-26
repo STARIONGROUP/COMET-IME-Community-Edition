@@ -54,6 +54,12 @@ namespace CDP4Composition.Tests.Converters
 
             Assert.AreEqual(Visibility.Visible, this.doubleToVisibilityConverter.Convert(0.1, null, null, null));
             Assert.AreEqual(Visibility.Visible, this.doubleToVisibilityConverter.Convert(98d, null, null, null));
+            
+            Assert.AreEqual(Visibility.Collapsed, this.doubleToVisibilityConverter.Convert(98d, null, "Invert", null));
+            Assert.AreEqual(Visibility.Visible, this.doubleToVisibilityConverter.Convert(98d, null, 0, null));
+
+            Assert.Throws<InvalidCastException>(
+                () => this.doubleToVisibilityConverter.Convert(1, null, null, null));
         }
 
         [Test]

@@ -30,9 +30,9 @@ namespace CDP4IME.Tests.ViewModels
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
-    using CDP4Composition.ViewModels;
 
     using CDP4IME.ViewModels;
 
@@ -43,7 +43,7 @@ namespace CDP4IME.Tests.ViewModels
     using ReactiveUI;
 
     [TestFixture]
-    public class PluginRowViewModelTestFixture : PluginUpdateDataSetup
+    public class PluginRowViewModelTestFixture : UpdateDownloaderInstallerDataSetup
     {
         [SetUp]
         public override void Setup()
@@ -56,10 +56,16 @@ namespace CDP4IME.Tests.ViewModels
         [TearDown]
         public void Teardown()
         {
-            if (Directory.Exists(this.BasePath))
+            try
             {
-                File.SetAttributes(this.BasePath, FileAttributes.Normal);
-                Directory.Delete(this.BasePath, true);
+                if (Directory.Exists(this.BasePath))
+                {
+                    Directory.Delete(this.BasePath, true);
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
             }
         }
 
@@ -69,10 +75,11 @@ namespace CDP4IME.Tests.ViewModels
             var viewModel = new PluginRowViewModel(this.Plugin);
 
             Assert.AreEqual(viewModel.Name, this.Manifest.Name);
-            Assert.AreEqual(viewModel.Version, $"version {this.Manifest.Version}");
+            Assert.AreEqual(viewModel.Version, $"Version {this.Manifest.Version}");
             Assert.AreEqual(viewModel.Description, this.Manifest.Description);
             Assert.AreEqual(viewModel.Author, this.Manifest.Author);
             Assert.AreEqual(viewModel.ReleaseNote, this.Manifest.ReleaseNote);
+            Assert.AreEqual(viewModel.Progress, 0);
 
             Assert.IsNotNull(viewModel.FileSystem.UpdateCdp4CkFileInfo);
 
@@ -83,32 +90,38 @@ namespace CDP4IME.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyInstallation()
+        public async Task VerifyInstallation()
         {
-            var viewModel = new PluginRowViewModel(this.Plugin, this.PluginFileSystem);
+            var viewModel = new PluginRowViewModel(this.Plugin, this.UpdateFileSystem);
             
-            viewModel.Install(); 
+            await viewModel.Install(new CancellationToken(false)); 
             
             Assert.IsTrue(new DirectoryInfo(this.InstallPath).Exists);
 
-            var filesEnumeration = this.PluginFileSystem.InstallationPath.EnumerateFiles("*", SearchOption.AllDirectories);
+            var filesEnumeration = this.UpdateFileSystem.InstallationPath.EnumerateFiles("*", SearchOption.AllDirectories);
             Assert.AreEqual(5, filesEnumeration.Count());
             
-            var newVersionManifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(this.PluginFileSystem.InstallationPath.FullName, "CDP4BasicRdl.plugin.manifest")));
+            var newVersionManifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(this.UpdateFileSystem.InstallationPath.FullName, "CDP4BasicRdl.plugin.manifest")));
             Assert.AreEqual(new Version("5.5.5.5"), new Version(newVersionManifest.Version));
             Assert.AreEqual(this.Manifest.Description, newVersionManifest.Description);
             Thread.Sleep(1);
         }
 
         [Test]
-        public void VerifyCancelation()
+        public async Task VerifyCancelation()
         {
-            this.SetupTestContentForCancellationPurpose(this.PluginFileSystem.TemporaryPath.FullName);
+            if (!this.UpdateFileSystem.TemporaryPath.Exists)
+            {
+                this.UpdateFileSystem.TemporaryPath.Create();
+                this.UpdateFileSystem.TemporaryPath.Refresh();
+            }
 
-            var viewModel = new PluginRowViewModel(this.Plugin, this.PluginFileSystem);
-            viewModel.HandlingCancelation();
+            this.SetupTestContentForInstallationCancellationPurpose(this.UpdateFileSystem.TemporaryPath.FullName);
 
-            this.AssertCreatedTestFileHasBeenRestored();
+            var viewModel = new PluginRowViewModel(this.Plugin, this.UpdateFileSystem);
+            await viewModel.HandlingCancelationOfInstallation();
+
+            this.AssertInstalledTestFileHasBeenRestored();
         }
     }
 }

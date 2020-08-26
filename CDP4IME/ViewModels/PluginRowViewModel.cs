@@ -25,13 +25,18 @@
 namespace CDP4IME.ViewModels
 {
     using System;
-    using System.Diagnostics;
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using CDP4Composition.Modularity;
 
     using CDP4IME.Services;
     using CDP4IME.Views;
+
+    using CDP4UpdateServerDal;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using NLog;
 
@@ -40,7 +45,7 @@ namespace CDP4IME.ViewModels
     /// <summary>
     /// Represents a <see cref="PluginRow"/> holding its properties and interaction logic
     /// </summary>
-    public class PluginRowViewModel : ReactiveObject
+    public class PluginRowViewModel : ReactiveObject, IPluginRowViewModel
     {
         /// <summary>
         /// The NLog logger
@@ -118,37 +123,37 @@ namespace CDP4IME.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the property <see cref="InstallationProgress"/>
+        /// Backing field for the property <see cref="Progress"/>
         /// </summary>
-        private double installationProgress;
+        private double progress;
 
         /// <summary>
-        /// Gets or Sets the <see cref="installationProgress"/> of the represented plugin
+        /// Gets or Sets the <see cref="progress"/> of the represented plugin
         /// </summary>
-        public double InstallationProgress
+        public double Progress
         {
-            get => this.installationProgress;
-            set => this.RaiseAndSetIfChanged(ref this.installationProgress, value);
+            get => this.progress;
+            set => this.RaiseAndSetIfChanged(ref this.progress, value);
         }
 
         /// <summary>
-        /// Backing field for the property <see cref="IsSelectedForInstallation"/>
+        /// Backing field for the property <see cref="IsSelected"/>
         /// </summary>
-        private bool isSelectedForInstallation;
-        
+        private bool isSelected;
+
         /// <summary>
-        /// Gets or sets the assert <see cref="isSelectedForInstallation"/> whether the represented plugin will be installed
+        /// Gets or sets the assert <see cref="isSelected"/> whether the represented plugin will be installed or downloaded
         /// </summary>
-        public bool IsSelectedForInstallation
+        public bool IsSelected
         {
-            get => this.isSelectedForInstallation;
-            set => this.RaiseAndSetIfChanged(ref this.isSelectedForInstallation, value);
+            get => this.isSelected;
+            set => this.RaiseAndSetIfChanged(ref this.isSelected, value);
         }
-        
+
         /// <summary>
-        /// Gets the <see cref="IPluginFileSystemService"/> to operate on
+        /// Gets the <see cref="IUpdateFileSystemService"/> to operate on
         /// </summary>
-        public IPluginFileSystemService FileSystem { get; set; }
+        public IUpdateFileSystemService FileSystem { get; set; }
 
         /// <summary>
         /// Gets the plugin download path and the new manifest
@@ -159,12 +164,23 @@ namespace CDP4IME.ViewModels
         /// Initializes a new instance of the <see cref="PluginRowViewModel"/> class
         /// </summary>
         /// <param name="plugin">The represented plugin</param>
-        /// <param name="pluginFileSystemService">The file system to operate on</param>
-        public PluginRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin, IPluginFileSystemService pluginFileSystemService = null)
+        /// <param name="updateFileSystemService">The file system to operate on</param>
+        public PluginRowViewModel((FileInfo cdp4ckFile, Manifest manifest) plugin, IUpdateFileSystemService updateFileSystemService = null)
         {
             this.Plugin = plugin;
-            this.FileSystem = pluginFileSystemService ?? new PluginFileSystemService(plugin);
+            this.FileSystem = updateFileSystemService ?? new UpdateFileSystemService(plugin);
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Initalizes a new instance of the <see cref="PluginRowViewModel"/> class
+        /// </summary>
+        /// <param name="plugin"> A <code>(string ThingName, string Version)</code> containing the name and the version</param>
+        public PluginRowViewModel((string ThingName, string Version) plugin)
+        {
+            this.Name = plugin.ThingName;
+            this.Version = plugin.Version;
+            this.FileSystem = ServiceLocator.Current.GetInstance<IUpdateFileSystemService>();
         }
 
         /// <summary>
@@ -174,27 +190,64 @@ namespace CDP4IME.ViewModels
         {
             this.Name = this.Plugin.manifest.Name;
             this.Description = this.Plugin.manifest.Description;
-            this.Version = $"version {this.Plugin.manifest.Version}";
+            this.Version = $"Version {this.Plugin.manifest.Version}";
             this.Author = this.Plugin.manifest.Author;
             this.ReleaseNote = this.Plugin.manifest.ReleaseNote;
         }
 
         /// <summary>
         /// Make the installation of the new Plugin
+        /// <param name="token">Cancelation Token</param>
         /// </summary>
-        public void Install()
+        /// <returns><see cref="Task"/></returns>
+        public Task Install(CancellationToken token)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    this.Progress += 33;
+                    this.FileSystem.BackUpOldVersion();
+
+                    this.Progress += 33;
+                    this.FileSystem.InstallNewVersion();
+
+                    this.Progress += 33;
+                    this.FileSystem.CleanUp();
+                    this.Progress = 100;
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Error($"An exception occured: {exception}");
+                    throw;
+                }
+            },
+            token);
+        }
+
+        /// <summary>
+        /// Downloads this represented plugin
+        /// </summary>
+        /// <param name="client">the Update Server Client to perform request</param>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Download(IUpdateServerClient client)
         {
             try
             {
-                this.InstallationProgress += 33;
-                this.FileSystem.BackUpOldVersion();
+                this.Progress = 0;
 
-                this.InstallationProgress += 33;
-                this.FileSystem.InstallNewVersion();
+                using (var stream = await client.DownloadPlugin(this.Name, this.Version))
+                {
+                    this.Progress = 50;
 
-                this.InstallationProgress += 33;
-                this.FileSystem.CleanUp();
-                this.InstallationProgress = 100;
+                    using (var fileStream = this.FileSystem.CreateCdp4Ck(this.Name))
+                    {
+                        stream.Seek(0, SeekOrigin.Begin);
+                        await stream.CopyToAsync(fileStream);
+                    }
+                }
+
+                this.Progress = 100;
             }
             catch (Exception exception)
             {
@@ -206,19 +259,49 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Called when the install gets canceled
         /// </summary>
-        public void HandlingCancelation()
+        /// <returns><see cref="Task"/></returns>
+        public Task HandlingCancelationOfInstallation()
         {
-            try
+            return Task.Run(() =>
             {
-                this.FileSystem.Restore();
+                try
+                {
+                    this.Progress = -1;
 
-                this.InstallationProgress = 0;
-            }
-            catch (Exception exception)
+                    this.FileSystem.Restore();
+
+                    this.Progress = 0;
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Error($"An exception occured: {exception}");
+                    throw;
+                }
+            });
+        }
+
+        /// <summary>
+        /// Handles the cancelation of the download process
+        /// </summary>
+        /// <returns><see cref="Task"/></returns>
+        public Task HandlingCancelationOfDownload()
+        {
+            return Task.Run(() =>
             {
-                this.logger.Error($"An exception occured: {exception}");
-                throw;
-            }
+                try
+                {
+                    this.Progress = -1;
+
+                    this.FileSystem.CleanupDownloadedPlugin(this.Name);
+
+                    this.Progress = 0;
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Error($"An exception occured: {exception}");
+                    throw;
+                }
+            });
         }
     }
 }

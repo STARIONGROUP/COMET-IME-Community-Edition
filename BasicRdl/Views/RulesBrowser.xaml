@@ -22,7 +22,7 @@
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <converters:CamelCaseToSpaceConverter x:Key="CamelCaseToSpaceConverter" />
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>

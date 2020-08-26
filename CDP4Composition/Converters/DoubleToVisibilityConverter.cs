@@ -36,21 +36,28 @@ namespace CDP4Composition.Converters
     public class DoubleToVisibilityConverter : IValueConverter
     {
         /// <summary>
-        /// Convert a bool to <see cref="Visibility.Visible"/>.
+        /// Convert a double to <see cref="Visibility.Visible"/>.
         /// </summary>
         /// <param name="value">The incoming type.</param>
         /// <param name="targetType">The target type.</param>
         /// <param name="parameter">The converter parameter.</param>
         /// <param name="culture">The supplied culture</param>
-        /// <returns><see cref="Visibility.Visible"/> if the value is true.</returns>
+        /// <returns><see cref="Visibility.Visible"/> if the value is greater than 0.</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
             {
                 return Visibility.Collapsed;
             }
+            
+            var result = (double)value > 0 ? Visibility.Visible : Visibility.Collapsed;
 
-            return (double)value > 0 ? Visibility.Visible : Visibility.Collapsed;
+            if (parameter is string stringParamater && stringParamater == "Invert")
+            {
+                result = result != Visibility.Visible ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            return result;
         }
         
         /// <summary>

@@ -180,9 +180,9 @@
     <Resource Include="ExceptionReporter.WinForms.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj" />
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
     <ProjectReference Include="..\CDP4ShellDialogs\CDP4ShellDialogs.csproj" />
+    <ProjectReference Include="..\CDP4UpdateServerDal\CDP4UpdateServerDal.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\PrepareProcess.ico" />
@@ -198,13 +198,29 @@
   <ItemGroup>
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" Exclude="App.xaml" />
     <None Remove="Resources\cdplogo3d_48x48.png" />
-    <None Remove="Views\PluginInstaller.xaml" />
+    <None Remove="Views\About - Copy.xaml" />
+    <None Remove="Views\ImeRow.xaml" />
     <None Remove="Views\PluginRow.xaml" />
+    <None Remove="Views\UpdateDownloaderInstaller.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
 
     <ApplicationDefinition Include="App.xaml">
       <Generator>MsBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\About - Copy.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PluginRow - Copy.xaml.cs">
+      <DependentUpon>PluginRow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PluginRow.xaml.cs">
+      <DependentUpon>PluginRow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\UpdateDownloaderInstaller.xaml.cs">
+      <DependentUpon>UpdateDownloaderInstaller.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
