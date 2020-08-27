@@ -160,7 +160,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="settings">The module settings</param>
         public MatrixViewModel(ISession session, Iteration iteration, RelationshipMatrixPluginSettings settings)
         {
-            
+
             this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
             this.IsDeprecatedDisplayed = this.filterStringService.ShowDeprecatedThings;
 
@@ -198,21 +198,21 @@ namespace CDP4RelationshipMatrix.ViewModels
                 RxApp.MainThreadScheduler);
 
             this.ProcessCellCommand =
-                ReactiveCommand.CreateAsyncTask(x => this.ProcessCellCommandExecute((List<object>) x),
+                ReactiveCommand.CreateAsyncTask(x => this.ProcessCellCommandExecute((List<object>)x),
                     RxApp.MainThreadScheduler);
 
             this.ProcessAltCellCommand =
-                ReactiveCommand.CreateAsyncTask(x => this.ProcessAltCellCommandExecute((List<object>) x),
+                ReactiveCommand.CreateAsyncTask(x => this.ProcessAltCellCommandExecute((List<object>)x),
                     RxApp.MainThreadScheduler);
 
             this.ProcessAltControlCellCommand = ReactiveCommand.CreateAsyncTask(
-                x => this.ProcessAltControlCellCommandExecute((List<object>) x), RxApp.MainThreadScheduler);
+                x => this.ProcessAltControlCellCommandExecute((List<object>)x), RxApp.MainThreadScheduler);
 
             this.ToggleColumnHighlightCommand = ReactiveCommand.CreateAsyncTask(
                 x => this.ToggleColumnHighlightCommandExecute(x as GridColumn), RxApp.MainThreadScheduler);
 
             this.MouseDownCommand = ReactiveCommand.Create();
-            this.MouseDownCommand.Subscribe(x => this.MouseDownCommandExecute((MatrixAddress) x));
+            this.MouseDownCommand.Subscribe(x => this.MouseDownCommandExecute((MatrixAddress)x));
 
             this.SubscribeCommandExceptions();
 
@@ -706,7 +706,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 (x.Source?.Iid == rowThing.Iid || x.Source?.Iid == columnThing.Iid) &&
                 (x.Target?.Iid == rowThing.Iid || x.Target?.Iid == columnThing.Iid)).ToList();
 
-            var cellValue = relationship.Count > 0 
+            var cellValue = relationship.Count > 0
                 ? new MatrixCellViewModel(rowThing, columnThing, relationship, relationshipRule)
                 : new MatrixCellViewModel(rowThing, columnThing, null, relationshipRule);
 
@@ -759,7 +759,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                     continue;
                 }
 
-                var thing = (ICategorizableThing) definedThing;
+                var thing = (ICategorizableThing)definedThing;
 
                 if (RelationshipMatrixViewModel.IsCategoryApplicableToConfiguration(thing, sourceConfigurationViewModel))
                 {
@@ -974,9 +974,12 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void MouseDownCommandExecute(MatrixAddress matrixAddress)
         {
             //Only if row is null, otherwise SelectedCell PropertyChanged handles setting properties
-            if (matrixAddress.Row is null)
+            if (matrixAddress != null)
             {
-                this.SetRowAndColumnPropertiesOnSelectedItemChanged(matrixAddress);
+                if (matrixAddress.Row is null)
+                {
+                    this.SetRowAndColumnPropertiesOnSelectedItemChanged(matrixAddress);
+                }
             }
         }
 
@@ -1090,7 +1093,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             var relationship = new BinaryRelationship(Guid.NewGuid(), null, null)
-                { Owner = this.session.OpenIterations[this.iteration].Item1 };
+            { Owner = this.session.OpenIterations[this.iteration].Item1 };
 
             relationship.Category.Add(vm.Rule.RelationshipCategory);
 
