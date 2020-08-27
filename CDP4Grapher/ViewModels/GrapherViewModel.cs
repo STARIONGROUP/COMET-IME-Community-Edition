@@ -40,7 +40,7 @@ namespace CDP4Grapher.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
 
@@ -79,7 +79,7 @@ namespace CDP4Grapher.ViewModels
         /// The container <see cref="iterationSetup"/> that is referenced by the container <see cref="Iteration"/> of the current <see cref="Option"/>.
         /// </summary>
         private readonly IterationSetup iterationSetup;
-        
+
         /// <summary>
         /// Holds the current <see cref="Option"/>
         /// </summary>
@@ -94,7 +94,7 @@ namespace CDP4Grapher.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Grapher";
-        
+
         /// <summary>
         /// Gets or sets the attached behavior
         /// </summary>
@@ -136,7 +136,7 @@ namespace CDP4Grapher.ViewModels
         /// Gets or sets the collection of <see cref="GraphElementViewModel"/> to display.
         /// </summary>
         public ReactiveList<GraphElementViewModel> GraphElements { get; } = new ReactiveList<GraphElementViewModel>();
-        
+
         /// <summary>
         /// Gets or sets the custom context menu
         /// </summary>
@@ -172,7 +172,7 @@ namespace CDP4Grapher.ViewModels
 
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Add the necessary subscriptions for this view model.
         /// </summary>
@@ -182,21 +182,21 @@ namespace CDP4Grapher.ViewModels
                     .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
-            
+
             this.Disposables.Add(engineeringModelSetupSubscription);
 
             var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                     .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
-            
+
             this.Disposables.Add(domainOfExpertiseSubscription);
 
             var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationSetup)
                     .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
-            
+
             this.Disposables.Add(iterationSetupSubscription);
 
             var iterationSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>((Iteration)this.Thing.Container)
@@ -206,7 +206,7 @@ namespace CDP4Grapher.ViewModels
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(iterationSubscription);
-            
+
             var optionSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
                 .Where(
                     objectChange =>
@@ -217,7 +217,7 @@ namespace CDP4Grapher.ViewModels
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(optionSubscription);
-            
+
             var elementUsageSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementUsage))
                 .Where(objectChange => objectChange.EventKind != EventKind.Updated)
                 .Select(x => x.ChangedThing as ElementUsage)
@@ -226,7 +226,7 @@ namespace CDP4Grapher.ViewModels
 
             this.Disposables.Add(elementUsageSubscription);
         }
-        
+
         /// <summary>
         /// Populate the <see cref="ElementUsage"/> property
         /// </summary>
@@ -235,19 +235,27 @@ namespace CDP4Grapher.ViewModels
             var elements = new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
             this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e)));
         }
-        
+
         /// <summary>
         /// Calculate and update the element of the tree under the <see cref="graphElement"/>
         /// </summary>
         /// <param name="graphElement">The Graph Element</param>
         public void Isolate(GraphElementViewModel graphElement)
         {
-            var newTree = this.GraphElements.Where(e => e.Thing.IsContainedBy(graphElement.Thing));
+            var newTree = new NestedElementTreeGenerator().GenerateNestedElements(this.option, this.currentDomainOfExpertise, graphElement.Thing.ElementUsage.Last().ElementDefinition);
             this.GraphElements.Clear();
-            this.GraphElements.Add(graphElement);
-            this.GraphElements.AddRange(newTree);
+            this.GraphElements.AddRange(newTree.Select(e => new GraphElementViewModel(e)));
         }
-        
+
+        /// <summary>
+        /// Exits the isolation
+        /// </summary>
+        public void ExitIsolation()
+        {
+            this.GraphElements.Clear();
+            this.PopulateElementUsages();
+        }
+
         /// <summary>
         /// Update the properties of this view-model
         /// </summary>
@@ -258,7 +266,7 @@ namespace CDP4Grapher.ViewModels
             this.CurrentOption = this.Thing.Name;
 
             var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing.Container);
-            
+
             if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
             {
                 this.DomainOfExpertise = "None";

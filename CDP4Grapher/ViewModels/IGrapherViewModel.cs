@@ -58,5 +58,10 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         /// <param name="graphElement">The Graph Element</param>
         void Isolate(GraphElementViewModel graphElement);
+        
+        /// <summary>
+        /// Exits the isolation
+        /// </summary>
+        void ExitIsolation();
     }
 }

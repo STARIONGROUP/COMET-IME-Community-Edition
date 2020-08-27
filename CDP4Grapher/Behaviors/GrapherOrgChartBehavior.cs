@@ -27,8 +27,8 @@
 namespace CDP4Grapher.Behaviors
 {
     using System;
-    using System.IO;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Windows;
     using System.Windows.Input;
 
@@ -42,14 +42,12 @@ namespace CDP4Grapher.Behaviors
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
     using DevExpress.Xpf.Diagram;
-    using DevExpress.Xpf.Layout.Core;
-    using DevExpress.XtraPrinting;
-    using DevExpress.XtraRichEdit.Model;
 
     using Microsoft.Practices.ServiceLocation;
 
+    using ReactiveUI;
+
     using Direction = DevExpress.Diagram.Core.Direction;
-    using File = CDP4Common.EngineeringModelData.File;
 
     /// <summary>
     /// Allows proper callbacks on the diagramming tool
@@ -67,9 +65,14 @@ namespace CDP4Grapher.Behaviors
         private bool hasLoaded;
 
         /// <summary>
-        /// Gets or sets the under the mouse element <see cref="DiagramItem"/>
+        /// Gets or sets the under the mouse element <see cref="GraphElementViewModel"/>
         /// </summary>
         public GraphElementViewModel HoveredElement { get; set; }
+
+        /// <summary>
+        /// Observable that can indicate whether the isolation command sould be available
+        /// </summary>
+        public IObservable<bool> CanIsolateObservable { get; private set; }
 
         /// <summary>
         /// The on attached event handler
@@ -81,6 +84,9 @@ namespace CDP4Grapher.Behaviors
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
             this.AssociatedObject.Loaded += this.Loaded;
             this.AssociatedObject.MouseMove += this.MouseMoved;
+
+            //this.CanIsolateObservable = this.WhenAnyValue(x => x.HoveredElement, x => x.HoveredElement.Thing.IsRootElement, (x, y) => x != null && !y ).ObserveOn(RxApp.MainThreadScheduler);
+            //this.CanIsolateObservable = this.WhenAny(x => x.HoveredElement, y => y != null).ObserveOn(RxApp.MainThreadScheduler);
         }
 
         /// <summary>
@@ -91,7 +97,7 @@ namespace CDP4Grapher.Behaviors
         private void MouseMoved(object sender, MouseEventArgs e)
         {
             var mousePosition = e.GetPosition(this.AssociatedObject);
-            this.HoveredElement = (this.AssociatedObject.CalcHitItem(mousePosition) as DiagramContentItem)?.Content as GraphElementViewModel;
+            this.HoveredElement = (this.AssociatedObject.CalcHitItem(mousePosition) as DiagramContentItem)?.Content as GraphElementViewModel;   
         }
 
         /// <summary>
@@ -362,10 +368,16 @@ namespace CDP4Grapher.Behaviors
 
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
+        }
+        
+        /// <summary>
+        /// Exits the isolation
+        /// </summary>
+        public void ExitIsolation()
+        {
+            (this.AssociatedObject.DataContext as IGrapherViewModel)?.ExitIsolation();
         }
     }
 }

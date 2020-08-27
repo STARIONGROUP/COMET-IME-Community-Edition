@@ -39,14 +39,14 @@ namespace CDP4Grapher.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// Represents a diagram element that holds a <see cref="Thing"/>
+    /// Represents a diagram element that holds a <see cref="NestedElement"/>
     /// </summary>
     public class GraphElementViewModel : ReactiveObject
     {
         /// <summary>
-        /// The represented <see cref="Thing"/>
+        /// The represented <see cref="NestedElement"/>
         /// </summary>
-        public Thing Thing { get; set; }
+        public NestedElement Thing { get; set; }
 
         /// <summary>
         /// Backing field the <see cref="Name"/> property

@@ -27,13 +27,13 @@ namespace CDP4Grapher.ViewModels
 {
     using System.Collections.Generic;
     using System;
+    using System.Linq;
     using System.Reactive.Linq;
     using System.Windows.Input;
 
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Utilities;
 
-    using DevExpress.Data.Helpers;
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
     using DevExpress.Xpf.Bars;
@@ -47,6 +47,16 @@ namespace CDP4Grapher.ViewModels
     /// </summary>
     public class DiagramControlContextMenuViewModel : ReactiveObject, IHaveContextMenu
     {
+        /// <summary>
+        /// Holds the text to display for the isolation related nmenu entry
+        /// </summary>
+        private const string IsolateContextMenuEntryText = "Isolate";
+        
+        /// <summary>
+        /// Holds the text to display for the isolation related nmenu entry
+        /// </summary>
+        private const string ExitIsolationContextMenuEntryText = "Exit Isolation";
+
         /// <summary>
         /// Backing field for <see cref="CanExportDiagram"/>
         /// </summary>
@@ -88,7 +98,7 @@ namespace CDP4Grapher.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
         /// </summary>
-        public ReactiveCommand<object> Isolate { get; private set; }
+        public ReactiveCommand<object> IsolateCommand { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
@@ -175,8 +185,31 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         public DiagramControlContextMenuViewModel()
         {
+            this.UpdateProperties();
             this.InitializeCommands();
-            this.CreateContextMenu();
+            
+            this.WhenAnyValue(x => x.Behavior).ObserveOn(RxApp.MainThreadScheduler).Subscribe(_ =>
+            {
+                if (this.Behavior == null)
+                {
+                    return;
+                }
+
+                var observable = this.WhenAnyValue(x => x.Behavior.HoveredElement, y => y.CanIsolate, (h, c) => (h != null && c) || !c);
+                this.IsolateCommand = ReactiveCommand.Create(observable);
+                this.IsolateCommand.Subscribe(_ => this.ExecuteIsolate());
+                
+                this.CreateContextMenu();
+            });
+        }
+
+        /// <summary>
+        /// Updates all properties of this view model that need to have an initial value
+        /// </summary>
+        public void UpdateProperties()
+        {
+            this.CanExportDiagram = true;
+            this.CanIsolate = true;
         }
 
         /// <summary>
@@ -184,11 +217,6 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void InitializeCommands()
         {
-            this.CanExportDiagram = true;
-
-            this.Isolate = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanIsolate).ObserveOn(RxApp.MainThreadScheduler));
-            this.Isolate.Subscribe(_ => this.ExecuteIsolate());
-
             this.ExportGraphAsJpg = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
             this.ExportGraphAsJpg.Subscribe(_ => this.ExecuteExportGraphAsPng());
             this.ExportGraphAsPdf = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
@@ -234,7 +262,7 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void CreateContextMenu()
         {
-            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Isolate Element", this.Isolate, "Office2013/Reports/None_32x32.png"));
+            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>(IsolateContextMenuEntryText, this.IsolateCommand, "Snap/SeparatorListNone.svg"));
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Export Graph as JPG", this.ExportGraphAsJpg, "XAF/Action_Export_ToImage.svg"));
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Export Graph as PDF", this.ExportGraphAsPdf, "Export/ExportToPDF.svg"));
             var layoutSubItem = this.GenerateContextMenuItem<BarSubItem>("Apply layouts", null, "DiagramIcons/Direction/re-layout.svg");
@@ -311,15 +339,40 @@ namespace CDP4Grapher.ViewModels
             this.canExportDiagram = true;
         }
 
-        public bool IsIsolating;
-
+        /// <summary>
+        /// Executes the <see cref="IsolateCommand"/>
+        /// </summary>
         private void ExecuteIsolate()
         {
-            this.IsIsolating = !this.IsIsolating;
-
-            if (this.IsIsolating)
+            if (this.CanIsolate)
             {
-                this.Behavior.Isolate();
+                this.CanIsolate = !this.Behavior.Isolate();
+
+                if (!this.CanIsolate)
+                {
+                    this.UpdateContextMenuEntryText(this.IsolateCommand, ExitIsolationContextMenuEntryText);
+                }
+            }
+            else
+            {
+                this.Behavior.ExitIsolation();
+                this.CanIsolate = true;
+                this.UpdateContextMenuEntryText(this.IsolateCommand, IsolateContextMenuEntryText);
+            }
+        }
+
+        /// <summary>
+        /// Updates the text of the corresponding Cntext Menu Entry 
+        /// </summary>
+        /// <param name="command">The command to identify the right Context Menu Entry</param>
+        /// <param name="text">The text</param>
+        private void UpdateContextMenuEntryText(ICommand command, string text)
+        {
+            var entry = this.ContextMenu.OfType<BarButtonItem>().FirstOrDefault(x => x.Command == command);
+
+            if (entry != null)
+            {
+                entry.Content = text;
             }
         }
     }

@@ -68,5 +68,20 @@ namespace CDP4Grapher.Behaviors
         /// </summary>
         /// <returns>An assert whether isolation is on</returns>
         bool Isolate();
+
+        /// <summary>
+        /// Observable that can indicate whether the isolation command sould be available
+        /// </summary>
+        IObservable<bool> CanIsolateObservable { get; }
+
+        /// <summary>
+        /// Exits the isolation
+        /// </summary>
+        void ExitIsolation();
+
+        /// <summary>
+        /// Gets or sets the under the mouse element <see cref="GraphElementViewModel"/>
+        /// </summary>
+        GraphElementViewModel HoveredElement { get; set; }
     }
 }

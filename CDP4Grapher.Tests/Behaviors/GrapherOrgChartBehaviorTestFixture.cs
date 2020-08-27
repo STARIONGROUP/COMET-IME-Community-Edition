@@ -27,10 +27,11 @@ namespace CDP4Grapher.Tests.Behaviors
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading;
-    using System.Windows.Data;
+    using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Types;
@@ -45,8 +46,6 @@ namespace CDP4Grapher.Tests.Behaviors
 
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
-    using DevExpress.Mvvm.Native;
-    using DevExpress.Xpf.Charts;
     using DevExpress.Xpf.Diagram;
 
     using Microsoft.Practices.ServiceLocation;
@@ -72,6 +71,7 @@ namespace CDP4Grapher.Tests.Behaviors
         public override void Setup()
         {
             base.Setup();
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
             this.elementViewModels = new List<GraphElementViewModel>()
             {
@@ -101,7 +101,7 @@ namespace CDP4Grapher.Tests.Behaviors
             this.saveFileDialog.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>())).Returns(string.Empty);
             this.serviceLocator = new Mock<IServiceLocator>();
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.saveFileDialog.Object);
-            ServiceLocator.SetLocatorProvider(() =>this.serviceLocator.Object);
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
         }
 
         [TearDown]
@@ -118,6 +118,15 @@ namespace CDP4Grapher.Tests.Behaviors
             Assert.IsTrue(this.behavior.CurrentLayout != default);
             Assert.AreSame(this.behavior.AssociatedObject, diagramControl);
             Assert.IsNull(this.behavior.HoveredElement);
+            Assert.IsNotNull(this.behavior.CanIsolateObservable);
+        }
+
+        [Test]
+        public async Task VerifyCanIsolateObservable()
+        {
+            this.behavior.Attach(new GrapherDiagramControl());
+            this.behavior.HoveredElement = new GraphElementViewModel(this.NestedElement);
+            Assert.IsTrue(await this.behavior.CanIsolateObservable.FirstAsync());
         }
 
         [Test]
@@ -125,7 +134,7 @@ namespace CDP4Grapher.Tests.Behaviors
         {
             this.behavior.Attach(new GrapherDiagramControl());
             this.behavior.ExportGraph(DiagramExportFormat.JPEG);
-            this.saveFileDialog.Verify(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>() , It.IsAny<int>()), Times.Once);
+            this.saveFileDialog.Verify(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
         }
 
         [Test]
@@ -185,11 +194,11 @@ namespace CDP4Grapher.Tests.Behaviors
                 this.behavior.ItemsChanged(null, new DiagramItemsChangedEventArgs(diagramControl, new DiagramContentItem() { Content = elementViewModel }, ItemsChangedAction.Added));
             }
         }
-        
+
         [Test]
         public void VerifyIsolate()
         {
-            this.behavior.Attach(new GrapherDiagramControl() { DataContext = this.grapherViewModel.Object});
+            this.behavior.Attach(new GrapherDiagramControl() { DataContext = this.grapherViewModel.Object });
             Assert.IsFalse(this.behavior.Isolate());
             this.behavior.HoveredElement = this.elementViewModels.First();
             Assert.IsTrue(this.behavior.Isolate());
