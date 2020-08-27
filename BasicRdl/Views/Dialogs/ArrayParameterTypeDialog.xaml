@@ -8,9 +8,9 @@
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
-             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              Width="800"
              Height="700"
              MaxWidth="800"
@@ -20,8 +20,8 @@
         <ResourceDictionary>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/ErrorTemplate.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/CDP4Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/ErrorTemplate.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </dx:DXWindow.Resources>

@@ -140,8 +140,8 @@ namespace CDP4Grapher.ViewModels
             this.Name = this.NestedElementElement.Name;
             this.ShortName = this.NestedElementElement.ShortName;
             this.OwnerShortName = this.NestedElementElement.Owner.ShortName;
-            var  joinedCategory = string.Join(", ", this.NestedElementElement.Category.Select(c => c.ShortName));
-            this.Category = string.IsNullOrWhiteSpace( joinedCategory) ? "-" :  joinedCategory ;
+            var categories = this.NestedElementElement.GetAllCategoryShortNames();
+            this.Category = string.IsNullOrWhiteSpace(categories) ? "-" : categories;
         }
 
         /// <summary>

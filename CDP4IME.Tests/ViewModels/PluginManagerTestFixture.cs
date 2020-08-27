@@ -26,6 +26,7 @@
 
 namespace CDP4IME.Tests.ViewModels
 {
+    using System;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -51,7 +52,7 @@ namespace CDP4IME.Tests.ViewModels
         private PluginManagerViewModel<ImeAppSettings> viewModel;
         private ImeAppSettings appSettings;
         private Mock<IServiceLocator> serviceLocator;
-        private Mock<IAssemblyLocationLoader> assemblyLocationLoader;
+        private Mock<IAssemblyInformationService> assemblyLocationLoader;
 
         [SetUp]
         public void Setup()
@@ -65,7 +66,7 @@ namespace CDP4IME.Tests.ViewModels
             this.appSettingService = new Mock<IAppSettingsService<ImeAppSettings>>();
             this.appSettingService.Setup(x => x.AppSettings).Returns(this.appSettings);
 
-            this.assemblyLocationLoader = new Mock<IAssemblyLocationLoader>();
+            this.assemblyLocationLoader = new Mock<IAssemblyInformationService>();
 
             var testDirectory = Path.Combine(Assembly.GetExecutingAssembly().Location, @"../../../../../");
 #if DEBUG
@@ -74,7 +75,7 @@ namespace CDP4IME.Tests.ViewModels
 #else
             this.assemblyLocationLoader.Setup(x => x.GetLocation()).Returns(Path.GetFullPath(testDirectory));
 #endif
-            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyLocationLoader>()).Returns(this.assemblyLocationLoader.Object);
+            this.serviceLocator.Setup(s => s.GetInstance<IAssemblyInformationService>()).Returns(this.assemblyLocationLoader.Object);
 
             this.serviceLocator.Setup(s => s.GetInstance<IAppSettingsService<ImeAppSettings>>()).Returns(this.appSettingService.Object);
 

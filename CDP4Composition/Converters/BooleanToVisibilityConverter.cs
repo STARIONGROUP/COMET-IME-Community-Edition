@@ -41,21 +41,26 @@ namespace CDP4Composition.Converters
         /// </summary>
         /// <param name="value">The incoming type.</param>
         /// <param name="targetType">The target type.</param>
-        /// <param name="parameter">The converter parameter.</param>
+        /// <param name="parameter">The converter parameter. The value can be "Invert" to inverse the result</param>
         /// <param name="culture">The supplied culture</param>
         /// <returns><see cref="Visibility.Visible"/> if the value is true.</returns>
-        public object Convert(object value, Type targetType, object parameter,
-          CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
             {
                 return Visibility.Collapsed;
             }
 
-            return (bool)value ? Visibility.Visible : Visibility.Collapsed;
+            var visibility = (bool)value ? Visibility.Visible : Visibility.Collapsed;
+
+            if (parameter is string parameterString && parameterString == "Invert")
+            {
+                visibility = visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            }
+
+            return visibility;
         }
-
-
+        
         /// <summary>
         /// Does nothing.
         /// </summary>

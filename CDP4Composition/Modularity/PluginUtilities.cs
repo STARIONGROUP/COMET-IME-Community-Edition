@@ -59,6 +59,11 @@ namespace CDP4Composition.Modularity
         public const string PluginDirectoryName = "plugins";
 
         /// <summary>
+        /// The name of the Ime msi directory
+        /// </summary>
+        public const string ImeDirectoryName = "ime";
+
+        /// <summary>
         /// The directory of the downloaded plugin
         /// </summary>
         public const string DownloadDirectory = "DownloadCache";
@@ -121,7 +126,7 @@ namespace CDP4Composition.Modularity
         /// <returns>The <see cref="DirectoryInfo"/></returns>
         public static DirectoryInfo PluginDirectoryExists(out bool specificPluginFolderExists)
         {
-            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyLocationLoader>().GetLocation();
+            var currentPath = ServiceLocator.Current.GetInstance<IAssemblyInformationService>().GetLocation();
 
             var directoryInfo = new DirectoryInfo(Path.Combine(currentPath, PluginDirectoryName));
             specificPluginFolderExists = directoryInfo.Exists;
@@ -138,7 +143,7 @@ namespace CDP4Composition.Modularity
         /// Compute and return the <see cref="DirectoryInfo"/> of the temporary folder of the specified plugin
         /// </summary>
         /// <param name="pluginName">the name of the plugin</param>
-        /// <returns>a <see cref="DirectoryInfo"/></returns>
+        /// <returns>A <see cref="DirectoryInfo"/></returns>
         public static DirectoryInfo GetTempDirectoryInfo(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName))
@@ -159,24 +164,38 @@ namespace CDP4Composition.Modularity
         }
 
         /// <summary>
+        /// Computes and returns the <see cref="DirectoryInfo"/> of the download folder
+        /// </summary>
+        /// <param name="isItForPlugins">An assert whether it should return the plugin download directory or the IME msi one</param>
+        /// <param name="pluginName">The plugin name</param>
+        /// <returns>A <see cref="DirectoryInfo"/></returns>
+        public static DirectoryInfo GetDownloadDirectory(bool isItForPlugins = true, string pluginName = null)
+        {
+            var path3 = isItForPlugins ? PluginDirectoryName : ImeDirectoryName;
+            var path4 = isItForPlugins && !string.IsNullOrWhiteSpace(pluginName) ? pluginName : string.Empty;
+
+            var downloadPath = new DirectoryInfo(Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, path3, path4));
+
+            if (!downloadPath.Exists)
+            {
+                downloadPath.Create();
+            }
+
+            return downloadPath;
+        }
+
+        /// <summary>
         /// Retrieve all plugin that can be installed
         /// </summary>
         /// <returns>Returns a <see cref="IEnumerable{T}"/> of type <code>(FileInfo cdp4ckFile, Manifest manifest)</code> of the updatable plugins</returns>
         public static IEnumerable<(FileInfo cdp4ckFile, Manifest manifest)> GetDownloadedInstallablePluginUpdate()
         {
-            var downloadPath = Path.Combine(path1: GetAppDataPath(), path2: DownloadDirectory, PluginDirectoryName);
-
             var updatablePlugins = new List<(FileInfo cdp4ckFile, Manifest manifest)>();
 
-            if (!Directory.Exists(path: downloadPath))
-            {
-                return updatablePlugins;
-            }
-            
             var currentPlateformVersion = GetVersion();
 
             // Loop through all existing download plugin folders
-            foreach (var downloadedPluginFolder in Directory.EnumerateDirectories(path: downloadPath).Select(selector: d => new DirectoryInfo(path: d)))
+            foreach (var downloadedPluginFolder in GetDownloadDirectory().EnumerateDirectories())
             {
                 if (GetPlugin(currentPlateformVersion, downloadedPluginFolder) is { manifest: { }, cdp4ckFile: { } } plugin)
                 {

@@ -151,14 +151,6 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
-    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj">
-      <Name>CDP4CommonView</Name>
-      <Project>{5e0e5c30-df40-4708-abae-4da03ec9b881}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Name>CDP4Composition</Name>
       <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>

@@ -39,7 +39,7 @@ namespace CDP4RelationshipMatrix.Converters
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((IList) value)?.Cast<Category>().OrderBy(c => c.Name).ToList() ?? new List<Category>();
+            return ((IList)value)?.Cast<Category>().OrderBy(c => c.Name).ToList() ?? new List<Category>();
         }
 
         /// <summary>

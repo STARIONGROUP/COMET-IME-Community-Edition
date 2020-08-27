@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4CommonView"
+             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
@@ -18,7 +18,7 @@
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
     <dx:DXWindow.Resources>
-        <ResourceDictionary Source="pack://application:,,,/CDP4CommonView;component/Resources/ErrorTemplate.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/ErrorTemplate.xaml"/>
     </dx:DXWindow.Resources>
     <dxlc:LayoutControl Margin="5"
                         Orientation="Vertical"

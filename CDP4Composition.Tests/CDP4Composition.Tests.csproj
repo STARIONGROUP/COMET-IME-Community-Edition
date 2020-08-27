@@ -119,7 +119,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CDP4CommonView\CDP4CommonView.csproj" />
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
     <ProjectReference Include="..\CDP4IME\CDP4IME-CE.csproj" />
   </ItemGroup>
