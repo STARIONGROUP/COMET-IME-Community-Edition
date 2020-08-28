@@ -68,12 +68,7 @@ namespace CDP4Grapher.Behaviors
         /// Gets or sets the under the mouse element <see cref="GraphElementViewModel"/>
         /// </summary>
         public GraphElementViewModel HoveredElement { get; set; }
-
-        /// <summary>
-        /// Observable that can indicate whether the isolation command sould be available
-        /// </summary>
-        public IObservable<bool> CanIsolateObservable { get; private set; }
-
+        
         /// <summary>
         /// The on attached event handler
         /// </summary>
@@ -84,9 +79,41 @@ namespace CDP4Grapher.Behaviors
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
             this.AssociatedObject.Loaded += this.Loaded;
             this.AssociatedObject.MouseMove += this.MouseMoved;
+            this.AssociatedObject.SelectionChanged += this.SelectionChanged; 
+        }
+        
+        /// <summary>
+        /// Unsubscribes eventhandlers when detaching.
+        /// </summary>
+        protected override void OnDetaching()
+        {
+            this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
+            this.AssociatedObject.ItemsChanged -= this.ItemsChanged;
+            this.AssociatedObject.Loaded -= this.Loaded;
+            this.AssociatedObject.MouseMove -= this.MouseMoved;
+            this.AssociatedObject.SelectionChanged -= this.SelectionChanged;
+            base.OnDetaching();
+        }
+        
+        /// <summary>
+        /// Occurs when the user selects a element on the grapher. It updates the viewmodel <see cref="IGrapherViewModel.SelectedElement"/> property
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SelectionChanged(object sender, DiagramSelectionChangedEventArgs e)
+        {
+            switch (this.AssociatedObject.DataContext)
+            {
+                case IGrapherViewModel viewModel 
+                    when this.AssociatedObject.SelectedItems.FirstOrDefault() is DiagramContentItem item 
+                         && item.Content is GraphElementViewModel element:
+                    viewModel.SetsSelectedElement(element.NestedElementElement);
+                    break;
 
-            //this.CanIsolateObservable = this.WhenAnyValue(x => x.HoveredElement, x => x.HoveredElement.Thing.IsRootElement, (x, y) => x != null && !y ).ObserveOn(RxApp.MainThreadScheduler);
-            //this.CanIsolateObservable = this.WhenAny(x => x.HoveredElement, y => y != null).ObserveOn(RxApp.MainThreadScheduler);
+                case IGrapherViewModel viewModel:
+                    viewModel.SelectedElement = null;
+                    break;
+            }
         }
 
         /// <summary>
@@ -193,7 +220,6 @@ namespace CDP4Grapher.Behaviors
                 e.Item.IsManipulationEnabled = false;
                 e.Item.CanMove = false;
                 e.Item.CanDelete = false;
-                e.Item.CanSelect = false;
             }
         }
 
@@ -209,17 +235,6 @@ namespace CDP4Grapher.Behaviors
                 viewModel.DiagramContextMenuViewModel.Behavior = this;
                 viewModel.Behavior = this;
             }
-        }
-        
-        /// <summary>
-        /// Unsubscribes eventhandlers when detaching.
-        /// </summary>
-        protected override void OnDetaching()
-        {
-            this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
-            this.AssociatedObject.ItemsChanged -= this.ItemsChanged;
-            this.AssociatedObject.Loaded -= this.Loaded;
-            base.OnDetaching();
         }
 
         /// <summary>

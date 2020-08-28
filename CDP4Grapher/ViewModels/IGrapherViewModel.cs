@@ -27,6 +27,10 @@ namespace CDP4Grapher.ViewModels
 {
     using System.Collections.Generic;
 
+    using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.ViewModels;
+
     using CDP4Grapher.Behaviors;
 
     using DevExpress.Xpf.Bars;
@@ -58,10 +62,21 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         /// <param name="graphElement">The Graph Element</param>
         void Isolate(GraphElementViewModel graphElement);
-        
+            
         /// <summary>
         /// Exits the isolation
         /// </summary>
         void ExitIsolation();
+
+        /// <summary>
+        /// Gets or sets the selected element
+        /// </summary>
+        ElementParameterRowControlViewModel SelectedElement { get; set; }
+
+        /// <summary>
+        /// Sets the selected element
+        /// </summary>
+        /// <param name="element">The selected element</param>
+        void SetsSelectedElement(ElementBase element);
     }
 }

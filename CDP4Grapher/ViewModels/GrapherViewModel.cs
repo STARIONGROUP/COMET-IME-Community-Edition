@@ -40,6 +40,7 @@ namespace CDP4Grapher.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -69,6 +70,11 @@ namespace CDP4Grapher.ViewModels
         /// Backing field for <see cref="CurrentOption"/>
         /// </summary>
         private string currentOption;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedElement"/>
+        /// </summary>
+        private ElementParameterRowControlViewModel selectedElement;
 
         /// <summary>
         /// The <see cref="EngineeringModelSetup"/> that is referenced by the <see cref="EngineeringModel"/> that contains the current <see cref="Option"/>
@@ -128,6 +134,15 @@ namespace CDP4Grapher.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the selected element
+        /// </summary>
+        public ElementParameterRowControlViewModel SelectedElement
+        {
+            get => this.selectedElement;
+            set => this.RaiseAndSetIfChanged(ref this.selectedElement, value);
+        }
+
+        /// <summary>
         /// The active <see cref="Participant"/>
         /// </summary>
         public readonly Participant ActiveParticipant;
@@ -150,15 +165,12 @@ namespace CDP4Grapher.ViewModels
         /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        /// <param name="pluginSettingsService">
-        /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
-        /// </param>
+        /// <param name="pluginSettingsService"> The <see cref="IPluginSettingsService"/> used to read and write plugin setting files. </param>
         public GrapherViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
             this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
-
             this.currentDomainOfExpertise = this.Session.QueryCurrentDomainOfExpertise();
             this.option = option;
 
@@ -290,6 +302,23 @@ namespace CDP4Grapher.ViewModels
         {
             this.GraphElements.ForEach(x => x.NestedElementElementListener.Dispose());
             this.GraphElements.Clear();
+        }
+        
+        /// <summary>
+        /// Sets the selected element
+        /// </summary>
+        /// <param name="element">The selected element</param>
+        public void SetsSelectedElement(ElementBase element)
+        {
+            this.SelectedElement = new ElementParameterRowControlViewModel(element, this.option);
+            this.ElementFullPath = element.Route;
+        }
+
+        private string elementFullPath;
+        public string ElementFullPath
+        {
+            get => this.elementFullPath;
+            set => this.RaiseAndSetIfChanged(ref this.elementFullPath, value);
         }
     }
 }

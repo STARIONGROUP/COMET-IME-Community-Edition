@@ -31,6 +31,9 @@ namespace CDP4Grapher.Tests.ViewModels
     using System.Reactive.Concurrency;
     using System.Threading;
 
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
@@ -121,12 +124,15 @@ namespace CDP4Grapher.Tests.ViewModels
         [Test]
         public void VerifyIsolation()
         {
-            var observable = new Mock<IObservable<bool>>();
-
-            this.behavior.Setup(x => x.CanIsolateObservable).Returns(observable.Object);
-            var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object };
             this.behavior.Setup(x => x.ExitIsolation());
             this.behavior.Setup(x => x.Isolate()).Returns(false);
+            this.behavior.Setup(x => x.HoveredElement).Returns(new GraphElementViewModel(new NestedElement() { ElementUsage = { new ElementUsage() { Owner = new DomainOfExpertise(), ElementDefinition = new ElementDefinition()} }}));
+
+            var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object };
+            Assert.IsFalse(vm.IsolateCommand.CanExecute(null));
+            this.behavior.Setup(x => x.HoveredElement).Returns(null as Delegate);
+            Assert.IsTrue(vm.IsolateCommand.CanExecute(null));
+
             vm.IsolateCommand.Execute(null);
             Assert.IsTrue(vm.CanIsolate);
             this.behavior.Setup(x => x.Isolate()).Returns(true);

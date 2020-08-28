@@ -10,5 +10,12 @@
                        d:DesignHeight="300"
                        d:DesignWidth="300"
                        dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
+                       SelectionMode="Single"
+                       ShowPageBreaks="True"
+                       IsManipulationEnabled="False"
+                       AllowRotateItems="False"
+                       AllowResizeItems="False"
+                       AllowApplyAutomaticLayoutForSubordinates="True"
+                       AllowApplyAutomaticLayout="True"
                        mc:Ignorable="d">
 </dxdiag:DiagramControl>

@@ -118,17 +118,8 @@ namespace CDP4Grapher.Tests.Behaviors
             Assert.IsTrue(this.behavior.CurrentLayout != default);
             Assert.AreSame(this.behavior.AssociatedObject, diagramControl);
             Assert.IsNull(this.behavior.HoveredElement);
-            Assert.IsNotNull(this.behavior.CanIsolateObservable);
         }
-
-        [Test]
-        public async Task VerifyCanIsolateObservable()
-        {
-            this.behavior.Attach(new GrapherDiagramControl());
-            this.behavior.HoveredElement = new GraphElementViewModel(this.NestedElement);
-            Assert.IsTrue(await this.behavior.CanIsolateObservable.FirstAsync());
-        }
-
+        
         [Test]
         public void VerifyExport()
         {
