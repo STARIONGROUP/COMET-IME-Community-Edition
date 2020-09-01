@@ -974,12 +974,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void MouseDownCommandExecute(MatrixAddress matrixAddress)
         {
             //Only if row is null, otherwise SelectedCell PropertyChanged handles setting properties
-            if (matrixAddress != null)
+            if (matrixAddress != null && matrixAddress.Row is null)
             {
-                if (matrixAddress.Row is null)
-                {
-                    this.SetRowAndColumnPropertiesOnSelectedItemChanged(matrixAddress);
-                }
+                this.SetRowAndColumnPropertiesOnSelectedItemChanged(matrixAddress);
             }
         }
 
