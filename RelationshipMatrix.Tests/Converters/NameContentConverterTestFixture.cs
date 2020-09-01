@@ -39,7 +39,7 @@ namespace CDP4RelationshipMatrix.Tests.Converters
         public void AssertThatConverterWorks()
         {
             Assert.Throws<NotSupportedException>(() => this.converter.ConvertBack(null, null, null, null));
-            Assert.IsNull(this.converter.Convert(null, null, null, null));
+            Assert.IsNull(this.converter.Convert(It.IsAny<object[]>(), null, null, null));
         }
     }
 }

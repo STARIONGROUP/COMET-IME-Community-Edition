@@ -9,6 +9,7 @@ namespace CDP4RelationshipMatrix.Converters
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Windows.Data;
     using CDP4Common.CommonData;
     using DevExpress.Xpf.Grid;
@@ -17,12 +18,12 @@ namespace CDP4RelationshipMatrix.Converters
     /// <summary>
     /// The converter to retrieve the name to display for a row based on the <see cref="EditGridCellData"/>
     /// </summary>
-    public class NameContentConverter : IValueConverter
+    public class NameContentConverter : IMultiValueConverter
     {
         /// <summary>
         /// The conversion method returns the object associated to the current fieldname
         /// </summary>
-        /// <param name="value">
+        /// <param name="values">
         /// The incoming value.
         /// </param>
         /// <param name="targetType">
@@ -37,9 +38,14 @@ namespace CDP4RelationshipMatrix.Converters
         /// <returns>
         /// The <see cref="object"/> containing the same objects as the input collection.
         /// </returns>
-        public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var gridData = value as EditGridCellData;
+            if (values == null)
+            {
+                return null;
+            }
+
+            var gridData = values.FirstOrDefault() as EditGridCellData;
 
             if (gridData == null)
             {
@@ -75,7 +81,7 @@ namespace CDP4RelationshipMatrix.Converters
         /// <param name="value">
         /// The incoming collection.
         /// </param>
-        /// <param name="targetType">
+        /// <param name="targetTypes">
         /// The target type.
         /// </param>
         /// <param name="parameter">
@@ -87,7 +93,7 @@ namespace CDP4RelationshipMatrix.Converters
         /// <returns>
         /// The result 
         /// </returns>
-        public virtual object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }
