@@ -72,11 +72,11 @@ namespace CDP4Grapher.ViewModels
         /// Gets or sets the selected element
         /// </summary>
         ElementParameterRowControlViewModel SelectedElement { get; set; }
-
+        
         /// <summary>
         /// Sets the selected element
         /// </summary>
         /// <param name="element">The selected element</param>
-        void SetsSelectedElement(ElementBase element);
+        void SetsSelectedElementAndSelectedElementPath(GraphElementViewModel element);
     }
 }

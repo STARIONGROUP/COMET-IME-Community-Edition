@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementParametersControl.cs" company="RHEA System S.A.">
+// <copyright file="ElementParameterRowControl.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -28,12 +28,12 @@ namespace CDP4Composition.Views
     /// <summary>
     /// Interaction logic for CommonThingControl
     /// </summary>
-    public partial class ElementParametersControl
+    public partial class ElementParameterRowControl
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ElementParametersControl"/> class.
+        /// Initializes a new instance of the <see cref="ElementParameterRowControl"/> class.
         /// </summary>
-        public ElementParametersControl()
+        public ElementParameterRowControl()
         {
             this.InitializeComponent();
         }

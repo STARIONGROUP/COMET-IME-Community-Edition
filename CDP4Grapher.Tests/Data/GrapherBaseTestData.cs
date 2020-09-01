@@ -80,12 +80,6 @@ namespace CDP4Grapher.Tests.Data
                 Category = new List<Category>() { new Category(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { ShortName = "Test" } }
             };
 
-            this.NestedElement = new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
-            {
-                RootElement = this.TopElement, Container = this.Option,
-                ElementUsage = new OrderedItemList<ElementUsage>(null) { this.ElementUsage }
-            };
-
             this.Person = new Person(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 DefaultDomain = this.Domain
@@ -99,6 +93,13 @@ namespace CDP4Grapher.Tests.Data
             };
 
             this.SetupElements();
+
+            this.NestedElement = new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
+            {
+                RootElement = this.TopElement,
+                Container = this.Option,
+                ElementUsage = new OrderedItemList<ElementUsage>(null) { this.ElementUsage }
+            };
 
             this.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {

@@ -1619,7 +1619,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\ElementParametersControl.xaml">
+    <Page Include="Views\ElementParameterRowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1679,6 +1679,6 @@
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Views\ElementParametersControl.xaml" />
+    <None Remove="Views\ElementParameterRowControl.xaml" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GraphElementViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -28,13 +28,19 @@ namespace CDP4Grapher.ViewModels
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Text;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Utilities;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using DevExpress.Mvvm.Native;
+    using DevExpress.Xpf.NavBar;
 
     using ReactiveUI;
 
@@ -67,6 +73,25 @@ namespace CDP4Grapher.ViewModels
         /// Backing field the <see cref="Category"/> property
         /// </summary>
         private string category = "-";
+
+        /// <summary>
+        /// Backing field the <see cref="ElementPath"/>
+        /// </summary>
+        private string elementPath;
+
+        /// <summary>
+        /// Holds the actual option
+        /// </summary>
+        private Option actualOption;
+
+        /// <summary>
+        /// Gets this respresented <see cref="NestedElement"/> Path
+        /// </summary>
+        public string ElementPath
+        {
+            get => this.elementPath;
+            private set => this.RaiseAndSetIfChanged(ref this.elementPath, value);
+        }
 
         /// <summary>
         /// Holds the revision number when the <see cref="Thing"/> was last updated
@@ -113,7 +138,7 @@ namespace CDP4Grapher.ViewModels
         /// Gets or sets the listener of the <see cref="NestedElementElement"/>
         /// </summary>
         public IDisposable NestedElementElementListener { get; set; }
-        
+
         /// <summary>
         /// Gets or Sets the NestedElementElement Associated with the <see cref="Thing"/>
         /// </summary>
@@ -122,15 +147,48 @@ namespace CDP4Grapher.ViewModels
         /// <summary>
         /// Instanciate a <see cref="GrapherViewModel"/> updating its property with the given <see cref="NestedElement"/> property
         /// </summary>
-        /// <param name="nestedElement"></param>
-        public GraphElementViewModel(NestedElement nestedElement)
+        /// <param name="nestedElement">The represented nested element</param>
+        /// <param name="actualOption">The option</param>
+        public GraphElementViewModel(NestedElement nestedElement, Option actualOption)
         {
             this.Thing = nestedElement;
-            this.NestedElementElement = (ElementBase)nestedElement.ElementUsage.LastOrDefault() ?? nestedElement.RootElement;
+            this.actualOption = actualOption;
+            this.NestedElementElement = (ElementBase) nestedElement.ElementUsage.LastOrDefault() ?? nestedElement.RootElement;
             this.RegisterSubscriptions();
             this.UpdateProperties();
         }
-        
+
+        /// <summary>
+        /// Computes the full path of the element
+        /// </summary>
+        /// <returns>The element path</returns>
+        private string ComputePath()
+        {
+            var elementPathStringBuilder = new StringBuilder();
+            elementPathStringBuilder.Append($"{this.actualOption.ShortName}.");
+
+            if (this.NestedElementElement is ElementDefinition elementDefinition)
+            {
+                elementPathStringBuilder.Append(elementDefinition.ShortName);
+            }
+            else
+            {
+                elementPathStringBuilder.Append($"{this.Thing.RootElement.ShortName}.");
+
+                foreach (ElementUsage element in this.Thing.ElementUsage)
+                {
+                    elementPathStringBuilder.Append($"{element.Name}");
+
+                    if (element != this.Thing.ElementUsage.Last())
+                    {
+                        elementPathStringBuilder.Append('.');
+                    }
+                }
+            }
+
+            return elementPathStringBuilder.ToString();
+        }
+
         /// <summary>
         /// Update all properties value
         /// </summary>
@@ -142,6 +200,7 @@ namespace CDP4Grapher.ViewModels
             this.OwnerShortName = this.NestedElementElement.Owner.ShortName;
             var categories = this.NestedElementElement.GetAllCategoryShortNames();
             this.Category = string.IsNullOrWhiteSpace(categories) ? "-" : categories;
+            this.ElementPath = this.ComputePath();
         }
 
         /// <summary>

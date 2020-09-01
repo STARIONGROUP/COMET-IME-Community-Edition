@@ -28,14 +28,37 @@ namespace CDP4Composition.ViewModels
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Utilities;
 
     using ReactiveUI;
 
     /// <summary>
-    /// Represents an element to use within the <see cref="ElementParametersControl"/>
+    /// Represents an element definition or usage to be use with <see cref="Views.ElementParameterRowControl"/>
     /// </summary>
-    public class ElementParameterRowControlViewModel
+    public class ElementParameterRowControlViewModel : ReactiveObject
     {
+        /// <summary>
+        /// Backing field for <see cref="Owner"/> property
+        /// </summary>
+        private string owner;
+
+        /// <summary>
+        /// Backing field for <see cref="category"/> property
+        /// </summary>
+        private string category;
+
+        /// <summary>
+        /// Backing field for <see cref="modelCode"/> property
+        /// </summary>
+        private string modelCode;
+
+        /// <summary>
+        /// Backing field for <see cref="definition"/> property
+        /// </summary>
+        private string definition;
+
         /// <summary>
         /// Gets the Parameter Collection of this represented Element
         /// </summary>
@@ -50,6 +73,42 @@ namespace CDP4Composition.ViewModels
         /// Gets the represented element Option
         /// </summary>
         public ElementBase Element { get; private set; }
+
+        /// <summary>
+        /// Gets this represented element owner
+        /// </summary>
+        public string Owner
+        {
+            get => this.owner;
+            private set => this.RaiseAndSetIfChanged(ref this.owner, value);
+        }
+
+        /// <summary>
+        /// Gets this represented element Categories
+        /// </summary>
+        public string Category
+        {
+            get => this.category;
+            private set => this.RaiseAndSetIfChanged(ref this.category, value);
+        }
+
+        /// <summary>
+        /// Gets this represented element Model Code
+        /// </summary>
+        public string ModelCode
+        {
+            get => this.modelCode;
+            private set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
+        }
+
+        /// <summary>
+        /// Gets this represented element Model Code
+        /// </summary>
+        public string Definition
+        {
+            get => this.definition;
+            private set => this.RaiseAndSetIfChanged(ref this.definition, value);
+        }
 
         /// <summary>
         /// Initializes a new instance of <see cref="ElementParameterRowControlViewModel"/>
@@ -68,15 +127,30 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         public void UpdateProperties()
         {
-            if (this.Element is ElementUsage elementUsage)
+            if (this.ActualOption == null)
             {
-                this.Parameters.AddRange(elementUsage.ParameterOverride.Select(p => new ParameterRowControlViewModel(p, this.ActualOption)));
-                this.Parameters.AddRange(elementUsage.ElementDefinition.Parameter.Select(p => new ParameterRowControlViewModel(p, this.ActualOption)));
+                return;
             }
-            else if (this.Element is ElementDefinition elementDefinition)
+
+            switch (this.Element)
             {
-                this.Parameters.AddRange(elementDefinition.Parameter.Select(p => new ParameterRowControlViewModel(p, this.ActualOption)));
+                case ElementUsage elementUsage:
+                    this.Parameters.AddRange(elementUsage.ParameterOverride.Select(p => new ParameterRowControlViewModel(p, this.ActualOption)));
+                    this.Parameters.AddRange(elementUsage.ElementDefinition.Parameter.Select(p => new ParameterRowControlViewModel(p, this.ActualOption)));
+                    this.ModelCode = elementUsage.ModelCode();
+                    break;
+                case ElementDefinition elementDefinition:
+                    this.Parameters.AddRange(elementDefinition.Parameter.Select(p => new ParameterRowControlViewModel(p, this.ActualOption)));
+                    this.ModelCode = elementDefinition.ModelCode();
+                    break;
             }
+
+            this.Owner = this.Element.Owner != null ? this.Element.Owner.ShortName : "NA";
+            var categories = this.Element.GetAllCategoryShortNames();
+            this.Category = string.IsNullOrWhiteSpace(categories) ? "-" : categories;
+
+            var firstDefinitionFound = this.Element.Definition.FirstOrDefault();
+            this.Definition = firstDefinitionFound != null && !string.IsNullOrWhiteSpace(firstDefinitionFound.Content) ? $"Definition [{firstDefinitionFound.LanguageCode}]: {firstDefinitionFound.Content}" : ": -";
         }
     }
 }

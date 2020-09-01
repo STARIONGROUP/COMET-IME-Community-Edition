@@ -26,6 +26,7 @@
 
 namespace CDP4Grapher.Tests.ViewModels
 {
+    using System;
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Security.Policy;
@@ -94,6 +95,8 @@ namespace CDP4Grapher.Tests.ViewModels
             Assert.IsNotNull(vm.CurrentModel);
             Assert.IsNotNull(vm.CurrentIteration);
             Assert.IsNotNull(vm.CurrentOption);
+            Assert.IsNull(vm.SelectedElementPath);
+            Assert.IsNull(vm.SelectedElement);
         }
 
         [Test]
@@ -129,8 +132,28 @@ namespace CDP4Grapher.Tests.ViewModels
 
             Assert.AreEqual(1, vm.GraphElements.Count);
             var newTrunk = vm.GraphElements.FirstOrDefault();
-            vm.Isolate(newTrunk);
+            Assert.Throws<InvalidOperationException>(() => vm.Isolate(newTrunk));
             Assert.AreEqual(1, vm.GraphElements.Count);
+        }
+
+        [Test]
+        public void VerifyExitIsolation()
+        {
+            var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
+            Assert.AreEqual(1, vm.GraphElements.Count);
+             vm.ExitIsolation();
+            Assert.AreEqual(1, vm.GraphElements.Count);
+        }
+
+        [Test]
+        public void SetsSelectedElementAndSelectedElementPath()
+        {
+            var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
+            Assert.IsNull(vm.SelectedElementPath);
+            Assert.IsNull(vm.SelectedElement);
+            vm.SetsSelectedElementAndSelectedElementPath(vm.GraphElements.FirstOrDefault());
+            Assert.IsNotNull(vm.SelectedElementPath);
+            Assert.IsNotNull(vm.SelectedElement);
         }
     }
 }

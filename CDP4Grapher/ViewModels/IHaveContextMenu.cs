@@ -47,5 +47,10 @@ namespace CDP4Grapher.ViewModels
         /// Gets or sets the attached behavior
         /// </summary>
         IGrapherOrgChartBehavior Behavior { get; set; }
+
+        /// <summary>
+        /// Gets or sets the under the mouse element <see cref="GraphElementViewModel"/>
+        /// </summary>
+        GraphElementViewModel HoveredElement { get; set; }
     }
 }

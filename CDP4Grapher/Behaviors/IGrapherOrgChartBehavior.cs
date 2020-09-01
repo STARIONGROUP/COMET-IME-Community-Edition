@@ -73,10 +73,5 @@ namespace CDP4Grapher.Behaviors
         /// Exits the isolation
         /// </summary>
         void ExitIsolation();
-
-        /// <summary>
-        /// Gets or sets the under the mouse element <see cref="GraphElementViewModel"/>
-        /// </summary>
-        GraphElementViewModel HoveredElement { get; set; }
     }
 }

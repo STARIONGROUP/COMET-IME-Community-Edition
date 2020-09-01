@@ -38,6 +38,7 @@ namespace CDP4Grapher.Behaviors
 
     using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
+    using CDP4Grapher.Views;
 
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
@@ -65,11 +66,6 @@ namespace CDP4Grapher.Behaviors
         private bool hasLoaded;
 
         /// <summary>
-        /// Gets or sets the under the mouse element <see cref="GraphElementViewModel"/>
-        /// </summary>
-        public GraphElementViewModel HoveredElement { get; set; }
-        
-        /// <summary>
         /// The on attached event handler
         /// </summary>
         protected override void OnAttached()
@@ -78,10 +74,10 @@ namespace CDP4Grapher.Behaviors
             this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
             this.AssociatedObject.Loaded += this.Loaded;
-            this.AssociatedObject.MouseMove += this.MouseMoved;
-            this.AssociatedObject.SelectionChanged += this.SelectionChanged; 
+            this.AssociatedObject.SelectionChanged += this.SelectionChanged;
+            this.AssociatedObject.LayoutUpdated += this.LayoutChanged;
         }
-        
+
         /// <summary>
         /// Unsubscribes eventhandlers when detaching.
         /// </summary>
@@ -90,11 +86,20 @@ namespace CDP4Grapher.Behaviors
             this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
             this.AssociatedObject.ItemsChanged -= this.ItemsChanged;
             this.AssociatedObject.Loaded -= this.Loaded;
-            this.AssociatedObject.MouseMove -= this.MouseMoved;
             this.AssociatedObject.SelectionChanged -= this.SelectionChanged;
             base.OnDetaching();
         }
         
+        /// <summary>
+        /// Occurs whenever the layout changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LayoutChanged(object sender, EventArgs e)
+        {
+            //this.AssociatedObject.AlignPage(HorizontalAlignment.Center, VerticalAlignment.Center);
+        }
+
         /// <summary>
         /// Occurs when the user selects a element on the grapher. It updates the viewmodel <see cref="IGrapherViewModel.SelectedElement"/> property
         /// </summary>
@@ -107,24 +112,15 @@ namespace CDP4Grapher.Behaviors
                 case IGrapherViewModel viewModel 
                     when this.AssociatedObject.SelectedItems.FirstOrDefault() is DiagramContentItem item 
                          && item.Content is GraphElementViewModel element:
-                    viewModel.SetsSelectedElement(element.NestedElementElement);
+                    viewModel.SetsSelectedElementAndSelectedElementPath(element);
+                    viewModel.DiagramContextMenuViewModel.HoveredElement = element;
                     break;
 
                 case IGrapherViewModel viewModel:
                     viewModel.SelectedElement = null;
+                    viewModel.DiagramContextMenuViewModel.HoveredElement = null;
                     break;
             }
-        }
-
-        /// <summary>
-        /// Occurs when the user mouse the mouse arround the <see cref="DiagramControl"/>
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MouseMoved(object sender, MouseEventArgs e)
-        {
-            var mousePosition = e.GetPosition(this.AssociatedObject);
-            this.HoveredElement = (this.AssociatedObject.CalcHitItem(mousePosition) as DiagramContentItem)?.Content as GraphElementViewModel;   
         }
 
         /// <summary>
@@ -154,6 +150,8 @@ namespace CDP4Grapher.Behaviors
             {
                 this.ApplySpecifiedLayout(this.CurrentLayout.layout);
             }
+
+            this.AssociatedObject.AlignPage(HorizontalAlignment.Center, VerticalAlignment.Center);
         }
 
         /// <summary>
@@ -175,7 +173,8 @@ namespace CDP4Grapher.Behaviors
                 throw new ArgumentOutOfRangeException(nameof(layout), layout, $"The {layout} provided must be used with a direction");
             }
 
-            this.CurrentLayout = (layout, null);    
+            this.CurrentLayout = (layout, null);
+            this.AssociatedObject.AlignPage(HorizontalAlignment.Center, VerticalAlignment.Center);
         }
 
         /// <summary>
@@ -205,6 +204,7 @@ namespace CDP4Grapher.Behaviors
             }
 
             this.CurrentLayout = (layout, direction);
+            this.AssociatedObject.AlignPage(HorizontalAlignment.Center, VerticalAlignment.Center);
         }
 
         /// <summary>
@@ -375,9 +375,12 @@ namespace CDP4Grapher.Behaviors
         /// <returns>An assert whether isolation is on</returns>
         public bool Isolate()
         {
-            if (this.HoveredElement != null)
+            var viewmodel = this.AssociatedObject.DataContext as IGrapherViewModel;
+            var hoveredElement = viewmodel?.DiagramContextMenuViewModel.HoveredElement;
+            
+            if (hoveredElement != null)
             {
-                (this.AssociatedObject.DataContext as IGrapherViewModel)?.Isolate(this.HoveredElement);
+                viewmodel?.Isolate(hoveredElement);
             
                 this.ApplyPreviousLayout();
 

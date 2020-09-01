@@ -66,7 +66,21 @@ namespace CDP4Grapher.ViewModels
         /// Backing field for <see cref="CanIsolate"/>
         /// </summary>
         private bool canIsolate;
+        
+        /// <summary>
+        /// Backing field for the <see cref="HoveredElement"/> property
+        /// </summary>
+        private GraphElementViewModel hoveredElement;
 
+        /// <summary>
+        /// Gets or sets the under the mouse element <see cref="GraphElementViewModel"/>
+        /// </summary>
+        public GraphElementViewModel HoveredElement
+        {
+            get => this.hoveredElement;
+            set => this.RaiseAndSetIfChanged(ref this.hoveredElement, value);
+        }
+        
         /// <summary>
         /// Gets or sets the attached behavior
         /// </summary>
@@ -94,11 +108,6 @@ namespace CDP4Grapher.ViewModels
             get => this.canIsolate;
             private set => this.RaiseAndSetIfChanged(ref this.canIsolate, value);
         }
-        
-        /// <summary>
-        /// Gets the observable of bool that allows the execution of the <see cref="IsolateCommand"/>
-        /// </summary>
-        public IObservable<bool> CanIsolateObservable { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
@@ -202,12 +211,7 @@ namespace CDP4Grapher.ViewModels
         {
             this.CanExportDiagram = true;
             this.CanIsolate = true;
-            
-            this.CanIsolateObservable = this.WhenAnyValue(
-                x => x.Behavior,
-                x => x.Behavior.HoveredElement, 
-                x => x.CanIsolate,
-                (a, b, c) => (a != null && b != null && c) || !c);
+
         }
 
         /// <summary>
@@ -215,7 +219,11 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void InitializeCommands()   
         {
-            this.IsolateCommand = ReactiveCommand.Create(this.CanIsolateObservable);
+            this.IsolateCommand = ReactiveCommand.Create(this.WhenAnyValue(
+                x => x.HoveredElement,
+                x => x.CanIsolate,
+                (b, c) => (b != null && c) || !c).ObserveOn(RxApp.MainThreadScheduler));
+
             this.IsolateCommand.Subscribe(_ => this.ExecuteIsolate());
 
             this.ExportGraphAsJpg = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));

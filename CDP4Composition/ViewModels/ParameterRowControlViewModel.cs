@@ -34,7 +34,7 @@ namespace CDP4Composition.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// Represents an element parameters to use within the <see cref="ElementParametersControl"/>
+    /// Represents an element parameters to use within the <see cref="ElementParameterRowControl"/>
     /// </summary>
     public class ParameterRowControlViewModel : ReactiveObject
     {
@@ -178,9 +178,9 @@ namespace CDP4Composition.ViewModels
         private void UpdateProperties()
         {
             var valueSet = this.GetValueSet();
-            this.Name = this.Parameter.UserFriendlyName;
-            this.ShortName = this.Parameter.UserFriendlyShortName;
-            this.Value = valueSet.Published.FirstOrDefault();
+            this.Name = this.Parameter.ParameterType.Name;
+            this.ShortName = this.Parameter.ParameterType.ShortName;
+            this.Value = $"{valueSet.Published.FirstOrDefault()} [{this.Parameter.Scale.ShortName}]";
             this.OwnerShortName = this.Parameter.Owner.ShortName;
             this.Switch = valueSet.ValueSwitch.ToString();
             this.Description = "-";

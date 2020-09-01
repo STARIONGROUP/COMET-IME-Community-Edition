@@ -52,11 +52,18 @@ namespace CDP4Grapher.Tests.ViewModels
     public class DiagramControlContextMenuViewModelTestFixture
     {
         private Mock<IGrapherOrgChartBehavior> behavior;
+        private Option option;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.option = new Option()
+            {
+                Name = "test"
+            };
+
             this.behavior = new Mock<IGrapherOrgChartBehavior>();
             this.behavior.Setup(x => x.ExportGraph(It.IsAny<DiagramExportFormat>()));
             this.behavior.Setup(x => x.ApplySpecifiedLayout(It.IsAny<LayoutEnumeration>()));
@@ -93,6 +100,8 @@ namespace CDP4Grapher.Tests.ViewModels
 
             Assert.IsNotNull(vm.ApplyCircularLayout);
             Assert.IsNotNull(vm.ApplyOrganisationalChartLayout);
+
+            Assert.IsNull(vm.HoveredElement);
         }
         
         [Test]
@@ -126,12 +135,21 @@ namespace CDP4Grapher.Tests.ViewModels
         {
             this.behavior.Setup(x => x.ExitIsolation());
             this.behavior.Setup(x => x.Isolate()).Returns(false);
-            this.behavior.Setup(x => x.HoveredElement).Returns(new GraphElementViewModel(new NestedElement() { ElementUsage = { new ElementUsage() { Owner = new DomainOfExpertise(), ElementDefinition = new ElementDefinition()} }}));
-
             var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object };
             Assert.IsFalse(vm.IsolateCommand.CanExecute(null));
-            this.behavior.Setup(x => x.HoveredElement).Returns(null as Delegate);
+
+            vm.HoveredElement = new GraphElementViewModel(new NestedElement()
+            {
+                RootElement = new ElementDefinition(),
+                ElementUsage =
+                {
+                    new ElementUsage() { Owner = new DomainOfExpertise(), ElementDefinition = new ElementDefinition() }
+                }
+            }, this.option);
+
             Assert.IsTrue(vm.IsolateCommand.CanExecute(null));
+            vm.HoveredElement = null;
+            Assert.IsFalse(vm.IsolateCommand.CanExecute(null));
 
             vm.IsolateCommand.Execute(null);
             Assert.IsTrue(vm.CanIsolate);
