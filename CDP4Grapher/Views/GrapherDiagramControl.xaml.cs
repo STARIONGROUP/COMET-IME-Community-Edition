@@ -22,32 +22,15 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4Grapher.Views
 {
-    using System;
     using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Windows;
-    using System.Windows.Controls;
-    using System.Windows.Input;
-    using System.Windows.Media;
 
-    using CDP4Common.EngineeringModelData;
-
-    using CDP4Composition.Mvvm;
-
-    using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
 
-    using DevExpress.Data.Helpers;
-    using DevExpress.Utils.Svg;
     using DevExpress.Xpf.Bars;
-    using DevExpress.Xpf.Core;
-    using DevExpress.Xpf.Core.Native;
     using DevExpress.Xpf.Diagram;
-
-    using File = CDP4Common.EngineeringModelData.File;
 
     /// <summary>
     /// Interaction logic for GrapherDiagramControl.xaml

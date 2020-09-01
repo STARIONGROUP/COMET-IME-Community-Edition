@@ -23,13 +23,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Composition.Tests.ViewModels
 {
     using System;
     using System.Linq;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -37,8 +35,6 @@ namespace CDP4Composition.Tests.ViewModels
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
-
-    using DevExpress.Mvvm.Native;
 
     using NUnit.Framework;
 

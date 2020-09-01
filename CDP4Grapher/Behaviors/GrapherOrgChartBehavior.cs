@@ -28,9 +28,7 @@ namespace CDP4Grapher.Behaviors
 {
     using System;
     using System.Linq;
-    using System.Reactive.Linq;
     using System.Windows;
-    using System.Windows.Input;
 
     using CDP4Common.EngineeringModelData;
 
@@ -38,15 +36,12 @@ namespace CDP4Grapher.Behaviors
 
     using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
-    using CDP4Grapher.Views;
 
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
     using DevExpress.Xpf.Diagram;
 
     using Microsoft.Practices.ServiceLocation;
-
-    using ReactiveUI;
 
     using Direction = DevExpress.Diagram.Core.Direction;
 
@@ -75,7 +70,6 @@ namespace CDP4Grapher.Behaviors
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
             this.AssociatedObject.Loaded += this.Loaded;
             this.AssociatedObject.SelectionChanged += this.SelectionChanged;
-            this.AssociatedObject.LayoutUpdated += this.LayoutChanged;
         }
 
         /// <summary>
@@ -89,22 +83,12 @@ namespace CDP4Grapher.Behaviors
             this.AssociatedObject.SelectionChanged -= this.SelectionChanged;
             base.OnDetaching();
         }
-        
-        /// <summary>
-        /// Occurs whenever the layout changes
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LayoutChanged(object sender, EventArgs e)
-        {
-            //this.AssociatedObject.AlignPage(HorizontalAlignment.Center, VerticalAlignment.Center);
-        }
 
         /// <summary>
         /// Occurs when the user selects a element on the grapher. It updates the viewmodel <see cref="IGrapherViewModel.SelectedElement"/> property
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The event arguments</param>
         private void SelectionChanged(object sender, DiagramSelectionChangedEventArgs e)
         {
             switch (this.AssociatedObject.DataContext)
@@ -126,8 +110,8 @@ namespace CDP4Grapher.Behaviors
         /// <summary>
         /// Fires when the canvas is ready for interaction. It is uses to apply the auto layout
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The event arguments</param>
         private void Loaded(object sender, RoutedEventArgs e)
         {
             if (!this.hasLoaded)
@@ -157,7 +141,7 @@ namespace CDP4Grapher.Behaviors
         /// <summary>
         /// Apply the desired layout specified
         /// </summary>
-        /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
+        /// <param name="layout">The <see cref="LayoutEnumeration"/> layout to apply </param>
         public void ApplySpecifiedLayout(LayoutEnumeration layout)
         {
             if (layout == LayoutEnumeration.Circular)
@@ -180,8 +164,8 @@ namespace CDP4Grapher.Behaviors
         /// <summary>
         /// Apply the desired layout specified
         /// </summary>
-        /// <param name="layout">the <see cref="LayoutEnumeration"/> layout to apply </param>
-        /// <param name="direction">the value holding the direction of the layout</param>
+        /// <param name="layout">The <see cref="LayoutEnumeration"/> layout to apply </param>
+        /// <param name="direction">The value holding the direction of the layout</param>
         /// <typeparam name="T">The devexpress enum type needed by the layouts Fugiyama, TipOver, Tree and Mind map </typeparam>
         public void ApplySpecifiedLayout<T>(LayoutEnumeration layout, T direction) where T : Enum
         {
@@ -210,8 +194,8 @@ namespace CDP4Grapher.Behaviors
         /// <summary>
         /// Raises when the item collection has changed
         /// </summary>
-        /// <param name="sender">the sender</param>
-        /// <param name="e">the argument</param>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The event arguments</param>
         public void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
             if (e.Item is DiagramContentItem diagramContentItem && e.Action == ItemsChangedAction.Added)
@@ -226,8 +210,8 @@ namespace CDP4Grapher.Behaviors
         /// <summary>
         /// Injects the behaviour into the viewmodel.
         /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The arguments.</param>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The event arguments</param>
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (this.AssociatedObject.DataContext is IGrapherViewModel viewModel)
@@ -240,10 +224,10 @@ namespace CDP4Grapher.Behaviors
         /// <summary>
         /// Adds connector to the provided <see cref="DiagramContentItem"/>
         /// </summary>
-        /// <param name="diagramContentItemToConnectTo">the end <see cref="DiagramContentItem"/> to connect to</param>
+        /// <param name="diagramContentItemToConnectTo">The end <see cref="DiagramContentItem"/> to connect to</param>
         public void AddConnector(DiagramContentItem diagramContentItemToConnectTo)
         {
-            var thing = (diagramContentItemToConnectTo.Content as GraphElementViewModel)?.Thing as NestedElement;
+            var thing = (diagramContentItemToConnectTo.Content as GraphElementViewModel)?.Thing;
 
             if (this.DetermineBeginItemToConnectFrom(thing) is { } beginItem && beginItem != diagramContentItemToConnectTo)
             {
@@ -266,8 +250,8 @@ namespace CDP4Grapher.Behaviors
         /// <summary>
         /// Determine the direct parent element in the tree
         /// </summary>
-        /// <param name="thing">the element to connect to</param>
-        /// <returns>returns a <see cref="DiagramItem"/></returns>
+        /// <param name="thing">The element to connect to</param>
+        /// <returns>A <see cref="DiagramItem"/></returns>
         private DiagramItem DetermineBeginItemToConnectFrom(NestedElement thing)
         {
             ElementDefinition theThingElementUsageParent = null;
@@ -289,7 +273,7 @@ namespace CDP4Grapher.Behaviors
         /// <returns> a <see cref="string"/> containing the short name</returns>
         private static string GetShortName(DiagramContentItem diagramContentItem)
         {
-            if ((diagramContentItem.Content as GraphElementViewModel)?.Thing is NestedElement element)
+            if ((diagramContentItem.Content as GraphElementViewModel)?.Thing is { } element)
             {
                 return element.IsRootElement ? element.ShortName : element.ElementUsage.Last().ElementDefinition.ShortName;
             }

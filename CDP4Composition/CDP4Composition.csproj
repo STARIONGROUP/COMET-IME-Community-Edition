@@ -1296,8 +1296,8 @@
     <Compile Update="Views\BrowserHeader.xaml.cs">
       <DependentUpon>BrowserHeader.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\CommonThingControl - Copy.xaml.cs">
-      <DependentUpon>CommonThingControl.xaml</DependentUpon>
+    <Compile Update="Views\ElementParameterRowControl.xaml.cs">
+      <DependentUpon>ElementParameterRowControl.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\CommonThingControl.xaml.cs">
       <DependentUpon>CommonThingControl.xaml</DependentUpon>

@@ -25,7 +25,6 @@
 
 namespace CDP4Grapher.Views
 {
-    using System.Windows;
     using System.Windows.Controls;
 
     using CDP4Composition;

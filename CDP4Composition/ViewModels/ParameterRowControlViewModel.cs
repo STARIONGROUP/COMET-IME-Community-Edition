@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterRowControlViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -178,11 +178,12 @@ namespace CDP4Composition.ViewModels
         private void UpdateProperties()
         {
             var valueSet = this.GetValueSet();
+
             this.Name = this.Parameter.ParameterType.Name;
             this.ShortName = this.Parameter.ParameterType.ShortName;
-            this.Value = $"{valueSet.Published.FirstOrDefault()} [{this.Parameter.Scale.ShortName}]";
+            this.Value = $"{valueSet?.Published.FirstOrDefault()} [{this.Parameter.Scale.ShortName}]";
             this.OwnerShortName = this.Parameter.Owner.ShortName;
-            this.Switch = valueSet.ValueSwitch.ToString();
+            this.Switch = valueSet?.ValueSwitch.ToString();
             this.Description = "-";
             this.ModelCode = this.Parameter.ModelCode();
             this.RowType = this.Parameter.ClassKind.ToString();

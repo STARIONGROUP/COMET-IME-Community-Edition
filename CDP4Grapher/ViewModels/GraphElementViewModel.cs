@@ -30,17 +30,11 @@ namespace CDP4Grapher.ViewModels
     using System.Reactive.Linq;
     using System.Text;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition.Utilities;
-
     using CDP4Dal;
     using CDP4Dal.Events;
-
-    using DevExpress.Mvvm.Native;
-    using DevExpress.Xpf.NavBar;
 
     using ReactiveUI;
 
@@ -82,7 +76,7 @@ namespace CDP4Grapher.ViewModels
         /// <summary>
         /// Holds the actual option
         /// </summary>
-        private Option actualOption;
+        private readonly Option actualOption;
 
         /// <summary>
         /// Gets this respresented <see cref="NestedElement"/> Path
