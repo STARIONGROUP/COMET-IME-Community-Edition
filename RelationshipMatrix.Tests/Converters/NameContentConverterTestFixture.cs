@@ -1,20 +1,18 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="NameContentConverterTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2018-2019 RHEA System S.A.
+//   Copyright (c) 2018-2020 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4RelationshipMatrix.Tests.Converters
 {
     using System;
-    using System.Dynamic;
-    using System.Windows;
+
     using CDP4RelationshipMatrix.Converters;
+
     using DevExpress.Xpf.Grid;
-    using DevExpress.Xpf.Grid.Native;
     using Moq;
     using NUnit.Framework;
-    using ViewModels;
 
     /// <summary>
     /// Suite of tests for the <see cref="NameContentConverter"/>
@@ -39,7 +37,8 @@ namespace CDP4RelationshipMatrix.Tests.Converters
         public void AssertThatConverterWorks()
         {
             Assert.Throws<NotSupportedException>(() => this.converter.ConvertBack(null, null, null, null));
-            Assert.IsNull(this.converter.Convert(null, null, null, null));
+            Assert.IsNull(this.converter.Convert(It.IsAny<object[]>(), null, null, null));
+            Assert.IsNull(this.converter.Convert(new[] { It.IsAny<RowData>() }, null, null, null));
         }
     }
 }

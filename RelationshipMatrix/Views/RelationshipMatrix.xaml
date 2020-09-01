@@ -70,13 +70,18 @@
             <DataTemplate x:Key="NameTemplate">
                 <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
                     <TextBlock x:Name="PART_Editor"
-                               Text="{Binding Converter={StaticResource NameContentConverter}}"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                TextWrapping="Wrap"
                                Margin="5"
                                FontWeight="Bold"
                                TextAlignment="Center">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource NameContentConverter}">
+                                <Binding />
+                                <Binding Path="RowData.Row" />
+                            </MultiBinding>
+                        </TextBlock.Text>
                         <TextBlock.Resources>
                             <Style x:Key="RowToolTipStyle">
                                 <Setter Property="TextBlock.TextAlignment" Value="Left" />
@@ -92,11 +97,13 @@
                     </TextBlock>
                 </Grid>
             </DataTemplate>
+
             <DataTemplate x:Key="None">
                 <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
                 </Grid>
             </DataTemplate>
-                <DataTemplate x:Key="HeaderColumnTemplate">
+
+            <DataTemplate x:Key="HeaderColumnTemplate">
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                       Background="{Binding Path=IsHighlighted, Converter={StaticResource BooleanToHighlightConverter}}">
                     <Grid.Width>
@@ -196,6 +203,7 @@
                                                    HorizontalScrollbarVisibility="Auto"
                                                    VerticalScrollbarVisibility="Auto"
                                                    ScrollingMode="Normal"
+                                                   AllowHorizontalScrollingVirtualization="True"
                                                    AllowColumnFiltering="False"
                                                    AllowGrouping="False"
                                                    AllowSorting="False">
