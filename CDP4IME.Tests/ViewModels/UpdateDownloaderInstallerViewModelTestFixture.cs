@@ -422,13 +422,11 @@ namespace CDP4IME.Tests.ViewModels
             var mockedPluginRow = new Mock<IPluginRowViewModel>();
             mockedPluginRow.Setup(x => x.Download(this.updateServerClient.Object)).Throws<UnauthorizedAccessException>();
             mockedPluginRow.Setup(x => x.IsSelected).Returns(true);
-            mockedPluginRow.Setup(x => x.HandlingCancelationOfDownload());
             mockedPluginRow.Setup(x => x.FileSystem).Returns(this.UpdateFileSystem);
 
             var mockedImeRow = new Mock<IImeRowViewModel>();
             mockedImeRow.Setup(x => x.Download(this.updateServerClient.Object)).Throws<UnauthorizedAccessException>();
             mockedImeRow.Setup(x => x.IsSelected).Returns(true);
-            mockedImeRow.Setup(x => x.HandlingCancelationOfDownload());
             mockedImeRow.Setup(x => x.FileSystem).Returns(this.UpdateFileSystem);
 
             var vm = new UpdateDownloaderInstallerViewModel(false)
