@@ -29,6 +29,7 @@ namespace CDP4Grapher.Behaviors
     using System;
 
     using CDP4Grapher.Utilities;
+    using CDP4Grapher.ViewModels;
 
     using DevExpress.Diagram.Core;
 
@@ -61,5 +62,16 @@ namespace CDP4Grapher.Behaviors
         /// Applies the saved layout from <see cref="CurrentLayout"/>
         /// </summary>
         void ApplyPreviousLayout();
+
+        /// <summary>
+        /// Isolate the Element under the mouse if any and display only the under it
+        /// </summary>
+        /// <returns>An assert whether isolation is on</returns>
+        bool Isolate();
+        
+        /// <summary>
+        /// Exits the isolation
+        /// </summary>
+        void ExitIsolation();
     }
 }

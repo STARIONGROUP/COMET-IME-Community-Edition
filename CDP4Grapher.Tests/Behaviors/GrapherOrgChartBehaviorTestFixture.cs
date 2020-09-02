@@ -27,15 +27,17 @@ namespace CDP4Grapher.Tests.Behaviors
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading;
-    using System.Windows.Data;
+    using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Types;
 
     using CDP4Composition.Navigation;
+    using CDP4Composition.ViewModels;
 
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Tests.Data;
@@ -45,8 +47,6 @@ namespace CDP4Grapher.Tests.Behaviors
 
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
-    using DevExpress.Mvvm.Native;
-    using DevExpress.Xpf.Charts;
     using DevExpress.Xpf.Diagram;
 
     using Microsoft.Practices.ServiceLocation;
@@ -67,40 +67,47 @@ namespace CDP4Grapher.Tests.Behaviors
         private List<GraphElementViewModel> elementViewModels;
         private Mock<IGrapherViewModel> grapherViewModel;
         private Mock<IServiceLocator> serviceLocator;
+        private Mock<IHaveContextMenu> contextMenu;
 
         [SetUp]
         public override void Setup()
         {
             base.Setup();
-
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            
             this.elementViewModels = new List<GraphElementViewModel>()
             {
                 new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
                 {
                     RootElement = this.ElementDefinition1,
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage }
-                }),
+                }, this.Option),
 
                 new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
                 {
+                    RootElement = this.ElementDefinition1,
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage, this.ElementUsage1 }
-                }),
+                }, this.Option),
 
                 new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
                 {
+                    RootElement = this.ElementDefinition1,
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage, this.ElementUsage1, this.ElementUsage2 }
-                })
+                }, this.Option)
             };
 
+            this.contextMenu = new Mock<IHaveContextMenu>();
             this.behavior = new GrapherOrgChartBehavior();
             this.grapherViewModel = new Mock<IGrapherViewModel>();
             this.grapherViewModel.Setup(x => x.GraphElements).Returns(new ReactiveList<GraphElementViewModel>(this.elementViewModels));
             this.grapherViewModel.Setup(x => x.Behavior).Returns(this.behavior);
+            this.grapherViewModel.Setup(x => x.Isolate(It.IsAny<GraphElementViewModel>()));
+            this.grapherViewModel.Setup(x => x.DiagramContextMenuViewModel).Returns(this.contextMenu.Object);
             this.saveFileDialog = new Mock<IOpenSaveFileDialogService>();
             this.saveFileDialog.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>())).Returns(string.Empty);
             this.serviceLocator = new Mock<IServiceLocator>();
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.saveFileDialog.Object);
-            ServiceLocator.SetLocatorProvider(() =>this.serviceLocator.Object);
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
         }
 
         [TearDown]
@@ -117,13 +124,13 @@ namespace CDP4Grapher.Tests.Behaviors
             Assert.IsTrue(this.behavior.CurrentLayout != default);
             Assert.AreSame(this.behavior.AssociatedObject, diagramControl);
         }
-
+        
         [Test]
         public void VerifyExport()
         {
             this.behavior.Attach(new GrapherDiagramControl());
             this.behavior.ExportGraph(DiagramExportFormat.JPEG);
-            this.saveFileDialog.Verify(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>() , It.IsAny<int>()), Times.Once);
+            this.saveFileDialog.Verify(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
         }
 
         [Test]
@@ -182,6 +189,16 @@ namespace CDP4Grapher.Tests.Behaviors
             {
                 this.behavior.ItemsChanged(null, new DiagramItemsChangedEventArgs(diagramControl, new DiagramContentItem() { Content = elementViewModel }, ItemsChangedAction.Added));
             }
+        }
+
+        [Test]
+        public void VerifyIsolate()
+        {
+            this.behavior.Attach(new GrapherDiagramControl() { DataContext = this.grapherViewModel.Object });
+            Assert.IsFalse(this.behavior.Isolate());
+            this.contextMenu.Setup(x => x.HoveredElement).Returns(this.elementViewModels.Last());
+            Assert.IsTrue(this.behavior.Isolate());
+            this.grapherViewModel.Verify(x => x.Isolate(It.IsAny<GraphElementViewModel>()), Times.Once);
         }
     }
 }

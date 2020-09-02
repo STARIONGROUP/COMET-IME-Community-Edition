@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IHaveContextMenu.cs" company="RHEA System S.A.">
+// <copyright file="ElementParameterRowControl.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,34 +23,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Grapher.ViewModels
+namespace CDP4Composition.Views
 {
-    using System.Collections.Generic;
-
-    using CDP4Grapher.Behaviors;
-
-    using DevExpress.Xpf.Bars;
-    using DevExpress.Xpf.Diagram;
-
     /// <summary>
-    /// Define a class that has a <see cref="List{IBarManagerControllerAction}"/> that can be use to override DiagramControl ContextMenu.
-    /// Using <see cref="DiagramControl.CreateContextMenu"/>
+    /// Interaction logic for CommonThingControl
     /// </summary>
-    public interface IHaveContextMenu
+    public partial class ElementParameterRowControl
     {
         /// <summary>
-        /// Holds the <see cref="BarButtonItem"/> and <see cref="BarSubItem"/> representing an overridable diagram Context Menu
+        /// Initializes a new instance of the <see cref="ElementParameterRowControl"/> class.
         /// </summary>
-        List<IBarManagerControllerAction> ContextMenu { get; }
-        
-        /// <summary>
-        /// Gets or sets the attached behavior
-        /// </summary>
-        IGrapherOrgChartBehavior Behavior { get; set; }
-
-        /// <summary>
-        /// Gets or sets the under the mouse element <see cref="GraphElementViewModel"/>
-        /// </summary>
-        GraphElementViewModel HoveredElement { get; set; }
+        public ElementParameterRowControl()
+        {
+            this.InitializeComponent();
+        }
     }
 }

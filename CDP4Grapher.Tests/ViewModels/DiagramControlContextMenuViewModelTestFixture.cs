@@ -31,6 +31,9 @@ namespace CDP4Grapher.Tests.ViewModels
     using System.Reactive.Concurrency;
     using System.Threading;
 
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
@@ -49,11 +52,18 @@ namespace CDP4Grapher.Tests.ViewModels
     public class DiagramControlContextMenuViewModelTestFixture
     {
         private Mock<IGrapherOrgChartBehavior> behavior;
+        private Option option;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.option = new Option()
+            {
+                Name = "test"
+            };
+
             this.behavior = new Mock<IGrapherOrgChartBehavior>();
             this.behavior.Setup(x => x.ExportGraph(It.IsAny<DiagramExportFormat>()));
             this.behavior.Setup(x => x.ApplySpecifiedLayout(It.IsAny<LayoutEnumeration>()));
@@ -65,10 +75,12 @@ namespace CDP4Grapher.Tests.ViewModels
         {
             var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object};
             Assert.IsNotEmpty(vm.ContextMenu);
-            Assert.AreEqual(3, vm.ContextMenu.Count);
+            Assert.AreEqual(4, vm.ContextMenu.Count);
             Assert.AreEqual(6, vm.ContextMenu.OfType<BarSubItem>().SelectMany(x => x.Items).Count());
             Assert.AreEqual(12, vm.ContextMenu.OfType<BarSubItem>().SelectMany(x => x.Items.OfType<BarSubItem>().SelectMany(s =>s.Items)).Count());
             Assert.IsNotNull(vm.Behavior);
+
+            Assert.IsNotNull(vm.IsolateCommand);
 
             Assert.IsNotNull(vm.ApplyTreeViewLayoutRightToLeft);
             Assert.IsNotNull(vm.ApplyTreeViewLayoutLeftToRight);
@@ -88,6 +100,8 @@ namespace CDP4Grapher.Tests.ViewModels
 
             Assert.IsNotNull(vm.ApplyCircularLayout);
             Assert.IsNotNull(vm.ApplyOrganisationalChartLayout);
+
+            Assert.IsNull(vm.HoveredElement);
         }
         
         [Test]
@@ -114,6 +128,38 @@ namespace CDP4Grapher.Tests.ViewModels
             this.behavior.Verify(x => x.ApplySpecifiedLayout(LayoutEnumeration.Fugiyama, Direction.Up), Times.Once);
             vm.ApplyCircularLayout.Execute(null);
             this.behavior.Verify(x => x.ApplySpecifiedLayout(LayoutEnumeration.Circular), Times.Once);
+        }
+
+        [Test]
+        public void VerifyIsolation()
+        {
+            this.behavior.Setup(x => x.ExitIsolation());
+            this.behavior.Setup(x => x.Isolate()).Returns(false);
+            var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object };
+            Assert.IsFalse(vm.IsolateCommand.CanExecute(null));
+
+            vm.HoveredElement = new GraphElementViewModel(new NestedElement()
+            {
+                RootElement = new ElementDefinition(),
+                ElementUsage =
+                {
+                    new ElementUsage() { Owner = new DomainOfExpertise(), ElementDefinition = new ElementDefinition() }
+                }
+            }, this.option);
+
+            Assert.IsTrue(vm.IsolateCommand.CanExecute(null));
+            vm.HoveredElement = null;
+            Assert.IsFalse(vm.IsolateCommand.CanExecute(null));
+
+            vm.IsolateCommand.Execute(null);
+            Assert.IsTrue(vm.CanIsolate);
+            this.behavior.Setup(x => x.Isolate()).Returns(true);
+            vm.IsolateCommand.Execute(null);
+            Assert.IsFalse(vm.CanIsolate);
+            vm.IsolateCommand.Execute(null);
+            Assert.IsTrue(vm.CanIsolate);
+            this.behavior.Verify(x => x.Isolate(), Times.Exactly(2));
+            this.behavior.Verify(x => x.ExitIsolation(), Times.Once);
         }
     }
 }
