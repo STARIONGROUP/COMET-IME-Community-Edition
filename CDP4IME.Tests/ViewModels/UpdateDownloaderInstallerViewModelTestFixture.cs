@@ -305,7 +305,7 @@ namespace CDP4IME.Tests.ViewModels
         /// </summary>
         /// <returns>The Task may fail on some system</returns>
         [Test]
-        public async Task VerifyCancellationToken()
+        public async Task aaa_NeedsToBeRunBeforeAllOtherTests_VerifyCancellationToken()
         {
             this.SetupTestContentForInstallationCancellationPurpose(this.UpdateFileSystem.InstallationPath.FullName);
 
@@ -345,6 +345,7 @@ namespace CDP4IME.Tests.ViewModels
         public async Task VerifyCancelDownload()
         {
             var vm = new UpdateDownloaderInstallerViewModel(true);
+            vm.Behavior = this.behavior.Object;
             vm.AvailablePlugins.First().IsSelected = true;
             vm.AvailableIme.First().IsSelected = true;
             Assert.IsTrue(vm.DownloadCommand.CanExecute(null));
