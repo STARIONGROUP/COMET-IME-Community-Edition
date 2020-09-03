@@ -102,9 +102,9 @@ namespace CDP4Grapher.ViewModels
         private const string PanelCaption = "Grapher";
 
         /// <summary>
-        /// Backing field for the <see cref="SelectedElementPath"/> Property
+        /// Backing field for the <see cref="SelectedElementModelCode"/> Property
         /// </summary>
-        private string selectedElementPath;
+        private string selectedElementModelCode;
 
         /// <summary>
         /// Gets or sets the attached behavior
@@ -148,12 +148,12 @@ namespace CDP4Grapher.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets the Selected Element Path
+        /// Gets or sets the selected element model code
         /// </summary>
-        public string SelectedElementPath
+        public string SelectedElementModelCode
         {
-            get => this.selectedElementPath;
-            set => this.RaiseAndSetIfChanged(ref this.selectedElementPath, value);
+            get => this.selectedElementModelCode;
+            set => this.RaiseAndSetIfChanged(ref this.selectedElementModelCode, value);
         }
 
         /// <summary>
@@ -268,7 +268,8 @@ namespace CDP4Grapher.ViewModels
         /// <param name="graphElement">The Graph Element</param>
         public void Isolate(GraphElementViewModel graphElement)
         {
-            var newTree = new NestedElementTreeGenerator().GenerateNestedElements(this.option, this.currentDomainOfExpertise, graphElement.Thing.ElementUsage.Last().ElementDefinition);
+            var newTree = new NestedElementTreeGenerator().GenerateNestedElements(this.option, this.currentDomainOfExpertise, graphElement.Thing.ElementUsage.Last().ElementDefinition)
+                .OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
             this.GraphElements.Clear();
             this.GraphElements.AddRange(newTree.Select(e => new GraphElementViewModel(e, this.option)));
         }
@@ -319,13 +320,13 @@ namespace CDP4Grapher.ViewModels
         }
         
         /// <summary>
-        /// Sets the selected element
+        /// Sets the selected element and the selected element model code
         /// </summary>
         /// <param name="element">The selected element</param>
         public void SetsSelectedElementAndSelectedElementPath(GraphElementViewModel element)
         {
             this.SelectedElement = new ElementParameterRowControlViewModel(element.NestedElementElement, this.option);
-            this.SelectedElementPath = element.ElementPath;
+            this.SelectedElementModelCode = element.ModelCode;
         }
     }
 }

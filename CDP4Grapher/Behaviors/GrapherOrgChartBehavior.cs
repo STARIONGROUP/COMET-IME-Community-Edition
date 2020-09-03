@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherOrgChartBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -235,7 +235,9 @@ namespace CDP4Grapher.Behaviors
                 {
                     BeginItem = beginItem,
                     BeginArrow = ArrowDescriptions.FilledDiamond,
+                    BeginArrowSize = new Size(20, 20),
                     EndArrow = ArrowDescriptions.IndentedFilledArrow,
+                    EndArrowSize = new Size(20, 20),
                     EndItem = diagramContentItemToConnectTo,
                     CanSelect = false,
                     CanMove = false,
@@ -354,7 +356,7 @@ namespace CDP4Grapher.Behaviors
         }
 
         /// <summary>
-        /// Isolate the Element under the mouse if any and display only the under it
+        /// Isolate the Element under the mouse if any and display only its children element and itself
         /// </summary>
         /// <returns>An assert whether isolation is on</returns>
         public bool Isolate()

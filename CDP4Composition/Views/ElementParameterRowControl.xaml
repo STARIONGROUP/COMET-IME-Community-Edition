@@ -4,38 +4,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-             xmlns:converters="clr-namespace:CDP4Composition.Converters"
              Name="ElementParameters"
              d:DesignHeight="300"
              d:DesignWidth="800"
              mc:Ignorable="d">
-    <UserControl.Resources>
-        <converters:NotConverter x:Key="NotConverter"></converters:NotConverter>
-    </UserControl.Resources>
-    <Grid>
+    <Grid Background="AliceBlue" >
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="7*"></RowDefinition>
         </Grid.RowDefinitions>
-        <StackPanel Margin="10,30,10,10" Grid.Row="0">
-            <StackPanel Orientation="Horizontal">
-                <Label FontWeight="Bold" Content="Owner: "></Label>
-                <Label Content="{Binding Owner}"></Label>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label FontWeight="Bold" Content="Category: "></Label>
-                <Label Content="{Binding Category}"></Label>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label FontWeight="Bold" Content="Model Code: "></Label>
-                <Label Content="{Binding ModelCode}"></Label>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label FontWeight="Bold" Content="Description: "></Label>
-                <Label Content="{Binding Description}"></Label>
-            </StackPanel>
-        </StackPanel>
-        <dxg:GridControl Grid.Row="1" AutoGenerateColumns="None"
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10,30,10,10" Grid.Row="0">
+            <Label Content="{Binding ElementTooltipInfo}"></Label>
+        </ScrollViewer>
+        <dxg:GridControl Grid.Row="1" AutoGenerateColumns="None"    
                          EnableSmartColumnsGeneration="False" 
                          ItemsSource="{Binding Parameters}">
             <dxg:GridControl.Columns>

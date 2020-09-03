@@ -48,23 +48,29 @@ namespace CDP4Grapher.Tests.ViewModels
         {
             var vm = new GraphElementViewModel(this.NestedElement, this.Option);
             Assert.AreSame(vm.Thing, this.NestedElement);
-            Assert.AreSame(vm.NestedElementElement, this.ElementUsage);
-            Assert.AreEqual(vm.Name, this.ElementUsage.Name);
-            Assert.AreEqual(vm.ShortName, this.ElementUsage.ShortName);
+            Assert.AreSame(vm.NestedElementElement, this.ElementUsage1);
+            Assert.AreEqual(vm.Name, this.ElementUsage1.Name);
+            Assert.AreEqual(vm.ShortName, this.ElementUsage1.ShortName);
             Assert.AreEqual(vm.OwnerShortName, this.Domain.ShortName);
+            Assert.IsNotNull(vm.ModelCode);
             Assert.AreNotEqual(vm.Category, "-");
             Assert.IsNotNull(vm.NestedElementElementListener);
+
+            this.NestedElement.ElementUsage.Clear();
+            var vmWithElementDefinition = new GraphElementViewModel(this.NestedElement, this.Option);
+            Assert.IsNotNull(vm.ModelCode);
+            Assert.AreNotEqual(vm.ModelCode, vmWithElementDefinition.ModelCode);
         }
         
         [Test]
         public void VerifyObjectChanged()
         {
             var vm = new GraphElementViewModel(this.NestedElement, this.Option);
-            Assert.AreEqual(vm.Name, this.ElementUsage.Name);
-            this.ElementUsage.Name = "ItHasNewNameNow";
+            Assert.AreEqual(vm.Name, this.ElementUsage1.Name);
+            this.ElementUsage1.Name = "ItHasNewNameNow";
             vm.RevisionNumber = -1;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.ElementUsage, EventKind.Updated);
-            Assert.AreEqual(vm.Name, this.ElementUsage.Name);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.ElementUsage1, EventKind.Updated);
+            Assert.AreEqual(vm.Name, this.ElementUsage1.Name);
         }
     }
 }
