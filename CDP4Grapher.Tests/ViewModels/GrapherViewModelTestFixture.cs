@@ -95,7 +95,7 @@ namespace CDP4Grapher.Tests.ViewModels
             Assert.IsNotNull(vm.CurrentModel);
             Assert.IsNotNull(vm.CurrentIteration);
             Assert.IsNotNull(vm.CurrentOption);
-            Assert.IsNull(vm.SelectedElementPath);
+            Assert.IsNull(vm.SelectedElementModelCode);
             Assert.IsNull(vm.SelectedElement);
         }
 
@@ -149,10 +149,10 @@ namespace CDP4Grapher.Tests.ViewModels
         public void SetsSelectedElementAndSelectedElementPath()
         {
             var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
-            Assert.IsNull(vm.SelectedElementPath);
+            Assert.IsNull(vm.SelectedElementModelCode);
             Assert.IsNull(vm.SelectedElement);
             vm.SetsSelectedElementAndSelectedElementPath(vm.GraphElements.FirstOrDefault());
-            Assert.IsNotNull(vm.SelectedElementPath);
+            Assert.IsNotNull(vm.SelectedElementModelCode);
             Assert.IsNotNull(vm.SelectedElement);
         }
     }
