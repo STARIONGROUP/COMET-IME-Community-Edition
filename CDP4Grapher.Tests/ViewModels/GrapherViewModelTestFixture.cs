@@ -129,7 +129,6 @@ namespace CDP4Grapher.Tests.ViewModels
         public void VerifyIsolate()
         {
             var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
-
             Assert.AreEqual(1, vm.GraphElements.Count);
             var newTrunk = vm.GraphElements.FirstOrDefault();
             Assert.Throws<InvalidOperationException>(() => vm.Isolate(newTrunk));

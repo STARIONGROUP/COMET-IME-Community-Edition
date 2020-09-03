@@ -259,7 +259,7 @@ namespace CDP4Grapher.ViewModels
         private void PopulateElementUsages()
         {
             var elements = new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
-            this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e, this.option)));
+            this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e)));
         }
 
         /// <summary>
@@ -270,8 +270,9 @@ namespace CDP4Grapher.ViewModels
         {
             var newTree = new NestedElementTreeGenerator().GenerateNestedElements(this.option, this.currentDomainOfExpertise, graphElement.Thing.ElementUsage.Last().ElementDefinition)
                 .OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
+            
             this.GraphElements.Clear();
-            this.GraphElements.AddRange(newTree.Select(e => new GraphElementViewModel(e, this.option)));
+            this.GraphElements.AddRange(newTree.Select(e => new GraphElementViewModel(e)));
         }
 
         /// <summary>

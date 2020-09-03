@@ -151,7 +151,7 @@ namespace CDP4Grapher.Tests.ViewModels
                         Owner = new DomainOfExpertise(), ElementDefinition = new ElementDefinition()
                     }
                 }
-            }, this.option);
+            });
 
             Assert.IsTrue(vm.IsolateCommand.CanExecute(null));
             vm.HoveredElement = null;

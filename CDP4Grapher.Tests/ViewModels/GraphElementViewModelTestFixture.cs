@@ -46,7 +46,7 @@ namespace CDP4Grapher.Tests.ViewModels
         [Test]
         public void VerifyProperties()
         {
-            var vm = new GraphElementViewModel(this.NestedElement, this.Option);
+            var vm = new GraphElementViewModel(this.NestedElement);
             Assert.AreSame(vm.Thing, this.NestedElement);
             Assert.AreSame(vm.NestedElementElement, this.ElementUsage1);
             Assert.AreEqual(vm.Name, this.ElementUsage1.Name);
@@ -57,7 +57,7 @@ namespace CDP4Grapher.Tests.ViewModels
             Assert.IsNotNull(vm.NestedElementElementListener);
 
             this.NestedElement.ElementUsage.Clear();
-            var vmWithElementDefinition = new GraphElementViewModel(this.NestedElement, this.Option);
+            var vmWithElementDefinition = new GraphElementViewModel(this.NestedElement);
             Assert.IsNotNull(vm.ModelCode);
             Assert.AreNotEqual(vm.ModelCode, vmWithElementDefinition.ModelCode);
         }
@@ -65,7 +65,7 @@ namespace CDP4Grapher.Tests.ViewModels
         [Test]
         public void VerifyObjectChanged()
         {
-            var vm = new GraphElementViewModel(this.NestedElement, this.Option);
+            var vm = new GraphElementViewModel(this.NestedElement);
             Assert.AreEqual(vm.Name, this.ElementUsage1.Name);
             this.ElementUsage1.Name = "ItHasNewNameNow";
             vm.RevisionNumber = -1;

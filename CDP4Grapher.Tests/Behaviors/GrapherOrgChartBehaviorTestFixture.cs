@@ -78,13 +78,13 @@ namespace CDP4Grapher.Tests.Behaviors
                 {
                     RootElement = this.ElementDefinition1,
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage1 }
-                }, this.Option),
+                }),
 
                 new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
                 {
                     RootElement = this.ElementDefinition1,
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage1, this.ElementUsage2 }
-                }, this.Option)
+                })
             };
 
             this.contextMenu = new Mock<IHaveContextMenu>();

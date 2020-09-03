@@ -74,11 +74,6 @@ namespace CDP4Grapher.ViewModels
         private string modelCode;
 
         /// <summary>
-        /// Holds the actual option
-        /// </summary>
-        private readonly Option actualOption;
-
-        /// <summary>
         /// Gets this respresented <see cref="NestedElement"/> Element Model Code
         /// </summary>
         public string ModelCode
@@ -142,11 +137,9 @@ namespace CDP4Grapher.ViewModels
         /// Instanciate a <see cref="GrapherViewModel"/> updating its property with the given <see cref="NestedElement"/> property
         /// </summary>
         /// <param name="nestedElement">The represented nested element</param>
-        /// <param name="actualOption">The option</param>
-        public GraphElementViewModel(NestedElement nestedElement, Option actualOption)
+        public GraphElementViewModel(NestedElement nestedElement)
         {
             this.Thing = nestedElement;
-            this.actualOption = actualOption;
             this.NestedElementElement = (ElementBase) nestedElement.ElementUsage.LastOrDefault() ?? nestedElement.RootElement;
 
             if (nestedElement.ElementUsage.LastOrDefault() is { } elementUsage)
