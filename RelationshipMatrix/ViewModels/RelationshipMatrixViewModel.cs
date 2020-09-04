@@ -141,19 +141,6 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private bool isSourceXSelected;
 
-
-        public bool IsSourceXSelected
-        {
-            get { return this.isSourceXSelected; }
-            private set { this.RaiseAndSetIfChanged(ref this.isSourceXSelected, value); }
-        }
-
-        public bool IsSourceYSelected
-        {
-            get { return this.isSourceYSelected; }
-            private set { this.RaiseAndSetIfChanged(ref this.isSourceYSelected, value); }
-        }
-
         /// <summary>
         /// Backing field for <see cref="SourceYConfiguration" />
         /// </summary>
@@ -463,6 +450,24 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the source Category from X-Axis is selected
+        /// </summary>
+        public bool IsSourceXSelected
+        {
+            get { return this.isSourceXSelected; }
+            private set { this.RaiseAndSetIfChanged(ref this.isSourceXSelected, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the source Category from Y-Axis is selected
+        /// </summary>
+        public bool IsSourceYSelected
+        {
+            get { return this.isSourceYSelected; }
+            private set { this.RaiseAndSetIfChanged(ref this.isSourceYSelected, value); }
+        }
+
+        /// <summary>
         /// Reloads the saved configurations.
         /// </summary>
         private void ReloadSavedConfigurations()
@@ -601,7 +606,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.WhenAnyValue(x => x.ShowDirectionality).Subscribe(_ => this.BuildRelationshipMatrix());
             this.WhenAnyValue(x => x.ShowRelatedOnly).Subscribe(_ => this.BuildRelationshipMatrix());
 
-            this.WhenAnyValue(x => x.SourceYConfiguration.SelectedCategories).Subscribe(x => this.IsSourceYSelected=x.Any());
+            this.WhenAnyValue(x => x.SourceYConfiguration.SelectedCategories).Subscribe(x => this.IsSourceYSelected = x.Any());
             this.WhenAnyValue(x => x.SourceXConfiguration.SelectedCategories).Subscribe(x => this.IsSourceXSelected = x.Any());
 
             this.WhenAny(x => x.SelectedSavedConfiguration, vm => vm.Value != null)

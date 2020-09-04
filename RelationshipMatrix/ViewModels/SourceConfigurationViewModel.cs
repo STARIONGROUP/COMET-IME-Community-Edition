@@ -34,6 +34,9 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using DevExpress.CodeParser;
+
     using ReactiveUI;
     using Settings;
 
@@ -124,7 +127,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             // default boolean operator is AND
             this.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.AND;
-            this.IncludeSubcategories = true;
+            this.IncludeSubcategories = false;
 
             this.WhenAnyValue(x => x.SelectedClassKind).Skip(1).Subscribe(_ =>
             {
@@ -148,7 +151,12 @@ namespace CDP4RelationshipMatrix.ViewModels
                 this.OnLightUpdateAction();
             });
 
-            this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
+            this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ =>
+            {
+                this.OnLightUpdateAction();
+                this.SelectCategoryWithIncludeSubcategories();
+            });
+
             this.WhenAnyValue(x => x.SelectedOwners).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
             this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
             this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
@@ -160,6 +168,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 .Subscribe(_ => {
                     this.PopulatePossibleCategories();
                     this.OnLightUpdateAction();
+                    this.SelectCategoryWithIncludeSubcategories();
                 });
 
             this.Disposables.Add(categorySubscription);
@@ -352,6 +361,26 @@ namespace CDP4RelationshipMatrix.ViewModels
             var engineeringModel = this.Iteration.TopContainer as EngineeringModel;
             var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
             this.PossibleOwners.AddRange(domains);
+        }
+
+        /// <summary>
+        /// Populates the selected <see cref="Category"/> accordingly to the IncludeSubcategories value
+        /// </summary>
+        private void SelectCategoryWithIncludeSubcategories()
+        {
+            if (this.IncludeSubcategories)
+            {
+                var categories = new List<Category>();
+                foreach (var item in this.SelectedCategories)
+                {
+                    categories.Add(item);
+                    var category = this.PossibleCategories.Where(x => x.SuperCategory.Any(z => z.Name == item.Name)).ToList();
+                    categories.AddRange(category);
+                }
+
+                this.SelectedCategories.Clear();
+                this.SelectedCategories.AddRange(categories);
+            }
         }
     }
 }
