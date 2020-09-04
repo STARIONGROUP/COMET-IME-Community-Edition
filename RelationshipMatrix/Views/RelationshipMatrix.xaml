@@ -17,6 +17,7 @@
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
              xmlns:settings="clr-namespace:CDP4RelationshipMatrix.Settings"
+             xmlns:converters1="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              d:DesignHeight="800"
              d:DesignWidth="800"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
@@ -34,6 +35,7 @@
             <converters:ColumnWidthConverter x:Key="ColumnWidthConverter" />
             <converters:NameContentConverter x:Key="NameContentConverter" />
             <converters:BooleanToHighlightConverter x:Key="BooleanToHighlightConverter"/>
+            <converters1:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:TooltipConverter x:Key="TooltipConverter" />
             <converters:DeprecatedBackgroundConverter x:Key="DeprecatedBackgroundConverter" />
             <converters:DeprecatedOpacityConverter x:Key="DeprecatedOpacityConverter" />
@@ -428,6 +430,8 @@
                                                 <dxlc:LayoutItem Label=" ">
                                                     <dxe:ListBoxEdit 
                                                             MinHeight="24"
+                                                            MaxHeight="80"
+                                                            Visibility="{Binding IsSourceXSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                             ItemsSource="{Binding SourceXConfiguration.SelectedCategories, 
                                                                           Mode=TwoWay,
                                                                           UpdateSourceTrigger=PropertyChanged,
@@ -531,6 +535,8 @@
                                                 <dxlc:LayoutItem Label=" ">
                                                     <dxe:ListBoxEdit 
                                                         MinHeight="24"
+                                                        MaxHeight="80"
+                                                        Visibility="{Binding IsSourceYSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                         ItemsSource="{Binding SourceYConfiguration.SelectedCategories, 
                                                                           Mode=TwoWay,
                                                                           UpdateSourceTrigger=PropertyChanged,
