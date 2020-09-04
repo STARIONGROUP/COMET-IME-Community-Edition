@@ -69,22 +69,17 @@ namespace CDP4Grapher.ViewModels
         private string category = "-";
 
         /// <summary>
-        /// Backing field the <see cref="ElementPath"/>
+        /// Backing field the <see cref="ModelCode"/>
         /// </summary>
-        private string elementPath;
+        private string modelCode;
 
         /// <summary>
-        /// Holds the actual option
+        /// Gets this respresented <see cref="NestedElement"/> Element Model Code
         /// </summary>
-        private readonly Option actualOption;
-
-        /// <summary>
-        /// Gets this respresented <see cref="NestedElement"/> Path
-        /// </summary>
-        public string ElementPath
+        public string ModelCode
         {
-            get => this.elementPath;
-            private set => this.RaiseAndSetIfChanged(ref this.elementPath, value);
+            get => this.modelCode;
+            private set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
         }
 
         /// <summary>
@@ -142,47 +137,26 @@ namespace CDP4Grapher.ViewModels
         /// Instanciate a <see cref="GrapherViewModel"/> updating its property with the given <see cref="NestedElement"/> property
         /// </summary>
         /// <param name="nestedElement">The represented nested element</param>
-        /// <param name="actualOption">The option</param>
-        public GraphElementViewModel(NestedElement nestedElement, Option actualOption)
+        public GraphElementViewModel(NestedElement nestedElement)
         {
             this.Thing = nestedElement;
-            this.actualOption = actualOption;
             this.NestedElementElement = (ElementBase) nestedElement.ElementUsage.LastOrDefault() ?? nestedElement.RootElement;
-            this.RegisterSubscriptions();
-            this.UpdateProperties();
-        }
 
-        /// <summary>
-        /// Computes the full path of the element
-        /// </summary>
-        /// <returns>The element path</returns>
-        private string ComputePath()
-        {
-            var elementPathStringBuilder = new StringBuilder();
-            elementPathStringBuilder.Append($"{this.actualOption.ShortName}.");
-
-            if (this.NestedElementElement is ElementDefinition elementDefinition)
+            if (nestedElement.ElementUsage.LastOrDefault() is { } elementUsage)
             {
-                elementPathStringBuilder.Append(elementDefinition.ShortName);
+                this.NestedElementElement = elementUsage;
+                this.ModelCode = elementUsage.ModelCode();
             }
             else
             {
-                elementPathStringBuilder.Append($"{this.Thing.RootElement.ShortName}.");
-
-                foreach (ElementUsage element in this.Thing.ElementUsage)
-                {
-                    elementPathStringBuilder.Append($"{element.Name}");
-
-                    if (element != this.Thing.ElementUsage.Last())
-                    {
-                        elementPathStringBuilder.Append('.');
-                    }
-                }
+                this.NestedElementElement = nestedElement.RootElement;
+                this.ModelCode = nestedElement.RootElement.ModelCode();
             }
 
-            return elementPathStringBuilder.ToString();
+            this.RegisterSubscriptions();
+            this.UpdateProperties();
         }
-
+        
         /// <summary>
         /// Update all properties value
         /// </summary>
@@ -194,7 +168,6 @@ namespace CDP4Grapher.ViewModels
             this.OwnerShortName = this.NestedElementElement.Owner.ShortName;
             var categories = this.NestedElementElement.GetAllCategoryShortNames();
             this.Category = string.IsNullOrWhiteSpace(categories) ? "-" : categories;
-            this.ElementPath = this.ComputePath();
         }
 
         /// <summary>

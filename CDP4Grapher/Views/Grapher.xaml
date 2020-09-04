@@ -26,13 +26,17 @@
         <dxdo:LayoutGroup AllowSplitters="True" Orientation="Horizontal">
             <dxdo:LayoutGroup ItemWidth="7*" Orientation="Vertical">
                 <dxdo:LayoutPanel AllowClose="False" VerticalAlignment="Stretch">
-                    <Grid>
+                    <Grid Background="AliceBlue">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="*"></RowDefinition>
                         </Grid.RowDefinitions>
                         <views:BrowserHeader IsOptionDependant="True"/>
-                        <views1:GrapherDiagramControl Grid.Row="1" x:Name="diagramControl">
+
+                        <TextBlock Grid.Row="1" Margin="5,10,5,10" TextAlignment="Center" Foreground="Black" FontSize="18" VerticalAlignment="Center" Background="AliceBlue" Text="{Binding SelectedElementModelCode}" HorizontalAlignment="Stretch"></TextBlock>
+
+                        <views1:GrapherDiagramControl Grid.Row="2" x:Name="diagramControl">
                             <dxmvvm:Interaction.Behaviors>
                                 <behaviors:GrapherOrgChartBehavior 
                                     ParentMember="ParentId" 
@@ -56,19 +60,9 @@
                 </dxdo:LayoutPanel>
             </dxdo:LayoutGroup>
             <dxdo:LayoutGroup  ItemWidth="3*" Orientation="Vertical">
-
-                    <dxdo:LayoutPanel AllowClose="False" VerticalAlignment="Stretch">
-
-                        <Grid Background="AliceBlue">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition Height="*"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <TextBlock Margin="5,27,5,27" TextAlignment="Center" Foreground="Black" FontSize="18" VerticalAlignment="Center" Background="AliceBlue" Text="{Binding SelectedElementPath}" HorizontalAlignment="Stretch"></TextBlock>
-
-                                <views:ElementParameterRowControl Grid.Row="1" DataContext="{Binding SelectedElement}"></views:ElementParameterRowControl>
-                            </Grid>
-                    </dxdo:LayoutPanel>
+                <dxdo:LayoutPanel AllowClose="False" VerticalAlignment="Stretch">
+                    <views:ElementParameterRowControl DataContext="{Binding SelectedElement}"></views:ElementParameterRowControl>
+                </dxdo:LayoutPanel>
             </dxdo:LayoutGroup>
         </dxdo:LayoutGroup>
     </dxdo:DockLayoutManager>

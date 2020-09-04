@@ -32,6 +32,7 @@ namespace CDP4Composition.Tests.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
@@ -102,11 +103,8 @@ namespace CDP4Composition.Tests.ViewModels
             Assert.AreSame(vm.Element, this.elementDefinition);
             Assert.AreSame(vm.ActualOption, this.option);
             Assert.AreSame(vm.Element, this.elementDefinition);
-            Assert.IsNotEmpty(vm.ModelCode);
-            Assert.AreEqual(vm.Category, "-");
             Assert.AreEqual(vm.Parameters.Count, this.elementDefinition.Parameter.Count);
-            Assert.AreEqual(vm.Definition, ": -");
-            Assert.AreSame(vm.Owner, "NA");
+            Assert.AreEqual(this.elementDefinition.Tooltip(), vm.ElementTooltipInfo);
 
             var firstParameter = vm.Parameters.FirstOrDefault();
             Assert.IsNotNull(firstParameter);

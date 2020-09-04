@@ -64,7 +64,7 @@ namespace CDP4Grapher.Behaviors
         void ApplyPreviousLayout();
 
         /// <summary>
-        /// Isolate the Element under the mouse if any and display only the under it
+        /// Isolate the Element under the mouse if any and display only its children element and itself
         /// </summary>
         /// <returns>An assert whether isolation is on</returns>
         bool Isolate();

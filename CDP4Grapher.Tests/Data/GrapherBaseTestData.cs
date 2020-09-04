@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherBaseTestData.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
@@ -71,15 +71,7 @@ namespace CDP4Grapher.Tests.Data
             {
                 ShortName = "test"
             };
-
-            this.ElementUsage = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
-            {
-                Name = "testName",
-                ShortName = "testShortName",
-                Owner = this.Domain,
-                Category = new List<Category>() { new Category(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { ShortName = "Test" } }
-            };
-
+            
             this.Person = new Person(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 DefaultDomain = this.Domain
@@ -94,11 +86,20 @@ namespace CDP4Grapher.Tests.Data
 
             this.SetupElements();
 
+            this.ElementUsage = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
+            {
+                Name = "testName",
+                ShortName = "testShortName",
+                Owner = this.Domain,
+                ElementDefinition = this.ElementDefinition1,
+                Category = new List<Category>() { new Category(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { ShortName = "Test" } }
+            };
+
             this.NestedElement = new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
             {
                 RootElement = this.TopElement,
                 Container = this.Option,
-                ElementUsage = new OrderedItemList<ElementUsage>(null) { this.ElementUsage }
+                ElementUsage = new OrderedItemList<ElementUsage>(null) { this.ElementUsage1 }
             };
 
             this.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
@@ -135,13 +136,18 @@ namespace CDP4Grapher.Tests.Data
 
         private void SetupElements()
         {
-            this.TopElement = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.Option };
+            this.TopElement = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Name = "TopElement", ShortName = "TopElement", Owner = this.Domain, Container = this.Option };
 
-            this.ElementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.TopElement };
-            this.ElementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.TopElement };
-            this.ElementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, Container = this.TopElement };
+            this.ElementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Name = "ElementDefinition1", ShortName = "ElementDefinition1", Owner = this.Domain, Container = this.TopElement };
+            this.ElementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Name = "ElementDefinition2", ShortName = "ElementDefinition2", Owner = this.Domain, Container = this.TopElement };
+            this.ElementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Name = "ElementDefinition3", ShortName = "ElementDefinition3", Owner = this.Domain, Container = this.TopElement };
 
-            this.ElementUsage1 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.TopElement, Container = this.TopElement };
+            this.ElementUsage1 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) 
+            {
+                Owner = this.Domain, ElementDefinition = this.TopElement, Container = this.ElementDefinition1,
+                Category = new List<Category>() { new Category(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { ShortName = "Test" } }
+            };
+
             this.ElementUsage2 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition2, Container = this.ElementDefinition2 };
             this.ElementUsage3 = new ElementUsage(Guid.NewGuid(), this.Assembler.Cache, this.Uri) { Owner = this.Domain, ElementDefinition = this.ElementDefinition3, Container = this.ElementDefinition3 };
         }
