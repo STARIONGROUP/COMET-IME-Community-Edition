@@ -29,7 +29,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <converters:OrderedCategoryListConverter x:Key="OrderedCategoryListConverter" />
-            <converters:OrderedCategoryNameListConverter x:Key="OrderedCategoryNameListConverter" />
             <converters:OrderedDomainOfExpertiseListConverter x:Key="OrderedDomainOfExpertiseListConverter" />
             <converters:ColumnFixedConverter x:Key="ColumnFixedConverter" />
             <converters:ColumnWidthConverter x:Key="ColumnWidthConverter" />
@@ -404,7 +403,7 @@
                                                         <dxe:ComboBoxEdit
                                                                 Grid.Column="0"
                                                                 EditValue="{Binding SourceXConfiguration.SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OrderedCategoryListConverter}}"
-                                                                ItemsSource="{Binding SourceXConfiguration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                ItemsSource="{Binding SourceXConfiguration.PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged }"
                                                                 AutoComplete="True"
                                                                 AllowNullInput="True"
                                                                 AllowDefaultButton="True"
@@ -431,11 +430,9 @@
                                                     <dxe:ListBoxEdit 
                                                             MinHeight="24"
                                                             MaxHeight="80"
-                                                            Visibility="{Binding IsSourceXSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                            ItemsSource="{Binding SourceXConfiguration.SelectedCategories, 
-                                                                          Mode=TwoWay,
-                                                                          UpdateSourceTrigger=PropertyChanged,
-                                                                          Converter={StaticResource OrderedCategoryNameListConverter}}"/>
+                                                            Visibility="{Binding SourceXConfiguration.IsSourceXSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                            ItemsSource="{Binding SourceXConfiguration.SelectedCategoriesWithSubcategories, 
+                                                                          Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                                                 </dxlc:LayoutItem>
                                                 <dxlc:LayoutItem Label="Owners: ">
                                                     <Grid>
@@ -536,11 +533,9 @@
                                                     <dxe:ListBoxEdit 
                                                         MinHeight="24"
                                                         MaxHeight="80"
-                                                        Visibility="{Binding IsSourceYSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                        ItemsSource="{Binding SourceYConfiguration.SelectedCategories, 
-                                                                          Mode=TwoWay,
-                                                                          UpdateSourceTrigger=PropertyChanged,
-                                                                          Converter={StaticResource OrderedCategoryNameListConverter}}"/>
+                                                        Visibility="{Binding SourceYConfiguration.IsSourceYSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                        ItemsSource="{Binding SourceYConfiguration.SelectedCategoriesWithSubcategories, 
+                                                                          Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                                                 </dxlc:LayoutItem>
                                                 <dxlc:LayoutItem Label="Owners: ">
                                                     <Grid>

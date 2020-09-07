@@ -75,7 +75,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Backing field for <see cref="SelectedSortOrder"/> property.
         /// </summary>
         private SortOrder selectedSortOrder;
-        
+
         /// <summary>
         /// Backing field for <see cref="SelectedCategories"/>
         /// </summary>
@@ -95,6 +95,16 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Backing field for <see cref="IncludeSubcategories"/>
         /// </summary>
         private bool includeSubcategories;
+
+        /// <summary>
+        /// Backing field for <see cref="IsSourceYSelected" />
+        /// </summary>
+        private bool isSourceYSelected;
+
+        /// <summary>
+        /// Backing field for <see cref="IsSourceXSelected" />
+        /// </summary>
+        private bool isSourceXSelected;
 
         /// <summary>
         /// Backing field for <see cref="SelectedOwners"/> property
@@ -120,6 +130,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.PossibleCategories = new ReactiveList<Category>();
             this.PossibleCategories.ChangeTrackingEnabled = true;
             this.SelectedCategories = new List<Category>();
+            this.SelectedCategoriesWithSubcategories = new ReactiveList<string>();
+            this.SelectedCategoriesWithSubcategories.ChangeTrackingEnabled = true;
 
             this.PossibleOwners = new ReactiveList<DomainOfExpertise>();
             this.PossibleOwners.ChangeTrackingEnabled = true;
@@ -157,9 +169,16 @@ namespace CDP4RelationshipMatrix.ViewModels
                 this.SelectCategoryWithIncludeSubcategories();
             });
 
+            this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ =>
+            {
+                this.OnLightUpdateAction();
+                this.SelectCategoryWithIncludeSubcategories();
+            });
+
             this.WhenAnyValue(x => x.SelectedOwners).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
             this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
-            this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
+            this.WhenAnyValue(x => x.SelectedCategories).Subscribe(x => this.IsSourceXSelected = x.Any());
+            this.WhenAnyValue(x => x.SelectedCategories).Subscribe(x => this.IsSourceYSelected = x.Any());
 
             var categorySubscription = CDPMessageBus.Current
                 .Listen<ObjectChangedEvent>(typeof(Category))
@@ -291,6 +310,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         public ReactiveList<Category> PossibleCategories { get; }
 
         /// <summary>
+        /// Gets or sets the selected categories names
+        /// </summary>
+        public ReactiveList<string> SelectedCategoriesWithSubcategories { get; set; }
+
+        /// <summary>
         /// Gets the possible <see cref="DomainOfExpertise"/> associated to the <see cref="SelectedClassKind"/>
         /// </summary>
         /// <remarks>
@@ -331,6 +355,24 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the source Category from X-Axis is selected
+        /// </summary>
+        public bool IsSourceXSelected
+        {
+            get { return this.isSourceXSelected; }
+            private set { this.RaiseAndSetIfChanged(ref this.isSourceXSelected, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the source Category from Y-Axis is selected
+        /// </summary>
+        public bool IsSourceYSelected
+        {
+            get { return this.isSourceYSelected; }
+            private set { this.RaiseAndSetIfChanged(ref this.isSourceYSelected, value); }
+        }
+
+        /// <summary>
         /// Populates the possible <see cref="Category"/>
         /// </summary>
         private void PopulatePossibleCategories()
@@ -364,22 +406,23 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
-        /// Populates the selected <see cref="Category"/> accordingly to the IncludeSubcategories value
+        /// Populates the selected <see cref="Category"/> name accordingly to the IncludeSubcategories value
         /// </summary>
         private void SelectCategoryWithIncludeSubcategories()
         {
+            this.SelectedCategoriesWithSubcategories.Clear();
             if (this.IncludeSubcategories)
             {
-                var categories = new List<Category>();
                 foreach (var item in this.SelectedCategories)
                 {
-                    categories.Add(item);
+                    this.SelectedCategoriesWithSubcategories.Add(item.Name);
                     var category = this.PossibleCategories.Where(x => x.SuperCategory.Any(z => z.Name == item.Name)).ToList();
-                    categories.AddRange(category);
+                    this.SelectedCategoriesWithSubcategories.AddRange(category.Select(x => x.Name));
                 }
-
-                this.SelectedCategories.Clear();
-                this.SelectedCategories.AddRange(categories);
+            }
+            else
+            {
+                this.SelectedCategoriesWithSubcategories.AddRange(this.SelectedCategories.Select(x=>x.Name));
             }
         }
     }
