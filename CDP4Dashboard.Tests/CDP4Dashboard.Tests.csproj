@@ -41,6 +41,7 @@
     <PackageReference Include="DevExpress.Wpf.Printing" Version="20.1.3" />
     <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.3" />
     <PackageReference Include="DevExpress.Xpo" Version="20.1.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="Moq" Version="4.11.0" />
     <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="NUnit" Version="3.12.0" />
