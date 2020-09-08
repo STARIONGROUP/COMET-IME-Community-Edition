@@ -25,6 +25,7 @@
 
 namespace CDP4Reporting.DataSource
 {
+    using System;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -171,6 +172,11 @@ namespace CDP4Reporting.DataSource
             /// </returns>
             public CategoryHierarchy Build()
             {
+                if (this.top == null)
+                {
+                    throw new ArgumentException("CategoryHierarchy should contain at least one level");
+                }
+
                 return this.top;
             }
         }

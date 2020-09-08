@@ -45,6 +45,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Utilities;
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
@@ -61,8 +62,6 @@ namespace CDP4Reporting.ViewModels
     using ICSharpCode.AvalonEdit.Document;
 
     using Microsoft.Practices.ServiceLocation;
-
-    using NLog;
 
     using ReactiveUI;
 
@@ -523,8 +522,8 @@ namespace CDP4Reporting.ViewModels
         /// </summary>
         private void RebuildDataSource()
         {
-            var dataSourceName = "ReportDataSource";
-            var reportDataSource = this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>().ToList().FirstOrDefault(x => x.Name.Equals(dataSourceName));
+            const string dataSourceName = "ReportDataSource";
+            var reportDataSource = this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>().FirstOrDefault(x => x.Name.Equals(dataSourceName));
             object dataSource;
 
             try
@@ -703,7 +702,7 @@ namespace CDP4Reporting.ViewModels
             if (this.CompileResult == null)
             {
                 this.AddOutput("Compile data source code first.");
-                return null;
+                return new List<IReportingParameter>();
             }
 
             AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolver;
@@ -720,13 +719,13 @@ namespace CDP4Reporting.ViewModels
 
                 if (editorFullClassName == null)
                 {
-                    return null;
+                    return new List<IReportingParameter>();
                 }
 
                 if (!(this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
                 {
                     this.AddOutput("Report parameter class not found.");
-                    return null;
+                    return new List<IReportingParameter>();
                 }
 
                 return instObj.CreateParameters(dataSource)?.ToList();
