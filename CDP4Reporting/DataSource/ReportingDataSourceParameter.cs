@@ -26,6 +26,7 @@
 namespace CDP4Reporting.DataSource
 {
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -37,19 +38,19 @@ namespace CDP4Reporting.DataSource
     internal abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
-        /// The associated <see cref="CDP4Common.EngineeringModelData.ParameterBase"/>.
-        /// </summary>
-        protected ParameterBase ParameterBase { get; private set; }
-
-        /// <summary>
         /// The associated <see cref="ParameterType"/> short name.
         /// </summary>
         internal readonly string ShortName;
 
         /// <summary>
-        /// The value of the associated <see cref="ParameterOrOverrideBase"/>.
+        /// The associated <see cref="CDP4Common.EngineeringModelData.ParameterBase"/>.
         /// </summary>
-        protected string Value { get; private set; }
+        protected ParameterBase ParameterBase { get; private set; }
+
+        /// <summary>
+        /// The <see cref="IValueSet"/>s of the associated <see cref="ParameterBase"/>.
+        /// </summary>
+        protected internal IEnumerable<IValueSet> ValueSets => this.ParameterBase?.ValueSets;
 
         /// <summary>
         /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterBase"/>.
@@ -87,8 +88,32 @@ namespace CDP4Reporting.DataSource
             this.ParameterBase = this.ParameterBase ??
                                  this.Node.ElementDefinition.Parameter.SingleOrDefault(
                                      x => x.ParameterType.ShortName == this.ShortName);
+        }
 
-            this.Value = this.ParameterBase?.ValueSets.First().ActualValue.First();
+        /// <summary>
+        /// Populates with data the <see cref="DataTable.Columns"/> associated with this object
+        /// in the given <paramref name="row"/>.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> to which the <paramref name="row"/> belongs to.
+        /// </param>
+        /// <param name="row">
+        /// The <see cref="DataRow"/> to be populated.
+        /// </param>
+        internal override void Populate(DataTable table, DataRow row)
+        {
+            foreach (var valueSet in this.ValueSets)
+            {
+                var columnName = $"{this.ShortName} {valueSet.ActualState.ShortName}";
+
+                if (!table.Columns.Contains(columnName))
+                {
+                    // TODO implement automatic data type handling based on class (DoubleParameter) or an attribute
+                    table.Columns.Add(columnName, typeof(string));
+                }
+
+                row[columnName] = valueSet.ActualValue.First();
+            }
         }
 
         /// <summary>

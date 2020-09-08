@@ -26,6 +26,7 @@
 namespace CDP4Reporting.DataSource
 {
     using System;
+    using System.Data;
     using System.Linq;
     using System.Reflection;
 
@@ -65,5 +66,17 @@ namespace CDP4Reporting.DataSource
         /// The associated <see cref="ReportingDataSourceNode{T}"/>.
         /// </param>
         internal abstract void Initialize(ReportingDataSourceNode<T> node);
+
+        /// <summary>
+        /// Populates with data the <see cref="DataTable.Columns"/> associated with this object
+        /// in the given <paramref name="row"/>.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> to which the <paramref name="row"/> belongs to.
+        /// </param>
+        /// <param name="row">
+        /// The <see cref="DataRow"/> to be populated.
+        /// </param>
+        internal abstract void Populate(DataTable table, DataRow row);
     }
 }

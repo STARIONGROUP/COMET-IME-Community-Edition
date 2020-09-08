@@ -26,7 +26,6 @@
 namespace CDP4Reporting.DataSource
 {
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
     using System;
     using System.Collections.Generic;
@@ -57,33 +56,6 @@ namespace CDP4Reporting.DataSource
         /// </summary>
         private static readonly IEnumerable<PropertyInfo> PublicGetters = typeof(T).GetProperties()
             .Where(p => p.GetMethod?.IsPublic == true);
-
-        /// <summary>
-        /// Creates a <see cref="DataTable"/> representation based on the <see cref="ReportingDataSourceRow"/>
-        /// representation.
-        /// </summary>
-        /// <param name="categoryHierarchy">
-        /// The <see cref="CategoryHierarchy"/> based on which to construct the column definitions.
-        /// </param>
-        /// <returns>
-        /// The <see cref="DataTable"/> representation.
-        /// </returns>
-        internal static DataTable GetTable(CategoryHierarchy categoryHierarchy)
-        {
-            var table = new DataTable();
-
-            for (var hierarchy = categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
-            {
-                table.Columns.Add(hierarchy.Category.ShortName, typeof(string));
-            }
-
-            foreach (var publicGetter in PublicGetters)
-            {
-                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
-            }
-
-            return table;
-        }
 
         /// <summary>
         /// The <see cref="ReportingDataSourceRow"/> representation of the current node.
@@ -126,19 +98,19 @@ namespace CDP4Reporting.DataSource
             this.ElementBase as ElementUsage;
 
         /// <summary>
-        /// The filtering <see cref="Category"/> that must be matched on the current <see cref="ElementBase"/>.
+        /// The filtering <see cref="CategoryHierarchy"/> that must be matched on the current <see cref="ElementBase"/>.
         /// </summary>
-        private readonly Category filterCategory;
+        private readonly CategoryHierarchy categoryHierarchy;
 
         /// <summary>
-        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
+        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="categoryHierarchy"/>.
         /// </summary>
         private bool IsVisible =>
-            this.ElementBase.Category.Contains(this.filterCategory);
+            this.ElementBase.Category.Contains(this.categoryHierarchy.Category);
 
         /// <summary>
         /// Boolean flag indicating whether the current node or any of its <see cref="Children"/>
-        /// match their associated <see cref="filterCategory"/>.
+        /// match their associated <see cref="categoryHierarchy"/>.
         /// </summary>
         private bool IsRelevant =>
             this.IsVisible || this.Children.Any(child => child.IsRelevant);
@@ -165,7 +137,7 @@ namespace CDP4Reporting.DataSource
             List<NestedElement> nestedElements,
             ReportingDataSourceNode<T> parent = null)
         {
-            this.filterCategory = categoryHierarchy.Category;
+            this.categoryHierarchy = categoryHierarchy;
 
             this.NestedElement = topElement;
 
@@ -251,6 +223,47 @@ namespace CDP4Reporting.DataSource
         }
 
         /// <summary>
+        /// Creates a <see cref="DataTable"/> representation based on the <see cref="ReportingDataSourceRow"/>
+        /// representation.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="DataTable"/> representation.
+        /// </returns>
+        internal DataTable GetTable()
+        {
+            var table = this.BuildTableStructure();
+
+            this.AddDataRows(table);
+
+            return table;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="DataTable"/> representation based on the <see cref="ReportingDataSourceRow"/> representation.
+        /// Note that this will only seed columns for categories and public getters;
+        /// the columns for parameter states will be built dynamically while the data is added.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="DataTable"/> representation.
+        /// </returns>
+        private DataTable BuildTableStructure()
+        {
+            var table = new DataTable();
+
+            for (var hierarchy = this.categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
+            {
+                table.Columns.Add(hierarchy.Category.ShortName, typeof(string));
+            }
+
+            foreach (var publicGetter in PublicGetters)
+            {
+                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
+            }
+
+            return table;
+        }
+
+        /// <summary>
         /// Adds to the <paramref name="table"/> the <see cref="DataRow"/> representations
         /// of this node's subtree.
         /// </summary>
@@ -287,6 +300,13 @@ namespace CDP4Reporting.DataSource
                     new object[] { });
             }
 
+            foreach (var rowField in RowFields)
+            {
+                var column = rowField.Value.GetValue(this.rowRepresentation) as ReportingDataSourceColumn<T>;
+
+                column.Populate(table, row);
+            }
+
             return row;
         }
 
@@ -301,7 +321,7 @@ namespace CDP4Reporting.DataSource
         {
             this.parent?.InitializeCategoryColumns(row);
 
-            row[this.filterCategory.ShortName] = this.ElementBase.Name;
+            row[this.categoryHierarchy.Category.ShortName] = this.ElementBase.Name;
         }
     }
 }

@@ -42,11 +42,6 @@ namespace CDP4Reporting.DataSource
     public class ReportingDataSourceClass<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
-        /// The <see cref="CategoryHierarchy"/> used for filtering the considered <see cref="ElementBase"/> items.
-        /// </summary>
-        private readonly CategoryHierarchy categoryHierarchy;
-
-        /// <summary>
         /// The <see cref="ReportingDataSourceNode{T}"/> which is the root of the hierarhical tree.
         /// </summary>
         private readonly ReportingDataSourceNode<T> topNode;
@@ -68,8 +63,6 @@ namespace CDP4Reporting.DataSource
             Option option,
             DomainOfExpertise domainOfExpertise)
         {
-            this.categoryHierarchy = categoryHierarchy;
-
             var nestedElements = new NestedElementTreeGenerator()
                 .Generate(option, domainOfExpertise)
                 .ToList();
@@ -80,18 +73,8 @@ namespace CDP4Reporting.DataSource
         }
 
         /// <summary>
-        /// Gets a <see cref="DataTable"/> representation of the hierarhical tree upon which the data source is based.
+        /// A <see cref="DataTable"/> representation of the hierarhical tree upon which the data source is based.
         /// </summary>
-        /// <returns>
-        /// The <see cref="DataTable"/>.
-        /// </returns>
-        public DataTable GetTable()
-        {
-            var table = ReportingDataSourceNode<T>.GetTable(this.categoryHierarchy);
-
-            this.topNode.AddDataRows(table);
-
-            return table;
-        }
+        public DataTable Table => this.topNode.GetTable();
     }
 }

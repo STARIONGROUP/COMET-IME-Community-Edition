@@ -275,7 +275,7 @@ namespace CDP4Reporting.Tests.DataSource
                 this.domain);
 
             // tabular representation built, category hierarchy considered, unneeded subtrees pruned
-            var rows = dataSource.GetTable().Rows;
+            var rows = dataSource.Table.Rows;
             Assert.AreEqual(6, rows.Count);
 
             ValidateRow(rows[0], true, this.ed1);

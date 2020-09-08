@@ -71,7 +71,7 @@ namespace CDP4Reporting.Tests.DataSource
         [DefinedThingShortName("type1")]
         private class TestParameter1 : ReportingDataSourceParameter<Row>
         {
-            public string GetValue() => this.Value;
+            public string GetValue() => this.ValueSets.First().ActualValue.First();
 
             public DomainOfExpertise GetOwner() => this.Owner;
         }
@@ -79,7 +79,7 @@ namespace CDP4Reporting.Tests.DataSource
         [DefinedThingShortName("type2")]
         private class TestParameter2 : ReportingDataSourceParameter<Row>
         {
-            public string GetValue() => this.Value;
+            public string GetValue() => this.ValueSets.First().ActualValue.First();
 
             public DomainOfExpertise GetOwner() => this.Owner;
         }
@@ -91,7 +91,7 @@ namespace CDP4Reporting.Tests.DataSource
 
         private class ComputedTestParameter : ReportingDataSourceParameter<Row>
         {
-            public string GetValue() => this.Value;
+            public IEnumerable<IValueSet> GetValueSets() => this.ValueSets;
 
             public DomainOfExpertise GetOwner() => this.Owner;
         }
@@ -370,7 +370,7 @@ namespace CDP4Reporting.Tests.DataSource
                 nestedElements);
 
             var computedParameter = node.GetColumn<ComputedTestParameter>();
-            Assert.IsNull(computedParameter.GetValue());
+            Assert.IsNull(computedParameter.GetValueSets());
             Assert.IsNull(computedParameter.GetOwner());
         }
 

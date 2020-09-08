@@ -25,6 +25,7 @@
 
 namespace CDP4Reporting.DataSource
 {
+    using System.Data;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -79,6 +80,23 @@ namespace CDP4Reporting.DataSource
             {
                 this.Value = true;
             }
+        }
+
+        /// <summary>
+        /// Populates with data the <see cref="DataTable.Columns"/> associated with this object
+        /// in the given <paramref name="row"/>.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> to which the <paramref name="row"/> belongs to.
+        /// </param>
+        /// <param name="row">
+        /// The <see cref="DataRow"/> to be populated.
+        /// </param>
+        internal override void Populate(DataTable table, DataRow row)
+        {
+            // currently intentionally left empty
+            // we could populate the value here, pending on what column name to use
+            // row[?] = this.Value;
         }
     }
 }
