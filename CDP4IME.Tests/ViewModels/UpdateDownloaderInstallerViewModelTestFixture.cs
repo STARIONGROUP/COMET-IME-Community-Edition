@@ -304,7 +304,7 @@ namespace CDP4IME.Tests.ViewModels
         /// The Task may fail on some system.
         /// </summary>
         /// <returns>The Task may fail on some system</returns>
-        [Test]
+        [Ignore("Test should run with mocked IUpdateFileSystemService implementation")]
         public async Task VerifyCancellationToken()
         {
             this.SetupTestContentForInstallationCancellationPurpose(this.UpdateFileSystem.InstallationPath.FullName);

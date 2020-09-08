@@ -48,24 +48,14 @@ namespace CDP4Grapher.ViewModels
     public class DiagramControlContextMenuViewModel : ReactiveObject, IHaveContextMenu
     {
         /// <summary>
-        /// Holds the text to display for the isolation related nmenu entry
-        /// </summary>
-        private const string IsolateContextMenuEntryText = "Isolate";
-        
-        /// <summary>
-        /// Holds the text to display for the isolation related nmenu entry
-        /// </summary>
-        private const string ExitIsolationContextMenuEntryText = "Exit Isolation";
-
-        /// <summary>
         /// Backing field for <see cref="CanExportDiagram"/>
         /// </summary>
-        private bool canExportDiagram;
+        private bool canExportDiagram = true;
 
         /// <summary>
-        /// Backing field for <see cref="CanIsolate"/>
+        /// Backing field for <see cref="CanExitIsolation"/>
         /// </summary>
-        private bool canIsolate;
+        private bool canExitIsolation;
         
         /// <summary>
         /// Backing field for the <see cref="HoveredElement"/> property
@@ -101,18 +91,23 @@ namespace CDP4Grapher.ViewModels
         }
         
         /// <summary>
-        /// Gets a value indicating whether the isolation can be applied
+        /// Gets a value indicating whether the user can exit Isolation
         /// </summary>
-        public bool CanIsolate
+        public bool CanExitIsolation
         {
-            get => this.canIsolate;
-            private set => this.RaiseAndSetIfChanged(ref this.canIsolate, value);
+            get => this.canExitIsolation;
+            private set => this.RaiseAndSetIfChanged(ref this.canExitIsolation, value);
         }
         
         /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
+        /// Gets the <see cref="ReactiveCommand"/> to Isolate the <see cref="HoveredElement"/>
         /// </summary>
         public ReactiveCommand<object> IsolateCommand { get; private set; }
+        
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to exit isolation
+        /// </summary>
+        public ReactiveCommand<object> ExitIsolationCommand { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
@@ -199,19 +194,8 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         public DiagramControlContextMenuViewModel()
         {
-            this.UpdateProperties();
             this.InitializeCommands();
             this.CreateContextMenu();
-        }
-
-        /// <summary>
-        /// Updates all properties of this view model that need to have an initial value
-        /// </summary>
-        public void UpdateProperties()
-        {
-            this.CanExportDiagram = true;
-            this.CanIsolate = true;
-
         }
 
         /// <summary>
@@ -219,12 +203,17 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void InitializeCommands()   
         {
-            this.IsolateCommand = ReactiveCommand.Create(this.WhenAnyValue(
-                x => x.HoveredElement,
-                x => x.CanIsolate,
-                (b, c) => (b != null && c) || !c).ObserveOn(RxApp.MainThreadScheduler));
+            this.IsolateCommand = ReactiveCommand.Create(
+                this.WhenAnyValue(x => x.HoveredElement)
+                    .Select(x => x != null).ObserveOn(RxApp.MainThreadScheduler));
 
             this.IsolateCommand.Subscribe(_ => this.ExecuteIsolate());
+
+            this.ExitIsolationCommand = ReactiveCommand.Create(
+                this.WhenAnyValue(x => x.CanExitIsolation)
+                    .ObserveOn(RxApp.MainThreadScheduler));
+
+            this.ExitIsolationCommand.Subscribe(_ => this.ExecuteExitIsolation());
 
             this.ExportGraphAsJpg = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
             this.ExportGraphAsJpg.Subscribe(_ => this.ExecuteExportGraphAsPng());
@@ -271,7 +260,8 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void CreateContextMenu()
         {
-            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>(IsolateContextMenuEntryText, this.IsolateCommand, "Snap/SeparatorListNone.svg"));
+            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Isolate", this.IsolateCommand, "Snap/SeparatorListNone.svg"));
+            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Exit Isolation", this.ExitIsolationCommand, "Icon Builder/Actions_RemoveCircled.svg"));
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Export Graph as JPG", this.ExportGraphAsJpg, "XAF/Action_Export_ToImage.svg"));
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Export Graph as PDF", this.ExportGraphAsPdf, "Export/ExportToPDF.svg"));
             var layoutSubItem = this.GenerateContextMenuItem<BarSubItem>("Apply layouts", null, "DiagramIcons/Direction/re-layout.svg");
@@ -353,36 +343,16 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void ExecuteIsolate()
         {
-            if (this.CanIsolate)
-            {
-                this.CanIsolate = !this.Behavior.Isolate();
-
-                if (!this.CanIsolate)
-                {
-                    this.UpdateContextMenuEntryText(this.IsolateCommand, ExitIsolationContextMenuEntryText);
-                }
-            }
-            else
-            {
-                this.Behavior.ExitIsolation();
-                this.CanIsolate = true;
-                this.UpdateContextMenuEntryText(this.IsolateCommand, IsolateContextMenuEntryText);
-            }
+            this.CanExitIsolation = this.Behavior.Isolate();
         }
 
         /// <summary>
-        /// Updates the text of the corresponding Cntext Menu Entry 
+        /// Executes the <see cref="ExitIsolationCommand"/>
         /// </summary>
-        /// <param name="command">The command to identify the right Context Menu Entry</param>
-        /// <param name="text">The text</param>
-        private void UpdateContextMenuEntryText(ICommand command, string text)
+        private void ExecuteExitIsolation()
         {
-            var entry = this.ContextMenu.OfType<BarButtonItem>().FirstOrDefault(x => x.Command == command);
-
-            if (entry != null)
-            {
-                entry.Content = text;
-            }
+            this.Behavior.ExitIsolation();
+            this.CanExitIsolation = false;
         }
     }
 }

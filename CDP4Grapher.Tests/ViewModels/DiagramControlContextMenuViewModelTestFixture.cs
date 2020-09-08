@@ -75,7 +75,7 @@ namespace CDP4Grapher.Tests.ViewModels
         {
             var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object};
             Assert.IsNotEmpty(vm.ContextMenu);
-            Assert.AreEqual(4, vm.ContextMenu.Count);
+            Assert.AreEqual(5, vm.ContextMenu.Count);
             Assert.AreEqual(6, vm.ContextMenu.OfType<BarSubItem>().SelectMany(x => x.Items).Count());
             Assert.AreEqual(12, vm.ContextMenu.OfType<BarSubItem>().SelectMany(x => x.Items.OfType<BarSubItem>().SelectMany(s =>s.Items)).Count());
             Assert.IsNotNull(vm.Behavior);
@@ -136,6 +136,8 @@ namespace CDP4Grapher.Tests.ViewModels
             this.behavior.Setup(x => x.ExitIsolation());
             this.behavior.Setup(x => x.Isolate()).Returns(false);
             var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object };
+
+            vm.HoveredElement = null;
             Assert.IsFalse(vm.IsolateCommand.CanExecute(null));
 
             vm.HoveredElement = new GraphElementViewModel(new NestedElement()
@@ -143,22 +145,31 @@ namespace CDP4Grapher.Tests.ViewModels
                 RootElement = new ElementDefinition(),
                 ElementUsage =
                 {
-                    new ElementUsage() { Owner = new DomainOfExpertise(), ElementDefinition = new ElementDefinition() }
+                    new ElementUsage() 
+                    { 
+                        Container = new ElementDefinition() { Owner = new DomainOfExpertise()},
+                        Owner = new DomainOfExpertise(), ElementDefinition = new ElementDefinition()
+                    }
                 }
-            }, this.option);
+            });
 
             Assert.IsTrue(vm.IsolateCommand.CanExecute(null));
             vm.HoveredElement = null;
             Assert.IsFalse(vm.IsolateCommand.CanExecute(null));
 
+            Assert.IsFalse(vm.CanExitIsolation);
             vm.IsolateCommand.Execute(null);
-            Assert.IsTrue(vm.CanIsolate);
+            Assert.IsFalse(vm.CanExitIsolation);
             this.behavior.Setup(x => x.Isolate()).Returns(true);
             vm.IsolateCommand.Execute(null);
-            Assert.IsFalse(vm.CanIsolate);
+            Assert.IsTrue(vm.CanExitIsolation);
             vm.IsolateCommand.Execute(null);
-            Assert.IsTrue(vm.CanIsolate);
-            this.behavior.Verify(x => x.Isolate(), Times.Exactly(2));
+            Assert.IsTrue(vm.CanExitIsolation);
+            vm.ExitIsolationCommand.Execute(null);
+            Assert.IsFalse(vm.CanExitIsolation);
+            Assert.IsFalse(vm.ExitIsolationCommand.CanExecute(null));
+
+            this.behavior.Verify(x => x.Isolate(), Times.Exactly(3));
             this.behavior.Verify(x => x.ExitIsolation(), Times.Once);
         }
     }

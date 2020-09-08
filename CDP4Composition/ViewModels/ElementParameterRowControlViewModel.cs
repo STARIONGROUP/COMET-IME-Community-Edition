@@ -28,9 +28,8 @@ namespace CDP4Composition.ViewModels
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition.Utilities;
+    using CDP4Composition.Services;
 
     using ReactiveUI;
 
@@ -40,24 +39,9 @@ namespace CDP4Composition.ViewModels
     public class ElementParameterRowControlViewModel : ReactiveObject
     {
         /// <summary>
-        /// Backing field for <see cref="Owner"/> property
+        /// Backing field for the <see cref="ElementTooltipInfo"/> property
         /// </summary>
-        private string owner;
-
-        /// <summary>
-        /// Backing field for <see cref="category"/> property
-        /// </summary>
-        private string category;
-
-        /// <summary>
-        /// Backing field for <see cref="modelCode"/> property
-        /// </summary>
-        private string modelCode;
-
-        /// <summary>
-        /// Backing field for <see cref="definition"/> property
-        /// </summary>
-        private string definition;
+        private string elementTooltipInfo;
 
         /// <summary>
         /// Gets the Parameter Collection of this represented Element
@@ -75,39 +59,12 @@ namespace CDP4Composition.ViewModels
         public ElementBase Element { get; private set; }
 
         /// <summary>
-        /// Gets this represented element owner
+        /// Gets or sets the tooltip informations about this reprented element
         /// </summary>
-        public string Owner
+        public string ElementTooltipInfo
         {
-            get => this.owner;
-            private set => this.RaiseAndSetIfChanged(ref this.owner, value);
-        }
-
-        /// <summary>
-        /// Gets this represented element Categories
-        /// </summary>
-        public string Category
-        {
-            get => this.category;
-            private set => this.RaiseAndSetIfChanged(ref this.category, value);
-        }
-
-        /// <summary>
-        /// Gets this represented element Model Code
-        /// </summary>
-        public string ModelCode
-        {
-            get => this.modelCode;
-            private set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
-        }
-
-        /// <summary>
-        /// Gets this represented element Model Code
-        /// </summary>
-        public string Definition
-        {
-            get => this.definition;
-            private set => this.RaiseAndSetIfChanged(ref this.definition, value);
+            get => this.elementTooltipInfo;
+            set => this.RaiseAndSetIfChanged(ref this.elementTooltipInfo, value);
         }
 
         /// <summary>
@@ -137,20 +94,13 @@ namespace CDP4Composition.ViewModels
                 case ElementUsage elementUsage:
                     this.Parameters.AddRange(elementUsage.ParameterOverride.Select(p => new ParameterRowControlViewModel(p, this.ActualOption)));
                     this.Parameters.AddRange(elementUsage.ElementDefinition.Parameter.Select(p => new ParameterRowControlViewModel(p, this.ActualOption)));
-                    this.ModelCode = elementUsage.ModelCode();
                     break;
                 case ElementDefinition elementDefinition:
                     this.Parameters.AddRange(elementDefinition.Parameter.Select(p => new ParameterRowControlViewModel(p, this.ActualOption)));
-                    this.ModelCode = elementDefinition.ModelCode();
                     break;
             }
 
-            this.Owner = this.Element.Owner != null ? this.Element.Owner.ShortName : "NA";
-            var categories = this.Element.GetAllCategoryShortNames();
-            this.Category = string.IsNullOrWhiteSpace(categories) ? "-" : categories;
-
-            var firstDefinitionFound = this.Element.Definition.FirstOrDefault();
-            this.Definition = firstDefinitionFound != null && !string.IsNullOrWhiteSpace(firstDefinitionFound.Content) ? $"Definition [{firstDefinitionFound.LanguageCode}]: {firstDefinitionFound.Content}" : ": -";
+            this.ElementTooltipInfo = this.Element.Tooltip();
         }
     }
 }
