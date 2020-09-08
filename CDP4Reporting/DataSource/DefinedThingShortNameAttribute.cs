@@ -30,8 +30,8 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.CommonData;
 
     /// <summary>
-    /// Attribute decorating implementations of <see cref="ReportingDataSourceParameter{T}"/> to mark
-    /// the associated <see cref="DefinedThing"/> short name.
+    /// Attribute decorating implementations of <see cref="ReportingDataSourceParameter{TRow,TValue}"/> or
+    /// <see cref="ReportingDataSourceCategory{T}"/> to mark the associated <see cref="DefinedThing"/> short name.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class DefinedThingShortNameAttribute : Attribute

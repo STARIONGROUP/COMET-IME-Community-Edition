@@ -69,7 +69,7 @@ namespace CDP4Reporting.Tests.DataSource
         private ElementUsage eu2;
 
         [DefinedThingShortName("type1")]
-        private class TestParameter1 : ReportingDataSourceParameter<Row>
+        private class TestParameter1 : ReportingDataSourceStringParameter<Row>
         {
             public string GetValue() => this.ValueSets.First().ActualValue.First();
 
@@ -77,7 +77,7 @@ namespace CDP4Reporting.Tests.DataSource
         }
 
         [DefinedThingShortName("type2")]
-        private class TestParameter2 : ReportingDataSourceParameter<Row>
+        private class TestParameter2 : ReportingDataSourceStringParameter<Row>
         {
             public string GetValue() => this.ValueSets.First().ActualValue.First();
 
@@ -85,11 +85,11 @@ namespace CDP4Reporting.Tests.DataSource
         }
 
         [DefinedThingShortName("type3")]
-        private class TestParameter3 : ReportingDataSourceParameter<Row>
+        private class TestParameter3 : ReportingDataSourceStringParameter<Row>
         {
         }
 
-        private class ComputedTestParameter : ReportingDataSourceParameter<Row>
+        private class ComputedTestParameter : ReportingDataSourceStringParameter<Row>
         {
             public IEnumerable<IValueSet> GetValueSets() => this.ValueSets;
 

@@ -33,9 +33,17 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Abstract base class from which all parameter columns for a <see cref="ReportingDataSourceRow"/> need to derive.
+    /// Abstract base class from which all parameter columns
+    /// for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
-    internal abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
+    /// <typeparam name="TRow">
+    /// The type of the associated <see cref="ReportingDataSourceRow"/>.
+    /// </typeparam>
+    /// <typeparam name="TValue">
+    /// The type that will be used for the parameter value representation.
+    /// </typeparam>
+    internal abstract class ReportingDataSourceParameter<TRow, TValue> : ReportingDataSourceColumn<TRow>
+        where TRow : ReportingDataSourceRow, new()
     {
         /// <summary>
         /// The associated <see cref="ParameterType"/> short name.
@@ -58,7 +66,7 @@ namespace CDP4Reporting.DataSource
         protected DomainOfExpertise Owner => this.ParameterBase?.Owner;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{T}"/> class.
+        /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{TRow,TValue}"/> class.
         /// </summary>
         protected ReportingDataSourceParameter()
         {
@@ -73,7 +81,7 @@ namespace CDP4Reporting.DataSource
         /// <param name="node">
         /// The associated <see cref="ReportingDataSourceNode{T}"/>.
         /// </param>
-        internal override void Initialize(ReportingDataSourceNode<T> node)
+        internal override void Initialize(ReportingDataSourceNode<TRow> node)
         {
             this.Node = node;
 
@@ -108,13 +116,24 @@ namespace CDP4Reporting.DataSource
 
                 if (!table.Columns.Contains(columnName))
                 {
-                    // TODO implement automatic data type handling based on class (DoubleParameter) or an attribute
-                    table.Columns.Add(columnName, typeof(string));
+                    table.Columns.Add(columnName, typeof(TValue));
                 }
 
-                row[columnName] = valueSet.ActualValue.First();
+                row[columnName] = this.Parse(valueSet.ActualValue.First());
             }
         }
+
+        /// <summary>
+        /// Parses a parameter value as the type that will be used for the row representation.
+        /// </summary>
+        /// <param name="value">
+        /// The parameter value to be parsed. This needs to be specified as a state dependent
+        /// <see cref="ReportingDataSourceParameter{TRow,TValue}"/> can have multiple values.
+        /// </param>
+        /// <returns>
+        /// The parsed value.
+        /// </returns>
+        internal abstract TValue Parse(string value);
 
         /// <summary>
         /// Gets the parameter of type <see cref="TP"/> on the same level in the
@@ -124,9 +143,9 @@ namespace CDP4Reporting.DataSource
         /// The desired parameter type.
         /// </typeparam>
         /// <returns>
-        /// The <see cref="ReportingDataSourceParameter{T}"/> of type <see cref="TP"/>.
+        /// The <see cref="ReportingDataSourceParameter{TRow,TValue}"/> of type <see cref="TP"/>.
         /// </returns>
-        public TP GetSibling<TP>() where TP : ReportingDataSourceParameter<T>
+        public TP GetSibling<TP>() where TP : ReportingDataSourceParameter<TRow, TValue>
         {
             return this.Node.GetColumn<TP>();
         }
@@ -139,9 +158,9 @@ namespace CDP4Reporting.DataSource
         /// The desired parameter type.
         /// </typeparam>
         /// <returns>
-        /// A list of <see cref="ReportingDataSourceParameter{T}"/>s of type <see cref="TP"/>.
+        /// A list of <see cref="ReportingDataSourceParameter{TRow,TValue}"/>s of type <see cref="TP"/>.
         /// </returns>
-        public IEnumerable<TP> GetChildren<TP>() where TP : ReportingDataSourceParameter<T>
+        public IEnumerable<TP> GetChildren<TP>() where TP : ReportingDataSourceParameter<TRow, TValue>
         {
             return this.Node.Children.Select(child => child.GetColumn<TP>());
         }
