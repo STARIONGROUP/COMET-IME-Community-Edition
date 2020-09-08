@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICDP4ReportingDataSource.cs" company="RHEA System S.A.">
+// <copyright file="CDP4ReportingDataSource.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,17 +25,48 @@
 
 namespace CDP4Reporting.DataSource
 {
-    /// <summary>
-    /// The interface used for creating a reporting data source.
-    /// </summary>
-    internal interface IReportingDataSource
+    using System.Collections.Generic;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
+    using CDP4Dal;
+
+    public abstract class ReportingDataSource : IReportingDataSource
     {
+        /// <summary>
+        /// Gets or sets the <see cref="Iteration"/>
+        /// </summary>
+        public Iteration Iteration { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ISession"/>
+        /// </summary>
+        public ISession Session { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DomainOfExpertise"/>
+        /// </summary>
+        public DomainOfExpertise DomainOfExpertise { get; private set; }
+
+        /// <summary>
+        /// The list of available <see cref="Option"/>s
+        /// </summary>
+        public IEnumerable<Option> Options => this.Iteration?.Option as IEnumerable<Option> ?? new List<Option>();
+
+        internal void Initialize(Iteration iteration, ISession session)
+        {
+            this.Iteration = iteration;
+            this.Session = session;
+            this.DomainOfExpertise = session.QueryCurrentDomainOfExpertise();
+        }
+
         /// <summary>
         /// Creates a new data source instance.
         /// </summary>
         /// <returns>
-        /// A new <see cref="ReportingDataSourceClass{T}"/> instance.
+        /// An object instance.
         /// </returns>
-        object CreateDataSource();
+        public abstract object CreateDataSource();
     }
 }

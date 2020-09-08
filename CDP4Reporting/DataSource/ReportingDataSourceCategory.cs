@@ -25,17 +25,24 @@
 
 namespace CDP4Reporting.DataSource
 {
-    using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Dal;
 
     /// <summary>
     /// Abstract base class from which all category columns for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
     public abstract class ReportingDataSourceCategory<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
+        /// <summary>
+        /// The <see cref="ISession"/> to be used by this class
+        /// </summary>
+        public ISession Session { get; }
+
         /// <summary>
         /// Gets or sets the associated <see cref="Category"/> short name.
         /// </summary>
@@ -49,8 +56,9 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceCategory{T}"/> class.
         /// </summary>
-        protected ReportingDataSourceCategory()
+        protected ReportingDataSourceCategory(ISession session)
         {
+            this.Session = session;
             this.ShortName = GetParameterAttribute(this.GetType())?.ShortName;
         }
 
@@ -64,7 +72,7 @@ namespace CDP4Reporting.DataSource
         internal override void Initialize(ReportingDataSourceNode<T> node)
         {
             this.Node = node;
-            this.Value = this.HasCategory();
+            this.Value = this.IsMemberOfCategory();
         }
 
         /// <summary>
@@ -75,73 +83,35 @@ namespace CDP4Reporting.DataSource
         /// <returns>
         /// True if <see cref="Category.ShortName"/> was found, otherwise false.
         /// </returns>
-        private bool HasCategory()
+        private bool IsMemberOfCategory()
         {
-            var definitionCategory = this.Node.ElementDefinition.Category
-                .SingleOrDefault(x => x.ShortName == this.ShortName);
-
-            if (definitionCategory != null)
+            bool CategorizableThingHasCategory(ICategorizableThing element)
             {
-                return true;
-            }
-
-            foreach (var category in this.Node.ElementDefinition.Category)
-            {
-                if (this.ExistsInSuperCategory(category))
+                if (element == null)
                 {
-                    return true;
-                }
-            }
-
-            if (this.Node.ElementUsage != null)
-            {
-                var usageCategory = this.Node.ElementUsage.Category
-                    .SingleOrDefault(x => x.ShortName == this.ShortName);
-
-                if (usageCategory != null)
-                {
-                    return true;
+                    return false;
                 }
 
-                foreach (var category in this.Node.ElementUsage.Category)
+                var categories =
+                    this.Session.Assembler.Cache
+                        .Where(x => x.Value.Value.ClassKind == ClassKind.Category)
+                        .Select(x => x.Value.Value)
+                        .Cast<Category>()
+                        .Where(x => x.ShortName == this.ShortName)
+                        .ToList();
+
+                foreach (var category in categories)
                 {
-                    if (this.ExistsInSuperCategory(category))
+                    if (element.IsMemberOfCategory(category))
                     {
                         return true;
                     }
                 }
+
+                return false;
             }
 
-            return false;
-        }
-
-        /// <summary>
-        /// Checks if a <see cref="Category"/> has has <see cref="ReportingDataSourceCategory{T}.ShortName"/> as its <see cref="Category.ShortName"/>
-        /// in its <see cref="Category.SuperCategory"/> hierarchy.
-        /// </summary>
-        /// <param name="category">
-        /// The <see cref="Category"/>
-        /// </param>
-        /// <returns>
-        /// True if <see cref="Category.ShortName"/> was found, otherwise false.
-        /// </returns>
-        private bool ExistsInSuperCategory(Category category)
-        {
-            var exists = false;
-            var currentCategories = new List<Category>{category};
-
-            while (currentCategories.Any())
-            {
-                if (currentCategories.Any(x => x.ShortName.Equals(this.ShortName)))
-                {
-                    exists = true;
-                    break;
-                }
-
-                currentCategories = currentCategories.SelectMany(x => x.SuperCategory).ToList();
-            }
-
-            return exists;
+            return CategorizableThingHasCategory(this.Node.ElementDefinition) || CategorizableThingHasCategory(this.Node.ElementUsage);
         }
     }
 }

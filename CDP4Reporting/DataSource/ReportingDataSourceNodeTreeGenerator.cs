@@ -29,16 +29,21 @@ namespace CDP4Reporting.DataSource
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// A builder that builds a tree of <see cref="IEnumerable{ReportingDataSourceNode{T}}"/> instances.
+    /// A builder that builds a forest of <see cref="IEnumerable{T}"/> of <see cref="ReportingDataSourceNode{T}"/> instances.
     /// </summary>
     /// <typeparam name="T">
     /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
     /// </typeparam>
     internal class ReportingDataSourceNodeTreeGenerator<T> where T : ReportingDataSourceRow, new()
     {
+        /// <summary>
+        /// Generates a forest of <see cref="IEnumerable{T}"/> of <see cref="ReportingDataSourceNode{T}"/> instances
+        /// </summary>
+        /// <param name="categoryHierarchy">The <see cref="CategoryHierarchy"/> instance to use when searching for relevant data.</param>
+        /// <param name="nestedElements">A <see cref="List{NestedElement}"/> that contains the <see cref="NestedElement"/>s to search for relevant data.</param>
+        /// <returns><see cref="IEnumerable{T}"/> of <see cref="ReportingDataSourceNode{T}"/> instances</returns>
         public IEnumerable<ReportingDataSourceNode<T>> Generate(CategoryHierarchy categoryHierarchy, List<NestedElement> nestedElements)
         {
             var topElement = nestedElements.First(ne => ne.IsRootElement);
@@ -59,22 +64,22 @@ namespace CDP4Reporting.DataSource
             ReportingDataSourceNode<T> newNode = null;
             var searchCategory = categoryHierarchy;
 
-            if (this.HasCategory(nestedElement, categoryHierarchy.Category))
+            if (nestedElement.IsMemberOfCategory(categoryHierarchy.Category))
             {
                 newNode = new ReportingDataSourceNode<T>(categoryHierarchy, nestedElement, parentNode);
                 parentNode?.Children.Add(newNode);
                 resultNodes.Add(newNode);
             }
-            else if ((parentNode?.HadCategoryUpTree(categoryHierarchy.Category) ?? false) && categoryHierarchy.Child != null && this.HasCategory(nestedElement, categoryHierarchy.Child.Category))
+            else if (categoryHierarchy.Child != null && (parentNode?.HadCategoryUpTree(categoryHierarchy.Category) ?? false) && nestedElement.IsMemberOfCategory(categoryHierarchy.Child.Category))
             {
                 searchCategory = categoryHierarchy.Child;
 
                 newNode = new ReportingDataSourceNode<T>(searchCategory, nestedElement, parentNode);
-                parentNode?.Children.Add(newNode);
+                parentNode.Children.Add(newNode);
                 resultNodes.Add(newNode);
             }
 
-            var children = this.GetChildren(nestedElement, nestedElements).ToList();
+            var children = nestedElement.GetChildren(nestedElements).ToList();
 
             foreach (var child in children)
             {
@@ -87,97 +92,6 @@ namespace CDP4Reporting.DataSource
             }
 
             return resultNodes;
-        }
-
-        /// <summary>
-        /// The <see cref="ElementBase"/> representing a <see cref="NestedElement"/>.
-        /// </summary>
-        /// <param name="nestedElement">
-        /// The <see cref="NestedElement"/>.
-        /// </param>
-        /// <returns>
-        /// The <see cref="ElementBase"/>.
-        /// </returns>
-        private ElementBase GetElementBase(NestedElement nestedElement)
-        {
-            return nestedElement.IsRootElement ? (ElementBase)nestedElement.RootElement
-                : nestedElement.ElementUsage.Last();
-        }
-
-        /// <summary>
-        /// The <see cref="ElementDefinition"/> representing a <see cref="NestedElement"/>, if it exists.
-        /// </summary>
-        /// <param name="nestedElement">
-        /// The <see cref="NestedElement"/>.
-        /// </param>
-        /// <returns>
-        /// The <see cref="ElementDefinition"/>.
-        /// </returns>
-        private ElementDefinition GetElementDefinition(NestedElement nestedElement)
-        {
-            var elementBase = this.GetElementBase(nestedElement);
-
-            return elementBase as ElementDefinition ?? (elementBase as ElementUsage)?.ElementDefinition;
-        }
-
-        /// <summary>
-        /// The <see cref="ElementUsage"/> representing a <see cref="NestedElement"/>, if it exists.
-        /// </summary>
-        /// <param name="nestedElement">
-        /// The <see cref="NestedElement"/>.
-        /// </param>
-        /// <returns>
-        /// The <see cref="ElementUsage"/>.
-        /// </returns>
-        private ElementUsage GetElementUsage(NestedElement nestedElement)
-        {
-            return this.GetElementBase(nestedElement) as ElementUsage;
-        }
-
-        /// <summary>
-        /// Checks if a <see cref="NestedElement"/> contains a specific <see cref="Category"/>.
-        /// </summary>
-        /// <param name="nestedElement">
-        /// The <see cref="NestedElement"/>.
-        /// </param>
-        /// <param name="category">
-        /// The <see cref="Category"/>.
-        /// </param>
-        /// <returns>
-        /// True if the <paramref name="category"/> is found, otherwise false.
-        /// </returns>
-        private bool HasCategory(NestedElement nestedElement, Category category)
-        {
-            return (this.GetElementDefinition(nestedElement)?.Category.Contains(category) ?? false)
-                   || (this.GetElementUsage(nestedElement)?.Category.Contains(category) ?? false);
-        }
-
-        /// <summary>
-        /// Get the children of a <see cref="NestedElement"/>.
-        /// </summary>
-        /// <param name="parentElement">
-        /// The parent <see cref="NestedElement"/>.
-        /// </param>
-        /// <param name="nestedElements">
-        /// A list containing all <see cref="NestedElement"/>s.
-        /// </param>
-        /// <returns>
-        /// An <see cref="IEnumerable{NestedElement}"/> contianing all children <see cref="NestedElement"/>s.
-        /// </returns>
-        private IEnumerable<NestedElement> GetChildren(NestedElement parentElement, List<NestedElement> nestedElements)
-        {
-            var level = parentElement.ElementUsage.Count;
-
-            var children = nestedElements.Where(ne => ne.ElementUsage.Count == level + 1);
-
-            if (level > 0)
-            {
-                children = children.Where(ne =>
-                    ne.ElementUsage[level - 1] == parentElement.ElementUsage.LastOrDefault());
-            }
-
-            children = children.ToList();
-            return children;
         }
     }
 }

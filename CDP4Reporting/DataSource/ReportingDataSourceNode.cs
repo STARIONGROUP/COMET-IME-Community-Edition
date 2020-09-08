@@ -109,21 +109,19 @@ namespace CDP4Reporting.DataSource
         /// The <see cref="CDP4Common.EngineeringModelData.ElementBase"/> associated with this node.
         /// </summary>
         internal ElementBase ElementBase =>
-            this.NestedElement.IsRootElement
-                ? (ElementBase)this.NestedElement.RootElement
-                : this.NestedElement.ElementUsage.Last();
+            this.NestedElement.GetElementBase();
 
         /// <summary>
         /// The <see cref="CDP4Common.EngineeringModelData.ElementDefinition"/> representing this node.
         /// </summary>
         internal ElementDefinition ElementDefinition =>
-            (this.ElementBase as ElementDefinition) ?? (this.ElementBase as ElementUsage)?.ElementDefinition;
+            this.NestedElement.GetElementDefinition();
 
         /// <summary>
         /// The <see cref="ElementUsage"/> representing this node, if it exists.
         /// </summary>
         internal ElementUsage ElementUsage =>
-            this.ElementBase as ElementUsage;
+            this.NestedElement.GetElementUsage();
 
         /// <summary>
         /// The filtering <see cref="CategoryHierarchy"/> that must be matched on the current <see cref="ElementBase"/>.
@@ -131,23 +129,9 @@ namespace CDP4Reporting.DataSource
         private readonly CategoryHierarchy filterCategory;
 
         /// <summary>
-        /// The name of the field/column when the data is transfered to a <see cref="DataRow"/>.
+        /// Gets the name of the field/column when the data is transfered to a <see cref="DataRow"/>.
         /// </summary>
-        private readonly string fieldname;
-
-        /// <summary>
-        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
-        /// </summary>
-        private bool IsVisible =>
-             (this.ElementDefinition?.Category.Contains(this.filterCategory.Category) ?? false) ||
-             (this.ElementUsage?.Category.Contains(this.filterCategory.Category) ?? false);
-
-        /// <summary>
-        /// Boolean flag indicating whether the current node or any of its <see cref="Children"/>
-        /// match their associated <see cref="filterCategory"/>.
-        /// </summary>
-        private bool IsRelevant =>
-            this.IsVisible || this.Children.Any(child => child.IsRelevant);
+        private string fieldName => this.filterCategory?.FieldName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceNode{T}"/> class.
@@ -158,10 +142,6 @@ namespace CDP4Reporting.DataSource
         /// <param name="topElement">
         /// The <see cref="CDP4Common.EngineeringModelData.NestedElement"/> associated with this node.
         /// </param>
-        /// <param name="nestedElements">
-        /// All <see cref="CDP4Common.EngineeringModelData.NestedElement"/>s associated with the current
-        /// <see cref="ReportingDataSourceClass{T}"/>.
-        /// </param>
         /// <param name="parent">
         /// The parent node in the hierarhical tree upon which the data source is based.
         /// </param>
@@ -171,12 +151,8 @@ namespace CDP4Reporting.DataSource
             ReportingDataSourceNode<T> parent = null)
         {
             this.filterCategory = categoryHierarchy;
-            this.fieldname = categoryHierarchy.FieldName;
-
             this.NestedElement = topElement;
-
             this.parent = parent;
-
             this.rowRepresentation = this.GetRowRepresentation();
         }
 
@@ -191,23 +167,13 @@ namespace CDP4Reporting.DataSource
         /// </returns>
         internal bool HadCategoryUpTree(Category category)
         {
-            return this.HasCategory(category) || (this.parent?.HadCategoryUpTree(category) ?? false);
+            return this.NestedElement.IsMemberOfCategory(category) || (this.parent?.HadCategoryUpTree(category) ?? false);
         }
 
         /// <summary>
-        /// Checks if the a specific <see cref="Category"/> is found for this instance.
+        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
         /// </summary>
-        /// <param name="category">
-        /// The <see cref="Category"/>.
-        /// </param>
-        /// <returns>
-        /// True if found, otherwise false.
-        /// </returns>
-        private bool HasCategory(Category category)
-        {
-            return (this.ElementDefinition?.Category.Contains(category) ?? false)
-                   || (this.ElementUsage?.Category.Contains(category) ?? false);
-        }
+        private bool IsVisible => this.NestedElement.IsMemberOfCategory(this.filterCategory.Category);
 
         /// <summary>
         /// Gets the column of type <see cref="TP"/> associated with this node.
@@ -231,26 +197,30 @@ namespace CDP4Reporting.DataSource
         /// </returns>
         private T GetRowRepresentation()
         {
+            if (!this.IsVisible)
+            {
+                return null;
+            }
+
             var row = new T
             {
                 ElementBase = this.ElementBase,
                 IsVisible = this.IsVisible
             };
 
-            if (!this.IsVisible)
-            {
-                return null;
-            }
-
             foreach (var rowField in RowFields)
             {
-                var column = rowField.Key
-                    .GetConstructor(Type.EmptyTypes)
-                    .Invoke(new object[] { }) as ReportingDataSourceColumn<T>;
+                var method = rowField.Key
+                    .GetConstructor(Type.EmptyTypes);
 
-                column.Initialize(this);
+                if (!(method is null))
+                {
+                    var column = method.Invoke(new object[] { }) as ReportingDataSourceColumn<T>;
 
-                rowField.Value.SetValue(row, column);
+                    column?.Initialize(this);
+
+                    rowField.Value.SetValue(row, column);
+                }
             }
 
             return row;
@@ -312,7 +282,7 @@ namespace CDP4Reporting.DataSource
         {
             this.parent?.InitializeCategoryColumns(row);
 
-            row[this.fieldname] = this.ElementBase.Name;
+            row[this.fieldName] = this.ElementBase.Name;
         }
     }
 }
