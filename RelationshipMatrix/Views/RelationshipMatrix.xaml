@@ -427,12 +427,14 @@
                                                             ToolTip="Recursively includes all subcategories of the selected Categories." />
                                                 </dxlc:LayoutItem>
                                                 <dxlc:LayoutItem Label=" ">
-                                                    <dxe:ListBoxEdit 
-                                                            MinHeight="24"
-                                                            MaxHeight="80"
-                                                            Visibility="{Binding SourceXConfiguration.IsSourceXSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                            ItemsSource="{Binding SourceXConfiguration.SelectedCategoriesWithSubcategories, 
-                                                                          Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <dxe:TextEdit EditValue="{Binding SourceXConfiguration.CategoriesString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                                  MinHeight="24"
+                                                                  MaxHeight="80"
+                                                                  Visibility="{Binding SourceXConfiguration.IsSourceXSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                  VerticalScrollBarVisibility="Auto"
+                                                                  VerticalContentAlignment="Top"
+                                                                  TextWrapping="Wrap"
+                                                                  IsReadOnly="True"/>
                                                 </dxlc:LayoutItem>
                                                 <dxlc:LayoutItem Label="Owners: ">
                                                     <Grid>
@@ -530,12 +532,14 @@
                                                             ToolTip="Recursively includes all subcategories of the selected Categories." />
                                                 </dxlc:LayoutItem>
                                                 <dxlc:LayoutItem Label=" ">
-                                                    <dxe:ListBoxEdit 
-                                                        MinHeight="24"
-                                                        MaxHeight="80"
-                                                        Visibility="{Binding SourceYConfiguration.IsSourceYSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                        ItemsSource="{Binding SourceYConfiguration.SelectedCategoriesWithSubcategories, 
-                                                                          Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <dxe:TextEdit EditValue="{Binding SourceYConfiguration.CategoriesString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                                  MinHeight="24"
+                                                                  MaxHeight="80"
+                                                                  Visibility="{Binding SourceYConfiguration.IsSourceXSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                  VerticalScrollBarVisibility="Auto"
+                                                                  VerticalContentAlignment="Top"
+                                                                  TextWrapping="Wrap"
+                                                                  IsReadOnly="True"/>
                                                 </dxlc:LayoutItem>
                                                 <dxlc:LayoutItem Label="Owners: ">
                                                     <Grid>

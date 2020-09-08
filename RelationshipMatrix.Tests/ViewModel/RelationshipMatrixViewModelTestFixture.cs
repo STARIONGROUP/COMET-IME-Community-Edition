@@ -105,8 +105,8 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             vm.SourceYConfiguration.IncludeSubcategories = false;
 
-            Assert.AreEqual(0, vm.Matrix.Records.Count);
-            Assert.AreEqual(0, vm.Matrix.Columns.Count);
+            Assert.AreEqual(3, vm.Matrix.Records.Count);
+            Assert.AreEqual(3, vm.Matrix.Columns.Count);
 
             vm.SourceYConfiguration.IncludeSubcategories = true;
 
