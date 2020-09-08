@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SourceConfigurationViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -34,6 +34,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
     using Settings;
 
@@ -72,7 +73,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Backing field for <see cref="SelectedSortOrder"/> property.
         /// </summary>
         private SortOrder selectedSortOrder;
-        
+
         /// <summary>
         /// Backing field for <see cref="SelectedCategories"/>
         /// </summary>
@@ -92,6 +93,21 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Backing field for <see cref="IncludeSubcategories"/>
         /// </summary>
         private bool includeSubcategories;
+
+        /// <summary>
+        /// Backing field for <see cref="IsSourceYSelected" />
+        /// </summary>
+        private bool isSourceYSelected;
+
+        /// <summary>
+        /// Backing field for <see cref="IsSourceXSelected" />
+        /// </summary>
+        private bool isSourceXSelected;
+
+        /// <summary>
+        /// Backing field for <see cref="CategoriesString" />
+        /// </summary>
+        private string categoriesString;
 
         /// <summary>
         /// Backing field for <see cref="SelectedOwners"/> property
@@ -148,10 +164,27 @@ namespace CDP4RelationshipMatrix.ViewModels
                 this.OnLightUpdateAction();
             });
 
-            this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
+            this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ =>
+            {
+                this.OnLightUpdateAction();
+                this.SelectCategoriesThatIncludeSubcategories();
+            });
+
+            this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ =>
+            {
+                this.OnLightUpdateAction();
+                this.SelectCategoriesThatIncludeSubcategories();
+            });
+
+            this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ =>
+            {
+                this.OnLightUpdateAction();
+                this.SelectCategoriesThatIncludeSubcategories();
+            });
+
             this.WhenAnyValue(x => x.SelectedOwners).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
-            this.WhenAnyValue(x => x.SelectedBooleanOperatorKind).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
-            this.WhenAnyValue(x => x.IncludeSubcategories).Skip(1).Subscribe(_ => this.OnLightUpdateAction());
+            this.WhenAnyValue(x => x.SelectedCategories).Subscribe(x => this.IsSourceXSelected = x.Any());
+            this.WhenAnyValue(x => x.SelectedCategories).Subscribe(x => this.IsSourceYSelected = x.Any());
 
             var categorySubscription = CDPMessageBus.Current
                 .Listen<ObjectChangedEvent>(typeof(Category))
@@ -160,6 +193,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 .Subscribe(_ => {
                     this.PopulatePossibleCategories();
                     this.OnLightUpdateAction();
+                    this.SelectCategoriesThatIncludeSubcategories();
                 });
 
             this.Disposables.Add(categorySubscription);
@@ -282,6 +316,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         public ReactiveList<Category> PossibleCategories { get; }
 
         /// <summary>
+        /// Gets or sets the selected categories names
+        /// </summary>
+        public ReactiveList<string> SelectedCategoriesToDisplay { get; set; }
+
+        /// <summary>
         /// Gets the possible <see cref="DomainOfExpertise"/> associated to the <see cref="SelectedClassKind"/>
         /// </summary>
         /// <remarks>
@@ -322,6 +361,33 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the source Category from X-Axis is selected
+        /// </summary>
+        public bool IsSourceXSelected
+        {
+            get { return this.isSourceXSelected; }
+            private set { this.RaiseAndSetIfChanged(ref this.isSourceXSelected, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the source Category from Y-Axis is selected
+        /// </summary>
+        public bool IsSourceYSelected
+        {
+            get { return this.isSourceYSelected; }
+            private set { this.RaiseAndSetIfChanged(ref this.isSourceYSelected, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected categories names
+        /// </summary>
+        public string CategoriesString
+        {
+            get { return this.categoriesString; }
+            private set { this.RaiseAndSetIfChanged(ref this.categoriesString, value); }
+        }
+
+        /// <summary>
         /// Populates the possible <see cref="Category"/>
         /// </summary>
         private void PopulatePossibleCategories()
@@ -352,6 +418,30 @@ namespace CDP4RelationshipMatrix.ViewModels
             var engineeringModel = this.Iteration.TopContainer as EngineeringModel;
             var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
             this.PossibleOwners.AddRange(domains);
+        }
+
+        /// <summary>
+        /// Populates the selected <see cref="Category"/> name accordingly to the IncludeSubcategories value
+        /// </summary>
+        private void SelectCategoriesThatIncludeSubcategories()
+        {
+            var categories = new List<string>();
+
+            if (this.IncludeSubcategories)
+            {
+                foreach (var item in this.SelectedCategories)
+                {
+                    var values = item.AllDerivedCategories().Select(x => x.Name);
+
+                    categories.Add(values.Count() > 1 ? $"({item.Name} OR {string.Join(" OR ", item.AllDerivedCategories().Select(x => x.Name))})" : $"({item.Name})");
+                }
+            }
+            else
+            {
+                categories.AddRange(this.SelectedCategories.Select(x => x.Name));
+            }
+
+            this.CategoriesString = string.Join($" {this.SelectedBooleanOperatorKind} ", categories);
         }
     }
 }

@@ -52,8 +52,6 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         public override void Setup()
         {
             base.Setup();
-
-            
         }
 
         [Test]
