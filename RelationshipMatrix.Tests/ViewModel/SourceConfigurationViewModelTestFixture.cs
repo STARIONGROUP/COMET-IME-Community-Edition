@@ -28,13 +28,10 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using System.Collections.Generic;
 
     using CDP4Common.SiteDirectoryData;
+
     using CDP4RelationshipMatrix.ViewModels;
 
     using NUnit.Framework;
-    using System.Linq;
-
-    using CDP4Dal;
-    using CDP4Dal.Events;
 
     using CDP4RelationshipMatrix.Settings;
 
