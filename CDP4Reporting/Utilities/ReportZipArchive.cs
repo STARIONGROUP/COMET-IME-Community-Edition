@@ -37,12 +37,12 @@ namespace CDP4Reporting.Utilities
         /// <summary>
         /// The report file <see cref="Stream"/>
         /// </summary>
-        public Stream Repx;
+        public Stream Repx { get; set; }
 
         /// <summary>
         /// The datasource <see cref="Stream"/>
         /// </summary>
-        public Stream DataSource;
+        public Stream Source { get; set; }
 
         /// <summary>
         /// Dispose the containing streams
@@ -50,7 +50,7 @@ namespace CDP4Reporting.Utilities
         public void Dispose()
         {
             this.Repx.Dispose();
-            this.DataSource.Dispose();
+            this.Source.Dispose();
         }
     }
 }
