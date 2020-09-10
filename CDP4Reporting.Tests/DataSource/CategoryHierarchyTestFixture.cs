@@ -111,13 +111,12 @@ namespace CDP4Reporting.Tests.DataSource
         }
 
         [Test]
-        public void VerifyThatTopHierarchyIsNull()
+        public void VerifyThatExceptionThrowsWhenEmptyTopLevel()
         {
             var hierarchy = new CategoryHierarchy
-                .Builder(this.iteration)
-                .Build();
+                .Builder(this.iteration);
 
-            Assert.IsNull(hierarchy);
+            Assert.Throws<ArgumentException>(() => hierarchy.Build());
         }
 
         [Test]

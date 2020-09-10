@@ -30,8 +30,6 @@ namespace CDP4Reporting.DataSource
     /// </summary>
     internal interface IReportingDataSource
     {
-        private readonly CategoryHierarchy categoryHierarchy;
-
         /// <summary>
         /// Creates a new data source instance.
         /// </summary>

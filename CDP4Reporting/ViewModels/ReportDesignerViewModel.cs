@@ -293,12 +293,21 @@ namespace CDP4Reporting.ViewModels
 
             this.RebuildDatasourceCommand.Subscribe(async _ =>
             {
-                var source = this.Document.Text;
-                await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+                this.IsBusy = true;
 
-                if (!this.CompileResult?.Errors.HasErrors ?? false)
+                try
                 {
-                    this.RebuildDataSource();
+                    var source = this.Document.Text;
+                    await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+
+                    if (!this.CompileResult?.Errors.HasErrors ?? false)
+                    {
+                            this.RebuildDataSource();
+                    }
+                }
+                finally
+                {
+                    this.IsBusy = false;
                 }
             });
 
