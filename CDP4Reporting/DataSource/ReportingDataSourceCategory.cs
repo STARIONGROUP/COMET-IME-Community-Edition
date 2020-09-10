@@ -31,18 +31,11 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Dal;
-
     /// <summary>
     /// Abstract base class from which all category columns for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
     public abstract class ReportingDataSourceCategory<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
-        /// <summary>
-        /// The <see cref="ISession"/> to be used by this class
-        /// </summary>
-        public ISession Session { get; }
-
         /// <summary>
         /// Gets or sets the associated <see cref="Category"/> short name.
         /// </summary>
@@ -56,9 +49,8 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceCategory{T}"/> class.
         /// </summary>
-        protected ReportingDataSourceCategory(ISession session)
+        protected ReportingDataSourceCategory()
         {
-            this.Session = session;
             this.ShortName = GetParameterAttribute(this.GetType())?.ShortName;
         }
 
@@ -85,33 +77,28 @@ namespace CDP4Reporting.DataSource
         /// </returns>
         private bool IsMemberOfCategory()
         {
-            bool CategorizableThingHasCategory(ICategorizableThing element)
+            if (this.Node.NestedElement == null)
             {
-                if (element == null)
-                {
-                    return false;
-                }
-
-                var categories =
-                    this.Session.Assembler.Cache
-                        .Where(x => x.Value.Value.ClassKind == ClassKind.Category)
-                        .Select(x => x.Value.Value)
-                        .Cast<Category>()
-                        .Where(x => x.ShortName == this.ShortName)
-                        .ToList();
-
-                foreach (var category in categories)
-                {
-                    if (element.IsMemberOfCategory(category))
-                    {
-                        return true;
-                    }
-                }
-
                 return false;
             }
 
-            return CategorizableThingHasCategory(this.Node.ElementDefinition) || CategorizableThingHasCategory(this.Node.ElementUsage);
+            var categories =
+                this.Node.ElementBase.Cache
+                    .Where(x => x.Value.Value.ClassKind == ClassKind.Category)
+                    .Select(x => x.Value.Value)
+                    .Cast<Category>()
+                    .Where(x => x.ShortName == this.ShortName)
+                    .ToList();
+
+            foreach (var category in categories)
+            {
+                if (this.Node.NestedElement.IsMemberOfCategory(category))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

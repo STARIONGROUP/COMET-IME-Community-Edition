@@ -699,10 +699,12 @@ namespace CDP4Reporting.ViewModels
         /// <returns>The <see cref="IEnumerable{IReportingParameter}"/></returns>
         private IReadOnlyList<IReportingParameter> GetParameters(object dataSource)
         {
+            var result = new List<IReportingParameter>();
+
             if (this.CompileResult == null)
             {
                 this.AddOutput("Compile data source code first.");
-                return new List<IReportingParameter>();
+                return result;
             }
 
             AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolver;
@@ -719,21 +721,27 @@ namespace CDP4Reporting.ViewModels
 
                 if (editorFullClassName == null)
                 {
-                    return new List<IReportingParameter>();
+                    return result;
                 }
 
                 if (!(this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
                 {
                     this.AddOutput("Report parameter class not found.");
-                    return new List<IReportingParameter>();
+                    return result;
                 }
 
-                return instObj.CreateParameters(dataSource)?.ToList();
+                result = instObj.CreateParameters(dataSource)?.ToList();
+            }
+            catch (Exception ex)
+            {
+                this.AddOutput(ex.ToString());
             }
             finally
             {
                 AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
             }
+
+            return result;
         }
 
         /// <summary>
@@ -775,10 +783,16 @@ namespace CDP4Reporting.ViewModels
 
                 return instObj.CreateFilterString(parameters);
             }
+            catch (Exception ex)
+            {
+                this.AddOutput(ex.ToString());
+            }
             finally
             {
                 AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
             }
+
+            return null;
         }
 
         /// <summary>
