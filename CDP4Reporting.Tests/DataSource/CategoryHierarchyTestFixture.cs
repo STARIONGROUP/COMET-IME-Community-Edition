@@ -47,6 +47,7 @@ namespace CDP4Reporting.Tests.DataSource
         private Category cat1;
         private Category cat2;
         private Category cat3;
+        private Category cat4;
 
         [SetUp]
         public void SetUp()
@@ -81,6 +82,14 @@ namespace CDP4Reporting.Tests.DataSource
 
             this.cache.TryAdd(new CacheKey(this.cat3.Iid, null), new Lazy<Thing>(() => this.cat3));
 
+            this.cat4 = new Category(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "cat4",
+                Name = "cat4"
+            };
+
+            this.cache.TryAdd(new CacheKey(this.cat4.Iid, null), new Lazy<Thing>(() => this.cat4));
+
             #endregion
         }
 
@@ -102,12 +111,22 @@ namespace CDP4Reporting.Tests.DataSource
         }
 
         [Test]
+        public void VerifyThatExceptionThrowsWhenEmptyTopLevel()
+        {
+            var hierarchy = new CategoryHierarchy
+                .Builder(this.iteration);
+
+            Assert.Throws<ArgumentException>(() => hierarchy.Build());
+        }
+
+        [Test]
         public void VerifyThatCategoryHierarchyIsCorrect()
         {
             var hierarchy = new CategoryHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .AddLevel(this.cat2.ShortName)
                 .AddLevel(this.cat3.ShortName)
+                .AddLevel(this.cat4.ShortName, "cat4FieldName")
                 .Build();
 
             Assert.AreEqual(this.cat1, hierarchy.Category);
@@ -117,6 +136,9 @@ namespace CDP4Reporting.Tests.DataSource
 
             hierarchy = hierarchy.Child;
             Assert.AreEqual(this.cat3, hierarchy.Category);
+
+            hierarchy = hierarchy.Child;
+            Assert.AreEqual(this.cat4, hierarchy.Category);
 
             Assert.IsNull(hierarchy.Child);
         }

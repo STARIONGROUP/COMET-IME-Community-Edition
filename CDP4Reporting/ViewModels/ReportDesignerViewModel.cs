@@ -23,9 +23,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Reporting.ViewModels
 {
+    using System;
+    using System.CodeDom.Compiler;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.IO.Compression;
+    using System.Linq;
+    using System.Reactive;
+    using System.Reflection;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
@@ -34,28 +45,33 @@ namespace CDP4Reporting.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Utilities;
+    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
+
+    using CDP4Reporting.DataSource;
+    using CDP4Reporting.Parameters;
+    using CDP4Reporting.Utilities;
+
+    using DevExpress.DataAccess.ObjectBinding;
+    using DevExpress.Xpf.Reports.UserDesigner;
+    using DevExpress.XtraReports.Parameters;
+    using DevExpress.XtraReports.UI;
+
     using ICSharpCode.AvalonEdit.Document;
+
     using Microsoft.Practices.ServiceLocation;
-    using NLog;
+
     using ReactiveUI;
-    using System;
-    using System.CodeDom.Compiler;
-    using System.IO;
-    using System.Linq;
-    using System.Reactive;
-    using System.Reactive.Linq;
-    using System.Reflection;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Threading;
+
+    using File = System.IO.File;
+    using Parameter = DevExpress.XtraReports.Parameters.Parameter;
 
     /// <summary>
     /// The view-model for the Report Designer that lets users to create reports based on template source files.
     /// </summary>
-    public class ReportDesignerViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
+    public partial class ReportDesignerViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -63,44 +79,112 @@ namespace CDP4Reporting.ViewModels
         private const string PanelCaption = "Reporting";
 
         /// <summary>
-        /// The Nlog Logger
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
         /// The <see cref="IOpenSaveFileDialogService"/> that is used to navigate to the File Open/Save dialog
         /// </summary>
         private readonly IOpenSaveFileDialogService openSaveFileDialogService;
 
         /// <summary>
+        /// The <see cref="SingleConcurrentActionRunner "/> that handles the compilation of a datasource
+        /// </summary>
+        private readonly SingleConcurrentActionRunner compilationConcurrentActionRunner = new SingleConcurrentActionRunner();
+
+        /// <summary>
+        /// The currently active <see cref="XtraReport"/> in the Report Designer
+        /// </summary>
+        private XtraReport currentReport = new XtraReport();
+
+        /// <summary>
+        /// The currently active <see cref="TextDocument"/> in the Avalon Editor
+        /// </summary>
+        private TextDocument document;
+
+        /// <summary>
+        /// The currently active <see cref="ReportDesignerDocument"/> in the Report Designer
+        /// </summary>
+        private ReportDesignerDocument currentReportDesignerDocument;
+
+        /// <summary>
         /// Open code file inside the editor
         /// </summary>
-        public ReactiveCommand<object> OpenScriptCommand { get; set; }
+        public ReactiveCommand<object> ImportScriptCommand { get; set; }
 
         /// <summary>
         /// Saves code that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<object> SaveScriptCommand { get; set; }
+        public ReactiveCommand<object> ExportScriptCommand { get; set; }
 
         /// <summary>
         /// Build code that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<object> BuildScriptCommand { get; set; }
+        public ReactiveCommand<Unit> CompileScriptCommand { get; set; }
 
         /// <summary>
-        /// Automatically build code that has been typed in the editor
+        /// Create a new Report 
         /// </summary>
-        public ReactiveCommand<Unit> AutomaticBuildCommand { get; set; }
+        public ReactiveCommand<object> NewReportCommand { get; set; }
+
+        /// <summary>
+        /// Open rep4 zip archive which consists in datasource code file and report designer file
+        /// </summary>
+        public ReactiveCommand<object> OpenReportCommand { get; set; }
+
+        /// <summary>
+        /// Save editor code and report designer to rep4 zip archive
+        /// </summary>
+        public ReactiveCommand<object> SaveReportCommand { get; set; }
+
+        /// <summary>
+        /// Save editor code and report designer to rep4 zip archive and force the SaveFile dialog to be shown
+        /// </summary>
+        public ReactiveCommand<object> SaveReportAsCommand { get; set; }
+
+        /// <summary>
+        /// Fires when the DataSource text was changed
+        /// </summary>
+        public ReactiveCommand<object> DataSourceTextChangedCommand { get; set; }
+
+        /// <summary>
+        /// Fires when the DataSource text was changed
+        /// </summary>
+        public ReactiveCommand<Unit> RebuildDatasourceCommand { get; set; }
+
+        /// <summary>
+        /// Fires when the DataSource text needs to be cleared
+        /// </summary>
+        public ReactiveCommand<object> ClearOutputCommand { get; set; }
+
+        /// <summary>
+        /// Fires when the Active Document changes in the Report Designer
+        /// </summary>
+        public ReactiveCommand<Unit> ActiveDocumentChangedCommand { get; set; }
 
         /// <summary>
         /// Gets or sets text editor document
         /// </summary>
-        public TextDocument Document { get; set; }
+        public TextDocument Document
+        {
+            get => this.document;
+            set => this.RaiseAndSetIfChanged(ref this.document, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Report Designer's current Report
+        /// </summary>
+        public XtraReport CurrentReport
+        {
+            get => this.currentReport;
+            set => this.RaiseAndSetIfChanged(ref this.currentReport, value);
+        }
 
         /// <summary>
         /// Gets or sets current edited file path
         /// </summary>
-        public string FilePath { get; set; }
+        public string CodeFilePath { get; set; }
+
+        /// <summary>
+        /// Gets or sets current archive zip file path that contains resx report designer file and datasource c# file
+        /// </summary>
+        public string CurrentReportProjectFilePath { get; set; }
 
         /// <summary>
         /// Backing field for <see cref="Errors" />
@@ -124,7 +208,8 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Gets or sets value for output's log messages
         /// </summary>
-        public string Output {
+        public string Output
+        {
             get => this.output;
             set => this.RaiseAndSetIfChanged(ref this.output, value);
         }
@@ -132,20 +217,25 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Gets or sets build output result
         /// </summary>
-        public CompilerResults BuildResult { get; private set; }
+        public CompilerResults CompileResult { get; private set; }
 
         /// <summary>
-        /// Backing field for <see cref="IsAutoBuildEnabled" />
+        /// Backing field for <see cref="IsAutoCompileEnabled" />
         /// </summary>
-        private bool isAutoBuildEnabled;
+        private bool isAutoCompileEnabled;
+
+        /// <summary>
+        /// The last saved datasource text
+        /// </summary>
+        private string lastSavedDataSourceText = string.Empty;
 
         /// <summary>
         /// Gets or sets a value indicating whether automatically build is checked
         /// </summary>
-        public bool IsAutoBuildEnabled
+        public bool IsAutoCompileEnabled
         {
-            get => this.isAutoBuildEnabled;
-            set => this.RaiseAndSetIfChanged(ref this.isAutoBuildEnabled, value);
+            get => this.isAutoCompileEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isAutoCompileEnabled, value);
         }
 
         /// <summary>
@@ -166,127 +256,664 @@ namespace CDP4Reporting.ViewModels
             this.Document = new TextDocument();
             this.Errors = string.Empty;
             this.Output = string.Empty;
-            this.IsAutoBuildEnabled = false;
+            this.IsAutoCompileEnabled = false;
 
             this.openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 
-            this.SaveScriptCommand = ReactiveCommand.Create();
-            this.SaveScriptCommand.Subscribe(_ => this.SaveScript());
+            this.ExportScriptCommand = ReactiveCommand.Create();
+            this.ExportScriptCommand.Subscribe(_ => this.ExportScript());
 
-            this.OpenScriptCommand = ReactiveCommand.Create();
-            this.OpenScriptCommand.Subscribe(_ => this.OpenScript());
+            this.ImportScriptCommand = ReactiveCommand.Create();
+            this.ImportScriptCommand.Subscribe(_ => this.ImportScript());
 
-            this.BuildScriptCommand = ReactiveCommand.Create();
-            this.BuildScriptCommand.Subscribe(_ => this.BuildScript());
-
-            this.AutomaticBuildCommand = ReactiveCommand.CreateAsyncTask(_ => this.AutomaticBuildScript(), RxApp.MainThreadScheduler);
-        }
-
-        /// <summary>
-        /// Trigger save file operation
-        /// </summary>
-        private void SaveScript()
-        {
-            if (string.IsNullOrEmpty(this.FilePath))
+            this.CompileScriptCommand = ReactiveCommand.CreateAsyncTask(async _ =>
             {
-                var filePath = this.openSaveFileDialogService.GetSaveFileDialog("MassBudgetDataSource", "cs", "CS(.cs) | *.cs", string.Empty, 1);
+                var source = this.Document.Text;
+                await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+            });
 
-                if (filePath == null)
+            this.NewReportCommand = ReactiveCommand.Create();
+            this.NewReportCommand.Subscribe(_ => this.CreateNewReport());
+
+            this.OpenReportCommand = ReactiveCommand.Create();
+            this.OpenReportCommand.Subscribe(_ => this.OpenReportProject());
+
+            this.SaveReportCommand = ReactiveCommand.Create();
+            this.SaveReportCommand.Subscribe(_ => this.SaveReportProject());
+
+            this.SaveReportAsCommand = ReactiveCommand.Create();
+            this.SaveReportAsCommand.Subscribe(_ => this.SaveReportProject(true));
+
+            this.DataSourceTextChangedCommand = ReactiveCommand.Create();
+            this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoCompileScript());
+
+            this.RebuildDatasourceCommand = ReactiveCommand.CreateAsyncTask(async _ =>
+            {
+                this.IsBusy = true;
+
+                try
                 {
-                    return;
-                }
+                    var source = this.Document.Text;
+                    await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
 
-                this.FilePath = filePath;
-            }
-            if (!string.IsNullOrEmpty(this.FilePath))
-            {
-                System.IO.File.WriteAllText(this.FilePath, this.Document.Text);
-            }
+                    if (!this.CompileResult?.Errors.HasErrors ?? false)
+                    {
+                            this.RebuildDataSource();
+                    }
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            });
+
+            this.ClearOutputCommand = ReactiveCommand.Create();
+            this.ClearOutputCommand.Subscribe(_ => { this.Output = string.Empty; });
+
+            this.ActiveDocumentChangedCommand = ReactiveCommand.CreateAsyncTask(x =>
+                this.SetReportDesigner(((DependencyPropertyChangedEventArgs) x).NewValue), RxApp.MainThreadScheduler);
         }
 
         /// <summary>
-        /// Trigger open file operation
+        /// Asynchronously runs the setting of the <see cref="currentReportDesignerDocument"/> field.
         /// </summary>
-        private void OpenScript()
+        /// <param name="newValue">The <see cref="ReportDesignerDocument"/> as an <see cref="object"/></param>
+        /// <returns>The <see cref="Task"/></returns>
+        private async Task SetReportDesigner(object newValue)
         {
-            var filePath = this.openSaveFileDialogService.GetOpenFileDialog(true, true, false, "CS(.cs) | *.cs", ".cs", string.Empty, 1);
+            await Task.Run(() => this.currentReportDesignerDocument = (ReportDesignerDocument) newValue);
+        }
+
+        /// <summary>
+        /// Trigger open script file operation
+        /// </summary>
+        private void ImportScript()
+        {
+            var filePath = this.openSaveFileDialogService.GetOpenFileDialog(true, true, false, "CS(.cs)|*.cs", ".cs", string.Empty, 1);
 
             if (filePath == null || filePath.Length != 1)
             {
                 return;
             }
 
-            this.Document.Text = System.IO.File.ReadAllText(filePath.Single());
+            this.CodeFilePath = filePath.Single();
+
+            this.Document.Text = File.ReadAllText(this.CodeFilePath);
             this.IsDirty = true;
         }
 
         /// <summary>
-        /// Trigger build operation
+        /// Trigger save script file operation
         /// </summary>
-        private void BuildScript()
+        private void ExportScript()
         {
-            this.CompileAssembly();
+            var codeFilePath = this.CodeFilePath ?? "ReportDataSource.cs";
+
+            var filePath = this.openSaveFileDialogService.GetSaveFileDialog(Path.GetFileName(codeFilePath), "cs", "CS(.cs) | *.cs", codeFilePath, 1);
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return;
+            }
+
+            this.CodeFilePath = filePath;
+
+            if (!string.IsNullOrEmpty(this.CodeFilePath))
+            {
+                File.WriteAllText(this.CodeFilePath, this.Document.Text);
+            }
         }
 
         /// <summary>
-        /// Trigger automatic build operation
+        /// Checks if AutoCompile script is active and start compilation accordingly.
         /// </summary>
-        public async Task AutomaticBuildScript()
+        private void CheckAutoCompileScript()
         {
-            await Task.Run(this.CompileAssembly);
+            if (!this.IsAutoCompileEnabled)
+            {
+                return;
+            }
+
+            this.compilationConcurrentActionRunner.DelayRunAction(() => this.CompileAssembly(this.Document.Text), 2500);
         }
 
         /// <summary>
-        /// Execute compile
+        /// Create a new report project
         /// </summary>
-        private void CompileAssembly()
+        private void CreateNewReport()
         {
-            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(() =>
+            if (!this.IsSwitchReportProjectAllowed())
+            {
+                return;
+            }
+
+            this.Document = new TextDocument(string.Empty);
+            this.lastSavedDataSourceText = "";
+            this.CurrentReport = new XtraReport();
+            this.CurrentReportProjectFilePath = string.Empty;
+        }
+
+        /// <summary>
+        /// Open an existing report project
+        /// </summary>
+        private void OpenReportProject()
+        {
+            if (!this.IsSwitchReportProjectAllowed())
+            {
+                return;
+            }
+
+            var filePath = this.openSaveFileDialogService.GetOpenFileDialog(true, true, false, "Report project files (*.rep4)|*.rep4|All files (*.*)|*.*", ".rep4", string.Empty, 1);
+
+            var reportProjectFilePath = filePath?.SingleOrDefault();
+
+            if (reportProjectFilePath == null)
+            {
+                return;
+            }
+
+            var report = new XtraReport();
+
+            using (var reportStream = this.GetReportStream(reportProjectFilePath))
+            {
+                report.LoadLayoutFromXml(reportStream.Repx);
+
+                this.Document = new TextDocument();
+
+                if (reportStream.DataSource != null)
+                {
+                    using (var streamReader = new StreamReader(reportStream.DataSource))
+                    {
+                        var datasource = streamReader.ReadToEnd();
+                        this.Document = new TextDocument(datasource);
+                    }
+
+                    this.CompileAssembly(this.Document.Text);
+                }
+            }
+
+            this.CurrentReport = report;
+            this.CurrentReportProjectFilePath = reportProjectFilePath;
+
+            this.RebuildDataSource();
+
+            this.lastSavedDataSourceText = this.Document.Text;
+            this.currentReportDesignerDocument?.SetValue(ReportDesignerDocument.HasChangesProperty, false);
+        }
+
+        /// <summary>
+        /// Checks if creating a new report, or opening an existing report is allowed.
+        /// </summary>
+        /// <returns>true if allowed, otherwise false. </returns>
+        private bool IsSwitchReportProjectAllowed()
+        {
+            if ((bool)(this.currentReportDesignerDocument?.GetValue(ReportDesignerDocument.HasChangesProperty) ?? false) || !this.lastSavedDataSourceText.Equals(this.Document.Text))
+            {
+                var confirmation = new GenericConfirmationDialogViewModel("Warning",
+                    "The currently active report has unsaved changes. \n Are you sure you want to continue and lose these changes?");
+
+                var result = this.DialogNavigationService.NavigateModal(confirmation);
+
+                return (result?.Result.HasValue ?? false) && result.Result.Value;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Save the report project
+        /// </summary>
+        /// <param name="forceDialog">Forces the file dialog to select where to save the report project.</param>
+        private void SaveReportProject(bool forceDialog = false)
+        {
+            var archiveName = "ReportArchive";
+            var initialPath = string.Empty;
+            var fileShouldExist = !string.IsNullOrWhiteSpace(this.CurrentReportProjectFilePath);
+
+            if (fileShouldExist)
+            {
+                archiveName = Path.GetFileNameWithoutExtension(this.CurrentReportProjectFilePath);
+                initialPath = this.CurrentReportProjectFilePath;
+            }
+
+            var filePath = this.CurrentReportProjectFilePath;
+
+            if (!fileShouldExist || forceDialog)
+            {
+                filePath = this.openSaveFileDialogService.GetSaveFileDialog(archiveName, "rep4", "Report project files (*.rep4)|*.rep4|All files (*.*)|*.*", initialPath, 1);
+            }
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return;
+            }
+
+            this.CurrentReportProjectFilePath = filePath;
+
+            if (File.Exists(this.CurrentReportProjectFilePath))
+            {
+                File.Delete(this.CurrentReportProjectFilePath);
+            }
+
+            using (var reportStream = new MemoryStream())
+            {
+                this.CurrentReport.SaveLayoutToXml(reportStream);
+
+                using (var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(this.Document.Text)))
+                {
+                    using (var zipFile = ZipFile.Open(this.CurrentReportProjectFilePath, ZipArchiveMode.Create))
+                    {
+                        using (var reportEntry = zipFile.CreateEntry("Report.repx").Open())
+                        {
+                            reportStream.Position = 0;
+                            reportStream.CopyTo(reportEntry);
+                        }
+
+                        using (var reportEntry = zipFile.CreateEntry("Datasource.cs").Open())
+                        {
+                            dataSourceStream.Position = 0;
+                            dataSourceStream.CopyTo(reportEntry);
+                        }
+                    }
+                }
+
+                this.lastSavedDataSourceText = this.Document.Text;
+                this.currentReportDesignerDocument?.SetValue(ReportDesignerDocument.HasChangesProperty, false);
+            }
+        }
+
+        /// <summary>
+        /// Rebuild the report's datasource
+        /// </summary>
+        private void RebuildDataSource()
+        {
+            const string dataSourceName = "ReportDataSource";
+            var reportDataSource = this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>().FirstOrDefault(x => x.Name.Equals(dataSourceName));
+            object dataSource;
+
+            try
+            {
+                dataSource = this.GetDataSource();
+            }
+            catch (Exception ex)
+            {
+                this.Errors = $"{ex.Message}\n{ex.StackTrace}";
+                return;
+            }
+
+            var parameters = this.GetParameters(dataSource);
+
+            if (parameters?.Any() ?? false)
+            {
+                var filterString = this.GetFilterString(parameters);
+
+                this.currentReport.FilterString = filterString;
+
+                this.CheckParameters(parameters);
+            }
+
+            if (reportDataSource == null)
+            {
+                // Create new datasource
+                reportDataSource = new ObjectDataSource
+                {
+                    DataSource = dataSource,
+                    Name = dataSourceName
+                };
+
+                this.CurrentReport.ComponentStorage.Add(reportDataSource);
+                this.CurrentReport.DataSource = reportDataSource;
+
+                // Add dynamic parameter to report definition
+                this.currentReportDesignerDocument?.MakeChanges(
+                    changes => { changes.AddItem(reportDataSource); });
+            }
+            else
+            {
+                // Use existing datasource
+                reportDataSource.DataSource = dataSource;
+                reportDataSource.RebuildResultSchema();
+            }
+        }
+
+        /// <summary>
+        /// Get the data representation for the report
+        /// </summary>
+        /// <returns>The datasource as an <see cref="object"/></returns>
+        private object GetDataSource()
+        {
+            if (this.CompileResult == null)
+            {
+                this.AddOutput("Build data source code first.");
+                return null;
+            }
+
+            AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolver;
+
+            try
+            {
+                var editorFullClassName =
+                    this.CompileResult
+                        .CompiledAssembly
+                        .GetTypes()
+                        .FirstOrDefault(t => t.IsSubclassOf(typeof(ReportingDataSource))
+                        )?.FullName;
+
+                if (editorFullClassName == null)
+                {
+                    this.AddOutput($"No class that inherits from {typeof(ReportingDataSource)} was found.");
+                    return null;
+                }
+
+                var instObj = this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) as ReportingDataSource;
+
+                if (instObj == null)
+                {
+                    this.AddOutput("Data source class not found.");
+                    return null;
+                }
+
+                instObj.Initialize(this.Thing, this.Session);
+
+                return instObj.CreateDataSource();
+            }
+            catch (Exception ex)
+            {
+                this.Errors = $"{ex.Message}\n{ex.StackTrace}";
+                throw;
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
+            }
+        }
+
+        /// <summary>
+        /// Check if the compiled assembly built from the code editor contains a class that implements the <see cref="IReportingParameters"/> interface
+        /// If true, then create report parameters using that class.
+        /// </summary>
+        /// <param name="parameters">
+        /// The <see cref="IEnumerable{IReportingParameter}"/> that contains the report's parameters
+        /// </param>
+        private void CheckParameters(IEnumerable<IReportingParameter> parameters)
+        {
+            var reportingParameters = parameters.ToList();
+
+            var toBeRemoved = new List<Parameter>();
+            var defaultValues = new Dictionary<string, object>();
+
+            //Find existing dynamic parameters
+            foreach (var reportParameter in this.CurrentReport.Parameters)
+            {
+                if (reportParameter.Name.StartsWith(ReportingParameter.NamePrefix))
+                {
+                    defaultValues.Add(reportParameter.Name, reportParameter.Value);
+                    toBeRemoved.Add(reportParameter);
+                }
+            }
+
+            // Remove old dynamic parameters
+            if (toBeRemoved.Any())
+            {
+                foreach (var reportParameter in toBeRemoved)
+                {
+                    this.currentReportDesignerDocument?.MakeChanges(
+                        changes => { changes.RemoveItem(reportParameter); });
+                }
+            }
+
+            if (!(reportingParameters?.Any() ?? false))
+            {
+                return;
+            }
+
+            // Create new dynamic parameters
+            foreach (var reportingParameter in reportingParameters)
+            {
+                var newReportParameter = new Parameter
+                {
+                    Name = reportingParameter.ParameterName,
+                    Description = reportingParameter.Name,
+                    Type = reportingParameter.Type,
+                    Visible = true
+                };
+
+                if (reportingParameter.LookUpValues.Any())
+                {
+                    var staticListLookupSettings = new StaticListLookUpSettings();
+                    newReportParameter.LookUpSettings = staticListLookupSettings;
+
+                    foreach (var keyValuePair in reportingParameter.LookUpValues)
+                    {
+                        staticListLookupSettings.LookUpValues.Add(new LookUpValue(keyValuePair.Key, keyValuePair.Value));
+                    }
+                }
+
+                // Restore default values
+                if (defaultValues.ContainsKey(reportingParameter.ParameterName))
+                {
+                    newReportParameter.Value = defaultValues[reportingParameter.ParameterName];
+                }
+
+                // Add dynamic parameter to report definition
+                this.currentReportDesignerDocument?.MakeChanges(
+                    changes => { changes.AddItem(newReportParameter); });
+            }
+        }
+
+        /// <summary>
+        /// Check if the compiled assembly built from the code editor contains a class that implements the <see cref="IReportingParameters"/> interface
+        /// If true, then execute the class' <see cref="IReportingParameters.CreateParameters"/> method.
+        /// </summary>
+        /// <param name="dataSource">The datasource, which could be used to create parameters</param>
+        /// <returns>The <see cref="IEnumerable{IReportingParameter}"/></returns>
+        private IReadOnlyList<IReportingParameter> GetParameters(object dataSource)
+        {
+            var result = new List<IReportingParameter>();
+
+            if (this.CompileResult == null)
+            {
+                this.AddOutput("Compile data source code first.");
+                return result;
+            }
+
+            AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolver;
+
+            try
+            {
+                var editorFullClassName =
+                    this.CompileResult
+                        .CompiledAssembly
+                        .GetTypes()
+                        .FirstOrDefault(t => t.GetInterfaces()
+                            .Any(i => i == typeof(IReportingParameters))
+                        )?.FullName;
+
+                if (editorFullClassName == null)
+                {
+                    return result;
+                }
+
+                if (!(this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
+                {
+                    this.AddOutput("Report parameter class not found.");
+                    return result;
+                }
+
+                result = instObj.CreateParameters(dataSource)?.ToList();
+            }
+            catch (Exception ex)
+            {
+                this.AddOutput(ex.ToString());
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Check if the compiled assembly built from the code editor contains a class that implements the <see cref="IReportingParameters"/> interface
+        /// If true, then execute the class' <see cref="IReportingParameters.CreateFilterString"/> method.
+        /// </summary>
+        /// <param name="parameters">The <see cref="IEnumerable{IReportingParameter}"/>, which could be used to create a filter string</param>
+        /// <returns>The create Filter string in <see cref="IReportingParameters.CreateFilterString"/></returns>.
+        private string GetFilterString(IEnumerable<IReportingParameter> parameters)
+        {
+            if (this.CompileResult == null)
+            {
+                this.AddOutput("Compile data source code first.");
+                return null;
+            }
+
+            AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolver;
+
+            try
+            {
+                var editorFullClassName =
+                    this.CompileResult
+                        .CompiledAssembly
+                        .GetTypes()
+                        .FirstOrDefault(t => t.GetInterfaces()
+                            .Any(i => i == typeof(IReportingParameters))
+                        )?.FullName;
+
+                if (editorFullClassName == null)
+                {
+                    return null;
+                }
+
+                if (!(this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
+                {
+                    this.AddOutput("Report parameter class not found.");
+                    return null;
+                }
+
+                return instObj.CreateFilterString(parameters);
+            }
+            catch (Exception ex)
+            {
+                this.AddOutput(ex.ToString());
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Needed for using the CDP4Reporting assembly
+        /// </summary>
+        /// <param name="sender">The sender <see cref="object"/></param>
+        /// <param name="args">The <see cref="ResolveEventArgs"/></param>
+        /// <returns></returns>
+        private Assembly AssemblyResolver(object sender, ResolveEventArgs args)
+        {
+            if (args.Name == this.GetType().Assembly.FullName)
+            {
+                return this.GetType().Assembly;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Add text to the output pane
+        /// </summary>
+        /// <param name="text">The text</param>
+        private void AddOutput(string text)
+        {
+            this.Output += $"{DateTime.Now:HH:mm:ss} {text}{Environment.NewLine}";
+        }
+
+        /// <summary>
+        /// Get report zip archive components
+        /// </summary>
+        /// <param name="rep4File">archive zip file</param>
+        /// <returns>The <see cref="ReportZipArchive"/></returns>
+        private ReportZipArchive GetReportStream(string rep4File)
+        {
+            using (var zipFile = ZipFile.OpenRead(rep4File))
+            {
+                var repxStream = new MemoryStream();
+                var dataSourceStream = new MemoryStream();
+
+                zipFile.Entries.FirstOrDefault(x => x.Name.EndsWith(".repx"))?.Open().CopyTo(repxStream);
+                repxStream.Position = 0;
+                zipFile.Entries.FirstOrDefault(x => x.Name.EndsWith(".cs"))?.Open().CopyTo(dataSourceStream);
+                dataSourceStream.Position = 0;
+
+                return new ReportZipArchive
+                {
+                    Repx = repxStream,
+                    DataSource = dataSourceStream
+                };
+            }
+        }
+
+        /// <summary>
+        /// Execute compilation of the code in the Code Editor
+        /// </summary>
+        private void CompileAssembly(string source)
+        {
+            try
             {
                 this.Errors = string.Empty;
 
-                if (string.IsNullOrEmpty(this.Document.Text))
+                if (string.IsNullOrEmpty(source))
                 {
-                    this.Output += $"{DateTime.Now:HH:mm:ss} Nothing to compile.{Environment.NewLine}";
+                    this.AddOutput("Nothing to compile.");
                     return;
                 }
 
                 var compiler = new Microsoft.CSharp.CSharpCodeProvider();
-                var parameters = new CompilerParameters();
-                // TODO Figure out how to invoke from different paths(eg: from tests)
-                var currentFolder = System.IO.File.Exists("CDP4Common.dll") ? "." : Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-                parameters.ReferencedAssemblies.Add("System.dll");
-                parameters.ReferencedAssemblies.Add("System.Core.dll");
-                parameters.ReferencedAssemblies.Add("System.Collections.dll");
-                parameters.ReferencedAssemblies.Add("System.Linq.dll");
-                parameters.ReferencedAssemblies.Add("System.Windows.dll");
-
-                parameters.ReferencedAssemblies.Add($"{currentFolder}\\CDP4Common.dll");
-                parameters.ReferencedAssemblies.Add($"{currentFolder}\\CDP4Composition.dll");
-
-                parameters.GenerateInMemory = true;
-                parameters.GenerateExecutable = false;
-
-                this.BuildResult = compiler.CompileAssemblyFromSource(parameters, this.Document.Text);
-
-                if (this.BuildResult.Errors.Count == 0)
+                var parameters = new CompilerParameters
                 {
-                    this.Output += $"{DateTime.Now:HH:mm:ss} File succesfully compiled.{Environment.NewLine}";
+                    GenerateInMemory = true,
+                    GenerateExecutable = false
+                };
+
+                var currentAssemblies =
+                    AppDomain.CurrentDomain.GetAssemblies()
+                        .Where(x => !x.IsDynamic)
+                        .Select(x => x.Location)
+                        .ToArray();
+
+                parameters.ReferencedAssemblies.AddRange(currentAssemblies);
+
+                this.CompileResult = compiler.CompileAssemblyFromSource(parameters, source);
+
+                if (this.CompileResult.Errors.Count == 0)
+                {
+                    this.AddOutput("File succesfully compiled.");
                     this.Errors = string.Empty;
                     return;
                 }
 
-                var sbErrors = new StringBuilder($"{DateTime.Now:HH:mm:ss} Compilation Errors");
+                var sbErrors = new StringBuilder($"{DateTime.Now:HH:mm:ss} Compilation Errors:");
 
-                foreach (var error in this.BuildResult.Errors)
+                foreach (var error in this.CompileResult.Errors)
                 {
                     sbErrors.AppendLine(error.ToString());
                 }
 
                 this.Errors = sbErrors.ToString();
-                Logger.Trace(sbErrors.ToString());
-            }));
+            }
+            catch (Exception ex)
+            {
+                var exception = ex;
+
+                while (exception != null)
+                {
+                    this.AddOutput($"{ex.Message}\\n{ex.StackTrace}\\n");
+                    exception = exception.InnerException;
+                }
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ namespace CDP4Reporting.DataSource
     /// <summary>
     /// Abstract base class from which all columns for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
-    internal abstract class ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
+    public abstract class ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
         /// Gets the <see cref="DefinedThingShortNameAttribute"/> decorating the class described by <paramref name="type"/>.
@@ -55,7 +55,7 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// The <see cref="ReportingDataSourceNode{T}"/> associated to this parameter.
         /// </summary>
-        protected ReportingDataSourceNode<T> Node;
+        internal ReportingDataSourceNode<T> Node;
 
         /// <summary>
         /// Initializes a reported column based on the corresponding <see cref="ReportingDataSourceNode{T}"/>

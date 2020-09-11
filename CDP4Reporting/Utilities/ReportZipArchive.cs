@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICDP4ReportingDataSource.cs" company="RHEA System S.A.">
+// <copyright file="ReportZipArchive.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -19,23 +19,38 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+
+namespace CDP4Reporting.Utilities
 {
+    using System;
+    using System.IO;
+
     /// <summary>
-    /// The interface used for creating a reporting data source.
+    /// Struct that maps streams on archive zip file path
     /// </summary>
-    internal interface IReportingDataSource
+    public struct ReportZipArchive : IDisposable
     {
         /// <summary>
-        /// Creates a new data source instance.
+        /// The report file <see cref="Stream"/>
         /// </summary>
-        /// <returns>
-        /// An object instance.
-        /// </returns>
-        object CreateDataSource();
+        public Stream Repx { get; set; }
+
+        /// <summary>
+        /// The datasource <see cref="Stream"/>
+        /// </summary>
+        public Stream DataSource { get; set; }
+
+        /// <summary>
+        /// Dispose the containing streams
+        /// </summary>
+        public void Dispose()
+        {
+            this.Repx.Dispose();
+            this.DataSource.Dispose();
+        }
     }
 }

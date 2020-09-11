@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICDP4ReportingDataSource.cs" company="RHEA System S.A.">
+// <copyright file="IReportingParameters.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -19,23 +19,39 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Reporting.Parameters
 {
+    using System.Collections.Generic;
+
     /// <summary>
-    /// The interface used for creating a reporting data source.
+    /// Interface to be used in the Code editor of <see cref="Views.ReportDesigner"/>.
     /// </summary>
-    internal interface IReportingDataSource
+    public interface IReportingParameters
     {
         /// <summary>
-        /// Creates a new data source instance.
+        /// Create a list of <see cref="IReportingParameter"/>s.
         /// </summary>
+        /// <param name="dataSource">
+        /// The datasource.
+        /// </param>
         /// <returns>
-        /// An object instance.
+        /// A list of <see cref="IReportingParameter"/>s.
         /// </returns>
-        object CreateDataSource();
+        IEnumerable<IReportingParameter> CreateParameters(object dataSource);
+
+        /// <summary>
+        /// Creates a filterString to be user as a report filter expression.
+        /// </summary>
+        /// <param name="reportingParameters">
+        /// The <see cref="IEnumerable{IReportingParameter}"/>.
+        /// </param>
+        /// <returns>
+        /// The filter expression.
+        /// </returns>
+        string CreateFilterString(IEnumerable<IReportingParameter> reportingParameters);
     }
 }

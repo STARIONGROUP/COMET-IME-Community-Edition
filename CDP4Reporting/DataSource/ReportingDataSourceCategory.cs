@@ -27,23 +27,24 @@ namespace CDP4Reporting.DataSource
 {
     using System.Linq;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// Abstract base class from which all category columns for a <see cref="ReportingDataSourceRow"/> need to derive.
     /// </summary>
-    internal abstract class ReportingDataSourceCategory<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
+    public abstract class ReportingDataSourceCategory<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
     {
         /// <summary>
-        /// The associated <see cref="Category"/> short name.
+        /// Gets or sets the associated <see cref="Category"/> short name.
         /// </summary>
-        internal readonly string ShortName;
+        public string ShortName { get; private set; }
 
         /// <summary>
         /// Flag indicating whether the associated <see cref="Category"/> is present.
         /// </summary>
-        protected bool Value { get; private set; }
+        public bool Value { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportingDataSourceCategory{T}"/> class.
@@ -63,22 +64,41 @@ namespace CDP4Reporting.DataSource
         internal override void Initialize(ReportingDataSourceNode<T> node)
         {
             this.Node = node;
+            this.Value = this.IsMemberOfCategory();
+        }
 
-            var definitionCategory = this.Node.ElementDefinition.Category
-                .SingleOrDefault(x => x.ShortName == this.ShortName);
-
-            if (definitionCategory != null)
+        /// <summary>
+        /// Checks if the <see cref="ElementDefinition.Category"/>, or <see cref="ElementUsage.Category"/> contains a <see cref="Category"/>
+        /// that has <see cref="ReportingDataSourceCategory{T}.ShortName"/> as its <see cref="Category.ShortName"/>, or somewhere in the
+        /// <see cref="Category.SuperCategory"/> hierarchy.
+        /// </summary>
+        /// <returns>
+        /// True if <see cref="Category.ShortName"/> was found, otherwise false.
+        /// </returns>
+        private bool IsMemberOfCategory()
+        {
+            if (this.Node.NestedElement == null)
             {
-                this.Value = true;
+                return false;
             }
 
-            var usageCategory = this.Node.ElementUsage?.Category
-                .SingleOrDefault(x => x.ShortName == this.ShortName);
+            var categories =
+                this.Node.ElementBase.Cache
+                    .Where(x => x.Value.Value.ClassKind == ClassKind.Category)
+                    .Select(x => x.Value.Value)
+                    .Cast<Category>()
+                    .Where(x => x.ShortName == this.ShortName)
+                    .ToList();
 
-            if (usageCategory != null)
+            foreach (var category in categories)
             {
-                this.Value = true;
+                if (this.Node.NestedElement.IsMemberOfCategory(category))
+                {
+                    return true;
+                }
             }
+
+            return false;
         }
     }
 }
