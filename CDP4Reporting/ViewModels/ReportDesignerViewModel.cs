@@ -116,7 +116,7 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Build code that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<object> CompileScriptCommand { get; set; }
+        public ReactiveCommand<Unit> CompileScriptCommand { get; set; }
 
         /// <summary>
         /// Create a new Report 
@@ -146,7 +146,7 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Fires when the DataSource text was changed
         /// </summary>
-        public ReactiveCommand<object> RebuildDatasourceCommand { get; set; }
+        public ReactiveCommand<Unit> RebuildDatasourceCommand { get; set; }
 
         /// <summary>
         /// Fires when the DataSource text needs to be cleared
@@ -184,7 +184,7 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Gets or sets current archive zip file path that contains resx report designer file and datasource c# file
         /// </summary>
-        public string currentReportProjectFilePath { get; set; }
+        public string CurrentReportProjectFilePath { get; set; }
 
         /// <summary>
         /// Backing field for <see cref="Errors" />
@@ -266,9 +266,7 @@ namespace CDP4Reporting.ViewModels
             this.ImportScriptCommand = ReactiveCommand.Create();
             this.ImportScriptCommand.Subscribe(_ => this.ImportScript());
 
-            this.CompileScriptCommand = ReactiveCommand.Create();
-
-            this.CompileScriptCommand.Subscribe(async _ =>
+            this.CompileScriptCommand = ReactiveCommand.CreateAsyncTask(async _ =>
             {
                 var source = this.Document.Text;
                 await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
@@ -289,9 +287,7 @@ namespace CDP4Reporting.ViewModels
             this.DataSourceTextChangedCommand = ReactiveCommand.Create();
             this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoCompileScript());
 
-            this.RebuildDatasourceCommand = ReactiveCommand.Create();
-
-            this.RebuildDatasourceCommand.Subscribe(async _ =>
+            this.RebuildDatasourceCommand = ReactiveCommand.CreateAsyncTask(async _ =>
             {
                 this.IsBusy = true;
 
@@ -394,7 +390,7 @@ namespace CDP4Reporting.ViewModels
             this.Document = new TextDocument(string.Empty);
             this.lastSavedDataSourceText = "";
             this.CurrentReport = new XtraReport();
-            this.currentReportProjectFilePath = string.Empty;
+            this.CurrentReportProjectFilePath = string.Empty;
         }
 
         /// <summary>
@@ -437,7 +433,7 @@ namespace CDP4Reporting.ViewModels
             }
 
             this.CurrentReport = report;
-            this.currentReportProjectFilePath = reportProjectFilePath;
+            this.CurrentReportProjectFilePath = reportProjectFilePath;
 
             this.RebuildDataSource();
 
@@ -472,15 +468,15 @@ namespace CDP4Reporting.ViewModels
         {
             var archiveName = "ReportArchive";
             var initialPath = string.Empty;
-            var fileShouldExist = !string.IsNullOrWhiteSpace(this.currentReportProjectFilePath);
+            var fileShouldExist = !string.IsNullOrWhiteSpace(this.CurrentReportProjectFilePath);
 
             if (fileShouldExist)
             {
-                archiveName = Path.GetFileNameWithoutExtension(this.currentReportProjectFilePath);
-                initialPath = this.currentReportProjectFilePath;
+                archiveName = Path.GetFileNameWithoutExtension(this.CurrentReportProjectFilePath);
+                initialPath = this.CurrentReportProjectFilePath;
             }
 
-            var filePath = this.currentReportProjectFilePath;
+            var filePath = this.CurrentReportProjectFilePath;
 
             if (!fileShouldExist || forceDialog)
             {
@@ -492,11 +488,11 @@ namespace CDP4Reporting.ViewModels
                 return;
             }
 
-            this.currentReportProjectFilePath = filePath;
+            this.CurrentReportProjectFilePath = filePath;
 
-            if (File.Exists(this.currentReportProjectFilePath))
+            if (File.Exists(this.CurrentReportProjectFilePath))
             {
-                File.Delete(this.currentReportProjectFilePath);
+                File.Delete(this.CurrentReportProjectFilePath);
             }
 
             using (var reportStream = new MemoryStream())
@@ -505,7 +501,7 @@ namespace CDP4Reporting.ViewModels
 
                 using (var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(this.Document.Text)))
                 {
-                    using (var zipFile = ZipFile.Open(this.currentReportProjectFilePath, ZipArchiveMode.Create))
+                    using (var zipFile = ZipFile.Open(this.CurrentReportProjectFilePath, ZipArchiveMode.Create))
                     {
                         using (var reportEntry = zipFile.CreateEntry("Report.repx").Open())
                         {
@@ -569,7 +565,7 @@ namespace CDP4Reporting.ViewModels
                 this.CurrentReport.DataSource = reportDataSource;
 
                 // Add dynamic parameter to report definition
-                this.currentReportDesignerDocument.MakeChanges(
+                this.currentReportDesignerDocument?.MakeChanges(
                     changes => { changes.AddItem(reportDataSource); });
             }
             else
@@ -621,6 +617,11 @@ namespace CDP4Reporting.ViewModels
 
                 return instObj.CreateDataSource();
             }
+            catch (Exception ex)
+            {
+                this.Errors = $"{ex.Message}\n{ex.StackTrace}";
+                throw;
+            }
             finally
             {
                 AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
@@ -656,7 +657,7 @@ namespace CDP4Reporting.ViewModels
             {
                 foreach (var reportParameter in toBeRemoved)
                 {
-                    this.currentReportDesignerDocument.MakeChanges(
+                    this.currentReportDesignerDocument?.MakeChanges(
                         changes => { changes.RemoveItem(reportParameter); });
                 }
             }
@@ -695,7 +696,7 @@ namespace CDP4Reporting.ViewModels
                 }
 
                 // Add dynamic parameter to report definition
-                this.currentReportDesignerDocument.MakeChanges(
+                this.currentReportDesignerDocument?.MakeChanges(
                     changes => { changes.AddItem(newReportParameter); });
             }
         }
