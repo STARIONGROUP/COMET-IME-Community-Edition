@@ -284,19 +284,19 @@ namespace CDP4Requirements.ReqIFDal
             thingFactory.ComputeRequirementThings(this.reqIf);
             
             var dialog = new RequirementSpecificationMappingDialogViewModel(thingFactory, this.iteration, this.session, this.thingDialogNavigationService, this.reqIf.Lang);
-            var res = (MappingDialogNavigationResult)this.dialogNavigationService.NavigateModal(dialog);
+            var mappingDialogNavigationResult = (MappingDialogNavigationResult)this.dialogNavigationService.NavigateModal(dialog);
 
-            if (res?.Result != true)
+            if (mappingDialogNavigationResult?.Result != true)
             {
                 return;
             }
 
-            if (res.GoNext == true)
+            if (mappingDialogNavigationResult.GoNext == true)
             {
                 this.SpecificationMapResult = thingFactory.SpecificationMap;
             }
 
-            if (res.Result == true && res.GoNext == false)
+            if (mappingDialogNavigationResult.Result == true && mappingDialogNavigationResult.GoNext == false)
             {
                 this.NavigateToRelationshipDialog();
             }
