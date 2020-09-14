@@ -105,7 +105,7 @@ namespace CDP4Requirements.ReqIFDal
         /// <summary>
         /// Gets the map of <see cref="Specification"/> created
         /// </summary>
-        public IReadOnlyDictionary<Specification, RequirementsSpecification> SpecificationMapResult;
+        public IReadOnlyDictionary<Specification, RequirementsSpecification> SpecificationMapResult { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReqIfImportMappingManager"/> class
