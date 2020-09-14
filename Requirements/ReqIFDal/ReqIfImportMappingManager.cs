@@ -1,20 +1,45 @@
-ï»¿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportMappingManager.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ReqIFDal
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+
     using CDP4Requirements.ViewModels;
+
     using ReqIFSharp;
 
     /// <summary>
@@ -76,6 +101,11 @@ namespace CDP4Requirements.ReqIFDal
         /// The <see cref="SpecificationType"/> map
         /// </summary>
         private Dictionary<SpecificationType, SpecTypeMap> specificationTypeMap;
+
+        /// <summary>
+        /// Gets the map of <see cref="Specification"/> created
+        /// </summary>
+        public IReadOnlyDictionary<Specification, RequirementsSpecification> SpecificationMapResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReqIfImportMappingManager"/> class
@@ -252,19 +282,55 @@ namespace CDP4Requirements.ReqIFDal
 
             var thingFactory = new ThingFactory(this.iteration, this.datatypeDefinitionMap, typeMap, this.currentDomain, this.reqIf.Lang);
             thingFactory.ComputeRequirementThings(this.reqIf);
-
+            
             var dialog = new RequirementSpecificationMappingDialogViewModel(thingFactory, this.iteration, this.session, this.thingDialogNavigationService, this.reqIf.Lang);
             var res = (MappingDialogNavigationResult)this.dialogNavigationService.NavigateModal(dialog);
 
-            if (res == null || !res.Result.HasValue || !res.Result.Value)
+            if (res?.Result != true)
             {
                 return;
             }
 
-            if (res.Result.Value && res.GoNext.HasValue && !res.GoNext.Value)
+            if (res.GoNext == true)
+            {
+                this.SpecificationMapResult = thingFactory.SpecificationMap;
+            }
+
+            if (res.Result == true && res.GoNext == false)
             {
                 this.NavigateToRelationshipDialog();
             }
+        }
+
+        /// <summary>
+        /// Saves the configured mapping
+        /// </summary>
+        public void SaveMapping()
+        {
+            if (this.SpecificationMapResult == null)
+            {
+                return;
+            }
+
+            var reqIfTitle = this.reqIf.TheHeader.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Title))?.Title;
+
+            var map = new ExternalIdentifierMap(Guid.NewGuid(), this.session.Assembler.Cache, this.session.Assembler.IDalUri)
+            {
+                Owner = this.currentDomain,
+                ExternalModelName = reqIfTitle
+            };
+
+            foreach (var keyValuePair in this.SpecificationMapResult)
+            {
+                map.Correspondence.Add(
+                new IdCorrespondence(Guid.NewGuid(), this.session.Assembler.Cache, this.session.Assembler.IDalUri)
+                {
+                    InternalThing = keyValuePair.Value.Iid,
+                    ExternalId = keyValuePair.Key.Identifier
+                });       
+            }
+
+            this.iteration.ExternalIdentifierMap.Add(map);
         }
     }
 }

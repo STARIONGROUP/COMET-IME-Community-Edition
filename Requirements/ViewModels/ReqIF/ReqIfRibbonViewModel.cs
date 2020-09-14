@@ -174,6 +174,7 @@ namespace CDP4Requirements.ViewModels
 
             var reqifToThingMapper = new ReqIfImportMappingManager(result.ReqIfObject, session, result.Iteration, activeDomain, this.DialogNavigationService, this.ThingDialogNavigationService);
             reqifToThingMapper.StartMapping();
+            reqifToThingMapper.SaveMapping();
         }
     }
 }
