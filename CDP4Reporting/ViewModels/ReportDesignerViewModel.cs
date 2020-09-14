@@ -528,7 +528,11 @@ namespace CDP4Reporting.ViewModels
         private void RebuildDataSource()
         {
             const string dataSourceName = "ReportDataSource";
-            var reportDataSource = this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>().FirstOrDefault(x => x.Name.Equals(dataSourceName));
+
+            var reportDataSource = 
+                this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>()
+                    .Union(this.CurrentReport.ComponentStorage.OfType<CDP4ObjectDataSource>()).FirstOrDefault(x => x.Name.Equals(dataSourceName));
+            
             object dataSource;
 
             try
@@ -552,10 +556,22 @@ namespace CDP4Reporting.ViewModels
                 this.CheckParameters(parameters);
             }
 
+            if (reportDataSource?.GetType() == typeof(ObjectDataSource))
+            {
+                var source = reportDataSource;
+
+                this.CurrentReport.ComponentStorage.Remove(reportDataSource);
+
+                this.currentReportDesignerDocument?.MakeChanges(
+                    changes => { changes.RemoveItem(source); });
+
+                reportDataSource = null;
+            }
+
             if (reportDataSource == null)
             {
                 // Create new datasource
-                reportDataSource = new ObjectDataSource
+                reportDataSource = new CDP4ObjectDataSource
                 {
                     DataSource = dataSource,
                     Name = dataSourceName
