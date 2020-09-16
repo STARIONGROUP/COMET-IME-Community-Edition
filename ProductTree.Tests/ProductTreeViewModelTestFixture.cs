@@ -1,9 +1,28 @@
-﻿// ------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ProductTree.Tests
 {
@@ -11,25 +30,40 @@ namespace ProductTree.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading;
+    using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services.NestedElementTreeService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4ProductTree.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
+    [Apartment(ApartmentState.STA)]
     internal class ProductTreeViewModelTestFixture
     {
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<IPermissionService> permissionService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -47,11 +81,20 @@ namespace ProductTree.Tests
         private ElementDefinition elementDef;
         private DomainOfExpertise domain;
         private Assembler assembler;
+        private readonly string nestedParameterPath = "PATH";
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.nestedElementTreeService = new Mock<INestedElementTreeService>();
+            this.nestedElementTreeService.Setup(x => x.GetNestedParameterPath(It.IsAny<ParameterBase>(), It.IsAny<Option>())).Returns(this.nestedParameterPath);
+
+            this.serviceLocator.Setup(x => x.GetInstance<INestedElementTreeService>()).Returns(this.nestedElementTreeService.Object);
 
             this.permissionService = new Mock<IPermissionService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -63,7 +106,7 @@ namespace ProductTree.Tests
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) {GivenName = "John", Surname = "Doe"};
+            this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
             this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelSetup.Name = "model name";
@@ -73,6 +116,7 @@ namespace ProductTree.Tests
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.option = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "option name",
@@ -80,6 +124,7 @@ namespace ProductTree.Tests
             };
 
             this.elementDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "domain",
@@ -104,10 +149,11 @@ namespace ProductTree.Tests
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(new BaseDialogResult(true));
+
             this.session.Setup(x => x.OpenIterations).Returns(
                 new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                 {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                    { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
                 });
         }
 
@@ -232,11 +278,12 @@ namespace ProductTree.Tests
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
 
-            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) {Container = this.iteration};
-            var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "Not owned"};
+            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
+            var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Not owned" };
             var boolParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) {Owner = anotherDomain, Container = elementdef, ParameterType = boolParamType};
-            var published = new ValueArray<string>(new List<string> {"published"});
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = anotherDomain, Container = elementdef, ParameterType = boolParamType };
+            var published = new ValueArray<string>(new List<string> { "published" });
+
             var paramValueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Published = published,
@@ -244,6 +291,7 @@ namespace ProductTree.Tests
                 Computed = published,
                 ValueSwitch = ParameterSwitchKind.COMPUTED
             };
+
             parameter.ValueSet.Add(paramValueSet);
             elementdef.Parameter.Add(parameter);
             this.iteration.TopElement = elementdef;
@@ -254,7 +302,6 @@ namespace ProductTree.Tests
             var paramRow = vm.TopElement.Single().ContainedRows.First() as ParameterOrOverrideBaseRowViewModel;
             Assert.NotNull(paramRow);
             vm.SelectedThing = paramRow;
-
 
             Assert.IsTrue(vm.CreateSubscriptionCommand.CanExecute(null));
             Assert.AreEqual(0, paramRow.Thing.ParameterSubscription.Count);
@@ -280,12 +327,13 @@ namespace ProductTree.Tests
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
 
-            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) {Container = this.iteration};
-            var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "Not owned"};
+            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
+            var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Not owned" };
             var boolParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) {Owner = anotherDomain, Container = elementdef, ParameterType = boolParamType};
-            parameter.ParameterSubscription.Add(new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) {Owner = this.domain});
-            var published = new ValueArray<string>(new List<string> {"published"});
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = anotherDomain, Container = elementdef, ParameterType = boolParamType };
+            parameter.ParameterSubscription.Add(new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain });
+            var published = new ValueArray<string>(new List<string> { "published" });
+
             var paramValueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Published = published,
@@ -293,6 +341,7 @@ namespace ProductTree.Tests
                 Computed = published,
                 ValueSwitch = ParameterSwitchKind.COMPUTED
             };
+
             parameter.ValueSet.Add(paramValueSet);
             elementdef.Parameter.Add(parameter);
             this.iteration.TopElement = elementdef;
@@ -305,11 +354,48 @@ namespace ProductTree.Tests
             vm.SelectedThing = paramRow;
 
             vm.PopulateContextMenu();
-            Assert.AreEqual(7, vm.ContextMenu.Count);
+            Assert.AreEqual(8, vm.ContextMenu.Count);
 
             Assert.IsTrue(vm.DeleteSubscriptionCommand.CanExecute(null));
             Assert.AreEqual(1, paramRow.Thing.ParameterSubscription.Count);
             vm.DeleteSubscriptionCommand.Execute(null);
+        }
+
+        [Test]
+        public void VerifyCopyPathToClipboardCommand()
+        {
+            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration, ShortName = "ELEMENT" };
+            var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Not owned" };
+            var boolParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "PARAM" };
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = anotherDomain, Container = elementdef, ParameterType = boolParamType };
+            var published = new ValueArray<string>(new List<string> { "published" });
+
+            var paramValueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Published = published,
+                Manual = published,
+                Computed = published,
+                ValueSwitch = ParameterSwitchKind.COMPUTED
+            };
+
+            parameter.ValueSet.Add(paramValueSet);
+            elementdef.Parameter.Add(parameter);
+            this.iteration.TopElement = elementdef;
+
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+
+            var paramRow = vm.TopElement.Single().ContainedRows.First() as ParameterOrOverrideBaseRowViewModel;
+            Assert.NotNull(paramRow);
+            vm.SelectedThing = paramRow;
+
+            vm.PopulateContextMenu();
+            Assert.AreEqual(7, vm.ContextMenu.Count);
+
+            Clipboard.SetText("Reset");
+
+            vm.CopyPathToClipboardCommand.Execute(null);
+
+            Assert.IsTrue(Clipboard.GetDataObject().GetData(typeof(string)).ToString().Contains($"{this.nestedParameterPath}"));
         }
 
         [Test]
@@ -318,7 +404,7 @@ namespace ProductTree.Tests
             this.session.Setup(x => x.OpenIterations).Returns(
                 new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                 {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                    { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
                 });
 
             var vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
@@ -327,7 +413,7 @@ namespace ProductTree.Tests
             this.session.Setup(x => x.OpenIterations).Returns(
                 new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                 {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null)}
+                    { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null) }
                 });
 
             vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
@@ -344,16 +430,19 @@ namespace ProductTree.Tests
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
-            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) {Container = this.iteration};
+            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
             var boolParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Container = elementdef,
                 ElementDefinition = elementdef
             };
-            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) {Owner = this.domain, Container = elementUsage, ParameterType = boolParamType};
+
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain, Container = elementUsage, ParameterType = boolParamType };
             elementdef.Parameter.Add(parameter);
-            var published = new ValueArray<string>(new List<string> {"published"});
+            var published = new ValueArray<string>(new List<string> { "published" });
+
             var paramValueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Published = published,
@@ -361,6 +450,7 @@ namespace ProductTree.Tests
                 Computed = published,
                 ValueSwitch = ParameterSwitchKind.COMPUTED
             };
+
             parameter.ValueSet.Add(paramValueSet);
 
             var usageRow = new ElementUsageRowViewModel(elementUsage, this.option, this.session.Object, null);
@@ -384,7 +474,7 @@ namespace ProductTree.Tests
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
             vm.PopulateContextMenu();
-            Assert.AreEqual(6, vm.ContextMenu.Count);
+            Assert.AreEqual(7, vm.ContextMenu.Count);
         }
 
         [Test]
@@ -401,7 +491,6 @@ namespace ProductTree.Tests
             Assert.DoesNotThrow(vm.Dispose);
         }
 
-
         [Test]
         public void VerifyContextMenuPopulation()
         {
@@ -414,7 +503,7 @@ namespace ProductTree.Tests
             var elemDef = vm.TopElement.Single();
             vm.SelectedThing = elemDef;
             vm.PopulateContextMenu();
-            Assert.AreEqual(5, vm.ContextMenu.Count);
+            Assert.AreEqual(6, vm.ContextMenu.Count);
         }
 
         [Test]
