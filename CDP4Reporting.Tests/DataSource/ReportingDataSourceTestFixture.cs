@@ -31,16 +31,23 @@ namespace CDP4Reporting.Tests.DataSource
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Dal;
+
     using CDP4Reporting.DataSource;
+
+    using Moq;
 
     using NUnit.Framework;
 
     [TestFixture]
-    public class DataSourceTestFixture
+    public class ReportingDataSourceTestFixture
     {
+        private Mock<ISession> session;
+
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private Iteration iteration;
@@ -79,7 +86,19 @@ namespace CDP4Reporting.Tests.DataSource
         {
         }
 
-        [SetUp]
+        public class TestDataSource : ReportingDataSource
+        {
+            public TestDataSource()
+            {
+            }
+
+            public override object CreateDataSource()
+            {
+                return null;
+            }
+        };
+
+    [SetUp]
         public void SetUp()
         {
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
@@ -136,14 +155,38 @@ namespace CDP4Reporting.Tests.DataSource
                 Name = "domain"
             };
 
-            // Element Definitions
+            this.session = new Mock<ISession>();
+            this.session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(this.domain);
 
+            // Element Definitions
             this.ed1 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed1",
                 Name = "element definition 1",
                 Owner = this.domain
             };
+
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, null);
+
+            var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, null)
+            {
+                Reference = new ValueArray<string>(new[] { "2" }),
+                Computed = new ValueArray<string>(new[] { "2" }),
+                Formula = new ValueArray<string>(new[] { "2" }),
+                Manual = new ValueArray<string>(new[] { "2" }),
+                ValueSwitch = ParameterSwitchKind.MANUAL
+            };
+
+            parameter.Owner = this.domain;
+
+            parameter.ParameterType = new SimpleQuantityKind
+            {
+                ShortName = "par"
+            };
+
+            parameter.ValueSet.Add(parameterValueSet);
+
+            this.ed1.Parameter.Add(parameter);
 
             this.ed2p = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
@@ -400,6 +443,17 @@ namespace CDP4Reporting.Tests.DataSource
 
             ValidateRow(rows[0], this.eu12p1, this.eu2p31);
             ValidateRow(rows[1], this.eu4, this.eu7);
+        }
+
+        [Test]
+        public void VerifyGetNestedParameterValueByPath()
+        {
+            var testDataSource = new TestDataSource();
+            testDataSource.Initialize(this.iteration, this.session.Object);
+
+            Assert.AreEqual(2D, testDataSource.GetNestedParameterValueByPath<double>(this.option, @"ed1\par\\option1"));
+            Assert.AreEqual("2", testDataSource.GetNestedParameterValueByPath<string>(this.option, @"ed1\par\\option1"));
+            Assert.Throws<FormatException>(() => testDataSource.GetNestedParameterValueByPath<bool>(this.option, @"ed1\par\\option1"));
         }
 
         private void VerifyStructure(ElementUsage row2Result)
