@@ -27,21 +27,29 @@ namespace CDP4Reporting.Tests.ViewModels
 {
     using System;
     using System.Collections.Concurrent;
-    using Microsoft.Practices.ServiceLocation;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
+
     using CDP4Reporting.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     /// <summary>
@@ -140,6 +148,7 @@ namespace CDP4Reporting.Tests.ViewModels
         public void VerifyThatInstantiatePanelViewModelNotReturnsExpectedViewModelWhenActiveParticipantIsNull()
         {
             (this.iteration.Container as EngineeringModel).EngineeringModelSetup.Participant.Clear();
+
             Assert.Throws<InvalidOperationException>(() =>
                 ReportDesignerRibbonViewModel.InstantiatePanelViewModel(
                     this.iteration,
@@ -154,6 +163,7 @@ namespace CDP4Reporting.Tests.ViewModels
         public void VerifyThatInstantiatePanelViewModelNotReturnsExpectedViewModelWhenModelIsNull()
         {
             this.iteration.Container = null;
+
             Assert.Throws<InvalidOperationException>(() =>
                 ReportDesignerRibbonViewModel.InstantiatePanelViewModel(
                     this.iteration,

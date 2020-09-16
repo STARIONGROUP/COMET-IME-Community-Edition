@@ -25,17 +25,20 @@
 
 namespace CDP4Reporting.Tests
 {
+    using System.Reactive.Concurrency;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Reporting.Views;
+
     using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
-    using System;
-    using System.Reactive.Concurrency;
 
     /// <summary>
     /// Suite of tests for the <see cref="CDP4Reporting"/>

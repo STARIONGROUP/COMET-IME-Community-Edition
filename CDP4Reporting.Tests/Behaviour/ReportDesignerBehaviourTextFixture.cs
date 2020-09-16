@@ -25,12 +25,16 @@
 
 namespace CDP4Reporting.Tests.Behaviour
 {
-    using CDP4Dal;
-    using CDP4Reporting.Behaviours;
-    using NUnit.Framework;
-    using ReactiveUI;
     using System.Reactive.Concurrency;
     using System.Threading;
+
+    using CDP4Dal;
+
+    using CDP4Reporting.Behaviours;
+
+    using NUnit.Framework;
+
+    using ReactiveUI;
 
     [TestFixture]
     [Apartment(ApartmentState.STA)]
@@ -55,15 +59,15 @@ namespace CDP4Reporting.Tests.Behaviour
         [Test]
         public void VerifyTheDefaultValueOfTheDependencyPropertyContainer()
         {
-            Assert.AreEqual(ReportDesignerBehaviour.RibbonMergeCategoryNameProperty.Name, "RibbonMergeCategoryName");
+            Assert.AreEqual("RibbonMergeCategoryName", ReportDesignerBehaviour.RibbonMergeCategoryNameProperty.Name);
         }
 
         [Test]
         public void VerifyGetSetRibbonMergeCategoryName()
         {
-            Assert.IsNull(reportDesignerBehaviour.RibbonMergeCategoryName);
-            reportDesignerBehaviour.RibbonMergeCategoryName = "abc";
-            Assert.AreEqual(reportDesignerBehaviour.RibbonMergeCategoryName, "abc");
+            Assert.IsNull(this.reportDesignerBehaviour.RibbonMergeCategoryName);
+            this.reportDesignerBehaviour.RibbonMergeCategoryName = "abc";
+            Assert.AreEqual("abc", this.reportDesignerBehaviour.RibbonMergeCategoryName);
         }
     }
 }

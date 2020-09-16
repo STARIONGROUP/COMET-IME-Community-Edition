@@ -25,15 +25,21 @@
 
 namespace CDP4Reporting.Tests.Behaviour
 {
-    using CDP4Dal;
-    using NUnit.Framework;
-    using ReactiveUI;
     using System.Reactive.Concurrency;
     using System.Threading;
+
     using CDP4Composition.Mvvm.Behaviours;
-    using Microsoft.Practices.ServiceLocation;
-    using Moq;
+
+    using CDP4Dal;
+
     using Microsoft.Practices.Prism.Regions;
+    using Microsoft.Practices.ServiceLocation;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using ReactiveUI;
 
     [TestFixture]
     [Apartment(ApartmentState.STA)]
@@ -68,14 +74,14 @@ namespace CDP4Reporting.Tests.Behaviour
         [Test]
         public void VerifyTheDefaultValueOfTheDependencyPropertyContainer()
         {
-            Assert.AreEqual(RibbonCategoryBehavior.CategoryNameProperty.Name, "CategoryName");
+            Assert.AreEqual("CategoryName", RibbonCategoryBehavior.CategoryNameProperty.Name);
         }
 
         [Test]
         public void VerifyIfCategoryNameOfTheTargetIsSet()
         {
             this.ribbonCategoryBehavior.CategoryName = "abc";
-            Assert.AreEqual(this.ribbonCategoryBehavior.CategoryName, "abc");
+            Assert.AreEqual("abc", this.ribbonCategoryBehavior.CategoryName);
         }
 
         [Test]
@@ -83,7 +89,7 @@ namespace CDP4Reporting.Tests.Behaviour
         {
             Assert.IsNull(this.ribbonCategoryBehavior.CategoryName);
             RibbonCategoryBehavior.SetCategoryName(this.ribbonCategoryBehavior, "abc");
-            Assert.AreEqual(this.ribbonCategoryBehavior.CategoryName, "abc");
+            Assert.AreEqual("abc", this.ribbonCategoryBehavior.CategoryName);
         }
 
         [TearDown]

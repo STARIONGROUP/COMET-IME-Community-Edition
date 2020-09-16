@@ -56,8 +56,6 @@ namespace CDP4Reporting.Tests.DataSource
 
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, null);
 
-            #region Categories
-
             this.cat1 = new Category(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "cat1",
@@ -89,8 +87,6 @@ namespace CDP4Reporting.Tests.DataSource
             };
 
             this.cache.TryAdd(new CacheKey(this.cat4.Iid, null), new Lazy<Thing>(() => this.cat4));
-
-            #endregion
         }
 
         [Test]

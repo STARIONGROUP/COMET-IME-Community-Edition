@@ -25,9 +25,8 @@
 
 namespace CDP4Reporting.Parameters
 {
-    using System;
     using System.Collections.Generic;
-    using System.Text;
+    using System.Linq;
 
     /// <summary>
     /// A class that is used to build Report Parameters and optional a specific filter string at the report level. 
@@ -44,32 +43,15 @@ namespace CDP4Reporting.Parameters
 
         /// <summary>
         /// Build a filter string that contains a concatination of all IReportingParameter's in the
-        /// parameters parameter, which are built in this class'
-        /// If this method returns a non-empty string, then the Report's FilterExpression will be
-        /// overwritten with this string.
+        /// parameters parameter, which are built in this class.
         /// </summary>
         /// <param name="reportingParameters">The <see cref="IEnumerable{IReportingParameter}"/> </param>
-        /// <returns>The filterstring to be set in the report definition.</returns>
+        /// <returns>The filterstring, built according to the DevExpress reporting guidelines for filtercriteria.</returns>
         public string CreateFilterString(IEnumerable<IReportingParameter> reportingParameters)
         {
-            var stringBuilder = new StringBuilder();
-
-            foreach (var parameter in reportingParameters)
-            {
-                if (!string.IsNullOrWhiteSpace(parameter.FilterExpression))
-                {
-                    if (stringBuilder.Length > 0)
-                    {
-                        stringBuilder.Append(" Or ");
-                    }
-
-                    stringBuilder.Append("(");
-                    stringBuilder.Append(parameter.FilterExpression);
-                    stringBuilder.Append(")");
-                }
-            }
-
-            return stringBuilder.ToString();
+            return string.Join(" And ", reportingParameters
+                .Where(x => !string.IsNullOrWhiteSpace(x.FilterExpression))
+                .Select(x => $"({x.FilterExpression})"));
         }
     }
 }

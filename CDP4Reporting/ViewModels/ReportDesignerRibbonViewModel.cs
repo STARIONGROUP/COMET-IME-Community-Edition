@@ -63,8 +63,13 @@ namespace CDP4Reporting.ViewModels
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
         /// <returns>An instance of <see cref="ReportDesignerRibbonViewModel"/></returns>
-        public static ReportDesignerViewModel InstantiatePanelViewModel(Iteration iteration, ISession session,
-            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        public static ReportDesignerViewModel InstantiatePanelViewModel(
+            Iteration iteration, 
+            ISession session,
+            IThingDialogNavigationService thingDialogNavigationService, 
+            IPanelNavigationService panelNavigationService, 
+            IDialogNavigationService dialogNavigationService, 
+            IPluginSettingsService pluginSettingsService)
         {
             if (!(iteration.Container is EngineeringModel model))
             {

@@ -35,6 +35,7 @@ namespace CDP4Composition.Mvvm.Behaviours
     using DevExpress.Mvvm.UI.Interactivity;
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;
+
     using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
 
@@ -58,6 +59,7 @@ namespace CDP4Composition.Mvvm.Behaviours
         private void RegisterRegions()
         {
             this.RegionManager = ServiceLocator.Current.GetInstance<IRegionManager>();
+
             if (this.RegionManager.Regions != null)
             {
                 this.RibbonRegion = this.RegionManager.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);

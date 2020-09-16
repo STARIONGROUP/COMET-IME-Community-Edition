@@ -25,12 +25,16 @@
 
 namespace CDP4Reporting.Tests.Behaviour
 {
-    using CDP4Dal;
-    using NUnit.Framework;
-    using ReactiveUI;
     using System.Reactive.Concurrency;
     using System.Threading;
+
     using CDP4Composition.Ribbon;
+
+    using CDP4Dal;
+
+    using NUnit.Framework;
+
+    using ReactiveUI;
 
     [TestFixture]
     [Apartment(ApartmentState.STA)]
@@ -55,17 +59,17 @@ namespace CDP4Reporting.Tests.Behaviour
         [Test]
         public void VerifyTheDefaultValueOfTheDependencyPropertyContainer()
         {
-            Assert.AreEqual(ExtendedRibbonPageCategory.ContainerRegionNameProperty.Name, "ContainerRegionName");
+            Assert.AreEqual("ContainerRegionName", ExtendedRibbonPageCategory.ContainerRegionNameProperty.Name);
         }
 
         [Test]
         public void GetSetTheDefaultValueOfTheDependencyPropertyContainer()
         {
-            Assert.IsNull(extendedRibbonPageCategory.ContainerRegionName);
+            Assert.IsNull(this.extendedRibbonPageCategory.ContainerRegionName);
 
-            extendedRibbonPageCategory.ContainerRegionName = "abc";
+            this.extendedRibbonPageCategory.ContainerRegionName = "abc";
 
-            Assert.AreEqual(extendedRibbonPageCategory.ContainerRegionName, "abc");
+            Assert.AreEqual("abc", this.extendedRibbonPageCategory.ContainerRegionName);
         }
     }
 }

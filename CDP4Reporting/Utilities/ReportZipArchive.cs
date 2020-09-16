@@ -23,7 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Reporting.Utilities
 {
     using System;
@@ -37,7 +36,7 @@ namespace CDP4Reporting.Utilities
         /// <summary>
         /// The report file <see cref="Stream"/>
         /// </summary>
-        public Stream Repx { get; set; }
+        public Stream ReportDefinition { get; set; }
 
         /// <summary>
         /// The datasource <see cref="Stream"/>
@@ -49,7 +48,7 @@ namespace CDP4Reporting.Utilities
         /// </summary>
         public void Dispose()
         {
-            this.Repx.Dispose();
+            this.ReportDefinition.Dispose();
             this.DataSource.Dispose();
         }
     }

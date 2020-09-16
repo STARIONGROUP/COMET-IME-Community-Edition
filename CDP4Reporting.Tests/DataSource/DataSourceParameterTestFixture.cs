@@ -458,32 +458,6 @@ namespace CDP4Composition.Tests.Reporting
         }
 
         [Test]
-        public void VerifyParameterSiblings()
-        {
-            var hierarchy = new CategoryHierarchy
-                    .Builder(this.iteration, this.cat1.ShortName)
-                .Build();
-
-            var dataSource = new ReportingDataSourceClass<Row>(
-                hierarchy,
-                this.option,
-                this.elementOwner);
-
-            var node = dataSource.topNodes.First();
-
-            var parameter1 = node.GetColumn<TestParameter1>();
-            var parameter2 = node.GetColumn<TestParameter2>();
-
-            Assert.AreSame(
-                parameter2,
-                parameter1.GetSibling<TestParameter2>());
-
-            Assert.AreSame(
-                parameter1,
-                parameter2.GetSibling<TestParameter1>());
-        }
-
-        [Test]
         public void VerifyParameterChildren()
         {
             var hierarchy = new CategoryHierarchy

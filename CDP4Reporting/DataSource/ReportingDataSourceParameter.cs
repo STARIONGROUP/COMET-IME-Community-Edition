@@ -92,21 +92,6 @@ namespace CDP4Reporting.DataSource
         }
 
         /// <summary>
-        /// Gets the parameter of type <see cref="TP"/> on the same level in the
-        /// hierarhical tree upon which the data source is based.
-        /// </summary>
-        /// <typeparam name="TP">
-        /// The desired parameter type.
-        /// </typeparam>
-        /// <returns>
-        /// The <see cref="ReportingDataSourceParameter{T}"/> of type <see cref="TP"/>.
-        /// </returns>
-        public TP GetSibling<TP>() where TP : ReportingDataSourceParameter<T>
-        {
-            return this.Node.GetColumn<TP>();
-        }
-
-        /// <summary>
         /// Gets the parameters of type <see cref="TP"/> on the children levels in the
         /// hierarhical tree upon which the data source is based.
         /// </summary>

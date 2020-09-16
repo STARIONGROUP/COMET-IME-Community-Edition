@@ -32,7 +32,6 @@ namespace CDP4Reporting.Tests.DataSource
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
@@ -63,13 +62,19 @@ namespace CDP4Reporting.Tests.DataSource
         [DefinedThingShortName("cat1")]
         private class TestCategory1 : ReportingDataSourceCategory<Row>
         {
-            public bool GetValue() => this.Value;
+            public bool GetValue()
+            {
+                return this.Value;
+            }
         }
 
         [DefinedThingShortName("cat2")]
         private class TestCategory2 : ReportingDataSourceCategory<Row>
         {
-            public bool GetValue() => this.Value;
+            public bool GetValue()
+            {
+                return this.Value;
+            }
         }
 
         [DefinedThingShortName("cat3")]

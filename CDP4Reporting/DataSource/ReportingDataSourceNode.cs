@@ -108,20 +108,17 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// The <see cref="CDP4Common.EngineeringModelData.ElementBase"/> associated with this node.
         /// </summary>
-        internal ElementBase ElementBase =>
-            this.NestedElement.GetElementBase();
+        internal ElementBase ElementBase => this.NestedElement.GetElementBase();
 
         /// <summary>
         /// The <see cref="CDP4Common.EngineeringModelData.ElementDefinition"/> representing this node.
         /// </summary>
-        internal ElementDefinition ElementDefinition =>
-            this.NestedElement.GetElementDefinition();
+        internal ElementDefinition ElementDefinition => this.NestedElement.GetElementDefinition();
 
         /// <summary>
         /// The <see cref="ElementUsage"/> representing this node, if it exists.
         /// </summary>
-        internal ElementUsage ElementUsage =>
-            this.NestedElement.GetElementUsage();
+        internal ElementUsage ElementUsage =>  this.NestedElement.GetElementUsage();
 
         /// <summary>
         /// The filtering <see cref="CategoryHierarchy"/> that must be matched on the current <see cref="ElementBase"/>.
@@ -165,9 +162,9 @@ namespace CDP4Reporting.DataSource
         /// <returns>
         /// True if found, otherwise false.
         /// </returns>
-        internal bool HadCategoryUpTree(Category category)
+        internal bool HasCategoryUpTree(Category category)
         {
-            return this.NestedElement.IsMemberOfCategory(category) || (this.parent?.HadCategoryUpTree(category) ?? false);
+            return this.NestedElement.IsMemberOfCategory(category) || (this.parent?.HasCategoryUpTree(category) ?? false);
         }
 
         /// <summary>

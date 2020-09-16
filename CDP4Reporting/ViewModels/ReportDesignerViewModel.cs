@@ -414,15 +414,15 @@ namespace CDP4Reporting.ViewModels
 
             var report = new XtraReport();
 
-            using (var reportStream = this.GetReportStream(reportProjectFilePath))
+            using (var reportZipArchive = this.GetReportZipArchive(reportProjectFilePath))
             {
-                report.LoadLayoutFromXml(reportStream.Repx);
+                report.LoadLayoutFromXml(reportZipArchive.ReportDefinition);
 
                 this.Document = new TextDocument();
 
-                if (reportStream.DataSource != null)
+                if (reportZipArchive.DataSource != null)
                 {
-                    using (var streamReader = new StreamReader(reportStream.DataSource))
+                    using (var streamReader = new StreamReader(reportZipArchive.DataSource))
                     {
                         var datasource = streamReader.ReadToEnd();
                         this.Document = new TextDocument(datasource);
@@ -851,7 +851,7 @@ namespace CDP4Reporting.ViewModels
         /// </summary>
         /// <param name="rep4File">archive zip file</param>
         /// <returns>The <see cref="ReportZipArchive"/></returns>
-        private ReportZipArchive GetReportStream(string rep4File)
+        private ReportZipArchive GetReportZipArchive(string rep4File)
         {
             using (var zipFile = ZipFile.OpenRead(rep4File))
             {
@@ -865,7 +865,7 @@ namespace CDP4Reporting.ViewModels
 
                 return new ReportZipArchive
                 {
-                    Repx = repxStream,
+                    ReportDefinition = repxStream,
                     DataSource = dataSourceStream
                 };
             }

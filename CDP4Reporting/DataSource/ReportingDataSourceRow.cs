@@ -47,6 +47,6 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
         /// </summary>
-        protected DomainOfExpertise Owner => this.ElementBase.Owner;
+        protected DomainOfExpertise ElementBaseOwner => this.ElementBase.Owner;
     }
 }

@@ -378,7 +378,7 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public void VerifyThatCompileScriptCommandWorks()
         {
-            Assert.DoesNotThrowAsync(async() => await this.reportDesignerViewModel.Object.CompileScriptCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.Object.CompileScriptCommand.ExecuteAsyncTask(null));
         }
 
         [Test]
@@ -553,7 +553,7 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public void VerifyThatRebuildDataSourceCommandWorksWithNoDataSource()
         {
-            Assert.DoesNotThrowAsync(async() => await this.reportDesignerViewModel.Object.RebuildDatasourceCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.Object.RebuildDatasourceCommand.ExecuteAsyncTask(null));
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Object.Output.Contains("Nothing to compile"));
         }

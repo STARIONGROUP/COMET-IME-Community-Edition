@@ -70,7 +70,7 @@ namespace CDP4Reporting.DataSource
                 parentNode?.Children.Add(newNode);
                 resultNodes.Add(newNode);
             }
-            else if (categoryHierarchy.Child != null && (parentNode?.HadCategoryUpTree(categoryHierarchy.Category) ?? false) && nestedElement.IsMemberOfCategory(categoryHierarchy.Child.Category))
+            else if (categoryHierarchy.Child != null && (parentNode?.HasCategoryUpTree(categoryHierarchy.Category) ?? false) && nestedElement.IsMemberOfCategory(categoryHierarchy.Child.Category))
             {
                 searchCategory = categoryHierarchy.Child;
 

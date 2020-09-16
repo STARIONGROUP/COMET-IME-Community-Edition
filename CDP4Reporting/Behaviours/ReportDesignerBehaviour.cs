@@ -26,13 +26,14 @@
 namespace CDP4Reporting.Behaviours
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Windows;
-    using DevExpress.Xpf.Ribbon;
+
     using DevExpress.Mvvm.UI;
     using DevExpress.Mvvm.UI.Interactivity;
     using DevExpress.Xpf.Reports.UserDesigner;
-    using System.Diagnostics.CodeAnalysis;
+    using DevExpress.Xpf.Ribbon;
 
     /// <summary>
     /// The purpose of the <see cref="ReportDesignerBehaviour"/> is to handle events from
@@ -75,8 +76,8 @@ namespace CDP4Reporting.Behaviours
         /// </summary>
         public string RibbonMergeCategoryName
         {
-            get { return (string)this.GetValue(RibbonMergeCategoryNameProperty); }
-            set { this.SetValue(RibbonMergeCategoryNameProperty, value); }
+            get => (string) this.GetValue(RibbonMergeCategoryNameProperty);
+            set => this.SetValue(RibbonMergeCategoryNameProperty, value);
         }
 
         /// <summary>
@@ -179,7 +180,7 @@ namespace CDP4Reporting.Behaviours
                 foreach (var reportingRibbonActualCategory in reportRibbon.ActualCategories)
                 {
                     this.mergedCategories.Add(reportingRibbonActualCategory);
-                    ((IRibbonMergingSupport)category).Merge(reportingRibbonActualCategory);
+                    ((IRibbonMergingSupport) category).Merge(reportingRibbonActualCategory);
                 }
             }
 
