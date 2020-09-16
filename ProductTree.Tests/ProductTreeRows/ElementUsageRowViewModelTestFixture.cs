@@ -20,6 +20,7 @@ namespace ProductTree.Tests.ProductTreeRows
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
+    using CDP4Composition.Services.NestedElementTreeService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -35,6 +36,7 @@ namespace ProductTree.Tests.ProductTreeRows
     [TestFixture]
     internal class ElementUsageRowViewModelTestFixture
     {
+        private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<IPermissionService> permissionService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -60,6 +62,7 @@ namespace ProductTree.Tests.ProductTreeRows
         private ParameterOverrideValueSet valueSetOverride;
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+        private readonly string nestedElementPath = "PATH";
 
         [SetUp]
         public void Setup()
@@ -73,8 +76,14 @@ namespace ProductTree.Tests.ProductTreeRows
             this.thingCreator = new Mock<IThingCreator>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+ 
             this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>())
                 .Returns(this.thingCreator.Object);
+
+            this.nestedElementTreeService = new Mock<INestedElementTreeService>();
+            this.nestedElementTreeService.Setup(x => x.GetNestedElementPath(It.IsAny<ElementUsage>(), It.IsAny<Option>())).Returns(this.nestedElementPath);
+
+            this.serviceLocator.Setup(x => x.GetInstance<INestedElementTreeService>()).Returns(this.nestedElementTreeService.Object);
 
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" , ShortName = "dom" };
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -144,6 +153,14 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreSame(this.elementDef2, vm.ElementDefinition);
             Assert.AreEqual("domain", vm.OwnerName);
             Assert.AreEqual("dom", vm.OwnerShortName);
+        }
+
+        [Test]
+        public void VerifyThatGetPathWorks()
+        {
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+
+            Assert.AreEqual(this.nestedElementPath, vm.GetPath());
         }
 
         [Test]

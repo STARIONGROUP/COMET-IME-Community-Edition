@@ -235,6 +235,11 @@ namespace CDP4ProductTree.ViewModels
         public ReactiveCommand<object> CopyModelCodeToClipboardCommand { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to Copy Path to clipboard
+        /// </summary>
+        public ReactiveCommand<object> CopyPathToClipboardCommand { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to delete a <see cref="ParameterSubscription"/>
         /// </summary>
         public ReactiveCommand<object> DeleteSubscriptionCommand { get; private set; }
@@ -343,6 +348,9 @@ namespace CDP4ProductTree.ViewModels
             this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create();
             this.CopyModelCodeToClipboardCommand.Subscribe(_ => this.ExecuteCopyModelCodeToClipboardCommand());
 
+            this.CopyPathToClipboardCommand = ReactiveCommand.Create();
+            this.CopyPathToClipboardCommand.Subscribe(_ => this.ExecuteCopyPathToClipboardCommand());
+
             this.DeleteSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDeleteSubscription));
 
             this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
@@ -439,9 +447,11 @@ namespace CDP4ProductTree.ViewModels
             if (this.SelectedThing is IModelCodeRowViewModel)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Path to Clipboard", "", this.CopyPathToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
             }
 
             var parameterOrOverrideRow = this.SelectedThing as ParameterOrOverrideBaseRowViewModel;
+
             if (parameterOrOverrideRow == null)
             {
                 return;
@@ -462,6 +472,7 @@ namespace CDP4ProductTree.ViewModels
             }
 
             var parameter = parameterOrOverrideRow.Thing as Parameter;
+
             if (parameter != null)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Override this Parameter", "", this.CreateOverrideCommand, MenuItemKind.Create, ClassKind.ParameterOverride));
@@ -575,6 +586,22 @@ namespace CDP4ProductTree.ViewModels
             if (this.SelectedThing is IModelCodeRowViewModel)
             {
                 Clipboard.SetText(((IModelCodeRowViewModel)this.SelectedThing).ModelCode);
+            }
+        }
+
+        /// <summary>
+        /// Execute the <see cref="CopyPathToClipboardCommand"/>
+        /// </summary>
+        private void ExecuteCopyPathToClipboardCommand()
+        {
+            if (this.SelectedThing == null)
+            {
+                return;
+            }
+
+            if (this.SelectedThing is IModelCodeRowViewModel model)
+            {
+                Clipboard.SetText(model.GetPath());
             }
         }
 
