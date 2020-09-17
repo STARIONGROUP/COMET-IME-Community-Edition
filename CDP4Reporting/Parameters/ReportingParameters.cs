@@ -49,7 +49,7 @@ namespace CDP4Reporting.Parameters
         /// <returns>The filterstring, built according to the DevExpress reporting guidelines for filtercriteria.</returns>
         public string CreateFilterString(IEnumerable<IReportingParameter> reportingParameters)
         {
-            return string.Join(" And ", reportingParameters
+            return string.Join(" Or ", reportingParameters
                 .Where(x => !string.IsNullOrWhiteSpace(x.FilterExpression))
                 .Select(x => $"({x.FilterExpression})"));
         }

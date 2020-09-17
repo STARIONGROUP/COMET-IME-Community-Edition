@@ -77,11 +77,6 @@ namespace CDP4Reporting.DataSource
         /// </returns>
         private bool IsMemberOfCategory()
         {
-            if (this.Node.NestedElement == null)
-            {
-                return false;
-            }
-
             var categories =
                 this.Node.ElementBase.Cache
                     .Where(x => x.Value.Value.ClassKind == ClassKind.Category)

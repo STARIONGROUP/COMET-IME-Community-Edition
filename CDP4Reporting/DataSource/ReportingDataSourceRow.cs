@@ -42,7 +42,7 @@ namespace CDP4Reporting.DataSource
         /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
         /// Note that when this is false, all values will be null on the row.
         /// </summary>
-        public bool IsVisible { get; internal set; }
+        protected internal bool IsVisible { get; internal set; }
 
         /// <summary>
         /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
