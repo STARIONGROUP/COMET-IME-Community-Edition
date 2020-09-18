@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinedThingShortNameAttribute.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorRow.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,33 +23,30 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.DataCollector
+namespace CDP4Reporting.DataCollection
 {
-    using System;
-
-    using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Attribute decorating implementations of <see cref="DataCollectorParameter{T}"/> to mark
-    /// the associated <see cref="DefinedThing"/> short name.
+    /// Abstract base class from which all row representations for a <see cref="NestedElementTreeDataCollector{T}"/> need to derive.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class DefinedThingShortNameAttribute : Attribute
+    public abstract class DataCollectorRow
     {
         /// <summary>
-        /// The short name of the associated <see cref="DefinedThing"/>.
+        /// The associated <see cref="ElementBase"/>.
         /// </summary>
-        public readonly string ShortName;
+        protected internal ElementBase ElementBase { get; internal set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefinedThingShortNameAttribute"/> class.
+        /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
+        /// Note that when this is false, all values will be null on the row.
         /// </summary>
-        /// <param name="shortName">
-        /// The short name of the associated <see cref="DefinedThing"/>.
-        /// </param>
-        public DefinedThingShortNameAttribute(string shortName)
-        {
-            this.ShortName = shortName;
-        }
+        protected internal bool IsVisible { get; internal set; }
+
+        /// <summary>
+        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
+        /// </summary>
+        protected DomainOfExpertise ElementBaseOwner => this.ElementBase.Owner;
     }
 }

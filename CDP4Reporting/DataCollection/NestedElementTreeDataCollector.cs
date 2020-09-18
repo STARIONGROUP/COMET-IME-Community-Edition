@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.DataCollector
+namespace CDP4Reporting.DataCollection
 {
     using System.Collections.Generic;
     using System.Data;

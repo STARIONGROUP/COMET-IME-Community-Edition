@@ -72,7 +72,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private const string DATASOURCE_CODE = @"namespace CDP4Reporting
         {
-            using CDP4Composition.DataCollector;
+            using CDP4Reporting.DataCollection;
             public class TestDataSource : DataCollector
             {
                 public TestDataSource()
@@ -88,7 +88,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private const string REBUILD_ERROR_DATASOURCE_CODE = @"namespace CDP4Reporting
         {
-            using CDP4Composition.DataCollector;
+            using CDP4Reporting.DataCollection;
             using System;
             
             public class TestDataSource : DataCollector
@@ -106,7 +106,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private const string DATASOURCE_CODE_WITH_PARAMS = @"namespace CDP4Reporting
         {
-            using CDP4Composition.DataCollector;
+            using CDP4Reporting.DataCollection;
 	        using CDP4Reporting.Parameters;
 	        using System.Collections.Generic;
 
@@ -141,7 +141,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private const string DATASOURCE_CODE_INVALID = @"namespace CDP4Reporting
         {
-            using CDP4Composition.DataCollector;
+            using CDP4Reporting.DataCollection;
             public1 class TestDataSource : ReportingDataSource
             {
                 public TestDataSource()

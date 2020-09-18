@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.DataCollector
+namespace CDP4Reporting.Tests.DataCollection
 {
     using System;
     using System.Collections.Concurrent;
@@ -34,9 +34,9 @@ namespace CDP4Composition.Tests.DataCollector
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Composition.DataCollector;
-
     using CDP4Dal;
+
+    using CDP4Reporting.DataCollection;
 
     using Moq;
 

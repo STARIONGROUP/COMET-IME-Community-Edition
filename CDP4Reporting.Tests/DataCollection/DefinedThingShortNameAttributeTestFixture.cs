@@ -23,9 +23,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.DataCollector
+namespace CDP4Reporting.Tests.DataCollection
 {
-    using CDP4Composition.DataCollector;
+    using CDP4Reporting.DataCollection;
 
     using NUnit.Framework;
 
@@ -36,7 +36,7 @@ namespace CDP4Composition.Tests.DataCollector
         public void TestParameterTypeShortNameAttribute()
         {
             var attribute = new DefinedThingShortNameAttribute("shortName");
-            Assert.AreEqual(attribute.ShortName, "shortName");
+            Assert.AreEqual("shortName", attribute.ShortName);
         }
     }
 }

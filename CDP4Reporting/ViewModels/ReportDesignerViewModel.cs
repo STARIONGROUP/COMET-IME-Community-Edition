@@ -41,7 +41,6 @@ namespace CDP4Reporting.ViewModels
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition;
-    using CDP4Composition.DataCollector;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -51,6 +50,7 @@ namespace CDP4Reporting.ViewModels
 
     using CDP4Dal;
 
+    using CDP4Reporting.DataCollection;
     using CDP4Reporting.DataSource;
     using CDP4Reporting.Parameters;
     using CDP4Reporting.Utilities;
