@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataSourceCategoryTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorCategoryColumnTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.Tests.DataSource
+namespace CDP4Composition.Tests.DataCollector
 {
     using System;
     using System.Collections.Concurrent;
@@ -35,12 +35,12 @@ namespace CDP4Reporting.Tests.DataSource
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Reporting.DataSource;
+    using CDP4Composition.DataCollector;
 
     using NUnit.Framework;
 
     [TestFixture]
-    public class DataSourceCategoryTestFixture
+    public class DataCollectorCategoryColumnTestFixture
     {
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
@@ -60,7 +60,7 @@ namespace CDP4Reporting.Tests.DataSource
         private ElementUsage eu;
 
         [DefinedThingShortName("cat1")]
-        private class TestCategory1 : ReportingDataSourceCategory<Row>
+        private class TestCategory1 : DataCollectorCategory<Row>
         {
             public bool GetValue()
             {
@@ -69,7 +69,7 @@ namespace CDP4Reporting.Tests.DataSource
         }
 
         [DefinedThingShortName("cat2")]
-        private class TestCategory2 : ReportingDataSourceCategory<Row>
+        private class TestCategory2 : DataCollectorCategory<Row>
         {
             public bool GetValue()
             {
@@ -78,11 +78,11 @@ namespace CDP4Reporting.Tests.DataSource
         }
 
         [DefinedThingShortName("cat3")]
-        private class TestCategory3 : ReportingDataSourceCategory<Row>
+        private class TestCategory3 : DataCollectorCategory<Row>
         {
         }
 
-        private class Row : ReportingDataSourceRow
+        private class Row : DataCollectorRow
         {
             public TestCategory1 category1;
             public TestCategory2 category2;
@@ -187,12 +187,12 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.domain);
 
-            var node = dataSource.topNodes.First();
+            var node = dataSource.TopNodes.First();
 
             Assert.IsNotNull(node.GetColumn<TestCategory1>());
             Assert.IsNotNull(node.GetColumn<TestCategory2>());
@@ -206,12 +206,12 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.domain);
 
-            var node = dataSource.topNodes.First();
+            var node = dataSource.TopNodes.First();
 
             var category1 = node.GetColumn<TestCategory1>();
             Assert.AreEqual("cat1", category1.ShortName);
@@ -227,12 +227,12 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.domain);
 
-            var node = dataSource.topNodes.First();
+            var node = dataSource.TopNodes.First();
 
             var category1 = node.GetColumn<TestCategory1>();
             Assert.AreEqual(true, category1.GetValue());
@@ -248,12 +248,12 @@ namespace CDP4Reporting.Tests.DataSource
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.domain);
 
-            var node = dataSource.topNodes.First();
+            var node = dataSource.TopNodes.First();
 
             var category1 = node.GetColumn<TestCategory1>();
             Assert.AreEqual(false, category1.GetValue());

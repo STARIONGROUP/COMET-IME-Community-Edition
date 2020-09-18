@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportingDataSourceCategory.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorCategory.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.DataCollector
 {
     using System.Linq;
 
@@ -32,9 +32,9 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Abstract base class from which all category columns for a <see cref="ReportingDataSourceRow"/> need to derive.
+    /// Abstract base class from which all category columns for a <see cref="DataCollectorRow"/> need to derive.
     /// </summary>
-    public abstract class ReportingDataSourceCategory<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
+    public abstract class DataCollectorCategory<T> : DataCollectorColumn<T> where T : DataCollectorRow, new()
     {
         /// <summary>
         /// Gets or sets the associated <see cref="Category"/> short name.
@@ -47,53 +47,46 @@ namespace CDP4Reporting.DataSource
         public bool Value { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReportingDataSourceCategory{T}"/> class.
+        /// Initializes a new instance of the <see cref="DataCollectorCategory{T}"/> class.
         /// </summary>
-        protected ReportingDataSourceCategory()
+        protected DataCollectorCategory()
         {
             this.ShortName = GetParameterAttribute(this.GetType())?.ShortName;
         }
 
         /// <summary>
         /// Initializes a reported category column based on the corresponding <see cref="ElementBase"/>
-        /// within the associated <see cref="ReportingDataSourceNode{T}"/>.
+        /// within the associated <see cref="DataCollectorNode{T}"/>.
         /// </summary>
         /// <param name="node">
-        /// The associated <see cref="ReportingDataSourceNode{T}"/>.
+        /// The associated <see cref="DataCollectorNode{T}"/>.
         /// </param>
-        internal override void Initialize(ReportingDataSourceNode<T> node)
+        internal override void Initialize(DataCollectorNode<T> node)
         {
             this.Node = node;
             this.Value = this.IsMemberOfCategory();
         }
 
         /// <summary>
-        /// Checks if the <see cref="ElementDefinition.Category"/>, or <see cref="ElementUsage.Category"/> contains a <see cref="Category"/>
-        /// that has <see cref="ReportingDataSourceCategory{T}.ShortName"/> as its <see cref="Category.ShortName"/>, or somewhere in the
-        /// <see cref="Category.SuperCategory"/> hierarchy.
+        /// Checks if <see cref="DataCollectorNode{T}.CategorizableThing"/> is member of a specific <see cref="Category"/>
+        /// that is found using <see cref="DataCollectorCategory{T}.ShortName"/>.
         /// </summary>
         /// <returns>
         /// True if <see cref="Category.ShortName"/> was found, otherwise false.
         /// </returns>
         private bool IsMemberOfCategory()
         {
+            var categorizableThing = this.Node.CategorizableThing as Thing;
+
             var categories =
-                this.Node.ElementBase.Cache
+                categorizableThing?.Cache
                     .Where(x => x.Value.Value.ClassKind == ClassKind.Category)
                     .Select(x => x.Value.Value)
                     .Cast<Category>()
                     .Where(x => x.ShortName == this.ShortName)
                     .ToList();
 
-            foreach (var category in categories)
-            {
-                if (this.Node.NestedElement.IsMemberOfCategory(category))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return categories?.Any(x => this.Node.NestedElement.IsMemberOfCategory(x)) ?? false;
         }
     }
 }

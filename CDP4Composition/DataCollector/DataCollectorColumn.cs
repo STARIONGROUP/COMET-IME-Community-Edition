@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportingDataSourceParameter.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorColumn.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,16 +23,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.DataCollector
 {
     using System;
     using System.Linq;
     using System.Reflection;
 
     /// <summary>
-    /// Abstract base class from which all columns for a <see cref="ReportingDataSourceRow"/> need to derive.
+    /// Abstract base class from which all columns for a <see cref="DataCollectorRow"/> need to derive.
     /// </summary>
-    public abstract class ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
+    public abstract class DataCollectorColumn<T> where T : DataCollectorRow, new()
     {
         /// <summary>
         /// Gets the <see cref="DefinedThingShortNameAttribute"/> decorating the class described by <paramref name="type"/>.
@@ -53,17 +53,17 @@ namespace CDP4Reporting.DataSource
         }
 
         /// <summary>
-        /// The <see cref="ReportingDataSourceNode{T}"/> associated to this parameter.
+        /// The <see cref="DataCollectorNode{T}"/> associated to this parameter.
         /// </summary>
-        internal ReportingDataSourceNode<T> Node;
+        internal DataCollectorNode<T> Node;
 
         /// <summary>
-        /// Initializes a reported column based on the corresponding <see cref="ReportingDataSourceNode{T}"/>
-        /// associated with the current <see cref="ReportingDataSourceRow"/>.
+        /// Initializes a reported column based on the corresponding <see cref="DataCollectorNode{T}"/>
+        /// associated with the current <see cref="DataCollectorRow"/>.
         /// </summary>
         /// <param name="node">
-        /// The associated <see cref="ReportingDataSourceNode{T}"/>.
+        /// The associated <see cref="DataCollectorNode{T}"/>.
         /// </param>
-        internal abstract void Initialize(ReportingDataSourceNode<T> node);
+        internal abstract void Initialize(DataCollectorNode<T> node);
     }
 }

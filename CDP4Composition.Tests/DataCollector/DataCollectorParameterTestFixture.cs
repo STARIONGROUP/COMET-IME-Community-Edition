@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.Reporting
+namespace CDP4Composition.Tests.DataCollector
 {
     using System;
     using System.Collections.Concurrent;
@@ -36,12 +36,12 @@ namespace CDP4Composition.Tests.Reporting
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Reporting.DataSource;
+    using CDP4Composition.DataCollector;
 
     using NUnit.Framework;
 
     [TestFixture]
-    public class DataSourceParameterTestFixture
+    public class DataCollectorParameterTestFixture
     {
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
@@ -69,7 +69,7 @@ namespace CDP4Composition.Tests.Reporting
         private ElementUsage eu2;
 
         [DefinedThingShortName("type1")]
-        private class TestParameter1 : ReportingDataSourceParameter<Row>
+        private class TestParameter1 : DataCollectorParameter<Row>
         {
             public string GetValue() => this.Value;
 
@@ -77,7 +77,7 @@ namespace CDP4Composition.Tests.Reporting
         }
 
         [DefinedThingShortName("type2")]
-        private class TestParameter2 : ReportingDataSourceParameter<Row>
+        private class TestParameter2 : DataCollectorParameter<Row>
         {
             public string GetValue() => this.Value;
 
@@ -85,18 +85,18 @@ namespace CDP4Composition.Tests.Reporting
         }
 
         [DefinedThingShortName("type3")]
-        private class TestParameter3 : ReportingDataSourceParameter<Row>
+        private class TestParameter3 : DataCollectorParameter<Row>
         {
         }
 
-        private class ComputedTestParameter : ReportingDataSourceParameter<Row>
+        private class ComputedTestParameter : DataCollectorParameter<Row>
         {
             public string GetValue() => this.Value;
 
             public DomainOfExpertise GetOwner() => this.Owner;
         }
 
-        private class Row : ReportingDataSourceRow
+        private class Row : DataCollectorRow
         {
             public TestParameter1 parameter1;
             public TestParameter2 parameter2;
@@ -316,12 +316,12 @@ namespace CDP4Composition.Tests.Reporting
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.elementOwner);
 
-            var node = dataSource.topNodes.First();
+            var node = dataSource.TopNodes.First();
 
             Assert.IsNotNull(node.GetColumn<TestParameter1>());
             Assert.IsNotNull(node.GetColumn<TestParameter2>());
@@ -340,12 +340,12 @@ namespace CDP4Composition.Tests.Reporting
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.elementOwner);
 
-            var node = dataSource.topNodes.First();
+            var node = dataSource.TopNodes.First();
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("type1", parameter1.ShortName);
@@ -368,12 +368,12 @@ namespace CDP4Composition.Tests.Reporting
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.elementOwner);
 
-            var node = dataSource.topNodes.First();
+            var node = dataSource.TopNodes.First();
 
             var computedParameter = node.GetColumn<ComputedTestParameter>();
             Assert.IsNull(computedParameter.GetValue());
@@ -391,12 +391,12 @@ namespace CDP4Composition.Tests.Reporting
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.elementOwner);
 
-            var node = dataSource.topNodes.First();
+            var node = dataSource.TopNodes.First();
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("11", parameter1.GetValue());
@@ -418,12 +418,12 @@ namespace CDP4Composition.Tests.Reporting
                 .Generate(this.option, this.elementOwner)
                 .ToList();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.elementOwner);
 
-            var node = dataSource.topNodes.First();
+            var node = dataSource.TopNodes.First();
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("121", parameter1.GetValue());
@@ -441,12 +441,12 @@ namespace CDP4Composition.Tests.Reporting
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.elementOwner);
 
-            var node = dataSource.topNodes.First(x => x.ElementBase.Iid == this.eu2.Iid);
+            var node = dataSource.TopNodes.First(x => x.ElementBase.Iid == this.eu2.Iid);
 
             var parameter1 = node.GetColumn<TestParameter1>();
             Assert.AreEqual("-21", parameter1.GetValue());
@@ -465,12 +465,12 @@ namespace CDP4Composition.Tests.Reporting
                 .AddLevel(this.cat2.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.elementOwner);
 
-            var parameter = dataSource.topNodes.First().GetColumn<TestParameter1>();
+            var parameter = dataSource.TopNodes.First().GetColumn<TestParameter1>();
 
             var children1 = parameter.GetChildren<TestParameter1>().ToList();
             Assert.AreEqual(2, children1.Count);

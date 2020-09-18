@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportingDataSourceNodeTreeGenerator.cs" company="RHEA System S.A.">
+// <copyright file="CategoryHierarchyDataCollectorNodesGenerator.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.DataCollector
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -31,42 +31,42 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.EngineeringModelData;
 
     /// <summary>
-    /// A builder that builds a forest of <see cref="IEnumerable{T}"/> of <see cref="ReportingDataSourceNode{T}"/> instances.
+    /// A builder that builds a forest of <see cref="IEnumerable{T}"/> of <see cref="DataCollectorNode{T}"/> instances.
     /// </summary>
     /// <typeparam name="T">
-    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
+    /// The <see cref="DataCollectorRow"/> representing the definition of the data collector rows.
     /// </typeparam>
-    internal class ReportingDataSourceNodeTreeGenerator<T> where T : ReportingDataSourceRow, new()
+    internal class CategoryHierarchyDataCollectorNodesGenerator<T> where T : DataCollectorRow, new()
     {
         /// <summary>
-        /// Generates a forest of <see cref="IEnumerable{T}"/> of <see cref="ReportingDataSourceNode{T}"/> instances
+        /// Generates a forest of <see cref="IEnumerable{T}"/> of <see cref="DataCollectorNode{T}"/> instances
         /// </summary>
         /// <param name="categoryHierarchy">The <see cref="CategoryHierarchy"/> instance to use when searching for relevant data.</param>
         /// <param name="nestedElements">A <see cref="List{NestedElement}"/> that contains the <see cref="NestedElement"/>s to search for relevant data.</param>
-        /// <returns><see cref="IEnumerable{T}"/> of <see cref="ReportingDataSourceNode{T}"/> instances</returns>
-        public IEnumerable<ReportingDataSourceNode<T>> Generate(CategoryHierarchy categoryHierarchy, List<NestedElement> nestedElements)
+        /// <returns><see cref="IEnumerable{T}"/> of <see cref="DataCollectorNode{T}"/> instances</returns>
+        public IEnumerable<DataCollectorNode<T>> Generate(CategoryHierarchy categoryHierarchy, List<NestedElement> nestedElements)
         {
             var topElement = nestedElements.First(ne => ne.IsRootElement);
-            return this.GetDataSourceNodes(topElement, categoryHierarchy, nestedElements, null);
+            return this.GetDataCollectorNodes(topElement, categoryHierarchy, nestedElements, null);
         }
 
         /// <summary>
-        /// Gets the tree of <see cref="ReportingDataSourceNode{T}"/>s. This method can call itself recursively.
+        /// Gets the tree of <see cref="DataCollectorNode{T}"/>s. This method can call itself recursively.
         /// </summary>
         /// <param name="nestedElement">The <see cref="NestedElement"/></param>
         /// <param name="categoryHierarchy">The <see cref="CategoryHierarchy"/></param>
         /// <param name="nestedElements">The <see cref="List{NestedElement}"/>s</param>
-        /// <param name="parentNode">The <see cref=" ReportingDataSourceNode{T}"/> that is the parent of new nodes.</param>
-        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="ReportingDataSourceNode{T}"/></returns>
-        private IEnumerable<ReportingDataSourceNode<T>> GetDataSourceNodes(NestedElement nestedElement, CategoryHierarchy categoryHierarchy, List<NestedElement> nestedElements, ReportingDataSourceNode<T> parentNode)
+        /// <param name="parentNode">The <see cref=" DataCollectorNode{T}"/> that is the parent of new nodes.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="DataCollectorNode{T}"/></returns>
+        private IEnumerable<DataCollectorNode<T>> GetDataCollectorNodes(NestedElement nestedElement, CategoryHierarchy categoryHierarchy, List<NestedElement> nestedElements, DataCollectorNode<T> parentNode)
         {
-            var resultNodes = new List<ReportingDataSourceNode<T>>();
-            ReportingDataSourceNode<T> newNode = null;
+            var resultNodes = new List<DataCollectorNode<T>>();
+            DataCollectorNode<T> newNode = null;
             var searchCategory = categoryHierarchy;
 
             if (nestedElement.IsMemberOfCategory(categoryHierarchy.Category))
             {
-                newNode = new ReportingDataSourceNode<T>(categoryHierarchy, nestedElement, parentNode);
+                newNode = new DataCollectorNode<T>(categoryHierarchy, nestedElement, parentNode);
                 parentNode?.Children.Add(newNode);
                 resultNodes.Add(newNode);
             }
@@ -74,7 +74,7 @@ namespace CDP4Reporting.DataSource
             {
                 searchCategory = categoryHierarchy.Child;
 
-                newNode = new ReportingDataSourceNode<T>(searchCategory, nestedElement, parentNode);
+                newNode = new DataCollectorNode<T>(searchCategory, nestedElement, parentNode);
                 parentNode.Children.Add(newNode);
                 resultNodes.Add(newNode);
             }
@@ -83,7 +83,7 @@ namespace CDP4Reporting.DataSource
 
             foreach (var child in children)
             {
-                var nodes = this.GetDataSourceNodes(child, searchCategory, nestedElements, newNode ?? parentNode).ToArray();
+                var nodes = this.GetDataCollectorNodes(child, searchCategory, nestedElements, newNode ?? parentNode).ToArray();
 
                 if (newNode == null && nodes.Any())
                 {

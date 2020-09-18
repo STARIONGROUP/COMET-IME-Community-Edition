@@ -72,14 +72,14 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private const string DATASOURCE_CODE = @"namespace CDP4Reporting
         {
-            using CDP4Reporting.DataSource;
-            public class TestDataSource : ReportingDataSource
+            using CDP4Composition.DataCollector;
+            public class TestDataSource : DataCollector
             {
                 public TestDataSource()
                 {
                 }
 
-                public override object CreateDataSource()
+                public override object CreateDataObject()
                 {
                     return null;
                 }
@@ -88,16 +88,16 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private const string REBUILD_ERROR_DATASOURCE_CODE = @"namespace CDP4Reporting
         {
-            using CDP4Reporting.DataSource;
+            using CDP4Composition.DataCollector;
             using System;
             
-            public class TestDataSource : ReportingDataSource
+            public class TestDataSource : DataCollector
             {
                 public TestDataSource()
                 {
                 }
 
-                public override object CreateDataSource()
+                public override object CreateDataObject()
                 {
                     throw new Exception(""REBUILD_FAILED"");
                 }
@@ -106,13 +106,13 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private const string DATASOURCE_CODE_WITH_PARAMS = @"namespace CDP4Reporting
         {
-	        using CDP4Reporting.DataSource;
+            using CDP4Composition.DataCollector;
 	        using CDP4Reporting.Parameters;
 	        using System.Collections.Generic;
 
 	        public class TestReportingParameters: IReportingParameters
 	        {
-		        public IEnumerable<IReportingParameter> CreateParameters(object dataSource)
+		        public IEnumerable<IReportingParameter> CreateParameters(object dataObject)
 		        {
 			        List<IReportingParameter> paramsList = new List<IReportingParameter>();
 			        paramsList.Add(new ReportingParameter(""param1"", typeof(int), 0));
@@ -126,13 +126,13 @@ namespace CDP4Reporting.Tests.ViewModels
                     return string.Empty;
                 }
             }
-            public class TestDataSource : ReportingDataSource
+            public class TestDataSource : DataCollector
             {
                 public TestDataSource()
                 {
                 }
 
-                public override object CreateDataSource()
+                public override object CreateDataObject()
                 {
                     return null;
                 }
@@ -141,14 +141,14 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private const string DATASOURCE_CODE_INVALID = @"namespace CDP4Reporting
         {
-            using CDP4Reporting.DataSource;
+            using CDP4Composition.DataCollector;
             public1 class TestDataSource : ReportingDataSource
             {
                 public TestDataSource()
                 {
                 }
 
-                public override object CreateDataSource()
+                public override object DataCollector()
                 {
                     return null;
                 }

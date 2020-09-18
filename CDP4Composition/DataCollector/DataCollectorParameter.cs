@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportingDataSourceParameter.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorParameterColumn.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.DataCollector
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -32,9 +32,9 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Abstract base class from which all parameter columns for a <see cref="ReportingDataSourceRow"/> need to derive.
+    /// Abstract base class from which all parameter columns for a <see cref="DataCollectorRow"/> need to derive.
     /// </summary>
-    public abstract class ReportingDataSourceParameter<T> : ReportingDataSourceColumn<T> where T : ReportingDataSourceRow, new()
+    public abstract class DataCollectorParameter<T> : DataCollectorColumn<T> where T : DataCollectorRow, new()
     {
         /// <summary>
         /// The associated <see cref="CDP4Common.EngineeringModelData.ParameterBase"/>.
@@ -57,9 +57,9 @@ namespace CDP4Reporting.DataSource
         protected DomainOfExpertise Owner => this.ParameterBase?.Owner;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReportingDataSourceParameter{T}"/> class.
+        /// Initializes a new instance of the <see cref="DataCollectorParameter{T}"/> class.
         /// </summary>
-        protected ReportingDataSourceParameter()
+        protected DataCollectorParameter()
         {
             this.ShortName = GetParameterAttribute(this.GetType())?.ShortName;
         }
@@ -67,41 +67,38 @@ namespace CDP4Reporting.DataSource
         /// <summary>
         /// Initializes a reported parameter column based on the corresponding
         /// <see cref="CDP4Common.EngineeringModelData.ParameterBase"/> within the associated
-        /// <see cref="ReportingDataSourceNode{T}"/>.
+        /// <see cref="DataCollectorNode{T}"/>.
         /// </summary>
         /// <param name="node">
-        /// The associated <see cref="ReportingDataSourceNode{T}"/>.
+        /// The associated <see cref="DataCollectorNode{T}"/>.
         /// </param>
-        internal override void Initialize(ReportingDataSourceNode<T> node)
+        internal override void Initialize(DataCollectorNode<T> node)
         {
             this.Node = node;
 
-            this.ParameterBase = this.ParameterBase ??
-                                 this.Node.NestedElement.NestedParameter.SingleOrDefault(
-                                     x => x.AssociatedParameter.ParameterType.ShortName == this.ShortName)?.AssociatedParameter;
+            this.ParameterBase ??= this.Node.NestedElement.NestedParameter.SingleOrDefault(
+                x => x.AssociatedParameter.ParameterType.ShortName == this.ShortName)?.AssociatedParameter;
 
-            this.ParameterBase = this.ParameterBase ??
-                                 this.Node.ElementUsage?.ParameterOverride.SingleOrDefault(
-                                     x => x.Parameter.ParameterType.ShortName == this.ShortName);
+            this.ParameterBase ??= this.Node.ElementUsage?.ParameterOverride.SingleOrDefault(
+                x => x.Parameter.ParameterType.ShortName == this.ShortName);
 
-            this.ParameterBase = this.ParameterBase ??
-                                 this.Node.ElementDefinition.Parameter.SingleOrDefault(
-                                     x => x.ParameterType.ShortName == this.ShortName);
+            this.ParameterBase ??= this.Node.ElementDefinition.Parameter.SingleOrDefault(
+                x => x.ParameterType.ShortName == this.ShortName);
 
             this.Value = this.ParameterBase?.ValueSets.First().ActualValue.First();
         }
 
         /// <summary>
         /// Gets the parameters of type <see cref="TP"/> on the children levels in the
-        /// hierarhical tree upon which the data source is based.
+        /// hierarhical tree upon which the data object is based.
         /// </summary>
         /// <typeparam name="TP">
         /// The desired parameter type.
         /// </typeparam>
         /// <returns>
-        /// A list of <see cref="ReportingDataSourceParameter{T}"/>s of type <see cref="TP"/>.
+        /// A list of <see cref="DataCollectorParameter{T}"/>s of type <see cref="TP"/>.
         /// </returns>
-        public IEnumerable<TP> GetChildren<TP>() where TP : ReportingDataSourceParameter<T>
+        public IEnumerable<TP> GetChildren<TP>() where TP : DataCollectorParameter<T>
         {
             return this.Node.Children.Select(child => child.GetColumn<TP>());
         }

@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.Tests.DataSource
+namespace CDP4Composition.Tests.DataCollector
 {
     using System;
     using System.Collections.Concurrent;
@@ -31,20 +31,19 @@ namespace CDP4Reporting.Tests.DataSource
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Dal;
+    using CDP4Composition.DataCollector;
 
-    using CDP4Reporting.DataSource;
+    using CDP4Dal;
 
     using Moq;
 
     using NUnit.Framework;
 
     [TestFixture]
-    public class ReportingDataSourceTestFixture
+    public class DataCollectorTestFixture
     {
         private Mock<ISession> session;
 
@@ -82,17 +81,17 @@ namespace CDP4Reporting.Tests.DataSource
         private ElementUsage eu6;
         private ElementUsage eu7;
 
-        private class Row : ReportingDataSourceRow
+        private class Row : DataCollectorRow
         {
         }
 
-        public class TestDataSource : ReportingDataSource
+        public class TestDataCollector : DataCollector
         {
-            public TestDataSource()
+            public TestDataCollector()
             {
             }
 
-            public override object CreateDataSource()
+            public override object CreateDataObject()
             {
                 return null;
             }
@@ -432,7 +431,7 @@ namespace CDP4Reporting.Tests.DataSource
                 .AddLevel(this.cat3.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.domain);
@@ -448,7 +447,7 @@ namespace CDP4Reporting.Tests.DataSource
         [Test]
         public void VerifyGetNestedParameterValueByPath()
         {
-            var testDataSource = new TestDataSource();
+            var testDataSource = new TestDataCollector();
             testDataSource.Initialize(this.iteration, this.session.Object);
 
             Assert.AreEqual(2D, testDataSource.GetNestedParameterValueByPath<double>(this.option, @"ed1\par\\option1"));
@@ -464,7 +463,7 @@ namespace CDP4Reporting.Tests.DataSource
                 .AddLevel(this.cat3.ShortName)
                 .Build();
 
-            var dataSource = new ReportingDataSourceClass<Row>(
+            var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
                 this.option,
                 this.domain);

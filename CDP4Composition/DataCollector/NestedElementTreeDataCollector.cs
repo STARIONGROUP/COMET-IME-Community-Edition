@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportingDataSourceClass.cs" company="RHEA System S.A.">
+// <copyright file="NestedElementTreeDataCollector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.DataCollector
 {
     using System.Collections.Generic;
     using System.Data;
@@ -34,12 +34,12 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Class representing a reporting data source.
+    /// Class that can be used to collect data from the NestedElementTree / ProductTree.
     /// </summary>
     /// <typeparam name="T">
-    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
+    /// The <see cref="DataCollectorRow"/> representing the data collector rows.
     /// </typeparam>
-    public class ReportingDataSourceClass<T> where T : ReportingDataSourceRow, new()
+    public class NestedElementTreeDataCollector<T> where T : DataCollectorRow, new()
     {
         /// <summary>
         /// The <see cref="CategoryHierarchy"/> used for filtering the considered <see cref="ElementBase"/> items.
@@ -47,23 +47,23 @@ namespace CDP4Reporting.DataSource
         private readonly CategoryHierarchy categoryHierarchy;
 
         /// <summary>
-        /// The <see cref="ReportingDataSourceNode{T}"/>'s which are the root elements of the hierarhical tree.
+        /// The <see cref="DataCollectorNode{T}"/>'s which are the root elements of the hierarhical tree.
         /// </summary>
-        internal readonly IEnumerable<ReportingDataSourceNode<T>> topNodes;
+        internal readonly IEnumerable<DataCollectorNode<T>> TopNodes;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReportingDataSourceClass{T}"/> class.
+        /// Initializes a new instance of the <see cref="NestedElementTreeDataCollector{T}"/> class.
         /// </summary>
         /// <param name="categoryHierarchy">
         /// The <see cref="CategoryHierarchy"/> used for filtering the considered <see cref="ElementBase"/> items.
         /// </param>
         /// <param name="option">
-        /// The <see cref="Option"/> for which the data source is built.
+        /// The <see cref="Option"/> for which the data object is built.
         /// </param>
         /// <param name="domainOfExpertise">
-        /// The <see cref="DomainOfExpertise"/> for which the data source is built.
+        /// The <see cref="DomainOfExpertise"/> for which the data object is built.
         /// </param>
-        public ReportingDataSourceClass(
+        public NestedElementTreeDataCollector(
             CategoryHierarchy categoryHierarchy,
             Option option,
             DomainOfExpertise domainOfExpertise)
@@ -74,20 +74,20 @@ namespace CDP4Reporting.DataSource
                 .Generate(option, domainOfExpertise)
                 .ToList();
 
-            this.topNodes = new ReportingDataSourceNodeTreeGenerator<T>().Generate(categoryHierarchy, nestedElements);
+            this.TopNodes = new CategoryHierarchyDataCollectorNodesGenerator<T>().Generate(categoryHierarchy, nestedElements);
         }
 
         /// <summary>
-        /// Gets a <see cref="DataTable"/> representation of the hierarhical tree upon which the data source is based.
+        /// Gets a <see cref="DataTable"/> representation of the hierarhical tree upon which the data object is based.
         /// </summary>
         /// <returns>
         /// The <see cref="DataTable"/>.
         /// </returns>
         public DataTable GetTable()
         {
-            var table = ReportingDataSourceNode<T>.GetTable(this.categoryHierarchy);
+            var table = DataCollectorNode<T>.GetTable(this.categoryHierarchy);
 
-            foreach (var topNode in this.topNodes)
+            foreach (var topNode in this.TopNodes)
             {
                 topNode.AddDataRows(table);
             }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinedThingShortNameAttribute.cs" company="RHEA System S.A.">
+// <copyright file="DefinedThingShortNameAttributeTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,33 +23,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.Tests.DataCollector
 {
-    using System;
+    using CDP4Composition.DataCollector;
 
-    using CDP4Common.CommonData;
+    using NUnit.Framework;
 
-    /// <summary>
-    /// Attribute decorating implementations of <see cref="ReportingDataSourceParameter{T}"/> to mark
-    /// the associated <see cref="DefinedThing"/> short name.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class DefinedThingShortNameAttribute : Attribute
+    [TestFixture]
+    public class DefinedThingShortNameAttributeTestFixture
     {
-        /// <summary>
-        /// The short name of the associated <see cref="DefinedThing"/>.
-        /// </summary>
-        public readonly string ShortName;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefinedThingShortNameAttribute"/> class.
-        /// </summary>
-        /// <param name="shortName">
-        /// The short name of the associated <see cref="DefinedThing"/>.
-        /// </param>
-        public DefinedThingShortNameAttribute(string shortName)
+        [Test]
+        public void TestParameterTypeShortNameAttribute()
         {
-            this.ShortName = shortName;
+            var attribute = new DefinedThingShortNameAttribute("shortName");
+            Assert.AreEqual(attribute.ShortName, "shortName");
         }
     }
 }

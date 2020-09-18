@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportingDataSourceNode.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorNode.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.DataCollector
 {
     using System;
     using System.Collections.Generic;
@@ -35,31 +35,31 @@ namespace CDP4Reporting.DataSource
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Class representing a node in the hierarhical tree upon which the data source is based.
-    /// Each node corresponds to a row in the data source tabular representation.
+    /// Class representing a node in the hierarhical tree upon which the data object is based.
+    /// Each node corresponds to a row in the data object's tabular representation.
     /// </summary>
     /// <typeparam name="T">
-    /// The <see cref="ReportingDataSourceRow"/> representing the data source rows.
+    /// The <see cref="DataCollectorRow"/> representing the data collector rows.
     /// </typeparam>
-    internal class ReportingDataSourceNode<T> where T : ReportingDataSourceRow, new()
+    internal class DataCollectorNode<T> where T : DataCollectorRow, new()
     {
         /// <summary>
-        /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="ReportingDataSourceColumn{T}"/>s
-        /// declared as <see cref="ReportingDataSourceRow"/> fields.
+        /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorColumn{T}"/>s
+        /// declared as <see cref="DataCollectorRow"/> fields.
         /// </summary>
         private static readonly Dictionary<Type, FieldInfo> RowFields = typeof(T).GetFields()
-            .Where(f => f.FieldType.IsSubclassOf(typeof(ReportingDataSourceColumn<T>)))
+            .Where(f => f.FieldType.IsSubclassOf(typeof(DataCollectorColumn<T>)))
             .ToDictionary(f => f.FieldType, f => f);
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> of all the public getters on the <see cref="ReportingDataSourceRow"/>
+        /// A <see cref="IEnumerable{T}"/> of all the public getters on the <see cref="DataCollectorRow"/>
         /// representation.
         /// </summary>
         private static readonly IEnumerable<PropertyInfo> PublicGetters = typeof(T).GetProperties()
             .Where(p => p.GetMethod?.IsPublic == true);
 
         /// <summary>
-        /// Creates a <see cref="DataTable"/> representation based on the <see cref="ReportingDataSourceRow"/>
+        /// Creates a <see cref="DataTable"/> representation based on the <see cref="DataCollectorRow"/>
         /// representation.
         /// </summary>
         /// <param name="categoryHierarchy">
@@ -86,24 +86,29 @@ namespace CDP4Reporting.DataSource
         }
 
         /// <summary>
-        /// The <see cref="ReportingDataSourceRow"/> representation of the current node.
+        /// The <see cref="DataCollectorRow"/> representation of the current node.
         /// </summary>
         private readonly T rowRepresentation;
 
         /// <summary>
-        /// The parent node in the hierarhical tree upon which the data source is based.
+        /// The parent node in the hierarhical tree upon which the data object is based.
         /// </summary>
-        private readonly ReportingDataSourceNode<T> parent;
+        private readonly DataCollectorNode<T> parent;
 
         /// <summary>
-        /// The children nodes in the hierarhical tree upon which the data source is based.
+        /// The children nodes in the hierarhical tree upon which the data object is based.
         /// </summary>
-        internal List<ReportingDataSourceNode<T>> Children { get; } = new List<ReportingDataSourceNode<T>>();
+        internal List<DataCollectorNode<T>> Children { get; } = new List<DataCollectorNode<T>>();
 
         /// <summary>
         /// The <see cref="CDP4Common.EngineeringModelData.NestedElement"/> associated with this node.
         /// </summary>
         internal readonly NestedElement NestedElement;
+
+        /// <summary>
+        /// The <see cref="ICategorizableThing"/> associated with this node.
+        /// </summary>
+        internal ICategorizableThing CategorizableThing => this.ElementBase;
 
         /// <summary>
         /// The <see cref="CDP4Common.EngineeringModelData.ElementBase"/> associated with this node.
@@ -131,7 +136,7 @@ namespace CDP4Reporting.DataSource
         private string fieldName => this.filterCategory?.FieldName;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReportingDataSourceNode{T}"/> class.
+        /// Initializes a new instance of the <see cref="DataCollectorNode{T}"/> class.
         /// </summary>
         /// <param name="categoryHierarchy">
         /// The <see cref="CategoryHierarchy"/> associated with this node's subtree.
@@ -140,12 +145,12 @@ namespace CDP4Reporting.DataSource
         /// The <see cref="CDP4Common.EngineeringModelData.NestedElement"/> associated with this node.
         /// </param>
         /// <param name="parent">
-        /// The parent node in the hierarhical tree upon which the data source is based.
+        /// The parent node in the hierarhical tree upon which the data collector is based.
         /// </param>
-        public ReportingDataSourceNode(
+        public DataCollectorNode(
             CategoryHierarchy categoryHierarchy,
             NestedElement topElement,
-            ReportingDataSourceNode<T> parent = null)
+            DataCollectorNode<T> parent = null)
         {
             this.filterCategory = categoryHierarchy;
             this.NestedElement = topElement;
@@ -179,9 +184,9 @@ namespace CDP4Reporting.DataSource
         /// The desired column type.
         /// </typeparam>
         /// <returns>
-        /// The <see cref="ReportingDataSourceColumn{T}"/> of type <see cref="TP"/>.
+        /// The <see cref="DataCollectorColumn{T}"/> of type <see cref="TP"/>.
         /// </returns>
-        public TP GetColumn<TP>() where TP : ReportingDataSourceColumn<T>
+        public TP GetColumn<TP>() where TP : DataCollectorColumn<T>
         {
             return RowFields[typeof(TP)].GetValue(this.rowRepresentation) as TP;
         }
@@ -190,7 +195,7 @@ namespace CDP4Reporting.DataSource
         /// Gets the row representation of this node.
         /// </summary>
         /// <returns>
-        /// A <see cref="ReportingDataSourceRow"/>.
+        /// A <see cref="DataCollectorRow"/>.
         /// </returns>
         private T GetRowRepresentation()
         {
@@ -212,7 +217,7 @@ namespace CDP4Reporting.DataSource
 
                 if (!(method is null))
                 {
-                    var column = method.Invoke(new object[] { }) as ReportingDataSourceColumn<T>;
+                    var column = method.Invoke(new object[] { }) as DataCollectorColumn<T>;
 
                     column?.Initialize(this);
 

@@ -41,6 +41,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition;
+    using CDP4Composition.DataCollector;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -612,26 +613,27 @@ namespace CDP4Reporting.ViewModels
                     this.CompileResult
                         .CompiledAssembly
                         .GetTypes()
-                        .FirstOrDefault(t => t.IsSubclassOf(typeof(ReportingDataSource))
+                        .FirstOrDefault(t => t.GetInterfaces()
+                            .Any(i => i == typeof(IDataCollector))
                         )?.FullName;
 
                 if (editorFullClassName == null)
                 {
-                    this.AddOutput($"No class that inherits from {typeof(ReportingDataSource)} was found.");
+                    this.AddOutput($"No class that implements from {nameof(IDataCollector)} was found.");
                     return null;
                 }
 
-                var instObj = this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) as ReportingDataSource;
+                var instObj = this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) as IDataCollector;
 
                 if (instObj == null)
                 {
-                    this.AddOutput("Data source class not found.");
+                    this.AddOutput("DataCollector class not found.");
                     return null;
                 }
 
                 instObj.Initialize(this.Thing, this.Session);
 
-                return instObj.CreateDataSource();
+                return instObj.CreateDataObject();
             }
             catch (Exception ex)
             {

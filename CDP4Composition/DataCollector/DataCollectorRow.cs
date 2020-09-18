@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICDP4ReportingDataSource.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorRow.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,19 +23,30 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.DataCollector
 {
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
     /// <summary>
-    /// The interface used for creating a reporting data source.
+    /// Abstract base class from which all row representations for a <see cref="NestedElementTreeDataCollector{T}"/> need to derive.
     /// </summary>
-    internal interface IReportingDataSource
+    public abstract class DataCollectorRow
     {
         /// <summary>
-        /// Creates a new data source instance.
+        /// The associated <see cref="ElementBase"/>.
         /// </summary>
-        /// <returns>
-        /// An object instance.
-        /// </returns>
-        object CreateDataSource();
+        protected internal ElementBase ElementBase { get; internal set; }
+
+        /// <summary>
+        /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
+        /// Note that when this is false, all values will be null on the row.
+        /// </summary>
+        protected internal bool IsVisible { get; internal set; }
+
+        /// <summary>
+        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ElementBase"/>.
+        /// </summary>
+        protected DomainOfExpertise ElementBaseOwner => this.ElementBase.Owner;
     }
 }

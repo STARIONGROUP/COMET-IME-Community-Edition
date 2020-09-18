@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.DataCollector
 {
     using System;
     using System.Linq;
@@ -182,8 +182,7 @@ namespace CDP4Reporting.DataSource
         }
 
         /// <summary>
-        /// The filtering <see cref="CDP4Common.SiteDirectoryData.Category"/> that must be matched on the associated level
-        /// of the <see cref="ReportingDataSourceNode{T}"/>.
+        /// The <see cref="CDP4Common.SiteDirectoryData.Category"/> of this level in the <see cref="CategoryHierarchy"/>.
         /// </summary>
         public readonly Category Category;
 

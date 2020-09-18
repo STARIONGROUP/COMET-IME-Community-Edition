@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.Tests.DataSource
+namespace CDP4Composition.Tests.DataCollector
 {
     using System;
     using System.Collections.Concurrent;
@@ -33,7 +33,7 @@ namespace CDP4Reporting.Tests.DataSource
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Reporting.DataSource;
+    using CDP4Composition.DataCollector;
 
     using NUnit.Framework;
 

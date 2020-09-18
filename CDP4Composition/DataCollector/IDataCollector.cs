@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CDP4ReportingDataSource.cs" company="RHEA System S.A.">
+// <copyright file="IDataCollector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,33 +23,46 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Composition.DataCollector
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal;
 
-    public abstract class ReportingDataSource : IReportingDataSource
+    /// <summary>
+    /// The interface used for collecting data.
+    /// </summary>
+    public interface IDataCollector
     {
         /// <summary>
-        /// Gets or sets the <see cref="Iteration"/>
+        /// Gets the <see cref="Iteration"/>
         /// </summary>
-        public Iteration Iteration { get; private set; }
+        Iteration Iteration { get; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ISession"/>
+        /// Gets the <see cref="ISession"/>
         /// </summary>
-        public ISession Session { get; private set; }
+        ISession Session { get; }
 
         /// <summary>
-        /// Gets or sets the <see cref="DomainOfExpertise"/>
+        /// Gets the <see cref="DomainOfExpertise"/>
         /// </summary>
-        public DomainOfExpertise DomainOfExpertise { get; private set; }
+        DomainOfExpertise DomainOfExpertise { get; }
+
+        /// <summary>
+        /// Gets the list of available <see cref="Option"/>s
+        /// </summary>
+        IEnumerable<Option> Options { get; }
+
+        /// <summary>
+        /// Initializes this DataCollector 
+        /// </summary>
+        /// <param name="iteration"></param>
+        /// <param name="session"></param>
+        void Initialize(Iteration iteration, ISession session);
 
         /// <summary>
         /// Finds <see cref="NestedParameter"/>s by their <see cref="NestedParameter.Path"/>s in the <see cref="Option"/>'s <see cref="NestedParameter"/>
@@ -64,29 +77,14 @@ namespace CDP4Reporting.DataSource
         /// </param>
         /// <returns>A single <see cref="NestedParameter"/> if the path was found and its <see cref="NestedParameter.ActualValue"/>
         /// could be converted to the requested generic <typeparamref name="T"></typeparamref>, otherwise null.</returns>
-        public T GetNestedParameterValueByPath<T>(Option option, string path, int index = 0)
-        {
-            return (T)Convert.ChangeType(option.GetNestedParameterValuesByPath<object>(path, this.DomainOfExpertise).ToArray()[index], typeof(T));
-        }
+        T GetNestedParameterValueByPath<T>(Option option, string path, int index = 0);
 
         /// <summary>
-        /// The list of available <see cref="Option"/>s
-        /// </summary>
-        public IEnumerable<Option> Options => this.Iteration?.Option as IEnumerable<Option> ?? new List<Option>();
-
-        internal void Initialize(Iteration iteration, ISession session)
-        {
-            this.Iteration = iteration;
-            this.Session = session;
-            this.DomainOfExpertise = session.QueryCurrentDomainOfExpertise();
-        }
-
-        /// <summary>
-        /// Creates a new data source instance.
+        /// Creates a new data object instance. Could be anything depending on what the data is used for.
         /// </summary>
         /// <returns>
         /// An object instance.
         /// </returns>
-        public abstract object CreateDataSource();
+        object CreateDataObject();
     }
 }
