@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SavedConfigurationDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -15,30 +15,34 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4RelationshipMatrix.ViewModels
+namespace CDP4Composition.ViewModels
 {
     using System;
+    using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.PluginSettingService;
-    using DialogResult;
+    using CDP4Composition.Services.PluginSettingService;
+    using CDP4Composition.ViewModels.DialogResult;
+
     using ReactiveUI;
-    using Settings;
 
     /// <summary>
     /// ViewModel for the dialog to save matrix configuration
     /// </summary>
-    public class SavedConfigurationDialogViewModel : DialogViewModelBase
+    /// <typeparam name="TPluginSettings">A type of <see cref="PluginSettings"/></typeparam>
+    public class SavedConfigurationDialogViewModel<TPluginSettings> : DialogViewModelBase where TPluginSettings : PluginSettings
     {
         /// <summary>
         /// Backing field for the <see cref="Name"/> property.
@@ -51,32 +55,25 @@ namespace CDP4RelationshipMatrix.ViewModels
         private string description;
 
         /// <summary>
-        /// The dialog navigation service.
-        /// </summary>
-        private IDialogNavigationService dialogNavigationService;
-
-        /// <summary>
         /// The plugin settings service.
         /// </summary>
-        private IPluginSettingsService pluginSettingService;
+        private readonly IPluginSettingsService pluginSettingService;
 
         /// <summary>
         /// The configuration to be saved.
         /// </summary>
-        private SavedConfiguration savedConfiguration;
+        private IPluginSavedConfiguration savedConfiguration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SavedConfigurationDialogViewModel"/> class.
         /// </summary>
-        /// <param name="dialogNavigationService">An instance of <see cref="IDialogNavigationService"/>.</param>
         /// <param name="pluginSettingService">An instance of <see cref="IPluginSettingsService"/>.</param>
         /// <param name="configuration">The configuration to be saved.</param>
-        public SavedConfigurationDialogViewModel(IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingService, SavedConfiguration configuration)
+        public SavedConfigurationDialogViewModel(IPluginSettingsService pluginSettingService, IPluginSavedConfiguration configuration)
         {
             // reset the loading indicator
             this.IsBusy = false;
 
-            this.dialogNavigationService = dialogNavigationService;
             this.pluginSettingService = pluginSettingService;
             this.savedConfiguration = configuration;
 
@@ -111,14 +108,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public string Name
         {
-            get
-            {
-                return this.name;
-            }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.name, value);
-            }
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         /// <summary>
@@ -126,14 +117,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public string Description
         {
-            get
-            {
-                return this.description;
-            }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.description, value);
-            }
+            get => this.description;
+            set => this.RaiseAndSetIfChanged(ref this.description, value);
         }
 
         /// <summary>
@@ -144,12 +129,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </returns>
         private async Task ExecuteOk()
         {
-            var settings = this.pluginSettingService.Read<RelationshipMatrixPluginSettings>();
+            var settings = this.pluginSettingService.Read<TPluginSettings>();
 
             this.savedConfiguration.Name = this.Name;
             this.savedConfiguration.Description = this.Description;
 
-            settings.SavedConfigurations.Add(this.savedConfiguration);
+            if (settings.SavedConfigurations.All(s => s.Id != this.savedConfiguration.Id))
+            {
+                settings.SavedConfigurations.Add(this.savedConfiguration);
+            }
 
             this.IsBusy = true;
 

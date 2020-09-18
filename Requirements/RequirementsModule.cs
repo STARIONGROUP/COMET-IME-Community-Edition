@@ -141,8 +141,8 @@ namespace CDP4Requirements
             }
             catch (PluginSettingsException pluginSettingsException)
             {
-                var relationshipMatrixPluginSettings = new RequirementsModuleSettings();
-                this.PluginSettingsService.Write(relationshipMatrixPluginSettings);
+                var moduleSettings = new RequirementsModuleSettings();
+                this.PluginSettingsService.Write(moduleSettings);
                 logger.Error(pluginSettingsException);
             }
             catch (Exception ex)

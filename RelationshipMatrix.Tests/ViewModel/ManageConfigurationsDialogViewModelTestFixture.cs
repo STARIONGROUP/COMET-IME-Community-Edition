@@ -6,6 +6,8 @@
 
 namespace CDP4RelationshipMatrix.Tests.ViewModel
 {
+    using CDP4Composition.ViewModels;
+
     using CDP4RelationshipMatrix.Settings;
     using NUnit.Framework;
     using ViewModels;
@@ -36,7 +38,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.settings.SavedConfigurations.Add(savedConfig1);
             this.settings.SavedConfigurations.Add(savedConfig2);
 
-            var vm = new ManageConfigurationsDialogViewModel(this.dialogNavigationService.Object, this.pluginService.Object);
+            var vm = new ManageConfigurationsDialogViewModel<RelationshipMatrixPluginSettings>(this.pluginService.Object);
 
             Assert.AreEqual(this.settings.SavedConfigurations.Count, vm.SavedConfigurations.Count);
 

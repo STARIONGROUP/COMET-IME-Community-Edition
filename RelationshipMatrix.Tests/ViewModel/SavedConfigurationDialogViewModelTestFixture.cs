@@ -6,6 +6,8 @@
 
 namespace CDP4RelationshipMatrix.Tests.ViewModel
 {
+    using CDP4Composition.ViewModels;
+
     using CDP4RelationshipMatrix.Settings;
     using NUnit.Framework;
     using ViewModels;
@@ -23,7 +25,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         {
             var savedConfiguration = new SavedConfiguration();
 
-            var vm = new SavedConfigurationDialogViewModel(this.dialogNavigationService.Object, this.pluginService.Object, savedConfiguration);
+            var vm = new SavedConfigurationDialogViewModel<RelationshipMatrixPluginSettings>(this.pluginService.Object, savedConfiguration);
 
             vm.Name = "adda";
             vm.Description = "dde";

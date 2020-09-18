@@ -8,6 +8,8 @@ namespace CDP4Requirements.ViewModels
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.Serialization;
+
     using CDP4Common.SiteDirectoryData;
     using ReqIFSharp;
     using ReqIFDal;

@@ -12,6 +12,8 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;    
     using Microsoft.Practices.ServiceLocation;
@@ -33,12 +35,17 @@ namespace CDP4Requirements.ViewModels
         /// The <see cref="IDialogNavigationService"/>
         /// </summary>
         protected readonly IDialogNavigationService DialogNavigationService;
+        
+        /// <summary>
+        /// The <see cref="IPluginSettingsService"/>
+        /// </summary>
+        protected readonly IPluginSettingsService PluginSettingsService;
 
         /// <summary>
         /// Backing field for <see cref="CanImportExport"/>
         /// </summary>
-        private bool canImportExport; 
-
+        private bool canImportExport;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ReqIfRibbonViewModel"/> class
         /// </summary>
@@ -46,6 +53,7 @@ namespace CDP4Requirements.ViewModels
         {
             this.DialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             this.ThingDialogNavigationService = ServiceLocator.Current.GetInstance<IThingDialogNavigationService>();
+            this.PluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
 
             this.Sessions = new ReactiveList<ISession>();
             this.Iterations = new ReactiveList<Iteration>();
@@ -159,7 +167,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void ExecuteImportCommand()
         {
-            var reqifImportDialogViewModel = new ReqIfImportDialogViewModel(this.Sessions, this.Iterations, new OpenSaveFileDialogService(), new ReqIFDeserializer());
+            var reqifImportDialogViewModel = new ReqIfImportDialogViewModel(this.Sessions, this.Iterations, new OpenSaveFileDialogService(), this.DialogNavigationService, this.PluginSettingsService, new ReqIFDeserializer());
             var result = (ReqIfImportResult)this.DialogNavigationService.NavigateModal(reqifImportDialogViewModel);
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
@@ -172,9 +180,8 @@ namespace CDP4Requirements.ViewModels
             var model = (EngineeringModel)result.Iteration.Container;
             var activeDomain = model.GetActiveParticipant(session.ActivePerson).SelectedDomain;
 
-            var reqifToThingMapper = new ReqIfImportMappingManager(result.ReqIfObject, session, result.Iteration, activeDomain, this.DialogNavigationService, this.ThingDialogNavigationService);
+            var reqifToThingMapper = new ReqIfImportMappingManager(result.ReqIfObject, session, result.Iteration, activeDomain, this.DialogNavigationService, this.PluginSettingsService, this.ThingDialogNavigationService, result.MappingConfiguration);
             reqifToThingMapper.StartMapping();
-            reqifToThingMapper.SaveMapping();
         }
     }
 }

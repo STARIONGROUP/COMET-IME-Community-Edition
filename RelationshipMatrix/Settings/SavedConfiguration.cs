@@ -6,11 +6,20 @@
 
 namespace CDP4RelationshipMatrix.Settings
 {
+    using System;
+
+    using CDP4Composition.Services.PluginSettingService;
+
     /// <summary>
     /// Represents a single instance of a fully saved matrix configuration.
     /// </summary>
-    public class SavedConfiguration
+    public class SavedConfiguration : IPluginSavedConfiguration
     {
+        /// <summary>
+        /// Gets the Unique identifier
+        /// </summary>
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         /// <summary>
         /// Gets or sets the name of the saved configuration.
         /// </summary>

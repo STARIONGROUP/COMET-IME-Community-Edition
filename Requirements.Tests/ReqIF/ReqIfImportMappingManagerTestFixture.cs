@@ -36,6 +36,7 @@ namespace CDP4Requirements.Tests.ReqIF
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
 
     using CDP4Requirements.ViewModels;
 
@@ -92,6 +93,7 @@ namespace CDP4Requirements.Tests.ReqIF
         private SpecObjectType specobjecttype;
 
         private ParameterType pt;
+        private Mock<IPluginSettingsService> pluginSettingsService;
 
         [SetUp]
         public void Setup()
@@ -100,6 +102,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.assembler = new Assembler(this.uri);
 
@@ -152,6 +155,7 @@ namespace CDP4Requirements.Tests.ReqIF
                 this.iteration,
                 this.domain,
                 this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object,
                 this.thingDialogNavigationService.Object);
         }
 
@@ -312,27 +316,27 @@ namespace CDP4Requirements.Tests.ReqIF
         [Test]
         public void VerifySaveMapping()
         {
-            Assert.DoesNotThrow(() => this.importMappingManager.SaveMapping());
+            Assert.DoesNotThrow(() => this.importMappingManager.SaveDataTypeDefinitionMap());
             
             this.importMappingManager.StartMapping();
 
-            this.importMappingManager.SpecificationMapResult = new Dictionary<Specification, RequirementsSpecification>()
-            {
-                {
-                    new Specification() {Identifier = Guid.NewGuid().ToString(), Description = "description0"}, 
-                    new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri)
-                },
-                {
-                    new Specification() {Identifier = Guid.NewGuid().ToString(), Description = "description1"}, 
-                    new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri)
-                },
-                {
-                    new Specification() {Identifier = Guid.NewGuid().ToString(), Description = "description2"}, 
-                    new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri)
-                },
-            };
-            
-            Assert.DoesNotThrow(() => this.importMappingManager.SaveMapping());
+            //this.importMappingManager. = new Dictionary<Specification, RequirementsSpecification>()
+            //{
+            //    {
+            //        new Specification() {Identifier = Guid.NewGuid().ToString(), Description = "description0"}, 
+            //        new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            //    },
+            //    {
+            //        new Specification() {Identifier = Guid.NewGuid().ToString(), Description = "description1"}, 
+            //        new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            //    },
+            //    {
+            //        new Specification() {Identifier = Guid.NewGuid().ToString(), Description = "description2"}, 
+            //        new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            //    },
+            //};
+
+            Assert.DoesNotThrow(() => this.importMappingManager.SaveDataTypeDefinitionMap());
         }
     }
 }

@@ -40,12 +40,13 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.ViewModels;
+    using CDP4Composition.ViewModels.DialogResult;
 
     using CDP4Dal;
     using CDP4Dal.Events;
 
     using CDP4RelationshipMatrix.Settings;
-    using CDP4RelationshipMatrix.ViewModels.DialogResult;
 
     using ReactiveUI;
 
@@ -445,7 +446,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void ReloadSavedConfigurations()
         {
             this.settings = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
-            this.SavedConfigurations = new ReactiveList<SavedConfiguration>(this.settings.SavedConfigurations);
+            this.SavedConfigurations = new ReactiveList<SavedConfiguration>(this.settings.SavedConfigurations.Cast<SavedConfiguration>());
 
             this.SavedConfigurations.Insert(0, new SavedConfiguration()
             {
@@ -835,7 +836,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void ExecuteManageSavedConfigurations()
         {
-            var vm = new ManageConfigurationsDialogViewModel(this.DialogNavigationService, this.PluginSettingsService);
+            var vm = new ManageConfigurationsDialogViewModel<RelationshipMatrixPluginSettings>(this.PluginSettingsService);
             var result = this.DialogNavigationService.NavigateModal(vm) as ManageConfigurationsResult;
 
             if (result?.Result == null || !result.Result.Value)
@@ -860,8 +861,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 ShowRelatedOnly = this.ShowRelatedOnly
             };
 
-            var vm = new SavedConfigurationDialogViewModel(this.DialogNavigationService, this.PluginSettingsService,
-                savedConfiguration);
+            var vm = new SavedConfigurationDialogViewModel<RelationshipMatrixPluginSettings>(this.PluginSettingsService, savedConfiguration);
 
             var result = this.DialogNavigationService.NavigateModal(vm) as SavedConfigurationResult;
 
