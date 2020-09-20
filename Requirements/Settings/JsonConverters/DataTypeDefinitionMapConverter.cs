@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequirementsModuleSettingsConverter.cs" company="RHEA System S.A.">
+// <copyright file="DataTypeDefinitionMapConverter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -26,7 +26,6 @@
 namespace CDP4Requirements.Settings.JsonConverters
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -38,42 +37,49 @@ namespace CDP4Requirements.Settings.JsonConverters
 
     using CDP4Requirements.ViewModels;
 
-    using NetOffice.Extensions.Invoker;
-
     using Newtonsoft.Json;
 
     using ReqIFSharp;
 
     /// <summary>
-    /// Allows Json.Net to convert <see cref="Dictionary{TKey,TValue}"/> of type
+    /// Allows Json.Net to convert <see cref="Dictionary{TKey,TValue}"/> of type <code>Dictionary&lt;DatatypeDefinition, DatatypeDefinitionMap&gt;</code>
     /// </summary>
-    public class RequirementsModuleSettingsConverter : JsonConverter<ImportMappingConfiguration>
+    public class DataTypeDefinitionMapConverter : JsonConverter<Dictionary<DatatypeDefinition, DatatypeDefinitionMap>>
     {
+        /// <summary>
+        /// Holds a list of <see cref="DatatypeDefinition"/>
+        /// </summary>
         private readonly IEnumerable<DatatypeDefinition> reqIfDataDefinitions;
+
+        /// <summary>
+        /// The <see cref="ISession"/>
+        /// </summary>
         private readonly ISession session;
+
+        /// <summary>
+        /// The <see cref="Iteration"/>
+        /// </summary>
         private readonly Iteration iteration;
 
-        public RequirementsModuleSettingsConverter(ReqIF reqIfDataDefinitions, ISession session, Iteration iteration)
+        /// <summary>
+        /// Initializes a new <see cref="DataTypeDefinitionMapConverter"/>
+        /// </summary>
+        /// <param name="reqIf">The associated <see cref="ReqIF"/></param>
+        /// <param name="session">The <see cref="ISession"/></param>
+        /// <param name="iteration">The <see cref="iteration"/></param>
+        public DataTypeDefinitionMapConverter(ReqIF reqIf, ISession session, Iteration iteration)
         {
-            this.reqIfDataDefinitions = reqIfDataDefinitions.CoreContent.FirstOrDefault()?.DataTypes;
+            this.reqIfDataDefinitions = reqIf.CoreContent.FirstOrDefault()?.DataTypes;
             this.session = session;
             this.iteration = iteration;
         }
 
         /// <inheritdoc cref="JsonConverter{T}.WriteJson"/>
-        public override void WriteJson(JsonWriter writer, ImportMappingConfiguration value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, Dictionary<DatatypeDefinition, DatatypeDefinitionMap> value, JsonSerializer serializer)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName(nameof(value.Id));
-            writer.WriteValue(value.Id);
-            writer.WritePropertyName(nameof(value.Name));
-            writer.WriteValue(value.Name);
-            writer.WritePropertyName(nameof(value.Description));
-            writer.WriteValue(value.Description);
-            writer.WritePropertyName(nameof(value.DatatypeDefinitionMap));
             writer.WriteStartArray();
             
-            foreach (var pair in value.DatatypeDefinitionMap)
+            foreach (var pair in value)
             {
                 writer.WriteStartObject();
                 writer.WritePropertyName(pair.Key.Identifier);
@@ -82,23 +88,19 @@ namespace CDP4Requirements.Settings.JsonConverters
             }
 
             writer.WriteEndArray();
-            writer.WriteEndObject();
         }
 
         /// <inheritdoc cref="JsonConverter{T}.ReadJson"/>
-        public override ImportMappingConfiguration ReadJson(JsonReader reader, Type objectType, ImportMappingConfiguration existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override Dictionary<DatatypeDefinition, DatatypeDefinitionMap> ReadJson(JsonReader reader, Type objectType, Dictionary<DatatypeDefinition, DatatypeDefinitionMap> existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            if (reader.Value is ImportMappingConfiguration readData)
-            {
-                var result = new ImportMappingConfiguration()
-                {
-                    Name = readData.Name, Description = readData.Description, Id = readData.Id
-                };
+            var result = new Dictionary<DatatypeDefinition, DatatypeDefinitionMap>();
 
-                foreach (var pair in readData.DatatypeDefinitionMap)
+            if (reader.Value is Dictionary<DatatypeDefinition, DatatypeDefinitionMap> readData)
+            {
+                foreach (var pair in readData)
                 {
                     var dataTypeDefinition = this.GetDatatypeDefinition(pair.Key.Identifier);
-                    result.DatatypeDefinitionMap[dataTypeDefinition] = new DatatypeDefinitionMap(dataTypeDefinition, this.GetParameterType(pair.Value.ParameterType.Iid.ToString()), null);
+                    result[dataTypeDefinition] = new DatatypeDefinitionMap(dataTypeDefinition, this.GetParameterType(pair.Value.ParameterType.Iid.ToString()), null);
                 }
 
                 return result;

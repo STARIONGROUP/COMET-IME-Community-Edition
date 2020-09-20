@@ -76,25 +76,21 @@ namespace CDP4Requirements
         /// <summary>
         /// The <see cref="SpecObjectType"/> map
         /// </summary>
-        [JsonIgnore]
         public Dictionary<SpecObjectType, SpecObjectTypeMap> SpecObjectTypeMap { get; set; } = new Dictionary<SpecObjectType, SpecObjectTypeMap>();
 
         /// <summary>
         /// The <see cref="SpecRelationType"/> map
         /// </summary>
-        [JsonIgnore]
         public Dictionary<SpecRelationType, SpecRelationTypeMap> SpecRelationTypeMap { get; set; } = new Dictionary<SpecRelationType, SpecRelationTypeMap>();
 
         /// <summary>
         /// The <see cref="RelationGroupType"/> map
         /// </summary>
-        [JsonIgnore]
         public Dictionary<RelationGroupType, RelationGroupTypeMap> RelationGroupTypeMap { get; set; } = new Dictionary<RelationGroupType, RelationGroupTypeMap>();
 
         /// <summary>
         /// The <see cref="SpecificationType"/> map
         /// </summary>
-        [JsonIgnore]
         public Dictionary<SpecificationType, SpecTypeMap> SpecificationTypeMap { get; set; } = new Dictionary<SpecificationType, SpecTypeMap>();
     }
 }
