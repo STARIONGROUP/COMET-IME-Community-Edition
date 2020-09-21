@@ -47,43 +47,13 @@ namespace CDP4Reporting.DataCollection
         /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorColumn{T}"/>s
         /// declared as <see cref="DataCollectorRow"/> fields.
         /// </summary>
-        private static readonly Dictionary<Type, FieldInfo> RowFields = typeof(T).GetFields()
-            .Where(f => f.FieldType.IsSubclassOf(typeof(DataCollectorColumn<T>)))
-            .ToDictionary(f => f.FieldType, f => f);
+        private Dictionary<PropertyInfo, Type> rowFields;
 
         /// <summary>
         /// A <see cref="IEnumerable{T}"/> of all the public getters on the <see cref="DataCollectorRow"/>
         /// representation.
         /// </summary>
-        private static readonly IEnumerable<PropertyInfo> PublicGetters = typeof(T).GetProperties()
-            .Where(p => p.GetMethod?.IsPublic == true);
-
-        /// <summary>
-        /// Creates a <see cref="DataTable"/> representation based on the <see cref="DataCollectorRow"/>
-        /// representation.
-        /// </summary>
-        /// <param name="categoryHierarchy">
-        /// The <see cref="CategoryHierarchy"/> based on which to construct the column definitions.
-        /// </param>
-        /// <returns>
-        /// The <see cref="DataTable"/> representation.
-        /// </returns>
-        internal static DataTable GetTable(CategoryHierarchy categoryHierarchy)
-        {
-            var table = new DataTable();
-
-            for (var hierarchy = categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
-            {
-                table.Columns.Add(hierarchy.FieldName, typeof(string));
-            }
-
-            foreach (var publicGetter in PublicGetters)
-            {
-                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
-            }
-
-            return table;
-        }
+        private IEnumerable<PropertyInfo> otherPublicGetters;
 
         /// <summary>
         /// The <see cref="DataCollectorRow"/> representation of the current node.
@@ -128,12 +98,12 @@ namespace CDP4Reporting.DataCollection
         /// <summary>
         /// The filtering <see cref="CategoryHierarchy"/> that must be matched on the current <see cref="ElementBase"/>.
         /// </summary>
-        private readonly CategoryHierarchy filterCategory;
+        private readonly CategoryHierarchy categoryHierarchy;
 
         /// <summary>
         /// Gets the name of the field/column when the data is transfered to a <see cref="DataRow"/>.
         /// </summary>
-        private string fieldName => this.filterCategory?.FieldName;
+        private string fieldName => this.categoryHierarchy?.FieldName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectorNode{T}"/> class.
@@ -152,10 +122,24 @@ namespace CDP4Reporting.DataCollection
             NestedElement topElement,
             DataCollectorNode<T> parent = null)
         {
-            this.filterCategory = categoryHierarchy;
+            this.Initialize();
+            this.categoryHierarchy = categoryHierarchy;
             this.NestedElement = topElement;
             this.parent = parent;
             this.rowRepresentation = this.GetRowRepresentation();
+        }
+
+        /// <summary>
+        /// Initializes this instance of <see cref="DataCollectorNode{T}"/>
+        /// </summary>
+        private void Initialize()
+        {
+            this.rowFields = typeof(T).GetProperties()
+                .Where(f => f.PropertyType.IsSubclassOf(typeof(DataCollectorColumn<T>)))
+                .ToDictionary(f => f, f => f.PropertyType);
+
+            this.otherPublicGetters = typeof(T).GetProperties()
+                .Where(p => p.GetMethod?.IsPublic == true).Where(x => !this.rowFields.ContainsKey(x));
         }
 
         /// <summary>
@@ -173,22 +157,34 @@ namespace CDP4Reporting.DataCollection
         }
 
         /// <summary>
-        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="filterCategory"/>.
+        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="categoryHierarchy"/>.
         /// </summary>
-        private bool IsVisible => this.NestedElement.IsMemberOfCategory(this.filterCategory.Category);
+        private bool IsVisible => this.NestedElement.IsMemberOfCategory(this.categoryHierarchy.Category);
 
         /// <summary>
-        /// Gets the column of type <see cref="TP"/> associated with this node.
+        /// Creates a <see cref="DataTable"/> representation based on the <see cref="DataCollectorRow"/>
+        /// representation.
         /// </summary>
-        /// <typeparam name="TP">
-        /// The desired column type.
-        /// </typeparam>
         /// <returns>
-        /// The <see cref="DataCollectorColumn{T}"/> of type <see cref="TP"/>.
+        /// The <see cref="DataTable"/> representation.
         /// </returns>
-        public TP GetColumn<TP>() where TP : DataCollectorColumn<T>
+        public DataTable GetTable()
         {
-            return RowFields[typeof(TP)].GetValue(this.rowRepresentation) as TP;
+            var table = new DataTable();
+
+            for (var hierarchy = this.categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
+            {
+                table.Columns.Add(hierarchy.FieldName, typeof(string));
+            }
+
+            foreach (var publicGetter in this.otherPublicGetters)
+            {
+                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
+            }
+
+            this.AddDataRows(table);
+
+            return table;
         }
 
         /// <summary>
@@ -210,22 +206,31 @@ namespace CDP4Reporting.DataCollection
                 IsVisible = this.IsVisible
             };
 
-            foreach (var rowField in RowFields)
+            foreach (var rowField in this.rowFields)
             {
-                var method = rowField.Key
-                    .GetConstructor(Type.EmptyTypes);
+                var column = Activator.CreateInstance(rowField.Value) as DataCollectorColumn<T>;
 
-                if (!(method is null))
-                {
-                    var column = method.Invoke(new object[] { }) as DataCollectorColumn<T>;
+                column?.Initialize(this, rowField.Key);
 
-                    column?.Initialize(this);
-
-                    rowField.Value.SetValue(row, column);
-                }
+                rowField.Key.SetValue(row, column);
             }
 
             return row;
+        }
+
+        /// <summary>
+        /// Gets the columns of type <see cref="TP"/> associated with this node.
+        /// </summary>
+        /// <typeparam name="TP">
+        /// The desired column type.
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="IEnumerable{TP}"/> of <see cref="DataCollectorColumn{T}"/>s of type <see cref="TP"/>.
+        /// </returns>
+        public IEnumerable<TP> GetColumns<TP>() where TP : DataCollectorColumn<T>
+        {
+            return this.rowFields.Where(x => x.Value == typeof(TP) || x.Value.IsSubclassOf(typeof(TP)))
+                .Select(x => x.Key.GetValue(this.rowRepresentation) as TP);
         }
 
         /// <summary>
@@ -237,7 +242,7 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         internal void AddDataRows(DataTable table)
         {
-            if (this.IsVisible && this.filterCategory.Child == null)
+            if (this.IsVisible && this.categoryHierarchy.Child == null)
             {
                 table.Rows.Add(this.GetDataRow(table));
             }
@@ -263,7 +268,14 @@ namespace CDP4Reporting.DataCollection
 
             this.InitializeCategoryColumns(row);
 
-            foreach (var publicGetter in PublicGetters)
+            foreach (var rowField in this.rowFields)
+            {
+                var column = rowField.Key.GetValue(this.rowRepresentation) as DataCollectorColumn<T>;
+
+                column?.Populate(table, row);
+            }
+
+            foreach (var publicGetter in this.otherPublicGetters)
             {
                 row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
                     this.rowRepresentation,

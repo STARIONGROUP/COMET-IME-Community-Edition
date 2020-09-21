@@ -31,7 +31,6 @@ namespace CDP4Reporting.DataCollection
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
-    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// Class that can be used to collect data from the NestedElementTree / ProductTree.
@@ -41,11 +40,6 @@ namespace CDP4Reporting.DataCollection
     /// </typeparam>
     public class NestedElementTreeDataCollector<T> where T : DataCollectorRow, new()
     {
-        /// <summary>
-        /// The <see cref="CategoryHierarchy"/> used for filtering the considered <see cref="ElementBase"/> items.
-        /// </summary>
-        private readonly CategoryHierarchy categoryHierarchy;
-
         /// <summary>
         /// The <see cref="DataCollectorNode{T}"/>'s which are the root elements of the hierarhical tree.
         /// </summary>
@@ -60,18 +54,12 @@ namespace CDP4Reporting.DataCollection
         /// <param name="option">
         /// The <see cref="Option"/> for which the data object is built.
         /// </param>
-        /// <param name="domainOfExpertise">
-        /// The <see cref="DomainOfExpertise"/> for which the data object is built.
-        /// </param>
         public NestedElementTreeDataCollector(
             CategoryHierarchy categoryHierarchy,
-            Option option,
-            DomainOfExpertise domainOfExpertise)
+            Option option)
         {
-            this.categoryHierarchy = categoryHierarchy;
-
             var nestedElements = new NestedElementTreeGenerator()
-                .Generate(option, domainOfExpertise)
+                .Generate(option)
                 .ToList();
 
             this.TopNodes = new CategoryHierarchyDataCollectorNodesGenerator<T>().Generate(categoryHierarchy, nestedElements);
@@ -85,14 +73,25 @@ namespace CDP4Reporting.DataCollection
         /// </returns>
         public DataTable GetTable()
         {
-            var table = DataCollectorNode<T>.GetTable(this.categoryHierarchy);
+            var dataTables = this.TopNodes.Select(x => x.GetTable()).ToList();
 
-            foreach (var topNode in this.TopNodes)
+            if (!dataTables.Any())
             {
-                topNode.AddDataRows(table);
+                return null;
             }
 
-            return table;
+            var dataTable = dataTables.First();
+
+            if (dataTables.Count > 1)
+            {
+                for (var dt = 1; dt < dataTables.Count; dt++)
+                {
+                    var mergeTable = dataTables[dt];
+                    dataTable.Merge(mergeTable, false, MissingSchemaAction.Add);
+                }
+            }
+
+            return dataTable;
         }
     }
 }

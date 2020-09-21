@@ -25,7 +25,9 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using System.Data;
     using System.Linq;
+    using System.Reflection;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -34,7 +36,7 @@ namespace CDP4Reporting.DataCollection
     /// <summary>
     /// Abstract base class from which all category columns for a <see cref="DataCollectorRow"/> need to derive.
     /// </summary>
-    public abstract class DataCollectorCategory<T> : DataCollectorColumn<T> where T : DataCollectorRow, new()
+    public class DataCollectorCategory<T> : DataCollectorColumn<T> where T : DataCollectorRow, new()
     {
         /// <summary>
         /// Gets or sets the associated <see cref="Category"/> short name.
@@ -42,17 +44,14 @@ namespace CDP4Reporting.DataCollection
         public string ShortName { get; private set; }
 
         /// <summary>
+        /// Gets or sets the desired field name.
+        /// </summary>
+        public string FieldName { get; private set; }
+
+        /// <summary>
         /// Flag indicating whether the associated <see cref="Category"/> is present.
         /// </summary>
         public bool Value { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectorCategory{T}"/> class.
-        /// </summary>
-        protected DataCollectorCategory()
-        {
-            this.ShortName = GetParameterAttribute(this.GetType())?.ShortName;
-        }
 
         /// <summary>
         /// Initializes a reported category column based on the corresponding <see cref="ElementBase"/>
@@ -61,10 +60,36 @@ namespace CDP4Reporting.DataCollection
         /// <param name="node">
         /// The associated <see cref="DataCollectorNode{T}"/>.
         /// </param>
-        internal override void Initialize(DataCollectorNode<T> node)
+        /// <param name="propertyInfo">
+        /// The <see cref="PropertyInfo"/> object for this <see cref="DataCollectorCategory{T}"/>'s usage in a class.
+        /// </param>
+        internal override void Initialize(DataCollectorNode<T> node, PropertyInfo propertyInfo)
         {
+            var definedShortNameAttribute = GetParameterAttribute(propertyInfo);
+            this.FieldName = definedShortNameAttribute?.FieldName;
+            this.ShortName = definedShortNameAttribute?.ShortName;
             this.Node = node;
             this.Value = this.IsMemberOfCategory();
+        }
+
+        /// <summary>
+        /// Populates with data the <see cref="DataTable.Columns"/> associated with this object
+        /// in the given <paramref name="row"/>.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> to which the <paramref name="row"/> belongs to.
+        /// </param>
+        /// <param name="row">
+        /// The <see cref="DataRow"/> to be populated.
+        /// </param>
+        public override void Populate(DataTable table, DataRow row)
+        {
+            if (!table.Columns.Contains(this.ShortName))
+            {
+                table.Columns.Add(this.FieldName, typeof(bool));
+            }
+
+            row[this.FieldName] = this.Value;
         }
 
         /// <summary>

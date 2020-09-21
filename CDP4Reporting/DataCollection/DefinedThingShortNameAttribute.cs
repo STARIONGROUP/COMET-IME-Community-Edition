@@ -30,16 +30,22 @@ namespace CDP4Reporting.DataCollection
     using CDP4Common.CommonData;
 
     /// <summary>
-    /// Attribute decorating implementations of <see cref="DataCollectorParameter{T}"/> to mark
+    /// Attribute decorating implementations of <see cref="DataCollectorParameter{TRow,TValue}"/> or
     /// the associated <see cref="DefinedThing"/> short name.
+    /// <see cref="DataCollectorCategory{T}"/> to mark the associated <see cref="DefinedThing"/> short name.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class DefinedThingShortNameAttribute : Attribute
     {
         /// <summary>
-        /// The short name of the associated <see cref="DefinedThing"/>.
+        /// Gets or sets the short name of the associated <see cref="DefinedThing"/>.
         /// </summary>
-        public readonly string ShortName;
+        public string ShortName { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the field name of the associated <see cref="DefinedThing"/>.
+        /// </summary>
+        public string FieldName { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefinedThingShortNameAttribute"/> class.
@@ -49,7 +55,36 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         public DefinedThingShortNameAttribute(string shortName)
         {
+            this.Initialize(shortName, shortName);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefinedThingShortNameAttribute"/> class.
+        /// </summary>
+        /// <param name="shortName">
+        /// The short name of the associated <see cref="DefinedThing"/>.
+        /// </param>
+        /// <param name="fieldName">
+        /// The fieldname in the result Data Object.
+        /// </param>
+        public DefinedThingShortNameAttribute(string shortName, string fieldName)
+        {
+            this.Initialize(shortName, fieldName);
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="DefinedThingShortNameAttribute"/> class.
+        /// </summary>
+        /// <param name="shortName">
+        /// The short name of the associated <see cref="DefinedThing"/>.
+        /// </param>
+        /// <param name="fieldName">
+        /// The fieldname in the result Data Object.
+        /// </param>
+        private void Initialize(string shortName, string fieldName)
+        {
             this.ShortName = shortName;
+            this.FieldName = fieldName;
         }
     }
 }

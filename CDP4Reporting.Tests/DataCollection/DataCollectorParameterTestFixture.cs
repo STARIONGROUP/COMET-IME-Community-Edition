@@ -32,7 +32,6 @@ namespace CDP4Reporting.Tests.DataCollection
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
@@ -45,11 +44,11 @@ namespace CDP4Reporting.Tests.DataCollection
     {
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
-        private Iteration iteration;
+        public Iteration iteration;
 
-        private Option option;
+        public Option option;
 
-        private Category cat1;
+        public Category cat1;
         private Category cat2;
 
         private DomainOfExpertise elementOwner;
@@ -62,45 +61,53 @@ namespace CDP4Reporting.Tests.DataCollection
         private SimpleQuantityKind parameterType2;
         private SimpleQuantityKind parameterType3;
 
-        private ElementDefinition ed1;
+        public ElementDefinition ed1;
         private ElementDefinition ed2;
 
         private ElementUsage eu1;
         private ElementUsage eu2;
 
-        [DefinedThingShortName("type1")]
-        private class TestParameter1 : DataCollectorParameter<Row>
+        private class TestParameter1 : DataCollectorParameter<Row, string>
         {
-            public string GetValue() => this.Value;
-
-            public DomainOfExpertise GetOwner() => this.Owner;
+            public override string Parse(string value)
+            {
+                return value;
+            }
         }
 
-        [DefinedThingShortName("type2")]
-        private class TestParameter2 : DataCollectorParameter<Row>
+        private class TestParameter2 : DataCollectorParameter<Row, string>
         {
-            public string GetValue() => this.Value;
-
-            public DomainOfExpertise GetOwner() => this.Owner;
+            public override string Parse(string value)
+            {
+                return value;
+            }
         }
 
-        [DefinedThingShortName("type3")]
-        private class TestParameter3 : DataCollectorParameter<Row>
+        private class TestParameter3 : DataCollectorParameter<Row, string>
         {
+            public override string Parse(string value)
+            {
+                return value;
+            }
         }
 
-        private class ComputedTestParameter : DataCollectorParameter<Row>
+        private class ComputedTestParameter : DataCollectorParameter<Row, string>
         {
-            public string GetValue() => this.Value;
-
-            public DomainOfExpertise GetOwner() => this.Owner;
+            public override string Parse(string value)
+            {
+                return null;
+            }
         }
 
         private class Row : DataCollectorRow
         {
-            public TestParameter1 parameter1;
-            public TestParameter2 parameter2;
-            public ComputedTestParameter ComputedParameter;
+            [DefinedThingShortName("type1")]
+            public TestParameter1 parameter1 { get; set; }
+
+            [DefinedThingShortName("type2")]
+            public TestParameter2 parameter2 { get; set; }
+
+            public ComputedTestParameter ComputedParameter { get; set; }
         }
 
         [SetUp]
@@ -210,9 +217,9 @@ namespace CDP4Reporting.Tests.DataCollection
                 Owner = this.elementOwner
             };
 
-            this.AddParameter(this.ed2, this.parameterType1, this.elementOwner, "-21");
-            this.AddParameter(this.ed2, this.parameterType2, this.elementOwner, "-22");
-            this.AddParameter(this.ed2, this.parameterType3, this.elementOwner, "-23");
+            var parameter1 = this.AddParameter(this.ed2, this.parameterType1, this.elementOwner, "-21");
+            var parameter2 = this.AddParameter(this.ed2, this.parameterType2, this.elementOwner, "-22");
+            var parameter3 = this.AddParameter(this.ed2, this.parameterType3, this.elementOwner, "-23");
 
             // Element Usages
 
@@ -224,9 +231,9 @@ namespace CDP4Reporting.Tests.DataCollection
                 Owner = this.elementOwner
             };
 
-            this.AddParameterOverride(this.eu1, this.parameterType1, this.parameterOverrideOwner, "121");
-            this.AddParameterOverride(this.eu1, this.parameterType2, this.parameterOverrideOwner, "122");
-            this.AddParameterOverride(this.eu1, this.parameterType3, this.parameterOverrideOwner, "123");
+            this.AddParameterOverride(this.eu1, this.parameterType1, this.parameterOverrideOwner, parameter1.ValueSet.First(), "121");
+            this.AddParameterOverride(this.eu1, this.parameterType2, this.parameterOverrideOwner, parameter2.ValueSet.First(), "122");
+            this.AddParameterOverride(this.eu1, this.parameterType3, this.parameterOverrideOwner, parameter3.ValueSet.First(), "123");
 
             this.eu2 = new ElementUsage(Guid.NewGuid(), this.cache, null)
             {
@@ -251,7 +258,7 @@ namespace CDP4Reporting.Tests.DataCollection
             this.iteration.Element.Add(this.ed2);
         }
 
-        private void AddParameter(
+        private Parameter AddParameter(
             ElementDefinition elementDefinition,
             ParameterType parameterType,
             DomainOfExpertise owner,
@@ -266,6 +273,7 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, null)
             {
+                Published = new ValueArray<string>(new List<string> { value }),
                 Manual = new ValueArray<string>(new List<string> { value }),
                 Computed = new ValueArray<string>(new List<string> { value }),
                 Formula = new ValueArray<string>(new List<string> { value }),
@@ -275,12 +283,15 @@ namespace CDP4Reporting.Tests.DataCollection
             parameter.ValueSet.Add(valueSet);
 
             elementDefinition.Parameter.Add(parameter);
+
+            return parameter;
         }
 
         private void AddParameterOverride(
             ElementUsage elementUsage,
             ParameterType parameterType,
             DomainOfExpertise owner,
+            ParameterValueSet parameterValueSet,
             string value)
         {
             var parameter = elementUsage.ElementDefinition.Parameter
@@ -294,6 +305,8 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var valueSet = new ParameterOverrideValueSet(Guid.NewGuid(), this.cache, null)
             {
+                ParameterValueSet = parameterValueSet,
+                Published = new ValueArray<string>(new List<string> { value }),
                 Manual = new ValueArray<string>(new List<string> { value }),
                 Computed = new ValueArray<string>(new List<string> { value }),
                 Formula = new ValueArray<string>(new List<string> { value }),
@@ -312,21 +325,16 @@ namespace CDP4Reporting.Tests.DataCollection
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var nestedElements = new NestedElementTreeGenerator()
-                .Generate(this.option, this.elementOwner)
-                .ToList();
-
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
+                this.option);
 
             var node = dataSource.TopNodes.First();
 
-            Assert.IsNotNull(node.GetColumn<TestParameter1>());
-            Assert.IsNotNull(node.GetColumn<TestParameter2>());
-            Assert.Throws<KeyNotFoundException>(() => node.GetColumn<TestParameter3>());
-            Assert.IsNotNull(node.GetColumn<ComputedTestParameter>());
+            Assert.AreEqual(1, node.GetColumns<TestParameter1>().Count());
+            Assert.AreEqual(1, node.GetColumns<TestParameter2>().Count());
+            Assert.AreEqual(0, node.GetColumns<TestParameter3>().Count());
+            Assert.AreEqual(1, node.GetColumns<ComputedTestParameter>().Count());
         }
 
         [Test]
@@ -336,25 +344,20 @@ namespace CDP4Reporting.Tests.DataCollection
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var nestedElements = new NestedElementTreeGenerator()
-                .Generate(this.option, this.elementOwner)
-                .ToList();
-
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
+                this.option);
 
             var node = dataSource.TopNodes.First();
 
-            var parameter1 = node.GetColumn<TestParameter1>();
-            Assert.AreEqual("type1", parameter1.ShortName);
+            var parameter1 = node.GetColumns<TestParameter1>().Single();
+            Assert.AreEqual("type1", parameter1.FieldName);
 
-            var parameter2 = node.GetColumn<TestParameter2>();
-            Assert.AreEqual("type2", parameter2.ShortName);
+            var parameter2 = node.GetColumns<TestParameter2>().Single();
+            Assert.AreEqual("type2", parameter2.FieldName);
 
-            var computedParameter = node.GetColumn<ComputedTestParameter>();
-            Assert.IsNull(computedParameter.ShortName);
+            var computedParameter = node.GetColumns<ComputedTestParameter>().Single();
+            Assert.IsNull(computedParameter.FieldName);
         }
 
         [Test]
@@ -364,20 +367,15 @@ namespace CDP4Reporting.Tests.DataCollection
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var nestedElements = new NestedElementTreeGenerator()
-                .Generate(this.option, this.elementOwner)
-                .ToList();
-
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
+                this.option);
 
             var node = dataSource.TopNodes.First();
 
-            var computedParameter = node.GetColumn<ComputedTestParameter>();
-            Assert.IsNull(computedParameter.GetValue());
-            Assert.IsNull(computedParameter.GetOwner());
+            var computedParameter = node.GetColumns<ComputedTestParameter>().Single();
+            Assert.AreEqual(null, computedParameter.ValueSets);
+            Assert.AreEqual(null, computedParameter.Owner);
         }
 
         [Test]
@@ -387,24 +385,19 @@ namespace CDP4Reporting.Tests.DataCollection
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var nestedElements = new NestedElementTreeGenerator()
-                .Generate(this.option, this.elementOwner)
-                .ToList();
-
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
+                this.option);
 
             var node = dataSource.TopNodes.First();
 
-            var parameter1 = node.GetColumn<TestParameter1>();
-            Assert.AreEqual("11", parameter1.GetValue());
-            Assert.AreEqual(this.parameterOwner, parameter1.GetOwner());
+            var parameter1 = node.GetColumns<TestParameter1>().Single();
+            Assert.AreEqual("11", parameter1.ValueSets.FirstOrDefault()?.ActualValue.First());
+            Assert.AreEqual(this.parameterOwner, parameter1.Owner);
 
-            var parameter2 = node.GetColumn<TestParameter2>();
-            Assert.AreEqual("12", parameter2.GetValue());
-            Assert.AreEqual(this.parameterOwner, parameter2.GetOwner());
+            var parameter2 = node.GetColumns<TestParameter2>().Single();
+            Assert.AreEqual("12", parameter2.ValueSets.FirstOrDefault()?.ActualValue.First());
+            Assert.AreEqual(this.parameterOwner, parameter2.Owner);
         }
 
         [Test]
@@ -414,24 +407,19 @@ namespace CDP4Reporting.Tests.DataCollection
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
-            var nestedElements = new NestedElementTreeGenerator()
-                .Generate(this.option, this.elementOwner)
-                .ToList();
-
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
+                this.option);
 
             var node = dataSource.TopNodes.First();
 
-            var parameter1 = node.GetColumn<TestParameter1>();
-            Assert.AreEqual("121", parameter1.GetValue());
-            Assert.AreEqual(this.parameterOverrideOwner, parameter1.GetOwner());
+            var parameter1 = node.GetColumns<TestParameter1>().Single();
+            Assert.AreEqual("121", parameter1.ValueSets.FirstOrDefault()?.ActualValue.First());
+            Assert.AreEqual(this.parameterOverrideOwner, parameter1.Owner);
 
-            var parameter2 = node.GetColumn<TestParameter2>();
-            Assert.AreEqual("122", parameter2.GetValue());
-            Assert.AreEqual(this.parameterOverrideOwner, parameter2.GetOwner());
+            var parameter2 = node.GetColumns<TestParameter2>().Single();
+            Assert.AreEqual("122", parameter2.ValueSets.FirstOrDefault()?.ActualValue.First());
+            Assert.AreEqual(this.parameterOverrideOwner, parameter2.Owner);
         }
 
         [Test]
@@ -443,44 +431,17 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.elementOwner);
+                this.option);
 
             var node = dataSource.TopNodes.First(x => x.ElementBase.Iid == this.eu2.Iid);
 
-            var parameter1 = node.GetColumn<TestParameter1>();
-            Assert.AreEqual("-21", parameter1.GetValue());
-            Assert.AreEqual(this.elementOwner, parameter1.GetOwner());
+            var parameter1 = node.GetColumns<TestParameter1>().Single();
+            Assert.AreEqual("-21", parameter1.ValueSets.FirstOrDefault()?.ActualValue.First());
+            Assert.AreEqual(this.elementOwner, parameter1.Owner);
 
-            var parameter2 = node.GetColumn<TestParameter2>();
-            Assert.AreEqual("-22", parameter2.GetValue());
-            Assert.AreEqual(this.elementOwner, parameter2.GetOwner());
-        }
-
-        [Test]
-        public void VerifyParameterChildren()
-        {
-            var hierarchy = new CategoryHierarchy
-                    .Builder(this.iteration, this.cat1.ShortName)
-                .AddLevel(this.cat2.ShortName)
-                .Build();
-
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option,
-                this.elementOwner);
-
-            var parameter = dataSource.TopNodes.First().GetColumn<TestParameter1>();
-
-            var children1 = parameter.GetChildren<TestParameter1>().ToList();
-            Assert.AreEqual(2, children1.Count);
-            Assert.AreEqual("121", children1[0].GetValue());
-            Assert.AreEqual("-21", children1[1].GetValue());
-
-            var children2 = parameter.GetChildren<TestParameter2>().ToList();
-            Assert.AreEqual(2, children2.Count);
-            Assert.AreEqual("122", children2[0].GetValue());
-            Assert.AreEqual("-22", children2[1].GetValue());
+            var parameter2 = node.GetColumns<TestParameter2>().Single();
+            Assert.AreEqual("-22", parameter2.ValueSets.FirstOrDefault()?.ActualValue.First());
+            Assert.AreEqual(this.elementOwner, parameter2.Owner);
         }
     }
 }

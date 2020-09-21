@@ -433,8 +433,7 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.domain);
+                this.option);
 
             // tabular representation built, category hierarchy considered, unneeded subtrees pruned
             var rows = dataSource.GetTable().Rows;
@@ -465,8 +464,7 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.domain);
+                this.option);
 
             // tabular representation built, category hierarchy considered, unneeded subtrees pruned
             var rows = dataSource.GetTable().Rows;

@@ -26,15 +26,18 @@
 namespace CDP4Reporting.DataCollection
 {
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
+    using System.Reflection;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     /// <summary>
     /// Abstract base class from which all parameter columns for a <see cref="DataCollectorRow"/> need to derive.
     /// </summary>
-    public abstract class DataCollectorParameter<T> : DataCollectorColumn<T> where T : DataCollectorRow, new()
+    public abstract class DataCollectorParameter<TRow, TValue> : DataCollectorColumn<TRow> where TRow : DataCollectorRow, new()
     {
         /// <summary>
         /// The associated <see cref="CDP4Common.EngineeringModelData.ParameterBase"/>.
@@ -42,27 +45,31 @@ namespace CDP4Reporting.DataCollection
         protected ParameterBase ParameterBase { get; private set; }
 
         /// <summary>
-        /// The associated <see cref="ParameterType"/> short name.
+        /// Gets or sets the associated <see cref="ParameterType"/> short name.
         /// </summary>
-        internal readonly string ShortName;
+        private string ShortName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the associated <see cref="ParameterType"/> field name in the result Data Object.
+        /// </summary>
+        internal string FieldName { get; private set; }
 
         /// <summary>
         /// The value of the associated <see cref="ParameterOrOverrideBase"/>.
+        /// The <see cref="IValueSet"/>s of the associated <see cref="ParameterBase"/>.
         /// </summary>
-        protected string Value { get; private set; }
+        public TValue Value => this.Parse(this.ValueSets?.FirstOrDefault()?.ActualValue?.FirstOrDefault()) ?? default;
 
         /// <summary>
-        /// The owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterBase"/>.
+        /// The ValueSets of the associated object.
+        /// The <see cref="IEnumerable{IValueSet}"/>s of the associated object/>.
         /// </summary>
-        protected DomainOfExpertise Owner => this.ParameterBase?.Owner;
+        internal IEnumerable<IValueSet> ValueSets { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectorParameter{T}"/> class.
+        /// Gets the owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterBase"/>.
         /// </summary>
-        protected DataCollectorParameter()
-        {
-            this.ShortName = GetParameterAttribute(this.GetType())?.ShortName;
-        }
+        public DomainOfExpertise Owner { get; set; }
 
         /// <summary>
         /// Initializes a reported parameter column based on the corresponding
@@ -70,37 +77,76 @@ namespace CDP4Reporting.DataCollection
         /// <see cref="DataCollectorNode{T}"/>.
         /// </summary>
         /// <param name="node">
-        /// The associated <see cref="DataCollectorNode{T}"/>.
+        /// The associated <see cref="DataCollectorNode{TRow}"/>.
         /// </param>
-        internal override void Initialize(DataCollectorNode<T> node)
+        /// <param name="propertyInfo">
+        /// The <see cref="PropertyInfo"/> object for this <see cref="DataCollectorCategory{TRow}"/>'s usage in a class.
+        /// </param>
+        internal override void Initialize(DataCollectorNode<TRow> node, PropertyInfo propertyInfo)
         {
+            var attribute = GetParameterAttribute(propertyInfo);
+
+            this.ShortName = attribute?.ShortName;
+            this.FieldName = attribute?.FieldName;
             this.Node = node;
 
-            this.ParameterBase ??= this.Node.NestedElement.NestedParameter.SingleOrDefault(
-                x => x.AssociatedParameter.ParameterType.ShortName == this.ShortName)?.AssociatedParameter;
+            var firstNestedParameter = this.Node.NestedElement.NestedParameter.FirstOrDefault(
+                x => x.AssociatedParameter.ParameterType.ShortName == this.ShortName);
 
-            this.ParameterBase ??= this.Node.ElementUsage?.ParameterOverride.SingleOrDefault(
-                x => x.Parameter.ParameterType.ShortName == this.ShortName);
+            this.ParameterBase = firstNestedParameter?.AssociatedParameter;
 
-            this.ParameterBase ??= this.Node.ElementDefinition.Parameter.SingleOrDefault(
-                x => x.ParameterType.ShortName == this.ShortName);
+            this.Owner = (firstNestedParameter?.ValueSet as ParameterValueSetBase)?.Owner ?? firstNestedParameter?.Owner;
 
-            this.Value = this.ParameterBase?.ValueSets.First().ActualValue.First();
+            var nestedParameterData =
+                this.Node.NestedElement.NestedParameter
+                .Where(x => x.AssociatedParameter.ParameterType.ShortName == this.ShortName)
+                .Select(x => x.ValueSet)
+                .ToList();
+
+            if (nestedParameterData.Any())
+            {
+                this.ValueSets = nestedParameterData;
+            }
         }
 
         /// <summary>
-        /// Gets the parameters of type <see cref="TP"/> on the children levels in the
-        /// hierarhical tree upon which the data object is based.
+        /// Populates with data the <see cref="DataTable.Columns"/> associated with this object
+        /// in the given <paramref name="row"/>.
         /// </summary>
-        /// <typeparam name="TP">
-        /// The desired parameter type.
-        /// </typeparam>
-        /// <returns>
-        /// A list of <see cref="DataCollectorParameter{T}"/>s of type <see cref="TP"/>.
-        /// </returns>
-        public IEnumerable<TP> GetChildren<TP>() where TP : DataCollectorParameter<T>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> to which the <paramref name="row"/> belongs to.
+        /// </param>
+        /// <param name="row">
+        /// The <see cref="DataRow"/> to be populated.
+        /// </param>
+        public override void Populate(DataTable table, DataRow row)
         {
-            return this.Node.Children.Select(child => child.GetColumn<TP>());
+            if (this.ValueSets?.Any() ?? false)
+            {
+                foreach (var valueSet in this.ValueSets)
+                {
+                    var columnName = $"{this.FieldName}{valueSet.ActualState?.ShortName ?? ""}";
+
+                    if (!table.Columns.Contains(columnName))
+                    {
+                        table.Columns.Add(columnName, typeof(TValue));
+                    }
+
+                    row[columnName] = this.Parse(valueSet.ActualValue.First());
+                }
+            }
         }
+
+        /// <summary>
+        /// Parses a parameter value as the type that will be used for the row representation.
+        /// </summary>
+        /// <param name="value">
+        /// The parameter value to be parsed. This needs to be specified as a state dependent
+        /// <see cref="DataCollectorParameter{TRow,TValue}"/> can have multiple values.
+        /// </param>
+        /// <returns>
+        /// The parsed value.
+        /// </returns>
+        public abstract TValue Parse(string value);
     }
 }

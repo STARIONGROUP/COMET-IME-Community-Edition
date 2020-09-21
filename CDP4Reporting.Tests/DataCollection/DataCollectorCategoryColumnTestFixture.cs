@@ -27,7 +27,6 @@ namespace CDP4Reporting.Tests.DataCollection
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -59,33 +58,13 @@ namespace CDP4Reporting.Tests.DataCollection
 
         private ElementUsage eu;
 
-        [DefinedThingShortName("cat1")]
-        private class TestCategory1 : DataCollectorCategory<Row>
-        {
-            public bool GetValue()
-            {
-                return this.Value;
-            }
-        }
-
-        [DefinedThingShortName("cat2")]
-        private class TestCategory2 : DataCollectorCategory<Row>
-        {
-            public bool GetValue()
-            {
-                return this.Value;
-            }
-        }
-
-        [DefinedThingShortName("cat3")]
-        private class TestCategory3 : DataCollectorCategory<Row>
-        {
-        }
-
         private class Row : DataCollectorRow
         {
-            public TestCategory1 category1;
-            public TestCategory2 category2;
+            [DefinedThingShortName("cat1")]
+            public DataCollectorCategory<Row> testCategory1 { get; set; }
+
+            [DefinedThingShortName("cat2")]
+            public DataCollectorCategory<Row> testCategory2 { get; set; }
         }
 
         [SetUp]
@@ -189,14 +168,10 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.domain);
+                this.option);
 
             var node = dataSource.TopNodes.First();
-
-            Assert.IsNotNull(node.GetColumn<TestCategory1>());
-            Assert.IsNotNull(node.GetColumn<TestCategory2>());
-            Assert.Throws<KeyNotFoundException>(() => node.GetColumn<TestCategory3>());
+            Assert.AreEqual(2, node.GetColumns<DataCollectorCategory<Row>>().Count());
         }
 
         [Test]
@@ -208,16 +183,13 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.domain);
+                this.option);
 
             var node = dataSource.TopNodes.First();
 
-            var category1 = node.GetColumn<TestCategory1>();
-            Assert.AreEqual("cat1", category1.ShortName);
-
-            var category2 = node.GetColumn<TestCategory2>();
-            Assert.AreEqual("cat2", category2.ShortName);
+            var categories = node.GetColumns<DataCollectorCategory<Row>>().ToList();
+            Assert.AreEqual("cat1", categories.Single(x => x.ShortName == "cat1").ShortName);
+            Assert.AreEqual("cat2", categories.Single(x => x.ShortName == "cat2").ShortName);
         }
 
         [Test]
@@ -229,16 +201,13 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.domain);
+                this.option);
 
             var node = dataSource.TopNodes.First();
 
-            var category1 = node.GetColumn<TestCategory1>();
-            Assert.AreEqual(true, category1.GetValue());
-
-            var category2 = node.GetColumn<TestCategory2>();
-            Assert.AreEqual(false, category2.GetValue());
+            var categories = node.GetColumns<DataCollectorCategory<Row>>().ToList();
+            Assert.AreEqual(true, categories.Single(x => x.ShortName == "cat1").Value);
+            Assert.AreEqual(false, categories.Single(x => x.ShortName == "cat2").Value);
         }
 
         [Test]
@@ -250,16 +219,13 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var dataSource = new NestedElementTreeDataCollector<Row>(
                 hierarchy,
-                this.option,
-                this.domain);
+                this.option);
 
             var node = dataSource.TopNodes.First();
 
-            var category1 = node.GetColumn<TestCategory1>();
-            Assert.AreEqual(false, category1.GetValue());
-
-            var category2 = node.GetColumn<TestCategory2>();
-            Assert.AreEqual(true, category2.GetValue());
+            var categories = node.GetColumns<DataCollectorCategory<Row>>().ToList();
+            Assert.AreEqual(false, categories.Single(x => x.ShortName == "cat1").Value);
+            Assert.AreEqual(true, categories.Single(x => x.ShortName == "cat2").Value);
         }
     }
 }

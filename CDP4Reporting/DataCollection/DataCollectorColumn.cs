@@ -26,6 +26,7 @@
 namespace CDP4Reporting.DataCollection
 {
     using System;
+    using System.Data;
     using System.Linq;
     using System.Reflection;
 
@@ -35,18 +36,18 @@ namespace CDP4Reporting.DataCollection
     public abstract class DataCollectorColumn<T> where T : DataCollectorRow, new()
     {
         /// <summary>
-        /// Gets the <see cref="DefinedThingShortNameAttribute"/> decorating the class described by <paramref name="type"/>.
+        /// Gets the <see cref="DefinedThingShortNameAttribute"/> decorating the property described by <paramref name="propertyType"/>.
         /// </summary>
-        /// <param name="type">
-        /// Describes the current parameter class.
+        /// <param name="propertyType">
+        /// Describes the current property.
         /// </param>
         /// <returns>
         /// The <see cref="DefinedThingShortNameAttribute"/> decorating the current parameter class.
         /// </returns>
-        protected static DefinedThingShortNameAttribute GetParameterAttribute(MemberInfo type)
+        protected static DefinedThingShortNameAttribute GetParameterAttribute(PropertyInfo propertyType)
         {
             var attr = Attribute
-                .GetCustomAttributes(type)
+                .GetCustomAttributes(propertyType)
                 .SingleOrDefault(attribute => attribute is DefinedThingShortNameAttribute);
 
             return attr as DefinedThingShortNameAttribute;
@@ -64,6 +65,21 @@ namespace CDP4Reporting.DataCollection
         /// <param name="node">
         /// The associated <see cref="DataCollectorNode{T}"/>.
         /// </param>
-        internal abstract void Initialize(DataCollectorNode<T> node);
+        /// <param name="propertyInfo">
+        /// The <see cref="PropertyInfo"/> object for this <see cref="DataCollectorCategory{T}"/>'s usage in a class.
+        /// </param>
+        internal abstract void Initialize(DataCollectorNode<T> node, PropertyInfo propertyInfo);
+
+        /// <summary>
+        /// Populates with data the <see cref="DataTable.Columns"/> associated with this object
+        /// in the given <paramref name="row"/>.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> to which the <paramref name="row"/> belongs to.
+        /// </param>
+        /// <param name="row">
+        /// The <see cref="DataRow"/> to be populated.
+        /// </param>
+        public abstract void Populate(DataTable table, DataRow row);
     }
 }
