@@ -32,7 +32,6 @@ namespace CDP4Reporting.DataCollection
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
 
     /// <summary>
     /// Abstract base class from which all parameter columns for a <see cref="DataCollectorRow"/> need to derive.
@@ -42,17 +41,17 @@ namespace CDP4Reporting.DataCollection
         /// <summary>
         /// The associated <see cref="CDP4Common.EngineeringModelData.ParameterBase"/>.
         /// </summary>
-        protected ParameterBase ParameterBase { get; private set; }
+        protected ParameterBase ParameterBase { get; set; }
 
         /// <summary>
         /// Gets or sets the associated <see cref="ParameterType"/> short name.
         /// </summary>
-        private string ShortName { get; set; }
+        protected string ShortName { get; set; }
 
         /// <summary>
         /// Gets or sets the associated <see cref="ParameterType"/> field name in the result Data Object.
         /// </summary>
-        internal string FieldName { get; private set; }
+        internal string FieldName { get; set; }
 
         /// <summary>
         /// The value of the associated <see cref="ParameterOrOverrideBase"/>.

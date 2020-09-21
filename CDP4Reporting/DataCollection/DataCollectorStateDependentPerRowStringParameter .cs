@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataCollectionDoubleParameter.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorStateDependentPerRowStringParameter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -26,13 +26,13 @@
 namespace CDP4Reporting.DataCollection
 {
     /// <summary>
-    /// Abstract base class from which all double parameter columns
+    /// Class from which state dependent per row double parameter columns
     /// for a <see cref="DataCollectorRow"/> need to derive.
     /// </summary>
     /// <typeparam name="TRow">
     /// The type of the associated <see cref="DataCollectorRow"/>.
     /// </typeparam>
-    public class DataCollectorDoubleParameter<TRow> : DataCollectorParameter<TRow, double>
+    public class DataCollectorStateDependentPerRowStringParameter<TRow> : DataCollectorStateDependentPerRowParameter<TRow, string>
         where TRow : DataCollectorRow, new()
     {
         /// <summary>
@@ -44,10 +44,9 @@ namespace CDP4Reporting.DataCollection
         /// <returns>
         /// The parsed value.
         /// </returns>
-        public override double Parse(string value)
+        public override string Parse(string value)
         {
-            var dataCollectorDoubleParameterParser = new DataCollectorDoubleParameterParser();
-            return dataCollectorDoubleParameterParser.Parse(value, this.ParameterBase);
+            return value;
         }
     }
 }

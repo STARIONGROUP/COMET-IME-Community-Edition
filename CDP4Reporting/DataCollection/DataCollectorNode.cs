@@ -47,13 +47,25 @@ namespace CDP4Reporting.DataCollection
         /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorColumn{T}"/>s
         /// declared as <see cref="DataCollectorRow"/> fields.
         /// </summary>
-        private Dictionary<PropertyInfo, Type> rowFields;
+        private IEnumerable<KeyValuePair<PropertyInfo, Type>> allColumns => this.normalColumns.AsEnumerable().Union(this.stateDependentColumns);
+
+        /// <summary>
+        /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorColumn{T}"/>s
+        /// declared as <see cref="DataCollectorRow"/> fields.
+        /// </summary>
+        private Dictionary<PropertyInfo, Type> normalColumns;
+
+        /// <summary>
+        /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorStateDependentPerRowParameter{TRow,TValue}"/>s
+        /// declared as <see cref="DataCollectorRow"/> fields.
+        /// </summary>
+        private Dictionary<PropertyInfo, Type> stateDependentColumns;
 
         /// <summary>
         /// A <see cref="IEnumerable{T}"/> of all the public getters on the <see cref="DataCollectorRow"/>
         /// representation.
         /// </summary>
-        private IEnumerable<PropertyInfo> otherPublicGetters;
+        private IEnumerable<PropertyInfo> publicGetterProperties;
 
         /// <summary>
         /// The <see cref="DataCollectorRow"/> representation of the current node.
@@ -134,12 +146,46 @@ namespace CDP4Reporting.DataCollection
         /// </summary>
         private void Initialize()
         {
-            this.rowFields = typeof(T).GetProperties()
-                .Where(f => f.PropertyType.IsSubclassOf(typeof(DataCollectorColumn<T>)))
+            this.stateDependentColumns = typeof(T).GetProperties()
+                .Where(f => this.isSubclassOfRawGeneric(f.PropertyType, typeof(DataCollectorStateDependentPerRowParameter<,>)))
                 .ToDictionary(f => f, f => f.PropertyType);
 
-            this.otherPublicGetters = typeof(T).GetProperties()
-                .Where(p => p.GetMethod?.IsPublic == true).Where(x => !this.rowFields.ContainsKey(x));
+            if (this.stateDependentColumns.Count > 1)
+            {
+                throw new NotSupportedException($"Currently only one property of {typeof(DataCollectorStateDependentPerRowParameter<,>).Name} can be used per {nameof(DataCollectorRow)}.");
+            }
+
+            this.normalColumns = typeof(T).GetProperties()
+                .Where(f => f.PropertyType.IsSubclassOf(typeof(DataCollectorColumn<T>)))
+                .Except(this.stateDependentColumns.Keys)
+                .ToDictionary(f => f, f => f.PropertyType);
+
+            this.publicGetterProperties = typeof(T).GetProperties()
+                .Where(p => p.GetMethod?.IsPublic == true)
+                .Except(this.allColumns.Select(x =>x.Key));
+        }
+
+        /// <summary>
+        /// Checks if a property <see cref="Type"/> is a subclass of a specific generic type.
+        /// </summary>
+        /// <param name="propertyType">The property <see cref="Type"/></param>
+        /// <param name="genericType">The generic <see cref="Type"/></param>
+        /// <returns>True if the <paramref name="propertyType"/> is a subclass of <see cref="genericType"/>, otherwise false.</returns>
+        private bool isSubclassOfRawGeneric(Type propertyType, Type genericType)
+        {
+            while (propertyType != null && propertyType != typeof(object))
+            {
+                var cur = propertyType.IsGenericType ? propertyType.GetGenericTypeDefinition() : propertyType;
+
+                if (genericType == cur)
+                {
+                    return true;
+                }
+
+                propertyType = propertyType.BaseType;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -177,7 +223,7 @@ namespace CDP4Reporting.DataCollection
                 table.Columns.Add(hierarchy.FieldName, typeof(string));
             }
 
-            foreach (var publicGetter in this.otherPublicGetters)
+            foreach (var publicGetter in this.publicGetterProperties)
             {
                 table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
             }
@@ -206,7 +252,7 @@ namespace CDP4Reporting.DataCollection
                 IsVisible = this.IsVisible
             };
 
-            foreach (var rowField in this.rowFields)
+            foreach (var rowField in this.allColumns)
             {
                 var column = Activator.CreateInstance(rowField.Value) as DataCollectorColumn<T>;
 
@@ -229,7 +275,7 @@ namespace CDP4Reporting.DataCollection
         /// </returns>
         public IEnumerable<TP> GetColumns<TP>() where TP : DataCollectorColumn<T>
         {
-            return this.rowFields.Where(x => x.Value == typeof(TP) || x.Value.IsSubclassOf(typeof(TP)))
+            return this.allColumns.Where(x => x.Value == typeof(TP) || x.Value.IsSubclassOf(typeof(TP)))
                 .Select(x => x.Key.GetValue(this.rowRepresentation) as TP);
         }
 
@@ -268,18 +314,25 @@ namespace CDP4Reporting.DataCollection
 
             this.InitializeCategoryColumns(row);
 
-            foreach (var rowField in this.rowFields)
+            foreach (var rowField in this.normalColumns)
             {
                 var column = rowField.Key.GetValue(this.rowRepresentation) as DataCollectorColumn<T>;
 
                 column?.Populate(table, row);
             }
 
-            foreach (var publicGetter in this.otherPublicGetters)
+            foreach (var publicGetter in this.publicGetterProperties)
             {
                 row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
                     this.rowRepresentation,
                     new object[] { });
+            }
+
+            foreach (var rowField in this.stateDependentColumns)
+            {
+                var column = rowField.Key.GetValue(this.rowRepresentation) as DataCollectorColumn<T>;
+
+                column?.Populate(table, row);
             }
 
             return row;

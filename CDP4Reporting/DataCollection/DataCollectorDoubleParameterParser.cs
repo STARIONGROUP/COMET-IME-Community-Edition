@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataCollectionDoubleParameter.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorDoubleParameterParser.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,29 +25,33 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using System.Globalization;
+
+    using CDP4Common.EngineeringModelData;
+
     /// <summary>
-    /// Abstract base class from which all double parameter columns
-    /// for a <see cref="DataCollectorRow"/> need to derive.
+    /// Utility class that helps to convert a <see cref="IValueSet"/> string to a double value according to ECSS-TM-10-25 rules.
     /// </summary>
-    /// <typeparam name="TRow">
-    /// The type of the associated <see cref="DataCollectorRow"/>.
-    /// </typeparam>
-    public class DataCollectorDoubleParameter<TRow> : DataCollectorParameter<TRow, double>
-        where TRow : DataCollectorRow, new()
+    public class DataCollectorDoubleParameterParser
     {
         /// <summary>
-        /// Parses a parameter value as double.
+        /// Convert a string value to a double according to ECSS-TM-10-25 rules.
         /// </summary>
-        /// <param name="value">
-        /// The parameter value to be parsed.
-        /// </param>
-        /// <returns>
-        /// The parsed value.
-        /// </returns>
-        public override double Parse(string value)
+        /// <param name="value">The <see cref="string"/> value</param>
+        /// <param name="parameterBase">The <see cref="ParameterBase"/> used to </param>
+        /// <returns>The converted <see cref="double"/></returns>
+        public double Parse(string value, ParameterBase parameterBase)
         {
-            var dataCollectorDoubleParameterParser = new DataCollectorDoubleParameterParser();
-            return dataCollectorDoubleParameterParser.Parse(value, this.ParameterBase);
+            var calculatedValue = value;
+
+            if (value != null && parameterBase != null)
+            {
+                calculatedValue = CDP4Common.Helpers.ValueSetConverter.ToValueSetString(calculatedValue, parameterBase.ParameterType);
+            }
+
+            double.TryParse(calculatedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var invariantNum);
+
+            return invariantNum;
         }
     }
 }

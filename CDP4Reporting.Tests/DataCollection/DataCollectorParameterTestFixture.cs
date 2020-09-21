@@ -60,12 +60,23 @@ namespace CDP4Reporting.Tests.DataCollection
         private SimpleQuantityKind parameterType1;
         private SimpleQuantityKind parameterType2;
         private SimpleQuantityKind parameterType3;
+        private SimpleQuantityKind parameterType4;
 
         public ElementDefinition ed1;
         private ElementDefinition ed2;
 
         private ElementUsage eu1;
         private ElementUsage eu2;
+
+        private ActualFiniteState actualFiniteState1;
+        private ActualFiniteState actualFiniteState2;
+        public ActualFiniteStateList actualList;
+        private EngineeringModel model;
+
+        private PossibleFiniteStateList possibleList;
+
+        private PossibleFiniteState possibleState1;
+        private PossibleFiniteState possibleState2;
 
         private class TestParameter1 : DataCollectorParameter<Row, string>
         {
@@ -108,6 +119,7 @@ namespace CDP4Reporting.Tests.DataCollection
             public TestParameter2 parameter2 { get; set; }
 
             public ComputedTestParameter ComputedParameter { get; set; }
+
         }
 
         [SetUp]
@@ -126,6 +138,31 @@ namespace CDP4Reporting.Tests.DataCollection
             };
 
             this.iteration.Option.Add(this.option);
+
+            this.actualFiniteState1 = new ActualFiniteState(Guid.NewGuid(), null, null);
+            this.actualFiniteState2 = new ActualFiniteState(Guid.NewGuid(), null, null);
+            this.actualList = new ActualFiniteStateList(Guid.NewGuid(), null, null);
+            this.actualList.Owner = new DomainOfExpertise(Guid.NewGuid(), null, null);
+
+            this.possibleList = new PossibleFiniteStateList(Guid.NewGuid(), null, null);
+
+            this.possibleState1 = new PossibleFiniteState(Guid.NewGuid(), null, null) { Name = "possiblestate1", ShortName = "state1" };
+            this.possibleState2 = new PossibleFiniteState(Guid.NewGuid(), null, null) { Name = "possiblestate2", ShortName = "state2" };
+
+            this.possibleList.PossibleState.Add(this.possibleState1);
+            this.possibleList.PossibleState.Add(this.possibleState2);
+
+            this.actualFiniteState1.PossibleState.Add(this.possibleState1);
+            this.actualFiniteState2.PossibleState.Add(this.possibleState2);
+
+            this.actualList.PossibleFiniteStateList.Add(this.possibleList);
+
+            this.model = new EngineeringModel(Guid.NewGuid(), null, null);
+            this.model.Iteration.Add(this.iteration);
+            this.iteration.ActualFiniteStateList.Add(this.actualList);
+            this.iteration.PossibleFiniteStateList.Add(this.possibleList);
+            this.actualList.ActualState.Add(this.actualFiniteState1);
+            this.actualList.ActualState.Add(this.actualFiniteState2);
 
             // Categories
 
@@ -197,6 +234,12 @@ namespace CDP4Reporting.Tests.DataCollection
                 Name = "parameter type 3"
             };
 
+            this.parameterType4 = new SimpleQuantityKind(Guid.NewGuid(), null, null)
+            {
+                ShortName = "type4",
+                Name = "parameter type 4",
+            };
+
             // Element Definitions
 
             this.ed1 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
@@ -209,6 +252,7 @@ namespace CDP4Reporting.Tests.DataCollection
             this.AddParameter(this.ed1, this.parameterType1, this.parameterOwner, "11");
             this.AddParameter(this.ed1, this.parameterType2, this.parameterOwner, "12");
             this.AddParameter(this.ed1, this.parameterType3, this.parameterOwner, "13");
+            this.AddStateDependentParameter(this.ed1, this.parameterType4, this.parameterOwner, this.actualList, "14");
 
             this.ed2 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
@@ -281,6 +325,40 @@ namespace CDP4Reporting.Tests.DataCollection
             };
 
             parameter.ValueSet.Add(valueSet);
+
+            elementDefinition.Parameter.Add(parameter);
+
+            return parameter;
+        }
+
+        private Parameter AddStateDependentParameter(
+            ElementDefinition elementDefinition,
+            ParameterType parameterType,
+            DomainOfExpertise owner,
+            ActualFiniteStateList actualFiniteStateList,
+            string value)
+        {
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, null)
+            {
+                ParameterType = parameterType,
+                Owner = owner,
+                Scale = this.scale
+            };
+
+            foreach (var state in actualFiniteStateList.ActualState)
+            {
+                var valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, null)
+                {
+                    ActualState = state,
+                    Published = new ValueArray<string>(new List<string> { value }),
+                    Manual = new ValueArray<string>(new List<string> { value }),
+                    Computed = new ValueArray<string>(new List<string> { value }),
+                    Formula = new ValueArray<string>(new List<string> { value }),
+                    ValueSwitch = ParameterSwitchKind.MANUAL
+                };
+
+                parameter.ValueSet.Add(valueSet);
+            }
 
             elementDefinition.Parameter.Add(parameter);
 
