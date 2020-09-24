@@ -108,34 +108,8 @@ namespace CDP4Requirements.ReqIFDal
             this.thingDialogNavigationService = thingDialogNavigationService;
             this.pluginSettingsService = pluginSettingsService;
             this.currentDomain = domain;
-            this.mappingConfiguration = mappingConfiguration ?? new ImportMappingConfiguration() { Name = this.reqIf.TheHeader.FirstOrDefault()?.Title };
-
-            //this.SetMappingConfiguration(mappingConfiguration);
+            this.mappingConfiguration = mappingConfiguration ?? new ImportMappingConfiguration() { ReqIfName = this.reqIf.TheHeader.FirstOrDefault()?.Title, ReqIfId = this.reqIf.TheHeader.FirstOrDefault()?.Identifier };
         }
-
-        ///// <summary>
-        ///// Sets the mapping configuration of the selected ReqIf
-        ///// </summary>
-        ///// <param name="configuration">The configuration</param>
-        //private void SetMappingConfiguration(ImportMappingConfiguration configuration)
-        //{
-        //    if (configuration is null)
-        //    {
-        //        this.mappingConfiguration = new ImportMappingConfiguration() { Name = this.reqIf.TheHeader.FirstOrDefault()?.Title };
-        //    }
-        //    else
-        //    {
-        //        this.mappingConfiguration = configuration;
-
-        //        if (this.iteration.ExternalIdentifierMap.FirstOrDefault(m => m.Name == this.mappingConfiguration.Name) is { } dataTypeDefinition )
-        //        {
-        //            foreach (var idCorrespondance in dataTypeDefinition.Correspondence)
-        //            {
-        //                this.mappingConfiguration.DatatypeDefinitionMap.Add(new DatatypeDefinition(), new DatatypeDefinitionMap());
-        //            }
-        //        }
-        //    }
-        //}
 
         /// <summary>
         /// Start the mapping process
@@ -332,8 +306,6 @@ namespace CDP4Requirements.ReqIFDal
                 Owner = this.currentDomain,
                 ExternalModelName = reqIfTitle
             };
-            
-            this.mappingConfiguration.ExternalIdentifierMapId = map.Iid;
             
             foreach (var keyValuePair in this.mappingConfiguration.DatatypeDefinitionMap)
             {

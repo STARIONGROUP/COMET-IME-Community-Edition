@@ -67,7 +67,13 @@ namespace CDP4Requirements.ViewModels
             {
                 foreach (var pair in map)
                 {
-                    var row = this.MappingRows.Single(x => x.Identifiable == pair.Key);
+                    var row = this.MappingRows.SingleOrDefault(x => x.Identifiable.Identifier == pair.Key.Identifier);
+
+                    if (row is null)
+                    {
+                        continue;
+                    }
+
                     row.MappedThing = pair.Value.ParameterType;
 
                     // set current enumvalue mapping

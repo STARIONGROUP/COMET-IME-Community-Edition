@@ -20,6 +20,10 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Dal;
     using CDP4Requirements.ReqIFDal;
+    using CDP4Requirements.Settings.JsonConverters;
+
+    using Newtonsoft.Json;
+
     using ReactiveUI;
     using ReqIFSharp;
     using NLog;
@@ -118,6 +122,8 @@ namespace CDP4Requirements.ViewModels
 
             this.ManageSavedConfiguration = ReactiveCommand.Create();
             this.ManageSavedConfiguration.Subscribe(_ => this.ExecuteManageSavedConfiguration());
+
+            this.WhenAnyValue(x => x.Path).Subscribe(_ => this.ReloadSavedConfigurations());
         }
 
         /// <summary>
@@ -232,6 +238,12 @@ namespace CDP4Requirements.ViewModels
             try
             {
                 var reqif = await Task.Run(() => this.serializer.Deserialize(this.Path));
+
+                var mappingConfigurations = this.pluginSettingsService.Read<RequirementsModuleSettings>(true, ConverterExtensions.BuildConverters(reqif, this.Sessions.Single(x => x.DataSourceUri == this.SelectedIteration.DataSourceUri), this.SelectedIteration.Iteration))
+                    .SavedConfigurations.Cast<ImportMappingConfiguration>();
+
+                this.SelectedMappingConfiguration = mappingConfigurations.FirstOrDefault(x => x.ReqIfId == reqif.TheHeader.First().Identifier);
+                
                 this.DialogResult = new ReqIfImportResult(reqif, this.SelectedIteration.Iteration, this.SelectedMappingConfiguration, true);
             }
             catch (Exception ex)
@@ -289,9 +301,9 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void ReloadSavedConfigurations()
         {
-            var settings = this.pluginSettingsService.Read<RequirementsModuleSettings>();
+            var settings = this.pluginSettingsService.Read<RequirementsModuleSettings>(true, ConverterExtensions.BuildConverters());
+            //settings.SavedConfigurations = settings.SavedConfigurations.Cast<ImportMappingConfiguration>().Where(x => this.Path.Contains(x.FileName));
             this.AvailableMappingConfiguration = new ReactiveList<ImportMappingConfiguration>(settings.SavedConfigurations.Cast<ImportMappingConfiguration>());
-
             this.AvailableMappingConfiguration.Insert(0, new ImportMappingConfiguration()
             {
                 Name = "(None)",

@@ -31,48 +31,55 @@ namespace CDP4Requirements.Settings.JsonConverters
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
 
     using CDP4Dal;
 
+    using CDP4Requirements.ReqIFDal;
     using CDP4Requirements.ViewModels;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     using ReqIFSharp;
 
     /// <summary>
     /// Allows Json.Net to convert <see cref="Dictionary{TKey,TValue}"/> of type <code>Dictionary&lt;SpecRelationType, SpecRelationTypeMap&gt;</code>
     /// </summary>
-    public class SpecRelationTypeMapConverter : JsonConverter<Dictionary<SpecRelationType, SpecRelationTypeMap>>
+    public class SpecRelationTypeMapConverter : JsonConverter<Dictionary<SpecRelationType, SpecRelationTypeMap>>, IReqIfJsonConverter
     {
         /// <summary>
-        /// Holds a list of <see cref="DatatypeDefinition"/>
+        /// The <see cref="ReqIF.CoreContent"/>
         /// </summary>
-        private readonly IEnumerable<DatatypeDefinition> reqIfDataDefinitions;
+        public ReqIFContent ReqIfCoreContent { get; private set; }
 
         /// <summary>
         /// The <see cref="ISession"/>
         /// </summary>
-        private readonly ISession session;
+        public ISession Session { get; private set; }
 
         /// <summary>
-        /// The <see cref="Iteration"/>
+        /// The <see cref="CDP4Common.EngineeringModelData.Iteration"/>
         /// </summary>
-        private readonly Iteration iteration;
+        public Iteration Iteration { get; private set; }
 
+        /// <summary>
+        /// Initializes a new <see cref="SpecRelationTypeMapConverter"/>
+        /// </summary>
+        public SpecRelationTypeMapConverter()
+        {
+        }
 
         /// <summary>
         /// Initializes a new <see cref="SpecRelationTypeMapConverter"/>
         /// </summary>
         /// <param name="reqIf">The associated <see cref="ReqIF"/></param>
         /// <param name="session">The <see cref="ISession"/></param>
-        /// <param name="iteration">The <see cref="iteration"/></param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
         public SpecRelationTypeMapConverter(ReqIF reqIf, ISession session, Iteration iteration)
         {
-            this.reqIfDataDefinitions = reqIf.CoreContent.FirstOrDefault()?.DataTypes;
-            this.session = session;
-            this.iteration = iteration;
+            this.ReqIfCoreContent = reqIf?.CoreContent.FirstOrDefault();
+            this.Session = session;
+            this.Iteration = iteration;
         }
 
         /// <inheritdoc cref="JsonConverter{T}.WriteJson"/>
@@ -85,7 +92,7 @@ namespace CDP4Requirements.Settings.JsonConverters
                 writer.WriteStartObject();
                 writer.WritePropertyName(nameof(SpecRelationType));
                 writer.WriteValue(pair.Key.Identifier);
-                writer.WritePropertyName(nameof(pair.Value.Categories));
+                writer.WritePropertyName(nameof(Category));
                 writer.WriteStartArray();
                 
                 foreach (var valueCategory in pair.Value.Categories)
@@ -95,7 +102,7 @@ namespace CDP4Requirements.Settings.JsonConverters
 
                 writer.WriteEndArray();
 
-                writer.WritePropertyName(nameof(pair.Value.Rules));
+                writer.WritePropertyName(nameof(ParameterizedCategoryRule));
                 writer.WriteStartArray();
 
                 foreach (var categoryRule in pair.Value.Rules)
@@ -105,22 +112,22 @@ namespace CDP4Requirements.Settings.JsonConverters
 
                 writer.WriteEndArray();
 
-                writer.WritePropertyName(nameof(pair.Value.AttributeDefinitionMap));
+                writer.WritePropertyName(nameof(AttributeDefinitionMap));
                 writer.WriteStartArray();
 
                 foreach (var definitionMap in pair.Value.AttributeDefinitionMap)
                 {
                     writer.WriteStartObject();
-                    writer.WritePropertyName(nameof(definitionMap.MapKind));
+                    writer.WritePropertyName(nameof(AttributeDefinitionMapKind));
                     writer.WriteValue(definitionMap.MapKind.ToString());
-                    writer.WritePropertyName(nameof(definitionMap.AttributeDefinition));
+                    writer.WritePropertyName(nameof(AttributeDefinition));
                     writer.WriteValue(definitionMap.AttributeDefinition.Identifier);
                     writer.WriteEndObject();
                 }
 
                 writer.WriteEndArray();
 
-                writer.WritePropertyName(nameof(pair.Value.BinaryRelationshipRules));
+                writer.WritePropertyName(nameof(BinaryRelationshipRule));
                 writer.WriteStartArray();
 
                 foreach (var relationshipRule in pair.Value.BinaryRelationshipRules)
@@ -141,30 +148,56 @@ namespace CDP4Requirements.Settings.JsonConverters
         {
             var result = new Dictionary<SpecRelationType, SpecRelationTypeMap>();
 
-            if (reader.Value is Dictionary<object, object> readData)
+            foreach (var pairs in JArray.Load(reader).Select(x => x.ToObject<Dictionary<string, object>>()))
             {
-                foreach (var pair in readData)
+                if (this.GetSpecType<SpecRelationType>((string)pairs[nameof(SpecRelationType)]) is { } specRelationType)
                 {
-                    //var dataTypeDefinition = this.GetDatatypeDefinition(pair.Key.Identifier);
-                    //result[dataTypeDefinition] = new DatatypeDefinitionMap(dataTypeDefinition, this.GetParameterType(pair.Value.ParameterType.Iid.ToString()), null);
+                    var rules = new List<ParameterizedCategoryRule>();
+
+                    foreach (var ruleId in ((JContainer)pairs[nameof(ParameterizedCategoryRule)]).ToObject<IEnumerable<Guid>>())
+                    {
+                        if (this.GetThing(ruleId, out ParameterizedCategoryRule rule))
+                        {
+                            rules.Add(rule);
+                        }
+                    }
+
+                    var categories = new List<Category>();
+
+                    foreach (var categoryId in ((JContainer)pairs[nameof(Category)]).ToObject<IEnumerable<Guid>>())
+                    {
+                        if (this.GetThing(categoryId, out Category category))
+                        {
+                            categories.Add(category);
+                        }
+                    }
+
+                    var binaryRelationshipRules = new List<BinaryRelationshipRule>();
+
+                    foreach (var binaryRelationshipRuleId in ((JContainer)pairs[nameof(BinaryRelationshipRule)]).ToObject<IEnumerable<Guid>>())
+                    {
+                        if (this.GetThing(binaryRelationshipRuleId, out BinaryRelationshipRule binaryRelationshipRule))
+                        {
+                            binaryRelationshipRules.Add(binaryRelationshipRule);
+                        }
+                    }
+
+                    var attributeDefinitionMaps = new List<AttributeDefinitionMap>();
+
+                    foreach (var attributeDefinitionMap in ((JContainer)pairs[nameof(AttributeDefinitionMap)]).ToObject<IEnumerable<Dictionary<string, string>>>())
+                    {
+                        if (Enum.TryParse(attributeDefinitionMap[nameof(AttributeDefinitionMapKind)], true, out AttributeDefinitionMapKind mapkind) &&
+                            this.GetAttributeDefinition(attributeDefinitionMap[nameof(AttributeDefinition)]) is { } attributeDefinition)
+                        {
+                            attributeDefinitionMaps.Add(new AttributeDefinitionMap(attributeDefinition, mapkind));
+                        }
+                    }
+
+                    result[specRelationType] = new SpecRelationTypeMap(specRelationType, rules, categories, attributeDefinitionMaps, binaryRelationshipRules);
                 }
-
-                return result;
             }
 
-            return null;
-        }
-
-        private DatatypeDefinition GetDatatypeDefinition(string id) => this.reqIfDataDefinitions.FirstOrDefault(d => Guid.Parse(d.Identifier) == Guid.Parse(id));
-
-        private ParameterType GetParameterType(string id)
-        {
-            if (this.session.Assembler.Cache.TryGetValue(new CacheKey(Guid.Parse(id), this.iteration.Iid), out var lazyThing))
-            {
-                return (ParameterType) lazyThing.Value;
-            }
-
-            return null;
+            return result;
         }
     }
 }

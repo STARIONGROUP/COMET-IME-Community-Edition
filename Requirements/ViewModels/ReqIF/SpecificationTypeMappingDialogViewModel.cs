@@ -25,7 +25,6 @@ namespace CDP4Requirements.ViewModels
     [DialogViewModelExport("SpecificationTypeMappingDialogViewModel", "The dialog used to map the Reqif SpecObjectType in order to create Requirements.")]
     public class SpecificationTypeMappingDialogViewModel : ReqIfMappingDialogViewModelBase
     {
-        #region fields
         /// <summary>
         /// Backing field for <see cref="CanGoNext"/>
         /// </summary>
@@ -35,9 +34,7 @@ namespace CDP4Requirements.ViewModels
         /// The <see cref="SpecType"/> map
         /// </summary>
         private Dictionary<SpecificationType, SpecTypeMap> specTypeMap;
-        #endregion
-
-        #region Constructor
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="SpecObjectTypesMappingDialogViewModel"/> class
         /// Used by MEF
@@ -74,12 +71,19 @@ namespace CDP4Requirements.ViewModels
             {
                 foreach (var pair in specTypeMap)
                 {
-                    var row = this.SpecTypes.Single(x => x.Identifiable == pair.Key);
-                    row.SelectedRules = new ReactiveList<ParameterizedCategoryRule>(row.PossibleRules.Where(x => pair.Value.Rules != null && pair.Value.Rules.Contains(x)));
-                    row.SelectedCategories = new ReactiveList<CategoryComboBoxItemViewModel>(row.PossibleCategories.Where(x => pair.Value.Categories != null && pair.Value.Categories.Contains(x.Category)).ToList());
+                    var row = this.SpecTypes.FirstOrDefault(x => x.Identifiable.Identifier == pair.Key.Identifier);
+
+                    if (row == null)
+                    {
+                        continue;
+                    }
+
+                    row.SelectedRules = new ReactiveList<ParameterizedCategoryRule>(row.PossibleRules.Where(x => pair.Value.Rules?.FirstOrDefault(r => r.Iid == x.Iid) != null));
+                    row.SelectedCategories = new ReactiveList<CategoryComboBoxItemViewModel>(row.PossibleCategories.Where(x => pair.Value.Categories?.FirstOrDefault(r => r.Iid == x.Category.Iid) != null));
+                    
                     foreach (var attributeDefinitionMap in pair.Value.AttributeDefinitionMap)
                     {
-                        var attRow = this.SpecTypes.SelectMany(x => x.AttributeDefinitions).Single(x => x.Identifiable == attributeDefinitionMap.AttributeDefinition);
+                        var attRow = this.SpecTypes.SelectMany(x => x.AttributeDefinitions).Single(x => x.Identifiable.Identifier == attributeDefinitionMap.AttributeDefinition.Identifier);
                         attRow.AttributeDefinitionMapKind = attributeDefinitionMap.MapKind;
                     }
                 }
@@ -87,9 +91,7 @@ namespace CDP4Requirements.ViewModels
 
             this.UpdateCanGoNext();
         }
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Gets a value indicating whether the <see cref="NextCommand"/> is enabled
         /// </summary>
@@ -113,7 +115,7 @@ namespace CDP4Requirements.ViewModels
         /// Gets the "next" <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> NextCommand { get; private set; }
-        #endregion
+        
 
         /// <summary>
         /// Execute the <see cref="ICommand"/> to create a <see cref="ParameterType"/>

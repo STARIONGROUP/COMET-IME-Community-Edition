@@ -34,6 +34,8 @@ namespace CDP4Requirements
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4OfficeInfrastructure;
+
+    using CDP4Requirements.Settings.JsonConverters;
     using CDP4Requirements.Views;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
@@ -136,8 +138,9 @@ namespace CDP4Requirements
 
             try
             {
-                var settings = this.PluginSettingsService.Read<RequirementsModuleSettings>();
-                PluginSettings = settings;
+                var settings = this.PluginSettingsService.Read<RequirementsModuleSettings>(true, ConverterExtensions.BuildConverters());
+
+                PluginSettings = settings ?? new RequirementsModuleSettings();
             }
             catch (PluginSettingsException pluginSettingsException)
             {

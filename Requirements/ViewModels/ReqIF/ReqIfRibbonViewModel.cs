@@ -170,7 +170,7 @@ namespace CDP4Requirements.ViewModels
             var reqifImportDialogViewModel = new ReqIfImportDialogViewModel(this.Sessions, this.Iterations, new OpenSaveFileDialogService(), this.DialogNavigationService, this.PluginSettingsService, new ReqIFDeserializer());
             var result = (ReqIfImportResult)this.DialogNavigationService.NavigateModal(reqifImportDialogViewModel);
 
-            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            if (result?.Result == null || !result.Result.Value)
             {
                 return;
             }

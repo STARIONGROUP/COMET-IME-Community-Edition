@@ -36,6 +36,8 @@ namespace CDP4Composition.ViewModels
     using CDP4Composition.Services.PluginSettingService;
     using CDP4Composition.ViewModels.DialogResult;
 
+    using Newtonsoft.Json;
+
     using ReactiveUI;
 
     /// <summary>
@@ -62,18 +64,24 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// The configuration to be saved.
         /// </summary>
-        private IPluginSavedConfiguration savedConfiguration;
+        private readonly IPluginSavedConfiguration savedConfiguration;
+
+        /// <summary>
+        /// Holds the <see cref="JsonConverter"/>
+        /// </summary>
+        private readonly JsonConverter[] jsonConverters;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SavedConfigurationDialogViewModel"/> class.
         /// </summary>
         /// <param name="pluginSettingService">An instance of <see cref="IPluginSettingsService"/>.</param>
         /// <param name="configuration">The configuration to be saved.</param>
-        public SavedConfigurationDialogViewModel(IPluginSettingsService pluginSettingService, IPluginSavedConfiguration configuration)
+        /// <param name="converters">The <see cref="JsonConverter"/></param>
+        public SavedConfigurationDialogViewModel(IPluginSettingsService pluginSettingService, IPluginSavedConfiguration configuration, params JsonConverter[] converters)
         {
             // reset the loading indicator
             this.IsBusy = false;
-
+            this.jsonConverters = converters;
             this.pluginSettingService = pluginSettingService;
             this.savedConfiguration = configuration;
 
@@ -144,7 +152,7 @@ namespace CDP4Composition.ViewModels
             try
             {
                 this.LoadingMessage = "Saving Configuration...";
-                await Task.Run(() => this.pluginSettingService.Write(settings));
+                await Task.Run(() => this.pluginSettingService.Write(settings, this.jsonConverters));
 
                 this.DialogResult = new SavedConfigurationResult(true);
             }

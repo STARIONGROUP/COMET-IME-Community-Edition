@@ -88,12 +88,14 @@ namespace CDP4Composition.PluginSettingService
         /// Reads the <see cref="TPluginSettings"/> in settings
         /// </summary>
         /// <typeparam name="TPluginSettings">A type of <see cref="PluginSettings"/></typeparam>
-        /// <returns> An instance of <see cref="TPluginSettings"/> </returns>
-        public TPluginSettings Read<TPluginSettings>() where TPluginSettings : PluginSettings
+        /// <param name="shouldReload">An assert wheter to reload from setting file</param>
+        /// <param name="converters">The Json data converters</param>
+        /// <returns> An instance of <see cref="TPluginSettings"/></returns>
+        public TPluginSettings Read<TPluginSettings>(bool shouldReload = false, params JsonConverter[] converters) where TPluginSettings : PluginSettings
         {
             var assemblyName = this.QueryAssemblyTitle(typeof(TPluginSettings));
 
-            if (this.applicationUserPluginSettings.TryGetValue(assemblyName, out var result))
+            if (!shouldReload && this.applicationUserPluginSettings.TryGetValue(assemblyName, out var result))
             {
                 return (TPluginSettings)result;
             }
@@ -108,11 +110,17 @@ namespace CDP4Composition.PluginSettingService
             {
                 using (var file = File.OpenText($"{path}{SettingFileExtension}"))
                 {
-                    var serializer = new JsonSerializer();
-                    result = (TPluginSettings) serializer.Deserialize(file, typeof(TPluginSettings));
+                    var settings = new JsonSerializerSettings
+                    {
+                        Converters = converters.ToList(), TypeNameHandling = TypeNameHandling.Auto,
+                        MissingMemberHandling = MissingMemberHandling.Ignore,
+                        DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate
+                    };
+
+                    result = JsonConvert.DeserializeObject<TPluginSettings>(file.ReadToEnd(), settings);
 
                     // once the settings have been read from disk, add them to the cache for fast access
-                    this.applicationUserPluginSettings.Add(assemblyName, result);
+                    this.applicationUserPluginSettings[assemblyName] = result;
 
                     return (TPluginSettings) result;
                 }
@@ -143,7 +151,7 @@ namespace CDP4Composition.PluginSettingService
         /// </summary>
         /// <typeparam name="TPluginSettings">A type of <see cref="PluginSettings"/></typeparam>
         /// <param name="pluginSettings"> The <see cref="PluginSettings"/> that will be persisted </param>
-        /// <param name="converters"></param>
+        /// <param name="converters">The Json data converters</param>
         public void Write<TPluginSettings>(TPluginSettings pluginSettings, params JsonConverter[] converters) where TPluginSettings : PluginSettings
         {
             if (pluginSettings == null)
@@ -164,6 +172,7 @@ namespace CDP4Composition.PluginSettingService
                 var serializerSettings = new JsonSerializerSettings
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    TypeNameHandling = TypeNameHandling.Auto,
                     Converters = converters.ToList(),
                     Formatting = Formatting.Indented
                 };

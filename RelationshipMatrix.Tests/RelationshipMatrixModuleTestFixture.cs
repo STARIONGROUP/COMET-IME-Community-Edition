@@ -50,7 +50,7 @@ namespace CDP4RelationshipMatrix.Tests
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
             
             this.relationshipMatrixModule = new RelationshipMatrixModule(this.regionManager.Object,this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, this.pluginSettingsService.Object);
-            this.pluginSettingsService.Setup(s => s.Read<RelationshipMatrixPluginSettings>())
+            this.pluginSettingsService.Setup(s => s.Read<RelationshipMatrixPluginSettings>(false))
                 .Returns(new RelationshipMatrixPluginSettings(true));
         }
 
@@ -59,14 +59,14 @@ namespace CDP4RelationshipMatrix.Tests
         {
            Assert.DoesNotThrow(() => this.relationshipMatrixModule.ReadPluginSettings());
             
-            this.pluginSettingsService.Verify(x => x.Read<RelationshipMatrixPluginSettings>());
+            this.pluginSettingsService.Verify(x => x.Read<RelationshipMatrixPluginSettings>(false));
         }
 
         [Test]
         public void Verify_that_when_settings_file_cannot_be_read_the_module_recovers_with_the_default_SettingsClass()
         {
             this.pluginSettingsService
-                .Setup(x => x.Read<RelationshipMatrixPluginSettings>())
+                .Setup(x => x.Read<RelationshipMatrixPluginSettings>(false))
                 .Throws<PluginSettingsException>();
             
             Assert.DoesNotThrow(() => this.relationshipMatrixModule.ReadPluginSettings());

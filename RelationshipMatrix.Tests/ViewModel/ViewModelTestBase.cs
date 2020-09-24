@@ -210,7 +210,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.settings = new RelationshipMatrixPluginSettings();
             this.settings.PossibleClassKinds.Add(ClassKind.ElementDefinition);
             this.settings.PossibleClassKinds.Add(ClassKind.ElementUsage);
-            this.pluginService.Setup(x => x.Read<RelationshipMatrixPluginSettings>()).Returns(this.settings);
+            this.pluginService.Setup(x => x.Read<RelationshipMatrixPluginSettings>(false)).Returns(this.settings);
 
             this.pluginService.Setup(x => x.Write(It.IsAny<RelationshipMatrixPluginSettings>()));
         }

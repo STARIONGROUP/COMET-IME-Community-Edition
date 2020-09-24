@@ -29,49 +29,67 @@ namespace CDP4Requirements.Settings.JsonConverters
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
 
     using CDP4Dal;
 
     using CDP4Requirements.ViewModels;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     using ReqIFSharp;
 
     /// <summary>
     /// Allows Json.Net to convert <see cref="Dictionary{TKey,TValue}"/> of type <code>Dictionary&lt;DatatypeDefinition, DatatypeDefinitionMap&gt;</code>
     /// </summary>
-    public class DataTypeDefinitionMapConverter : JsonConverter<Dictionary<DatatypeDefinition, DatatypeDefinitionMap>>
+    public class DataTypeDefinitionMapConverter : JsonConverter<Dictionary<DatatypeDefinition, DatatypeDefinitionMap>>, IReqIfJsonConverter
     {
         /// <summary>
-        /// Holds a list of <see cref="DatatypeDefinition"/>
+        /// The <see cref="ReqIF.CoreContent"/>
         /// </summary>
-        private readonly IEnumerable<DatatypeDefinition> reqIfDataDefinitions;
+        public ReqIFContent ReqIfCoreContent { get; private set; }
 
         /// <summary>
         /// The <see cref="ISession"/>
         /// </summary>
-        private readonly ISession session;
+        public ISession Session { get; private set; }
 
         /// <summary>
-        /// The <see cref="Iteration"/>
+        /// The <see cref="CDP4Common.EngineeringModelData.Iteration"/>
         /// </summary>
-        private readonly Iteration iteration;
+        public Iteration Iteration { get; private set; }
+
+        /// <summary>
+        /// Identifier Key constant
+        /// </summary>
+        private const string IdentifierKey = "Identifier";
+
+        /// <summary>
+        /// Iid key constant
+        /// </summary>
+        private const string IidKey = "Iid";
+
+        /// <summary>
+        /// Initializes a new <see cref="DataTypeDefinitionMapConverter"/>
+        /// </summary>
+        public DataTypeDefinitionMapConverter()
+        {
+        }
 
         /// <summary>
         /// Initializes a new <see cref="DataTypeDefinitionMapConverter"/>
         /// </summary>
         /// <param name="reqIf">The associated <see cref="ReqIF"/></param>
         /// <param name="session">The <see cref="ISession"/></param>
-        /// <param name="iteration">The <see cref="iteration"/></param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
         public DataTypeDefinitionMapConverter(ReqIF reqIf, ISession session, Iteration iteration)
         {
-            this.reqIfDataDefinitions = reqIf.CoreContent.FirstOrDefault()?.DataTypes;
-            this.session = session;
-            this.iteration = iteration;
+            this.ReqIfCoreContent = reqIf?.CoreContent?.FirstOrDefault();
+            this.Session = session;
+            this.Iteration = iteration;
         }
 
         /// <inheritdoc cref="JsonConverter{T}.WriteJson"/>
@@ -79,10 +97,12 @@ namespace CDP4Requirements.Settings.JsonConverters
         {
             writer.WriteStartArray();
             
-            foreach (var pair in value)
+            foreach (var pair in value.Where(x => x.Value?.ParameterType != null))
             {
                 writer.WriteStartObject();
-                writer.WritePropertyName(pair.Key.Identifier);
+                writer.WritePropertyName(IdentifierKey);
+                writer.WriteValue(pair.Key.Identifier);
+                writer.WritePropertyName(IidKey);
                 writer.WriteValue(pair.Value.ParameterType.Iid);
                 writer.WriteEndObject();
             }
@@ -94,31 +114,26 @@ namespace CDP4Requirements.Settings.JsonConverters
         public override Dictionary<DatatypeDefinition, DatatypeDefinitionMap> ReadJson(JsonReader reader, Type objectType, Dictionary<DatatypeDefinition, DatatypeDefinitionMap> existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var result = new Dictionary<DatatypeDefinition, DatatypeDefinitionMap>();
-
-            if (reader.Value is Dictionary<DatatypeDefinition, DatatypeDefinitionMap> readData)
+            
+            foreach (var token in JArray.Load(reader).Select(x => x.ToObject<Dictionary<string, Guid>>()))
             {
-                foreach (var pair in readData)
+                if (this.GetDatatypeDefinition(token[IdentifierKey]) is { } dataTypeDefinition && this.GetThing(token[IidKey], out ParameterType parameterType))
                 {
-                    var dataTypeDefinition = this.GetDatatypeDefinition(pair.Key.Identifier);
-                    result[dataTypeDefinition] = new DatatypeDefinitionMap(dataTypeDefinition, this.GetParameterType(pair.Value.ParameterType.Iid.ToString()), null);
+                    result[dataTypeDefinition] = new DatatypeDefinitionMap(dataTypeDefinition, parameterType, null);
                 }
-
-                return result;
             }
 
-            return null;
+            return result;
         }
 
-        private DatatypeDefinition GetDatatypeDefinition(string id) => this.reqIfDataDefinitions.FirstOrDefault(d => Guid.Parse(d.Identifier) == Guid.Parse(id));
-
-        private ParameterType GetParameterType(string id)
+        /// <summary>
+        /// Gets the corresponding dataType
+        /// </summary>
+        /// <param name="id">The definition id</param>
+        /// <returns>A <see cref="DatatypeDefinition"/></returns>
+        private DatatypeDefinition GetDatatypeDefinition(Guid id)
         {
-            if (this.session.Assembler.Cache.TryGetValue(new CacheKey(Guid.Parse(id), this.iteration.Iid), out var lazyThing))
-            {
-                return (ParameterType) lazyThing.Value;
-            }
-
-            return null;
+            return this.ReqIfCoreContent?.DataTypes.FirstOrDefault(d => Guid.Parse(d.Identifier) == id);
         }
     }
 }

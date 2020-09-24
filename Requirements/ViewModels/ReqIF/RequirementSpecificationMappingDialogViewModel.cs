@@ -27,6 +27,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Dal;
     using CDP4Requirements.ReqIFDal;
+    using CDP4Requirements.Settings.JsonConverters;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -249,11 +250,15 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void SaveMappingCommandExecute()
         {
-            var saveDialog = new SavedConfigurationDialogViewModel<RequirementsModuleSettings>(this.pluginSettingsService, this.importMappingConfiguration);
-            this.dialogNavigationService.NavigateModal(saveDialog);
+            var saveDialog = new SavedConfigurationDialogViewModel<RequirementsModuleSettings>(
+                this.pluginSettingsService,
+                this.importMappingConfiguration, 
+                ConverterExtensions.BuildConverters());
+
+                this.dialogNavigationService.NavigateModal(saveDialog);
         }
 
-        /// <summary>
+        /// <summary>                                                                                                                                        = new SpecificationTypeMapConverter(this.reqIf, this.session, this.iteration);
         /// Execute the <see cref="InspectCommand"/>
         /// </summary>
         protected virtual void ExecuteInspectCommand()

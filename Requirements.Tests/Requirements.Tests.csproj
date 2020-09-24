@@ -85,4 +85,9 @@
     <ProjectReference Include="..\CDP4OfficeInfrastructure\CDP4OfficeInfrastructure.csproj" />
     <ProjectReference Include="..\Requirements\Requirements.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Settings\testreq.reqif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

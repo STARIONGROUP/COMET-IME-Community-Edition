@@ -17,15 +17,17 @@ namespace CDP4Composition.PluginSettingService
         /// Reads the <see cref="TPluginSettings"/>
         /// </summary>
         /// <typeparam name="TPluginSettings">A type of <see cref="PluginSettings"/></typeparam>
-        /// <returns> An instance of <see cref="PluginSettings"/> </returns>
-        TPluginSettings Read<TPluginSettings>() where TPluginSettings : PluginSettings;
+        /// <param name="shouldReload">An assert wheter to reload from setting file</param>
+        /// <param name="converters">The Json data converters</param>
+        /// <returns> An instance of <see cref="PluginSettings"/></returns>
+        TPluginSettings Read<TPluginSettings>(bool shouldReload = false, params JsonConverter[] converters) where TPluginSettings : PluginSettings;
 
         /// <summary>
         /// Writes the <see cref="TPluginSettings"/> to disk
         /// </summary>
         /// <typeparam name="TPluginSettings">A type of <see cref="PluginSettings"/></typeparam>
         /// <param name="pluginSettings"> The <see cref="PluginSettings"/> that will be persisted </param>
-        /// <param name="converters"></param>
+        /// <param name="converters">The Json data converters</param>
         void Write<TPluginSettings>(TPluginSettings pluginSettings, params JsonConverter[] converters) where TPluginSettings : PluginSettings;
     }
 }

@@ -27,20 +27,13 @@ namespace CDP4Requirements
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
 
-    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Services.PluginSettingService;
 
-    using CDP4Dal;
-
-    using CDP4Requirements.Settings.JsonConverters;
     using CDP4Requirements.ViewModels;
-
-    using Newtonsoft.Json;
-
+    
     using ReqIFSharp;
 
     /// <summary>
@@ -64,9 +57,14 @@ namespace CDP4Requirements
         public string Description { get; set; }
 
         /// <summary>
-        /// The loose reference to a corresponding <see cref="CDP4Common.EngineeringModelData.ExternalIdentifierMap"/>
+        /// Gets or sets the associated reqIf filename
         /// </summary>
-        public Guid ExternalIdentifierMapId { get; set; }
+        public string ReqIfId { get; set; }
+
+        /// <summary>
+        /// The reqIf name from its header
+        /// </summary>
+        public string ReqIfName { get; set; }
 
         /// <summary>
         /// The <see cref="ParameterType"/> Mapping
