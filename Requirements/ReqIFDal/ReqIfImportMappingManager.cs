@@ -40,7 +40,9 @@ namespace CDP4Requirements.ReqIFDal
     using CDP4Dal;
 
     using CDP4Requirements.ViewModels;
-    
+
+    using Microsoft.Practices.ServiceLocation;
+
     using ReqIFSharp;
 
     /// <summary>
@@ -81,12 +83,7 @@ namespace CDP4Requirements.ReqIFDal
         /// <summary>
         /// The <see cref="ImportMappingConfiguration"/> in wich the mapping will be held and save at will
         /// </summary>
-        private ImportMappingConfiguration mappingConfiguration;
-
-        /// <summary>
-        /// The <see cref="IPluginSettingsService"/>
-        /// </summary>
-        private readonly IPluginSettingsService pluginSettingsService;
+        private readonly ImportMappingConfiguration mappingConfiguration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReqIfImportMappingManager"/> class
@@ -97,16 +94,14 @@ namespace CDP4Requirements.ReqIFDal
         /// <param name="domain">The active <see cref="DomainOfExpertise"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
-        /// <param name="pluginSettingsService">The <see cref="IPluginSettingsService"/></param>
         /// <param name="mappingConfiguration">The <see cref="ImportMappingConfiguration"/></param>
-        public ReqIfImportMappingManager(ReqIF reqif, ISession session, Iteration iteration, DomainOfExpertise domain, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IThingDialogNavigationService thingDialogNavigationService, ImportMappingConfiguration mappingConfiguration = null)
+        public ReqIfImportMappingManager(ReqIF reqif, ISession session, Iteration iteration, DomainOfExpertise domain, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, ImportMappingConfiguration mappingConfiguration = null)
         {
             this.reqIf = reqif;
             this.session = session;
             this.iteration = iteration.Clone(false);
             this.dialogNavigationService = dialogNavigationService;
             this.thingDialogNavigationService = thingDialogNavigationService;
-            this.pluginSettingsService = pluginSettingsService;
             this.currentDomain = domain;
             this.mappingConfiguration = mappingConfiguration ?? new ImportMappingConfiguration() { ReqIfName = this.reqIf.TheHeader.FirstOrDefault()?.Title, ReqIfId = this.reqIf.TheHeader.FirstOrDefault()?.Identifier };
         }
@@ -270,12 +265,10 @@ namespace CDP4Requirements.ReqIFDal
                 typeMap.Add(groupTypeMap.Key, groupTypeMap.Value);
             }
 
-            //this.SaveDataTypeDefinitionMap();
-
             var thingFactory = new ThingFactory(this.iteration, this.mappingConfiguration.DatatypeDefinitionMap, typeMap, this.currentDomain, this.reqIf.Lang);
             thingFactory.ComputeRequirementThings(this.reqIf);
 
-            var dialog = new RequirementSpecificationMappingDialogViewModel(thingFactory, this.iteration, this.session, this.thingDialogNavigationService, this.dialogNavigationService, this.reqIf.Lang, this.pluginSettingsService, this.mappingConfiguration);
+            var dialog = new RequirementSpecificationMappingDialogViewModel(thingFactory, this.iteration, this.session, this.thingDialogNavigationService, this.dialogNavigationService, this.reqIf.Lang, this.mappingConfiguration);
             var mappingDialogNavigationResult = (MappingDialogNavigationResult)this.dialogNavigationService.NavigateModal(dialog);
 
             if (mappingDialogNavigationResult?.Result != true)

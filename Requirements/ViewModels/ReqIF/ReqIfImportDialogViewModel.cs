@@ -54,11 +54,6 @@ namespace CDP4Requirements.ViewModels
         private readonly IOpenSaveFileDialogService fileDialogService;
 
         /// <summary>
-        /// The <see cref="IDialogNavigationService"/>
-        /// </summary>
-        private readonly IDialogNavigationService dialogNavigationService;
-
-        /// <summary>
         /// The <see cref="IPluginSettingsService"/> instance
         /// </summary>
         private readonly IPluginSettingsService pluginSettingsService;
@@ -74,25 +69,17 @@ namespace CDP4Requirements.ViewModels
         private bool canExecuteImport;
 
         /// <summary>
-        /// Backing field for <see cref="SelectedMappingConfiguration"/>
-        /// </summary>
-        private ImportMappingConfiguration selectedMappingConfiguration;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ReqIfExportDialogViewModel"/> class
         /// </summary>
         /// <param name="sessions">The list of <see cref="ISession"/> available</param>
         /// <param name="iterations">The list of <see cref="Iteration"/> available</param>
         /// <param name="fileDialogService">The <see cref="IOpenSaveFileDialogService"/></param>
-        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
         /// <param name="pluginSettingsService">The <see cref="IPluginSettingsService"/></param>
         /// <param name="serializer"></param>
-        public ReqIfImportDialogViewModel(IEnumerable<ISession> sessions, IEnumerable<Iteration> iterations, IOpenSaveFileDialogService fileDialogService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IReqIFDeSerializer serializer)
+        public ReqIfImportDialogViewModel(IEnumerable<ISession> sessions, IEnumerable<Iteration> iterations, IOpenSaveFileDialogService fileDialogService, IPluginSettingsService pluginSettingsService, IReqIFDeSerializer serializer)
         {
             this.Sessions = sessions?.ToList() ?? throw new ArgumentNullException(nameof(sessions));
-            this.AvailableMappingConfiguration = new ReactiveList<ImportMappingConfiguration>(RequirementsModule.PluginSettings?.SavedConfigurations.Cast<ImportMappingConfiguration>());
             this.fileDialogService = fileDialogService ?? throw new ArgumentNullException(nameof(fileDialogService));
-            this.dialogNavigationService = dialogNavigationService;
             this.pluginSettingsService = pluginSettingsService;
             this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
 
@@ -102,10 +89,6 @@ namespace CDP4Requirements.ViewModels
             {
                 this.Iterations.Add(new ReqIfExportIterationRowViewModel(iteration));
             }
-
-            this.AvailableMappingConfiguration = new ReactiveList<ImportMappingConfiguration>();
-
-            this.ReloadSavedConfigurations();
 
             this.WhenAnyValue(vm => vm.Path).Subscribe(_ => this.UpdateCanExecuteImport());
             this.WhenAnyValue(vm => vm.SelectedIteration).Subscribe(_ => this.UpdateCanExecuteImport());
@@ -119,11 +102,6 @@ namespace CDP4Requirements.ViewModels
 
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
-
-            this.ManageSavedConfiguration = ReactiveCommand.Create();
-            this.ManageSavedConfiguration.Subscribe(_ => this.ExecuteManageSavedConfiguration());
-
-            this.WhenAnyValue(x => x.Path).Subscribe(_ => this.ReloadSavedConfigurations());
         }
 
         /// <summary>
@@ -146,26 +124,12 @@ namespace CDP4Requirements.ViewModels
         public ReactiveList<ReqIfExportIterationRowViewModel> Iterations { get; private set; }
 
         /// <summary>
-        /// Gets the available saved mapping configuration to choose from
-        /// </summary>
-        public ReactiveList<ImportMappingConfiguration> AvailableMappingConfiguration { get; private set; }
-
-        /// <summary>
         /// Gets or sets the selected iteration to export
         /// </summary>
         public ReqIfExportIterationRowViewModel SelectedIteration
         {
             get => this.selectedIteration;
             set => this.RaiseAndSetIfChanged(ref this.selectedIteration, value);
-        }
-
-        /// <summary>
-        /// Gets or sets the selected mapping configuration
-        /// </summary>
-        public ImportMappingConfiguration SelectedMappingConfiguration
-        {
-            get => this.selectedMappingConfiguration;
-            set => this.RaiseAndSetIfChanged(ref this.selectedMappingConfiguration, value);
         }
 
         /// <summary>
@@ -242,9 +206,9 @@ namespace CDP4Requirements.ViewModels
                 var mappingConfigurations = this.pluginSettingsService.Read<RequirementsModuleSettings>(true, ConverterExtensions.BuildConverters(reqif, this.Sessions.Single(x => x.DataSourceUri == this.SelectedIteration.DataSourceUri), this.SelectedIteration.Iteration))
                     .SavedConfigurations.Cast<ImportMappingConfiguration>();
 
-                this.SelectedMappingConfiguration = mappingConfigurations.FirstOrDefault(x => x.ReqIfId == reqif.TheHeader.First().Identifier);
+                var configuration = mappingConfigurations.FirstOrDefault(x => x.ReqIfId == reqif.TheHeader.First().Identifier);
                 
-                this.DialogResult = new ReqIfImportResult(reqif, this.SelectedIteration.Iteration, this.SelectedMappingConfiguration, true);
+                this.DialogResult = new ReqIfImportResult(reqif, this.SelectedIteration.Iteration, configuration, true);
             }
             catch (Exception ex)
             {
@@ -278,37 +242,6 @@ namespace CDP4Requirements.ViewModels
             }
 
             this.Path = result.Single();
-        }
-        
-        /// <summary>
-        /// Executes the Cancel Command
-        /// </summary>
-        private void ExecuteManageSavedConfiguration()
-        {
-            var manageConfigurationViewModel = new ManageConfigurationsDialogViewModel<RequirementsModuleSettings>(this.pluginSettingsService);
-            var result = this.dialogNavigationService.NavigateModal(manageConfigurationViewModel) as ManageConfigurationsResult;
-
-            if (result?.Result == null || !result.Result.Value)
-            {
-                return;
-            }
-
-            this.ReloadSavedConfigurations();
-        }
-
-        /// <summary>
-        /// Reloads the saved configurations.
-        /// </summary>
-        private void ReloadSavedConfigurations()
-        {
-            var settings = this.pluginSettingsService.Read<RequirementsModuleSettings>(true, ConverterExtensions.BuildConverters());
-            //settings.SavedConfigurations = settings.SavedConfigurations.Cast<ImportMappingConfiguration>().Where(x => this.Path.Contains(x.FileName));
-            this.AvailableMappingConfiguration = new ReactiveList<ImportMappingConfiguration>(settings.SavedConfigurations.Cast<ImportMappingConfiguration>());
-            this.AvailableMappingConfiguration.Insert(0, new ImportMappingConfiguration()
-            {
-                Name = "(None)",
-                Description = "(None)"
-            });
         }
     }
 }

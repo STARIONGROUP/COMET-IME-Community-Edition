@@ -143,36 +143,11 @@ namespace CDP4Requirements.Settings.JsonConverters
             {
                 if (this.GetSpecType<SpecificationType>((string)pairs[nameof(SpecificationType)]) is { } specificationType)
                 {
-                    var rules = new List<ParameterizedCategoryRule>();
+                    var rules = this.GetParameterizedCategoryRule(pairs);
 
-                    foreach (var ruleId in ((JContainer)pairs[nameof(ParameterizedCategoryRule)]).ToObject<IEnumerable<Guid>>())
-                    {
-                        if (this.GetThing(ruleId, out ParameterizedCategoryRule rule))
-                        {
-                            rules.Add(rule);
-                        }
-                    }
-
-                    var categories = new List<Category>();
-
-                    foreach (var categoryId in ((JContainer)pairs[nameof(Category)]).ToObject<IEnumerable<Guid>>())
-                    {
-                        if (this.GetThing(categoryId, out Category category))
-                        {
-                            categories.Add(category);
-                        }
-                    }
-
-                    var attributeDefinitionMaps = new List<AttributeDefinitionMap>();
-
-                    foreach (var attributeDefinitionMap in ((JContainer)pairs[nameof(AttributeDefinitionMap)]).ToObject<IEnumerable<Dictionary<string, string>>>())
-                    {
-                        if (Enum.TryParse(attributeDefinitionMap[nameof(AttributeDefinitionMapKind)], true, out AttributeDefinitionMapKind mapkind) &&
-                            this.GetAttributeDefinition(attributeDefinitionMap[nameof(AttributeDefinition)]) is { } attributeDefinition)
-                        {
-                            attributeDefinitionMaps.Add(new AttributeDefinitionMap(attributeDefinition, mapkind));
-                        }
-                    }
+                    var categories = this.GetCategory(pairs);
+                    
+                    var attributeDefinitionMaps = this.GetAttributeDefinitionMaps(pairs);
 
                     result[specificationType] = new SpecTypeMap(specificationType, rules, categories, attributeDefinitionMaps);
                 }

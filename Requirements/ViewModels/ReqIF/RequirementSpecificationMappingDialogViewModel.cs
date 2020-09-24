@@ -81,15 +81,14 @@ namespace CDP4Requirements.ViewModels
         /// <param name="thingDialogNavigationService">The thing Dialog Navigation Service</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
         /// <param name="lang">The current langguage code</param>
-        /// <param name="pluginSettingsService">The <see cref="IPluginSettingsService"/></param>
         /// <param name="importMappingConfiguration">The <see cref="ImportMappingConfiguration"/></param>
-        public RequirementSpecificationMappingDialogViewModel(ThingFactory thingFactory, Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, string lang, IPluginSettingsService pluginSettingsService, ImportMappingConfiguration importMappingConfiguration)
+        public RequirementSpecificationMappingDialogViewModel(ThingFactory thingFactory, Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, string lang, ImportMappingConfiguration importMappingConfiguration)
             : base(iteration, session, thingDialogNavigationService, lang)
         {
             this.PreviewRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.thingFactory = thingFactory;
             this.dialogNavigationService = dialogNavigationService;
-            this.pluginSettingsService = pluginSettingsService;
+            this.pluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
             this.importMappingConfiguration = importMappingConfiguration;
 
             this.PopulateRows();

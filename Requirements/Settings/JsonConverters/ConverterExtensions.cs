@@ -27,17 +27,19 @@ namespace CDP4Requirements.Settings.JsonConverters
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
 
     using CDP4Dal;
 
+    using CDP4Requirements.ReqIFDal;
+    using CDP4Requirements.ViewModels;
+
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     using ReqIFSharp;
 
@@ -84,13 +86,7 @@ namespace CDP4Requirements.Settings.JsonConverters
         /// <returns>A <see cref="AttributeDefinition"/></returns>
         public static AttributeDefinition GetAttributeDefinition(this IReqIfJsonConverter converter, string id)
         {
-            var result = converter.ReqIfCoreContent?.SpecTypes.SelectMany(x => x.SpecAttributes).SingleOrDefault(x => x.Identifier == id);
-
-            if (converter.ReqIfCoreContent != null && result == null)
-            {
-            }
-
-            return result;
+            return converter.ReqIfCoreContent?.SpecTypes.SelectMany(x => x.SpecAttributes).SingleOrDefault(x => x.Identifier == id);
         }
 
         /// <summary>
@@ -138,6 +134,91 @@ namespace CDP4Requirements.Settings.JsonConverters
                 new RelationGroupTypeMapConverter(),
                 new SpecificationTypeMapConverter(),
             };
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ParameterizedCategoryRule"/> collection
+        /// </summary>
+        /// <param name="converter">The <see cref="IReqIfJsonConverter"/></param>
+        /// <param name="pairs">The <see cref="IDictionary{TKey,TValue}"/> containing Json data</param>
+        /// <returns>A collection of <see cref="ParameterizedCategoryRule"/></returns>
+        public static IEnumerable<ParameterizedCategoryRule> GetParameterizedCategoryRule(this IReqIfJsonConverter converter, IReadOnlyDictionary<string, object> pairs)
+        {
+            var rules = new List<ParameterizedCategoryRule>();
+
+            foreach (var ruleId in ((JContainer)pairs[nameof(ParameterizedCategoryRule)]).ToObject<IEnumerable<Guid>>())
+            {
+                if (converter.GetThing(ruleId, out ParameterizedCategoryRule rule))
+                {
+                    rules.Add(rule);
+                }
+            }
+
+            return rules;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Category"/> collection
+        /// </summary>
+        /// <param name="converter">The <see cref="IReqIfJsonConverter"/></param>
+        /// <param name="pairs">The <see cref="IDictionary{TKey,TValue}"/> containing Json data</param>
+        /// <returns>A collection of <see cref="Category"/></returns>
+        public static IEnumerable<Category> GetCategory(this IReqIfJsonConverter converter, IReadOnlyDictionary<string, object> pairs)
+        {
+            var categories = new List<Category>();
+
+            foreach (var categoryId in ((JContainer)pairs[nameof(Category)]).ToObject<IEnumerable<Guid>>())
+            {
+                if (converter.GetThing(categoryId, out Category category))
+                {
+                    categories.Add(category);
+                }
+            }
+
+            return categories;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="BinaryRelationshipRule"/> collection
+        /// </summary>
+        /// <param name="converter">The <see cref="IReqIfJsonConverter"/></param>
+        /// <param name="pairs">The <see cref="IDictionary{TKey,TValue}"/> containing Json data</param>
+        /// <returns>A collection of <see cref="BinaryRelationshipRule"/></returns>
+        public static IEnumerable<BinaryRelationshipRule> GetBinaryRelationshipRule(this IReqIfJsonConverter converter, IReadOnlyDictionary<string, object> pairs)
+        {
+            var binaryRelationshipRules = new List<BinaryRelationshipRule>();
+
+            foreach (var binaryRelationshipRuleId in ((JContainer)pairs[nameof(BinaryRelationshipRule)]).ToObject<IEnumerable<Guid>>())
+            {
+                if (converter.GetThing(binaryRelationshipRuleId, out BinaryRelationshipRule binaryRelationshipRule))
+                {
+                    binaryRelationshipRules.Add(binaryRelationshipRule);
+                }
+            }
+
+            return binaryRelationshipRules;
+        }
+        
+        /// <summary>
+        /// Gets the <see cref="AttributeDefinitionMap"/> collection
+        /// </summary>
+        /// <param name="converter">The <see cref="IReqIfJsonConverter"/></param>
+        /// <param name="pairs">The <see cref="IDictionary{TKey,TValue}"/> containing Json data</param>
+        /// <returns>A collection of <see cref="AttributeDefinitionMap"/></returns>
+        public static IEnumerable<AttributeDefinitionMap> GetAttributeDefinitionMaps(this IReqIfJsonConverter converter, IReadOnlyDictionary<string, object> pairs)
+        {
+            var attributeDefinitionMaps = new List<AttributeDefinitionMap>();
+
+            foreach (var attributeDefinitionMap in ((JContainer)pairs[nameof(AttributeDefinitionMap)]).ToObject<IEnumerable<Dictionary<string, string>>>())
+            {
+                if (Enum.TryParse(attributeDefinitionMap[nameof(AttributeDefinitionMapKind)], true, out AttributeDefinitionMapKind mapkind) &&
+                    converter.GetAttributeDefinition(attributeDefinitionMap[nameof(AttributeDefinition)]) is { } attributeDefinition)
+                {
+                    attributeDefinitionMaps.Add(new AttributeDefinitionMap(attributeDefinition, mapkind));
+                }
+            }
+
+            return attributeDefinitionMaps;
         }
     }
 }

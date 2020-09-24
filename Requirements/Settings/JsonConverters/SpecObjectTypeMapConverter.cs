@@ -144,37 +144,12 @@ namespace CDP4Requirements.Settings.JsonConverters
             {
                 if (this.GetSpecType<SpecObjectType>((string)pairs[nameof(SpecObjectType)]) is { } specObjectType)
                 {
-                    var rules = new List<ParameterizedCategoryRule>();
+                    var rules = this.GetParameterizedCategoryRule(pairs);
 
-                    foreach (var ruleId in ((JContainer)pairs[nameof(ParameterizedCategoryRule)]).ToObject<IEnumerable<Guid>>())
-                    {
-                        if (this.GetThing(ruleId, out ParameterizedCategoryRule rule))
-                        {
-                            rules.Add(rule);
-                        }
-                    }
+                    var categories = this.GetCategory(pairs);
 
-                    var categories = new List<Category>();
-
-                    foreach (var categoryId in ((JContainer)pairs[nameof(Category)]).ToObject<IEnumerable<Guid>>())
-                    {
-                        if (this.GetThing(categoryId, out Category category))
-                        {
-                            categories.Add(category);
-                        }
-                    }
+                    var attributeDefinitionMaps = this.GetAttributeDefinitionMaps(pairs);
                     
-                    var attributeDefinitionMaps = new List<AttributeDefinitionMap>();
-
-                    foreach (var attributeDefinitionMap in ((JContainer)pairs[nameof(AttributeDefinitionMap)]).ToObject<IEnumerable<Dictionary<string, string>>>())
-                    {
-                        if (Enum.TryParse(attributeDefinitionMap[nameof(AttributeDefinitionMapKind)], true, out AttributeDefinitionMapKind mapkind) && 
-                            this.GetAttributeDefinition(attributeDefinitionMap[nameof(AttributeDefinition)]) is { } attributeDefinition)
-                        {
-                            attributeDefinitionMaps.Add(new AttributeDefinitionMap(attributeDefinition, mapkind));
-                        }
-                    }
-
                     result[specObjectType] = new SpecObjectTypeMap(specObjectType, rules, categories, attributeDefinitionMaps, bool.Parse(pairs["IsRequirement"].ToString()));
                 }
             }

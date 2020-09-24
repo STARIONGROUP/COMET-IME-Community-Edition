@@ -42,7 +42,11 @@ namespace CDP4Requirements.Tests.ReqIF
 
     using CDP4Dal;
     using CDP4Dal.Permission;
-    
+
+    using DevExpress.Xpf.Layout.Core;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
     
     using NUnit.Framework;
@@ -94,6 +98,7 @@ namespace CDP4Requirements.Tests.ReqIF
 
         private ParameterType pt;
         private Mock<IPluginSettingsService> pluginSettingsService;
+        private Mock<IServiceLocator> serviceLocator;
 
         [SetUp]
         public void Setup()
@@ -155,8 +160,11 @@ namespace CDP4Requirements.Tests.ReqIF
                 this.iteration,
                 this.domain,
                 this.dialogNavigationService.Object,
-                this.pluginSettingsService.Object,
                 this.thingDialogNavigationService.Object);
+            
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.serviceLocator.Setup(x => x.GetInstance<IPluginSettingsService>()).Returns(this.pluginSettingsService.Object);
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
         }
 
         [Test]

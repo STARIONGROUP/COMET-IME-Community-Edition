@@ -49,48 +49,75 @@ namespace CDP4Requirements.ViewModels
             this.CreateParameterTypeCommands = new ReactiveList<ContextMenuItemViewModel>();
             this.ParameterTypes = new ReactiveList<ParameterType>();
             this.PopulateParameterTypes();
-            
+
             this.PopulateCreateParameterTypeCommands();
             this.PopulateCreateMeasurementScaleCommands();
 
             this.WhenAnyValue(x => x.SelectedRow).Subscribe(_ => this.PopulateCreateParameterTypeCommands());
 
             this.MappingRows = new ReactiveList<DatatypeDefinitionMappingRowViewModel>();
+
+            this.PopulateRows(datatypeDefinitions);
+
+            // set current parameter type mapping if any
+            if (map != null)
+            {
+                this.SetCurrentMapping(map);
+            }
+        }
+
+        /// <summary>
+        /// Populates the <see cref="MappingRows"/>
+        /// </summary>
+        /// <param name="datatypeDefinitions"></param>
+        private void PopulateRows(IEnumerable<DatatypeDefinition> datatypeDefinitions)
+        {
             foreach (var datatypeDefinition in datatypeDefinitions)
             {
                 var row = new DatatypeDefinitionMappingRowViewModel(datatypeDefinition, this.ParameterTypes);
                 this.MappingRows.Add(row);
             }
+        }
 
-            // set current parameter type mapping if any
-            if (map != null)
+        /// <summary>
+        /// Sets the current mapping
+        /// </summary>
+        /// <param name="map">The mapping configuration</param>
+        private void SetCurrentMapping(IDictionary<DatatypeDefinition, DatatypeDefinitionMap> map)
+        {
+            foreach (var pair in map)
             {
-                foreach (var pair in map)
+                var row = this.MappingRows.SingleOrDefault(x => x.Identifiable.Identifier == pair.Key.Identifier);
+
+                if (row is null)
                 {
-                    var row = this.MappingRows.SingleOrDefault(x => x.Identifiable.Identifier == pair.Key.Identifier);
+                    continue;
+                }
 
-                    if (row is null)
-                    {
-                        continue;
-                    }
+                row.MappedThing = pair.Value.ParameterType;
 
-                    row.MappedThing = pair.Value.ParameterType;
+                // set current enumvalue mapping
+                if (!(row.Identifiable is DatatypeDefinitionEnumeration))
+                {
+                    continue;
+                }
 
-                    // set current enumvalue mapping
-                    if(!(row.Identifiable is DatatypeDefinitionEnumeration))
-                    {
-                        continue;
-                    }
+                this.PopulateEnumRow(pair.Value, row);
+            }
+        }
 
-                    foreach (var enumRow in row.EnumValue)
-                    {
-                        EnumerationValueDefinition enumValueDef;
-                        if (pair.Value.EnumValueMap.TryGetValue(enumRow.Identifiable, out enumValueDef))
-                        {
-                            enumRow.MappedThing =
-                            enumRow.PossibleThings.Single(x => x.Iid == enumValueDef.Iid);
-                        }
-                    }
+        /// <summary>
+        /// Sets the Mapped Thing on enum values of the provided row
+        /// </summary>
+        /// <param name="dataTypeDefinitionMap"></param>
+        /// <param name="row"></param>
+        private void PopulateEnumRow(DatatypeDefinitionMap dataTypeDefinitionMap, DatatypeDefinitionMappingRowViewModel row)
+        {
+            foreach (var enumRow in row.EnumValue)
+            {
+                if (dataTypeDefinitionMap.EnumValueMap.TryGetValue(enumRow.Identifiable, out var enumValueDef))
+                {
+                    enumRow.MappedThing = enumRow.PossibleThings.Single(x => x.Iid == enumValueDef.Iid);
                 }
             }
         }

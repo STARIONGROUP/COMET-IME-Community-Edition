@@ -29,7 +29,6 @@ namespace CDP4Requirements.Settings.JsonConverters
     using System.Collections.Generic;
     using System.Linq;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
