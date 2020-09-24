@@ -31,6 +31,7 @@ namespace CDP4Reporting.Tests.DataCollection
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
@@ -50,6 +51,8 @@ namespace CDP4Reporting.Tests.DataCollection
         private Category cat1;
         private Category cat2;
         private Category cat3;
+        private Category superCat;
+        private Category subCat;
 
         private DomainOfExpertise domain;
 
@@ -65,6 +68,15 @@ namespace CDP4Reporting.Tests.DataCollection
 
             [DefinedThingShortName("cat2")]
             public DataCollectorCategory<Row> testCategory2 { get; set; }
+        }
+
+        private class Row2 : DataCollectorRow
+        {
+            [DefinedThingShortName("superCat")]
+            public DataCollectorCategory<Row2> superCategory { get; set; }
+
+            [DefinedThingShortName("subCat")]
+            public DataCollectorCategory<Row2> supbCategory { get; set; }
         }
 
         [SetUp]
@@ -84,6 +96,14 @@ namespace CDP4Reporting.Tests.DataCollection
 
             this.iteration.Option.Add(this.option);
 
+            var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
+            var modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, null);
+
+            engineeringModel.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
+            engineeringModel.EngineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+
+            this.iteration.Container = engineeringModel;
+
             // Categories
 
             this.cat1 = new Category(Guid.NewGuid(), this.cache, null)
@@ -91,6 +111,8 @@ namespace CDP4Reporting.Tests.DataCollection
                 ShortName = "cat1",
                 Name = "cat1"
             };
+
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat1);
 
             this.cache.TryAdd(
                 new CacheKey(this.cat1.Iid, null),
@@ -102,6 +124,8 @@ namespace CDP4Reporting.Tests.DataCollection
                 Name = "cat2"
             };
 
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat2);
+
             this.cache.TryAdd(
                 new CacheKey(this.cat2.Iid, null),
                 new Lazy<Thing>(() => this.cat2));
@@ -112,9 +136,37 @@ namespace CDP4Reporting.Tests.DataCollection
                 Name = "cat3"
             };
 
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat3);
+
             this.cache.TryAdd(
                 new CacheKey(this.cat3.Iid, null),
                 new Lazy<Thing>(() => this.cat3));
+
+            this.superCat = new Category(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "superCat",
+                Name = "superCat"
+            };
+
+            modelReferenceDataLibrary.DefinedCategory.Add(this.superCat);
+
+            this.cache.TryAdd(
+                new CacheKey(this.superCat.Iid, null),
+                new Lazy<Thing>(() => this.superCat));
+
+            this.subCat = new Category(Guid.NewGuid(), this.cache, null)
+            {
+                ShortName = "subCat",
+                Name = "subCat"
+            };
+
+            this.subCat.SuperCategory.Add(this.superCat);
+
+            modelReferenceDataLibrary.DefinedCategory.Add(this.subCat);
+
+            this.cache.TryAdd(
+                new CacheKey(this.subCat.Iid, null),
+                new Lazy<Thing>(() => this.subCat));
 
             // Domain of expertise
 
@@ -162,30 +214,33 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyThatNodeIdentifiesCategories()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+            
+            var node = dataSource.CreateNodes(
                 hierarchy,
-                this.option);
-
-            var node = dataSource.TopNodes.First();
+                nestedElementTree).First();
+            
             Assert.AreEqual(2, node.GetColumns<DataCollectorCategory<Row>>().Count());
         }
 
         [Test]
         public void VerifyCategoryShortNameInitialization()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
-            var node = dataSource.TopNodes.First();
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
 
             var categories = node.GetColumns<DataCollectorCategory<Row>>().ToList();
             Assert.AreEqual("cat1", categories.Single(x => x.ShortName == "cat1").ShortName);
@@ -195,15 +250,16 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyElementDefinitionCategoryValueInitialization()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
-            var node = dataSource.TopNodes.First();
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
 
             var categories = node.GetColumns<DataCollectorCategory<Row>>().ToList();
             Assert.AreEqual(true, categories.Single(x => x.ShortName == "cat1").Value);
@@ -213,19 +269,107 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyElementUsageCategoryValueInitialization()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
-            var node = dataSource.TopNodes.First();
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
 
             var categories = node.GetColumns<DataCollectorCategory<Row>>().ToList();
             Assert.AreEqual(false, categories.Single(x => x.ShortName == "cat1").Value);
             Assert.AreEqual(true, categories.Single(x => x.ShortName == "cat2").Value);
+        }
+
+        [Test]
+        public void VerifyCategorySuperCategoryInCategoryHierarchy()
+        {
+            this.ed1.Category.Add(this.superCat);
+
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.superCat.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
+
+            Assert.AreEqual(true, node.GetTable().Columns.Contains(this.superCat.ShortName));
+            Assert.AreEqual(false, node.GetTable().Columns.Contains(this.subCat.ShortName));
+        }
+
+        [Test]
+        public void VerifyCategorySubCategoryInCategoryHierarchy()
+        {
+            this.ed1.Category.Add(this.subCat);
+
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.subCat.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
+
+            Assert.AreEqual(false, node.GetTable().Columns.Contains(this.superCat.ShortName));
+            Assert.AreEqual(true, node.GetTable().Columns.Contains(this.subCat.ShortName));
+        }
+
+        [Test]
+        public void VerifyCategorySubCategoryAsColumn()
+        {
+            this.ed1.Category.Add(this.subCat);
+
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat1.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row2>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
+
+            var categories = node.GetColumns<DataCollectorCategory<Row2>>().ToList();
+            Assert.AreEqual(true, categories.Single(x => x.ShortName == this.superCat.ShortName).Value);
+            Assert.AreEqual(this.superCat, categories.Single(x => x.ShortName == this.superCat.ShortName).MainCategory);
+
+            Assert.AreEqual(true, categories.Single(x => x.ShortName == this.subCat.ShortName).Value);
+            Assert.AreEqual(this.subCat, categories.Single(x => x.ShortName == this.subCat.ShortName).MainCategory);
+        }
+
+        [Test]
+        public void VerifyCategorySuperCategoryAsColumn()
+        {
+            this.ed1.Category.Add(this.superCat);
+
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat1.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row2>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
+
+            var categories = node.GetColumns<DataCollectorCategory<Row2>>().ToList();
+            Assert.AreEqual(true, categories.Single(x => x.ShortName == this.superCat.ShortName).Value);
+            Assert.AreEqual(this.superCat, categories.Single(x => x.ShortName == this.superCat.ShortName).MainCategory);
+
+            Assert.AreEqual(false, categories.Single(x => x.ShortName == this.subCat.ShortName).Value);
         }
     }
 }

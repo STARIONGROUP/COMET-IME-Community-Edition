@@ -25,11 +25,11 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using System.Collections.Generic;
     using System.Data;
     using System.Linq;
     using System.Reflection;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -39,7 +39,7 @@ namespace CDP4Reporting.DataCollection
     public class DataCollectorCategory<T> : DataCollectorColumn<T> where T : DataCollectorRow, new()
     {
         /// <summary>
-        /// Gets or sets the associated <see cref="Category"/> short name.
+        /// Gets or sets the associated <see cref="MainCategory"/> short name.
         /// </summary>
         public string ShortName { get; private set; }
 
@@ -49,9 +49,19 @@ namespace CDP4Reporting.DataCollection
         public string FieldName { get; private set; }
 
         /// <summary>
-        /// Flag indicating whether the associated <see cref="Category"/> is present.
+        /// Flag indicating whether the associated <see cref="MainCategory"/> is present.
         /// </summary>
         public bool Value { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the the <see cref="IReadOnlyList{Category}"/> that contains all <see cref="MainCategory"/> object in the scope of this <see cref="DataCollectorCategory{T}"/>
+        /// </summary>
+        public IReadOnlyList<Category> CategoriesInRequiredRdl { get; set; }
+
+        /// <summary>
+        /// The main <see cref="Category"/> that could also be the super <see cref="Category"/>.
+        /// </summary>
+        public Category MainCategory { get; set; }
 
         /// <summary>
         /// Initializes a reported category column based on the corresponding <see cref="ElementBase"/>
@@ -70,6 +80,8 @@ namespace CDP4Reporting.DataCollection
             this.ShortName = definedShortNameAttribute?.ShortName;
             this.Node = node;
             this.Value = this.IsMemberOfCategory();
+
+            this.MainCategory = this.CategoriesInRequiredRdl.FirstOrDefault(x => x.ShortName == this.ShortName);
         }
 
         /// <summary>
@@ -93,21 +105,16 @@ namespace CDP4Reporting.DataCollection
         }
 
         /// <summary>
-        /// Checks if <see cref="DataCollectorNode{T}.CategorizableThing"/> is member of a specific <see cref="Category"/>
+        /// Checks if <see cref="DataCollectorNode{T}.CategorizableThing"/> is member of a specific <see cref="MainCategory"/>
         /// that is found using <see cref="DataCollectorCategory{T}.ShortName"/>.
         /// </summary>
         /// <returns>
-        /// True if <see cref="Category.ShortName"/> was found, otherwise false.
+        /// True if a <see cref="MainCategory"/>'s ShortName propertye was found, otherwise false.
         /// </returns>
         private bool IsMemberOfCategory()
         {
-            var categorizableThing = this.Node.CategorizableThing as Thing;
-
             var categories =
-                categorizableThing?.Cache
-                    .Where(x => x.Value.Value.ClassKind == ClassKind.Category)
-                    .Select(x => x.Value.Value)
-                    .Cast<Category>()
+                this.CategoriesInRequiredRdl?
                     .Where(x => x.ShortName == this.ShortName)
                     .ToList();
 

@@ -29,7 +29,7 @@ namespace CDP4Reporting.DataCollection
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Abstract base class from which all row representations for a <see cref="NestedElementTreeDataCollector{T}"/> need to derive.
+    /// Abstract base class from which all row representations for a <see cref="DataCollectorNodesCreator{T}"/> need to derive.
     /// </summary>
     public abstract class DataCollectorRow
     {
@@ -39,7 +39,7 @@ namespace CDP4Reporting.DataCollection
         protected internal ElementBase ElementBase { get; internal set; }
 
         /// <summary>
-        /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryHierarchy"/>.
+        /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryDecompositionHierarchy"/>.
         /// Note that when this is false, all values will be null on the row.
         /// </summary>
         protected internal bool IsVisible { get; internal set; }

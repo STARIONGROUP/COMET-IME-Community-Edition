@@ -421,9 +421,9 @@ namespace CDP4Reporting.ViewModels
 
                 this.Document = new TextDocument();
 
-                if (reportZipArchive.DataSource != null)
+                if (reportZipArchive.DataSourceCode != null)
                 {
-                    using (var streamReader = new StreamReader(reportZipArchive.DataSource))
+                    using (var streamReader = new StreamReader(reportZipArchive.DataSourceCode))
                     {
                         var datasource = streamReader.ReadToEnd();
                         this.Document = new TextDocument(datasource);
@@ -868,7 +868,7 @@ namespace CDP4Reporting.ViewModels
                 return new ReportZipArchive
                 {
                     ReportDefinition = repxStream,
-                    DataSource = dataSourceStream
+                    DataSourceCode = dataSourceStream
                 };
             }
         }

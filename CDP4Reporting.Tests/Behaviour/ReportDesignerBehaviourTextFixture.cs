@@ -61,13 +61,5 @@ namespace CDP4Reporting.Tests.Behaviour
         {
             Assert.AreEqual("RibbonMergeCategoryName", ReportDesignerBehaviour.RibbonMergeCategoryNameProperty.Name);
         }
-
-        [Test]
-        public void VerifyGetSetRibbonMergeCategoryName()
-        {
-            Assert.IsNull(this.reportDesignerBehaviour.RibbonMergeCategoryName);
-            this.reportDesignerBehaviour.RibbonMergeCategoryName = "abc";
-            Assert.AreEqual("abc", this.reportDesignerBehaviour.RibbonMergeCategoryName);
-        }
     }
 }

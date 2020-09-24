@@ -32,6 +32,7 @@ namespace CDP4Reporting.Tests.DataCollection
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
@@ -119,7 +120,6 @@ namespace CDP4Reporting.Tests.DataCollection
             public TestParameter2 parameter2 { get; set; }
 
             public ComputedTestParameter ComputedParameter { get; set; }
-
         }
 
         [SetUp]
@@ -128,6 +128,14 @@ namespace CDP4Reporting.Tests.DataCollection
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, null);
+
+            this.model = new EngineeringModel(Guid.NewGuid(), null, null);
+            this.model.Iteration.Add(this.iteration);
+
+            var modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, null);
+
+            this.model.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
+            this.model.EngineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
 
             // Option
 
@@ -157,8 +165,6 @@ namespace CDP4Reporting.Tests.DataCollection
 
             this.actualList.PossibleFiniteStateList.Add(this.possibleList);
 
-            this.model = new EngineeringModel(Guid.NewGuid(), null, null);
-            this.model.Iteration.Add(this.iteration);
             this.iteration.ActualFiniteStateList.Add(this.actualList);
             this.iteration.PossibleFiniteStateList.Add(this.possibleList);
             this.actualList.ActualState.Add(this.actualFiniteState1);
@@ -172,6 +178,8 @@ namespace CDP4Reporting.Tests.DataCollection
                 Name = "cat1"
             };
 
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat1);
+
             this.cache.TryAdd(
                 new CacheKey(this.cat1.Iid, null),
                 new Lazy<Thing>(() => this.cat1));
@@ -181,6 +189,8 @@ namespace CDP4Reporting.Tests.DataCollection
                 ShortName = "cat2",
                 Name = "cat2"
             };
+
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat2);
 
             this.cache.TryAdd(
                 new CacheKey(this.cat2.Iid, null),
@@ -399,15 +409,16 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyThatNodeIdentifiesParameters()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
-            var node = dataSource.TopNodes.First();
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
 
             Assert.AreEqual(1, node.GetColumns<TestParameter1>().Count());
             Assert.AreEqual(1, node.GetColumns<TestParameter2>().Count());
@@ -418,15 +429,16 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyParameterShortNameInitialization()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
-            var node = dataSource.TopNodes.First();
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
 
             var parameter1 = node.GetColumns<TestParameter1>().Single();
             Assert.AreEqual("type1", parameter1.FieldName);
@@ -441,15 +453,16 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyComputedParameterInitialization()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
-            var node = dataSource.TopNodes.First();
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
 
             var computedParameter = node.GetColumns<ComputedTestParameter>().Single();
             Assert.AreEqual(null, computedParameter.ValueSets);
@@ -459,15 +472,16 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyParameterInitialization()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
-            var node = dataSource.TopNodes.First();
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
 
             var parameter1 = node.GetColumns<TestParameter1>().Single();
             Assert.AreEqual("11", parameter1.ValueSets.FirstOrDefault()?.ActualValue.First());
@@ -481,15 +495,16 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyParameterOverrideInitialization()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
-            var node = dataSource.TopNodes.First();
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
 
             var parameter1 = node.GetColumns<TestParameter1>().Single();
             Assert.AreEqual("121", parameter1.ValueSets.FirstOrDefault()?.ActualValue.First());
@@ -503,15 +518,16 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyNestedParameterInitialization()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat2.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
-            var node = dataSource.TopNodes.First(x => x.ElementBase.Iid == this.eu2.Iid);
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First(x => x.ElementBase.Iid == this.eu2.Iid);
 
             var parameter1 = node.GetColumns<TestParameter1>().Single();
             Assert.AreEqual("-21", parameter1.ValueSets.FirstOrDefault()?.ActualValue.First());

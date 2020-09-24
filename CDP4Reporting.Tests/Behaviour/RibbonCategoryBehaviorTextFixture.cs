@@ -78,13 +78,6 @@ namespace CDP4Reporting.Tests.Behaviour
         }
 
         [Test]
-        public void VerifyIfCategoryNameOfTheTargetIsSet()
-        {
-            this.ribbonCategoryBehavior.CategoryName = "abc";
-            Assert.AreEqual("abc", this.ribbonCategoryBehavior.CategoryName);
-        }
-
-        [Test]
         public void VerifyIfTheCategoryNameIsChanged()
         {
             Assert.IsNull(this.ribbonCategoryBehavior.CategoryName);

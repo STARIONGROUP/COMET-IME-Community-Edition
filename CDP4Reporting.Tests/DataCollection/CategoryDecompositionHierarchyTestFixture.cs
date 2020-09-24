@@ -38,7 +38,7 @@ namespace CDP4Reporting.Tests.DataCollection
     using NUnit.Framework;
 
     [TestFixture]
-    public class CategoryHierarchyTestFixture
+    public class CategoryDecompositionHierarchyTestFixture
     {
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
@@ -56,12 +56,21 @@ namespace CDP4Reporting.Tests.DataCollection
 
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, null);
 
+            var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
+            var modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, null);
+
+            engineeringModel.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
+            engineeringModel.EngineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+            
+            this.iteration.Container = engineeringModel;
+
             this.cat1 = new Category(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "cat1",
                 Name = "cat1"
             };
 
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat1);
             this.cache.TryAdd(new CacheKey(this.cat1.Iid, null), new Lazy<Thing>(() => this.cat1));
 
             this.cat2 = new Category(Guid.NewGuid(), this.cache, null)
@@ -70,6 +79,7 @@ namespace CDP4Reporting.Tests.DataCollection
                 Name = "cat2"
             };
 
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat2);
             this.cache.TryAdd(new CacheKey(this.cat2.Iid, null), new Lazy<Thing>(() => this.cat2));
 
             this.cat3 = new Category(Guid.NewGuid(), this.cache, null)
@@ -78,6 +88,7 @@ namespace CDP4Reporting.Tests.DataCollection
                 Name = "cat3"
             };
 
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat3);
             this.cache.TryAdd(new CacheKey(this.cat3.Iid, null), new Lazy<Thing>(() => this.cat3));
 
             this.cat4 = new Category(Guid.NewGuid(), this.cache, null)
@@ -86,6 +97,7 @@ namespace CDP4Reporting.Tests.DataCollection
                 Name = "cat4"
             };
 
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat4);
             this.cache.TryAdd(new CacheKey(this.cat4.Iid, null), new Lazy<Thing>(() => this.cat4));
         }
 
@@ -93,32 +105,32 @@ namespace CDP4Reporting.Tests.DataCollection
         public void VerifyThatBuilderThrowsOnUnkownCategory()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                new CategoryHierarchy.Builder(this.iteration, "unknown_cat"));
+                new CategoryDecompositionHierarchy.Builder(this.iteration, "unknown_cat"));
         }
 
         [Test]
         public void VerifyThatBuilderBuids()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                 .Builder(this.iteration, this.cat1.ShortName)
                 .Build();
 
-            Assert.IsInstanceOf<CategoryHierarchy>(hierarchy);
+            Assert.IsInstanceOf<CategoryDecompositionHierarchy>(hierarchy);
         }
 
         [Test]
         public void VerifyThatExceptionThrowsWhenEmptyTopLevel()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                 .Builder(this.iteration);
 
-            Assert.Throws<ArgumentException>(() => hierarchy.Build());
+            Assert.Throws<InvalidOperationException>(() => hierarchy.Build());
         }
 
         [Test]
         public void VerifyThatCategoryHierarchyIsCorrect()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .AddLevel(this.cat2.ShortName)
                 .AddLevel(this.cat3.ShortName)

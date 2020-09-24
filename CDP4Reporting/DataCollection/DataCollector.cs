@@ -52,38 +52,27 @@ namespace CDP4Reporting.DataCollection
         public DomainOfExpertise DomainOfExpertise { get; private set; }
 
         /// <summary>
-        /// Gets the list of available <see cref="Option"/>s
+        /// All currently open <see cref="ReferenceDataLibrary"/>s in this <see cref="IDataCollector.Session"/>
         /// </summary>
-        public IEnumerable<Option> Options => this.Iteration?.Option as IEnumerable<Option> ?? new List<Option>();
+        public IEnumerable<ReferenceDataLibrary> OpenReferenceDataLibraries { get; private set; }
+
+        /// <summary>
+        /// The current <see cref="SiteDirectory"/>s in this <see cref="IDataCollector.Session"/>
+        /// </summary>
+        public SiteDirectory SiteDirectory { get; private set; }
 
         /// <summary>
         /// Initializes this DataCollector 
         /// </summary>
+        /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="iteration"></param>
-        /// <param name="session"></param>
         public void Initialize(Iteration iteration, ISession session)
         {
             this.Iteration = iteration;
             this.Session = session;
             this.DomainOfExpertise = session.QueryCurrentDomainOfExpertise();
-        }
-
-        /// <summary>
-        /// Finds <see cref="NestedParameter"/>s by their <see cref="NestedParameter.Path"/>s in the <see cref="Option"/>'s <see cref="NestedParameter"/>
-        /// and returns its <see cref="NestedParameter.ActualValue"/> "converted" to the generic <typeparamref name="T"></typeparamref>'s .
-        /// </summary>
-        /// <typeparam name="T">The generic type to which the <see cref="NestedParameter.ActualValue"/> needs to be "converted".</typeparam>
-        /// <param name="option">The <see cref="Option"/> in which to find the <see cref="NestedParameter"/>s.</param>
-        /// <param name="path">The path to search for in all this <see cref="Option"/>'s <see cref="NestedParameter.Path"/> properties.</param>
-        /// <param name="index">
-        /// Index/position of the wanted value from the result array of <see cref="Option.GetNestedParameterValuesByPath{T}"/>
-        /// 0-based indexing is used for this.
-        /// </param>
-        /// <returns>A single <see cref="NestedParameter"/> if the path was found and its <see cref="NestedParameter.ActualValue"/>
-        /// could be converted to the requested generic <typeparamref name="T"></typeparamref>, otherwise null.</returns>
-        public T GetNestedParameterValueByPath<T>(Option option, string path, int index = 0)
-        {
-            return (T)Convert.ChangeType(option.GetNestedParameterValuesByPath<object>(path, this.DomainOfExpertise).ToArray()[index], typeof(T));
+            this.OpenReferenceDataLibraries = session.OpenReferenceDataLibraries;
+            this.SiteDirectory = session.RetrieveSiteDirectory();
         }
 
         /// <summary>

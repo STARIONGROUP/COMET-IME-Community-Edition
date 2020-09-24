@@ -27,6 +27,8 @@ namespace CDP4Reporting.Tests.DataCollection
 {
     using System.Linq;
 
+    using CDP4Common.Helpers;
+
     using CDP4Reporting.DataCollection;
 
     using NUnit.Framework;
@@ -52,15 +54,16 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyThatCorrectColumnNameIsUsed()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.dataCollectorParameterTestFixture.iteration, this.dataCollectorParameterTestFixture.cat1.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.dataCollectorParameterTestFixture.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.dataCollectorParameterTestFixture.option).ToList();
 
-            var node = dataSource.TopNodes.First();
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
 
             Assert.AreEqual(1, node.GetColumns<DataCollectorStateDependentPerRowDoubleParameter<Row>>().Count());
             Assert.IsTrue(node.GetTable().Columns.Contains("TypeFour"));

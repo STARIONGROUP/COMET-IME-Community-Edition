@@ -32,8 +32,11 @@ namespace CDP4Reporting.DataCollection
     /// <summary>
     /// Abstract base class from which parameter columns, that result in seperate <see cref="DataRow"/>s per state, need to derive.
     /// </summary>
-    public abstract class DataCollectorStateDependentPerRowParameter<TRow, TValue> : DataCollectorParameter<TRow, TValue>, IDataCollectorStateDependentPerRow where TRow : DataCollectorRow, new()
+    public abstract class DataCollectorStateDependentPerRowParameter<TRow, TValue> : DataCollectorParameter<TRow, TValue>  where TRow : DataCollectorRow, new()
     {
+        /// <summary>
+        /// Overrides the Value property and throws an <see cref="Exception"/>
+        /// </summary>
         public new TValue Value => throw new NotSupportedException(
             $"Getting the Value property of a {nameof(DataCollectorStateDependentPerRowParameter<TRow, TValue>)} object is not supported");
 
@@ -61,7 +64,7 @@ namespace CDP4Reporting.DataCollection
                     {
                         currentRow = table.NewRow();
 
-                         var clone =  new object[row.ItemArray.Length];
+                        var clone = new object[row.ItemArray.Length];
                         Array.Copy(row.ItemArray, clone, row.ItemArray.Length);
                         currentRow.ItemArray = clone;
 
@@ -89,9 +92,5 @@ namespace CDP4Reporting.DataCollection
                 }
             }
         }
-    }
-
-    public interface IDataCollectorStateDependentPerRow
-    {
     }
 }

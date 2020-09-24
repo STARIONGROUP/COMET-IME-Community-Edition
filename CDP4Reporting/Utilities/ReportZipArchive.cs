@@ -41,7 +41,7 @@ namespace CDP4Reporting.Utilities
         /// <summary>
         /// The datasource <see cref="Stream"/>
         /// </summary>
-        public Stream DataSource { get; set; }
+        public Stream DataSourceCode { get; set; }
 
         /// <summary>
         /// Dispose the containing streams
@@ -49,7 +49,7 @@ namespace CDP4Reporting.Utilities
         public void Dispose()
         {
             this.ReportDefinition.Dispose();
-            this.DataSource.Dispose();
+            this.DataSourceCode.Dispose();
         }
     }
 }

@@ -28,9 +28,11 @@ namespace CDP4Reporting.Tests.DataCollection
     using System;
     using System.Collections.Concurrent;
     using System.Data;
+    using System.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
@@ -104,6 +106,14 @@ namespace CDP4Reporting.Tests.DataCollection
 
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, null);
 
+            var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
+            var modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, null);
+
+            engineeringModel.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
+            engineeringModel.EngineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+
+            this.iteration.Container = engineeringModel;
+
             // Option
 
             this.option = new Option(Guid.NewGuid(), this.cache, null)
@@ -122,6 +132,8 @@ namespace CDP4Reporting.Tests.DataCollection
                 Name = "cat1"
             };
 
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat1);
+
             this.cache.TryAdd(
                 new CacheKey(this.cat1.Iid, null),
                 new Lazy<Thing>(() => this.cat1));
@@ -132,6 +144,8 @@ namespace CDP4Reporting.Tests.DataCollection
                 Name = "cat2"
             };
 
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat2);
+
             this.cache.TryAdd(
                 new CacheKey(this.cat2.Iid, null),
                 new Lazy<Thing>(() => this.cat2));
@@ -141,6 +155,8 @@ namespace CDP4Reporting.Tests.DataCollection
                 ShortName = "cat3",
                 Name = "cat3"
             };
+
+            modelReferenceDataLibrary.DefinedCategory.Add(this.cat3);
 
             this.cache.TryAdd(
                 new CacheKey(this.cat3.Iid, null),
@@ -407,6 +423,7 @@ namespace CDP4Reporting.Tests.DataCollection
 
             this.ed5.Category.Add(this.cat2);
             this.VerifyStructure(this.eu5);
+            this.VerifyRecursiveStructure(this.eu4, this.eu5);
         }
 
         [Test]
@@ -421,71 +438,97 @@ namespace CDP4Reporting.Tests.DataCollection
             this.ed5.Category.Add(this.cat2);
             this.ed6.Category.Add(this.cat2);
             this.VerifyStructure(this.eu6);
+            this.VerifyRecursiveStructure(this.eu4, this.eu5, this.eu6);
         }
 
         [Test]
         public void VerifyMultiRootStructure()
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat2.ShortName)
                 .AddLevel(this.cat3.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
             // tabular representation built, category hierarchy considered, unneeded subtrees pruned
-            var rows = dataSource.GetTable().Rows;
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree).Rows;
             Assert.AreEqual(2, rows.Count);
 
             ValidateRow(rows[0], this.eu12p1, this.eu2p31);
             ValidateRow(rows[1], this.eu4, this.eu7);
         }
 
-        [Test]
-        public void VerifyGetNestedParameterValueByPath()
-        {
-            var testDataSource = new TestDataCollector();
-            testDataSource.Initialize(this.iteration, this.session.Object);
-
-            Assert.AreEqual(2D, testDataSource.GetNestedParameterValueByPath<double>(this.option, @"ed1\par\\option1"));
-            Assert.AreEqual("2", testDataSource.GetNestedParameterValueByPath<string>(this.option, @"ed1\par\\option1"));
-            Assert.Throws<FormatException>(() => testDataSource.GetNestedParameterValueByPath<bool>(this.option, @"ed1\par\\option1"));
-        }
-
         private void VerifyStructure(ElementUsage row2Result)
         {
-            var hierarchy = new CategoryHierarchy
+            var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.iteration, this.cat1.ShortName)
                 .AddLevel(this.cat2.ShortName)
                 .AddLevel(this.cat3.ShortName)
                 .Build();
 
-            var dataSource = new NestedElementTreeDataCollector<Row>(
-                hierarchy,
-                this.option);
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
 
             // tabular representation built, category hierarchy considered, unneeded subtrees pruned
-            var rows = dataSource.GetTable().Rows;
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree).Rows;
             Assert.AreEqual(2, rows.Count);
 
             ValidateRow(rows[0], this.ed1, this.eu12p1, this.eu2p31);
             ValidateRow(rows[1], this.ed1, row2Result, this.eu7);
         }
 
+        private void VerifyRecursiveStructure(params ElementUsage[] levels)
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat1.ShortName)
+                .AddLevel(this.cat2.ShortName, 3)
+                .AddLevel(this.cat3.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree).Rows;
+            Assert.AreEqual(2, rows.Count);
+
+            if (levels.Length == 2)
+            {
+                ValidateRow(rows[1], this.ed1, levels[0], levels[1], null, this.eu7);
+            }
+
+            if (levels.Length == 3)
+            {
+                ValidateRow(rows[1], this.ed1, levels[0], levels[1], levels[2], this.eu7);
+            }
+        }
+
         private static void ValidateRow(
             DataRow row,
             ElementBase level0 = null,
             ElementBase level1 = null,
-            ElementBase level2 = null)
+            ElementBase level2 = null,
+            ElementBase level3 = null,
+            ElementBase level4 = null)
         {
             Assert.AreEqual(level0?.Name, row.Field<string>(0));
             Assert.AreEqual(level1?.Name, row.Field<string>(1));
 
-            if (row.ItemArray.Length > 3)
+            if (row.ItemArray.Length > 2)
             {
                 Assert.AreEqual(level2?.Name, row.Field<string>(2));
+            }
+
+            if (row.ItemArray.Length > 3)
+            {
+                Assert.AreEqual(level3?.Name, row.Field<string>(3));
+            }
+
+            if (row.ItemArray.Length > 4)
+            {
+                Assert.AreEqual(level4?.Name, row.Field<string>(4));
             }
         }
     }

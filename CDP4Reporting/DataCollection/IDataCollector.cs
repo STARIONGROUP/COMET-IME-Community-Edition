@@ -53,31 +53,11 @@ namespace CDP4Reporting.DataCollection
         DomainOfExpertise DomainOfExpertise { get; }
 
         /// <summary>
-        /// Gets the list of available <see cref="Option"/>s
-        /// </summary>
-        IEnumerable<Option> Options { get; }
-
-        /// <summary>
         /// Initializes this DataCollector 
         /// </summary>
         /// <param name="iteration"></param>
         /// <param name="session"></param>
         void Initialize(Iteration iteration, ISession session);
-
-        /// <summary>
-        /// Finds <see cref="NestedParameter"/>s by their <see cref="NestedParameter.Path"/>s in the <see cref="Option"/>'s <see cref="NestedParameter"/>
-        /// and returns its <see cref="NestedParameter.ActualValue"/> "converted" to the generic <typeparamref name="T"></typeparamref>'s .
-        /// </summary>
-        /// <typeparam name="T">The generic type to which the <see cref="NestedParameter.ActualValue"/> needs to be "converted".</typeparam>
-        /// <param name="option">The <see cref="Option"/> in which to find the <see cref="NestedParameter"/>s.</param>
-        /// <param name="path">The path to search for in all this <see cref="Option"/>'s <see cref="NestedParameter.Path"/> properties.</param>
-        /// <param name="index">
-        /// Index/position of the wanted value from the result array of <see cref="Option.GetNestedParameterValuesByPath{T}"/>
-        /// 0-based indexing is used for this.
-        /// </param>
-        /// <returns>A single <see cref="NestedParameter"/> if the path was found and its <see cref="NestedParameter.ActualValue"/>
-        /// could be converted to the requested generic <typeparamref name="T"></typeparamref>, otherwise null.</returns>
-        T GetNestedParameterValueByPath<T>(Option option, string path, int index = 0);
 
         /// <summary>
         /// Creates a new data object instance. Could be anything depending on what the data is used for.

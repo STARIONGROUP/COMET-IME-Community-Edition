@@ -50,32 +50,42 @@ namespace CDP4Reporting.DataCollection
         private IEnumerable<KeyValuePair<PropertyInfo, Type>> allColumns => this.normalColumns.AsEnumerable().Union(this.stateDependentColumns);
 
         /// <summary>
-        /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorColumn{T}"/>s
+        /// Gets or sets a <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorColumn{T}"/>s
         /// declared as <see cref="DataCollectorRow"/> fields.
         /// </summary>
-        private Dictionary<PropertyInfo, Type> normalColumns;
+        private Dictionary<PropertyInfo, Type> normalColumns { get; set; }
 
         /// <summary>
-        /// A <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorStateDependentPerRowParameter{TRow,TValue}"/>s
+        /// Gets or sets a <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorStateDependentPerRowParameter{TRow,TValue}"/>s
         /// declared as <see cref="DataCollectorRow"/> fields.
         /// </summary>
-        private Dictionary<PropertyInfo, Type> stateDependentColumns;
+        private Dictionary<PropertyInfo, Type> stateDependentColumns { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> of all the public getters on the <see cref="DataCollectorRow"/>
+        /// Gets or sets a <see cref="IEnumerable{T}"/> of all the public getters on the <see cref="DataCollectorRow"/>
         /// representation.
         /// </summary>
-        private IEnumerable<PropertyInfo> publicGetterProperties;
+        private IEnumerable<PropertyInfo> publicGetterProperties { get; set; }
 
         /// <summary>
-        /// The <see cref="DataCollectorRow"/> representation of the current node.
+        /// Gets or sets the <see cref="DataCollectorRow"/> representation of the current node.
         /// </summary>
-        private readonly T rowRepresentation;
+        private T rowRepresentation { get; set; }
 
         /// <summary>
-        /// The parent node in the hierarhical tree upon which the data object is based.
+        /// Gets the parent node in the hierarhical tree upon which the data object is based.
         /// </summary>
-        private readonly DataCollectorNode<T> parent;
+        private DataCollectorNode<T> parent { get; }
+
+        /// <summary>
+        /// Gets or sets The filtering <see cref="CategoryDecompositionHierarchy"/> that must be matched on the current <see cref="ElementBase"/>.
+        /// </summary>
+        private CategoryDecompositionHierarchy categoryDecompositionHierarchy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the field/column when the data is transfered to a <see cref="DataRow"/>.
+        /// </summary>
+        private string FieldName { get; set; }
 
         /// <summary>
         /// The children nodes in the hierarhical tree upon which the data object is based.
@@ -83,9 +93,9 @@ namespace CDP4Reporting.DataCollection
         internal List<DataCollectorNode<T>> Children { get; } = new List<DataCollectorNode<T>>();
 
         /// <summary>
-        /// The <see cref="CDP4Common.EngineeringModelData.NestedElement"/> associated with this node.
+        /// Gets the <see cref="CDP4Common.EngineeringModelData.NestedElement"/> associated with this node.
         /// </summary>
-        internal readonly NestedElement NestedElement;
+        internal NestedElement NestedElement { get; }
 
         /// <summary>
         /// The <see cref="ICategorizableThing"/> associated with this node.
@@ -108,20 +118,20 @@ namespace CDP4Reporting.DataCollection
         internal ElementUsage ElementUsage =>  this.NestedElement.GetElementUsage();
 
         /// <summary>
-        /// The filtering <see cref="CategoryHierarchy"/> that must be matched on the current <see cref="ElementBase"/>.
+        /// GEts or sets an <see cref="IReadOnlyList{Category}"/> that contains all <see cref="Category"/>s in scope of this node.
         /// </summary>
-        private readonly CategoryHierarchy categoryHierarchy;
+        public IReadOnlyList<Category> CategoriesInRequiredRdl { get; set; }
 
         /// <summary>
-        /// Gets the name of the field/column when the data is transfered to a <see cref="DataRow"/>.
+        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="categoryDecompositionHierarchy"/>.
         /// </summary>
-        private string fieldName => this.categoryHierarchy?.FieldName;
+        private bool IsVisible => this.NestedElement.IsMemberOfCategory(this.categoryDecompositionHierarchy.Category);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectorNode{T}"/> class.
         /// </summary>
-        /// <param name="categoryHierarchy">
-        /// The <see cref="CategoryHierarchy"/> associated with this node's subtree.
+        /// <param name="categoryDecompositionHierarchy">
+        /// The <see cref="CategoryDecompositionHierarchy"/> associated with this node's subtree.
         /// </param>
         /// <param name="topElement">
         /// The <see cref="CDP4Common.EngineeringModelData.NestedElement"/> associated with this node.
@@ -130,15 +140,36 @@ namespace CDP4Reporting.DataCollection
         /// The parent node in the hierarhical tree upon which the data collector is based.
         /// </param>
         public DataCollectorNode(
-            CategoryHierarchy categoryHierarchy,
+            CategoryDecompositionHierarchy categoryDecompositionHierarchy,
             NestedElement topElement,
             DataCollectorNode<T> parent = null)
         {
             this.Initialize();
-            this.categoryHierarchy = categoryHierarchy;
             this.NestedElement = topElement;
             this.parent = parent;
-            this.rowRepresentation = this.GetRowRepresentation();
+            this.InitializeCategoryDecompositionHierarchy(categoryDecompositionHierarchy);
+        }
+
+        /// <summary>
+        /// Sets all properties according to data in the related <see cref="CategoryDecompositionHierarchy"/>
+        /// </summary>
+        /// <param name="categoryDecompositionHierarchy">
+        /// The related <see cref="CategoryDecompositionHierarchy"/>
+        /// </param>
+        private void InitializeCategoryDecompositionHierarchy(CategoryDecompositionHierarchy categoryDecompositionHierarchy)
+        {
+            this.categoryDecompositionHierarchy = categoryDecompositionHierarchy;
+            this.CategoriesInRequiredRdl = categoryDecompositionHierarchy.CategoriesInRequiredRdl;
+
+            if (categoryDecompositionHierarchy.IsRecursive)
+            {
+                var level = this.CountCategoryRecursionLevel(this.categoryDecompositionHierarchy.Category);
+                this.FieldName = $"{categoryDecompositionHierarchy.FieldName}_{Math.Min(level, categoryDecompositionHierarchy.MaximumRecursiveLevels)}";
+            }
+            else
+            {
+                this.FieldName = categoryDecompositionHierarchy.FieldName;
+            }
         }
 
         /// <summary>
@@ -189,7 +220,7 @@ namespace CDP4Reporting.DataCollection
         }
 
         /// <summary>
-        /// Checks if a category was found in this instance or up its parent tree.
+        /// Counts the times a category was (recusrively) found in this instance or up its parent tree.
         /// </summary>
         /// <param name="category">
         /// The <see cref="Category"/>.
@@ -197,15 +228,17 @@ namespace CDP4Reporting.DataCollection
         /// <returns>
         /// True if found, otherwise false.
         /// </returns>
-        internal bool HasCategoryUpTree(Category category)
+        internal int CountCategoryRecursionLevel(Category category)
         {
-            return this.NestedElement.IsMemberOfCategory(category) || (this.parent?.HasCategoryUpTree(category) ?? false);
-        }
+            var count = this.parent?.CountCategoryRecursionLevel(category) ?? 0;
 
-        /// <summary>
-        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="categoryHierarchy"/>.
-        /// </summary>
-        private bool IsVisible => this.NestedElement.IsMemberOfCategory(this.categoryHierarchy.Category);
+            if (this.NestedElement.IsMemberOfCategory(category))
+            {
+                count += 1;
+            }
+
+            return count;
+        }
 
         /// <summary>
         /// Creates a <see cref="DataTable"/> representation based on the <see cref="DataCollectorRow"/>
@@ -218,9 +251,19 @@ namespace CDP4Reporting.DataCollection
         {
             var table = new DataTable();
 
-            for (var hierarchy = this.categoryHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
+            for (var hierarchy = this.categoryDecompositionHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
             {
-                table.Columns.Add(hierarchy.FieldName, typeof(string));
+                if (hierarchy.IsRecursive)
+                {
+                    for (var recursiveCounter = 1; recursiveCounter <= hierarchy.MaximumRecursiveLevels; recursiveCounter++)
+                    {
+                        table.Columns.Add($"{hierarchy.FieldName}_{recursiveCounter}", typeof(string));
+                    }
+                }
+                else
+                {
+                    table.Columns.Add(hierarchy.FieldName, typeof(string));
+                }
             }
 
             foreach (var publicGetter in this.publicGetterProperties)
@@ -246,6 +289,11 @@ namespace CDP4Reporting.DataCollection
                 return null;
             }
 
+            if (this.rowRepresentation != null)
+            {
+                return this.rowRepresentation;
+            }
+
             var row = new T
             {
                 ElementBase = this.ElementBase,
@@ -254,14 +302,20 @@ namespace CDP4Reporting.DataCollection
 
             foreach (var rowField in this.allColumns)
             {
-                var column = Activator.CreateInstance(rowField.Value) as DataCollectorColumn<T>;
+                var newObject = Activator.CreateInstance(rowField.Value);
+                var column = newObject as DataCollectorColumn<T>;
+
+                if (newObject is DataCollectorCategory<T> categoryColumn)
+                {
+                    categoryColumn.CategoriesInRequiredRdl = this.CategoriesInRequiredRdl;
+                }
 
                 column?.Initialize(this, rowField.Key);
 
                 rowField.Key.SetValue(row, column);
             }
 
-            return row;
+            return this.rowRepresentation = row;
         }
 
         /// <summary>
@@ -276,7 +330,7 @@ namespace CDP4Reporting.DataCollection
         public IEnumerable<TP> GetColumns<TP>() where TP : DataCollectorColumn<T>
         {
             return this.allColumns.Where(x => x.Value == typeof(TP) || x.Value.IsSubclassOf(typeof(TP)))
-                .Select(x => x.Key.GetValue(this.rowRepresentation) as TP);
+                .Select(x => x.Key.GetValue(this.GetRowRepresentation()) as TP);
         }
 
         /// <summary>
@@ -288,7 +342,7 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         internal void AddDataRows(DataTable table)
         {
-            if (this.IsVisible && this.categoryHierarchy.Child == null)
+            if (this.IsVisible && this.categoryDecompositionHierarchy.Child == null)
             {
                 table.Rows.Add(this.GetDataRow(table));
             }
@@ -316,7 +370,7 @@ namespace CDP4Reporting.DataCollection
 
             foreach (var rowField in this.normalColumns)
             {
-                var column = rowField.Key.GetValue(this.rowRepresentation) as DataCollectorColumn<T>;
+                var column = rowField.Key.GetValue(this.GetRowRepresentation()) as DataCollectorColumn<T>;
 
                 column?.Populate(table, row);
             }
@@ -324,13 +378,13 @@ namespace CDP4Reporting.DataCollection
             foreach (var publicGetter in this.publicGetterProperties)
             {
                 row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
-                    this.rowRepresentation,
+                    this.GetRowRepresentation(),
                     new object[] { });
             }
 
             foreach (var rowField in this.stateDependentColumns)
             {
-                var column = rowField.Key.GetValue(this.rowRepresentation) as DataCollectorColumn<T>;
+                var column = rowField.Key.GetValue(this.GetRowRepresentation()) as DataCollectorColumn<T>;
 
                 column?.Populate(table, row);
             }
@@ -349,7 +403,7 @@ namespace CDP4Reporting.DataCollection
         {
             this.parent?.InitializeCategoryColumns(row);
 
-            row[this.fieldName] = this.ElementBase.Name;
+            row[this.FieldName] = this.ElementBase.Name;
         }
     }
 }
