@@ -224,7 +224,7 @@ namespace CDP4Requirements.Tests.Settings
         {
             if (File.Exists(this.expectedSettingsPath))
             {
-                File.Delete(this.expectedSettingsPath);
+                //File.Delete(this.expectedSettingsPath);
             }
         }
 

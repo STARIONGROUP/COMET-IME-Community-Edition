@@ -133,9 +133,6 @@ namespace CDP4Requirements
         /// </summary>
         public void Initialize()
         {
-            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(RequirementsRibbon));
-            this.RegisterRibbonParts();
-
             try
             {
                 var settings = this.PluginSettingsService.Read<RequirementsModuleSettings>(true, ConverterExtensions.BuildConverters());
@@ -153,6 +150,9 @@ namespace CDP4Requirements
                 logger.Fatal(ex);
                 throw ex;
             }
+
+            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(RequirementsRibbon));
+            this.RegisterRibbonParts();
         }
 
         /// <summary>

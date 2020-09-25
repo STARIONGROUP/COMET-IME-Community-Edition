@@ -94,40 +94,12 @@ namespace CDP4Requirements.Settings.JsonConverters
                 writer.WriteValue(pair.Key.Identifier);
                 writer.WritePropertyName(nameof(pair.Value.IsRequirement));
                 writer.WriteValue(pair.Value.IsRequirement);
-                writer.WritePropertyName(nameof(Category));
-                writer.WriteStartArray();
-                
-                foreach (var valueCategory in pair.Value.Categories)
-                {
-                    writer.WriteValue(valueCategory.Iid);
-                }
 
-                writer.WriteEndArray();
+                this.WriteThingEnumerable(writer, pair.Value.Categories);
 
-                writer.WritePropertyName(nameof(ParameterizedCategoryRule));
-                writer.WriteStartArray();
+                this.WriteThingEnumerable(writer, pair.Value.Rules);
 
-                foreach (var categoryRule in pair.Value.Rules)
-                {
-                    writer.WriteValue(categoryRule.Iid);
-                }
-
-                writer.WriteEndArray();
-
-                writer.WritePropertyName(nameof(AttributeDefinitionMap));
-                writer.WriteStartArray();
-
-                foreach (var definitionMap in pair.Value.AttributeDefinitionMap)
-                {
-                    writer.WriteStartObject();
-                    writer.WritePropertyName(nameof(AttributeDefinitionMapKind));
-                    writer.WriteValue(definitionMap.MapKind.ToString());
-                    writer.WritePropertyName(nameof(AttributeDefinition));
-                    writer.WriteValue(definitionMap.AttributeDefinition.Identifier);
-                    writer.WriteEndObject();
-                }
-
-                writer.WriteEndArray();
+                this.WriteAttributeDefinitionMap(writer, pair.Value.AttributeDefinitionMap);
 
                 writer.WriteEndObject();
             }

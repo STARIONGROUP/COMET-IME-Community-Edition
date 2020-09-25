@@ -29,6 +29,7 @@ namespace CDP4Requirements.Settings.JsonConverters
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -92,51 +93,15 @@ namespace CDP4Requirements.Settings.JsonConverters
                 writer.WriteStartObject();
                 writer.WritePropertyName(nameof(RelationGroupType));
                 writer.WriteValue(pair.Key.Identifier);
-                writer.WritePropertyName(nameof(Category));
-                writer.WriteStartArray();
+
+                this.WriteThingEnumerable(writer, pair.Value.Categories);
+
+                this.WriteThingEnumerable(writer, pair.Value.Rules);
+
+                this.WriteAttributeDefinitionMap(writer, pair.Value.AttributeDefinitionMap);
+
+                this.WriteThingEnumerable(writer, pair.Value.BinaryRelationshipRules);
                 
-                foreach (var valueCategory in pair.Value.Categories)
-                {
-                    writer.WriteValue(valueCategory.Iid);
-                }
-
-                writer.WriteEndArray();
-
-                writer.WritePropertyName(nameof(ParameterizedCategoryRule));
-                writer.WriteStartArray();
-
-                foreach (var categoryRule in pair.Value.Rules)
-                {
-                    writer.WriteValue(categoryRule.Iid);
-                }
-
-                writer.WriteEndArray();
-
-                writer.WritePropertyName(nameof(AttributeDefinitionMap));
-                writer.WriteStartArray();
-
-                foreach (var definitionMap in pair.Value.AttributeDefinitionMap)
-                {
-                    writer.WriteStartObject();
-                    writer.WritePropertyName(nameof(AttributeDefinitionMapKind));
-                    writer.WriteValue(definitionMap.MapKind.ToString());
-                    writer.WritePropertyName(nameof(AttributeDefinition));
-                    writer.WriteValue(definitionMap.AttributeDefinition.Identifier);
-                    writer.WriteEndObject();
-                }
-
-                writer.WriteEndArray();
-
-                writer.WritePropertyName(nameof(BinaryRelationshipRule));
-                writer.WriteStartArray();
-
-                foreach (var relationshipRule in pair.Value.BinaryRelationshipRules)
-                {
-                    writer.WriteValue(relationshipRule.Iid);
-                }
-
-                writer.WriteEndArray();
-
                 writer.WriteEndObject();
             }
 

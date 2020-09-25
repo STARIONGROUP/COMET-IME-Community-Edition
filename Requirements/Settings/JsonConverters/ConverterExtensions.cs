@@ -49,6 +49,50 @@ namespace CDP4Requirements.Settings.JsonConverters
     public static class ConverterExtensions
     {
         /// <summary>
+        /// Writes the Json list values of specified parameter named <see cref="value"/>
+        /// </summary>
+        /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
+        /// <param name="_">The <see cref="IReqIfJsonConverter"/> to extend</param>
+        /// <param name="writer">The <see cref="JsonWriter"/></param>
+        /// <param name="value">The <see cref="IEnumerable{T}"/> of value to write</param>
+        public static void WriteThingEnumerable<TThing>(this IReqIfJsonConverter _, JsonWriter writer, IEnumerable<TThing> value) where TThing : Thing
+        {
+            writer.WritePropertyName(typeof(TThing).Name);
+            writer.WriteStartArray();
+
+            foreach (var thing in value)
+            {
+                writer.WriteValue(thing.Iid);
+            }
+
+            writer.WriteEndArray();
+        }
+
+        /// <summary>
+        /// Writes the <see cref="AttributeDefinitionMap"/> values 
+        /// </summary>
+        /// <param name="converter">The <see cref="IReqIfJsonConverter"/> to extend</param>
+        /// <param name="writer">The <see cref="JsonWriter"/></param>
+        /// <param name="value">The array of AttributeDefinitionMap values to write</param>
+        public static void WriteAttributeDefinitionMap(this IReqIfJsonConverter converter, JsonWriter writer, AttributeDefinitionMap[] value)
+        {
+            writer.WritePropertyName(nameof(AttributeDefinitionMap));
+            writer.WriteStartArray();
+
+            foreach (var definitionMap in value)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName(nameof(AttributeDefinitionMapKind));
+                writer.WriteValue(definitionMap.MapKind.ToString());
+                writer.WritePropertyName(nameof(AttributeDefinition));
+                writer.WriteValue(definitionMap.AttributeDefinition.Identifier);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+        }
+
+        /// <summary>
         /// Gets the <see cref="Thing"/> by its <see cref="iid"/> from rdls
         /// </summary>
         /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
@@ -98,7 +142,7 @@ namespace CDP4Requirements.Settings.JsonConverters
         /// <returns>A <see cref="TSpecType"/></returns>
         public static TSpecType GetSpecType<TSpecType>(this IReqIfJsonConverter converter, string id) where TSpecType : SpecType
         {
-            return converter.ReqIfCoreContent?.SpecTypes.OfType<TSpecType>().FirstOrDefault(d => Guid.Parse(d.Identifier) == Guid.Parse(id));
+            return converter.ReqIfCoreContent?.SpecTypes.OfType<TSpecType>().FirstOrDefault(d => d.Identifier == id);
         }
 
         /// <summary>
