@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
+  <Fragment>
+    <ComponentGroup Id="CDP4REPORTING_CG" Directory="REPORTING">
+
+      <Component Id="comp_Reporting" Guid="{2468B91C-D476-4A2F-BCB3-DF416CB1CD66}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4Reporting"  Vital="yes" Source="$(var.CDP4Reporting.TargetPath)" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Manifest_CDP4Reporting" Guid="{BBDF2759-2A50-47B2-BE2A-2CE5A8F6BF45}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4Reporting"  Vital="yes" Source="$(var.CDP4Reporting.TargetDir)CDP4Reporting.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
+    </ComponentGroup>
+  </Fragment>
+</Wix>

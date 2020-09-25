@@ -1,0 +1,14 @@
+﻿<ribbon:ExtendedRibbonPageCategory x:Class="CDP4Reporting.Views.ReportingRibbonPageCategory"
+                                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                                   xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
+                                   mc:Ignorable="d"
+                                   Caption="Reporting"
+                                   IsVisible="False"
+                                   ToolTip="Reporting Controls"
+                                   x:Name="ReportingCategory"
+                                   Color="Blue"
+                                   MergeOrder="8005">
+</ribbon:ExtendedRibbonPageCategory>
