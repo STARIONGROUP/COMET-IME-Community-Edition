@@ -114,9 +114,9 @@ namespace CDP4Requirements.Settings.JsonConverters
         {
             var result = new Dictionary<DatatypeDefinition, DatatypeDefinitionMap>();
             
-            foreach (var token in JArray.Load(reader).Select(x => x.ToObject<Dictionary<string, Guid>>()))
+            foreach (var token in JArray.Load(reader).Select(x => x.ToObject<Dictionary<string, string>>()))
             {
-                if (this.GetDatatypeDefinition(token[IdentifierKey]) is { } dataTypeDefinition && this.GetThing(token[IidKey], out ParameterType parameterType))
+                if (this.GetDatatypeDefinition(token[IdentifierKey]) is { } dataTypeDefinition && this.GetThing(Guid.Parse(token[IidKey]), out ParameterType parameterType))
                 {
                     result[dataTypeDefinition] = new DatatypeDefinitionMap(dataTypeDefinition, parameterType, null);
                 }
@@ -130,9 +130,9 @@ namespace CDP4Requirements.Settings.JsonConverters
         /// </summary>
         /// <param name="id">The definition id</param>
         /// <returns>A <see cref="DatatypeDefinition"/></returns>
-        private DatatypeDefinition GetDatatypeDefinition(Guid id)
+        private DatatypeDefinition GetDatatypeDefinition(string id)
         {
-            return this.ReqIfCoreContent?.DataTypes.FirstOrDefault(d => Guid.Parse(d.Identifier) == id);
+            return this.ReqIfCoreContent?.DataTypes.FirstOrDefault(d => d.Identifier == id);
         }
     }
 }

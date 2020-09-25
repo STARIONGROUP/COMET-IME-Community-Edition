@@ -8,26 +8,23 @@ namespace CDP4Requirements.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Reactive;
-    using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using System.Windows.Navigation;
+
     using CDP4Common.EngineeringModelData;
+    
     using CDP4Composition.Navigation;
     using CDP4Composition.PluginSettingService;
-    using CDP4Composition.ViewModels;
-    using CDP4Composition.ViewModels.DialogResult;
 
     using CDP4Dal;
-    using CDP4Requirements.ReqIFDal;
+
     using CDP4Requirements.Settings.JsonConverters;
 
-    using Newtonsoft.Json;
-
     using ReactiveUI;
+    
     using ReqIFSharp;
+
     using NLog;
 
     /// <summary>
