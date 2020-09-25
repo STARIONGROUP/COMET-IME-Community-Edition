@@ -182,7 +182,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.dialog.SelectedIteration = this.dialog.Iterations.First();
             
             Assert.IsTrue(this.dialog.CanExecuteImport);
-            var resultTask = await this.dialog.OkCommand.ExecuteAsyncTask(null);
+            _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
             this.reqIfSerialiser.Verify(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null), Times.Once);
             this.pluginSettingService.Verify(x => x.Read<RequirementsModuleSettings>(true, It.IsAny<JsonConverter[]>()), Times.Once);
             var result = this.dialog.DialogResult as ReqIfImportResult;
