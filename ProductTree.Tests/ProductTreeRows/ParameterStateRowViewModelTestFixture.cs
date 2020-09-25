@@ -17,15 +17,22 @@ namespace ProductTree.Tests.ProductTreeRows
     using CDP4Common.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services.NestedElementTreeService;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
     using CDP4ProductTree.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
     using NUnit.Framework;
 
     [TestFixture]
     internal class ParameterStateRowViewModelTestFixture
     {
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<ISession> session;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
@@ -45,10 +52,19 @@ namespace ProductTree.Tests.ProductTreeRows
         private Option option;
         private DomainOfExpertise domain;
         private ParameterRowViewModel parameterRowViewModel;
+        private readonly string nestedParameterPath = "PATH";
 
         [SetUp]
         public void Setup()
         {
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.nestedElementTreeService = new Mock<INestedElementTreeService>();
+            this.nestedElementTreeService.Setup(x => x.GetNestedParameterPath(It.IsAny<ParameterBase>(), It.IsAny<Option>(), It.IsAny<ActualFiniteState>())).Returns(this.nestedParameterPath);
+
+            this.serviceLocator.Setup(x => x.GetInstance<INestedElementTreeService>()).Returns(this.nestedElementTreeService.Object);
+
             this.session = new Mock<ISession>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
@@ -102,6 +118,15 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreEqual(row.ActualState, this.state1);
             Assert.AreEqual(row.IsDefault, row.ActualState.IsDefault);
             Assert.AreSame(this.state1.Name, row.ActualState.Name);
+        }
+
+        [Test]
+        public void VerifyThatGetPathWorks()
+        {
+            this.parameterRowViewModel = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
+            var row = new ParameterStateRowViewModel(this.parameter1, this.state1, this.session.Object, this.parameterRowViewModel);
+
+            Assert.AreEqual(this.nestedParameterPath, row.GetPath());
         }
 
         [Test]

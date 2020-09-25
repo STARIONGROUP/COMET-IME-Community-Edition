@@ -1,18 +1,45 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeComponentRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
+//            Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ProductTree.ViewModels
 {
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services.NestedElementTreeService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using ReactiveUI;
 
     /// <summary>
@@ -51,6 +78,11 @@ namespace CDP4ProductTree.ViewModels
         private string modelCode;
 
         /// <summary>
+        /// The <see cref="INestedElementTreeService"/>
+        /// </summary>
+        private readonly INestedElementTreeService nestedElementTreeService = ServiceLocator.Current.GetInstance<INestedElementTreeService>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeComponentRowViewModel"/> class
         /// </summary>
         /// <param name="component">The <see cref="ParameterTypeComponent"/> represented</param>
@@ -76,6 +108,19 @@ namespace CDP4ProductTree.ViewModels
         {
             get { return this.modelCode; }
             private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
+
+        /// <summary>
+        /// Calculates the Path
+        /// </summary>
+        public string GetPath()
+        {
+            if (!(this.ContainerViewModel is ParameterOrOverrideBaseRowViewModel parameterOrOverrideBaseRowViewModel))
+            {
+                return "";
+            }
+
+            return this.nestedElementTreeService.GetNestedParameterPath(parameterOrOverrideBaseRowViewModel.Thing, parameterOrOverrideBaseRowViewModel.Option);
         }
 
         /// <summary>
