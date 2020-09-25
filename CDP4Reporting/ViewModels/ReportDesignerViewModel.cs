@@ -590,6 +590,19 @@ namespace CDP4Reporting.ViewModels
                 // Use existing datasource
                 reportDataSource.DataSource = dataSource;
                 reportDataSource.RebuildResultSchema();
+
+                //This call to MakeChanges adds a temporary datasource and removes it immediately.
+                //This triggers the UI to refresh itself.
+                this.currentReportDesignerDocument?.MakeChanges(changes => {
+                    var refreshDataSource = new CDP4ObjectDataSource
+                    {
+                        DataSource = dataSource,
+                        Name = "__temporaryDataSource__"
+                    };
+
+                    changes.AddItem(refreshDataSource);
+                    changes.RemoveItem(refreshDataSource);
+                });
             }
         }
 

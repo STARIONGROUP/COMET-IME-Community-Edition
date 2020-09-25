@@ -25,6 +25,8 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using CDP4Common.Helpers;
+
     /// <summary>
     /// Abstract base class from which all double parameter columns
     /// for a <see cref="DataCollectorRow"/> need to derive.
@@ -46,8 +48,8 @@ namespace CDP4Reporting.DataCollection
         /// </returns>
         public override double Parse(string value)
         {
-            var dataCollectorDoubleParameterParser = new DataCollectorDoubleParameterParser();
-            return dataCollectorDoubleParameterParser.Parse(value, this.ParameterBase);
+            ValueSetConverter.TryParseDouble(value, this.ParameterBase?.ParameterType, out var parsedValue);
+            return parsedValue;
         }
     }
 }
