@@ -49,7 +49,7 @@ namespace CDP4Reporting.DataCollection
         public string FieldName { get; private set; }
 
         /// <summary>
-        /// Flag indicating whether the associated <see cref="MainCategory"/> is present.
+        /// Gets or sets a value indicating whether the associated <see cref="MainCategory"/> is present.
         /// </summary>
         public bool Value { get; private set; }
 
