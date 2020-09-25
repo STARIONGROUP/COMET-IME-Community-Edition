@@ -249,12 +249,26 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void SaveMappingCommandExecute()
         {
-            var saveDialog = new SavedConfigurationDialogViewModel<RequirementsModuleSettings>(
-                this.pluginSettingsService,
-                this.importMappingConfiguration, 
-                ConverterExtensions.BuildConverters());
+            if (string.IsNullOrWhiteSpace(this.importMappingConfiguration.Name))
+            {
+                var saveDialog = new SavedConfigurationDialogViewModel<RequirementsModuleSettings>(
+                    this.pluginSettingsService,
+                    this.importMappingConfiguration,
+                    ConverterExtensions.BuildConverters());
 
                 this.dialogNavigationService.NavigateModal(saveDialog);
+            }
+            else
+            {
+                var settings = this.pluginSettingsService.Read<RequirementsModuleSettings>();
+                
+                var configurationToUpdateIndex = settings.SavedConfigurations.IndexOf(
+                    settings.SavedConfigurations.Single(x => x.Id == this.importMappingConfiguration.Id));
+                
+                settings.SavedConfigurations[configurationToUpdateIndex] = this.importMappingConfiguration;
+
+                this.pluginSettingsService.Write(settings, ConverterExtensions.BuildConverters());
+            }
         }
 
         /// <summary>                                                                                                                                        = new SpecificationTypeMapConverter(this.reqIf, this.session, this.iteration);

@@ -86,6 +86,9 @@
     <ProjectReference Include="..\Requirements\Requirements.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="ReqIF\testreq.reqif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Settings\testreq.reqif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

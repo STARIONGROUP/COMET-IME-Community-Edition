@@ -41,7 +41,7 @@ namespace CDP4Composition.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// ViewModel for the dialog to save matrix configuration
+    /// ViewModel for the dialog to save plugins configuration <see cref="IPluginSavedConfiguration"/>
     /// </summary>
     /// <typeparam name="TPluginSettings">A type of <see cref="PluginSettings"/></typeparam>
     public class SavedConfigurationDialogViewModel<TPluginSettings> : DialogViewModelBase where TPluginSettings : PluginSettings

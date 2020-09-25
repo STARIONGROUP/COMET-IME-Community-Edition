@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<REQ-IF xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en" xmlns="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd">
+  <THE-HEADER>
+    <REQ-IF-HEADER IDENTIFIER="44647ff6-ffe3-44ff-9ed9-3256e2a97f9d">
+      <COMMENT />
+      <CREATION-TIME>2020-09-09T12:27:17.4267239Z</CREATION-TIME>
+      <REPOSITORY-ID>http://localhost:5000/</REPOSITORY-ID>
+      <REQ-IF-TOOL-ID>CDP4</REQ-IF-TOOL-ID>
+      <SOURCE-TOOL-ID>CDP4</SOURCE-TOOL-ID>
+      <TITLE>LOFT (LOFT)</TITLE>
+    </REQ-IF-HEADER>
+  </THE-HEADER>
+  <CORE-CONTENT>
+    <REQ-IF-CONTENT>
+      <DATATYPES>
+        <DATATYPE-DEFINITION-STRING DESC="quality factor" IDENTIFIER="fa58a412-19a1-48bb-892c-692fa539e984" LAST-CHANGE="2020-09-09T12:27:17.433722Z" LONG-NAME="qf" MAX-LENGTH="0" />
+        <DATATYPE-DEFINITION-STRING DESC="A string datatype" IDENTIFIER="a0788043-3c29-4cdc-b656-816a1a9e111d" LAST-CHANGE="2020-09-09T12:27:17.4257235Z" LONG-NAME="String" MAX-LENGTH="0" />
+        <DATATYPE-DEFINITION-BOOLEAN DESC="A boolean datatype" IDENTIFIER="cf78e807-a8af-4816-aa0f-c7b9e7ec1520" LAST-CHANGE="2020-09-09T12:27:17.4257235Z" LONG-NAME="Boolean" />
+      </DATATYPES>
+      <SPEC-TYPES>
+        <SPECIFICATION-TYPE DESC="RequirementsSpecification" IDENTIFIER="675c8305-2ceb-49f3-92dc-8e34299c403b" LAST-CHANGE="2020-09-09T12:27:17.4377216Z" LONG-NAME="RequirementsSpecification">
+          <SPEC-ATTRIBUTES>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Short-Name Attribute" IDENTIFIER="6312b3a7-2b4f-4a10-a95a-268bef140c92" LAST-CHANGE="2020-09-09T12:27:17.4377216Z" LONG-NAME="Short-Name" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Name Attribute" IDENTIFIER="a1c43b77-8872-4e41-b59e-0483c9575d21" LAST-CHANGE="2020-09-09T12:27:17.4377216Z" LONG-NAME="Name" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Categories Attribute" IDENTIFIER="6a19ebdf-83e4-4538-8318-05d8faf3c096" LAST-CHANGE="2020-09-09T12:27:17.4377216Z" LONG-NAME="Categories" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-BOOLEAN DESC="The IsDeprecated Attribute Definition" IDENTIFIER="2a15dd13-e106-4300-b2b0-2aaee069d337" LAST-CHANGE="2020-09-09T12:27:17.4387218Z" LONG-NAME="IsDeprecated" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-BOOLEAN-REF>cf78e807-a8af-4816-aa0f-c7b9e7ec1520</DATATYPE-DEFINITION-BOOLEAN-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-BOOLEAN>
+          </SPEC-ATTRIBUTES>
+        </SPECIFICATION-TYPE>
+        <SPEC-OBJECT-TYPE DESC="Requirement" IDENTIFIER="2ff15755-fdfb-40e8-9a9e-93943cd824cf" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Requirement">
+          <SPEC-ATTRIBUTES>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Short-Name Attribute" IDENTIFIER="8f7ca64f-68ce-47d8-a2dd-27c823dd2c21" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Short-Name" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Name Attribute" IDENTIFIER="e0054b79-918b-482e-a307-44b2921209fd" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Name" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Categories Attribute" IDENTIFIER="db5cb418-715e-4bc7-9e13-81d10a89f92c" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Categories" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Requirement Text Attribute Definition" IDENTIFIER="1fb3078b-9397-4c4f-8da7-2c667869f650" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Requirement Text" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-BOOLEAN DESC="The IsDeprecated Attribute Definition" IDENTIFIER="be01017d-676e-42d2-b14e-2589ed8425e5" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="IsDeprecated" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-BOOLEAN-REF>cf78e807-a8af-4816-aa0f-c7b9e7ec1520</DATATYPE-DEFINITION-BOOLEAN-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-BOOLEAN>
+          </SPEC-ATTRIBUTES>
+        </SPEC-OBJECT-TYPE>
+        <SPEC-OBJECT-TYPE DESC="Requirement" IDENTIFIER="088bf1de-731c-4da3-8c9e-0f5f2fe87deb" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Requirement">
+          <SPEC-ATTRIBUTES>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Short-Name Attribute" IDENTIFIER="1a388177-e1e0-40b3-b99d-39717ceaae5a" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Short-Name" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Name Attribute" IDENTIFIER="791fffc1-ae27-416c-aa60-48dd6f8a4612" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Name" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Categories Attribute" IDENTIFIER="a04b5e53-32d9-41f4-a471-1155a1c08a67" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Categories" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Requirement Text Attribute Definition" IDENTIFIER="e7045f93-299c-467e-a2ea-ecb43a1b8541" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="Requirement Text" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-BOOLEAN DESC="The IsDeprecated Attribute Definition" IDENTIFIER="665369dd-1942-448f-a627-079efc0b239c" LAST-CHANGE="2020-09-09T12:27:17.4477215Z" LONG-NAME="IsDeprecated" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-BOOLEAN-REF>cf78e807-a8af-4816-aa0f-c7b9e7ec1520</DATATYPE-DEFINITION-BOOLEAN-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-BOOLEAN>
+          </SPEC-ATTRIBUTES>
+        </SPEC-OBJECT-TYPE>
+        <SPEC-OBJECT-TYPE DESC="Requirement" IDENTIFIER="31b123b6-4237-4c0d-9f2f-3dbf62e0ad08" LAST-CHANGE="2020-09-09T12:27:17.4487218Z" LONG-NAME="Requirement">
+          <SPEC-ATTRIBUTES>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Short-Name Attribute" IDENTIFIER="f0dde493-5989-450b-96b4-bb7701fda1dc" LAST-CHANGE="2020-09-09T12:27:17.4487218Z" LONG-NAME="Short-Name" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Name Attribute" IDENTIFIER="5035a2b1-11d4-4c27-8552-5a4711b1b6fd" LAST-CHANGE="2020-09-09T12:27:17.4487218Z" LONG-NAME="Name" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Categories Attribute" IDENTIFIER="248e8715-39b6-4525-a132-0721df6d5d94" LAST-CHANGE="2020-09-09T12:27:17.4487218Z" LONG-NAME="Categories" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING DESC="The Requirement Text Attribute Definition" IDENTIFIER="82dc46b7-027a-4c31-b959-5ecab5035710" LAST-CHANGE="2020-09-09T12:27:17.4487218Z" LONG-NAME="Requirement Text" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>a0788043-3c29-4cdc-b656-816a1a9e111d</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-BOOLEAN DESC="The IsDeprecated Attribute Definition" IDENTIFIER="67cd88ef-f12b-4255-81bd-a63b518a4169" LAST-CHANGE="2020-09-09T12:27:17.4487218Z" LONG-NAME="IsDeprecated" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-BOOLEAN-REF>cf78e807-a8af-4816-aa0f-c7b9e7ec1520</DATATYPE-DEFINITION-BOOLEAN-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-BOOLEAN>
+            <ATTRIBUTE-DEFINITION-STRING DESC="for non-radiating systems, if Ẕ = R + jX, then Q =|X|/R where Ẕ is impedance (item 6-51.1), R is resistance (item 6-51.2), and X is reactance (item 6-51.3)" IDENTIFIER="1f4d28ee-9173-4c5b-9399-8a4c408bd603" LAST-CHANGE="2020-09-09T12:27:17.4497218Z" IS-EDITABLE="false">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>fa58a412-19a1-48bb-892c-692fa539e984</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+          </SPEC-ATTRIBUTES>
+        </SPEC-OBJECT-TYPE>
+      </SPEC-TYPES>
+      <SPEC-OBJECTS>
+        <SPEC-OBJECT DESC="oo" IDENTIFIER="70e4ba7d-309e-481b-99cb-72860816b5fc" LAST-CHANGE="2020-09-09T12:27:17.4507218Z" LONG-NAME="oo">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="oo">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>8f7ca64f-68ce-47d8-a2dd-27c823dd2c21</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="oo">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>e0054b79-918b-482e-a307-44b2921209fd</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="-">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>db5cb418-715e-4bc7-9e13-81d10a89f92c</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="At vero eos et accus&#xD;&#xA;&#xD;&#xA;- amus et iusto odio dignissimos ducimus qui blanditiis praesentium volu&#xD;&#xA;&#xD;&#xA;- ptatum deleniti atqu&#xD;&#xA;e corrupti quos dolores et quas mo&#xD;&#xA;&#xD;&#xA;- lestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa q&#xD;&#xA;ui officia deserunt mol&#xD;&#xA;&#xD;&#xA;- &#xD;&#xA;&#xD;&#xA;- litia animi, id est&#xD;&#xA;&#xD;&#xA;-  laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tem&#xD;&#xA;&#xD;&#xA;- pore, cum soluta nobis est eligendi optio cumque&#xD;&#xA; nihil impedit quo minus&#xD;&#xA;&#xD;&#xA;-  id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.&#xD;&#xA;&#xD;&#xA;-  Temporibus autem quibusdam et aut officiis debitis aut re&#xD;&#xA;&#xD;&#xA;- &#xD;&#xA;rum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusanda&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;- kk&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;- kkk&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;- ooo&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;- oop&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;e. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias cons&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;j">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>1fb3078b-9397-4c4f-8da7-2c667869f650</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-BOOLEAN THE-VALUE="false">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-BOOLEAN-REF>be01017d-676e-42d2-b14e-2589ed8425e5</ATTRIBUTE-DEFINITION-BOOLEAN-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-BOOLEAN>
+          </VALUES>
+          <TYPE>
+            <SPEC-OBJECT-TYPE-REF>2ff15755-fdfb-40e8-9a9e-93943cd824cf</SPEC-OBJECT-TYPE-REF>
+          </TYPE>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT DESC="SquareWheels" IDENTIFIER="bdbf5db1-281f-4a92-9677-ae71cc2cb638" LAST-CHANGE="2020-09-09T12:27:17.4507218Z" LONG-NAME="SquareWheels">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="SquareWheels">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>1a388177-e1e0-40b3-b99d-39717ceaae5a</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="SquareWheels">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>791fffc1-ae27-416c-aa60-48dd6f8a4612</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="-">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>a04b5e53-32d9-41f4-a471-1155a1c08a67</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="&#xD;&#xA;&#xD;&#xA;- t&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;- h&#xD;&#xA;&#xD;&#xA;- e&#xD;&#xA;&#xD;&#xA;- w&#xD;&#xA;&#xD;&#xA;- h&#xD;&#xA;&#xD;&#xA;- e&#xD;&#xA;&#xD;&#xA;- e&#xD;&#xA;&#xD;&#xA;- l&#xD;&#xA;&#xD;&#xA;- s&#xD;&#xA;&#xD;&#xA;- s&#xD;&#xA;&#xD;&#xA;- h&#xD;&#xA;&#xD;&#xA;- a&#xD;&#xA;&#xD;&#xA;- l&#xD;&#xA;&#xD;&#xA;- l&#xD;&#xA;&#xD;&#xA;- a&#xD;&#xA;&#xD;&#xA;- l&#xD;&#xA;&#xD;&#xA;- &#xD;&#xA;&#xD;&#xA;- l&#xD;&#xA;&#xD;&#xA;- b&#xD;&#xA;&#xD;&#xA;- e&#xD;&#xA;&#xD;&#xA;- s&#xD;&#xA;&#xD;&#xA;- q&#xD;&#xA;&#xD;&#xA;- u&#xD;&#xA;&#xD;&#xA;- a&#xD;&#xA;&#xD;&#xA;- r&#xD;&#xA;&#xD;&#xA;- e&#xD;&#xA;&#xD;&#xA;- ">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>e7045f93-299c-467e-a2ea-ecb43a1b8541</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-BOOLEAN THE-VALUE="false">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-BOOLEAN-REF>665369dd-1942-448f-a627-079efc0b239c</ATTRIBUTE-DEFINITION-BOOLEAN-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-BOOLEAN>
+          </VALUES>
+          <TYPE>
+            <SPEC-OBJECT-TYPE-REF>088bf1de-731c-4da3-8c9e-0f5f2fe87deb</SPEC-OBJECT-TYPE-REF>
+          </TYPE>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT DESC="refg" IDENTIFIER="e5992fb9-89ca-4fe8-b8f0-e86a6219b100" LAST-CHANGE="2020-09-09T12:27:17.4507218Z" LONG-NAME="refg">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="refg">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>f0dde493-5989-450b-96b4-bb7701fda1dc</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="refg">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>5035a2b1-11d4-4c27-8552-5a4711b1b6fd</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="-">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>248e8715-39b6-4525-a132-0721df6d5d94</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="43 [-]">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>1f4d28ee-9173-4c5b-9399-8a4c408bd603</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias cons">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>82dc46b7-027a-4c31-b959-5ecab5035710</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-BOOLEAN THE-VALUE="false">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-BOOLEAN-REF>67cd88ef-f12b-4255-81bd-a63b518a4169</ATTRIBUTE-DEFINITION-BOOLEAN-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-BOOLEAN>
+          </VALUES>
+          <TYPE>
+            <SPEC-OBJECT-TYPE-REF>31b123b6-4237-4c0d-9f2f-3dbf62e0ad08</SPEC-OBJECT-TYPE-REF>
+          </TYPE>
+        </SPEC-OBJECT>
+      </SPEC-OBJECTS>
+      <SPECIFICATIONS>
+        <SPECIFICATION DESC="requirement" IDENTIFIER="1031fcbd-e914-4fc8-8311-6c0c58f86d92" LAST-CHANGE="2020-09-09T12:27:17.4417225Z" LONG-NAME="requirement">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="requirement">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>6312b3a7-2b4f-4a10-a95a-268bef140c92</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="requirement">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>a1c43b77-8872-4e41-b59e-0483c9575d21</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="-">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>6a19ebdf-83e4-4538-8318-05d8faf3c096</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-BOOLEAN THE-VALUE="false">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-BOOLEAN-REF>2a15dd13-e106-4300-b2b0-2aaee069d337</ATTRIBUTE-DEFINITION-BOOLEAN-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-BOOLEAN>
+          </VALUES>
+          <TYPE>
+            <SPECIFICATION-TYPE-REF>675c8305-2ceb-49f3-92dc-8e34299c403b</SPECIFICATION-TYPE-REF>
+          </TYPE>
+        </SPECIFICATION>
+        <SPECIFICATION DESC="requirement" IDENTIFIER="cc116019-91dd-496d-9dbf-6c42aea5c7ab" LAST-CHANGE="2020-09-09T12:27:17.4427219Z" LONG-NAME="requirement">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="requirement">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>6312b3a7-2b4f-4a10-a95a-268bef140c92</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="requirement">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>a1c43b77-8872-4e41-b59e-0483c9575d21</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="-">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>6a19ebdf-83e4-4538-8318-05d8faf3c096</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-BOOLEAN THE-VALUE="false">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-BOOLEAN-REF>2a15dd13-e106-4300-b2b0-2aaee069d337</ATTRIBUTE-DEFINITION-BOOLEAN-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-BOOLEAN>
+          </VALUES>
+          <TYPE>
+            <SPECIFICATION-TYPE-REF>675c8305-2ceb-49f3-92dc-8e34299c403b</SPECIFICATION-TYPE-REF>
+          </TYPE>
+          <CHILDREN>
+            <SPEC-HIERARCHY IDENTIFIER="2ced9982-740a-4b8f-add9-e169e2ac46c5" LAST-CHANGE="2020-09-09T12:27:17.4557217Z" IS-EDITABLE="false" IS-TABLE-INTERNAL="false">
+              <OBJECT>
+                <SPEC-OBJECT-REF>70e4ba7d-309e-481b-99cb-72860816b5fc</SPEC-OBJECT-REF>
+              </OBJECT>
+              <CHILDREN />
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="9235bff3-68f3-4663-bb96-d19e6e991d9a" LAST-CHANGE="2020-09-09T12:27:17.4567216Z" IS-EDITABLE="false" IS-TABLE-INTERNAL="false">
+              <OBJECT>
+                <SPEC-OBJECT-REF>bdbf5db1-281f-4a92-9677-ae71cc2cb638</SPEC-OBJECT-REF>
+              </OBJECT>
+              <CHILDREN />
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="202142f5-0870-4e98-a78f-f63c20daa018" LAST-CHANGE="2020-09-09T12:27:17.4567216Z" IS-EDITABLE="false" IS-TABLE-INTERNAL="false">
+              <OBJECT>
+                <SPEC-OBJECT-REF>e5992fb9-89ca-4fe8-b8f0-e86a6219b100</SPEC-OBJECT-REF>
+              </OBJECT>
+              <CHILDREN />
+            </SPEC-HIERARCHY>
+          </CHILDREN>
+        </SPECIFICATION>
+      </SPECIFICATIONS>
+    </REQ-IF-CONTENT>
+  </CORE-CONTENT>
+  <TOOL-EXTENSIONS />
+</REQ-IF>

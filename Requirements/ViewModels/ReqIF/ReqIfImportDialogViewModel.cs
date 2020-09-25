@@ -10,6 +10,8 @@ namespace CDP4Requirements.ViewModels
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows.Navigation;
     using CDP4Common.EngineeringModelData;
@@ -91,11 +93,12 @@ namespace CDP4Requirements.ViewModels
             }
 
             this.WhenAnyValue(vm => vm.Path).Subscribe(_ => this.UpdateCanExecuteImport());
+            
             this.WhenAnyValue(vm => vm.SelectedIteration).Subscribe(_ => this.UpdateCanExecuteImport());
+            
             var canOk = this.WhenAnyValue(vm => vm.CanExecuteImport);
-
-            this.OkCommand = ReactiveCommand.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+            
+            this.OkCommand = ReactiveCommand.CreateAsyncTask(canOk, async _ => await this.ExecuteOk());
 
             this.BrowseCommand = ReactiveCommand.Create();
             this.BrowseCommand.Subscribe(_ => this.ExecuteBrowse());
@@ -144,7 +147,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the Ok Command
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel Command
@@ -156,11 +159,6 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public ReactiveCommand<object> BrowseCommand { get; private set; }
 
-        /// <summary>
-        /// Gets the Manage saved configuration Command
-        /// </summary>
-        public ReactiveCommand<object> ManageSavedConfiguration { get; private set; }
-        
         /// <summary>
         /// Update the <see cref="CanExecuteImport"/> property
         /// </summary>
@@ -194,7 +192,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Executes the Ok Command
         /// </summary>
-        private async void ExecuteOk()
+        private async Task ExecuteOk()
         {
             this.IsBusy = true;
             this.LoadingMessage = "Importing...";
