@@ -21,6 +21,7 @@ namespace ProductTree.Tests.ProductTreeRows
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
+    using CDP4Composition.Services.NestedElementTreeService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -36,6 +37,7 @@ namespace ProductTree.Tests.ProductTreeRows
     [TestFixture]
     public class ElementDefinitionRowViewModelTestFixture
     {
+        private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<IPermissionService> permissionService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -58,7 +60,7 @@ namespace ProductTree.Tests.ProductTreeRows
         private ElementUsage elementUsage;
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
-
+        private readonly string nestedElementPath = "PATH";
 
         [SetUp]
         public void Setup()
@@ -73,8 +75,14 @@ namespace ProductTree.Tests.ProductTreeRows
             this.thingCreator = new Mock<IThingCreator>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>())
                 .Returns(this.thingCreator.Object);
+
+            this.nestedElementTreeService = new Mock<INestedElementTreeService>();
+            this.nestedElementTreeService.Setup(x => x.GetNestedElementPath(It.IsAny<ElementDefinition>(), It.IsAny<Option>())).Returns(this.nestedElementPath);
+
+            this.serviceLocator.Setup(x => x.GetInstance<INestedElementTreeService>()).Returns(this.nestedElementTreeService.Object);
 
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
@@ -126,6 +134,14 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreEqual("dom", vm.OwnerShortName );
 
             Assert.AreEqual(1, vm.ContainedRows.Count);
+        }
+
+        [Test]
+        public void VerifyThatGetPathWorks()
+        {
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+
+            Assert.AreEqual(this.nestedElementPath, vm.GetPath());
         }
 
         [Test]

@@ -5,6 +5,7 @@
                                 xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
                                 xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                 xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+                                xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                                 Name="DashboardViewRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="351"
@@ -22,7 +23,7 @@
                             Content="Dashboard"
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
-                            LargeGlyph="pack://application:,,,/CDP4IME;component/cdplogo_48x48.ico"
+                            LargeGlyph="{dx:DXImage 'Images/XAF/ModelEditor_DashboardView_32x32.png'}"
                             Hint="Open the Dashboard for the selected Option">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>

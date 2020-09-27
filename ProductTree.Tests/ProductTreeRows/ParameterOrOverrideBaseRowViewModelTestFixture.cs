@@ -21,6 +21,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
     using CDP4Composition.DragDrop;
     using CDP4Composition.Services;
+    using CDP4Composition.Services.NestedElementTreeService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -36,6 +37,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
     [TestFixture]
     public class ParameterOrOverrideBaseRowViewModelTestFixture
     {
+        private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<ISession> session;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
@@ -58,6 +60,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         private RelationalExpression relationalExpression;
         private Mock<IThingCreator> thingCreator;
         private Mock<IServiceLocator> serviceLocator;
+        private readonly string nestedParameterPath = "PATH";
 
         [SetUp]
         public void Setup()
@@ -107,6 +110,11 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
+            this.nestedElementTreeService = new Mock<INestedElementTreeService>();
+            this.nestedElementTreeService.Setup(x => x.GetNestedParameterPath(It.IsAny<ParameterBase>(), It.IsAny<Option>())).Returns(this.nestedParameterPath);
+
+            this.serviceLocator.Setup(x => x.GetInstance<INestedElementTreeService>()).Returns(this.nestedElementTreeService.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>())
                 .Returns(this.thingCreator.Object);
 
@@ -118,6 +126,60 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         public void TearDown()
         {
             CDPMessageBus.Current.ClearSubscriptions();
+        }
+
+        [Test]
+        public void VerifyThatGetPathWorks()
+        {
+            // **************************INPUT***************************************
+            var published = new ValueArray<string>(new List<string> { "manual1", "manual2" }, this.valueset);
+            var actual = new ValueArray<string>(new List<string> { "manual1", "manual2" }, this.valueset);
+
+            this.valueset.Published = published;
+            this.valueset.Manual = actual;
+            this.valueset.ValueSwitch = ParameterSwitchKind.MANUAL;
+            this.valueset.ActualOption = this.option;
+
+            var compoundtype = new CompoundParameterType(Guid.NewGuid(), null, this.uri);
+
+            var component1 = new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
+            {
+                ParameterType = this.parameterType1,
+                ShortName = "c1"
+            };
+
+            var component2 = new ParameterTypeComponent(Guid.NewGuid(), null, this.uri)
+            {
+                ParameterType = this.parameterType1,
+                ShortName = "c2"
+            };
+
+            compoundtype.Component.Add(component1);
+            compoundtype.Component.Add(component2);
+
+            var state2 = new ActualFiniteState(Guid.NewGuid(), null, this.uri);
+            this.stateList.ActualState.Add(state2);
+
+            this.parameter1.ParameterType = compoundtype;
+            this.parameter1.ValueSet.Add(this.valueset);
+            this.parameter1.IsOptionDependent = true;
+
+            var valueset2 = new ParameterValueSet(Guid.NewGuid(), null, this.uri)
+            {
+                ActualState = state2,
+                Published = published
+            };
+
+            this.parameter1.ValueSet.Add(valueset2);
+
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
+            Assert.AreEqual(this.nestedParameterPath, row.GetPath());
+
+            var row2 = new ParameterTypeComponentRowViewModel(compoundtype.Component.First(), this.session.Object, null);
+            Assert.AreEqual(string.Empty, row2.GetPath());
+
+            var row3 = new ParameterTypeComponentRowViewModel(compoundtype.Component.First(), this.session.Object, row);
+            Assert.AreEqual(this.nestedParameterPath, row3.GetPath());
         }
 
         [Test]
