@@ -81,7 +81,7 @@ namespace CDP4Requirements.ViewModels
         /// Populates the <see cref="SpecTypes"/> row properties
         /// </summary>
         /// <param name="specRelationTypeMap">The Relationship Type Map collection</param>
-        private void PopulateRelationGroupTypeMapProperties(IReadOnlyDictionary<RelationGroupType, RelationGroupTypeMap> specRelationTypeMap)
+        internal void PopulateRelationGroupTypeMapProperties(IReadOnlyDictionary<RelationGroupType, RelationGroupTypeMap> specRelationTypeMap)
         {
             foreach (var pair in specRelationTypeMap)
             {

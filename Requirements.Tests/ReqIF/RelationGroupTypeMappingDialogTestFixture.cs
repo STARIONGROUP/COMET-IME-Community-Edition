@@ -215,5 +215,46 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.IsTrue(res.GoNext.Value);
             Assert.IsNotEmpty(res.Map);
         }
+
+        [Test]
+        public void VerifyThatExistingMapIsApplied()
+        {
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var rule = new ParameterizedCategoryRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Category = category };
+            var binaryRelationshipRule = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { RelationshipCategory = category, TargetCategory = category, SourceCategory = category };
+            var categoryVm = new CategoryComboBoxItemViewModel(category, true);
+
+            Dictionary<RelationGroupType, RelationGroupTypeMap> RelationGroupTypeMaps = null;
+
+            var datatypeDefinitionMaps = new Dictionary<DatatypeDefinition, DatatypeDefinitionMap> { { this.stringDatadef, new DatatypeDefinitionMap(this.stringDatadef, this.pt, null) } };
+            var newDialog = new RelationGroupTypeMappingDialogViewModel(new List<RelationGroupType> { this.spectype }, RelationGroupTypeMaps, datatypeDefinitionMaps, this.iteration, this.session.Object, this.thingDialogNavigationService.Object, "en");
+            Assert.IsEmpty(newDialog.SpecTypes.SelectMany(x => x.SelectedCategories));
+            Assert.IsNull(newDialog.SpecTypes[0].SelectedRules);
+            Assert.IsNull(newDialog.SpecTypes[0].SelectedBinaryRelationshipRules);
+
+            var row = newDialog.SpecTypes.First();
+            row.PossibleBinaryRelationshipRules.Add(binaryRelationshipRule);
+            row.PossibleCategories.Add(categoryVm);
+            row.PossibleRules.Add(rule);
+
+            RelationGroupTypeMaps = new Dictionary<RelationGroupType, RelationGroupTypeMap>()
+            {
+                {
+                    this.spectype,
+                    new RelationGroupTypeMap(
+                        this.spectype,
+                        new[] { rule },
+                        new[] { category },
+                        new List<AttributeDefinitionMap>() { new AttributeDefinitionMap(this.attribute, AttributeDefinitionMapKind.SHORTNAME) },
+                        new[] { binaryRelationshipRule })
+                }
+            };
+
+            newDialog.PopulateRelationGroupTypeMapProperties(RelationGroupTypeMaps);
+
+            Assert.IsNotEmpty(newDialog.SpecTypes.SelectMany(x => x.SelectedCategories));
+            Assert.IsNotEmpty(newDialog.SpecTypes.SelectMany(x => x.SelectedRules));
+            Assert.IsNotEmpty(newDialog.SpecTypes.SelectMany(x => x.SelectedBinaryRelationshipRules));
+        }
     }
 }
