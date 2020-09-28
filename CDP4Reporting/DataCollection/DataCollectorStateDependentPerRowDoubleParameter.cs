@@ -25,6 +25,10 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using System.Diagnostics.CodeAnalysis;
+
+    using CDP4Common.Helpers;
+
     /// <summary>
     /// Class from which state dependent per row double parameter columns
     /// for a <see cref="DataCollectorRow"/> need to derive.
@@ -44,10 +48,11 @@ namespace CDP4Reporting.DataCollection
         /// <returns>
         /// The parsed value.
         /// </returns>
+        [ExcludeFromCodeCoverage] // Remove attribute when more logic is added to this method. It's only SDK functionality now and that is fully covered.
         public override double Parse(string value)
         {
-            var dataCollectorDoubleParameterParser = new DataCollectorDoubleParameterParser();
-            return dataCollectorDoubleParameterParser.Parse(value, this.ParameterBase);
+            ValueSetConverter.TryParseDouble(value, this.ParameterBase?.ParameterType, out var parsedValue);
+            return parsedValue;
         }
     }
 }
