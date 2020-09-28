@@ -28,6 +28,7 @@ namespace CDP4Reporting.ViewModels
     using System;
     using System.CodeDom.Compiler;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
@@ -591,19 +592,28 @@ namespace CDP4Reporting.ViewModels
                 reportDataSource.DataSource = dataSource;
                 reportDataSource.RebuildResultSchema();
 
-                //This call to MakeChanges adds a temporary datasource and removes it immediately.
-                //This triggers the UI to refresh itself.
-                this.currentReportDesignerDocument?.MakeChanges(changes => {
-                    var refreshDataSource = new CDP4ObjectDataSource
-                    {
-                        DataSource = dataSource,
-                        Name = "__temporaryDataSource__"
-                    };
-
-                    changes.AddItem(refreshDataSource);
-                    changes.RemoveItem(refreshDataSource);
-                });
+                this.TriggerRefreshReportingDesigner();
             }
+        }
+
+        /// <summary>
+        /// Triggers the UI of the Reporting Designer to refresh itself.
+        /// Currently implemented using a call to MakeChanges that adds a temporary datasource and removes it immediately.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void TriggerRefreshReportingDesigner()
+        {
+            this.currentReportDesignerDocument?.MakeChanges(changes =>
+            {
+                var refreshDataSource = new CDP4ObjectDataSource
+                {
+                    DataSource = new object(),
+                    Name = "__temporaryDataSource__"
+                };
+
+                changes.AddItem(refreshDataSource);
+                changes.RemoveItem(refreshDataSource);
+            });
         }
 
         /// <summary>
