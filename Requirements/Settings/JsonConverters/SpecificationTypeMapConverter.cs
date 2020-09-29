@@ -29,12 +29,8 @@ namespace CDP4Requirements.Settings.JsonConverters
     using System.Collections.Generic;
     using System.Linq;
 
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
     using CDP4Dal;
 
-    using CDP4Requirements.ReqIFDal;
     using CDP4Requirements.ViewModels;
 
     using Newtonsoft.Json;
@@ -45,23 +41,8 @@ namespace CDP4Requirements.Settings.JsonConverters
     /// <summary>
     /// Allows Json.Net to convert <see cref="Dictionary{TKey,TValue}"/> of type <code>Dictionary&lt;SpecificationType, SpecTypeMap&gt;</code>
     /// </summary>
-    public class SpecificationTypeMapConverter : JsonConverter<Dictionary<SpecificationType, SpecTypeMap>>, IReqIfJsonConverter
+    public class SpecificationTypeMapConverter : ReqIfJsonConverter<Dictionary<SpecificationType, SpecTypeMap>>
     {
-        /// <summary>
-        /// The <see cref="ReqIF.CoreContent"/>
-        /// </summary>
-        public ReqIFContent ReqIfCoreContent { get; private set; }
-
-        /// <summary>
-        /// The <see cref="ISession"/>
-        /// </summary>
-        public ISession Session { get; private set; }
-
-        /// <summary>
-        /// The <see cref="CDP4Common.EngineeringModelData.Iteration"/>
-        /// </summary>
-        public Iteration Iteration { get; private set; }
-
         /// <summary>
         /// Initializes a new <see cref="SpecificationTypeMapConverter"/>
         /// </summary>
@@ -74,12 +55,8 @@ namespace CDP4Requirements.Settings.JsonConverters
         /// </summary>
         /// <param name="reqIf">The associated <see cref="ReqIF"/></param>
         /// <param name="session">The <see cref="ISession"/></param>
-        /// <param name="iteration">The <see cref="iteration"/></param>
-        public SpecificationTypeMapConverter(ReqIF reqIf, ISession session, Iteration iteration)
+        public SpecificationTypeMapConverter(ReqIF reqIf, ISession session) : base(reqIf, session)
         {
-            this.ReqIfCoreContent = reqIf?.CoreContent.FirstOrDefault();
-            this.Session = session;
-            this.Iteration = iteration;
         }
 
         /// <inheritdoc cref="JsonConverter{T}.WriteJson"/>

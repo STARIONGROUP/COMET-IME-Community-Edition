@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
@@ -21,6 +40,8 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Requirements.Settings.JsonConverters;
 
+    using DevExpress.XtraRichEdit.Layout.Engine;
+
     using ReactiveUI;
     
     using ReqIFSharp;
@@ -32,6 +53,16 @@ namespace CDP4Requirements.ViewModels
     /// </summary>
     public class ReqIfImportDialogViewModel : DialogViewModelBase
     {
+        /// <summary>
+        /// Holds the string that defines that no saved mapping configuration should be use
+        /// </summary>
+        internal const string NoConfigurationText = "(None)";
+
+        /// <summary>
+        /// Holds the string that defines that the saved configuration will be automatically selected
+        /// </summary>
+        internal const string AutoConfigurationText = "(Auto)";
+
         /// <summary>
         /// The NLog logger
         /// </summary>
@@ -68,6 +99,11 @@ namespace CDP4Requirements.ViewModels
         private bool canExecuteImport;
 
         /// <summary>
+        /// Backing field for <see cref="SelectedMappingConfiguration"/>
+        /// </summary>
+        private ImportMappingConfiguration selectedMappingConfiguration;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ReqIfExportDialogViewModel"/> class
         /// </summary>
         /// <param name="sessions">The list of <see cref="ISession"/> available</param>
@@ -88,6 +124,10 @@ namespace CDP4Requirements.ViewModels
             {
                 this.Iterations.Add(new ReqIfExportIterationRowViewModel(iteration));
             }
+
+            this.AvailableMappingConfiguration = new ReactiveList<ImportMappingConfiguration>();
+
+            this.ReloadSavedConfigurations();
 
             this.WhenAnyValue(vm => vm.Path).Subscribe(_ => this.UpdateCanExecuteImport());
             
@@ -142,6 +182,15 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the selected mapping configuration
+        /// </summary>
+        public ImportMappingConfiguration SelectedMappingConfiguration
+        {
+            get => this.selectedMappingConfiguration;
+            set => this.RaiseAndSetIfChanged(ref this.selectedMappingConfiguration, value);
+        }
+
+        /// <summary>
         /// Gets the Ok Command
         /// </summary>
         public ReactiveCommand<Unit> OkCommand { get; private set; }
@@ -155,6 +204,11 @@ namespace CDP4Requirements.ViewModels
         /// Gets the Browse Command
         /// </summary>
         public ReactiveCommand<object> BrowseCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the available saved mapping configuration to choose from
+        /// </summary>
+        public ReactiveList<ImportMappingConfiguration> AvailableMappingConfiguration { get; private set; }
 
         /// <summary>
         /// Update the <see cref="CanExecuteImport"/> property
@@ -198,11 +252,8 @@ namespace CDP4Requirements.ViewModels
             {
                 var reqif = await Task.Run(() => this.serializer.Deserialize(this.Path));
 
-                var mappingConfigurations = this.pluginSettingsService.Read<RequirementsModuleSettings>(true, ConverterExtensions.BuildConverters(reqif, this.Sessions.Single(x => x.DataSourceUri == this.SelectedIteration.DataSourceUri), this.SelectedIteration.Iteration))
-                    .SavedConfigurations.Cast<ImportMappingConfiguration>();
+                var configuration = this.GetMappingConfiguation(reqif);
 
-                var configuration = mappingConfigurations.FirstOrDefault(x => x.ReqIfId == reqif.TheHeader.First().Identifier);
-                
                 this.DialogResult = new ReqIfImportResult(reqif, this.SelectedIteration.Iteration, configuration, true);
             }
             catch (Exception ex)
@@ -214,6 +265,31 @@ namespace CDP4Requirements.ViewModels
             {
                 this.IsBusy = false;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reqif"></param>
+        /// <returns></returns>
+        internal ImportMappingConfiguration GetMappingConfiguation(ReqIF reqif)
+        {
+            if (this.SelectedMappingConfiguration.Name == NoConfigurationText)
+            {
+                return null;
+            }
+
+            var mappingConfigurations = this.pluginSettingsService.Read<RequirementsModuleSettings>(true, ReqIfJsonConverterUtility.BuildConverters(reqif, this.Sessions.Single(x => x.DataSourceUri == this.SelectedIteration.DataSourceUri)))
+                .SavedConfigurations.Cast<ImportMappingConfiguration>();
+
+            if (this.SelectedMappingConfiguration.Name != AutoConfigurationText)
+            {
+                return mappingConfigurations.FirstOrDefault(
+                    x => x.Name == this.SelectedMappingConfiguration.Name);
+            }
+
+            return mappingConfigurations.FirstOrDefault(
+                x => x.ReqIfId == reqif.TheHeader.First().Identifier);
         }
 
         /// <summary>
@@ -237,6 +313,33 @@ namespace CDP4Requirements.ViewModels
             }
 
             this.Path = result.Single();
+        }
+
+        /// <summary>
+        /// Reloads the saved configurations.
+        /// </summary>
+        private void ReloadSavedConfigurations()
+        {
+            var settings = this.pluginSettingsService.Read<RequirementsModuleSettings>();
+            this.AvailableMappingConfiguration = new ReactiveList<ImportMappingConfiguration>(settings.SavedConfigurations.Cast<ImportMappingConfiguration>());
+
+            this.AvailableMappingConfiguration.Insert(
+                0, 
+                new ImportMappingConfiguration()
+                {
+                    Name = NoConfigurationText,
+                    Description = NoConfigurationText
+                });
+
+            this.AvailableMappingConfiguration.Insert(
+                0, 
+                new ImportMappingConfiguration()
+                {
+                    Name = AutoConfigurationText,
+                    Description = AutoConfigurationText
+                });
+
+            this.SelectedMappingConfiguration = this.AvailableMappingConfiguration.FirstOrDefault();
         }
     }
 }

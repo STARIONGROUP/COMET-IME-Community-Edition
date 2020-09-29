@@ -135,7 +135,7 @@ namespace CDP4Requirements
         {
             try
             {
-                var settings = this.PluginSettingsService.Read<RequirementsModuleSettings>(true, ConverterExtensions.BuildConverters());
+                var settings = this.PluginSettingsService.Read<RequirementsModuleSettings>(true, ReqIfJsonConverterUtility.BuildConverters());
 
                 PluginSettings = settings ?? new RequirementsModuleSettings();
             }

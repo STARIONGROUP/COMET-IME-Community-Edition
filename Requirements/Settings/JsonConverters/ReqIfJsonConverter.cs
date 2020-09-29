@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConverterExtensions.cs" company="RHEA System S.A.">
+// <copyright file="ReqIfJsonConverter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -9,16 +9,16 @@
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
-//    modify it under the terms of the GNU Affero General Public
+//    modify it under the terms of the GNU Affero General protected
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//    GNU Affero General Public License for more details.
+//    GNU Affero General protected License for more details.
 //
-//    You should have received a copy of the GNU Affero General Public License
+//    You should have received a copy of the GNU Affero General protected License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -30,7 +30,6 @@ namespace CDP4Requirements.Settings.JsonConverters
     using System.Linq;
 
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal;
@@ -44,18 +43,46 @@ namespace CDP4Requirements.Settings.JsonConverters
     using ReqIFSharp;
 
     /// <summary>
-    /// Provides extensions method for JsonConverters
+    /// The <see cref="ReqIfJsonConverter{T}"/> implements base Methods for 
     /// </summary>
-    public static class ConverterExtensions
+    /// <typeparam name="T"></typeparam>
+    public abstract class ReqIfJsonConverter<T> : JsonConverter<T>
     {
+        /// <summary>
+        /// The <see cref="ReqIF.CoreContent"/>
+        /// </summary>
+        protected ReqIFContent ReqIfCoreContent { get; set; }
+
+        /// <summary>
+        /// The <see cref="ISession"/>
+        /// </summary>
+        private readonly ISession session;
+
+        /// <summary>
+        /// Initializes a new <see cref="ReqIfJsonConverter{T}"/>
+        /// </summary>
+        /// <param name="reqIf">The associated <see cref="ReqIF"/></param>
+        /// <param name="session">The <see cref="ISession"/></param>
+        protected ReqIfJsonConverter(ReqIF reqIf, ISession session)
+        {
+            this.ReqIfCoreContent = reqIf?.CoreContent.FirstOrDefault();
+            this.session = session;
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="ReqIfJsonConverter{T}"/>
+        /// </summary>
+        protected ReqIfJsonConverter()
+        {
+        }
+
         /// <summary>
         /// Writes the Json list values of specified parameter named <see cref="value"/>
         /// </summary>
         /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
-        /// <param name="_">The <see cref="IReqIfJsonConverter"/> to extend</param>
         /// <param name="writer">The <see cref="JsonWriter"/></param>
         /// <param name="value">The <see cref="IEnumerable{T}"/> of value to write</param>
-        public static void WriteThingEnumerable<TThing>(this IReqIfJsonConverter _, JsonWriter writer, IEnumerable<TThing> value) where TThing : Thing
+        protected void WriteThingEnumerable<TThing>(JsonWriter writer, IEnumerable<TThing> value) where TThing : Thing
         {
             writer.WritePropertyName(typeof(TThing).Name);
             writer.WriteStartArray();
@@ -71,10 +98,9 @@ namespace CDP4Requirements.Settings.JsonConverters
         /// <summary>
         /// Writes the <see cref="AttributeDefinitionMap"/> values 
         /// </summary>
-        /// <param name="converter">The <see cref="IReqIfJsonConverter"/> to extend</param>
         /// <param name="writer">The <see cref="JsonWriter"/></param>
         /// <param name="value">The array of AttributeDefinitionMap values to write</param>
-        public static void WriteAttributeDefinitionMap(this IReqIfJsonConverter converter, JsonWriter writer, AttributeDefinitionMap[] value)
+        protected void WriteAttributeDefinitionMap(JsonWriter writer, AttributeDefinitionMap[] value)
         {
             writer.WritePropertyName(nameof(AttributeDefinitionMap));
             writer.WriteStartArray();
@@ -91,16 +117,15 @@ namespace CDP4Requirements.Settings.JsonConverters
 
             writer.WriteEndArray();
         }
-
+        
         /// <summary>
         /// Gets the <see cref="Thing"/> by its <see cref="iid"/> from rdls
         /// </summary>
         /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
-        /// <param name="converter">The <see cref="IReqIfJsonConverter"/> to extend</param>
         /// <param name="iid">The id of the <see cref="Thing"/></param>
         /// <param name="thing">The <see cref="Thing"/></param>
         /// <returns>An assert whether the <see cref="thing"/> has been found</returns>
-        public static bool GetThing<TThing>(this IReqIfJsonConverter converter, Guid iid, out TThing thing) where TThing : Thing
+        protected bool GetThing<TThing>(Guid iid, out TThing thing) where TThing : Thing
         {
             thing = default;
 
@@ -118,81 +143,43 @@ namespace CDP4Requirements.Settings.JsonConverters
                 return false;
             }
 
-            thing = converter.Session?.OpenReferenceDataLibraries.SelectMany(collectionSelector).FirstOrDefault(x => x.Iid == iid);
+            thing = this.session?.OpenReferenceDataLibraries.SelectMany(collectionSelector).FirstOrDefault(x => x.Iid == iid);
             return thing != null;
         }
 
         /// <summary>
         /// Gets <see cref="AttributeDefinition"/> by its id
         /// </summary>
-        /// <param name="converter">The <see cref="IReqIfJsonConverter"/> to extend</param>
         /// <param name="id">the id of the <see cref="AttributeDefinition"/></param>
         /// <returns>A <see cref="AttributeDefinition"/></returns>
-        public static AttributeDefinition GetAttributeDefinition(this IReqIfJsonConverter converter, string id)
+        protected AttributeDefinition GetAttributeDefinition(string id)
         {
-            return converter.ReqIfCoreContent?.SpecTypes.SelectMany(x => x.SpecAttributes).SingleOrDefault(x => x.Identifier == id);
+            return this.ReqIfCoreContent?.SpecTypes.SelectMany(x => x.SpecAttributes).SingleOrDefault(x => x.Identifier == id);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="TSpecType">The <see cref="TSpecType"/></typeparam>
-        /// <param name="converter">The <see cref="IReqIfJsonConverter"/> to extend</param>
         /// <param name="id">the id of the <see cref="TSpecType"/></param>
         /// <returns>A <see cref="TSpecType"/></returns>
-        public static TSpecType GetSpecType<TSpecType>(this IReqIfJsonConverter converter, string id) where TSpecType : SpecType
+        protected TSpecType GetSpecType<TSpecType>(string id) where TSpecType : SpecType
         {
-            return converter.ReqIfCoreContent?.SpecTypes.OfType<TSpecType>().FirstOrDefault(d => d.Identifier == id);
-        }
-
-        /// <summary>
-        /// Initializes necessary <see cref="JsonConverter"/>  for the requirement plugin
-        /// </summary>
-        /// <param name="reqIf">The <see cref="ReqIF"/></param>
-        /// <param name="session">The <see cref="ISession"/></param>
-        /// <param name="iteration">The <see cref="Iteration"/></param>
-        /// <returns>An array of <see cref="JsonConverter"/></returns>
-        public static JsonConverter[] BuildConverters(ReqIF reqIf, ISession session, Iteration iteration)
-        {
-            return new JsonConverter[]
-            {
-                new DataTypeDefinitionMapConverter(reqIf, session, iteration),
-                new SpecObjectTypeMapConverter(reqIf, session, iteration),
-                new SpecRelationTypeMapConverter(reqIf, session, iteration),
-                new RelationGroupTypeMapConverter(reqIf, session, iteration),
-                new SpecificationTypeMapConverter(reqIf, session, iteration),
-            };
-        }
-
-        /// <summary>
-        /// Initializes necessary <see cref="JsonConverter"/>  for the requirement plugin, use this overload only for writting
-        /// </summary>
-        /// <returns>An array of <see cref="JsonConverter"/></returns>
-        public static JsonConverter[] BuildConverters()
-        {
-            return new JsonConverter[]
-            {
-                new DataTypeDefinitionMapConverter(),
-                new SpecObjectTypeMapConverter(),
-                new SpecRelationTypeMapConverter(),
-                new RelationGroupTypeMapConverter(),
-                new SpecificationTypeMapConverter(),
-            };
+            return this.ReqIfCoreContent?.SpecTypes.OfType<TSpecType>().FirstOrDefault(d => d.Identifier == id);
         }
 
         /// <summary>
         /// Gets the <see cref="ParameterizedCategoryRule"/> collection
         /// </summary>
-        /// <param name="converter">The <see cref="IReqIfJsonConverter"/></param>
         /// <param name="pairs">The <see cref="IDictionary{TKey,TValue}"/> containing Json data</param>
         /// <returns>A collection of <see cref="ParameterizedCategoryRule"/></returns>
-        public static IEnumerable<ParameterizedCategoryRule> GetParameterizedCategoryRule(this IReqIfJsonConverter converter, IReadOnlyDictionary<string, object> pairs)
+        protected IEnumerable<ParameterizedCategoryRule> GetParameterizedCategoryRule(IReadOnlyDictionary<string, object> pairs)
         {
             var rules = new List<ParameterizedCategoryRule>();
 
             foreach (var ruleId in ((JContainer)pairs[nameof(ParameterizedCategoryRule)]).ToObject<IEnumerable<Guid>>())
             {
-                if (converter.GetThing(ruleId, out ParameterizedCategoryRule rule))
+                if (this.GetThing(ruleId, out ParameterizedCategoryRule rule))
                 {
                     rules.Add(rule);
                 }
@@ -204,16 +191,15 @@ namespace CDP4Requirements.Settings.JsonConverters
         /// <summary>
         /// Gets the <see cref="Category"/> collection
         /// </summary>
-        /// <param name="converter">The <see cref="IReqIfJsonConverter"/></param>
         /// <param name="pairs">The <see cref="IDictionary{TKey,TValue}"/> containing Json data</param>
         /// <returns>A collection of <see cref="Category"/></returns>
-        public static IEnumerable<Category> GetCategory(this IReqIfJsonConverter converter, IReadOnlyDictionary<string, object> pairs)
+        protected IEnumerable<Category> GetCategory(IReadOnlyDictionary<string, object> pairs)
         {
             var categories = new List<Category>();
 
             foreach (var categoryId in ((JContainer)pairs[nameof(Category)]).ToObject<IEnumerable<Guid>>())
             {
-                if (converter.GetThing(categoryId, out Category category))
+                if (this.GetThing(categoryId, out Category category))
                 {
                     categories.Add(category);
                 }
@@ -225,16 +211,15 @@ namespace CDP4Requirements.Settings.JsonConverters
         /// <summary>
         /// Gets the <see cref="BinaryRelationshipRule"/> collection
         /// </summary>
-        /// <param name="converter">The <see cref="IReqIfJsonConverter"/></param>
         /// <param name="pairs">The <see cref="IDictionary{TKey,TValue}"/> containing Json data</param>
         /// <returns>A collection of <see cref="BinaryRelationshipRule"/></returns>
-        public static IEnumerable<BinaryRelationshipRule> GetBinaryRelationshipRule(this IReqIfJsonConverter converter, IReadOnlyDictionary<string, object> pairs)
+        protected IEnumerable<BinaryRelationshipRule> GetBinaryRelationshipRule(IReadOnlyDictionary<string, object> pairs)
         {
             var binaryRelationshipRules = new List<BinaryRelationshipRule>();
 
             foreach (var binaryRelationshipRuleId in ((JContainer)pairs[nameof(BinaryRelationshipRule)]).ToObject<IEnumerable<Guid>>())
             {
-                if (converter.GetThing(binaryRelationshipRuleId, out BinaryRelationshipRule binaryRelationshipRule))
+                if (this.GetThing(binaryRelationshipRuleId, out BinaryRelationshipRule binaryRelationshipRule))
                 {
                     binaryRelationshipRules.Add(binaryRelationshipRule);
                 }
@@ -242,21 +227,20 @@ namespace CDP4Requirements.Settings.JsonConverters
 
             return binaryRelationshipRules;
         }
-        
+
         /// <summary>
         /// Gets the <see cref="AttributeDefinitionMap"/> collection
         /// </summary>
-        /// <param name="converter">The <see cref="IReqIfJsonConverter"/></param>
         /// <param name="pairs">The <see cref="IDictionary{TKey,TValue}"/> containing Json data</param>
         /// <returns>A collection of <see cref="AttributeDefinitionMap"/></returns>
-        public static IEnumerable<AttributeDefinitionMap> GetAttributeDefinitionMaps(this IReqIfJsonConverter converter, IReadOnlyDictionary<string, object> pairs)
+        protected IEnumerable<AttributeDefinitionMap> GetAttributeDefinitionMaps(IReadOnlyDictionary<string, object> pairs)
         {
             var attributeDefinitionMaps = new List<AttributeDefinitionMap>();
 
             foreach (var attributeDefinitionMap in ((JContainer)pairs[nameof(AttributeDefinitionMap)]).ToObject<IEnumerable<Dictionary<string, string>>>())
             {
                 if (Enum.TryParse(attributeDefinitionMap[nameof(AttributeDefinitionMapKind)], true, out AttributeDefinitionMapKind mapkind) &&
-                    converter.GetAttributeDefinition(attributeDefinitionMap[nameof(AttributeDefinition)]) is { } attributeDefinition)
+                    this.GetAttributeDefinition(attributeDefinitionMap[nameof(AttributeDefinition)]) is { } attributeDefinition)
                 {
                     attributeDefinitionMaps.Add(new AttributeDefinitionMap(attributeDefinition, mapkind));
                 }

@@ -254,7 +254,7 @@ namespace CDP4Requirements.ViewModels
                 var saveDialog = new SavedConfigurationDialogViewModel<RequirementsModuleSettings>(
                     this.pluginSettingsService,
                     this.importMappingConfiguration,
-                    ConverterExtensions.BuildConverters());
+                    ReqIfJsonConverterUtility.BuildConverters());
 
                 this.dialogNavigationService.NavigateModal(saveDialog);
             }
@@ -267,7 +267,7 @@ namespace CDP4Requirements.ViewModels
                 
                 settings.SavedConfigurations[configurationToUpdateIndex] = this.importMappingConfiguration;
 
-                this.pluginSettingsService.Write(settings, ConverterExtensions.BuildConverters());
+                this.pluginSettingsService.Write(settings, ReqIfJsonConverterUtility.BuildConverters());
             }
         }
 

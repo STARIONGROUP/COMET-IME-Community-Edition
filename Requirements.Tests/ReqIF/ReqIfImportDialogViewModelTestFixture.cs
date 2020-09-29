@@ -40,6 +40,7 @@ namespace CDP4Requirements.Tests.ReqIF
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services.PluginSettingService;
 
     using CDP4Dal;
     using CDP4Dal.Permission;
@@ -115,9 +116,21 @@ namespace CDP4Requirements.Tests.ReqIF
             this.spectype.SpecAttributes.Add(this.attribute);
 
             corecontent.DataTypes.Add(this.stringDatadef);
-            this.settings = new RequirementsModuleSettings() { SavedConfigurations = { new ImportMappingConfiguration() { ReqIfId = this.reqIf.TheHeader[0].Identifier} } };
+
+            this.settings = new RequirementsModuleSettings() 
+            {
+                SavedConfigurations = 
+                {
+                    new ImportMappingConfiguration()
+                    {
+                        ReqIfId = this.reqIf.TheHeader[0].Identifier, Name = "Test"
+                    }
+                }
+            };
+
             this.pluginSettingService = new Mock<IPluginSettingsService>();
             this.pluginSettingService.Setup(x => x.Read<RequirementsModuleSettings>(true, It.IsAny<JsonConverter[]>())).Returns(this.settings);
+            this.pluginSettingService.Setup(x => x.Read<RequirementsModuleSettings>(false)).Returns(this.settings);
             
             this.reqIfSerialiser = new Mock<IReqIFDeSerializer>();
             this.reqIfSerialiser.Setup(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null)).Returns(this.reqIf);
@@ -191,6 +204,56 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.AreSame(this.settings.SavedConfigurations[0], result.MappingConfiguration);
             Assert.IsNotNull(result.Iteration);
             Assert.IsNotNull(result.ReqIfObject);
+        }
+        
+        [Test]
+        public async Task VerifyThatSavedConfigurationArePickedUpCorrectly()
+        {
+            Assert.IsFalse(this.dialog.CanExecuteImport);
+            this.dialog.Path = this.path;
+            this.dialog.SelectedIteration = this.dialog.Iterations.First();
+
+            // Without Any Configuration
+            this.dialog.SelectedMappingConfiguration = this.dialog.AvailableMappingConfiguration.FirstOrDefault(x => x.Name == ReqIfImportDialogViewModel.NoConfigurationText);
+            Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.NoConfigurationText);
+            
+            Assert.IsTrue(this.dialog.CanExecuteImport);
+            _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
+            var resultNoConfiguration = this.dialog.DialogResult as ReqIfImportResult;
+            Assert.IsNotNull(resultNoConfiguration);
+            Assert.IsTrue(resultNoConfiguration?.Result.Value);
+            Assert.IsNull(resultNoConfiguration.MappingConfiguration);
+
+            //With AUTO selection of the mapping configuration
+            this.dialog.SelectedMappingConfiguration = this.dialog.AvailableMappingConfiguration.FirstOrDefault(x => x.Name == ReqIfImportDialogViewModel.AutoConfigurationText);
+            Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.AutoConfigurationText);
+            
+            Assert.IsTrue(this.dialog.CanExecuteImport);
+            _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
+
+            Assert.IsNotNull(this.dialog.SelectedMappingConfiguration);
+            var resultAutoSelectedConfiguration = this.dialog.DialogResult as ReqIfImportResult;
+            Assert.IsNotNull(resultAutoSelectedConfiguration);
+            Assert.IsTrue(resultAutoSelectedConfiguration?.Result.Value);
+            Assert.AreSame(this.settings.SavedConfigurations[0], resultAutoSelectedConfiguration.MappingConfiguration);
+
+            //With explicite selection
+            this.dialog.SelectedMappingConfiguration = this.dialog.AvailableMappingConfiguration.Last();
+            Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == this.settings.SavedConfigurations.Last().Name);
+
+            Assert.IsTrue(this.dialog.CanExecuteImport);
+            _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
+            Assert.IsNotNull(this.dialog.SelectedMappingConfiguration);
+            var result = this.dialog.DialogResult as ReqIfImportResult;
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result?.Result.Value);
+            Assert.AreSame(this.settings.SavedConfigurations[0], result.MappingConfiguration);
+
+            //Verifications on Mocks
+
+            this.reqIfSerialiser.Verify(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null), Times.Exactly(3));
+            this.pluginSettingService.Verify(x => x.Read<RequirementsModuleSettings>(false), Times.Once);
+            this.pluginSettingService.Verify(x => x.Read<RequirementsModuleSettings>(true, It.IsAny<JsonConverter[]>()), Times.Exactly(2));
         }
     }
 }

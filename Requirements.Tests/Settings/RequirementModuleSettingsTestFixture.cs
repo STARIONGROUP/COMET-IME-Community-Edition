@@ -97,11 +97,11 @@ namespace CDP4Requirements.Tests.Settings
             var reqIfPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Settings","testreq.reqif");
             this.reqIf = new ReqIFDeserializer().Deserialize(reqIfPath);
 
-            this.dataTypeDefinitionMapConverter = new DataTypeDefinitionMapConverter(this.reqIf, this.session, this.iteration);
-            this.specObjectTypeMapConverter = new SpecObjectTypeMapConverter(this.reqIf, this.session, this.iteration);
-            this.specRelationTypeMapConverter = new SpecRelationTypeMapConverter(this.reqIf, this.session, this.iteration);
-            this.relationGroupTypeMapConverter = new RelationGroupTypeMapConverter(this.reqIf, this.session, this.iteration);
-            this.specificationTypeMapConverter = new SpecificationTypeMapConverter(this.reqIf, this.session, this.iteration);
+            this.dataTypeDefinitionMapConverter = new DataTypeDefinitionMapConverter(this.reqIf, this.session);
+            this.specObjectTypeMapConverter = new SpecObjectTypeMapConverter(this.reqIf, this.session);
+            this.specRelationTypeMapConverter = new SpecRelationTypeMapConverter(this.reqIf, this.session);
+            this.relationGroupTypeMapConverter = new RelationGroupTypeMapConverter(this.reqIf, this.session);
+            this.specificationTypeMapConverter = new SpecificationTypeMapConverter(this.reqIf, this.session);
         }
 
         private void SetupData()

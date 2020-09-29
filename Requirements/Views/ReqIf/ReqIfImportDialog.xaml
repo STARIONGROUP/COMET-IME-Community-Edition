@@ -12,8 +12,7 @@
     Title="Import Requirement Data from ReqIF file..." 
     dx:ThemeManager.ThemeName="Seven"
     navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
-    Height="350" 
-    Width="525">
+    Height="390" Width="525">
 
     <Grid>
         <dxlc:LayoutControl Background="White" Orientation="Vertical">
@@ -72,6 +71,24 @@
                                 Content="..." />
                     </Grid>
 
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem AddColonToLabel="True" 
+                                 LabelPosition="Top"
+                                 Label="Saved Mapping">
+
+                    <dxe:ComboBoxEdit EditValue="{Binding SelectedMappingConfiguration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ItemsSource="{Binding AvailableMappingConfiguration, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          AutoComplete="True"
+                                          AllowNullInput="True"
+                                          AllowDefaultButton="True"
+                                          DisplayMember="Name">
+                        <dxe:ComboBoxEdit.ItemContainerStyle>
+                            <Style TargetType="dxe:ComboBoxEditItem">
+                                <Setter Property="ToolTip"
+                                            Value="{Binding Description}" />
+                            </Style>
+                        </dxe:ComboBoxEdit.ItemContainerStyle>
+                    </dxe:ComboBoxEdit>
                 </dxlc:LayoutItem>
             </dxlc:LayoutGroup>
             

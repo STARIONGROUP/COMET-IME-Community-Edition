@@ -11,11 +11,17 @@ namespace CDP4Requirements.Tests.Controls
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Navigation;
+    using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Requirements.ViewModels;
     using Microsoft.Practices.ServiceLocation;
     using Moq;
+
+    using Newtonsoft.Json;
+
     using NUnit.Framework;
 
     using ReqIFSharp;
@@ -32,6 +38,7 @@ namespace CDP4Requirements.Tests.Controls
 
         private Assembler assembler;
         private Mock<IOpenSaveFileDialogService> fileDialogService;
+        private Mock<IPluginSettingsService> pluginSettingService;
 
         [SetUp]
         public void Setup()
@@ -41,6 +48,13 @@ namespace CDP4Requirements.Tests.Controls
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<ReqIfExportDialogViewModel>()));
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<ReqIfImportDialogViewModel>()));
+            this.pluginSettingService = new Mock<IPluginSettingsService>();
+
+            this.pluginSettingService.Setup(
+                x => 
+                    x.Read<RequirementsModuleSettings>(
+                        It.IsAny<bool>(), It.IsAny<JsonConverter[]>())).Returns(
+                new RequirementsModuleSettings());
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             
@@ -49,6 +63,9 @@ namespace CDP4Requirements.Tests.Controls
 
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>())
                 .Returns(this.fileDialogService.Object);
+
+            this.serviceLocator.Setup(x => x.GetInstance<IPluginSettingsService>())
+                .Returns(this.pluginSettingService.Object);
 
             this.assembler = new Assembler(this.uri);
             this.session = new Mock<ISession>();
