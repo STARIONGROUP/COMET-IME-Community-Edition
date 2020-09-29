@@ -271,7 +271,7 @@ namespace CDP4Requirements.ViewModels
             }
         }
 
-        /// <summary>                                                                                                                                        = new SpecificationTypeMapConverter(this.reqIf, this.session, this.iteration);
+        /// <summary>
         /// Execute the <see cref="InspectCommand"/>
         /// </summary>
         protected virtual void ExecuteInspectCommand()
