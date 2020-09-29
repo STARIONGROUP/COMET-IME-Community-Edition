@@ -25,6 +25,7 @@
 
 namespace CDP4Reporting.Tests.DataCollection
 {
+    using System;
     using System.Linq;
 
     using CDP4Common.Helpers;
@@ -42,6 +43,21 @@ namespace CDP4Reporting.Tests.DataCollection
         {
             [DefinedThingShortName("type4", "TypeFour")]
             public DataCollectorStateDependentPerRowDoubleParameter<Row> parameter4 { get; set; }
+        }
+
+        private class NoActualStateRow : DataCollectorRow
+        {
+            [DefinedThingShortName("type1", "typeOne")]
+            public DataCollectorStateDependentPerRowDoubleParameter<NoActualStateRow> parameter1 { get; set; }
+        }
+
+        private class ErrorRow : DataCollectorRow
+        {
+            [DefinedThingShortName("type1", "typeOne")]
+            public DataCollectorStateDependentPerRowDoubleParameter<ErrorRow> parameter1 { get; set; }
+
+            [DefinedThingShortName("type4", "TypeFour")]
+            public DataCollectorStateDependentPerRowDoubleParameter<ErrorRow> parameter4 { get; set; }
         }
 
         [SetUp]
@@ -70,6 +86,48 @@ namespace CDP4Reporting.Tests.DataCollection
             Assert.IsTrue(node.GetTable().Columns.Contains("TypeFour_state"));
 
             Assert.AreEqual(2, node.GetTable().Rows.Count);
+        }
+
+        [Test]
+        public void VerifyThatParametersWithoutStateDependenciesWork()
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.dataCollectorParameterTestFixture.iteration, this.dataCollectorParameterTestFixture.cat1.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<NoActualStateRow>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.dataCollectorParameterTestFixture.option).ToList();
+
+            var node = dataSource.CreateNodes(
+                hierarchy,
+                nestedElementTree).First();
+
+            Assert.AreEqual(1, node.GetColumns<DataCollectorStateDependentPerRowDoubleParameter<NoActualStateRow>>().Count());
+
+            Assert.IsTrue(node.GetTable().Columns.Contains("TypeOne"));
+            Assert.IsTrue(node.GetTable().Columns.Contains("TypeOne_state"));
+
+            Assert.AreEqual(1, node.GetTable().Rows.Count);
+
+            Assert.AreEqual(DBNull.Value, node.GetTable().Rows[0]["TypeOne_state"]);
+        }
+
+        [Test]
+        public void VerifyThatMultipleStateDependentPerRowColumnsISNotAllowed()
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.dataCollectorParameterTestFixture.iteration, this.dataCollectorParameterTestFixture.cat1.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<ErrorRow>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.dataCollectorParameterTestFixture.option).ToList();
+
+            Assert.Throws<NotSupportedException>(() =>
+            {
+                var node = dataSource.CreateNodes(
+                    hierarchy,
+                    nestedElementTree).First();
+            });
         }
     }
 }

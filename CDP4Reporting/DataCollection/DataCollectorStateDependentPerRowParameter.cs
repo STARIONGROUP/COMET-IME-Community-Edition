@@ -79,14 +79,14 @@ namespace CDP4Reporting.DataCollection
                         table.Columns.Add(columnName, typeof(TValue));
                     }
 
-                    currentRow[columnName] = this.Parse(valueSet.ActualValue.First());
+                    currentRow[columnName] = this.Parse(valueSet.ActualValue?.First());
 
                     if (!table.Columns.Contains(columnStateName))
                     {
                         table.Columns.Add(columnStateName, typeof(string));
                     }
 
-                    currentRow[columnStateName] = valueSet.ActualState.ShortName;
+                    currentRow[columnStateName] = valueSet.ActualState?.ShortName;
 
                     copyRow = true;
                 }
