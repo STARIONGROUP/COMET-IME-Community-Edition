@@ -27,7 +27,6 @@ namespace CDP4Requirements.Tests.ReqIF
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -42,8 +41,6 @@ namespace CDP4Requirements.Tests.ReqIF
 
     using CDP4Dal;
     using CDP4Dal.Permission;
-
-    using DevExpress.Xpf.Layout.Core;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -319,32 +316,6 @@ namespace CDP4Requirements.Tests.ReqIF
                 .Returns(new RelationshipMappingDialogResult(specrelationTypeMap, true, true));
 
             Assert.DoesNotThrow(() => this.importMappingManager.StartMapping());
-        }
-
-        [Test]
-        public void VerifySaveMapping()
-        {
-            Assert.DoesNotThrow(() => this.importMappingManager.SaveDataTypeDefinitionMap());
-            
-            this.importMappingManager.StartMapping();
-
-            //this.importMappingManager. = new Dictionary<Specification, RequirementsSpecification>()
-            //{
-            //    {
-            //        new Specification() {Identifier = Guid.NewGuid().ToString(), Description = "description0"}, 
-            //        new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            //    },
-            //    {
-            //        new Specification() {Identifier = Guid.NewGuid().ToString(), Description = "description1"}, 
-            //        new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            //    },
-            //    {
-            //        new Specification() {Identifier = Guid.NewGuid().ToString(), Description = "description2"}, 
-            //        new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            //    },
-            //};
-
-            Assert.DoesNotThrow(() => this.importMappingManager.SaveDataTypeDefinitionMap());
         }
     }
 }

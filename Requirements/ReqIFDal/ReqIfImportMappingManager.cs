@@ -81,7 +81,7 @@ namespace CDP4Requirements.ReqIFDal
         private readonly Iteration iteration;
 
         /// <summary>
-        /// The <see cref="ImportMappingConfiguration"/> in wich the mapping will be held and save at will
+        /// The <see cref="ImportMappingConfiguration"/> in which the mapping will be held and save at will
         /// </summary>
         private readonly ImportMappingConfiguration mappingConfiguration;
 

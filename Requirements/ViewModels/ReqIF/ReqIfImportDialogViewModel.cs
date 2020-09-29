@@ -279,7 +279,7 @@ namespace CDP4Requirements.ViewModels
                 return null;
             }
 
-            var mappingConfigurations = this.pluginSettingsService.Read<RequirementsModuleSettings>(true, ConverterExtensions.BuildConverters(reqif, this.Sessions.Single(x => x.DataSourceUri == this.SelectedIteration.DataSourceUri), this.SelectedIteration.Iteration))
+            var mappingConfigurations = this.pluginSettingsService.Read<RequirementsModuleSettings>(true, ReqIfJsonConverterUtility.BuildConverters(reqif, this.Sessions.Single(x => x.DataSourceUri == this.SelectedIteration.DataSourceUri)))
                 .SavedConfigurations.Cast<ImportMappingConfiguration>();
 
             if (this.SelectedMappingConfiguration.Name != AutoConfigurationText)
