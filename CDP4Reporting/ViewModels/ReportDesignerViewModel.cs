@@ -681,14 +681,14 @@ namespace CDP4Reporting.ViewModels
             var reportingParameters = parameters.ToList();
 
             var toBeRemoved = new List<Parameter>();
-            var defaultValues = new Dictionary<string, object>();
+            var previouslySetValues = new Dictionary<string, object>();
 
             //Find existing dynamic parameters
             foreach (var reportParameter in this.CurrentReport.Parameters)
             {
                 if (reportParameter.Name.StartsWith(ReportingParameter.NamePrefix))
                 {
-                    defaultValues.Add(reportParameter.Name, reportParameter.Value);
+                    previouslySetValues.Add(reportParameter.Name, reportParameter.Value);
                     toBeRemoved.Add(reportParameter);
                 }
             }
@@ -731,10 +731,16 @@ namespace CDP4Reporting.ViewModels
                 }
 
                 // Restore default values
-                if (defaultValues.ContainsKey(reportingParameter.ParameterName))
+                if (reportingParameter.Visible && previouslySetValues.ContainsKey(reportingParameter.ParameterName))
                 {
-                    newReportParameter.Value = defaultValues[reportingParameter.ParameterName];
+                    newReportParameter.Value = previouslySetValues[reportingParameter.ParameterName];
                 }
+                else if (reportingParameter.DefaultValue != null)
+                {
+                    newReportParameter.Value = reportingParameter.DefaultValue;
+                }
+
+                newReportParameter.Visible = reportingParameter.Visible;
 
                 // Add dynamic parameter to report definition
                 this.currentReportDesignerDocument?.MakeChanges(
