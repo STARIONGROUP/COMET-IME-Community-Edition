@@ -98,10 +98,14 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
             var modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, null);
+            var iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, null);
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
 
-            engineeringModel.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
-            engineeringModel.EngineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+            iterationSetup.Container = engineeringModelSetup;
+            engineeringModel.EngineeringModelSetup = engineeringModelSetup;
+            engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
 
+            this.iteration.IterationSetup = iterationSetup;
             this.iteration.Container = engineeringModel;
 
             // Categories
@@ -182,14 +186,16 @@ namespace CDP4Reporting.Tests.DataCollection
             {
                 ShortName = "ed1",
                 Name = "element definition 1",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed2 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed2",
                 Name = "element definition 2",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             // Element Usages

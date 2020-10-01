@@ -108,14 +108,19 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
             var modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, null);
+            var iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, null);
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
 
-            engineeringModel.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
-            engineeringModel.EngineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+            engineeringModel.EngineeringModelSetup = engineeringModelSetup;
+            engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
 
+            this.iteration.Container = engineeringModel;
+            iterationSetup.Container = engineeringModelSetup;
+
+            this.iteration.IterationSetup = iterationSetup;
             this.iteration.Container = engineeringModel;
 
             // Option
-
             this.option = new Option(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "option1",
@@ -125,7 +130,6 @@ namespace CDP4Reporting.Tests.DataCollection
             this.iteration.Option.Add(this.option);
 
             // Categories
-
             this.cat1 = new Category(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "cat1",
@@ -178,7 +182,8 @@ namespace CDP4Reporting.Tests.DataCollection
             {
                 ShortName = "ed1",
                 Name = "element definition 1",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             var parameter = new Parameter(Guid.NewGuid(), this.cache, null);
@@ -207,49 +212,56 @@ namespace CDP4Reporting.Tests.DataCollection
             {
                 ShortName = "ed2p",
                 Name = "element definition 2p",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed2n = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed2n",
                 Name = "element definition 2n",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed3 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed3",
                 Name = "element definition 3",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed4 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed4",
                 Name = "element definition 4",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed5 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed5",
                 Name = "element definition 5 same category",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed6 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed6",
                 Name = "element definition 6 no category",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed7 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed7",
                 Name = "element definition 7 ",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             // Element Usages

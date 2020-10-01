@@ -133,9 +133,17 @@ namespace CDP4Reporting.Tests.DataCollection
             this.model.Iteration.Add(this.iteration);
 
             var modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, null);
+            var iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, null);
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
 
-            this.model.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
-            this.model.EngineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+            this.model.EngineeringModelSetup = engineeringModelSetup;
+
+            iterationSetup.Container = engineeringModelSetup;
+            this.model.EngineeringModelSetup = engineeringModelSetup;
+            engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+
+            this.iteration.IterationSetup = iterationSetup;
+            this.iteration.Container = this.model;
 
             // Option
 

@@ -42,6 +42,37 @@
         <File Id="_35A4943B" Vital="yes" Source="$(var.CDP4ShellDialogs.TargetPath)" KeyPath="yes" />
       </Component>
 
+      <Component Id="_9FC869835B58" Guid="{8A0C86D0-F677-4DB8-A670-9FC869835B58}" Location="local" Win64="$(var.Win64)">
+        <File Id="_8A0C86D0" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)CDP4UpdateServerDal.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="_4FCE2A4CFC36" Guid="{5548D940-7CB2-45FD-AC59-4FCE2A4CFC36}" Location="local" Win64="$(var.Win64)">
+        <File Id="_5548D940" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)Microsoft.Web.Infrastructure.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="_6D720DCD465E" Guid="{893269E3-D690-4A57-A11D-6D720DCD465E}" Location="local" Win64="$(var.Win64)">
+        <File Id="_893269E3" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.Helpers.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="_FEABE3418FF3" Guid="{C8228B58-6B85-4F2D-BA8A-FEABE3418FF3}" Location="local" Win64="$(var.Win64)">
+        <File Id="_C8228B58" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.Mvc.dll" KeyPath="yes" />
+      </Component>
+      
+      <Component Id="_EEF397B38B08" Guid="{51FAF09F-FA44-45C3-8E0F-EEF397B38B08}" Location="local" Win64="$(var.Win64)">
+        <File Id="_51FAF09F" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.Razor.dll" KeyPath="yes" />
+      </Component>
+      
+      <Component Id="_3CF6F0369232" Guid="{510C49BC-ADCD-43E0-B7B0-3CF6F0369232}" Location="local" Win64="$(var.Win64)">
+        <File Id="_510C49BC" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.WebPages.Deployment.dll" KeyPath="yes" />
+      </Component>
+      
+      <Component Id="_FD5285E2B91A" Guid="{9130FB95-EA85-424C-8776-FD5285E2B91A}" Location="local" Win64="$(var.Win64)">
+        <File Id="_9130FB95" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.WebPages.dll" KeyPath="yes" />
+      </Component>
+      
+      <Component Id="_3753BF54D1CB" Guid="{04240947-6EED-4E5C-993C-3753BF54D1CB}" Location="local" Win64="$(var.Win64)">
+        <File Id="_04240947" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.WebPages.Razor.dll" KeyPath="yes" />
+      </Component>
     </ComponentGroup>
   </Fragment>
 </Wix>
