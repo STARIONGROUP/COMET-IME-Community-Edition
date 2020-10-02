@@ -71,16 +71,31 @@ namespace CDP4Requirements.ViewModels
 
             if (specRelationTypeMap != null)
             {
-                foreach (var pair in specRelationTypeMap)
-                {
-                    var row = this.SpecTypes.Single(x => x.Identifiable == pair.Key);
-                    row.SelectedRules = new ReactiveList<ParameterizedCategoryRule>(row.PossibleRules.Where(r => pair.Value.Rules.Contains(r)));
-                    row.SelectedBinaryRelationshipRules = new ReactiveList<BinaryRelationshipRule>(row.PossibleBinaryRelationshipRules.Where(r => pair.Value.BinaryRelationshipRules.Contains(r)));
-                    row.SelectedCategories = new ReactiveList<CategoryComboBoxItemViewModel>(row.PossibleCategories.Where(c => pair.Value.Categories.Contains(c.Category)));
-                }
+                this.PopulateRelationGroupTypeMapProperties(specRelationTypeMap);
             }
 
             this.UpdateCanOk();
+        }
+
+        /// <summary>
+        /// Populates the <see cref="SpecTypes"/> row properties
+        /// </summary>
+        /// <param name="specRelationTypeMap">The Relationship Type Map collection</param>
+        internal void PopulateRelationGroupTypeMapProperties(IReadOnlyDictionary<RelationGroupType, RelationGroupTypeMap> specRelationTypeMap)
+        {
+            foreach (var pair in specRelationTypeMap)
+            {
+                var row = this.SpecTypes.SingleOrDefault(x => x.Identifiable.Identifier == pair.Key.Identifier);
+
+                if (row is null)
+                {
+                    continue;
+                }
+
+                row.SelectedRules = new ReactiveList<ParameterizedCategoryRule>(row.PossibleRules.Where(x => pair.Value.Rules?.FirstOrDefault(r => r.Iid == x.Iid) != null));
+                row.SelectedCategories = new ReactiveList<CategoryComboBoxItemViewModel>(row.PossibleCategories.Where(x => pair.Value.Categories?.FirstOrDefault(r => r.Iid == x.Category.Iid) != null));
+                row.SelectedBinaryRelationshipRules = new ReactiveList<BinaryRelationshipRule>(row.PossibleBinaryRelationshipRules.Where(r => pair.Value.BinaryRelationshipRules?.FirstOrDefault(x => x.Iid == r.Iid) != null));
+            }
         }
 
         /// <summary>

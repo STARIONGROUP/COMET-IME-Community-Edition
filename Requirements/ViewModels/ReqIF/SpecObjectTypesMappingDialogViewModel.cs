@@ -78,12 +78,19 @@ namespace CDP4Requirements.ViewModels
             {
                 foreach (var pair in specTypeMap)
                 {
-                    var row = this.SpecTypes.Single(x => x.Identifiable == pair.Key);
-                    row.SelectedRules = new ReactiveList<ParameterizedCategoryRule>(row.PossibleRules.Where(x => pair.Value.Rules != null && pair.Value.Rules.Contains(x)));
-                    row.SelectedCategories = new ReactiveList<CategoryComboBoxItemViewModel>(row.PossibleCategories.Where(x => pair.Value.Categories != null && pair.Value.Categories.Contains(x.Category)));
+                    var row = this.SpecTypes.SingleOrDefault(x => x.Identifiable.Identifier == pair.Key.Identifier);
+
+                    if (row is null)
+                    {
+                        continue;
+                    }
+
+                    row.SelectedRules = new ReactiveList<ParameterizedCategoryRule>(row.PossibleRules.Where(x => pair.Value.Rules?.FirstOrDefault(r => r.Iid == x.Iid) != null));
+                    row.SelectedCategories = new ReactiveList<CategoryComboBoxItemViewModel>(row.PossibleCategories.Where(x => pair.Value.Categories?.FirstOrDefault(r => r.Iid == x.Category.Iid) != null));
+                    
                     foreach (var attributeDefinitionMap in pair.Value.AttributeDefinitionMap)
                     {
-                        var attRow = this.SpecTypes.SelectMany(x => x.AttributeDefinitions).Single(x => x.Identifiable == attributeDefinitionMap.AttributeDefinition);
+                        var attRow = this.SpecTypes.SelectMany(x => x.AttributeDefinitions).Single(x => x.Identifiable.Identifier == attributeDefinitionMap.AttributeDefinition.Identifier);
                         attRow.AttributeDefinitionMapKind = attributeDefinitionMap.MapKind;
                     }
                 }

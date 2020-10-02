@@ -29,7 +29,9 @@ namespace CDP4RelationshipMatrix
     using System.Linq;
 
     using CDP4Common.CommonData;
+
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services.PluginSettingService;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
@@ -65,7 +67,7 @@ namespace CDP4RelationshipMatrix
             DisplayKind.Name,
             DisplayKind.ShortName
         };
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixPluginSettings"/> class
         /// </summary>
@@ -82,7 +84,7 @@ namespace CDP4RelationshipMatrix
                 this.PossibleDisplayKinds = new List<DisplayKind>();
             }
 
-            this.SavedConfigurations = new List<SavedConfiguration>();
+            this.SavedConfigurations = new List<IPluginSavedConfiguration>();
         }
 
         /// <summary>
@@ -96,11 +98,5 @@ namespace CDP4RelationshipMatrix
         /// </summary>
         [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
         public List<DisplayKind> PossibleDisplayKinds { get; set; }
-
-        /// <summary>
-        /// Gets or sets the saved <see cref="SavedConfiguration"/>s
-        /// </summary>
-        [JsonProperty]
-        public List<SavedConfiguration> SavedConfigurations { get; set; }
     }
 }

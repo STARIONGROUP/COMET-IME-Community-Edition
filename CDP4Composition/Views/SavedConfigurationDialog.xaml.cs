@@ -4,10 +4,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4RelationshipMatrix.Views
+namespace CDP4Composition.Views
 {
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+
     using DevExpress.Xpf.Core;
 
     /// <summary>

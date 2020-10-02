@@ -34,6 +34,8 @@ namespace CDP4Requirements
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4OfficeInfrastructure;
+
+    using CDP4Requirements.Settings.JsonConverters;
     using CDP4Requirements.Views;
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
@@ -131,18 +133,16 @@ namespace CDP4Requirements
         /// </summary>
         public void Initialize()
         {
-            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(RequirementsRibbon));
-            this.RegisterRibbonParts();
-
             try
             {
-                var settings = this.PluginSettingsService.Read<RequirementsModuleSettings>();
-                PluginSettings = settings;
+                var settings = this.PluginSettingsService.Read<RequirementsModuleSettings>(true, ReqIfJsonConverterUtility.BuildConverters());
+
+                PluginSettings = settings ?? new RequirementsModuleSettings();
             }
             catch (PluginSettingsException pluginSettingsException)
             {
-                var relationshipMatrixPluginSettings = new RequirementsModuleSettings();
-                this.PluginSettingsService.Write(relationshipMatrixPluginSettings);
+                var moduleSettings = new RequirementsModuleSettings();
+                this.PluginSettingsService.Write(moduleSettings);
                 logger.Error(pluginSettingsException);
             }
             catch (Exception ex)
@@ -150,6 +150,9 @@ namespace CDP4Requirements
                 logger.Fatal(ex);
                 throw ex;
             }
+
+            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(RequirementsRibbon));
+            this.RegisterRibbonParts();
         }
 
         /// <summary>

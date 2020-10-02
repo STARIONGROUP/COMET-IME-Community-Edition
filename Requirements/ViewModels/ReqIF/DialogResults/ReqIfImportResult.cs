@@ -20,11 +20,13 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         /// <param name="reqIfObject">The <see cref="ReqIF"/> object</param>
         /// <param name="iteration">The selected <see cref="Iteration"/></param>
+        /// <param name="mappingConfiguration">The Selected <see cref="ImportMappingConfiguration"/></param>
         /// <param name="res">A value indicating whether the task in the </param>
-        public ReqIfImportResult(ReqIF reqIfObject, Iteration iteration, bool? res) : base(res)
+        public ReqIfImportResult(ReqIF reqIfObject, Iteration iteration, ImportMappingConfiguration mappingConfiguration, bool? res) : base(res)
         {
             this.ReqIfObject = reqIfObject;
             this.Iteration = iteration;
+            this.MappingConfiguration = mappingConfiguration;
         }
 
         /// <summary>
@@ -36,5 +38,10 @@ namespace CDP4Requirements.ViewModels
         /// Gets the <see cref="Iteration"/> in which the requirements shall be contained
         /// </summary>
         public Iteration Iteration { get; private set; }
+
+        /// <summary>
+        /// Gets the selected <see cref="ImportMappingConfiguration"/> 
+        /// </summary>
+        public ImportMappingConfiguration MappingConfiguration { get; private set; }
     }
 }
