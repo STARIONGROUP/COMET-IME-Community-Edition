@@ -36,7 +36,7 @@ namespace CDP4Reporting.DataCollection
     /// <summary>
     /// Abstract base class from which all parameter columns for a <see cref="DataCollectorRow"/> need to derive.
     /// </summary>
-    public abstract class DataCollectorParameter<TRow, TValue> : DataCollectorColumn<TRow> where TRow : DataCollectorRow, new()
+    public abstract class DataCollectorParameter<TRow, TValue> : DataCollectorColumn<TRow>, IDataCollectorParameter where TRow : DataCollectorRow, new()
     {
         /// <summary>
         /// The associated <see cref="CDP4Common.EngineeringModelData.ParameterBase"/>.
@@ -57,7 +57,44 @@ namespace CDP4Reporting.DataCollection
         /// The value of the associated <see cref="ParameterOrOverrideBase"/>.
         /// The <see cref="IValueSet"/>s of the associated <see cref="ParameterBase"/>.
         /// </summary>
-        public TValue Value => this.Parse(this.ValueSets?.FirstOrDefault()?.ActualValue?.FirstOrDefault()) ?? default;
+        public TValue Value
+        {
+            get
+            {
+                if (this.ValueSets?.Any() ?? false)
+                {
+                    var valueSet = this.ValueSets.FirstOrDefault();
+
+                        return this.GetValueSetValue(valueSet);
+                }
+
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// Get the correct value of a <see cref="IValueSet"/>.
+        /// </summary>
+        /// <param name="valueSet">The <see cref="IValueSet"/></param>
+        /// <returns>The correct value of the <see cref="IValueSet"/></returns>
+        protected TValue GetValueSetValue(IValueSet valueSet)
+        {
+            if (valueSet is ParameterSubscriptionValueSet)
+            {
+                {
+                    return this.Parse(valueSet.Computed.FirstOrDefault()) ?? default;
+                }
+            }
+
+            if (valueSet is ParameterValueSetBase valueSetBase)
+            {
+                {
+                    return this.Parse(valueSetBase.Published.FirstOrDefault()) ?? default;
+                }
+            }
+
+            return default;
+        }
 
         /// <summary>
         /// The ValueSets of the associated object.
@@ -99,7 +136,7 @@ namespace CDP4Reporting.DataCollection
             var nestedParameterData =
                 this.Node.NestedElement.NestedParameter
                 .Where(x => x.AssociatedParameter.ParameterType.ShortName == this.ShortName)
-                .Select(x => x.ValueSet)
+                .Select(x => x.ValueSet as ParameterValueSetBase)
                 .ToList();
 
             if (nestedParameterData.Any())
@@ -120,7 +157,7 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         public override void Populate(DataTable table, DataRow row)
         {
-            if (this.ValueSets?.Any() ?? false)
+            if (this.HasValueSets)
             {
                 foreach (var valueSet in this.ValueSets)
                 {
@@ -131,7 +168,7 @@ namespace CDP4Reporting.DataCollection
                         table.Columns.Add(columnName, typeof(TValue));
                     }
 
-                    row[columnName] = this.Parse(valueSet.ActualValue.First());
+                    row[columnName] = this.Value;
                 }
             }
         }
@@ -147,5 +184,18 @@ namespace CDP4Reporting.DataCollection
         /// The parsed value.
         /// </returns>
         public abstract TValue Parse(string value);
+
+        /// <summary>
+        /// Gets a flag that indicates whether this instance has <see cref="IValueSet"/>s.
+        /// </summary>
+        public bool HasValueSets => this.ValueSets?.Any() ?? false;
+    }
+
+    internal interface IDataCollectorParameter
+    {
+        /// <summary>
+        /// Gets a flag that indicates whether this instance has <see cref="IValueSet"/>s.
+        /// </summary>
+        bool HasValueSets { get; }
     }
 }

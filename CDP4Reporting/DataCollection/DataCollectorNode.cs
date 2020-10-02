@@ -181,11 +181,6 @@ namespace CDP4Reporting.DataCollection
                 .Where(f => this.isSubclassOfRawGeneric(f.PropertyType, typeof(DataCollectorStateDependentPerRowParameter<,>)))
                 .ToDictionary(f => f, f => f.PropertyType);
 
-            if (this.stateDependentColumns.Count > 1)
-            {
-                throw new NotSupportedException($"Currently only one property of {typeof(DataCollectorStateDependentPerRowParameter<,>).Name} can be used per {nameof(DataCollectorRow)}.");
-            }
-
             this.normalColumns = typeof(T).GetProperties()
                 .Where(f => f.PropertyType.IsSubclassOf(typeof(DataCollectorColumn<T>)))
                 .Except(this.stateDependentColumns.Keys)
@@ -214,6 +209,30 @@ namespace CDP4Reporting.DataCollection
                 }
 
                 propertyType = propertyType.BaseType;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if there are any columns that implement <see cref="IDataCollectorParameter"/> and have their <see cref="IDataCollectorParameter.HasValueSets"/>
+        /// property set to true.
+        /// </summary>
+        /// <returns>true if there is a column that implements <see cref="IDataCollectorParameter"/> and has its <see cref="IDataCollectorParameter.HasValueSets"/>
+        /// property set to true. Otherwise false.</returns>
+        private bool ParameterColumnsHaveValueSets()
+        {
+            var rowPresentation = this.GetRowRepresentation();
+
+            foreach (var rowField in this.allColumns)
+            {
+                if (rowField.Key.GetValue(rowPresentation) is IDataCollectorParameter column)
+                {
+                    if (column.HasValueSets)
+                    {
+                        return true;
+                    }
+                }
             }
 
             return false;
@@ -249,6 +268,22 @@ namespace CDP4Reporting.DataCollection
         /// </returns>
         public DataTable GetTable()
         {
+            return this.GetTable(false);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="DataTable"/> representation based on the <see cref="DataCollectorRow"/>
+        /// representation.
+        /// </summary>
+        /// <param name="excludeMissingParameters">
+        /// By default all rows are returned by filtering on <see cref="CategoryDecompositionHierarchy"/>.
+        /// In case you only want the rows that indeed contain the wanted <see cref="ParameterValueSet"/>s then set this parameter to true.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DataTable"/> representation.
+        /// </returns>
+        public DataTable GetTable(bool excludeMissingParameters)
+        {
             var table = new DataTable();
 
             for (var hierarchy = this.categoryDecompositionHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
@@ -271,7 +306,7 @@ namespace CDP4Reporting.DataCollection
                 table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
             }
 
-            this.AddDataRows(table);
+            this.AddDataRows(table, excludeMissingParameters);
 
             return table;
         }
@@ -311,7 +346,6 @@ namespace CDP4Reporting.DataCollection
                 }
 
                 column?.Initialize(this, rowField.Key);
-
                 rowField.Key.SetValue(row, column);
             }
 
@@ -340,16 +374,22 @@ namespace CDP4Reporting.DataCollection
         /// <param name="table">
         /// The associated <see cref="DataTable"/>.
         /// </param>
-        internal void AddDataRows(DataTable table)
+        /// <param name="excludeMissingParameters">
+        /// By default all rows are returned by filtering on <see cref="CategoryDecompositionHierarchy"/>.
+        /// In case you only want the rows that indeed contain the wanted <see cref="ParameterValueSet"/>s then set this parameter to true.
+        /// </param>
+        internal void AddDataRows(DataTable table, bool excludeMissingParameters)
         {
-            if (this.IsVisible && this.categoryDecompositionHierarchy.Child == null)
+            if ((!excludeMissingParameters || this.ParameterColumnsHaveValueSets()) 
+                && this.IsVisible 
+                && this.categoryDecompositionHierarchy.Child == null)
             {
-                table.Rows.Add(this.GetDataRow(table));
+                this.AddDataRow(table);
             }
 
             foreach (var child in this.Children)
             {
-                child.AddDataRows(table);
+                child.AddDataRows(table, excludeMissingParameters);
             }
         }
 
@@ -362,15 +402,18 @@ namespace CDP4Reporting.DataCollection
         /// <returns>
         /// A <see cref="DataRow"/>.
         /// </returns>
-        private DataRow GetDataRow(DataTable table)
+        private void AddDataRow(DataTable table)
         {
             var row = table.NewRow();
+            table.Rows.Add(row);
+
+            var rowPresentation = this.GetRowRepresentation();
 
             this.InitializeCategoryColumns(row);
 
             foreach (var rowField in this.normalColumns)
             {
-                var column = rowField.Key.GetValue(this.GetRowRepresentation()) as DataCollectorColumn<T>;
+                var column = rowField.Key.GetValue(rowPresentation) as DataCollectorColumn<T>;
 
                 column?.Populate(table, row);
             }
@@ -382,14 +425,24 @@ namespace CDP4Reporting.DataCollection
                     new object[] { });
             }
 
+            var removeOriginalColumn = false;
+
             foreach (var rowField in this.stateDependentColumns)
             {
-                var column = rowField.Key.GetValue(this.GetRowRepresentation()) as DataCollectorColumn<T>;
+                var column = rowField.Key.GetValue(rowPresentation) as DataCollectorColumn<T>;
 
                 column?.Populate(table, row);
+
+                if (column is IDataCollectorParameter dataCollectorParameter && dataCollectorParameter.HasValueSets)
+                {
+                    removeOriginalColumn = true;
+                }
             }
 
-            return row;
+            if (removeOriginalColumn)
+            {
+                table.Rows.Remove(row);
+            }
         }
 
         /// <summary>

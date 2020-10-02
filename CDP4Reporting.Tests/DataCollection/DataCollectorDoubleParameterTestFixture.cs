@@ -75,7 +75,7 @@ namespace CDP4Reporting.Tests.DataCollection
         [TestCaseSource(nameof(TestCases))]
         public void VerifyThatValuesAreCalculatedCorrectly(string valueArrayValue, double expectedValue1, double expectedValue2)
         {
-            this.dataCollectorParameterTestFixture.ed1.Parameter.First().ValueSet.First().Manual =  new ValueArray<string>(new [] { valueArrayValue });
+            this.dataCollectorParameterTestFixture.ed1.Parameter.First().ValueSet.First().Published =  new ValueArray<string>(new [] { valueArrayValue });
 
             var hierarchy = new CategoryDecompositionHierarchy
                     .Builder(this.dataCollectorParameterTestFixture.iteration, this.dataCollectorParameterTestFixture.cat1.ShortName)
@@ -87,7 +87,6 @@ namespace CDP4Reporting.Tests.DataCollection
             var node = dataSource.CreateNodes(
                 hierarchy,
                 nestedElementTree).First();
-
 
             var culture = new CultureInfo("en-GB")
             {

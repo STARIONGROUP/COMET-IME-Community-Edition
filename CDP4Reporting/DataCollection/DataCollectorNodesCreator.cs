@@ -67,16 +67,22 @@ namespace CDP4Reporting.DataCollection
         /// <param name="nestedElements">
         /// The <see cref="List{NestedElement}"/>s
         /// </param>
+        /// <param name="excludeMissingParameters">
+        /// By default all rows are returned by filtering on <see cref="CategoryDecompositionHierarchy"/>.
+        /// In case you only want the rows that indeed contain the wanted <see cref="ParameterValueSet"/>s then set this parameter to true.
+        /// </param>
         /// <returns>
         /// The <see cref="DataTable"/>.
         /// </returns>
         public DataTable GetTable(
             CategoryDecompositionHierarchy categoryDecompositionHierarchy,
-            List<NestedElement> nestedElements)
+            List<NestedElement> nestedElements, 
+            bool excludeMissingParameters
+            )
         {
-            var dataTables = 
+            var dataTables =
                 this.CreateNodes(categoryDecompositionHierarchy, nestedElements)
-                    .Select(x => x.GetTable())
+                    .Select(x => x.GetTable(excludeMissingParameters))
                     .ToList();
 
             if (!dataTables.Any())
@@ -96,6 +102,25 @@ namespace CDP4Reporting.DataCollection
             }
 
             return dataTable;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="DataTable"/> representation from data in a tree structure of <see cref="NestedElement"/>s based on a <see cref="CategoryDecompositionHierarchy"/>
+        /// </summary>
+        /// <param name="categoryDecompositionHierarchy">
+        /// The <see cref="CategoryDecompositionHierarchy"/> used for filtering the considered <see cref="NestedElement"/> items.
+        /// </param>
+        /// <param name="nestedElements">
+        /// The <see cref="List{NestedElement}"/>s
+        /// </param>
+        /// <returns>
+        /// The <see cref="DataTable"/>.
+        /// </returns>
+        public DataTable GetTable(
+            CategoryDecompositionHierarchy categoryDecompositionHierarchy,
+            List<NestedElement> nestedElements)
+        {
+            return this.GetTable(categoryDecompositionHierarchy, nestedElements, false);
         }
 
         /// <summary>

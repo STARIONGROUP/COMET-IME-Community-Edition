@@ -52,7 +52,6 @@ namespace CDP4Reporting.ViewModels
     using CDP4Dal;
 
     using CDP4Reporting.DataCollection;
-    using CDP4Reporting.DataSource;
     using CDP4Reporting.Parameters;
     using CDP4Reporting.Utilities;
 
@@ -533,7 +532,7 @@ namespace CDP4Reporting.ViewModels
 
             var reportDataSource = 
                 this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>()
-                    .Union(this.CurrentReport.ComponentStorage.OfType<CDP4ObjectDataSource>()).FirstOrDefault(x => x.Name.Equals(dataSourceName));
+                    .FirstOrDefault(x => x.Name.Equals(dataSourceName));
             
             object dataSource;
 
@@ -558,22 +557,10 @@ namespace CDP4Reporting.ViewModels
                 this.CheckParameters(parameters);
             }
 
-            if (reportDataSource?.GetType() == typeof(ObjectDataSource))
-            {
-                var source = reportDataSource;
-
-                this.CurrentReport.ComponentStorage.Remove(reportDataSource);
-
-                this.currentReportDesignerDocument?.MakeChanges(
-                    changes => { changes.RemoveItem(source); });
-
-                reportDataSource = null;
-            }
-
             if (reportDataSource == null)
             {
                 // Create new datasource
-                reportDataSource = new CDP4ObjectDataSource
+                reportDataSource = new ObjectDataSource
                 {
                     DataSource = dataSource,
                     Name = dataSourceName
@@ -605,7 +592,7 @@ namespace CDP4Reporting.ViewModels
         {
             this.currentReportDesignerDocument?.MakeChanges(changes =>
             {
-                var refreshDataSource = new CDP4ObjectDataSource
+                var refreshDataSource = new ObjectDataSource
                 {
                     DataSource = new object(),
                     Name = "__temporaryDataSource__"

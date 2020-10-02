@@ -82,8 +82,9 @@ namespace CDP4Reporting.Tests.DataCollection
                 nestedElementTree).First();
 
             Assert.AreEqual(1, node.GetColumns<DataCollectorStateDependentPerRowDoubleParameter<Row>>().Count());
-            Assert.IsTrue(node.GetTable().Columns.Contains("TypeFour"));
-            Assert.IsTrue(node.GetTable().Columns.Contains("TypeFour_state"));
+            Assert.IsTrue(node.GetTable().Columns.Contains("ParameterName"));
+            Assert.IsTrue(node.GetTable().Columns.Contains("ParameterState"));
+            Assert.IsTrue(node.GetTable().Columns.Contains("ParameterValue"));
 
             Assert.AreEqual(2, node.GetTable().Rows.Count);
         }
@@ -104,30 +105,15 @@ namespace CDP4Reporting.Tests.DataCollection
 
             Assert.AreEqual(1, node.GetColumns<DataCollectorStateDependentPerRowDoubleParameter<NoActualStateRow>>().Count());
 
-            Assert.IsTrue(node.GetTable().Columns.Contains("TypeOne"));
-            Assert.IsTrue(node.GetTable().Columns.Contains("TypeOne_state"));
+            Assert.IsTrue(node.GetTable().Columns.Contains("ParameterName"));
+            Assert.IsTrue(node.GetTable().Columns.Contains("ParameterState"));
+            Assert.IsTrue(node.GetTable().Columns.Contains("ParameterValue"));
 
             Assert.AreEqual(1, node.GetTable().Rows.Count);
 
-            Assert.AreEqual(DBNull.Value, node.GetTable().Rows[0]["TypeOne_state"]);
-        }
-
-        [Test]
-        public void VerifyThatMultipleStateDependentPerRowColumnsISNotAllowed()
-        {
-            var hierarchy = new CategoryDecompositionHierarchy
-                    .Builder(this.dataCollectorParameterTestFixture.iteration, this.dataCollectorParameterTestFixture.cat1.ShortName)
-                .Build();
-
-            var dataSource = new DataCollectorNodesCreator<ErrorRow>();
-            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.dataCollectorParameterTestFixture.option).ToList();
-
-            Assert.Throws<NotSupportedException>(() =>
-            {
-                var node = dataSource.CreateNodes(
-                    hierarchy,
-                    nestedElementTree).First();
-            });
+            Assert.AreEqual("typeOne", node.GetTable().Rows[0]["ParameterName"]);
+            Assert.AreEqual(DBNull.Value, node.GetTable().Rows[0]["ParameterState"]);
+            Assert.AreEqual(11D, node.GetTable().Rows[0]["ParameterValue"]);
         }
     }
 }
