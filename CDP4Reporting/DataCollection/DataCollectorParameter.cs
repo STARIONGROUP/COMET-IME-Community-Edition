@@ -131,12 +131,12 @@ namespace CDP4Reporting.DataCollection
 
             this.ParameterBase = firstNestedParameter?.AssociatedParameter;
 
-            this.Owner = (firstNestedParameter?.ValueSet as ParameterValueSetBase)?.Owner ?? firstNestedParameter?.Owner;
+            this.Owner = (firstNestedParameter?.ValueSet as IOwnedThing)?.Owner ?? firstNestedParameter?.Owner;
 
             var nestedParameterData =
                 this.Node.NestedElement.NestedParameter
                 .Where(x => x.AssociatedParameter.ParameterType.ShortName == this.ShortName)
-                .Select(x => x.ValueSet as ParameterValueSetBase)
+                .Select(x => x.ValueSet)
                 .ToList();
 
             if (nestedParameterData.Any())
