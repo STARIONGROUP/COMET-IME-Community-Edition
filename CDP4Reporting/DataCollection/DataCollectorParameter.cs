@@ -62,10 +62,8 @@ namespace CDP4Reporting.DataCollection
             get
             {
                 if (this.ValueSets?.Any() ?? false)
-                {
-                    var valueSet = this.ValueSets.FirstOrDefault();
-
-                        return this.GetValueSetValue(valueSet);
+                { 
+                    return this.GetValueSetValue(this.ValueSets.FirstOrDefault());
                 }
 
                 return default;
@@ -81,16 +79,12 @@ namespace CDP4Reporting.DataCollection
         {
             if (valueSet is ParameterSubscriptionValueSet)
             {
-                {
-                    return this.Parse(valueSet.Computed.FirstOrDefault()) ?? default;
-                }
+                return this.Parse(valueSet.Computed.FirstOrDefault()) ?? default;
             }
 
             if (valueSet is ParameterValueSetBase valueSetBase)
             {
-                {
-                    return this.Parse(valueSetBase.Published.FirstOrDefault()) ?? default;
-                }
+                return this.Parse(valueSetBase.Published.FirstOrDefault()) ?? default;
             }
 
             return default;
@@ -189,13 +183,5 @@ namespace CDP4Reporting.DataCollection
         /// Gets a flag that indicates whether this instance has <see cref="IValueSet"/>s.
         /// </summary>
         public bool HasValueSets => this.ValueSets?.Any() ?? false;
-    }
-
-    internal interface IDataCollectorParameter
-    {
-        /// <summary>
-        /// Gets a flag that indicates whether this instance has <see cref="IValueSet"/>s.
-        /// </summary>
-        bool HasValueSets { get; }
     }
 }

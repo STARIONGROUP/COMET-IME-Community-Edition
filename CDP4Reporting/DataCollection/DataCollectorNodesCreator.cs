@@ -77,7 +77,7 @@ namespace CDP4Reporting.DataCollection
         public DataTable GetTable(
             CategoryDecompositionHierarchy categoryDecompositionHierarchy,
             List<NestedElement> nestedElements, 
-            bool excludeMissingParameters
+            bool excludeMissingParameters = false
             )
         {
             var dataTables =
@@ -102,25 +102,6 @@ namespace CDP4Reporting.DataCollection
             }
 
             return dataTable;
-        }
-
-        /// <summary>
-        /// Gets a <see cref="DataTable"/> representation from data in a tree structure of <see cref="NestedElement"/>s based on a <see cref="CategoryDecompositionHierarchy"/>
-        /// </summary>
-        /// <param name="categoryDecompositionHierarchy">
-        /// The <see cref="CategoryDecompositionHierarchy"/> used for filtering the considered <see cref="NestedElement"/> items.
-        /// </param>
-        /// <param name="nestedElements">
-        /// The <see cref="List{NestedElement}"/>s
-        /// </param>
-        /// <returns>
-        /// The <see cref="DataTable"/>.
-        /// </returns>
-        public DataTable GetTable(
-            CategoryDecompositionHierarchy categoryDecompositionHierarchy,
-            List<NestedElement> nestedElements)
-        {
-            return this.GetTable(categoryDecompositionHierarchy, nestedElements, false);
         }
 
         /// <summary>

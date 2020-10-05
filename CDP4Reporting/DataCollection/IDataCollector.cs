@@ -53,6 +53,16 @@ namespace CDP4Reporting.DataCollection
         DomainOfExpertise DomainOfExpertise { get; }
 
         /// <summary>
+        /// All currently open <see cref="ReferenceDataLibrary"/>s in this <see cref="IDataCollector.Session"/>
+        /// </summary>
+        public IEnumerable<ReferenceDataLibrary> OpenReferenceDataLibraries { get; }
+
+        /// <summary>
+        /// The current <see cref="SiteDirectory"/>s in this <see cref="IDataCollector.Session"/>
+        /// </summary>
+        public SiteDirectory SiteDirectory { get; }
+
+        /// <summary>
         /// Initializes this DataCollector 
         /// </summary>
         /// <param name="iteration"></param>

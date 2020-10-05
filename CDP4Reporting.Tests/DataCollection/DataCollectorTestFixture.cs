@@ -83,8 +83,12 @@ namespace CDP4Reporting.Tests.DataCollection
         private ElementUsage eu6;
         private ElementUsage eu7;
 
+        private Parameter parameter1;
+
         private class Row : DataCollectorRow
         {
+            [DefinedThingShortName("par")]
+            public DataCollectorStringParameter<Row> parameter1 { get; set; }
         }
 
         public class TestDataCollector : DataCollector
@@ -99,7 +103,7 @@ namespace CDP4Reporting.Tests.DataCollection
             }
         };
 
-    [SetUp]
+        [SetUp]
         public void SetUp()
         {
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
@@ -186,27 +190,26 @@ namespace CDP4Reporting.Tests.DataCollection
                 Container = this.iteration
             };
 
-            var parameter = new Parameter(Guid.NewGuid(), this.cache, null);
+            this.parameter1 = new Parameter(Guid.NewGuid(), this.cache, null);
 
             var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, null)
             {
-                Reference = new ValueArray<string>(new[] { "2" }),
+                Reference = new ValueArray<string>(new[] { "1" }),
                 Computed = new ValueArray<string>(new[] { "2" }),
-                Formula = new ValueArray<string>(new[] { "2" }),
-                Manual = new ValueArray<string>(new[] { "2" }),
+                Formula = new ValueArray<string>(new[] { "3" }),
+                Manual = new ValueArray<string>(new[] { "4" }),
+                Published = new ValueArray<string>(new[] { "5" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
 
-            parameter.Owner = this.domain;
+            this.parameter1.Owner = this.domain;
 
-            parameter.ParameterType = new SimpleQuantityKind
+            this.parameter1.ParameterType = new SimpleQuantityKind
             {
                 ShortName = "par"
             };
 
-            parameter.ValueSet.Add(parameterValueSet);
-
-            this.ed1.Parameter.Add(parameter);
+            this.parameter1.ValueSet.Add(parameterValueSet);
 
             this.ed2p = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
@@ -470,6 +473,42 @@ namespace CDP4Reporting.Tests.DataCollection
 
             ValidateRow(rows[0], this.eu12p1, this.eu2p31);
             ValidateRow(rows[1], this.eu4, this.eu7);
+        }
+
+        [Test]
+        public void VerifyMultiRootStructureWithParameterCheck()
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat2.ShortName)
+                .AddLevel(this.cat3.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned, don't return rows that have no parameters set
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree, true).Rows;
+            Assert.AreEqual(0, rows.Count);
+        }
+
+        [Test]
+        public void VerifyMultiRootStructureWithParameterCheckAndParameterPresent()
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat2.ShortName)
+                .AddLevel(this.cat3.ShortName)
+                .Build();
+
+            this.eu7.ElementDefinition.Parameter.Add(this.parameter1);
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned, don't return rows that have no parameters set
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree, true).Rows;
+
+            Assert.AreEqual(1, rows.Count);
+            Assert.AreEqual(this.parameter1.ValueSet.First().Published.First(), rows[0]["par"].ToString());
         }
 
         private void VerifyStructure(ElementUsage row2Result)

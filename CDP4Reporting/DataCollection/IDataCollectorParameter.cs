@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataCollectorStringParameter.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorParameterColumn.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,28 +25,16 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using CDP4Common.EngineeringModelData;
+
     /// <summary>
-    /// Abstract base class from which all string parameter columns
-    /// for a <see cref="DataCollectorRow"/> need to derive.
+    /// The interface that defines members of implementing classes of <see cref="IDataCollectorParameter"/>
     /// </summary>
-    /// <typeparam name="T">
-    /// The type of the associated <see cref="DataCollectorRow"/>.
-    /// </typeparam>
-    public class DataCollectorStringParameter<T> : DataCollectorParameter<T, string>
-        where T : DataCollectorRow, new()
+    internal interface IDataCollectorParameter
     {
         /// <summary>
-        /// Parses a parameter value as string.
+        /// Gets a flag that indicates whether this instance has <see cref="IValueSet"/>s.
         /// </summary>
-        /// <param name="value">
-        /// The parameter value to be parsed.
-        /// </param>
-        /// <returns>
-        /// The parsed value.
-        /// </returns>
-        public override string Parse(string value)
-        {
-            return value;
-        }
+        bool HasValueSets { get; }
     }
 }

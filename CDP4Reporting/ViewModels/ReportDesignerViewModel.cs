@@ -690,7 +690,7 @@ namespace CDP4Reporting.ViewModels
                 }
             }
 
-            if (!(reportingParameters?.Any() ?? false))
+            if (!(reportingParameters.Any()))
             {
                 return;
             }
@@ -698,41 +698,56 @@ namespace CDP4Reporting.ViewModels
             // Create new dynamic parameters
             foreach (var reportingParameter in reportingParameters)
             {
-                var newReportParameter = new Parameter
-                {
-                    Name = reportingParameter.ParameterName,
-                    Description = reportingParameter.Name,
-                    Type = reportingParameter.Type,
-                    Visible = true
-                };
+                var previouslySetValue =
+                    reportingParameter.Visible && previouslySetValues.ContainsKey(reportingParameter.ParameterName)
+                        ? previouslySetValues[reportingParameter.ParameterName]
+                        : null;
 
-                if (reportingParameter.LookUpValues.Any())
-                {
-                    var staticListLookupSettings = new StaticListLookUpSettings();
-                    newReportParameter.LookUpSettings = staticListLookupSettings;
-
-                    foreach (var keyValuePair in reportingParameter.LookUpValues)
-                    {
-                        staticListLookupSettings.LookUpValues.Add(new LookUpValue(keyValuePair.Key, keyValuePair.Value));
-                    }
-                }
-
-                // Restore default values
-                if (reportingParameter.Visible && previouslySetValues.ContainsKey(reportingParameter.ParameterName))
-                {
-                    newReportParameter.Value = previouslySetValues[reportingParameter.ParameterName];
-                }
-                else if (reportingParameter.DefaultValue != null)
-                {
-                    newReportParameter.Value = reportingParameter.DefaultValue;
-                }
-
-                newReportParameter.Visible = reportingParameter.Visible;
-
-                // Add dynamic parameter to report definition
-                this.currentReportDesignerDocument?.MakeChanges(
-                    changes => { changes.AddItem(newReportParameter); });
+                this.CreateDynamicParameter(reportingParameter, previouslySetValue);
             }
+        }
+
+        /// <summary>
+        /// Create a dynamic parameter, set its default value based on previously set values and add it to the current Report
+        /// </summary>
+        /// <param name="reportingParameter">The <see cref="IReportingParameter"/></param>
+        /// <param name="previouslySetValue">The previously set value in the report designer.</param>
+        private void CreateDynamicParameter(IReportingParameter reportingParameter, object previouslySetValue)
+        {
+            var newReportParameter = new Parameter
+            {
+                Name = reportingParameter.ParameterName,
+                Description = reportingParameter.Name,
+                Type = reportingParameter.Type,
+                Visible = true
+            };
+
+            if (reportingParameter.LookUpValues.Any())
+            {
+                var staticListLookupSettings = new StaticListLookUpSettings();
+                newReportParameter.LookUpSettings = staticListLookupSettings;
+
+                foreach (var keyValuePair in reportingParameter.LookUpValues)
+                {
+                    staticListLookupSettings.LookUpValues.Add(new LookUpValue(keyValuePair.Key, keyValuePair.Value));
+                }
+            }
+
+            // Restore default values
+            if (previouslySetValue!= null)
+            {
+                newReportParameter.Value = previouslySetValue;
+            }
+            else if (reportingParameter.DefaultValue != null)
+            {
+                newReportParameter.Value = reportingParameter.DefaultValue;
+            }
+
+            newReportParameter.Visible = reportingParameter.Visible;
+
+            // Add dynamic parameter to report definition
+            this.currentReportDesignerDocument?.MakeChanges(
+                changes => { changes.AddItem(newReportParameter); });
         }
 
         /// <summary>
@@ -773,6 +788,8 @@ namespace CDP4Reporting.ViewModels
                     this.AddOutput("Report parameter class not found.");
                     return result;
                 }
+
+                instObj.Initialize(this.Thing, this.Session);
 
                 result = instObj.CreateParameters(dataSource)?.ToList();
             }

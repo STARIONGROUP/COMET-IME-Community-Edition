@@ -25,9 +25,7 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;

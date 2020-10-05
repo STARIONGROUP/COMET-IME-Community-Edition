@@ -226,12 +226,9 @@ namespace CDP4Reporting.DataCollection
 
             foreach (var rowField in this.allColumns)
             {
-                if (rowField.Key.GetValue(rowPresentation) is IDataCollectorParameter column)
+                if (rowField.Key.GetValue(rowPresentation) is IDataCollectorParameter column && column.HasValueSets)
                 {
-                    if (column.HasValueSets)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
@@ -263,18 +260,6 @@ namespace CDP4Reporting.DataCollection
         /// Creates a <see cref="DataTable"/> representation based on the <see cref="DataCollectorRow"/>
         /// representation.
         /// </summary>
-        /// <returns>
-        /// The <see cref="DataTable"/> representation.
-        /// </returns>
-        public DataTable GetTable()
-        {
-            return this.GetTable(false);
-        }
-
-        /// <summary>
-        /// Creates a <see cref="DataTable"/> representation based on the <see cref="DataCollectorRow"/>
-        /// representation.
-        /// </summary>
         /// <param name="excludeMissingParameters">
         /// By default all rows are returned by filtering on <see cref="CategoryDecompositionHierarchy"/>.
         /// In case you only want the rows that indeed contain the wanted <see cref="ParameterValueSet"/>s then set this parameter to true.
@@ -282,7 +267,7 @@ namespace CDP4Reporting.DataCollection
         /// <returns>
         /// The <see cref="DataTable"/> representation.
         /// </returns>
-        public DataTable GetTable(bool excludeMissingParameters)
+        public DataTable GetTable(bool excludeMissingParameters = false)
         {
             var table = new DataTable();
 

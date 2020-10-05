@@ -114,15 +114,14 @@ namespace CDP4Reporting.Tests.ViewModels
 	        {
 		        public IEnumerable<IReportingParameter> CreateParameters(object dataObject)
 		        {
-			        List<IReportingParameter> paramsList = new List<IReportingParameter>();
-			        paramsList.Add(new ReportingParameter(""param1"", typeof(int), 0));
-			        paramsList.Add(new ReportingParameter(""param2"", typeof(string), string.Empty));
+                    List<IReportingParameter> paramsList = new List<IReportingParameter>();
+                    paramsList.Add(new ReportingParameter(""param1"", typeof(int), 0));
+                    paramsList.Add(new ReportingParameter(""param2"", typeof(string), string.Empty));
                     paramsList[1].AddLookupValue(""1"", ""one"");
-			        paramsList.Add(new ReportingParameter(""param3"", typeof(string), ""DefaultValue""));
-			        paramsList[2].Visible = false;
-			        paramsList.Add(new ReportingParameter(""param3"", typeof(string), string.Empty));
-			        paramsList[3].Visible = false;
-
+                    paramsList.Add(new ReportingParameter(""param3"", typeof(string), ""DefaultValue""));
+                    paramsList[2].Visible = false;
+                    paramsList.Add(new ReportingParameter(""param3"", typeof(string), string.Empty));
+                    paramsList[3].Visible = false;
 
 			        return paramsList;
 		        }
