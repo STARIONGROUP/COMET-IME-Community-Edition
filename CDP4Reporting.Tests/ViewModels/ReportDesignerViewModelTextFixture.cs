@@ -110,9 +110,9 @@ namespace CDP4Reporting.Tests.ViewModels
 	        using CDP4Reporting.Parameters;
 	        using System.Collections.Generic;
 
-	        public class TestReportingParameters: IReportingParameters
+	        public class TestReportingParameters: ReportingParameters
 	        {
-		        public IEnumerable<IReportingParameter> CreateParameters(object dataObject)
+		        public override IEnumerable<IReportingParameter> CreateParameters(object dataObject)
 		        {
                     List<IReportingParameter> paramsList = new List<IReportingParameter>();
                     paramsList.Add(new ReportingParameter(""param1"", typeof(int), 0));
@@ -125,10 +125,6 @@ namespace CDP4Reporting.Tests.ViewModels
 
 			        return paramsList;
 		        }
-                public string CreateFilterString(IEnumerable<IReportingParameter> reportingParameters)
-                {
-                    return string.Empty;
-                }
             }
             public class TestDataSource : DataCollector
             {
