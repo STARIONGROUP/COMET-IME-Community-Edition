@@ -187,6 +187,18 @@ namespace CDP4Reporting.DataCollection
             }
 
             /// <summary>
+            /// Sets the <see cref="CategoryDecompositionHierarchy.AllowSkipUnknownCategories"/> property to false.
+            /// </summary>
+            /// <returns>
+            /// The built <see cref="CategoryDecompositionHierarchy"/>.
+            /// </returns>
+            public Builder DenySkipUnknownCategories()
+            {
+                this.current.AllowSkipUnknownCategories = false;
+                return this;
+            }
+
+            /// <summary>
             /// Finishes building the current <see cref="CategoryDecompositionHierarchy"/>.
             /// </summary>
             /// <returns>
@@ -232,6 +244,26 @@ namespace CDP4Reporting.DataCollection
         /// The child node in this <see cref="CategoryDecompositionHierarchy"/>'s linear hierarchy.
         /// </summary>
         public CategoryDecompositionHierarchy Child { get; private set; }
+
+        /// <summary>
+        /// A flag that indicates whether it is allowd to skip a <see cref="Category"/> in the <see cref="CategoryDecompositionHierarchy"/> can be skipped,
+        /// while traversing a tree of objects.
+        /// Case:
+        /// A tree of <see cref="CategoryDecompositionHierarchy"/> contains the following hierarchycal structure:
+        /// - Cat1
+        ///   - Cat3
+        ///
+        /// The tree of objects that is traversed, for example a ProductTree, contains a tree of the following <see cref="ElementUsage"/>s:
+        /// - Cat1
+        ///   - Cat2
+        ///     - Cat3
+        ///
+        /// When AllowSkipUnknownCategories is true, the data on the level of Cat3 will be found, because it is allowed to skip unknown categories.
+        ///
+        /// When AllowSkipUnknownCategories is false, the data on the level of Cat3 will NOT be found, because it is NOT allowed to skip unknown categories;
+        /// IN other words, Cat3 should be a direct child of Cat1, which isn't the case.
+        /// </summary>
+        internal bool AllowSkipUnknownCategories { get; private set; } = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CategoryDecompositionHierarchy"/> class.

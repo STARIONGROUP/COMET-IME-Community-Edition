@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportingDataSourceStringParameter.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorStringParameter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -32,7 +32,7 @@ namespace CDP4Reporting.DataCollection
     /// <typeparam name="T">
     /// The type of the associated <see cref="DataCollectorRow"/>.
     /// </typeparam>
-    public class ReportingDataSourceStringParameter<T> : DataCollectorParameter<T, string>
+    public class DataCollectorStringParameter<T> : DataCollectorParameter<T, string>
         where T : DataCollectorRow, new()
     {
         /// <summary>

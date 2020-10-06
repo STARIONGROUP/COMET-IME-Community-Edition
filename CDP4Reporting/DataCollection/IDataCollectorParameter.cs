@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CDP4ObjectDataSource.cs" company="RHEA System S.A.">
+// <copyright file="IDataCollectorParameter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -23,17 +23,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataSource
+namespace CDP4Reporting.DataCollection
 {
-    using System.Windows;
+    using CDP4Common.EngineeringModelData;
 
-    using DevExpress.DataAccess.ObjectBinding;
-
-    public class CDP4ObjectDataSource : ObjectDataSource
+    /// <summary>
+    /// The interface that defines members of implementing classes of <see cref="IDataCollectorParameter"/>
+    /// </summary>
+    internal interface IDataCollectorParameter
     {
-        public void SetValueByModelCode(string modelCode = null, object Value = null)
-        {
-            MessageBox.Show($"SetModelCode {modelCode} => {Value}");
-        }
+        /// <summary>
+        /// Gets a flag that indicates whether this instance has <see cref="IValueSet"/>s.
+        /// </summary>
+        bool HasValueSets { get; }
     }
 }

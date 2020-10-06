@@ -28,10 +28,12 @@ namespace CDP4Reporting.Parameters
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Reporting.DataCollection;
+
     /// <summary>
     /// A class that is used to build Report Parameters and optional a specific filter string at the report level. 
     /// </summary>
-    public abstract class ReportingParameters : IReportingParameters
+    public abstract class ReportingParameters : ReportScriptDataProvider, IReportingParameters
     {
         /// <summary>
         /// Creates a list of report reporting parameter that should dynamically be added to the 

@@ -54,32 +54,26 @@ namespace CDP4Reporting.DataCollection
         {
             if (this.ValueSets?.Any() ?? false)
             {
-                var copyRow = false;
-
                 foreach (var valueSet in this.ValueSets)
                 {
-                    var currentRow = row;
+                    var currentRow = table.NewRow();
 
-                    if (copyRow)
+                    var clone = new object[row.ItemArray.Length];
+                    Array.Copy(row.ItemArray, clone, row.ItemArray.Length);
+                    currentRow.ItemArray = clone;
+
+                    table.Rows.Add(currentRow);
+
+                    var columnParameterName = "ParameterName";
+                    var columnStateName = "ParameterState";
+                    var columnValue = "ParameterValue";
+
+                    if (!table.Columns.Contains(columnParameterName))
                     {
-                        currentRow = table.NewRow();
-
-                        var clone = new object[row.ItemArray.Length];
-                        Array.Copy(row.ItemArray, clone, row.ItemArray.Length);
-                        currentRow.ItemArray = clone;
-
-                        table.Rows.Add(currentRow);
+                        table.Columns.Add(columnParameterName, typeof(string));
                     }
 
-                    var columnName = $"{this.FieldName}";
-                    var columnStateName = $"{this.FieldName}_state";
-
-                    if (!table.Columns.Contains(columnName))
-                    {
-                        table.Columns.Add(columnName, typeof(TValue));
-                    }
-
-                    currentRow[columnName] = this.Parse(valueSet.ActualValue?.First());
+                    currentRow[columnParameterName] = this.FieldName;
 
                     if (!table.Columns.Contains(columnStateName))
                     {
@@ -88,7 +82,12 @@ namespace CDP4Reporting.DataCollection
 
                     currentRow[columnStateName] = valueSet.ActualState?.ShortName;
 
-                    copyRow = true;
+                    if (!table.Columns.Contains(columnValue))
+                    {
+                        table.Columns.Add(columnValue, typeof(TValue));
+                    }
+
+                    currentRow[columnValue] = this.GetValueSetValue(valueSet);
                 }
             }
         }

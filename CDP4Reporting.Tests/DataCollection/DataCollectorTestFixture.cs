@@ -83,8 +83,12 @@ namespace CDP4Reporting.Tests.DataCollection
         private ElementUsage eu6;
         private ElementUsage eu7;
 
+        private Parameter parameter1;
+
         private class Row : DataCollectorRow
         {
+            [DefinedThingShortName("par")]
+            public DataCollectorStringParameter<Row> parameter1 { get; set; }
         }
 
         public class TestDataCollector : DataCollector
@@ -99,7 +103,7 @@ namespace CDP4Reporting.Tests.DataCollection
             }
         };
 
-    [SetUp]
+        [SetUp]
         public void SetUp()
         {
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
@@ -108,14 +112,19 @@ namespace CDP4Reporting.Tests.DataCollection
 
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
             var modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, null);
+            var iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, null);
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
 
-            engineeringModel.EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
-            engineeringModel.EngineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+            engineeringModel.EngineeringModelSetup = engineeringModelSetup;
+            engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
 
+            this.iteration.Container = engineeringModel;
+            iterationSetup.Container = engineeringModelSetup;
+
+            this.iteration.IterationSetup = iterationSetup;
             this.iteration.Container = engineeringModel;
 
             // Option
-
             this.option = new Option(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "option1",
@@ -125,7 +134,6 @@ namespace CDP4Reporting.Tests.DataCollection
             this.iteration.Option.Add(this.option);
 
             // Categories
-
             this.cat1 = new Category(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "cat1",
@@ -178,78 +186,85 @@ namespace CDP4Reporting.Tests.DataCollection
             {
                 ShortName = "ed1",
                 Name = "element definition 1",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
-            var parameter = new Parameter(Guid.NewGuid(), this.cache, null);
+            this.parameter1 = new Parameter(Guid.NewGuid(), this.cache, null);
 
             var parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, null)
             {
-                Reference = new ValueArray<string>(new[] { "2" }),
+                Reference = new ValueArray<string>(new[] { "1" }),
                 Computed = new ValueArray<string>(new[] { "2" }),
-                Formula = new ValueArray<string>(new[] { "2" }),
-                Manual = new ValueArray<string>(new[] { "2" }),
+                Formula = new ValueArray<string>(new[] { "3" }),
+                Manual = new ValueArray<string>(new[] { "4" }),
+                Published = new ValueArray<string>(new[] { "5" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
 
-            parameter.Owner = this.domain;
+            this.parameter1.Owner = this.domain;
 
-            parameter.ParameterType = new SimpleQuantityKind
+            this.parameter1.ParameterType = new SimpleQuantityKind
             {
                 ShortName = "par"
             };
 
-            parameter.ValueSet.Add(parameterValueSet);
-
-            this.ed1.Parameter.Add(parameter);
+            this.parameter1.ValueSet.Add(parameterValueSet);
 
             this.ed2p = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed2p",
                 Name = "element definition 2p",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed2n = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed2n",
                 Name = "element definition 2n",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed3 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed3",
                 Name = "element definition 3",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed4 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed4",
                 Name = "element definition 4",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed5 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed5",
                 Name = "element definition 5 same category",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed6 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed6",
                 Name = "element definition 6 no category",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             this.ed7 = new ElementDefinition(Guid.NewGuid(), this.cache, null)
             {
                 ShortName = "ed7",
                 Name = "element definition 7 ",
-                Owner = this.domain
+                Owner = this.domain,
+                Container = this.iteration
             };
 
             // Element Usages
@@ -410,6 +425,7 @@ namespace CDP4Reporting.Tests.DataCollection
             // ["cat3"]       +--> "ed1.eu4.eu5.eu6.eu7"
 
             this.VerifyStructure(this.eu4);
+            this.VerifyStructureWithDenySkipCategories(this.eu4);
         }
 
         [Test]
@@ -424,6 +440,8 @@ namespace CDP4Reporting.Tests.DataCollection
             this.ed5.Category.Add(this.cat2);
             this.VerifyStructure(this.eu5);
             this.VerifyRecursiveStructure(this.eu4, this.eu5);
+
+            this.VerifyRecursiveStructureWithDenySkipCategorie(false, this.eu4, this.eu5);
         }
 
         [Test]
@@ -439,6 +457,7 @@ namespace CDP4Reporting.Tests.DataCollection
             this.ed6.Category.Add(this.cat2);
             this.VerifyStructure(this.eu6);
             this.VerifyRecursiveStructure(this.eu4, this.eu5, this.eu6);
+            this.VerifyRecursiveStructureWithDenySkipCategorie(true, this.eu4, this.eu5, this.eu6);
         }
 
         [Test]
@@ -460,6 +479,42 @@ namespace CDP4Reporting.Tests.DataCollection
             ValidateRow(rows[1], this.eu4, this.eu7);
         }
 
+        [Test]
+        public void VerifyMultiRootStructureWithParameterCheck()
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat2.ShortName)
+                .AddLevel(this.cat3.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned, don't return rows that have no parameters set
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree, true).Rows;
+            Assert.AreEqual(0, rows.Count);
+        }
+
+        [Test]
+        public void VerifyMultiRootStructureWithParameterCheckAndParameterPresent()
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat2.ShortName)
+                .AddLevel(this.cat3.ShortName)
+                .Build();
+
+            this.eu7.ElementDefinition.Parameter.Add(this.parameter1);
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned, don't return rows that have no parameters set
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree, true).Rows;
+
+            Assert.AreEqual(1, rows.Count);
+            Assert.AreEqual(this.parameter1.ValueSet.First().Published.First(), rows[0]["par"].ToString());
+        }
+
         private void VerifyStructure(ElementUsage row2Result)
         {
             var hierarchy = new CategoryDecompositionHierarchy
@@ -477,6 +532,24 @@ namespace CDP4Reporting.Tests.DataCollection
 
             ValidateRow(rows[0], this.ed1, this.eu12p1, this.eu2p31);
             ValidateRow(rows[1], this.ed1, row2Result, this.eu7);
+        }
+
+        private void VerifyStructureWithDenySkipCategories(ElementUsage row2Result)
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat1.ShortName)
+                .AddLevel(this.cat2.ShortName)
+                .AddLevel(this.cat3.ShortName).DenySkipUnknownCategories()
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree).Rows;
+
+            Assert.AreEqual(1, rows.Count);
+            ValidateRow(rows[0], this.ed1, this.eu12p1, this.eu2p31);
         }
 
         private void VerifyRecursiveStructure(params ElementUsage[] levels)
@@ -503,6 +576,23 @@ namespace CDP4Reporting.Tests.DataCollection
             {
                 ValidateRow(rows[1], this.ed1, levels[0], levels[1], levels[2], this.eu7);
             }
+        }
+
+        private void VerifyRecursiveStructureWithDenySkipCategorie(bool shouldBeFound, params ElementUsage[] levels)
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat1.ShortName)
+                .AddLevel(this.cat2.ShortName, 3)
+                .AddLevel(this.cat3.ShortName).DenySkipUnknownCategories()
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree).Rows;
+
+            Assert.AreEqual(shouldBeFound ? 2 : 1, rows.Count);
         }
 
         private static void ValidateRow(

@@ -67,16 +67,22 @@ namespace CDP4Reporting.DataCollection
         /// <param name="nestedElements">
         /// The <see cref="List{NestedElement}"/>s
         /// </param>
+        /// <param name="excludeMissingParameters">
+        /// By default all rows are returned by filtering on <see cref="CategoryDecompositionHierarchy"/>.
+        /// In case you only want the rows that indeed contain the wanted <see cref="ParameterValueSet"/>s then set this parameter to true.
+        /// </param>
         /// <returns>
         /// The <see cref="DataTable"/>.
         /// </returns>
         public DataTable GetTable(
             CategoryDecompositionHierarchy categoryDecompositionHierarchy,
-            List<NestedElement> nestedElements)
+            List<NestedElement> nestedElements, 
+            bool excludeMissingParameters = false
+            )
         {
-            var dataTables = 
+            var dataTables =
                 this.CreateNodes(categoryDecompositionHierarchy, nestedElements)
-                    .Select(x => x.GetTable())
+                    .Select(x => x.GetTable(excludeMissingParameters))
                     .ToList();
 
             if (!dataTables.Any())
@@ -135,6 +141,10 @@ namespace CDP4Reporting.DataCollection
                 newNode = new DataCollectorNode<T>(searchCategory, nestedElement, parentNode);
                 parentNode.Children.Add(newNode);
                 resultNodes.Add(newNode);
+            }
+            else if (!(categoryDecompositionHierarchy.Child?.AllowSkipUnknownCategories ?? true))
+            {
+                return resultNodes;
             }
 
             var children = nestedElement.GetChildren(nestedElements).ToList();

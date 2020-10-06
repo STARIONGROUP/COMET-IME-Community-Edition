@@ -107,23 +107,23 @@ namespace CDP4Reporting.Tests.ViewModels
         private const string DATASOURCE_CODE_WITH_PARAMS = @"namespace CDP4Reporting
         {
             using CDP4Reporting.DataCollection;
-	        using CDP4Reporting.Parameters;
-	        using System.Collections.Generic;
+            using CDP4Reporting.Parameters;
+            using System.Collections.Generic;
 
-	        public class TestReportingParameters: IReportingParameters
-	        {
-		        public IEnumerable<IReportingParameter> CreateParameters(object dataObject)
-		        {
-			        List<IReportingParameter> paramsList = new List<IReportingParameter>();
-			        paramsList.Add(new ReportingParameter(""param1"", typeof(int), 0));
-			        paramsList.Add(new ReportingParameter(""param2"", typeof(string), string.Empty));
-                    paramsList[1].AddLookupValue(""1"", ""one"");
-
-			        return paramsList;
-		        }
-                public string CreateFilterString(IEnumerable<IReportingParameter> reportingParameters)
+            public class TestReportingParameters: ReportingParameters
+            {
+                public override IEnumerable<IReportingParameter> CreateParameters(object dataObject)
                 {
-                    return string.Empty;
+                    List<IReportingParameter> paramsList = new List<IReportingParameter>();
+                    paramsList.Add(new ReportingParameter(""param1"", typeof(int), 0));
+                    paramsList.Add(new ReportingParameter(""param2"", typeof(string), string.Empty));
+                    paramsList[1].AddLookupValue(""1"", ""one"");
+                    paramsList.Add(new ReportingParameter(""param3"", typeof(string), ""DefaultValue""));
+                    paramsList[2].Visible = false;
+                    paramsList.Add(new ReportingParameter(""param3"", typeof(string), string.Empty));
+                    paramsList[3].Visible = false;
+
+                    return paramsList;
                 }
             }
             public class TestDataSource : DataCollector

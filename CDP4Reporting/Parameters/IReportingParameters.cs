@@ -27,11 +27,48 @@ namespace CDP4Reporting.Parameters
 {
     using System.Collections.Generic;
 
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
+    using CDP4Dal;
+
     /// <summary>
     /// Interface to be used in the Code editor of <see cref="Views.ReportDesigner"/>.
     /// </summary>
     public interface IReportingParameters
     {
+        /// <summary>
+        /// Gets the <see cref="Iteration"/>
+        /// </summary>
+        Iteration Iteration { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ISession"/>
+        /// </summary>
+        ISession Session { get; }
+
+        /// <summary>
+        /// Gets the <see cref="DomainOfExpertise"/>
+        /// </summary>
+        DomainOfExpertise DomainOfExpertise { get; }
+
+        /// <summary>
+        /// All currently open <see cref="ReferenceDataLibrary"/>s in this <see cref="IReportingParameters.Session"/>
+        /// </summary>
+        IEnumerable<ReferenceDataLibrary> OpenReferenceDataLibraries { get; }
+
+        /// <summary>
+        /// The current <see cref="SiteDirectory"/>s in this <see cref="IReportingParameters.Session"/>
+        /// </summary>
+        SiteDirectory SiteDirectory { get; }
+
+        /// <summary>
+        /// Initializes this DataCollector 
+        /// </summary>
+        /// <param name="iteration"></param>
+        /// <param name="session"></param>
+        void Initialize(Iteration iteration, ISession session);
+
         /// <summary>
         /// Create a list of <see cref="IReportingParameter"/>s.
         /// </summary>
