@@ -425,6 +425,7 @@ namespace CDP4Reporting.Tests.DataCollection
             // ["cat3"]       +--> "ed1.eu4.eu5.eu6.eu7"
 
             this.VerifyStructure(this.eu4);
+            this.VerifyStructureWithDenySkipCategories(this.eu4);
         }
 
         [Test]
@@ -439,6 +440,8 @@ namespace CDP4Reporting.Tests.DataCollection
             this.ed5.Category.Add(this.cat2);
             this.VerifyStructure(this.eu5);
             this.VerifyRecursiveStructure(this.eu4, this.eu5);
+
+            this.VerifyRecursiveStructureWithDenySkipCategorie(false, this.eu4, this.eu5);
         }
 
         [Test]
@@ -454,6 +457,7 @@ namespace CDP4Reporting.Tests.DataCollection
             this.ed6.Category.Add(this.cat2);
             this.VerifyStructure(this.eu6);
             this.VerifyRecursiveStructure(this.eu4, this.eu5, this.eu6);
+            this.VerifyRecursiveStructureWithDenySkipCategorie(true, this.eu4, this.eu5, this.eu6);
         }
 
         [Test]
@@ -530,6 +534,24 @@ namespace CDP4Reporting.Tests.DataCollection
             ValidateRow(rows[1], this.ed1, row2Result, this.eu7);
         }
 
+        private void VerifyStructureWithDenySkipCategories(ElementUsage row2Result)
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat1.ShortName)
+                .AddLevel(this.cat2.ShortName)
+                .AddLevel(this.cat3.ShortName).DenySkipUnknownCategories()
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree).Rows;
+
+            Assert.AreEqual(1, rows.Count);
+            ValidateRow(rows[0], this.ed1, this.eu12p1, this.eu2p31);
+        }
+
         private void VerifyRecursiveStructure(params ElementUsage[] levels)
         {
             var hierarchy = new CategoryDecompositionHierarchy
@@ -553,6 +575,30 @@ namespace CDP4Reporting.Tests.DataCollection
             if (levels.Length == 3)
             {
                 ValidateRow(rows[1], this.ed1, levels[0], levels[1], levels[2], this.eu7);
+            }
+        }
+
+        private void VerifyRecursiveStructureWithDenySkipCategorie(bool shouldBeFound, params ElementUsage[] levels)
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat1.ShortName)
+                .AddLevel(this.cat2.ShortName, 3)
+                .AddLevel(this.cat3.ShortName).DenySkipUnknownCategories()
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<Row>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            // tabular representation built, category hierarchy considered, unneeded subtrees pruned
+            var rows = dataSource.GetTable(hierarchy, nestedElementTree).Rows;
+
+            if (shouldBeFound)
+            {
+                Assert.AreEqual(2, rows.Count);
+            }
+            else
+            {
+                Assert.AreEqual(1, rows.Count);
             }
         }
 

@@ -142,6 +142,10 @@ namespace CDP4Reporting.DataCollection
                 parentNode.Children.Add(newNode);
                 resultNodes.Add(newNode);
             }
+            else if (!(categoryDecompositionHierarchy.Child?.AllowSkipUnknownCategories ?? true))
+            {
+                return resultNodes;
+            }
 
             var children = nestedElement.GetChildren(nestedElements).ToList();
 
