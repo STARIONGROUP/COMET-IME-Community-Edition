@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequirementsModuleSettings.cs" company="RHEA System S.A.">
+// <copyright file="ManageConfigurationsResult.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,26 +23,22 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements
+namespace CDP4Composition.ViewModels.DialogResult
 {
-    using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Navigation;
 
     /// <summary>
-    /// A setting class for the requirement module
+    /// The <see cref="IDialogResult"/> for the <see cref="ManageConfigurationsDialogViewModel"/> dialog
     /// </summary>
-    public class RequirementsModuleSettings : PluginSettings
+    public class ManageConfigurationsResult : BaseDialogResult
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RequirementsModuleSettings"/> class
+        /// Initializes a new instance of the <see cref="ManageConfigurationsResult"/> class
         /// </summary>
-        public RequirementsModuleSettings()
+        /// <param name="res">An instance of <see cref="Nullable{T}"/> that gives the action of the user</param>
+        public ManageConfigurationsResult(bool? res)
+            : base(res)
         {
-            this.OrderSettings = new OrderSettings();
         }
-
-        /// <summary>
-        /// Gets or sets the order-settings
-        /// </summary>
-        public OrderSettings OrderSettings { get; set; }
     }
 }

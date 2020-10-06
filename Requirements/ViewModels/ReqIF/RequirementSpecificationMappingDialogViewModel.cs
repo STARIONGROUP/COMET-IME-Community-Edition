@@ -11,6 +11,9 @@ namespace CDP4Requirements.ViewModels
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Web.UI;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
@@ -19,8 +22,15 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
+    using CDP4Composition.ViewModels;
+
     using CDP4Dal;
     using CDP4Requirements.ReqIFDal;
+    using CDP4Requirements.Settings.JsonConverters;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using ReactiveUI;
 
     /// <summary>
@@ -38,6 +48,21 @@ namespace CDP4Requirements.ViewModels
         /// The <see cref="ThingFactory"/>
         /// </summary>
         private readonly ThingFactory thingFactory;
+        
+        /// <summary>
+        /// The <see cref="IDialogNavigationService"/>
+        /// </summary>
+        private readonly IDialogNavigationService dialogNavigationService;
+
+        /// <summary>
+        /// The <see cref="IPluginSettingsService"/>
+        /// </summary>
+        private readonly IPluginSettingsService pluginSettingsService;
+
+        /// <summary>
+        /// The <see cref="ImportMappingConfiguration"/>
+        /// </summary>
+        private readonly ImportMappingConfiguration importMappingConfiguration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementSpecificationMappingDialogViewModel"/> class.
@@ -54,12 +79,17 @@ namespace CDP4Requirements.ViewModels
         /// <param name="iteration">The iteration</param>
         /// <param name="session">The session</param>
         /// <param name="thingDialogNavigationService">The thing Dialog Navigation Service</param>
+        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
         /// <param name="lang">The current langguage code</param>
-        public RequirementSpecificationMappingDialogViewModel(ThingFactory thingFactory, Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, string lang)
+        /// <param name="importMappingConfiguration">The <see cref="ImportMappingConfiguration"/></param>
+        public RequirementSpecificationMappingDialogViewModel(ThingFactory thingFactory, Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, string lang, ImportMappingConfiguration importMappingConfiguration)
             : base(iteration, session, thingDialogNavigationService, lang)
         {
             this.PreviewRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.thingFactory = thingFactory;
+            this.dialogNavigationService = dialogNavigationService;
+            this.pluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
+            this.importMappingConfiguration = importMappingConfiguration;
 
             this.PopulateRows();
 
@@ -75,6 +105,11 @@ namespace CDP4Requirements.ViewModels
         /// Gets the "Ok" <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<Unit> OkCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the Save mapping configuration <see cref="ICommand"/>
+        /// </summary>
+        public ReactiveCommand<object> SaveMappingCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
@@ -103,6 +138,12 @@ namespace CDP4Requirements.ViewModels
         {
             var transactionContext = TransactionContextResolver.ResolveContext(this.IterationClone);
             var transaction = new ThingTransaction(transactionContext, this.IterationClone);
+
+            foreach (var externalIdentifierMap in this.IterationClone.ExternalIdentifierMap)
+            {
+                transaction.CreateOrUpdate(externalIdentifierMap);
+            }
+
             foreach (var specMap in this.thingFactory.SpecificationMap)
             {
                 transaction.CreateDeep(specMap.Value);
@@ -161,8 +202,7 @@ namespace CDP4Requirements.ViewModels
                 var row = new RequirementsSpecificationRowViewModel(map.Value, this.Session, null);
                 this.PreviewRows.Add(row);
             }
-
-
+            
             foreach (var keyValuePair in this.thingFactory.RelationGroupMap)
             {
                 var row = new BinaryRelationshipRowViewModel(keyValuePair.Value, this.Session, null);
@@ -190,14 +230,45 @@ namespace CDP4Requirements.ViewModels
             this.BackCommand.Subscribe(_ => this.ExecuteBackCommand());
 
             this.OkCommand = ReactiveCommand.CreateAsyncTask(x => this.ExecuteOkCommand(), RxApp.MainThreadScheduler);
+            
             this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
             {
                 this.ErrorMessage = x.Message;
                 this.IsBusy = false;
             });
 
+            this.SaveMappingCommand = ReactiveCommand.Create();
+            this.SaveMappingCommand.Subscribe(_ => this.SaveMappingCommandExecute());
+
             this.InspectCommand = ReactiveCommand.Create(canExecuteCommand);
             this.InspectCommand.Subscribe(_ => this.ExecuteInspectCommand());
+        }
+
+        /// <summary>
+        /// Executes the <see cref="SaveMappingCommand"/>
+        /// </summary>
+        private void SaveMappingCommandExecute()
+        {
+            if (string.IsNullOrWhiteSpace(this.importMappingConfiguration.Name))
+            {
+                var saveDialog = new SavedConfigurationDialogViewModel<RequirementsModuleSettings>(
+                    this.pluginSettingsService,
+                    this.importMappingConfiguration,
+                    ReqIfJsonConverterUtility.BuildConverters());
+
+                this.dialogNavigationService.NavigateModal(saveDialog);
+            }
+            else
+            {
+                var settings = this.pluginSettingsService.Read<RequirementsModuleSettings>();
+                
+                var configurationToUpdateIndex = settings.SavedConfigurations.IndexOf(
+                    settings.SavedConfigurations.Single(x => x.Id == this.importMappingConfiguration.Id));
+                
+                settings.SavedConfigurations[configurationToUpdateIndex] = this.importMappingConfiguration;
+
+                this.pluginSettingsService.Write(settings, ReqIfJsonConverterUtility.BuildConverters());
+            }
         }
 
         /// <summary>

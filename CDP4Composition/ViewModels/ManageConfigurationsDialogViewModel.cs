@@ -1,65 +1,77 @@
-﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="ManageConfigurationsDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ManageConfigurationDialogViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -----------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4RelationshipMatrix.ViewModels
+namespace CDP4Composition.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.PluginSettingService;
-    using DialogResult;
+    using CDP4Composition.Services.PluginSettingService;
+    using CDP4Composition.ViewModels.DialogResult;
+
     using ReactiveUI;
-    using Settings;
 
     /// <summary>
     /// ViewModel for the dialog to manage matrix configurations
     /// </summary>
-    public class ManageConfigurationsDialogViewModel : DialogViewModelBase
+    /// <typeparam name="TPluginSettings">A type of <see cref="PluginSettings"/></typeparam>
+    public class ManageConfigurationsDialogViewModel<TPluginSettings> : DialogViewModelBase where TPluginSettings : PluginSettings
     {
-        /// <summary>
-        /// The dialog navigation service.
-        /// </summary>
-        private IDialogNavigationService dialogNavigationService;
-
         /// <summary>
         /// The plugin settings service.
         /// </summary>
-        private IPluginSettingsService pluginSettingService;
+        private readonly IPluginSettingsService pluginSettingService;
 
         /// <summary>
         /// Backing field for <see cref="SelectedConfiguration"/>
         /// </summary>
-        private SavedConfiguration selectedConfiguration;
-
-        /// <summary>
-        /// Backing field for <see cref="SavedConfigurations"/>
-        /// </summary>
-        private ReactiveList<SavedConfiguration> savedConfigurations;
-
+        private IPluginSavedConfiguration selectedConfiguration;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ManageConfigurationsDialogViewModel"/> class.
         /// </summary>
-        /// <param name="dialogNavigationService">An instance of <see cref="IDialogNavigationService"/>.</param>
         /// <param name="pluginSettingService">An instance of <see cref="IPluginSettingsService"/>.</param>
-        public ManageConfigurationsDialogViewModel(IDialogNavigationService dialogNavigationService,
-            IPluginSettingsService pluginSettingService)
+        public ManageConfigurationsDialogViewModel(IPluginSettingsService pluginSettingService)
         {
             // reset the loading indicator
             this.IsBusy = false;
 
-            this.dialogNavigationService = dialogNavigationService;
             this.pluginSettingService = pluginSettingService;
 
-            var settings = pluginSettingService.Read<RelationshipMatrixPluginSettings>();
+            var settings = pluginSettingService.Read<TPluginSettings>();
 
-            this.SavedConfigurations = new ReactiveList<SavedConfiguration>(settings.SavedConfigurations);
-            this.SavedConfigurations.ChangeTrackingEnabled = true;
+            this.SavedConfigurations = new ReactiveList<IPluginSavedConfiguration>(settings.SavedConfigurations)
+            {
+                ChangeTrackingEnabled = true
+            };
 
             this.OkCommand = ReactiveCommand.CreateAsyncTask(x => this.ExecuteOk(), RxApp.MainThreadScheduler);
             this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; });
@@ -90,19 +102,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets or sets the list of saved configurations.
         /// </summary>
-        public ReactiveList<SavedConfiguration> SavedConfigurations
-        {
-            get { return this.savedConfigurations; }
-            set { this.RaiseAndSetIfChanged(ref this.savedConfigurations, value); }
-        }
+        public ReactiveList<IPluginSavedConfiguration> SavedConfigurations { get; private set; }
 
         /// <summary>
         /// Gets or sets the selected configuration
         /// </summary>
-        public SavedConfiguration SelectedConfiguration
+        public IPluginSavedConfiguration SelectedConfiguration
         {
-            get { return this.selectedConfiguration; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedConfiguration, value); }
+            get => this.selectedConfiguration;
+            set => this.RaiseAndSetIfChanged(ref this.selectedConfiguration, value);
         }
 
         /// <summary>
@@ -113,9 +121,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </returns>
         private async Task ExecuteOk()
         {
-            var settings = this.pluginSettingService.Read<RelationshipMatrixPluginSettings>();
+            var settings = this.pluginSettingService.Read<TPluginSettings>();
 
-            settings.SavedConfigurations = this.SavedConfigurations.ToList();
+            settings.SavedConfigurations = this.SavedConfigurations;
 
             this.IsBusy = true;
 
@@ -155,7 +163,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             this.SavedConfigurations.Remove(this.SelectedConfiguration);
-            this.SelectedConfiguration = null;
+            this.SelectedConfiguration = default;
         }
     }
 }

@@ -2,8 +2,7 @@
 // <copyright file="PluginSettingsService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -30,12 +29,19 @@ namespace CDP4Composition.PluginSettingService
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
+    
     using CDP4Composition.Exceptions;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
+    
     using NLog;
 
+    /// <summary>
+    /// Implementation of a <see cref="IPluginSettingsService"/>
+    /// </summary>
     [Export(typeof(IPluginSettingsService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PluginSettingsService : IPluginSettingsService
@@ -43,22 +49,22 @@ namespace CDP4Composition.PluginSettingService
         /// <summary>
         /// The logger for the current class
         /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Path to special windows "AppData" folder 
         /// </summary>
-        public static string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        public readonly string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public static string CDP4ConfigurationDirectoryFolder = $"RHEA{Path.DirectorySeparatorChar}CDP4{Path.DirectorySeparatorChar}";
+        public readonly string Cdp4ConfigurationDirectoryFolder = $"RHEA{Path.DirectorySeparatorChar}CDP4{Path.DirectorySeparatorChar}";
 
         /// <summary>
         /// The setting file extension
         /// </summary>
-        public const string SETTING_FILE_EXTENSION = ".settings.json";
+        public const string SettingFileExtension = ".settings.json";
 
         /// <summary>
         /// A dictionary used to store the user plugin-setting of the application
@@ -76,49 +82,52 @@ namespace CDP4Composition.PluginSettingService
         /// <summary>
         /// Configuration file Directory
         /// </summary>
-        public string ApplicationConfigurationDirectory
-        {
-            get { return Path.Combine(AppDataFolder, CDP4ConfigurationDirectoryFolder); }
-        }
+        public string ApplicationConfigurationDirectory => Path.Combine(this.AppDataFolder, this.Cdp4ConfigurationDirectoryFolder);
 
         /// <summary>
-        /// Reads the <see cref="T"/> plug in settings
+        /// Reads the <see cref="TPluginSettings"/> in settings
         /// </summary>
-        /// <typeparam name="T">A type of <see cref="PluginSettings"/></typeparam>
-        /// <returns>
-        /// An instance of <see cref="PluginSettings"/>
-        /// </returns>
-        public T Read<T>() where T : PluginSettings
+        /// <typeparam name="TPluginSettings">A type of <see cref="PluginSettings"/></typeparam>
+        /// <param name="shouldReload">An assert wheter to reload from setting file</param>
+        /// <param name="converters">The Json data converters</param>
+        /// <returns> An instance of <see cref="TPluginSettings"/></returns>
+        public TPluginSettings Read<TPluginSettings>(bool shouldReload = false, params JsonConverter[] converters) where TPluginSettings : PluginSettings
         {
-            var assemblyName = this.QueryAssemblyTitle(typeof(T));
+            var assemblyName = this.QueryAssemblyTitle(typeof(TPluginSettings));
 
-            if (this.applicationUserPluginSettings.TryGetValue(assemblyName, out var result))
+            if (!shouldReload && this.applicationUserPluginSettings.TryGetValue(assemblyName, out var result))
             {
-                return result as T;
+                return (TPluginSettings)result;
             }
 
             this.CheckApplicationConfigurationDirectory();
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
 
-            logger.Debug("Read pluggin settings for {0} from {1}", assemblyName, path);
+            this.logger.Debug("Read pluggin settings for {0} from {1}", assemblyName, path);
 
             try
             {
-                using (var file = File.OpenText($"{path}{SETTING_FILE_EXTENSION}"))
+                using (var file = File.OpenText($"{path}{SettingFileExtension}"))
                 {
-                    var serializer = new JsonSerializer();
-                    result = (T)serializer.Deserialize(file, typeof(T));
+                    var settings = new JsonSerializerSettings
+                    {
+                        Converters = converters.ToList(), TypeNameHandling = TypeNameHandling.Auto,
+                        MissingMemberHandling = MissingMemberHandling.Ignore,
+                        DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate
+                    };
+
+                    result = JsonConvert.DeserializeObject<TPluginSettings>(file.ReadToEnd(), settings);
 
                     // once the settings have been read from disk, add them to the cache for fast access
-                    this.applicationUserPluginSettings.Add(assemblyName, result);
+                    this.applicationUserPluginSettings[assemblyName] = result;
 
-                    return (T)result;
+                    return (TPluginSettings) result;
                 }
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "The PluginSettings could not be read");
+                this.logger.Error(ex, "The PluginSettings could not be read");
 
                 throw new PluginSettingsException("The PluginSettings could not be read", ex);
             }
@@ -131,19 +140,19 @@ namespace CDP4Composition.PluginSettingService
         {
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
-                logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
+                this.logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
                 Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
-                logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
+                this.logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
             }
         }
 
         /// <summary>
-        /// Writes the <see cref="PluginSettings"/> to disk
+        /// Writes the <see cref="pluginSettings"/> to disk
         /// </summary>
-        /// <param name="pluginSettings">
-        /// The <see cref="PluginSettings"/> that will be persisted
-        /// </param>
-        public void Write<T>(T pluginSettings) where T : PluginSettings
+        /// <typeparam name="TPluginSettings">A type of <see cref="PluginSettings"/></typeparam>
+        /// <param name="pluginSettings"> The <see cref="PluginSettings"/> that will be persisted </param>
+        /// <param name="converters">The Json data converters</param>
+        public void Write<TPluginSettings>(TPluginSettings pluginSettings, params JsonConverter[] converters) where TPluginSettings : PluginSettings
         {
             if (pluginSettings == null)
             {
@@ -154,29 +163,26 @@ namespace CDP4Composition.PluginSettingService
 
             this.CheckApplicationConfigurationDirectory();
 
-            var path = Path.Combine(this.ApplicationConfigurationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}");
+            var path = Path.Combine(this.ApplicationConfigurationDirectory, $"{assemblyName}{SettingFileExtension}");
 
-            logger.Debug("write settings to for {0} to {1}", assemblyName, path);
-
+            this.logger.Debug("write settings to for {0} to {1}", assemblyName, path);
+            //Json DataTypeConverter custom converter
             using (var streamWriter = File.CreateText(path))
             {
-                var serializer = new JsonSerializer
+                var serializerSettings = new JsonSerializerSettings
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    Converters = converters.ToList(),
                     Formatting = Formatting.Indented
                 };
 
+                var serializer = JsonSerializer.Create(serializerSettings);
+
                 serializer.Serialize(streamWriter, pluginSettings);
             }
-
-            if (this.applicationUserPluginSettings.ContainsKey(assemblyName))
-            {
-                this.applicationUserPluginSettings[assemblyName] = pluginSettings;
-            }
-            else
-            {
-                this.applicationUserPluginSettings.Add(assemblyName, pluginSettings);
-            }
+            
+            this.applicationUserPluginSettings[assemblyName] = pluginSettings;
         }
 
         /// <summary>

@@ -28,7 +28,11 @@ namespace CDP4Composition.Tests.PluginSettingService
 {
     using System;
     using System.IO;
+    using System.Linq;
+
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Tests.Views;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -44,13 +48,13 @@ namespace CDP4Composition.Tests.PluginSettingService
         [SetUp]
         public void SetUp()
         {
-            this.expectedSettingsPath = 
-                Path.Combine(
-                    PluginSettingsService.AppDataFolder,
-                    PluginSettingsService.CDP4ConfigurationDirectoryFolder,
-                    "CDP4Composition.Tests.settings.json");
-            
             this.pluginSettingsService = new PluginSettingsService();
+         
+            this.expectedSettingsPath =
+                Path.Combine(
+                    this.pluginSettingsService.AppDataFolder,
+                    this.pluginSettingsService.Cdp4ConfigurationDirectoryFolder,
+                    "CDP4Composition.Tests.settings.json");
 
             this.testSettings = new TestSettings
             {
@@ -71,7 +75,7 @@ namespace CDP4Composition.Tests.PluginSettingService
         [Test]
         public void Verify_that_on_write_ArgumentNullException_is_thrown()
         {
-            Assert.Throws<ArgumentNullException>(() => this.pluginSettingsService.Write<TestSettings>(null));
+            Assert.Throws<ArgumentNullException>(() => this.pluginSettingsService.Write(default(TestSettings)));
         }
 
         [Test]
@@ -111,16 +115,18 @@ namespace CDP4Composition.Tests.PluginSettingService
 
             var id = Guid.NewGuid();
             var description = "this is a new description";
+            var ownTestConfigurationProperty = "NotNull";
 
             readSettings.Identifier = id;
             readSettings.Description = description;
+            readSettings.SavedConfigurations.Add(new TestConfiguration() { OwnTestConfigurationProperty = ownTestConfigurationProperty });
 
             this.pluginSettingsService.Write(readSettings);
-
             var newSettings = this.pluginSettingsService.Read<TestSettings>();
 
             Assert.AreEqual(id, newSettings.Identifier);
             Assert.AreEqual(description, newSettings.Description);
+            Assert.AreNotEqual($"-{ownTestConfigurationProperty}", newSettings.SavedConfigurations.OfType<TestConfiguration>().First().OwnTestConfigurationProperty);
         }
     }
 }

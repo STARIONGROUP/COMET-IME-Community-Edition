@@ -236,68 +236,68 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-            <dxlc:LayoutGroup Grid.Row="0" Orientation="Vertical" View="GroupBox">
-                <dxlc:LayoutItem>
-                    <dxb:ToolBarControl Height="25">
-                        <dxb:BarButtonItem Command="{Binding InspectCommand}"
-                                       Glyph="{dx:DXImage Image=Find_16x16.png}"
-                                       Hint="{Binding SelectedThingClassKindString,
-                                                        Converter={dx:FormatStringConverter FormatString={}Inspect {0}}}" />
-                    </dxb:ToolBarControl>
-                </dxlc:LayoutItem>
-                <dxg:TreeListControl x:Name="RequirementBrowserTreeListControl"
-                                     ItemsSource="{Binding PreviewRows}"
-                                     SelectedItem="{Binding SelectedThing}">
-                    <dxg:TreeListControl.Columns>
-                        <dxg:TreeListColumn FieldName="ShortName" Width="50"/>
-                        <dxg:TreeListColumn FieldName="Name" Width="Auto"/>
-                        <dxg:TreeListColumn FieldName="Definition" Width="Auto"/>
-                        <dxg:TreeListColumn FieldName="CategoryList" 
-                                            Width="Auto" 
-                                            CellTemplateSelector="{StaticResource CategorizableThingCellTemplateSelector}"/>
-                        <dxg:TreeListColumn FieldName="Scale" 
-                                            AllowEditing="True"
-                                            CellTemplateSelector="{StaticResource ScaleCellTemplateSelector}"/>
-                    </dxg:TreeListControl.Columns>
-                    <dxg:TreeListControl.View>
-                        <dxg:TreeListView x:Name="View"
-                                          AllowEditing="False"
-                                          AutoWidth="True"
-                                          AutoExpandAllNodes="False"
-                                          HorizontalScrollbarVisibility="Auto"
-                                          NavigationStyle="Cell"
-                                          ShowHorizontalLines="False"
-                                          ShowIndicator="False"
-                                          ShowNodeImages="False"
-                                          ShowVerticalLines="False"
-                                          TreeDerivationMode="HierarchicalDataTemplate"
-                                          TreeLineStyle="Solid"
-                                          VerticalScrollbarVisibility="Auto"
-                                          EnableImmediatePosting="True">
-                            <dxg:TreeListView.FocusedRow>
-                                <dynamic:ExpandoObject />
-                            </dxg:TreeListView.FocusedRow>
-                        </dxg:TreeListView>
-                    </dxg:TreeListControl.View>
-                </dxg:TreeListControl>
+        <dxlc:LayoutGroup Grid.Row="0" Orientation="Vertical" View="GroupBox">
+            <dxlc:LayoutItem>
+                <dxb:ToolBarControl Height="25">
+                    <dxb:BarButtonItem Command="{Binding InspectCommand}"
+                                   Glyph="{dx:DXImage Image=Find_16x16.png}"
+                                   Hint="{Binding SelectedThingClassKindString,
+                                                    Converter={dx:FormatStringConverter FormatString={}Inspect {0}}}" />
+                </dxb:ToolBarControl>
+            </dxlc:LayoutItem>
+            <dxg:TreeListControl x:Name="RequirementBrowserTreeListControl"
+                                 ItemsSource="{Binding PreviewRows}"
+                                 SelectedItem="{Binding SelectedThing}">
+                <dxg:TreeListControl.Columns>
+                    <dxg:TreeListColumn FieldName="ShortName" Width="50"/>
+                    <dxg:TreeListColumn FieldName="Name" Width="Auto"/>
+                    <dxg:TreeListColumn FieldName="Definition" Width="Auto"/>
+                    <dxg:TreeListColumn FieldName="CategoryList" 
+                                        Width="Auto" 
+                                        CellTemplateSelector="{StaticResource CategorizableThingCellTemplateSelector}"/>
+                    <dxg:TreeListColumn FieldName="Scale" 
+                                        AllowEditing="True"
+                                        CellTemplateSelector="{StaticResource ScaleCellTemplateSelector}"/>
+                </dxg:TreeListControl.Columns>
+                <dxg:TreeListControl.View>
+                    <dxg:TreeListView x:Name="View"
+                                      AllowEditing="False"
+                                      AutoWidth="True"
+                                      AutoExpandAllNodes="False"
+                                      HorizontalScrollbarVisibility="Auto"
+                                      NavigationStyle="Cell"
+                                      ShowHorizontalLines="False"
+                                      ShowIndicator="False"
+                                      ShowNodeImages="False"
+                                      ShowVerticalLines="False"
+                                      TreeDerivationMode="HierarchicalDataTemplate"
+                                      TreeLineStyle="Solid"
+                                      VerticalScrollbarVisibility="Auto"
+                                      EnableImmediatePosting="True">
+                        <dxg:TreeListView.FocusedRow>
+                            <dynamic:ExpandoObject />
+                        </dxg:TreeListView.FocusedRow>
+                    </dxg:TreeListView>
+                </dxg:TreeListControl.View>
+            </dxg:TreeListControl>
 
-                <TextBox IsReadOnly="True"
-                         VerticalAlignment="Bottom"
-                         Text="{Binding Path=ErrorMessage,
-                                        Mode=OneWay}"
-                         Visibility="{Binding Path=HasError,
-                                              UpdateSourceTrigger=PropertyChanged,
-                                              Converter={StaticResource BooleanToVisibilityConverter}}" />
-            </dxlc:LayoutGroup>
+            <TextBox IsReadOnly="True"
+                     VerticalAlignment="Bottom"
+                     Text="{Binding Path=ErrorMessage,
+                                    Mode=OneWay}"
+                     Visibility="{Binding Path=HasError,
+                                          UpdateSourceTrigger=PropertyChanged,
+                                          Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </dxlc:LayoutGroup>
 
-            <views:LoadingControl Grid.Row="0" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
+        <views:LoadingControl Grid.Row="0" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
 
-            <dxlc:LayoutGroup Orientation="Horizontal" 
-                              Grid.Row="1"
-                              Height="35"
-                              Margin="3"
-                              VerticalAlignment="Bottom"
-                              HorizontalAlignment="Right">
+        <dxlc:LayoutGroup Orientation="Horizontal" 
+                          Grid.Row="1"
+                          Height="35"
+                          Margin="3"
+                          VerticalAlignment="Bottom"
+                          HorizontalAlignment="Right">
             <Button MinWidth="75"
                     MinHeight="25"
                     MaxWidth="75"
@@ -312,13 +312,22 @@
                     HorizontalAlignment="Right"
                     Command="{Binding Path=OkCommand}"
                     Content="OK" />
-                <Button MinWidth="75"
+            <Button MinWidth="75"
                     MinHeight="25"
                     MaxWidth="75"
                     MaxHeight="25"
                     HorizontalAlignment="Right"
                     Command="{Binding Path=CancelCommand}"
                     Content="Cancel" />
-            </dxlc:LayoutGroup>
+            <dx:SimpleButton MinWidth="75"
+                             MinHeight="25"
+                             MaxWidth="150"
+                             MaxHeight="25"
+                             GlyphAlignment="Right"
+                             Command="{Binding SaveMappingCommand}"
+                             ToolTip="Save Current Configuration"
+                             Glyph="{dx:DXImage Image=Save_16x16.png}"
+                             Content="Save Mapping"/>
+        </dxlc:LayoutGroup>
     </Grid>
 </dx:DXWindow>

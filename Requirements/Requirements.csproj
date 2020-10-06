@@ -26,6 +26,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4Requirements\</OutputPath>

@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RelationshipMatrixPluginSettingsTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="RelationshpMatrixPluginSettingsTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -23,6 +22,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 
 namespace CDP4RelationshipMatrix.Tests.Settings
 {
@@ -51,15 +51,16 @@ namespace CDP4RelationshipMatrix.Tests.Settings
         [SetUp]
         public void SetUp()
         {
+            this.pluginSettingsService = new PluginSettingsService();
+
             this.expectedSettingsPath =
                 Path.Combine(
-                    PluginSettingsService.AppDataFolder,
-                    PluginSettingsService.CDP4ConfigurationDirectoryFolder,
+                    this.pluginSettingsService.AppDataFolder,
+                    this.pluginSettingsService.Cdp4ConfigurationDirectoryFolder,
                     "CDP4RelationshipMatrix.settings.json");
 
             this.regionManager = new Mock<IRegionManager>();
 
-            this.pluginSettingsService = new PluginSettingsService();
             this.relationshipMatrixModule = new RelationshipMatrixModule(this.regionManager.Object, null, null, null, null, null);
 
             this.settings = new RelationshipMatrixPluginSettings
@@ -93,7 +94,7 @@ namespace CDP4RelationshipMatrix.Tests.Settings
         {
             var expectedSettingsContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "Settings", "expectedSettings.settings.json"));
 
-            Assert.DoesNotThrow(() => this.pluginSettingsService.Write(settings));
+            Assert.DoesNotThrow(() => this.pluginSettingsService.Write(this.settings));
 
             var writtenContent = File.ReadAllText(this.expectedSettingsPath);
             Assert.That(expectedSettingsContent, Is.EqualTo(writtenContent));

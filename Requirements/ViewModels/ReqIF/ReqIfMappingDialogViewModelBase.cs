@@ -45,7 +45,7 @@ namespace CDP4Requirements.ViewModels
         /// The <see cref="IThingDialogNavigationService"/>
         /// </summary>
         protected readonly IThingDialogNavigationService ThingDialogNavigationService;
-
+        
         /// <summary>
         /// The unique clone of the current <see cref="Iteration"/> to update
         /// </summary>

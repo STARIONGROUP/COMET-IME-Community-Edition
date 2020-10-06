@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequirementsModuleSettings.cs" company="RHEA System S.A.">
+// <copyright file="IPluginSettingConfiguration.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
@@ -23,26 +23,28 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements
+namespace CDP4Composition.Services.PluginSettingService
 {
-    using CDP4Composition.PluginSettingService;
+    using System;
 
     /// <summary>
-    /// A setting class for the requirement module
+    /// Interface for plugin settings that saves configurations
     /// </summary>
-    public class RequirementsModuleSettings : PluginSettings
+    public interface IPluginSavedConfiguration
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RequirementsModuleSettings"/> class
+        /// Gets the Unique identifier
         /// </summary>
-        public RequirementsModuleSettings()
-        {
-            this.OrderSettings = new OrderSettings();
-        }
+        Guid Id { get; }
 
         /// <summary>
-        /// Gets or sets the order-settings
+        /// Gets or sets the name of the saved configuration.
         /// </summary>
-        public OrderSettings OrderSettings { get; set; }
+        string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the description of the saved configuration.
+        /// </summary>
+        string Description { get; set; }
     }
 }

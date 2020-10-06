@@ -9,6 +9,8 @@ namespace CDP4Requirements.Tests.ReqIF
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Threading;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -28,10 +30,10 @@ namespace CDP4Requirements.Tests.ReqIF
     using Moq;
 
     using NUnit.Framework;
-
+    using ReactiveUI;
     using ReqIFSharp;
 
-    [TestFixture]
+    [TestFixture, Apartment(ApartmentState.STA)]
     internal class SpecRelationTypeMappingDialogTestFixture
     {
         /// <summary>
@@ -78,6 +80,8 @@ namespace CDP4Requirements.Tests.ReqIF
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
             this.session = new Mock<ISession>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -121,7 +125,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.reqIf.CoreContent.Add(corecontent);
             this.stringDatadef = new DatatypeDefinitionString();
             this.spectype = new SpecRelationType();
-            this.attribute = new AttributeDefinitionString() { DatatypeDefinition = this.stringDatadef };
+            this.attribute = new AttributeDefinitionString() { Identifier = Guid.NewGuid().ToString(), DatatypeDefinition = this.stringDatadef };
 
             this.spectype.SpecAttributes.Add(this.attribute);
 
@@ -214,6 +218,47 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.IsTrue(res.Result.Value);
             Assert.IsTrue(res.GoNext.Value);
             Assert.IsNotEmpty(res.Map);
+        }
+
+        [Test]
+        public void VerifyThatExistingMapIsApplied()
+        {
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var rule = new ParameterizedCategoryRule(Guid.NewGuid(), this.assembler.Cache, this.uri) {Category = category};
+            var binaryRelationshipRule = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { RelationshipCategory = category, TargetCategory = category, SourceCategory = category};
+            var categoryVm = new CategoryComboBoxItemViewModel(category, true);
+
+            Dictionary<SpecRelationType, SpecRelationTypeMap> specRelationTypeMaps = null;
+
+            var datatypeDefinitionMaps = new Dictionary<DatatypeDefinition, DatatypeDefinitionMap> { { this.stringDatadef, new DatatypeDefinitionMap(this.stringDatadef, this.pt, null) } };
+            var newDialog = new SpecRelationTypeMappingDialogViewModel(new List<SpecRelationType> { this.spectype }, specRelationTypeMaps, datatypeDefinitionMaps, this.iteration, this.session.Object, this.thingDialogNavigationService.Object, "en");
+            Assert.IsEmpty(newDialog.SpecTypes.SelectMany(x => x.SelectedCategories));
+            Assert.IsNull(newDialog.SpecTypes[0].SelectedRules);
+            Assert.IsNull(newDialog.SpecTypes[0].SelectedBinaryRelationshipRules);
+
+            var row = newDialog.SpecTypes.First();
+            row.PossibleBinaryRelationshipRules.Add(binaryRelationshipRule);
+            row.PossibleCategories.Add(categoryVm);
+            row.PossibleRules.Add(rule);
+            
+            specRelationTypeMaps = new Dictionary<SpecRelationType, SpecRelationTypeMap>()
+            {
+                {
+                    this.spectype,
+                    new SpecRelationTypeMap(
+                        this.spectype,
+                        new [] { rule }, 
+                        new [] { category },
+                        new List<AttributeDefinitionMap>() { new AttributeDefinitionMap(this.attribute, AttributeDefinitionMapKind.SHORTNAME)},
+                        new [] { binaryRelationshipRule })
+                }
+            };
+
+            newDialog.PopulateRelationTypeMapProperties(specRelationTypeMaps);
+
+            Assert.IsNotEmpty(newDialog.SpecTypes.SelectMany(x => x.SelectedCategories));
+            Assert.IsNotEmpty(newDialog.SpecTypes.SelectMany(x => x.SelectedRules));
+            Assert.IsNotEmpty(newDialog.SpecTypes.SelectMany(x => x.SelectedBinaryRelationshipRules));
         }
     }
 }

@@ -37,6 +37,9 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
+    using CDP4Composition.ViewModels;
+    using CDP4Composition.ViewModels.DialogResult;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
     using Microsoft.Practices.ServiceLocation;
@@ -45,7 +48,6 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using ReactiveUI;
 
     using ViewModels;
-    using ViewModels.DialogResult;
 
     public abstract class ViewModelTestBase
     {
@@ -100,10 +102,10 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
 
-            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<ManageConfigurationsDialogViewModel>()))
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<ManageConfigurationsDialogViewModel<PluginSettings>>()))
                 .Returns(new ManageConfigurationsResult(true));
 
-            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<SavedConfigurationDialogViewModel>()))
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<SavedConfigurationDialogViewModel<PluginSettings>>()))
                 .Returns(new SavedConfigurationResult(true));
 
             this.permissionService = new Mock<IPermissionService>();
@@ -208,7 +210,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.settings = new RelationshipMatrixPluginSettings();
             this.settings.PossibleClassKinds.Add(ClassKind.ElementDefinition);
             this.settings.PossibleClassKinds.Add(ClassKind.ElementUsage);
-            this.pluginService.Setup(x => x.Read<RelationshipMatrixPluginSettings>()).Returns(this.settings);
+            this.pluginService.Setup(x => x.Read<RelationshipMatrixPluginSettings>(false)).Returns(this.settings);
 
             this.pluginService.Setup(x => x.Write(It.IsAny<RelationshipMatrixPluginSettings>()));
         }

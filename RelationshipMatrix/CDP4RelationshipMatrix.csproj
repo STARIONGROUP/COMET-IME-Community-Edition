@@ -244,17 +244,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\ManageConfigurationsDialog.xaml.cs">
-      <DependentUpon>ManageConfigurationsDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Views\RelationshipMatrix.xaml.cs">
       <DependentUpon>RelationshipMatrix.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\RelationshipMatrixRibbon.xaml.cs">
       <DependentUpon>RelationshipMatrixRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SavedConfigurationDialog.xaml.cs">
-      <DependentUpon>SavedConfigurationDialog.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -265,19 +259,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\ManageConfigurationsDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\RelationshipMatrix.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\RelationshipMatrixRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SavedConfigurationDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
