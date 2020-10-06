@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDataCollector.cs" company="RHEA System S.A.">
+// <copyright file="IReportScriptDataProvider.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,17 +25,48 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using System.Collections.Generic;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
+    using CDP4Dal;
+
     /// <summary>
-    /// The interface used for collecting data.
+    /// The interface used for classes that can be used in a Report Script to provide commonly used objects to the script editor.
     /// </summary>
-    public interface IDataCollector
+    public interface IReportScriptDataProvider
     {
         /// <summary>
-        /// Creates a new data object instance. Could be anything depending on what the data is used for.
+        /// Gets the <see cref="Iteration"/>
         /// </summary>
-        /// <returns>
-        /// An object instance.
-        /// </returns>
-        object CreateDataObject();
+        Iteration Iteration { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ISession"/>
+        /// </summary>
+        ISession Session { get; }
+
+        /// <summary>
+        /// Gets the <see cref="DomainOfExpertise"/>
+        /// </summary>
+        DomainOfExpertise DomainOfExpertise { get; }
+
+        /// <summary>
+        /// All currently open <see cref="ReferenceDataLibrary"/>s in this <see cref="IDataCollector.Session"/>
+        /// </summary>
+        public IEnumerable<ReferenceDataLibrary> OpenReferenceDataLibraries { get; }
+
+        /// <summary>
+        /// The current <see cref="SiteDirectory"/>s in this <see cref="IDataCollector.Session"/>
+        /// </summary>
+        public SiteDirectory SiteDirectory { get; }
+
+        /// <summary>
+        /// Initializes this DataCollector 
+        /// </summary>
+        /// <param name="iteration"></param>
+        /// <param name="session"></param>
+        void Initialize(Iteration iteration, ISession session);
     }
 }

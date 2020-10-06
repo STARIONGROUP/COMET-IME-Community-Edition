@@ -641,7 +641,10 @@ namespace CDP4Reporting.ViewModels
                     return null;
                 }
 
-                instObj.Initialize(this.Thing, this.Session);
+                if (instObj is IReportScriptDataProvider reportScriptDataProvider)
+                {
+                    reportScriptDataProvider.Initialize(this.Thing, this.Session);
+                }
 
                 return instObj.CreateDataObject();
             }
@@ -789,7 +792,10 @@ namespace CDP4Reporting.ViewModels
                     return result;
                 }
 
-                instObj.Initialize(this.Thing, this.Session);
+                if (instObj is IReportScriptDataProvider reportScriptDataProvider)
+                {
+                    reportScriptDataProvider.Initialize(this.Thing, this.Session);
+                }
 
                 result = instObj.CreateParameters(dataSource)?.ToList();
             }

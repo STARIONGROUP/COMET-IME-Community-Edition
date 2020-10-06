@@ -592,14 +592,7 @@ namespace CDP4Reporting.Tests.DataCollection
             // tabular representation built, category hierarchy considered, unneeded subtrees pruned
             var rows = dataSource.GetTable(hierarchy, nestedElementTree).Rows;
 
-            if (shouldBeFound)
-            {
-                Assert.AreEqual(2, rows.Count);
-            }
-            else
-            {
-                Assert.AreEqual(1, rows.Count);
-            }
+            Assert.AreEqual(shouldBeFound ? 2 : 1, rows.Count);
         }
 
         private static void ValidateRow(

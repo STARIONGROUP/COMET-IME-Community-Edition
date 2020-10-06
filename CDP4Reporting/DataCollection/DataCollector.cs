@@ -25,54 +25,8 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    using System.Collections.Generic;
-
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
-    using CDP4Dal;
-
-    public abstract class DataCollector : IDataCollector
+    public abstract class DataCollector : ReportScriptDataProvider, IDataCollector
     {
-        /// <summary>
-        /// Gets or sets the <see cref="Iteration"/>
-        /// </summary>
-        public Iteration Iteration { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="ISession"/>
-        /// </summary>
-        public ISession Session { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="DomainOfExpertise"/>
-        /// </summary>
-        public DomainOfExpertise DomainOfExpertise { get; private set; }
-
-        /// <summary>
-        /// All currently open <see cref="ReferenceDataLibrary"/>s in this <see cref="IDataCollector.Session"/>
-        /// </summary>
-        public IEnumerable<ReferenceDataLibrary> OpenReferenceDataLibraries { get; private set; }
-
-        /// <summary>
-        /// The current <see cref="SiteDirectory"/>s in this <see cref="IDataCollector.Session"/>
-        /// </summary>
-        public SiteDirectory SiteDirectory { get; private set; }
-
-        /// <summary>
-        /// Initializes this DataCollector 
-        /// </summary>
-        /// <param name="session">The <see cref="ISession"/></param>
-        /// <param name="iteration"></param>
-        public void Initialize(Iteration iteration, ISession session)
-        {
-            this.Iteration = iteration;
-            this.Session = session;
-            this.DomainOfExpertise = session.QueryCurrentDomainOfExpertise();
-            this.OpenReferenceDataLibraries = session.OpenReferenceDataLibraries;
-            this.SiteDirectory = session.RetrieveSiteDirectory();
-        }
-
         /// <summary>
         /// Creates a new data collection instance.
         /// </summary>
