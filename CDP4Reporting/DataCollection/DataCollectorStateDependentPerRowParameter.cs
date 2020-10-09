@@ -25,20 +25,52 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    using System;
     using System.Data;
     using System.Linq;
 
     /// <summary>
     /// Abstract base class from which parameter columns, that result in seperate <see cref="DataRow"/>s per state, need to derive.
     /// </summary>
-    public abstract class DataCollectorStateDependentPerRowParameter<TRow, TValue> : DataCollectorParameter<TRow, TValue>  where TRow : DataCollectorRow, new()
+    public abstract class DataCollectorStateDependentPerRowParameter<TRow, TValue> : DataCollectorParameter<TRow, TValue>, IDataCollectorStateDependentPerRowParameter  where TRow : DataCollectorRow, new()
     {
         /// <summary>
-        /// Overrides the Value property and throws an <see cref="Exception"/>
+        /// The name of the Parameter Name column
         /// </summary>
-        public new TValue Value => throw new NotSupportedException(
-            $"Getting the Value property of a {nameof(DataCollectorStateDependentPerRowParameter<TRow, TValue>)} object is not supported");
+        private const string columnParameterName = "ParameterName";
+
+        /// <summary>
+        /// The name of the Parameter State column
+        /// </summary>
+        private const string columnStateName = "ParameterState";
+
+        /// <summary>
+        /// The name of the Value column
+        /// </summary>
+        private const string columnValue = "ParameterValue";
+
+        /// <summary>
+        /// Initialize a DataTable so the correct columns will be available when writing state dependent parameter data
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/>.
+        /// </param>
+        public void InitializeColumns(DataTable table)
+        {
+            if (!table.Columns.Contains(columnParameterName))
+            {
+                table.Columns.Add(columnParameterName, typeof(string));
+            }
+
+            if (!table.Columns.Contains(columnStateName))
+            {
+                table.Columns.Add(columnStateName, typeof(string));
+            }
+
+            if (!table.Columns.Contains(columnValue))
+            {
+                table.Columns.Add(columnValue, typeof(TValue));
+            }
+        }
 
         /// <summary>
         /// Populates with data the <see cref="DataTable.Columns"/> associated with this object
@@ -52,43 +84,13 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         public override void Populate(DataTable table, DataRow row)
         {
-            if (this.ValueSets?.Any() ?? false)
+            if (this.HasValueSets)
             {
-                foreach (var valueSet in this.ValueSets)
-                {
-                    var currentRow = table.NewRow();
+                var valueSet = this.ValueSets.First();
 
-                    var clone = new object[row.ItemArray.Length];
-                    Array.Copy(row.ItemArray, clone, row.ItemArray.Length);
-                    currentRow.ItemArray = clone;
-
-                    table.Rows.Add(currentRow);
-
-                    var columnParameterName = "ParameterName";
-                    var columnStateName = "ParameterState";
-                    var columnValue = "ParameterValue";
-
-                    if (!table.Columns.Contains(columnParameterName))
-                    {
-                        table.Columns.Add(columnParameterName, typeof(string));
-                    }
-
-                    currentRow[columnParameterName] = this.FieldName;
-
-                    if (!table.Columns.Contains(columnStateName))
-                    {
-                        table.Columns.Add(columnStateName, typeof(string));
-                    }
-
-                    currentRow[columnStateName] = valueSet.ActualState?.ShortName;
-
-                    if (!table.Columns.Contains(columnValue))
-                    {
-                        table.Columns.Add(columnValue, typeof(TValue));
-                    }
-
-                    currentRow[columnValue] = this.GetValueSetValue(valueSet);
-                }
+                row[columnParameterName] = this.FieldName;
+                row[columnStateName] = valueSet.ActualState?.ShortName;
+                row[columnValue] = this.GetValueSetValue(valueSet);
             }
         }
     }

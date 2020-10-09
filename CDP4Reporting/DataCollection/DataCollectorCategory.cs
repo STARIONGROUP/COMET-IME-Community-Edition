@@ -88,9 +88,6 @@ namespace CDP4Reporting.DataCollection
         /// Populates with data the <see cref="DataTable.Columns"/> associated with this object
         /// in the given <paramref name="row"/>.
         /// </summary>
-        /// <param name="table">
-        /// The <see cref="DataTable"/> to which the <paramref name="row"/> belongs to.
-        /// </param>
         /// <param name="row">
         /// The <see cref="DataRow"/> to be populated.
         /// </param>

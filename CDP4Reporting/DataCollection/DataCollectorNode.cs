@@ -56,7 +56,7 @@ namespace CDP4Reporting.DataCollection
         private Dictionary<PropertyInfo, Type> normalColumns { get; set; }
 
         /// <summary>
-        /// Gets or sets a <see cref="Dictionary{TKey,TValue}"/> of all the <see cref="DataCollectorStateDependentPerRowParameter{TRow,TValue}"/>s
+        /// Gets or sets a <see cref="Dictionary{TKey,TValue}"/> of all classes that implement <see cref="IDataCollectorStateDependentPerRowParameter"/>
         /// declared as <see cref="DataCollectorRow"/> fields.
         /// </summary>
         private Dictionary<PropertyInfo, Type> stateDependentColumns { get; set; }
@@ -125,7 +125,7 @@ namespace CDP4Reporting.DataCollection
         /// <summary>
         /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="categoryDecompositionHierarchy"/>.
         /// </summary>
-        private bool IsVisible => this.NestedElement.IsMemberOfCategory(this.categoryDecompositionHierarchy.Category);
+        private bool IsVisible => this.NestedElement.IsMemberOfCategory(this.categoryDecompositionHierarchy.Category) && !this.Children.Any(x => x.IsVisible);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectorNode{T}"/> class.
@@ -178,8 +178,13 @@ namespace CDP4Reporting.DataCollection
         private void Initialize()
         {
             this.stateDependentColumns = typeof(T).GetProperties()
-                .Where(f => this.isSubclassOfRawGeneric(f.PropertyType, typeof(DataCollectorStateDependentPerRowParameter<,>)))
+                .Where(f => f.PropertyType.GetInterfaces().Any(i => i == typeof(IDataCollectorStateDependentPerRowParameter)))
                 .ToDictionary(f => f, f => f.PropertyType);
+
+            if (this.stateDependentColumns.Select(x => x.Value).Distinct().Count() > 1)
+            {
+                throw new InvalidOperationException("DataCollectorStateDependentPerRowParameter properties need to be of the same type.");
+            }
 
             this.normalColumns = typeof(T).GetProperties()
                 .Where(f => f.PropertyType.IsSubclassOf(typeof(DataCollectorColumn<T>)))
@@ -189,29 +194,6 @@ namespace CDP4Reporting.DataCollection
             this.publicGetterProperties = typeof(T).GetProperties()
                 .Where(p => p.GetMethod?.IsPublic == true)
                 .Except(this.allColumns.Select(x =>x.Key));
-        }
-
-        /// <summary>
-        /// Checks if a property <see cref="Type"/> is a subclass of a specific generic type.
-        /// </summary>
-        /// <param name="propertyType">The property <see cref="Type"/></param>
-        /// <param name="genericType">The generic <see cref="Type"/></param>
-        /// <returns>True if the <paramref name="propertyType"/> is a subclass of <see cref="genericType"/>, otherwise false.</returns>
-        private bool isSubclassOfRawGeneric(Type propertyType, Type genericType)
-        {
-            while (propertyType != null && propertyType != typeof(object))
-            {
-                var cur = propertyType.IsGenericType ? propertyType.GetGenericTypeDefinition() : propertyType;
-
-                if (genericType == cur)
-                {
-                    return true;
-                }
-
-                propertyType = propertyType.BaseType;
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -271,6 +253,52 @@ namespace CDP4Reporting.DataCollection
         {
             var table = new DataTable();
 
+            this.CreateDataColumnsForCategoryDecompositionHierarchy(table);
+            this.CreateDataColumnsForPublicGetters(table);
+            this.CheckDataColumnsForStateDependentPerRowParameters(table);
+
+            this.AddDataRows(table, excludeMissingParameters);
+
+            return table;
+        }
+
+        /// <summary>
+        /// Create <see cref="DataColumn"/>s for properties of <see cref="T"/> whose <see cref="System.Type"/> implements <see cref="IDataCollectorStateDependentPerRowParameter"/>.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> where to add the columns to.
+        /// </param>
+        private void CheckDataColumnsForStateDependentPerRowParameters(DataTable table)
+        {
+            foreach (var rowField in this.stateDependentColumns)
+            {
+                var column = rowField.Key.GetValue(this.GetRowRepresentation()) as IDataCollectorStateDependentPerRowParameter;
+                column?.InitializeColumns(table);
+            }
+        }
+
+        /// <summary>
+        /// Create <see cref="DataColumn"/>s for properties of <see cref="T"/> that have public getters.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> where to add the columns to.
+        /// </param>
+        private void CreateDataColumnsForPublicGetters(DataTable table)
+        {
+            foreach (var publicGetter in this.publicGetterProperties)
+            {
+                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
+            }
+        }
+
+        /// <summary>
+        /// Create <see cref="DataColumn"/>s that ned to be created from the <see cref="CategoryDecompositionHierarchy"/>'s point of view.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> where to add the columns to.
+        /// </param>
+        private void CreateDataColumnsForCategoryDecompositionHierarchy(DataTable table)
+        {
             for (var hierarchy = this.categoryDecompositionHierarchy; hierarchy != null; hierarchy = hierarchy.Child)
             {
                 if (hierarchy.IsRecursive)
@@ -285,31 +313,20 @@ namespace CDP4Reporting.DataCollection
                     table.Columns.Add(hierarchy.FieldName, typeof(string));
                 }
             }
-
-            foreach (var publicGetter in this.publicGetterProperties)
-            {
-                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
-            }
-
-            this.AddDataRows(table, excludeMissingParameters);
-
-            return table;
         }
 
         /// <summary>
         /// Gets the row representation of this node.
         /// </summary>
+        /// <param name="forceNew">
+        /// If set to true, a new <see cref="T"/> will be created and the cach field <see cref="rowRepresentation"/> will not be set.
+        /// </param>
         /// <returns>
         /// A <see cref="DataCollectorRow"/>.
         /// </returns>
-        private T GetRowRepresentation()
+        private T GetRowRepresentation(bool forceNew = false)
         {
-            if (!this.IsVisible)
-            {
-                return null;
-            }
-
-            if (this.rowRepresentation != null)
+            if (!forceNew && this.rowRepresentation != null)
             {
                 return this.rowRepresentation;
             }
@@ -332,6 +349,11 @@ namespace CDP4Reporting.DataCollection
 
                 column?.Initialize(this, rowField.Key);
                 rowField.Key.SetValue(row, column);
+            }
+
+            if (forceNew)
+            {
+                return row;
             }
 
             return this.rowRepresentation = row;
@@ -365,8 +387,8 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         internal void AddDataRows(DataTable table, bool excludeMissingParameters)
         {
-            if ((!excludeMissingParameters || this.ParameterColumnsHaveValueSets()) 
-                && this.IsVisible 
+            if (this.IsVisible 
+                && (!excludeMissingParameters || this.ParameterColumnsHaveValueSets())
                 && this.categoryDecompositionHierarchy.Child == null)
             {
                 this.AddDataRow(table);
@@ -389,59 +411,120 @@ namespace CDP4Reporting.DataCollection
         /// </returns>
         private void AddDataRow(DataTable table)
         {
-            var row = table.NewRow();
-            table.Rows.Add(row);
+            var rowPresentationTuples = this.FillStateDependentParameterColumns(table);
 
-            var rowPresentation = this.GetRowRepresentation();
-
-            this.InitializeCategoryColumns(row);
-
-            foreach (var rowField in this.normalColumns)
+            if (!rowPresentationTuples.Any())
             {
-                var column = rowField.Key.GetValue(rowPresentation) as DataCollectorColumn<T>;
-
-                column?.Populate(table, row);
+                rowPresentationTuples.Add((this.GetRowRepresentation(), table.NewRow()));
             }
 
-            foreach (var publicGetter in this.publicGetterProperties)
+            foreach (var (rowPresentation, dataRow) in rowPresentationTuples)
             {
-                row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
-                    this.GetRowRepresentation(),
-                    new object[] { });
-            }
+                table.Rows.Add(dataRow);
 
-            var removeOriginalColumn = false;
-
-            foreach (var rowField in this.stateDependentColumns)
-            {
-                var column = rowField.Key.GetValue(rowPresentation) as DataCollectorColumn<T>;
-
-                column?.Populate(table, row);
-
-                if (column is IDataCollectorParameter dataCollectorParameter && dataCollectorParameter.HasValueSets)
-                {
-                    removeOriginalColumn = true;
-                }
-            }
-
-            if (removeOriginalColumn)
-            {
-                table.Rows.Remove(row);
+                this.FillCategoryDecompositionHierarchyColumns(dataRow);
+                this.FillNormalColumns(rowPresentation, dataRow);
+                this.FillPublicGetterColumns(rowPresentation, dataRow);
             }
         }
 
         /// <summary>
-        /// Initializes the category columns for the given <paramref name="row"/>
+        /// Fills the <see cref="DataColumn"/>s with data for properties of an instance of <see cref="T"/> whose <see cref="Type"/> implement <see cref="IDataCollectorStateDependentPerRowParameter"/>.
+        /// with values from the current node.
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/> to fill.
+        /// </param>
+        private List<(T rowPresentation, DataRow dataRow)> FillStateDependentParameterColumns(DataTable table)
+        {
+            var mainRowPresentation = this.GetRowRepresentation();
+            var rowPresentationTuples = new List<(T rowPresentation, DataRow dataRow)>();
+
+            if (mainRowPresentation != null && this.stateDependentColumns.Any())
+            {
+                foreach (var rowField in this.stateDependentColumns)
+                {
+                    var column = rowField.Key.GetValue(mainRowPresentation) as DataCollectorColumn<T>;
+
+                    if (!(column is IDataCollectorParameter dataCollectorParameter) || !dataCollectorParameter.HasValueSets)
+                    {
+                        continue;
+                    }
+
+                    foreach (var valueSet in dataCollectorParameter.ValueSets)
+                    {
+                        var stateRowPresentation = this.GetRowRepresentation(true);
+                        var stateColumn = rowField.Key.GetValue(stateRowPresentation) as DataCollectorColumn<T>;
+
+                        if (!(stateColumn is IDataCollectorParameter stateDataCollectorParameter))
+                        {
+                            continue;
+                        }
+
+                        stateDataCollectorParameter.ValueSets = new List<IValueSet> { valueSet };
+                        var stateDataRow = table.NewRow();
+
+                        stateColumn.Populate(table, stateDataRow);
+
+                        rowPresentationTuples.Add((stateRowPresentation, stateDataRow));
+                    }
+                }
+            }
+
+            return rowPresentationTuples;
+        }
+
+        /// <summary>
+        /// Fills the <see cref="categoryDecompositionHierarchy"/> related <see cref="DataColumn"/>s for the given <paramref name="row"/>
         /// with values from the current node.
         /// </summary>
         /// <param name="row">
-        /// The <see cref="DataRow"/> to initialize.
+        /// The <see cref="DataRow"/> to fill.
         /// </param>
-        private void InitializeCategoryColumns(DataRow row)
+        private void FillCategoryDecompositionHierarchyColumns(DataRow row)
         {
-            this.parent?.InitializeCategoryColumns(row);
+            this.parent?.FillCategoryDecompositionHierarchyColumns(row);
 
             row[this.FieldName] = this.ElementBase.Name;
+        }
+
+        /// <summary>
+        /// Fill the related <see cref="DataColumn"/>s of properties of an instance of <see cref="T"/> that have public getters for the given <paramref name="row"/>
+        /// with values from the current node.
+        /// </summary>
+        /// <param name="rowPresentation">
+        /// The instance of <see cref="T"/>
+        /// </param>
+        /// <param name="row">
+        /// The <see cref="DataRow"/> to fill.
+        /// </param>
+        private void FillPublicGetterColumns(T rowPresentation, DataRow row)
+        {
+            foreach (var publicGetter in this.publicGetterProperties)
+            {
+                row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
+                    rowPresentation,
+                    new object[] { });
+            }
+        }
+
+        /// <summary>
+        /// Fills the <see cref="DataColumn"/>s with data for properties of an instance of <see cref="T"/> whose <see cref="Type"/> inherits from <see cref="DataCollectorColumn{T}"/>.
+        /// with values from the current node.
+        /// </summary>
+        /// <param name="rowPresentation">
+        /// The instance of <see cref="T"/>
+        /// </param>
+        /// <param name="row">
+        /// The <see cref="DataRow"/> to fill.
+        /// </param>
+        private void FillNormalColumns(T rowPresentation, DataRow row)
+        {
+            foreach (var rowField in this.normalColumns)
+            {
+                var column = rowField.Key.GetValue(rowPresentation) as DataCollectorColumn<T>;
+                column?.Populate(row.Table, row);
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDataCollectorParameter.cs" company="RHEA System S.A.">
+// <copyright file="IDataCollectorStateDependentPerRowParameter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,24 +25,19 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    using System.Collections.Generic;
-
-    using CDP4Common.EngineeringModelData;
+    using System.Data;
 
     /// <summary>
-    /// The interface that defines members of implementing classes of <see cref="IDataCollectorParameter"/>
+    /// The interface used defining state dependent parameters resulting in multiple rows per state.
     /// </summary>
-    internal interface IDataCollectorParameter
+    public interface IDataCollectorStateDependentPerRowParameter
     {
         /// <summary>
-        /// Gets a flag that indicates whether this instance has <see cref="IValueSet"/>s.
+        /// Initialize a DataTable so the correct columns will be available when writing state dependent parameter data
         /// </summary>
-        bool HasValueSets { get; }
-
-        /// <summary>
-        /// The ValueSets of the associated object.
-        /// The <see cref="IEnumerable{T}"/>s of the associated object/>.
-        /// </summary>
-        IEnumerable<IValueSet> ValueSets { get; set; }
+        /// <param name="table">
+        /// The <see cref="DataTable"/>.
+        /// </param>
+        void InitializeColumns(DataTable table);
     }
 }
