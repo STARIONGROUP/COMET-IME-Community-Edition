@@ -89,7 +89,7 @@ namespace CDP4Reporting.DataCollection
         /// in the given <paramref name="row"/>.
         /// </summary>
         /// <param name="table">
-        /// The <see cref="DataTable"/> to which the <paramref name="row"/> belongs to.
+        /// The <see cref="DataTable"/> the <paramref name="row"/> belongs to, or will belong to.
         /// </param>
         /// <param name="row">
         /// The <see cref="DataRow"/> to be populated.

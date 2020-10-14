@@ -57,7 +57,16 @@ namespace CDP4Reporting.Tests.DataCollection
             public DataCollectorStateDependentPerRowDoubleParameter<ErrorRow> parameter1 { get; set; }
 
             [DefinedThingShortName("type4", "TypeFour")]
-            public DataCollectorStateDependentPerRowDoubleParameter<ErrorRow> parameter4 { get; set; }
+            public DataCollectorStateDependentPerRowStringParameter<ErrorRow> parameter4 { get; set; }
+        }
+
+        private class CorrectRow : DataCollectorRow
+        {
+            [DefinedThingShortName("type1", "typeOne")]
+            public DataCollectorStateDependentPerRowStringParameter<CorrectRow> parameter1 { get; set; }
+
+            [DefinedThingShortName("type4", "TypeFour")]
+            public DataCollectorStateDependentPerRowStringParameter<CorrectRow> parameter4 { get; set; }
         }
 
         [SetUp]
@@ -114,6 +123,32 @@ namespace CDP4Reporting.Tests.DataCollection
             Assert.AreEqual("typeOne", node.GetTable().Rows[0]["ParameterName"]);
             Assert.AreEqual(DBNull.Value, node.GetTable().Rows[0]["ParameterState"]);
             Assert.AreEqual(11D, node.GetTable().Rows[0]["ParameterValue"]);
+        }
+
+        [Test]
+        public void VerifyThatMultipleParametersOfSameTypeAreAllowed()
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.dataCollectorParameterTestFixture.iteration, this.dataCollectorParameterTestFixture.cat1.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<CorrectRow>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.dataCollectorParameterTestFixture.option).ToList();
+
+            Assert.DoesNotThrow(() => dataSource.CreateNodes(hierarchy, nestedElementTree));
+        }
+
+        [Test]
+        public void VerifyThatMultipleParametersOfDifferentTypesAreNotAllowed()
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.dataCollectorParameterTestFixture.iteration, this.dataCollectorParameterTestFixture.cat1.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<ErrorRow>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.dataCollectorParameterTestFixture.option).ToList();
+
+            Assert.Throws<InvalidOperationException>(() => dataSource.CreateNodes(hierarchy, nestedElementTree));
         }
     }
 }

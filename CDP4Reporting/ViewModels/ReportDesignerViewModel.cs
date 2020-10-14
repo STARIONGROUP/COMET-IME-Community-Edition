@@ -28,6 +28,7 @@ namespace CDP4Reporting.ViewModels
     using System;
     using System.CodeDom.Compiler;
     using System.Collections.Generic;
+    using System.Data;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.IO.Compression;
@@ -313,6 +314,18 @@ namespace CDP4Reporting.ViewModels
 
             this.ActiveDocumentChangedCommand = ReactiveCommand.CreateAsyncTask(x =>
                 this.SetReportDesigner(((DependencyPropertyChangedEventArgs) x).NewValue), RxApp.MainThreadScheduler);
+
+            this.InitializeDataSetExtensionsUsage();
+        }
+
+        /// <summary>
+        /// Method that is here that does nothing, but makes sure that System.Data.DataSetExtensions.dll is
+        /// available in the report script
+        /// </summary>
+        private void InitializeDataSetExtensionsUsage()
+        {
+            var dataTable = new DataTable();
+            var initializeExtension = dataTable.AsEnumerable();
         }
 
         /// <summary>

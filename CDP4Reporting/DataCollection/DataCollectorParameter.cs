@@ -94,7 +94,7 @@ namespace CDP4Reporting.DataCollection
         /// The ValueSets of the associated object.
         /// The <see cref="IEnumerable{IValueSet}"/>s of the associated object/>.
         /// </summary>
-        internal IEnumerable<IValueSet> ValueSets { get; set; }
+        public IEnumerable<IValueSet> ValueSets { get; set; }
 
         /// <summary>
         /// Gets the owner <see cref="DomainOfExpertise"/> of the associated <see cref="ParameterBase"/>.

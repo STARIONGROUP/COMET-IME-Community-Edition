@@ -67,13 +67,13 @@ namespace CDP4Reporting.Views
         /// <param name="e">The <see cref="TextChangedEventArgs"/></param>
         private void Focus_Me(object sender, TextChangedEventArgs e)
         {
-            if (Equals(e.Source, this.OutputTextBox))
-            {
-                this.lgTabs.SelectTab(this.lgOutput);
-            }
-            else if (Equals(e.Source, this.ErrorTextBox) && !string.IsNullOrEmpty(this.ErrorTextBox.Text))
+            if (!string.IsNullOrEmpty(this.ErrorTextBox.Text))
             {
                 this.lgTabs.SelectTab(this.lgErrors);
+            }
+            else if (Equals(e.Source, this.OutputTextBox))
+            {
+                this.lgTabs.SelectTab(this.lgOutput);
             }
         }
     }
