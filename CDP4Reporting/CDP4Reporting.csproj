@@ -42,6 +42,8 @@
   <ItemGroup>
     <None Remove="Views\ReportDesigner.xaml" />
     <None Remove="Views\ReportingRibbonPageCategory.xaml" />
+    <None Remove="Views\ReportPreview.xaml" />
+    <None Remove="Views\ReportPreviewRibbon.xaml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.0.1" />
@@ -321,6 +323,13 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ReportDesignerRibbon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ReportPreview.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ReportPreviewRibbon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
