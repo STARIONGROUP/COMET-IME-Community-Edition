@@ -359,6 +359,7 @@ namespace CDP4Reporting.ViewModels
             this.InitializeDataSetExtensionsUsage();
 
             Dispatcher.CurrentDispatcher.InvokeAsync(() => this.Reports.Add(new ReportPreviewItemViewModel(this)));
+            Dispatcher.CurrentDispatcher.InvokeAsync(() => this.Reports.Add(new ReportPreviewItemViewModel(this)));
         }
 
         /// <summary>
