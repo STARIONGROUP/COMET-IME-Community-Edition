@@ -93,7 +93,7 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// The currently active <see cref="XtraReport"/> in the Report Designer
         /// </summary>
-        private XtraReport currentReport = new XtraReport();
+        private XtraReport currentReport = GetNewXtraReport();
 
         /// <summary>
         /// The currently active <see cref="TextDocument"/> in the Avalon Editor
@@ -403,8 +403,23 @@ namespace CDP4Reporting.ViewModels
 
             this.Document = new TextDocument(string.Empty);
             this.lastSavedDataSourceText = "";
-            this.CurrentReport = new XtraReport();
+            this.CurrentReport = GetNewXtraReport();
             this.CurrentReportProjectFilePath = string.Empty;
+        }
+
+        /// <summary>
+        /// Get a new <see cref="XtraReport"/> and initialize default settings
+        /// </summary>
+        /// <returns>The <see cref="XtraReport"/></returns>
+        private static XtraReport GetNewXtraReport()
+        {
+            var newReport = new XtraReport();
+            newReport.ReportUnit = ReportUnit.Pixels;
+            newReport.SnapGridSize = 6F;
+            newReport.SnapGridStepCount = 5;
+            newReport.SnappingMode = SnappingMode.SnapToGridAndSnapLines;
+
+            return newReport;
         }
 
         /// <summary>
@@ -750,7 +765,7 @@ namespace CDP4Reporting.ViewModels
             }
 
             // Restore default values
-            if (previouslySetValue!= null)
+            if (previouslySetValue != null && !reportingParameter.ForceDefaultValue)
             {
                 newReportParameter.Value = previouslySetValue;
             }
