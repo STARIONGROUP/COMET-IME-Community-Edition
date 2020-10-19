@@ -132,8 +132,8 @@ namespace CDP4Reporting.Parameters
         private object GetDefault(Type type)
         {
             return this.GetType()
-                .GetMethod("GetDefaultGeneric", BindingFlags.NonPublic | BindingFlags.Instance)?
-                .MakeGenericMethod(type).Invoke(this, null);
+                .GetMethod(nameof(this.GetDefaultGeneric), BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.MakeGenericMethod(type).Invoke(this, null);
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace CDP4Reporting.Parameters
         /// <returns>The default value</returns>
         private T GetDefaultGeneric<T>()
         {
-            return default(T);
+            return default;
         }
     }
 }
