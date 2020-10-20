@@ -120,7 +120,7 @@ namespace CDP4Reporting.Tests.ViewModels
                     paramsList[1].AddLookupValue(""1"", ""one"");
                     paramsList.Add(new ReportingParameter(""param3"", typeof(string), ""DefaultValue""));
                     paramsList[2].Visible = false;
-                    paramsList.Add(new ReportingParameter(""param3"", typeof(string), string.Empty));
+                    paramsList.Add(new ReportingParameter(""param3"", typeof(string), null));
                     paramsList[3].Visible = false;
 
                     return paramsList;

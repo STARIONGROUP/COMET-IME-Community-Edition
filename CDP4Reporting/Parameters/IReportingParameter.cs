@@ -69,6 +69,11 @@ namespace CDP4Reporting.Parameters
         string FilterExpression { get; set; }
 
         /// <summary>
+        /// Indicates wether the <see cref="DefaultValue"/> should forcibly be written to existing report parameters
+        /// </summary>
+        bool ForceDefaultValue { get; set; }
+
+        /// <summary>
         /// Adds a lookup value to the <see cref="LookUpValues"/> property.
         /// </summary>
         /// <param name="value">

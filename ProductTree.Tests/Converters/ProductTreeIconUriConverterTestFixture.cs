@@ -19,7 +19,12 @@ namespace CDP4ProductTree.Tests.Converters
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     using CDP4CommonView;
+
+    using CDP4Composition.Services.NestedElementTreeService;
+
     using CDP4ProductTree.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using ParameterRowViewModel = CDP4ProductTree.ViewModels.ParameterRowViewModel;
     using Thing = CDP4Common.CommonData.Thing;
@@ -46,6 +51,9 @@ namespace CDP4ProductTree.Tests.Converters
         private Option option;
         private DomainOfExpertise domain;
         private ProductTreeIconUriConverter converter;
+        private Mock<INestedElementTreeService> nestedElementTreeService;
+        private Mock<IServiceLocator> serviceLocator;
+
 
         [SetUp]
         public void SetUp()
@@ -84,6 +92,12 @@ namespace CDP4ProductTree.Tests.Converters
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
 
             this.cache.TryAdd(new CacheKey(this.parameter.Iid, null), new Lazy<Thing>(() => this.parameter));
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.nestedElementTreeService = new Mock<INestedElementTreeService>();
+            this.serviceLocator.Setup(x => x.GetInstance<INestedElementTreeService>()).Returns(this.nestedElementTreeService.Object);
         }
 
         [Test]

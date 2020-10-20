@@ -27,6 +27,7 @@ namespace CDP4Reporting.Parameters
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
 
     /// <summary>
     /// class to be used to define dynamic report parameters in the Code editor of <see cref="Views.ReportDesigner"/>.
@@ -74,6 +75,11 @@ namespace CDP4Reporting.Parameters
         public string FilterExpression { get; set; }
 
         /// <summary>
+        /// Indicates wether the <see cref="DefaultValue"/> should forcibly be written to existing report parameters
+        /// </summary>
+        public bool ForceDefaultValue { get; set; }
+
+        /// <summary>
         /// Adds a lookup value to the <see cref="LookUpValues"/> property.
         /// </summary>
         /// <param name="value">
@@ -112,7 +118,32 @@ namespace CDP4Reporting.Parameters
             this.Name = name;
             this.Type = type;
             this.DefaultValue = defaultValue;
+
+            this.ForceDefaultValue = defaultValue != null && this.GetDefault(type) != defaultValue;
+
             this.FilterExpression = filterExpression;
+        }
+
+        /// <summary>
+        /// Get the default value of a specific <see cref="Type"/>
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/></param>
+        /// <returns>The default value</returns>
+        private object GetDefault(Type type)
+        {
+            return this.GetType()
+                .GetMethod(nameof(this.GetDefaultGeneric), BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.MakeGenericMethod(type).Invoke(this, null);
+        }
+
+        /// <summary>
+        /// Get the default value of a specific generic type <typeparamref name="T"/>
+        /// </summary>
+        /// <typeparam name="T">Generic type</typeparam>
+        /// <returns>The default value</returns>
+        private T GetDefaultGeneric<T>()
+        {
+            return default;
         }
     }
 }
