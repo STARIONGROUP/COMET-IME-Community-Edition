@@ -9,17 +9,21 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
 
-    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
     using CDP4Dal.Operations;
+
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+    
     using CDP4CommonView.ViewModels;
+    
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
@@ -28,12 +32,20 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+    
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
+
+    using DevExpress.Data.Filtering;
+    using DevExpress.Xpf.Core.FilteringUI;
+    using DevExpress.Xpf.Editors.Settings;
+
     using NLog;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -41,6 +53,10 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ElementDefinitionsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget
     {
+        private string IsMemberOfCategoryName = "IsMemberOfCategory";
+
+        private string IsMemberOfSuperCategoryName = "IsMemberOfSuperCategory";
+
         /// <summary>
         /// The logger for the current class
         /// </summary>
@@ -103,6 +119,34 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.AddSubscriptions();
             this.UpdateProperties();
+            this.PopulatePossibleCategory();
+        }
+
+        /// <summary>
+        /// populate the possible <see cref="Category"/>
+        /// </summary>
+        private void PopulatePossibleCategory()
+        {
+            this.PossibleCategory.Clear();
+
+            var container = this.Thing.RequiredRdls.First();
+
+            var allowedCategories = 
+                this.GetAllowedCategoriesByClassName(container, ClassKind.ElementDefinition)
+                    .Union(this.GetAllowedCategoriesByClassName(container, ClassKind.ElementUsage))
+                    .Distinct();
+
+            this.PossibleCategory.AddRange(allowedCategories.OrderBy(c => c.ShortName));
+        }
+
+        private List<Category> GetAllowedCategoriesByClassName(ReferenceDataLibrary container, ClassKind classKind)
+        {
+            var allowedCategories = new List<Category>(container.DefinedCategory.Where(c => c.PermissibleClass.Contains(classKind)));
+
+            allowedCategories.AddRange(container.GetRequiredRdls().SelectMany(rdl => rdl.DefinedCategory)
+                .Where(c => c.PermissibleClass.Contains(classKind)));
+
+            return allowedCategories;
         }
 
         /// <summary>
@@ -203,10 +247,17 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveCommand<object> CreateSubscriptionCommand { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ICommand"/> to extend a list of QueryField names
+        /// </summary>
+        public ReactiveCommand<Unit> QueryOperatorsCommand { get; private set; }
+
+        /// <summary>
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
         /// </summary>
         /// <remarks>This was made into a list of generic row to use the ReactiveList extension</remarks>
         public DisposableReactiveList<IRowViewModelBase<Thing>> ElementDefinitionRowViewModels { get; private set; }
+
+        public List<Category> PossibleCategory { get; } = new List<Category>();
 
         /// <summary>
         /// Updates the current drag state.
@@ -356,6 +407,26 @@ namespace CDP4EngineeringModel.ViewModels
             this.CreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSubscription));
             this.CreateSubscriptionCommand.Subscribe(_ => this.ExecuteCreateSubscriptionCommand());
 
+            var isMemberOfCategoryFunction = CustomFunctionFactory.Create(
+                this.IsMemberOfCategoryName,
+                (IEnumerable<Category> categories, Category category) =>
+                {
+                    return categories?.Any(x => x.Equals(category)) ?? false;
+                });
+
+            CriteriaOperator.RegisterCustomFunction(isMemberOfCategoryFunction);
+
+            var isMemberOfSuperCategoryFunction = CustomFunctionFactory.Create(
+                this.IsMemberOfSuperCategoryName,
+                (IEnumerable<Category> categories, Category category) =>
+                {
+                    return categories?.Any(x => x.Equals(category) || x.AllSuperCategories().Any(y => y.Equals(category))) ?? false;
+                });
+
+            CriteriaOperator.RegisterCustomFunction(isMemberOfSuperCategoryFunction);
+
+            this.QueryOperatorsCommand = ReactiveCommand.CreateAsyncTask(this.SetCategoryFilter, RxApp.MainThreadScheduler);
+
             this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
             this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
 
@@ -364,6 +435,26 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create();
             this.CopyModelCodeToClipboardCommand.Subscribe(_ => this.ExecuteCopyModelCodeToClipboardCommand());
+        }
+
+        private async Task SetCategoryFilter(object obj)
+        {
+            if (obj is FilterEditorQueryOperatorsEventArgs e && e.FieldName == "Category")
+            {
+                e.Operators.Clear();
+
+                var customFunctionEditSettings = new BaseEditSettings[]
+                {
+                    new ComboBoxEditSettings
+                    {
+                        ItemsSource = this.PossibleCategory,
+                        DisplayMember = nameof(Category.Name)
+                    }
+                };
+
+                e.Operators.Add(new FilterEditorOperatorItem(this.IsMemberOfCategoryName, customFunctionEditSettings) { Caption = "Member of Category" });
+                e.Operators.Add(new FilterEditorOperatorItem(this.IsMemberOfSuperCategoryName, customFunctionEditSettings) { Caption = "Member of SuperCategory" });
+            }
         }
 
         /// <summary>

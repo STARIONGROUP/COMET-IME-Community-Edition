@@ -67,7 +67,7 @@
                                RowStyle="{StaticResource RowStyleDeprecatedHighlightedBaseQuantityKind}"
                                IsDetailButtonVisibleBinding="{x:Null}"
                                ShowGroupPanel="False"
-                               ShowSearchPanelMode="Always">
+                               ShowSearchPanelMode="Default">
                     <dxg:TableView.FocusedRow>
                         <dynamic:ExpandoObject />
                     </dxg:TableView.FocusedRow>

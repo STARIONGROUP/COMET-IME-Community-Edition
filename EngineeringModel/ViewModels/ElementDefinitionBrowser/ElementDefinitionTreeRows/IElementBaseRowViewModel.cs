@@ -1,18 +1,23 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="IParameterRowContainer.cs" company="RHEA System S.A.">
+// <copyright file="IElementBaseRowViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015 RHEA System S.A.
 // </copyright>
 // -----------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
+    using System.Collections.Generic;
+
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// The interface for rows that contains rows representing a <see cref="ParameterGroup"/> or <see cref="ParameterBase"/>
     /// </summary>
     public interface IElementBaseRowViewModel : IModelCodeRowViewModel
     {
+        IEnumerable<Category> Category { get; }
+
         /// <summary>
         /// Update the row containment associated to a <see cref="ParameterBase"/>
         /// </summary>

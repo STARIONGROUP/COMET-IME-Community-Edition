@@ -46,6 +46,7 @@ namespace BasicRdl.Views
             {
                 this.InitializeComponent();
                 this.FilterableControl = this.ParameterTypesGridControl;
+                this.View.ShowSearchPanel(true);
             }
         }
 
