@@ -147,7 +147,9 @@ namespace CDP4EngineeringModel.ViewModels
             get { return this.selectedOptions; }
             set { this.RaiseAndSetIfChanged(ref this.selectedOptions, value); }
         }
-        
+
+        public new IEnumerable<Category> Category => this.Thing.Category.Union(this.Thing.ElementDefinition.Category).Distinct();
+
         /// <summary>
         /// Update the children rows of the current row
         /// </summary>

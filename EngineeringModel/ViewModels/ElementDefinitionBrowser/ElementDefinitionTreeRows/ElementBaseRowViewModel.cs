@@ -147,6 +147,8 @@ namespace CDP4EngineeringModel.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
         }
 
+        public IEnumerable<Category> Category => this.Thing.Category;
+
         /// <summary>
         /// Update the row containment associated to a <see cref="ParameterBase"/>
         /// </summary>
