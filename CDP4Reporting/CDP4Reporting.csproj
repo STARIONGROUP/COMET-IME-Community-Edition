@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.0.1" />
-    <PackageReference Include="CDP4Common-CE" Version="6.2.1-2020.10.26.1-pre-release">
+    <PackageReference Include="CDP4Common-CE" Version="6.2.1-2020.10.28.2-pre-release">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CDP4Dal-CE" Version="6.2.0">

@@ -46,7 +46,10 @@ namespace CDP4Reporting.Tests.ViewModels
 
     using CDP4Dal;
 
+    using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.ViewModels;
+
+    using DevExpress.XtraReports.UI;
 
     using ICSharpCode.AvalonEdit.Document;
 
@@ -73,7 +76,7 @@ namespace CDP4Reporting.Tests.ViewModels
         private const string DATASOURCE_CODE = @"namespace CDP4Reporting
         {
             using CDP4Reporting.DataCollection;
-            public class TestDataSource : DataCollector
+            public class TestDataSource : OptionDependentDataCollector
             {
                 public TestDataSource()
                 {
@@ -167,6 +170,7 @@ namespace CDP4Reporting.Tests.ViewModels
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<IOpenSaveFileDialogService> openSaveFileDialogService;
+        private Mock<ISubmittableParameterValuesCollector> submittableParameterValuesCollector;
 
         private static readonly Application application = new Application();
 
@@ -180,6 +184,7 @@ namespace CDP4Reporting.Tests.ViewModels
         private EngineeringModel model;
         private Iteration iteration;
         private DomainOfExpertise domain;
+        private Option option;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
@@ -195,10 +200,12 @@ namespace CDP4Reporting.Tests.ViewModels
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
             this.openSaveFileDialogService = new Mock<IOpenSaveFileDialogService>();
+            this.submittableParameterValuesCollector = new Mock<ISubmittableParameterValuesCollector>();
 
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.openSaveFileDialogService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<ISubmittableParameterValuesCollector>()).Returns(this.submittableParameterValuesCollector.Object);
 
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
@@ -219,6 +226,10 @@ namespace CDP4Reporting.Tests.ViewModels
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.modelsetup };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationsetup };
             this.model.Iteration.Add(this.iteration);
+
+            this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
+            this.iteration.Option.Add(option);
+            this.iteration.DefaultOption = this.option;
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
@@ -264,6 +275,41 @@ namespace CDP4Reporting.Tests.ViewModels
         }
 
         [Test]
+        public async Task VerifyThatSubmitParameterValuesCommandWorks()
+        {
+            var submittableParameterValues = new List<SubmittableParameterValue>();
+            submittableParameterValues.Add(new SubmittableParameterValue("PathExists"));
+            submittableParameterValues.Add(new SubmittableParameterValue("PathDoesNotExist"));
+
+            this.submittableParameterValuesCollector.Setup(x => x.Collect(It.IsAny<XtraReport>())).Returns(submittableParameterValues);
+
+            var reportStream = new MemoryStream(Encoding.UTF8.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(DATASOURCE_CODE));
+
+            using (var zipFile = ZipFile.Open(this.zipPathSave, ZipArchiveMode.Create))
+            {
+                using (var reportEntry = zipFile.CreateEntry("Report.repx").Open())
+                {
+                    reportStream.Position = 0;
+                    await reportStream.CopyToAsync(reportEntry);
+                }
+
+                using (var reportEntry = zipFile.CreateEntry("Datasource.cs").Open())
+                {
+                    dataSourceStream.Position = 0;
+                    await dataSourceStream.CopyToAsync(reportEntry);
+                }
+            }
+
+            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathSave });
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
+
+            //await this.reportDesignerViewModel.Object.CurrentReport.CreateDocumentAsync();
+            
+            //Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.Object.SubmitParameterValuesCommand.ExecuteAsyncTask(null));
+        }
+
+        [Test]
         public void VerifyThatExportCommandWorksWithoutSavingFile()
         {
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
@@ -278,8 +324,8 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public async Task VerifySavingExistingReportWorks()
         {
-            var reportStream = new MemoryStream(Encoding.ASCII.GetBytes(REPORT_CODE));
-            var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(DATASOURCE_CODE));
+            var reportStream = new MemoryStream(Encoding.UTF8.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(DATASOURCE_CODE));
 
             using (var zipFile = ZipFile.Open(this.zipPathSave, ZipArchiveMode.Create))
             {
@@ -308,8 +354,8 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             System.IO.File.WriteAllText(this.dsPathSave, DATASOURCE_CODE);
 
-            var reportStream = new MemoryStream(Encoding.ASCII.GetBytes(REPORT_CODE));
-            var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(DATASOURCE_CODE));
+            var reportStream = new MemoryStream(Encoding.UTF8.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(DATASOURCE_CODE));
 
             using (var zipFile = ZipFile.Open(this.zipPathSave, ZipArchiveMode.Create))
             {
@@ -350,8 +396,8 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             System.IO.File.WriteAllText(this.dsPathOpen, DATASOURCE_CODE);
 
-            var reportStream = new MemoryStream(Encoding.ASCII.GetBytes(REPORT_CODE));
-            var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(DATASOURCE_CODE));
+            var reportStream = new MemoryStream(Encoding.UTF8.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(DATASOURCE_CODE));
 
             using (var zipFile = ZipFile.Open(this.zipPathOpen, ZipArchiveMode.Create))
             {
@@ -454,8 +500,8 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             System.IO.File.WriteAllText(this.dsPathOpen, DATASOURCE_CODE);
 
-            var reportStream = new MemoryStream(Encoding.ASCII.GetBytes(REPORT_CODE));
-            var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(DATASOURCE_CODE));
+            var reportStream = new MemoryStream(Encoding.UTF8.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(DATASOURCE_CODE));
 
             using (var zipFile = ZipFile.Open(this.zipPathOpen, ZipArchiveMode.Create))
             {
@@ -487,8 +533,8 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             System.IO.File.WriteAllText(this.dsPathOpen, DATASOURCE_CODE_WITH_PARAMS);
 
-            var reportStream = new MemoryStream(Encoding.ASCII.GetBytes(REPORT_CODE));
-            var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(DATASOURCE_CODE_WITH_PARAMS));
+            var reportStream = new MemoryStream(Encoding.UTF8.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(DATASOURCE_CODE_WITH_PARAMS));
 
             using (var zipFile = ZipFile.Open(this.zipPathOpen, ZipArchiveMode.Create))
             {
@@ -520,8 +566,8 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             System.IO.File.WriteAllText(this.dsPathOpen, REBUILD_ERROR_DATASOURCE_CODE);
 
-            var reportStream = new MemoryStream(Encoding.ASCII.GetBytes(REPORT_CODE));
-            var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(REBUILD_ERROR_DATASOURCE_CODE));
+            var reportStream = new MemoryStream(Encoding.UTF8.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(REBUILD_ERROR_DATASOURCE_CODE));
 
             using (var zipFile = ZipFile.Open(this.zipPathOpen, ZipArchiveMode.Create))
             {
