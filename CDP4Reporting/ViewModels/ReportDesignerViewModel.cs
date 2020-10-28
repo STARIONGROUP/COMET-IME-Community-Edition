@@ -59,11 +59,11 @@ namespace CDP4Reporting.ViewModels
 
     using CDP4Reporting.DataCollection;
     using CDP4Reporting.Parameters;
+    using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.Utilities;
 
     using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Reports.UserDesigner;
-    using DevExpress.XtraPrinting;
     using DevExpress.XtraReports.Parameters;
     using DevExpress.XtraReports.UI;
 
@@ -91,6 +91,11 @@ namespace CDP4Reporting.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Reporting";
+
+        /// <summary>
+        /// The <see cref="ISubmittableParameterValuesCollector"/> used to collect submittable parameter values from the report previewer.
+        /// </summary>
+        private readonly ISubmittableParameterValuesCollector submittableParameterValuesCollector = ServiceLocator.Current.GetInstance<ISubmittableParameterValuesCollector>();
 
         /// <summary>
         /// The <see cref="IOpenSaveFileDialogService"/> that is used to navigate to the File Open/Save dialog
@@ -138,10 +143,9 @@ namespace CDP4Reporting.ViewModels
         private bool canSubmitParameterValues;
 
         /// <summary>
-        /// A temporary <see cref="Dictionary{key, value}"/> of <see cref="string"/> and <see cref="object"/>
-        /// that contains data about the submittable parameters that are present in the report
+        /// A temporary <see cref="IEnumerable{SubmittableParameterValue}"/> that represent all submittable parameters that are present in the report preview
         /// </summary>
-        private Dictionary<string, string> submittableParameterValues;
+        private IEnumerable<SubmittableParameterValue> submittableParameterValues;
 
         /// <summary>
         /// Backing field for <see cref="Errors" />
@@ -1091,55 +1095,8 @@ namespace CDP4Reporting.ViewModels
         private void CheckSubmittableParameterValues(object sender, EventArgs e)
         {
             var report = sender as XtraReport;
-            this.submittableParameterValues = new Dictionary<string, string>();
 
-            foreach (Page p in report.Pages)
-            {
-                var iterator = new DevExpress.XtraPrinting.Native.NestedBrickIterator(p.InnerBricks);
-
-                while (iterator.MoveNext())
-                {
-                    if (iterator.CurrentBrick is VisualBrick visualBrick)
-                    {
-                        if (visualBrick.BrickOwner is XRControl control)
-                        {
-                            var controlTagString = control.Tag.ToString();
-
-                            if (string.IsNullOrWhiteSpace(controlTagString))
-                            {
-                                continue;
-                            }
-
-                            var tagArray = controlTagString.Split(',');
-
-                            if (tagArray.Length == 0)
-                            {
-                                continue;
-                            }
-
-                            foreach (var tag in tagArray)
-                            {
-                                var tagSplit = tag.Split('=');
-
-                                if (tagSplit[0].ToLower().Equals("path"))
-                                {
-                                    if (this.submittableParameterValues.ContainsKey(tagSplit[1]))
-                                    {
-                                        this.submittableParameterValues[tagSplit[1]] = visualBrick.Text;
-                                    }
-
-                                    else
-                                    {
-                                        this.submittableParameterValues.Add(tagSplit[1], visualBrick.Text);
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            this.submittableParameterValues = this.submittableParameterValuesCollector.Collect(report);
 
             this.CanSubmitParameterValues = this.submittableParameterValues.Any();
         }
@@ -1168,7 +1125,7 @@ namespace CDP4Reporting.ViewModels
 
         /// <summary>
         /// Gets a < see cref="Dictionary{Guid, ProcessedValueSet}"/> that contains the <see cref="ProcessedValueSet"/>s that were created using data
-        /// from the <see cref="ReportDesignerViewModel.submittableParameterValues"/> property.
+        /// from the <see cref="submittableParameterValues"/> field.
         /// </summary>
         /// <param name="errorTexts">
         /// A <see cref="List{String}"/> that contains text about all problems during the process
@@ -1204,8 +1161,7 @@ namespace CDP4Reporting.ViewModels
                             optionDependentDataCollector.SelectedOption,
                             allNestedParameters,
                             ownedNestedParameters,
-                            submittableParameter.Key,
-                            submittableParameter.Value,
+                            submittableParameter,
                             ref processedValueSets,
                             out var errorText))
                     {

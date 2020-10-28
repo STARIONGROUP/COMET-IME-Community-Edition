@@ -38,6 +38,8 @@ namespace CDP4Reporting.Utilities
     using CDP4Composition.ViewModels;
 
     using CDP4Reporting.DataCollection;
+    using CDP4Reporting.SubmittableParameterValues;
+    using CDP4Reporting.ViewModels;
 
     /// <summary>
     /// Helper class to create <see cref="ProcessedValueSet"/>s using data from an <see cref="IIterationDependentDataCollector"/>.
@@ -74,11 +76,8 @@ namespace CDP4Reporting.Utilities
         /// An <see cref="IEnumerable{NestedParameter}"/> that contains only the nested parameters for a specific ProductTree
         /// that are available to a specific <see cref="DomainOfExpertise"/>.
         /// </param>
-        /// <param name="path">
-        /// The <see cref="NestedParameter.Path"/> to search for.
-        /// </param>
-        /// <param name="manualValue">
-        /// The <see cref="ParameterValueSetBase.Manual"/> value or <see cref="ParameterSubscriptionValueSet.Manual"/> value to be set.
+        /// <param name="submittableParameterValue">
+        /// The <see cref="SubmittableParameterValue"/> that contains 
         /// </param>
         /// <param name="processedValueSets">A <see cref="Dictionary{Guid, ProcessedValueSet}"/> that contains all <see cref="ProcessedValueSet"/> found until now.</param>
         /// <param name="errorText">
@@ -87,9 +86,9 @@ namespace CDP4Reporting.Utilities
         /// <returns>
         /// true if <see cref="NestedParameter.Path"/> was found and the <see cref="ProcessedValueSet"/> was succesfully created and processed, otherwise false.
         /// </returns>
-        public bool TryGetProcessedValueSet(Option option, IEnumerable<NestedParameter> allNestedParameters, IEnumerable<NestedParameter> ownedNestedParameters, string path, string manualValue, ref Dictionary<Guid, ProcessedValueSet> processedValueSets, out string errorText)
+        public bool TryGetProcessedValueSet(Option option, IEnumerable<NestedParameter> allNestedParameters, IEnumerable<NestedParameter> ownedNestedParameters, SubmittableParameterValue submittableParameterValue, ref Dictionary<Guid, ProcessedValueSet> processedValueSets, out string errorText)
         {
-            path = CheckPath(path, option);
+            var path = CheckPath(submittableParameterValue.Path, option);
 
             var nestedParameters = option.GetNestedParameterValueSetsByPath(path, allNestedParameters).ToList();
 
@@ -129,13 +128,13 @@ namespace CDP4Reporting.Utilities
 
             if (nestedParameter.AssociatedParameter is ParameterOrOverrideBase parameterOrOverrideBase && nestedParameter.ValueSet is ParameterValueSetBase parameterValueSetBase)
             {
-                var processedValueSet = this.ProcessValueSet(parameterValueSetBase, parameterOrOverrideBase, 0, manualValue, ref processedValueSets, null, out errorText);
+                var processedValueSet = this.ProcessValueSet(parameterValueSetBase, parameterOrOverrideBase, 0, submittableParameterValue.Text, ref processedValueSets, null, out errorText);
                 return processedValueSet.ValidationResult == ValidationResultKind.Valid;
             }
 
             if (nestedParameter.AssociatedParameter is ParameterSubscription parameterSubscription && nestedParameter.ValueSet is ParameterSubscriptionValueSet parameterSubscriptionValueSet)
             {
-                var processedValueSet = this.ProcessValueSet(parameterSubscriptionValueSet, parameterSubscription, 0, manualValue, ref processedValueSets, null, out errorText);
+                var processedValueSet = this.ProcessValueSet(parameterSubscriptionValueSet, parameterSubscription, 0, submittableParameterValue.Text, ref processedValueSets, null, out errorText);
                 return processedValueSet.ValidationResult == ValidationResultKind.Valid;
             }
 
