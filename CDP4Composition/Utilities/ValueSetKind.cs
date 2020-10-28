@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataCollector.cs" company="RHEA System S.A.">
+// <copyright file="SubmitConfirmationViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -19,23 +19,33 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataCollection
+namespace CDP4Composition.Utilities
 {
+    using CDP4Common.EngineeringModelData;
+
     /// <summary>
-    /// The abstract base class that implements the <see cref="IDataCollector"/>
+    /// Enumeration that specifies what combination of <see cref="Parameter"/>, <see cref="ParameterOverride"/> and <see cref="ParameterSubscription"/>
+    /// needs to be taken into account.
     /// </summary>
-    public abstract class DataCollector : IDataCollector
+    public enum ValueSetKind
     {
         /// <summary>
-        /// Creates a new data collection instance.
+        /// Assertion that Paramters, Overrides and Subscriptions need to be taken into account
         /// </summary>
-        /// <returns>
-        /// An object instance.
-        /// </returns>
-        public abstract object CreateDataObject();
+        All = 0,
+
+        /// <summary>
+        /// Assertion that Parameters and Overrides need to be taken into account
+        /// </summary>
+        ParameterAndOrverride = 1,
+
+        /// <summary>
+        /// Assertion that ParameterSubscriptions need to be taken into account
+        /// </summary>
+        ParameterSubscription = 2
     }
 }

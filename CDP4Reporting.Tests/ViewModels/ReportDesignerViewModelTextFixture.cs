@@ -112,7 +112,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             public class TestReportingParameters: ReportingParameters
             {
-                public override IEnumerable<IReportingParameter> CreateParameters(object dataObject)
+                public override IEnumerable<IReportingParameter> CreateParameters(object dataObject, IDataCollector dataCollector)
                 {
                     List<IReportingParameter> paramsList = new List<IReportingParameter>();
                     paramsList.Add(new ReportingParameter(""param1"", typeof(int), 0));

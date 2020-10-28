@@ -1,25 +1,43 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="SubmitConfirmationViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ParameterSheetGenerator.Tests.ViewModels
+namespace CDP4Composition.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     using CDP4Common.Validation;
 
     using CDP4Composition.Navigation;
+    using CDP4Composition.Utilities;
+    using CDP4Composition.ViewModels;
 
-    using CDP4ParameterSheetGenerator.Generator.ParameterSheet;
-    using CDP4ParameterSheetGenerator.ViewModels;
     using NUnit.Framework;
 
     /// <summary>
@@ -74,7 +92,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ViewModels
             
             var viewmodel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All);
 
-            Assert.AreEqual(1, viewmodel.ParameterOrOverrideWorkbookRebuildRowViewModels.Count);
+            Assert.AreEqual(1, viewmodel.ParameterOrOverrideSubmitParameterRowViewModels.Count);
         }
 
         [Test]
@@ -89,7 +107,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ViewModels
             
             var viewmodel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All);
 
-            var row = viewmodel.ParameterOrOverrideWorkbookRebuildRowViewModels.Single();
+            var row = viewmodel.ParameterOrOverrideSubmitParameterRowViewModels.Single();
             Assert.IsTrue(row.IsSelected);
             Assert.IsTrue(viewmodel.OkCommand.CanExecute(null));
 
@@ -113,7 +131,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ViewModels
             var viewmodel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All);
             viewmodel.SubmitMessage = submitmessage;
 
-            var row = viewmodel.ParameterOrOverrideWorkbookRebuildRowViewModels.Single();
+            var row = viewmodel.ParameterOrOverrideSubmitParameterRowViewModels.Single();
             Assert.IsTrue(row.IsSelected);
             Assert.IsTrue(viewmodel.OkCommand.CanExecute(null));
 
@@ -156,7 +174,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ViewModels
 
             var vm = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All);
 
-            var rows = vm.ParameterOrOverrideWorkbookRebuildRowViewModels;
+            var rows = vm.ParameterOrOverrideSubmitParameterRowViewModels;
             Assert.AreEqual(2, rows.Count);
             Assert.IsTrue(rows.All(r => r.IsSelected));
         }

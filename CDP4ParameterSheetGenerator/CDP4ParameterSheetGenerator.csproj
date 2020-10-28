@@ -35,7 +35,7 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="6.2.1-2020.9.30.2-pre-release">
+    <PackageReference Include="CDP4Common-CE" Version="6.2.1-2020.10.26.1-pre-release">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CDP4Dal-CE" Version="6.2.0">
@@ -249,9 +249,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\SubmitConfirmation.xaml.cs">
-      <DependentUpon>SubmitConfirmation.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Views\WorkbookRebuild.xaml.cs">
       <DependentUpon>WorkbookRebuild.xaml</DependentUpon>
     </Compile>
@@ -275,10 +272,6 @@
     <EmbeddedResource Include="Resources\RibbonXml\parametersheetgeneratorribbon.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\SubmitConfirmation.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\WorkbookRebuild.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -36,9 +36,12 @@
                               Orientation="Vertical">
 
                 <dxlc:LayoutGroup>
-                    <dxlc:LayoutItemLabel VerticalAlignment="Top" 
-                              Content="{Binding Message, Mode=OneTime}"
-                              FontSize="16"/>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <TextBlock VerticalAlignment="Top"
+                                   TextWrapping="Wrap"
+                                   Text="{Binding Message, Mode=OneTime}"
+                                   FontSize="16"/>
+                    </ScrollViewer>
                 </dxlc:LayoutGroup>
             </dxlc:LayoutGroup>
         </dxlc:LayoutGroup>

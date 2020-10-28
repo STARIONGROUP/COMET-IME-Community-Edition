@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataCollector.cs" company="RHEA System S.A.">
+// <copyright file="IOptionDependentDataCollector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,17 +25,22 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using CDP4Common.EngineeringModelData;
+
     /// <summary>
-    /// The abstract base class that implements the <see cref="IDataCollector"/>
+    /// The interface used for classes that can be used in an <see cref="Option"/> dependent Report Script.
+    /// Its main purpose is to provide commonly used objects to the script editor.
     /// </summary>
-    public abstract class DataCollector : IDataCollector
+    public interface IOptionDependentDataCollector : IIterationDependentDataCollector
     {
         /// <summary>
-        /// Creates a new data collection instance.
+        /// Gets or sets the selected <see cref="Option"/>
         /// </summary>
-        /// <returns>
-        /// An object instance.
-        /// </returns>
-        public abstract object CreateDataObject();
+        Option SelectedOption { get; }
+
+        /// <summary>
+        /// Selects an <see cref="Option"/> and sets the <see cref="SelectedOption"/> property
+        /// </summary>
+        void SelectOption();
     }
 }

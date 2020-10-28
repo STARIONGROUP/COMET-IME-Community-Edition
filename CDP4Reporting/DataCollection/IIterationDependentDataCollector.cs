@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportScriptDataProvider.cs" company="RHEA System S.A.">
+// <copyright file="IIterationDependentDataCollector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -26,7 +26,6 @@
 namespace CDP4Reporting.DataCollection
 {
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -34,49 +33,41 @@ namespace CDP4Reporting.DataCollection
     using CDP4Dal;
 
     /// <summary>
-    /// This class is a base class for classes that can be used in a Report Script.
-    /// It provides commonly used objects to the script editor.
+    /// The interface used for classes that can be used in an <see cref="Iteration"/> dependent Report Script.
+    /// Its main purpose is to provide commonly used objects to the script editor.
     /// </summary>
-    [ExcludeFromCodeCoverage]
-    public abstract class ReportScriptDataProvider : IReportScriptDataProvider
+    public interface IIterationDependentDataCollector
     {
         /// <summary>
-        /// Gets or sets the <see cref="Iteration"/>
+        /// Gets the <see cref="Iteration"/>
         /// </summary>
-        public Iteration Iteration { get; private set; }
+        Iteration Iteration { get; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ISession"/>
+        /// Gets the <see cref="ISession"/>
         /// </summary>
-        public ISession Session { get; private set; }
+        ISession Session { get; }
 
         /// <summary>
-        /// Gets or sets the <see cref="DomainOfExpertise"/>
+        /// Gets the <see cref="DomainOfExpertise"/>
         /// </summary>
-        public DomainOfExpertise DomainOfExpertise { get; private set; }
+        DomainOfExpertise DomainOfExpertise { get; }
 
         /// <summary>
         /// All currently open <see cref="ReferenceDataLibrary"/>s in this <see cref="Session"/>
         /// </summary>
-        public IEnumerable<ReferenceDataLibrary> OpenReferenceDataLibraries { get; private set; }
+        public IEnumerable<ReferenceDataLibrary> OpenReferenceDataLibraries { get; }
 
         /// <summary>
         /// The current <see cref="SiteDirectory"/>s in this <see cref="Session"/>
         /// </summary>
-        public SiteDirectory SiteDirectory { get; private set; }
+        public SiteDirectory SiteDirectory { get; }
 
         /// <summary>
         /// Initializes this DataCollector 
         /// </summary>
-        /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="iteration"></param>
-        public void Initialize(Iteration iteration, ISession session)
-        {
-            this.Iteration = iteration;
-            this.Session = session;
-            this.DomainOfExpertise = session.QueryCurrentDomainOfExpertise();
-            this.OpenReferenceDataLibraries = session.OpenReferenceDataLibraries;
-            this.SiteDirectory = session.RetrieveSiteDirectory();
-        }
+        /// <param name="session"></param>
+        void Initialize(Iteration iteration, ISession session);
     }
 }

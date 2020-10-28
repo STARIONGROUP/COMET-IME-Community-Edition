@@ -34,6 +34,7 @@ namespace CDP4Reporting.ViewModels
     using System.IO.Compression;
     using System.Linq;
     using System.Reactive;
+    using System.Reactive.Linq;
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
@@ -41,6 +42,9 @@ namespace CDP4Reporting.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
+
+    using CDP4CommonView.ViewModels;
 
     using CDP4Composition;
     using CDP4Composition.Mvvm;
@@ -51,6 +55,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
+    using CDP4Dal.Operations;
 
     using CDP4Reporting.DataCollection;
     using CDP4Reporting.Parameters;
@@ -58,6 +63,7 @@ namespace CDP4Reporting.ViewModels
 
     using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Reports.UserDesigner;
+    using DevExpress.XtraPrinting;
     using DevExpress.XtraReports.Parameters;
     using DevExpress.XtraReports.UI;
 
@@ -65,16 +71,22 @@ namespace CDP4Reporting.ViewModels
 
     using Microsoft.Practices.ServiceLocation;
 
+    using NLog;
+
     using ReactiveUI;
 
     using File = System.IO.File;
-    using Parameter = DevExpress.XtraReports.Parameters.Parameter;
 
     /// <summary>
     /// The view-model for the Report Designer that lets users to create reports based on template source files.
     /// </summary>
     public partial class ReportDesignerViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
+        /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -96,6 +108,11 @@ namespace CDP4Reporting.ViewModels
         private XtraReport currentReport = GetNewXtraReport();
 
         /// <summary>
+        /// Backing field for <see cref="CurrentDataCollector"/>
+        /// </summary>
+        private IDataCollector currentDataCollector;
+
+        /// <summary>
         /// The currently active <see cref="TextDocument"/> in the Avalon Editor
         /// </summary>
         private TextDocument document;
@@ -104,6 +121,115 @@ namespace CDP4Reporting.ViewModels
         /// The currently active <see cref="ReportDesignerDocument"/> in the Report Designer
         /// </summary>
         private ReportDesignerDocument currentReportDesignerDocument;
+
+        /// <summary>
+        /// Backing field for <see cref="IsAutoCompileEnabled" />
+        /// </summary>
+        private bool isAutoCompileEnabled;
+
+        /// <summary>
+        /// The last saved datasource text
+        /// </summary>
+        private string lastSavedDataSourceText = string.Empty;
+
+        /// <summary>
+        /// Backing field for <see cref="CanSubmitParameterValues"/>
+        /// </summary>
+        private bool canSubmitParameterValues;
+
+        /// <summary>
+        /// A temporary <see cref="Dictionary{key, value}"/> of <see cref="string"/> and <see cref="object"/>
+        /// that contains data about the submittable parameters that are present in the report
+        /// </summary>
+        private Dictionary<string, string> submittableParameterValues;
+
+        /// <summary>
+        /// Backing field for <see cref="Errors" />
+        /// </summary>
+        private string errors;
+
+        /// <summary>
+        /// Backing field for <see cref="Output" />
+        /// </summary>
+        private string output;
+
+        /// <summary>
+        /// Gets or sets text editor document
+        /// </summary>
+        public TextDocument Document
+        {
+            get => this.document;
+            set => this.RaiseAndSetIfChanged(ref this.document, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Report Designer's current Report
+        /// </summary>
+        public XtraReport CurrentReport
+        {
+            get => this.currentReport;
+            set => this.RaiseAndSetIfChanged(ref this.currentReport, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the current report DataSource
+        /// </summary>
+        public IDataCollector CurrentDataCollector
+        {
+            get => this.currentDataCollector;
+            set => this.RaiseAndSetIfChanged(ref this.currentDataCollector, value);
+        }
+
+        /// <summary>
+        /// Gets or sets current edited file path
+        /// </summary>
+        public string CodeFilePath { get; set; }
+
+        /// <summary>
+        /// Gets or sets current archive zip file path that contains resx report designer file and datasource c# file
+        /// </summary>
+        public string CurrentReportProjectFilePath { get; set; }
+
+        /// <summary>
+        /// Gets or sets value for editor's errors
+        /// </summary>
+        public string Errors
+        {
+            get => this.errors;
+            set => this.RaiseAndSetIfChanged(ref this.errors, value);
+        }
+
+        /// <summary>
+        /// Gets or sets value for output's log messages
+        /// </summary>
+        public string Output
+        {
+            get => this.output;
+            set => this.RaiseAndSetIfChanged(ref this.output, value);
+        }
+
+        /// <summary>
+        /// Sets or gets a boolean indicating whether the Submit parameter button is enabled
+        /// </summary>
+        public bool CanSubmitParameterValues
+        {
+            get => this.canSubmitParameterValues;
+            set => this.RaiseAndSetIfChanged(ref this.canSubmitParameterValues, value);
+        }
+
+        /// <summary>
+        /// Gets or sets build output result
+        /// </summary>
+        public CompilerResults CompileResult { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether automatically build is checked
+        /// </summary>
+        public bool IsAutoCompileEnabled
+        {
+            get => this.isAutoCompileEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isAutoCompileEnabled, value);
+        }
 
         /// <summary>
         /// Open code file inside the editor
@@ -146,9 +272,14 @@ namespace CDP4Reporting.ViewModels
         public ReactiveCommand<object> DataSourceTextChangedCommand { get; set; }
 
         /// <summary>
-        /// Fires when the DataSource text was changed
+        /// Rebuild the DataSource
         /// </summary>
         public ReactiveCommand<Unit> RebuildDatasourceCommand { get; set; }
+
+        /// <summary>
+        /// Submit data from a previewed report
+        /// </summary>
+        public ReactiveCommand<Unit> SubmitParameterValuesCommand { get; set; }
 
         /// <summary>
         /// Fires when the DataSource text needs to be cleared
@@ -159,86 +290,6 @@ namespace CDP4Reporting.ViewModels
         /// Fires when the Active Document changes in the Report Designer
         /// </summary>
         public ReactiveCommand<Unit> ActiveDocumentChangedCommand { get; set; }
-
-        /// <summary>
-        /// Gets or sets text editor document
-        /// </summary>
-        public TextDocument Document
-        {
-            get => this.document;
-            set => this.RaiseAndSetIfChanged(ref this.document, value);
-        }
-
-        /// <summary>
-        /// Gets or sets the Report Designer's current Report
-        /// </summary>
-        public XtraReport CurrentReport
-        {
-            get => this.currentReport;
-            set => this.RaiseAndSetIfChanged(ref this.currentReport, value);
-        }
-
-        /// <summary>
-        /// Gets or sets current edited file path
-        /// </summary>
-        public string CodeFilePath { get; set; }
-
-        /// <summary>
-        /// Gets or sets current archive zip file path that contains resx report designer file and datasource c# file
-        /// </summary>
-        public string CurrentReportProjectFilePath { get; set; }
-
-        /// <summary>
-        /// Backing field for <see cref="Errors" />
-        /// </summary>
-        private string errors;
-
-        /// <summary>
-        /// Gets or sets value for editor's errors
-        /// </summary>
-        public string Errors
-        {
-            get => this.errors;
-            set => this.RaiseAndSetIfChanged(ref this.errors, value);
-        }
-
-        /// <summary>
-        /// Backing field for <see cref="Output" />
-        /// </summary>
-        private string output;
-
-        /// <summary>
-        /// Gets or sets value for output's log messages
-        /// </summary>
-        public string Output
-        {
-            get => this.output;
-            set => this.RaiseAndSetIfChanged(ref this.output, value);
-        }
-
-        /// <summary>
-        /// Gets or sets build output result
-        /// </summary>
-        public CompilerResults CompileResult { get; private set; }
-
-        /// <summary>
-        /// Backing field for <see cref="IsAutoCompileEnabled" />
-        /// </summary>
-        private bool isAutoCompileEnabled;
-
-        /// <summary>
-        /// The last saved datasource text
-        /// </summary>
-        private string lastSavedDataSourceText = string.Empty;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether automatically build is checked
-        /// </summary>
-        public bool IsAutoCompileEnabled
-        {
-            get => this.isAutoCompileEnabled;
-            set => this.RaiseAndSetIfChanged(ref this.isAutoCompileEnabled, value);
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportDesignerViewModel"/> class
@@ -289,31 +340,33 @@ namespace CDP4Reporting.ViewModels
             this.DataSourceTextChangedCommand = ReactiveCommand.Create();
             this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoCompileScript());
 
-            this.RebuildDatasourceCommand = ReactiveCommand.CreateAsyncTask(async _ =>
-            {
-                this.IsBusy = true;
+            this.RebuildDatasourceCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteRebuildDatasourceCommand());
 
-                try
-                {
-                    var source = this.Document.Text;
-                    await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
-
-                    if (!this.CompileResult?.Errors.HasErrors ?? false)
-                    {
-                            this.RebuildDataSource();
-                    }
-                }
-                finally
-                {
-                    this.IsBusy = false;
-                }
-            });
+            this.SubmitParameterValuesCommand = ReactiveCommand.CreateAsyncTask(
+                this.WhenAnyValue(x => x.CanSubmitParameterValues),
+                x => this.SubmitParameterValues(),
+                RxApp.MainThreadScheduler);
 
             this.ClearOutputCommand = ReactiveCommand.Create();
             this.ClearOutputCommand.Subscribe(_ => { this.Output = string.Empty; });
 
             this.ActiveDocumentChangedCommand = ReactiveCommand.CreateAsyncTask(x =>
                 this.SetReportDesigner(((DependencyPropertyChangedEventArgs) x).NewValue), RxApp.MainThreadScheduler);
+
+            this.WhenAnyValue(x => x.CurrentReport).Subscribe(x =>
+            {
+                x.AfterPrint += this.CheckSubmittableParameterValues;
+            });
+
+            this.Changing
+                .Where(x => x.PropertyName == nameof(this.CurrentReport))
+                .Subscribe(x => 
+                {
+                    if (this.CurrentReport != null)
+                    {
+                        this.CurrentReport.AfterPrint -= this.CheckSubmittableParameterValues;
+                    }
+                });
 
             this.InitializeDataSetExtensionsUsage();
         }
@@ -322,6 +375,7 @@ namespace CDP4Reporting.ViewModels
         /// Method that is here that does nothing, but makes sure that System.Data.DataSetExtensions.dll is
         /// available in the report script
         /// </summary>
+        [SuppressMessage("Minor Code Smell", "S1481:Unused local variables should be removed", Justification = "<Pending>")]
         private void InitializeDataSetExtensionsUsage()
         {
             var dataTable = new DataTable();
@@ -403,6 +457,7 @@ namespace CDP4Reporting.ViewModels
 
             this.Document = new TextDocument(string.Empty);
             this.lastSavedDataSourceText = "";
+
             this.CurrentReport = GetNewXtraReport();
             this.CurrentReportProjectFilePath = string.Empty;
         }
@@ -413,11 +468,13 @@ namespace CDP4Reporting.ViewModels
         /// <returns>The <see cref="XtraReport"/></returns>
         private static XtraReport GetNewXtraReport()
         {
-            var newReport = new XtraReport();
-            newReport.ReportUnit = ReportUnit.Pixels;
-            newReport.SnapGridSize = 6F;
-            newReport.SnapGridStepCount = 5;
-            newReport.SnappingMode = SnappingMode.SnapToGridAndSnapLines;
+            var newReport = new XtraReport
+            {
+                ReportUnit = ReportUnit.Pixels, 
+                SnapGridSize = 6F, 
+                SnapGridStepCount = 5, 
+                SnappingMode = SnappingMode.SnapToGridAndSnapLines
+            };
 
             return newReport;
         }
@@ -528,7 +585,7 @@ namespace CDP4Reporting.ViewModels
             {
                 this.CurrentReport.SaveLayoutToXml(reportStream);
 
-                using (var dataSourceStream = new MemoryStream(Encoding.ASCII.GetBytes(this.Document.Text)))
+                using (var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(this.Document.Text)))
                 {
                     using (var zipFile = ZipFile.Open(this.CurrentReportProjectFilePath, ZipArchiveMode.Create))
                     {
@@ -548,6 +605,30 @@ namespace CDP4Reporting.ViewModels
 
                 this.lastSavedDataSourceText = this.Document.Text;
                 this.currentReportDesignerDocument?.SetValue(ReportDesignerDocument.HasChangesProperty, false);
+            }
+        }
+
+        /// <summary>
+        /// Executes the <see cref="RebuildDatasourceCommand"/>
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        private async Task ExecuteRebuildDatasourceCommand()
+        {
+            this.IsBusy = true;
+
+            try
+            {
+                var source = this.Document.Text;
+                await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+
+                if (!this.CompileResult?.Errors.HasErrors ?? false)
+                {
+                    this.RebuildDataSource();
+                }
+            }
+            finally
+            {
+                this.IsBusy = false;
             }
         }
 
@@ -669,10 +750,12 @@ namespace CDP4Reporting.ViewModels
                     return null;
                 }
 
-                if (instObj is IReportScriptDataProvider reportScriptDataProvider)
+                if (instObj is IIterationDependentDataCollector iterationDependentDataCollector)
                 {
-                    reportScriptDataProvider.Initialize(this.Thing, this.Session);
+                    iterationDependentDataCollector.Initialize(this.Thing, this.Session);
                 }
+
+                this.CurrentDataCollector = instObj;
 
                 return instObj.CreateDataObject();
             }
@@ -698,7 +781,7 @@ namespace CDP4Reporting.ViewModels
         {
             var reportingParameters = parameters.ToList();
 
-            var toBeRemoved = new List<Parameter>();
+            var toBeRemoved = new List<DevExpress.XtraReports.Parameters.Parameter>();
             var previouslySetValues = new Dictionary<string, object>();
 
             //Find existing dynamic parameters
@@ -745,7 +828,7 @@ namespace CDP4Reporting.ViewModels
         /// <param name="previouslySetValue">The previously set value in the report designer.</param>
         private void CreateDynamicParameter(IReportingParameter reportingParameter, object previouslySetValue)
         {
-            var newReportParameter = new Parameter
+            var newReportParameter = new DevExpress.XtraReports.Parameters.Parameter
             {
                 Name = reportingParameter.ParameterName,
                 Description = reportingParameter.Name,
@@ -820,12 +903,7 @@ namespace CDP4Reporting.ViewModels
                     return result;
                 }
 
-                if (instObj is IReportScriptDataProvider reportScriptDataProvider)
-                {
-                    reportScriptDataProvider.Initialize(this.Thing, this.Session);
-                }
-
-                result = instObj.CreateParameters(dataSource)?.ToList();
+                result = instObj.CreateParameters(dataSource, this.CurrentDataCollector)?.ToList();
             }
             catch (Exception ex)
             {
@@ -997,6 +1075,198 @@ namespace CDP4Reporting.ViewModels
                 {
                     this.AddOutput($"{ex.Message}\\n{ex.StackTrace}\\n");
                     exception = exception.InnerException;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if the previewed/printed <see cref="XtraReport"/> contains any submittable parameter values.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender
+        /// </param>
+        /// <param name="e">
+        /// The <see cref="EventArgs"/>
+        /// </param>
+        private void CheckSubmittableParameterValues(object sender, EventArgs e)
+        {
+            var report = sender as XtraReport;
+            this.submittableParameterValues = new Dictionary<string, string>();
+
+            foreach (Page p in report.Pages)
+            {
+                var iterator = new DevExpress.XtraPrinting.Native.NestedBrickIterator(p.InnerBricks);
+
+                while (iterator.MoveNext())
+                {
+                    if (iterator.CurrentBrick is VisualBrick visualBrick)
+                    {
+                        if (visualBrick.BrickOwner is XRControl control)
+                        {
+                            var controlTagString = control.Tag.ToString();
+
+                            if (string.IsNullOrWhiteSpace(controlTagString))
+                            {
+                                continue;
+                            }
+
+                            var tagArray = controlTagString.Split(',');
+
+                            if (tagArray.Length == 0)
+                            {
+                                continue;
+                            }
+
+                            foreach (var tag in tagArray)
+                            {
+                                var tagSplit = tag.Split('=');
+
+                                if (tagSplit[0].ToLower().Equals("path"))
+                                {
+                                    if (this.submittableParameterValues.ContainsKey(tagSplit[1]))
+                                    {
+                                        this.submittableParameterValues[tagSplit[1]] = visualBrick.Text;
+                                    }
+
+                                    else
+                                    {
+                                        this.submittableParameterValues.Add(tagSplit[1], visualBrick.Text);
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            this.CanSubmitParameterValues = this.submittableParameterValues.Any();
+        }
+
+        /// <summary>
+        /// Executes the <see cref="SubmitParameterValuesCommand"/>
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        private async Task SubmitParameterValues()
+        {
+            if (!(this.CurrentDataCollector is IOptionDependentDataCollector optionDependentDataCollector))
+            {
+                return;
+            }
+
+            var processedValueSets = this.GetProcessedValueSets(out var errorTexts);
+
+            if (errorTexts.Any())
+            {
+                var okDialogViewModel = new OkDialogViewModel("Warning", $"The following errors were found during ValueSet lookup:\n\n {string.Join("\n", errorTexts)}");
+                this.DialogNavigationService.NavigateModal(okDialogViewModel);
+            }
+
+            await this.ProcessProcessedValueSets(processedValueSets, optionDependentDataCollector.Iteration, optionDependentDataCollector.Session);
+        }
+
+        /// <summary>
+        /// Gets a < see cref="Dictionary{Guid, ProcessedValueSet}"/> that contains the <see cref="ProcessedValueSet"/>s that were created using data
+        /// from the <see cref="ReportDesignerViewModel.submittableParameterValues"/> property.
+        /// </summary>
+        /// <param name="errorTexts">
+        /// A <see cref="List{String}"/> that contains text about all problems during the process
+        /// </param>
+        /// <returns>
+        /// The < see cref="Dictionary{Guid, ProcessedValueSet}"/>.
+        /// </returns>
+        private Dictionary<Guid, ProcessedValueSet> GetProcessedValueSets(out List<string> errorTexts)
+        {
+            errorTexts = new List<string>();
+            var processedValueSets = new Dictionary<Guid, ProcessedValueSet>();
+
+            if (!(this.CurrentDataCollector is IOptionDependentDataCollector optionDependentDataCollector))
+            {
+                errorTexts.Add( $"CurrentDataCollector should be of type {nameof(IOptionDependentDataCollector)}");
+                return processedValueSets;
+            }
+
+            if (this.submittableParameterValues.Any())
+            {
+                var nestedElementTree = new NestedElementTreeGenerator();
+                var allNestedParameters = nestedElementTree.GetNestedParameters(optionDependentDataCollector.SelectedOption).ToList();
+
+                var ownedNestedParameters = nestedElementTree.GetNestedParameters(
+                    optionDependentDataCollector.SelectedOption, optionDependentDataCollector.DomainOfExpertise).ToList();
+
+                var processedValueSetGenerator = new ProcessedValueSetGenerator(optionDependentDataCollector);
+
+                foreach (var submittableParameter in this.submittableParameterValues)
+                {
+                    if (!processedValueSetGenerator
+                        .TryGetProcessedValueSet(
+                            optionDependentDataCollector.SelectedOption,
+                            allNestedParameters,
+                            ownedNestedParameters,
+                            submittableParameter.Key,
+                            submittableParameter.Value,
+                            ref processedValueSets,
+                            out var errorText))
+                    {
+                        if (!string.IsNullOrWhiteSpace(errorText))
+                        {
+                            errorTexts.Add(errorText);
+                        }
+                    }
+                }
+            }
+
+            return processedValueSets;
+        }
+
+        /// <summary>
+        /// Processes <see cref="ProcessedValueSet"/>s and submits changed values back to the model.
+        /// </summary>
+        /// <param name="processedValueSets">
+        /// The <see cref="Dictionary{Guid, ProcessedValueSet}"/> that contains the <see cref="ProcessedValueSet"/>s to process.
+        /// </param>
+        /// <param name="iteration">
+        /// The <see cref="Iteration"/>
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/>
+        /// </param>
+        /// <returns>
+        /// An awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ProcessProcessedValueSets(Dictionary<Guid, ProcessedValueSet> processedValueSets, Iteration iteration, ISession session)
+        {
+            if (processedValueSets.Any())
+            {
+                try
+                {
+                    var submitConfirmationViewModel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.ParameterAndOrverride);
+                    var dialogResult = this.DialogNavigationService.NavigateModal(submitConfirmationViewModel);
+
+                    if (dialogResult.Result.HasValue && dialogResult.Result.Value)
+                    {
+                        var submitConfirmationDialogResult = (SubmitConfirmationDialogResult) dialogResult;
+
+                        var context = TransactionContextResolver.ResolveContext(iteration);
+                        var transaction = new ThingTransaction(context);
+
+                        foreach (var clone in submitConfirmationDialogResult.Clones)
+                        {
+                            transaction.CreateOrUpdate(clone);
+                        }
+
+                        var operationContainer = transaction.FinalizeTransaction();
+
+                        await session.Write(operationContainer);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.logger.Error(ex, "Error while trying to submit data to the model");
+
+                    var okDialogViewModel = new OkDialogViewModel("Error", $"Error while trying to submit data to the model:\n\n{ex.Message}");
+                    this.DialogNavigationService.NavigateModal(okDialogViewModel);
                 }
             }
         }
