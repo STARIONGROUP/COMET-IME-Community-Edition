@@ -27,7 +27,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="6.2.1-2020.9.30.2-pre-release" />
+    <PackageReference Include="CDP4Common-CE" Version="6.2.1-2020.10.26.1-pre-release" />
     <PackageReference Include="CDP4Dal-CE" Version="6.2.0" />
     <PackageReference Include="CDP4JsonSerializer-CE" Version="6.2.0" />
     <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.4.0" />
@@ -1321,6 +1321,9 @@
     <Compile Update="Views\GenericConfirmationDialog.xaml.cs">
       <DependentUpon>GenericConfirmationDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\SubmitConfirmation.xaml.cs">
+      <DependentUpon>SubmitConfirmation.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\ThingSelectorDialog.xaml.cs">
       <DependentUpon>ThingSelectorDialog.xaml</DependentUpon>
     </Compile>
@@ -1659,6 +1662,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\SubmitConfirmation.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ThingSelectorDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1694,5 +1701,6 @@
     <None Remove="Views\ElementParameterRowControl.xaml" />
     <None Remove="Views\ManageConfigurationsDialog.xaml" />
     <None Remove="Views\SavedConfigurationDialog.xaml" />
+    <None Remove="Views\SubmitConfirmation.xaml" />
   </ItemGroup>
 </Project>

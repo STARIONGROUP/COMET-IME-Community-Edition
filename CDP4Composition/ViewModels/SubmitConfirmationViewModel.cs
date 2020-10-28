@@ -1,19 +1,43 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SubmitConfirmationViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
-namespace CDP4ParameterSheetGenerator.ViewModels
+namespace CDP4Composition.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;    
+    using System.Linq;
+    using System.Windows.Input;
+
+    using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.Validation;
+
     using CDP4Composition.Navigation;
-    using Generator.ParameterSheet;
+    using CDP4Composition.Utilities;
+
     using ReactiveUI;
-    
+
     /// <summary>
     /// The purpose of the <see cref="SubmitConfirmationViewModel"/> is to present the changed <see cref="Thing"/>s
     /// before they are submitted as well as offering the opportunity to add a log entry or cancel.
@@ -28,12 +52,12 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// <summary>
         /// Backing field for the <see cref="SelectedParameters"/>
         /// </summary>
-        private ReactiveList<WorkbookRebuildRowViewModel> selectedParameters;
+        private ReactiveList<SubmitParameterRowViewModel> selectedParameters;
 
         /// <summary>
         /// Backing field for the <see cref="SelectedSubscriptions"/>
         /// </summary>
-        private ReactiveList<WorkbookRebuildRowViewModel> selectedSubscriptions;
+        private ReactiveList<SubmitParameterRowViewModel> selectedSubscriptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SubmitConfirmationViewModel"/> class.
@@ -48,8 +72,8 @@ namespace CDP4ParameterSheetGenerator.ViewModels
             : base(processedValueSets, valueSetKind)
         {
             this.DialogTitle = "Submit Changes...";
-            this.SelectedParameters = new ReactiveList<WorkbookRebuildRowViewModel>();
-            this.SelectedSubscriptions = new ReactiveList<WorkbookRebuildRowViewModel>();
+            this.SelectedParameters = new ReactiveList<SubmitParameterRowViewModel>();
+            this.SelectedSubscriptions = new ReactiveList<SubmitParameterRowViewModel>();
 
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
@@ -57,12 +81,12 @@ namespace CDP4ParameterSheetGenerator.ViewModels
             this.SelectedParameters.ChangeTrackingEnabled = true;
             this.SelectedParameters.CountChanged.Subscribe(_ => this.ToggleParameterSelection());
 
-            this.SelectedParameters.AddRange(this.ParameterOrOverrideWorkbookRebuildRowViewModels.Where(r=>!r.HasValidationError));
+            this.SelectedParameters.AddRange(this.ParameterOrOverrideSubmitParameterRowViewModels.Where(r => !r.HasValidationError));
 
             this.SelectedSubscriptions.ChangeTrackingEnabled = true;
             this.SelectedSubscriptions.CountChanged.Subscribe(_ => this.ToggleSubscriptionsSelection());
 
-            this.SelectedSubscriptions.AddRange(this.ParameterSubscriptionWorkbookRebuildRowViewModels.Where(r => !r.HasValidationError));
+            this.SelectedSubscriptions.AddRange(this.ParameterSubscriptionSubmitParameterRowViewModels.Where(r => !r.HasValidationError));
 
             var canOk = this.WhenAnyValue(vm => vm.OkCanExecute);
             this.OkCommand = ReactiveCommand.Create(canOk);
@@ -70,7 +94,7 @@ namespace CDP4ParameterSheetGenerator.ViewModels
 
             if (this.ProcessedValueSets.Any() && this.ProcessedValueSets.Values.Any(x => x.ValidationResult != ValidationResultKind.Valid))
             {
-                this.InformationMessage = "Warning: There are invalid values in the sheet. These values will not be submitted even if selected!";
+                this.InformationMessage = "Warning: There are invalid values found. These values will not be submitted even if selected!";
                 this.IsInformationMessageVisible = true;
             }
         }
@@ -105,26 +129,26 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// </summary>
         public string SubmitMessage
         {
-            get { return this.submitMessage; }
-            set { this.RaiseAndSetIfChanged(ref this.submitMessage, value); }
+            get => this.submitMessage;
+            set => this.RaiseAndSetIfChanged(ref this.submitMessage, value);
         }
 
         /// <summary>
         /// Gets or sets the selected Parameters.
         /// </summary>
-        public ReactiveList<WorkbookRebuildRowViewModel> SelectedParameters
+        public ReactiveList<SubmitParameterRowViewModel> SelectedParameters
         {
-            get { return this.selectedParameters; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedParameters, value); }
+            get => this.selectedParameters;
+            set => this.RaiseAndSetIfChanged(ref this.selectedParameters, value);
         }
 
         /// <summary>
         /// Gets or sets the selected ParameterSubscriptions.
         /// </summary>
-        public ReactiveList<WorkbookRebuildRowViewModel> SelectedSubscriptions
+        public ReactiveList<SubmitParameterRowViewModel> SelectedSubscriptions
         {
-            get { return this.selectedSubscriptions; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSubscriptions, value); }
+            get => this.selectedSubscriptions;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSubscriptions, value);
         }
 
         /// <summary>
@@ -140,7 +164,7 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// </summary>
         protected override void UpdateOkCanExecute()
         {
-            this.OkCanExecute = this.ParameterOrOverrideWorkbookRebuildRowViewModels.Any(row => row.IsSelected) || this.ParameterSubscriptionWorkbookRebuildRowViewModels.Any(row => row.IsSelected);
+            this.OkCanExecute = this.ParameterOrOverrideSubmitParameterRowViewModels.Any(row => row.IsSelected) || this.ParameterSubscriptionSubmitParameterRowViewModels.Any(row => row.IsSelected);
         }
 
         /// <summary>
@@ -148,8 +172,8 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// </summary>
         private void ExecuteOk()
         {
-            var parameterOrOverrides = this.ParameterOrOverrideWorkbookRebuildRowViewModels.Where(x => x.IsSelected && !x.HasValidationError).Select(x => x.Thing).ToList();
-            var parameterSubscriptions = this.ParameterSubscriptionWorkbookRebuildRowViewModels.Where(x => x.IsSelected && !x.HasValidationError).Select(x => x.Thing).ToList();
+            var parameterOrOverrides = this.ParameterOrOverrideSubmitParameterRowViewModels.Where(x => x.IsSelected && !x.HasValidationError).Select(x => x.Thing).ToList();
+            var parameterSubscriptions = this.ParameterSubscriptionSubmitParameterRowViewModels.Where(x => x.IsSelected && !x.HasValidationError).Select(x => x.Thing).ToList();
 
             var clones = parameterOrOverrides.Concat(parameterSubscriptions);
 
@@ -161,7 +185,7 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// </summary>
         private void ToggleParameterSelection()
         {
-            foreach (var item in this.ParameterOrOverrideWorkbookRebuildRowViewModels)
+            foreach (var item in this.ParameterOrOverrideSubmitParameterRowViewModels)
             {
                 item.IsSelected = this.SelectedParameters.Contains(item);
             }
@@ -172,7 +196,7 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// </summary>
         private void ToggleSubscriptionsSelection()
         {
-            foreach (var item in this.ParameterSubscriptionWorkbookRebuildRowViewModels)
+            foreach (var item in this.ParameterSubscriptionSubmitParameterRowViewModels)
             {
                 item.IsSelected = this.SelectedSubscriptions.Contains(item);
             }

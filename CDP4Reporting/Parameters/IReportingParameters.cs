@@ -27,10 +27,7 @@ namespace CDP4Reporting.Parameters
 {
     using System.Collections.Generic;
 
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
-    using CDP4Dal;
+    using CDP4Reporting.DataCollection;
 
     /// <summary>
     /// Interface to be used in the Code editor of <see cref="Views.ReportDesigner"/>.
@@ -38,47 +35,17 @@ namespace CDP4Reporting.Parameters
     public interface IReportingParameters
     {
         /// <summary>
-        /// Gets the <see cref="Iteration"/>
-        /// </summary>
-        Iteration Iteration { get; }
-
-        /// <summary>
-        /// Gets the <see cref="ISession"/>
-        /// </summary>
-        ISession Session { get; }
-
-        /// <summary>
-        /// Gets the <see cref="DomainOfExpertise"/>
-        /// </summary>
-        DomainOfExpertise DomainOfExpertise { get; }
-
-        /// <summary>
-        /// All currently open <see cref="ReferenceDataLibrary"/>s in this <see cref="IReportingParameters.Session"/>
-        /// </summary>
-        IEnumerable<ReferenceDataLibrary> OpenReferenceDataLibraries { get; }
-
-        /// <summary>
-        /// The current <see cref="SiteDirectory"/>s in this <see cref="IReportingParameters.Session"/>
-        /// </summary>
-        SiteDirectory SiteDirectory { get; }
-
-        /// <summary>
-        /// Initializes this DataCollector 
-        /// </summary>
-        /// <param name="iteration"></param>
-        /// <param name="session"></param>
-        void Initialize(Iteration iteration, ISession session);
-
-        /// <summary>
-        /// Create a list of <see cref="IReportingParameter"/>s.
+        /// Creates a list of report reporting parameter that should dynamically be added to the 
+        /// Report Designer's report parameter list.
         /// </summary>
         /// <param name="dataSource">
-        /// The datasource.
+        /// The already calculated datasource.
         /// </param>
-        /// <returns>
-        /// A list of <see cref="IReportingParameter"/>s.
-        /// </returns>
-        IEnumerable<IReportingParameter> CreateParameters(object dataSource);
+        /// <param name="dataCollector">
+        /// The <see cref="IDataCollector"/> used for creating the dataSource.
+        /// </param>
+        /// <returns>An <see cref="IEnumerable{IReportingParameter}"/></returns>
+        IEnumerable<IReportingParameter> CreateParameters(object dataSource, IDataCollector dataCollector);
 
         /// <summary>
         /// Creates a filterString to be user as a report filter expression.

@@ -33,15 +33,20 @@ namespace CDP4Reporting.Parameters
     /// <summary>
     /// A class that is used to build Report Parameters and optional a specific filter string at the report level. 
     /// </summary>
-    public abstract class ReportingParameters : ReportScriptDataProvider, IReportingParameters
+    public abstract class ReportingParameters : IReportingParameters
     {
         /// <summary>
         /// Creates a list of report reporting parameter that should dynamically be added to the 
         /// Report Designer's report parameter list.
         /// </summary>
-        /// <param name="dataSource">The already calculated datasource.</param>
+        /// <param name="dataSource">
+        /// The already calculated datasource.
+        /// </param>
+        /// <param name="dataCollector">
+        /// The <see cref="IDataCollector"/> used for creating the dataSource.
+        /// </param>
         /// <returns>An <see cref="IEnumerable{IReportingParameter}"/></returns>
-        public abstract IEnumerable<IReportingParameter> CreateParameters(object dataSource);
+        public abstract IEnumerable<IReportingParameter> CreateParameters(object dataSource, IDataCollector dataCollector);
 
         /// <summary>
         /// Build a filter string that contains a concatination of all IReportingParameter's in the

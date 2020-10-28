@@ -25,6 +25,7 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using System;
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
@@ -54,6 +55,19 @@ namespace CDP4Reporting.DataCollection
         internal string FieldName { get; set; }
 
         /// <summary>
+        /// The <see cref="ParameterValueContext"/> for which the value needs to be retrieved
+        /// in case <see cref="DataCollectorParameter{TRow, TValue}.ParameterBase"/> is of type <see cref="Parameter"/>
+        /// or of type <see cref="ParameterOverride"/>
+        /// </summary>
+        internal ParameterValueContext ParameterValueContext { get; set; } = ParameterValueContext.PublishedValue;
+
+        /// <summary>
+        /// The <see cref="ParameterValueContext"/> for which the value needs to be retrieved
+        /// in case <see cref="DataCollectorParameter{TRow, TValue}.ParameterBase"/> is of type <see cref="ParameterSubscription"/>
+        /// </summary>
+        internal ParameterValueContext ParameterSubscriptionValueContext { get; set; } = ParameterValueContext.PublishedValue;
+
+        /// <summary>
         /// The value of the associated <see cref="ParameterOrOverrideBase"/>.
         /// The <see cref="IValueSet"/>s of the associated <see cref="ParameterBase"/>.
         /// </summary>
@@ -77,14 +91,30 @@ namespace CDP4Reporting.DataCollection
         /// <returns>The correct value of the <see cref="IValueSet"/></returns>
         protected TValue GetValueSetValue(IValueSet valueSet)
         {
-            if (valueSet is ParameterSubscriptionValueSet)
+            if (valueSet is ParameterSubscriptionValueSet valueSetSubscription)
             {
-                return this.Parse(valueSet.Computed.FirstOrDefault()) ?? default;
+                if (this.ParameterSubscriptionValueContext == ParameterValueContext.ActualValue)
+                {
+                    return this.Parse(valueSet.ActualValue.FirstOrDefault()) ?? default;
+                }
+
+                if (this.ParameterSubscriptionValueContext == ParameterValueContext.PublishedValue)
+                {
+                    return this.Parse(valueSetSubscription.Computed.FirstOrDefault()) ?? default;
+                }
             }
 
             if (valueSet is ParameterValueSetBase valueSetBase)
             {
-                return this.Parse(valueSetBase.Published.FirstOrDefault()) ?? default;
+                if (this.ParameterValueContext == ParameterValueContext.ActualValue)
+                {
+                    return this.Parse(valueSet.ActualValue.FirstOrDefault()) ?? default;
+                }
+
+                if (this.ParameterValueContext == ParameterValueContext.PublishedValue)
+                {
+                    return this.Parse(valueSetBase.Published.FirstOrDefault()) ?? default;
+                }
             }
 
             return default;
@@ -114,10 +144,19 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         internal override void Initialize(DataCollectorNode<TRow> node, PropertyInfo propertyInfo)
         {
-            var attribute = GetParameterAttribute(propertyInfo);
+            var definedShortNameAttribute = GetParameterAttribute(propertyInfo);
 
-            this.ShortName = attribute?.ShortName;
-            this.FieldName = attribute?.FieldName;
+            this.ShortName = definedShortNameAttribute?.ShortName;
+            this.FieldName = definedShortNameAttribute?.FieldName;
+
+            var parameterValueContext = GetParameterValueContextAttribute(propertyInfo);
+
+            if (parameterValueContext != null)
+            {
+                this.ParameterValueContext = parameterValueContext.ParameterValueContext;
+                this.ParameterSubscriptionValueContext = parameterValueContext.ParameterSubscriptionValueContext;
+            }
+
             this.Node = node;
 
             var firstNestedParameter = this.Node.NestedElement.NestedParameter.FirstOrDefault(
@@ -137,6 +176,24 @@ namespace CDP4Reporting.DataCollection
             {
                 this.ValueSets = nestedParameterData;
             }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ParameterValueContextAttribute"/> decorating the property described by <paramref name="propertyType"/>.
+        /// </summary>
+        /// <param name="propertyType">
+        /// Describes the current property.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ParameterValueContextAttribute"/> decorating the current parameter class.
+        /// </returns>
+        protected static ParameterValueContextAttribute GetParameterValueContextAttribute(PropertyInfo propertyType)
+        {
+            var attr = Attribute
+                .GetCustomAttributes(propertyType)
+                .SingleOrDefault(attribute => attribute is ParameterValueContextAttribute);
+
+            return attr as ParameterValueContextAttribute;
         }
 
         /// <summary>

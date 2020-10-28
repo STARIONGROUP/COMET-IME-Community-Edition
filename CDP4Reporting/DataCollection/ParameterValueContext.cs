@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IReportScriptDataProvider.cs" company="RHEA System S.A.">
+// <copyright file="ParameterValueContext.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,48 +25,21 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    using System.Collections.Generic;
-
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
-    using CDP4Dal;
 
     /// <summary>
-    /// The interface used for classes that can be used in a Report Script to provide commonly used objects to the script editor.
+    /// A context which defines which value should be used for <see cref="Parameter"/>s during data collection
     /// </summary>
-    public interface IReportScriptDataProvider
+    public enum ParameterValueContext
     {
         /// <summary>
-        /// Gets the <see cref="Iteration"/>
+        /// Use the actual values
         /// </summary>
-        Iteration Iteration { get; }
+        ActualValue,
 
         /// <summary>
-        /// Gets the <see cref="ISession"/>
+        /// Use the pulished values 
         /// </summary>
-        ISession Session { get; }
-
-        /// <summary>
-        /// Gets the <see cref="DomainOfExpertise"/>
-        /// </summary>
-        DomainOfExpertise DomainOfExpertise { get; }
-
-        /// <summary>
-        /// All currently open <see cref="ReferenceDataLibrary"/>s in this <see cref="IDataCollector.Session"/>
-        /// </summary>
-        public IEnumerable<ReferenceDataLibrary> OpenReferenceDataLibraries { get; }
-
-        /// <summary>
-        /// The current <see cref="SiteDirectory"/>s in this <see cref="IDataCollector.Session"/>
-        /// </summary>
-        public SiteDirectory SiteDirectory { get; }
-
-        /// <summary>
-        /// Initializes this DataCollector 
-        /// </summary>
-        /// <param name="iteration"></param>
-        /// <param name="session"></param>
-        void Initialize(Iteration iteration, ISession session);
+        PublishedValue
     }
 }
