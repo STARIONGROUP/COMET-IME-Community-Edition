@@ -1120,6 +1120,14 @@ namespace CDP4Reporting.ViewModels
                 this.DialogNavigationService.NavigateModal(okDialogViewModel);
             }
 
+            if (!processedValueSets.Any())
+            {
+                var okDialogViewModel = new OkDialogViewModel("Info", "No parameter changes found.");
+                this.DialogNavigationService.NavigateModal(okDialogViewModel);
+
+                return;
+            }
+
             await this.ProcessProcessedValueSets(processedValueSets, optionDependentDataCollector.Iteration, optionDependentDataCollector.Session);
         }
 
@@ -1193,37 +1201,34 @@ namespace CDP4Reporting.ViewModels
         /// </returns>
         private async Task ProcessProcessedValueSets(Dictionary<Guid, ProcessedValueSet> processedValueSets, Iteration iteration, ISession session)
         {
-            if (processedValueSets.Any())
+            try
             {
-                try
-                {
-                    var submitConfirmationViewModel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All);
-                    var dialogResult = this.DialogNavigationService.NavigateModal(submitConfirmationViewModel);
+                var submitConfirmationViewModel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All);
+                var dialogResult = this.DialogNavigationService.NavigateModal(submitConfirmationViewModel);
 
-                    if (dialogResult.Result.HasValue && dialogResult.Result.Value)
+                if (dialogResult.Result.HasValue && dialogResult.Result.Value)
+                {
+                    var submitConfirmationDialogResult = (SubmitConfirmationDialogResult) dialogResult;
+
+                    var context = TransactionContextResolver.ResolveContext(iteration);
+                    var transaction = new ThingTransaction(context);
+
+                    foreach (var clone in submitConfirmationDialogResult.Clones)
                     {
-                        var submitConfirmationDialogResult = (SubmitConfirmationDialogResult) dialogResult;
-
-                        var context = TransactionContextResolver.ResolveContext(iteration);
-                        var transaction = new ThingTransaction(context);
-
-                        foreach (var clone in submitConfirmationDialogResult.Clones)
-                        {
-                            transaction.CreateOrUpdate(clone);
-                        }
-
-                        var operationContainer = transaction.FinalizeTransaction();
-
-                        await session.Write(operationContainer);
+                        transaction.CreateOrUpdate(clone);
                     }
-                }
-                catch (Exception ex)
-                {
-                    this.logger.Error(ex, "Error while trying to submit data to the model");
 
-                    var okDialogViewModel = new OkDialogViewModel("Error", $"Error while trying to submit data to the model:\n\n{ex.Message}");
-                    this.DialogNavigationService.NavigateModal(okDialogViewModel);
+                    var operationContainer = transaction.FinalizeTransaction();
+
+                    await session.Write(operationContainer);
                 }
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Error while trying to submit data to the model");
+
+                var okDialogViewModel = new OkDialogViewModel("Error", $"Error while trying to submit data to the model:\n\n{ex.Message}");
+                this.DialogNavigationService.NavigateModal(okDialogViewModel);
             }
         }
     }
