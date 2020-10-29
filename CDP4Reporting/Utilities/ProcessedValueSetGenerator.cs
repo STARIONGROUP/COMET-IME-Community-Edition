@@ -155,7 +155,7 @@ namespace CDP4Reporting.Utilities
         /// <param name="componentIndex">
         /// The index of the <see cref="ParameterTypeComponent"/>.
         /// </param>
-        /// <param name="manualValue">
+        /// <param name="computedValue">
         /// The manual value of the <see cref="ParameterValueSet"/>.
         /// </param>
         /// <param name="processedValueSets">
@@ -170,7 +170,7 @@ namespace CDP4Reporting.Utilities
         /// <returns>
         /// The added or changed <see cref="ProcessedValueSet"/>
         /// </returns>
-        private ProcessedValueSet ProcessValueSet(ParameterValueSetBase parameterValueSet, ParameterOrOverrideBase parameterOrOverrideBase, int componentIndex, string manualValue, ref Dictionary<Guid, ProcessedValueSet> processedValueSets, IFormatProvider provider, out string validationErrorText)
+        private ProcessedValueSet ProcessValueSet(ParameterValueSetBase parameterValueSet, ParameterOrOverrideBase parameterOrOverrideBase, int componentIndex, string computedValue, ref Dictionary<Guid, ProcessedValueSet> processedValueSets, IFormatProvider provider, out string validationErrorText)
         {
             var validationResult = ValidationResultKind.InConclusive;
 
@@ -182,9 +182,9 @@ namespace CDP4Reporting.Utilities
 
             if (parameterType != null)
             {
-                manualValue = manualValue?.ToValueSetObject(parameterType).ToValueSetString(parameterType) ?? parameterValueSet.Manual[componentIndex];
+                computedValue = computedValue?.ToValueSetObject(parameterType).ToValueSetString(parameterType) ?? parameterValueSet.Computed[componentIndex];
 
-                var validManualValue = parameterType.Validate(manualValue, measurementScale, provider);
+                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
 
                 if (validManualValue.ResultKind > validationResult)
                 {
@@ -200,7 +200,7 @@ namespace CDP4Reporting.Utilities
                 processedValueSet = new ProcessedValueSet(parameterValueSet, validationResult);
             }
 
-            if (processedValueSet.IsDirty(componentIndex, parameterType, switchKind, manualValue, parameterValueSet.Computed[componentIndex], parameterValueSet.Reference[componentIndex], parameterValueSet.Formula[componentIndex], out var valueSetValues))
+            if (processedValueSet.IsDirty(componentIndex, parameterType, switchKind, parameterValueSet.Manual[componentIndex], computedValue, parameterValueSet.Reference[componentIndex], parameterValueSet.Formula[componentIndex], out var valueSetValues))
             {
                 processedValueSet.UpdateClone(valueSetValues);
 
@@ -225,7 +225,7 @@ namespace CDP4Reporting.Utilities
         /// <param name="componentIndex">
         /// The index of the <see cref="ParameterTypeComponent"/>.
         /// </param>
-        /// <param name="manualValue">
+        /// <param name="computedValue">
         /// The manual value of the <see cref="ParameterValueSet"/>.
         /// </param>
         /// <param name="processedValueSets">
@@ -240,7 +240,7 @@ namespace CDP4Reporting.Utilities
         /// <returns>
         /// The added or changed <see cref="ProcessedValueSet"/>
         /// </returns>
-        private ProcessedValueSet ProcessValueSet(ParameterSubscriptionValueSet parameterSubscriptionValueSet, ParameterSubscription parameterSubscription, int componentIndex, string manualValue, ref Dictionary<Guid, ProcessedValueSet> processedValueSets, IFormatProvider provider, out string validationErrorText)
+        private ProcessedValueSet ProcessValueSet(ParameterSubscriptionValueSet parameterSubscriptionValueSet, ParameterSubscription parameterSubscription, int componentIndex, string computedValue, ref Dictionary<Guid, ProcessedValueSet> processedValueSets, IFormatProvider provider, out string validationErrorText)
         {
             var validationResult = ValidationResultKind.InConclusive;
 
@@ -252,9 +252,9 @@ namespace CDP4Reporting.Utilities
 
             if (parameterType != null)
             {
-                manualValue = manualValue.ToValueSetObject(parameterType).ToValueSetString(parameterType);
+                computedValue = computedValue.ToValueSetObject(parameterType).ToValueSetString(parameterType);
 
-                var validManualValue = parameterType.Validate(manualValue, measurementScale, provider);
+                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
 
                 if (validManualValue.ResultKind > validationResult)
                 {
@@ -270,7 +270,7 @@ namespace CDP4Reporting.Utilities
                 processedValueSet = new ProcessedValueSet(parameterSubscriptionValueSet, validationResult);
             }
 
-            if (processedValueSet.IsDirty(componentIndex, parameterType, switchKind, manualValue, null, null, null, out var valueSetValues))
+            if (processedValueSet.IsDirty(componentIndex, parameterType, switchKind, computedValue, null, null, null, out var valueSetValues))
             {
                 processedValueSet.UpdateClone(valueSetValues);
 
@@ -292,8 +292,14 @@ namespace CDP4Reporting.Utilities
         public static string CheckPath(string path, Option option)
         {
             var pathArray = path.Split('\\');
-            pathArray[3] = option.ShortName;
-            return string.Join(@"\", pathArray);
+
+            if (pathArray.Length == 4)
+            {
+                pathArray[3] = option.ShortName;
+                return string.Join(@"\", pathArray);
+            }
+
+            return path;
         }
     }
 }
