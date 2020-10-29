@@ -39,7 +39,6 @@ namespace CDP4Reporting.Utilities
 
     using CDP4Reporting.DataCollection;
     using CDP4Reporting.SubmittableParameterValues;
-    using CDP4Reporting.ViewModels;
 
     /// <summary>
     /// Helper class to create <see cref="ProcessedValueSet"/>s using data from an <see cref="IIterationDependentDataCollector"/>.
@@ -88,7 +87,7 @@ namespace CDP4Reporting.Utilities
         /// </returns>
         public bool TryGetProcessedValueSet(Option option, IEnumerable<NestedParameter> allNestedParameters, IEnumerable<NestedParameter> ownedNestedParameters, SubmittableParameterValue submittableParameterValue, ref Dictionary<Guid, ProcessedValueSet> processedValueSets, out string errorText)
         {
-            var path = CheckPath(submittableParameterValue.Path, option);
+            var path = ReportingUtilities.ConvertToOptionPath(submittableParameterValue.Path, option);
 
             var nestedParameters = option.GetNestedParameterValueSetsByPath(path, allNestedParameters).ToList();
 
@@ -281,25 +280,6 @@ namespace CDP4Reporting.Utilities
             }
 
             return processedValueSet;
-        }
-
-        /// <summary>
-        /// Gets a path and converts it to be usefull for the applicable <see cref="Option"/>.
-        /// </summary>
-        /// <param name="path">The <see cref="NestedParameter.Path"/></param>
-        /// <param name="option">The <see cref="Option"/> for which to convert the <paramref name="path"/> param to.</param>
-        /// <returns>The converted path as a <see cref="string"/></returns>
-        public static string CheckPath(string path, Option option)
-        {
-            var pathArray = path.Split('\\');
-
-            if (pathArray.Length == 4)
-            {
-                pathArray[3] = option.ShortName;
-                return string.Join(@"\", pathArray);
-            }
-
-            return path;
         }
     }
 }

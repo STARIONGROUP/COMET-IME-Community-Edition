@@ -81,11 +81,17 @@ namespace CDP4Reporting.SubmittableParameterValues
 
                             foreach (var tag in tagArray)
                             {
+                                if (!tag.Contains("="))
+                                {
+                                    continue;
+                                }
+
                                 var tagSplit = tag.Split('=');
-                                var path = tagSplit[1];
 
                                 if (tagSplit[0].ToLower().Equals("path"))
                                 {
+                                    var path = tagSplit[1].Trim();
+
                                     var submittableParameterValue = submittableParameterValues.SingleOrDefault(x => x.Path == path);
 
                                     if (submittableParameterValue == null)
