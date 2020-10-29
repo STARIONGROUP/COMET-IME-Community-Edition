@@ -49,7 +49,7 @@ namespace CDP4Composition.ViewModels
         private bool okCanExecute;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValueSetDialogViewModel{T}"/> class.
+        /// Initializes a new instance of the <see cref="ValueSetDialogViewModel"/> class.
         /// </summary>
         /// <param name="processedValueSets">
         /// The <see cref="ProcessedValueSet"/>s that references <see cref="Thing"/>s that have been changed on the workbook.
