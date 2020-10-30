@@ -1,0 +1,45 @@
+<dx:DXWindow 
+    x:Class="CDP4Composition.Views.CustomFilterEditorDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dxfui="http://schemas.devexpress.com/winfx/2008/xaml/core/filteringui"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    mc:Ignorable="d"
+    Title="Filter Editor"
+    Height="350" Width="500"
+    WindowStartupLocation ="CenterScreen"
+    x:Name="Dialog">
+    <dxlc:LayoutControl View="Group">
+        <dxlc:LayoutGroup VerticalAlignment="Stretch"
+                          Margin="3"
+                          View="Group"
+                          Orientation="Vertical">
+            <dxlc:LayoutItem VerticalAlignment="Stretch">
+                <dxfui:FilterEditorControl x:Name="FilterEditor" VerticalAlignment="Stretch"  Context="{Binding Path=FilteringContext, ElementName=Dialog}">
+                    <dxmvvm:Interaction.Behaviors>
+                        <dxmvvm:EventToCommand Command="{Binding QueryOperatorsCommand}"  PassEventArgsToCommand="True" EventName="QueryOperators" />
+                    </dxmvvm:Interaction.Behaviors>
+                </dxfui:FilterEditorControl>
+            </dxlc:LayoutItem>
+            <dxlc:LayoutGroup HorizontalAlignment="Right"
+                              VerticalAlignment =" Bottom"
+                              Margin="3"
+                              View="Group"
+                              Orientation="Horizontal">
+                <dxlc:LayoutItem>
+                    <Button Width ="75" Content="Ok" Click="OkClicked"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem>
+                    <Button Width ="75" Content="Cancel" Click="CancelClicked"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem>
+                    <Button Width ="75" Content="Apply" Click="ApplyClicked" />
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutGroup>
+    </dxlc:LayoutControl>
+</dx:DXWindow>

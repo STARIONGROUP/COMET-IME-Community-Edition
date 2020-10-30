@@ -17,7 +17,6 @@
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:commonData="clr-namespace:CDP4Common.CommonData;assembly=CDP4Common"
-             xmlns:dxfui="http://schemas.devexpress.com/winfx/2008/xaml/core/filteringui"
              d:DesignHeight="400"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
@@ -190,36 +189,20 @@
                          OwnerLock="LoadingContent"
                          BorderEffect="Default"
                          BorderEffectColor="Blue">
-        <Grid>
+
+            <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <views:CommonThingControl GridView="{Binding ElementName=View}" />
+            <views:CommonThingControl HasCustomFilterPanel="true" GridView="{Binding ElementName=View}" />
 
             <views:BrowserHeader Grid.Row="1" />
 
             <Grid Grid.Row="2" Background="AliceBlue">
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel MinWidth="150"  Visibility="{Binding ElementName=View, Path=ActualShowSearchPanel, Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalAlignment="Left" >
-                    <dxfui:FilterEditorControl Background="AliceBlue" x:Name="FilterEditor" MaxHeight="300" Context="{Binding Path=FilteringContext, ElementName=TreeList}">
-                        <dxmvvm:Interaction.Behaviors>
-                            <dxmvvm:EventToCommand Command="{Binding QueryOperatorsCommand}"  PassEventArgsToCommand="True" EventName="QueryOperators" />
-                        </dxmvvm:Interaction.Behaviors>
-                    </dxfui:FilterEditorControl>
-                    <Button Width ="100" Content="Apply Filter" Command="{Binding Commands.ApplyFilter, ElementName=FilterEditor}" />
-                </StackPanel>
-
                 <dxg:TreeListControl x:Name="TreeList"
-                                     Grid.Column="1"
-                                    
                                      ItemsSource="{Binding ElementDefinitionRowViewModels}"
                                      SelectedItem="{Binding SelectedThing}"
                                      CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -236,7 +219,6 @@
                         <dxg:TreeListView Name="View"
                                           AllowEditing="False"
                                           AutoWidth="False"
-                                          AllowFilterEditor ="false"
                                           EditorShowMode="MouseUpFocused"
                                           ExpandCollapseNodesOnNavigation="True"
                                           EnableDynamicLoading="False"

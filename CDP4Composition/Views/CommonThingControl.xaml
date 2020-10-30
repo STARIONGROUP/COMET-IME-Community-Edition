@@ -68,10 +68,13 @@
 
         <dxb:BarItemSeparator />
 
-        <dxb:BarCheckItem IsChecked="{Binding GridView.ActualShowFilterPanel, ElementName=Toolbar, Mode=OneWay, NotifyOnTargetUpdated=True}"
-                          ItemClick="ButtonBase_OnClick"
-                          Glyph="{dx:DXImage Image=Filter_16x16.png}"
-                          Hint="Show Search/Filter Panels" />
+        <dxb:BarButtonItem ItemClick="OpenFilterPanel"
+                           Glyph="{dx:DXImage Image=Filter_16x16.png}"
+                           Hint="Show Filter Panel" />
+
+        <dxb:BarButtonItem ItemClick="ToggleSearchPanel" 
+                           Glyph="{dx:DXImage Image=Zoom_16x16.png}"
+                           Hint="Show/Hide Search Panel" />
 
         <dxb:BarCheckItem 
                           IsChecked="{Binding ShowOnlyFavorites}"
