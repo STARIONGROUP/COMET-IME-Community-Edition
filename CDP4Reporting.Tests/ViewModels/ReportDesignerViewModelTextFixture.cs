@@ -518,7 +518,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             this.session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(tuple.domain);
 
-            this.permissionService.Setup(x => x.CanWrite( It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<SubmitConfirmationViewModel>()))
                 .Returns(new SubmitConfirmationDialogResult(false, "", new List<Thing>()));

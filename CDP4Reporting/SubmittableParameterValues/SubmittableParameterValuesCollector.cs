@@ -61,57 +61,84 @@ namespace CDP4Reporting.SubmittableParameterValues
 
                 while (iterator.MoveNext())
                 {
-                    if (iterator.CurrentBrick is VisualBrick visualBrick)
+                    if (!(iterator.CurrentBrick is VisualBrick visualBrick))
                     {
-                        if (visualBrick.BrickOwner is XRControl control)
-                        {
-                            var controlTagString = control.Tag.ToString();
-
-                            if (string.IsNullOrWhiteSpace(controlTagString))
-                            {
-                                continue;
-                            }
-
-                            var tagArray = controlTagString.Split(',');
-
-                            if (tagArray.Length == 0)
-                            {
-                                continue;
-                            }
-
-                            foreach (var tag in tagArray)
-                            {
-                                if (!tag.Contains("="))
-                                {
-                                    continue;
-                                }
-
-                                var tagSplit = tag.Split('=');
-
-                                if (tagSplit[0].ToLower().Equals("path"))
-                                {
-                                    var path = tagSplit[1].Trim();
-
-                                    var submittableParameterValue = submittableParameterValues.SingleOrDefault(x => x.Path == path);
-
-                                    if (submittableParameterValue == null)
-                                    {
-                                        submittableParameterValue = new SubmittableParameterValue(path);
-                                        submittableParameterValues.Add(submittableParameterValue);
-                                    }
-
-                                    submittableParameterValue.ControlName = control.Name;
-                                    submittableParameterValue.Text = visualBrick.Text;
-
-                                    break;
-                                }
-                            }
-                        }
+                        continue;
                     }
+
+                    if (!(visualBrick.BrickOwner is XRControl control))
+                    {
+                        continue;
+                    }
+
+                    string path;
+
+                    if (this.TryExtractPath(control.Tag.ToString(), out var tagPath))
+                    {
+                        path = tagPath;
+                    }
+                    else if (this.TryExtractPath(visualBrick.Hint, out var hintPath))
+                    {
+                        path = hintPath;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    var submittableParameterValue = submittableParameterValues.SingleOrDefault(x => x.Path == path);
+
+                    if (submittableParameterValue == null)
+                    {
+                        submittableParameterValue = new SubmittableParameterValue(path);
+                        submittableParameterValues.Add(submittableParameterValue);
+                    }
+
+                    submittableParameterValue.ControlName = control.Name;
+                    submittableParameterValue.Text = visualBrick.Text;
                 }
             }
 
             return submittableParameterValues;
+        }
+
+        /// <summary>
+        /// Tries to extract a path value from a comma separated string that contains
+        /// key/value pairs divided by an '=' character
+        /// </summary>
+        /// <param name="extractFrom">The <see cref="string"/> to extract the path from</param>
+        /// <param name="path">The path</param>
+        /// <returns>true if the path was found, otherwise false</returns>
+        private bool TryExtractPath(string extractFrom, out string path)
+        {
+            path = null;
+            var extractArray = extractFrom.Split(',');
+
+            if (extractArray.Length == 0)
+            {
+                return false;
+            }
+
+            foreach (var tag in extractArray)
+            {
+                if (!tag.Contains("="))
+                {
+                    continue;
+                }
+
+                var tagSplit = tag.Split('=');
+
+                if (!tagSplit[0].ToLower().Equals("path"))
+                {
+                    continue;
+                }
+
+                path = tagSplit[1].Trim();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

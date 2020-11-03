@@ -36,16 +36,16 @@ namespace CDP4Composition.Utilities
         /// <summary>
         /// Assertion that Paramters, Overrides and Subscriptions need to be taken into account
         /// </summary>
-        All = 0,
+        All,
 
         /// <summary>
         /// Assertion that Parameters and Overrides need to be taken into account
         /// </summary>
-        ParameterAndOrverride = 1,
+        ParameterAndOrverride,
 
         /// <summary>
         /// Assertion that ParameterSubscriptions need to be taken into account
         /// </summary>
-        ParameterSubscription = 2
+        ParameterSubscription
     }
 }

@@ -379,7 +379,8 @@ namespace CDP4Reporting.ViewModels
         /// Method that is here that does nothing, but makes sure that System.Data.DataSetExtensions.dll is
         /// available in the report script
         /// </summary>
-        [SuppressMessage("Minor Code Smell", "S1481:Unused local variables should be removed", Justification = "<Pending>")]
+        [SuppressMessage("Minor Code Smell", "S1481:Unused local variables should be removed", 
+            Justification = "Method that is here that does nothing, but makes sure that System.Data.DataSetExtensions.dll is available in the report script.")]
         private void InitializeDataSetExtensionsUsage()
         {
             var dataTable = new DataTable();
@@ -1152,32 +1153,36 @@ namespace CDP4Reporting.ViewModels
                 return processedValueSets;
             }
 
-            if (this.submittableParameterValues.Any())
+            if (!this.submittableParameterValues.Any())
             {
-                var nestedElementTree = new NestedElementTreeGenerator();
-                var allNestedParameters = nestedElementTree.GetNestedParameters(optionDependentDataCollector.SelectedOption).ToList();
+                return processedValueSets;
+            }
 
-                var ownedNestedParameters = nestedElementTree.GetNestedParameters(
-                    optionDependentDataCollector.SelectedOption, optionDependentDataCollector.DomainOfExpertise).ToList();
+            var nestedElementTree = new NestedElementTreeGenerator();
+            var allNestedParameters = nestedElementTree.GetNestedParameters(optionDependentDataCollector.SelectedOption).ToList();
 
-                var processedValueSetGenerator = new ProcessedValueSetGenerator(optionDependentDataCollector);
+            var ownedNestedParameters = nestedElementTree.GetNestedParameters(
+                optionDependentDataCollector.SelectedOption, optionDependentDataCollector.DomainOfExpertise).ToList();
 
-                foreach (var submittableParameter in this.submittableParameterValues)
+            var processedValueSetGenerator = new ProcessedValueSetGenerator(optionDependentDataCollector);
+
+            foreach (var submittableParameter in this.submittableParameterValues)
+            {
+                if (processedValueSetGenerator
+                    .TryGetProcessedValueSet(
+                        optionDependentDataCollector.SelectedOption,
+                        allNestedParameters,
+                        ownedNestedParameters,
+                        submittableParameter,
+                        ref processedValueSets,
+                        out var errorText))
                 {
-                    if (!processedValueSetGenerator
-                        .TryGetProcessedValueSet(
-                            optionDependentDataCollector.SelectedOption,
-                            allNestedParameters,
-                            ownedNestedParameters,
-                            submittableParameter,
-                            ref processedValueSets,
-                            out var errorText))
-                    {
-                        if (!string.IsNullOrWhiteSpace(errorText))
-                        {
-                            errorTexts.Add(errorText);
-                        }
-                    }
+                    continue;
+                }
+
+                if (!string.IsNullOrWhiteSpace(errorText))
+                {
+                    errorTexts.Add(errorText);
                 }
             }
 
