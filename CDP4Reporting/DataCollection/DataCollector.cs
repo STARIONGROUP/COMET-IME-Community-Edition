@@ -25,7 +25,10 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    public abstract class DataCollector : ReportScriptDataProvider, IDataCollector
+    /// <summary>
+    /// The abstract base class that implements the <see cref="IDataCollector"/>
+    /// </summary>
+    public abstract class DataCollector : IDataCollector
     {
         /// <summary>
         /// Creates a new data collection instance.

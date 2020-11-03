@@ -13,6 +13,7 @@
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
     x:Class="CDP4Reporting.Views.ReportDesigner"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="650">
@@ -178,7 +179,21 @@
                                     </dxb:InsertAction.Element>
                                 </dxb:InsertAction>
                                 <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.DesignerHomePage}" PropertyName="Caption" Value="File" />
-
+                                    <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.PreviewPage}">
+                                    <dxb:InsertAction.Element>
+                                        <dxr:RibbonPageGroup Caption="Submit" Name="SubmitGroup" />
+                                    </dxb:InsertAction.Element>
+                                </dxb:InsertAction>
+                                <dxb:InsertAction ContainerName="SubmitGroup">
+                                    <dxb:InsertAction.Element>
+                                        <dxb:BarButtonItem
+                                            LargeGlyph="{dx:DXImage Image=Export_32x32.png}"
+                                            Command="{Binding Path=SubmitParameterValuesCommand}"
+                                            Content="Parameter Values"
+                                            Hint="Submit Parameter Values" >
+                                        </dxb:BarButtonItem>
+                                    </dxb:InsertAction.Element>
+                                </dxb:InsertAction>
                             </dxrud:ReportDesigner.RibbonCustomizationActions>
                             <dxrud:ReportDesignerClassicView/>
                         </dxrud:ReportDesigner>

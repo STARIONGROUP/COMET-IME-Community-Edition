@@ -1,20 +1,40 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="WorkbookRebuildRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SubmitParameterRowViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ParameterSheetGenerator.ViewModels
+namespace CDP4Composition.ViewModels
 {
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Validation;
+
     using ReactiveUI;
 
     /// <summary>
-    /// Represents a row in the <see cref="WorkbookRebuildViewModel"/> that shows a parameter that has changed, and the new value
+    /// Represents a row that shows a parameter that has changed, and the new value
     /// </summary>
-    public class WorkbookRebuildRowViewModel : ReactiveObject
+    public class SubmitParameterRowViewModel : ReactiveObject
     {
         /// <summary>
         /// Backing field for the <see cref="IsSelected"/> property.
@@ -22,7 +42,7 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         private bool isSelected;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkbookRebuildRowViewModel"/> class.
+        /// Initializes a new instance of the <see cref="SubmitParameterRowViewModel"/> class.
         /// </summary>
         /// <param name="parameterValueSet">
         /// The <see cref="ParameterValueSet"/> that is represented by the current view model
@@ -33,7 +53,7 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// <param name="validationResult">
         /// The result of the Validation
         /// </param>
-        public WorkbookRebuildRowViewModel(ParameterValueSet parameterValueSet, int componentIndex, ValidationResultKind validationResult)
+        public SubmitParameterRowViewModel(ParameterValueSet parameterValueSet, int componentIndex, ValidationResultKind validationResult)
         {
             this.Thing = parameterValueSet;
             this.IsSelected = true;
@@ -45,11 +65,11 @@ namespace CDP4ParameterSheetGenerator.ViewModels
             this.ActualValue = parameterValueSet.ActualValue[componentIndex];
             this.Switch = parameterValueSet.ValueSwitch.ToString();
             this.HasValidationError = validationResult != ValidationResultKind.Valid;
-            this.IsSelected = this.HasValidationError == false;
+            this.IsSelected = !this.HasValidationError;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkbookRebuildRowViewModel"/> class.
+        /// Initializes a new instance of the <see cref="SubmitParameterRowViewModel"/> class.
         /// </summary>
         /// <param name="parameterOverrideValueSet">
         /// The <see cref="ParameterOverrideValueSet"/> that is represented by the current view model
@@ -60,7 +80,7 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// <param name="validationResult">
         /// The result of the Validation
         /// </param>
-        public WorkbookRebuildRowViewModel(ParameterOverrideValueSet parameterOverrideValueSet, int componentIndex, ValidationResultKind validationResult)
+        public SubmitParameterRowViewModel(ParameterOverrideValueSet parameterOverrideValueSet, int componentIndex, ValidationResultKind validationResult)
         {
             this.Thing = parameterOverrideValueSet;
             this.IsSelected = true;
@@ -72,11 +92,11 @@ namespace CDP4ParameterSheetGenerator.ViewModels
             this.ActualValue = parameterOverrideValueSet.ActualValue[componentIndex];
             this.Switch = parameterOverrideValueSet.ValueSwitch.ToString();
             this.HasValidationError = validationResult != ValidationResultKind.Valid;
-            this.IsSelected = this.HasValidationError == false;
+            this.IsSelected = !this.HasValidationError;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkbookRebuildRowViewModel"/> class.
+        /// Initializes a new instance of the <see cref="SubmitParameterRowViewModel"/> class.
         /// </summary>
         /// <param name="parameterSubscriptionValueSet">
         /// The <see cref="ParameterSubscriptionValueSet"/> that is represented by the current view model
@@ -87,7 +107,7 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// <param name="validationResult">
         /// The result of the Validation
         /// </param>
-        public WorkbookRebuildRowViewModel(ParameterSubscriptionValueSet parameterSubscriptionValueSet, int componentIndex, ValidationResultKind validationResult)
+        public SubmitParameterRowViewModel(ParameterSubscriptionValueSet parameterSubscriptionValueSet, int componentIndex, ValidationResultKind validationResult)
         {
             this.Thing = parameterSubscriptionValueSet;
             this.IsSelected = true;
@@ -99,7 +119,7 @@ namespace CDP4ParameterSheetGenerator.ViewModels
             this.ActualValue = parameterSubscriptionValueSet.ActualValue[componentIndex];
             this.Switch = parameterSubscriptionValueSet.ValueSwitch.ToString();
             this.HasValidationError = validationResult != ValidationResultKind.Valid;
-            this.IsSelected = this.HasValidationError == false;
+            this.IsSelected = !this.HasValidationError;
         }
 
         /// <summary>

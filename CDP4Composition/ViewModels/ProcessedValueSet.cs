@@ -1,17 +1,38 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProcessedValueSet.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
+namespace CDP4Composition.ViewModels
 {
     using System;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Validation;
+
     using NLog;
 
     /// <summary>
@@ -84,14 +105,12 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
         /// </returns>
         public bool IsDirty(int componentIndex, ParameterType parameterType, ParameterSwitchKind switchKind, object manualValue, object computedValue, object referenceValue, string formulaValue, out ValueSetValues valueSetValues)
         {
-            var parameterValueSet = this.OriginalThing as ParameterValueSet;
-            if (parameterValueSet != null)
+            if (this.OriginalThing is ParameterValueSet parameterValueSet)
             {
                 return this.IsDirty(parameterValueSet, componentIndex, parameterType, switchKind, manualValue, computedValue, referenceValue, formulaValue, out valueSetValues);
             }
 
-            var parameterOverrideValueSet = this.OriginalThing as ParameterOverrideValueSet;
-            if (parameterOverrideValueSet != null)
+            if (this.OriginalThing is ParameterOverrideValueSet parameterOverrideValueSet)
             {
                 return this.IsDirty(parameterOverrideValueSet, componentIndex, parameterType, switchKind, manualValue, computedValue, referenceValue, formulaValue, out valueSetValues);
             }
@@ -142,6 +161,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             var stringReferenceValue = referenceValue.ToValueSetString(parameterType);
 
             bool isManualValueDirty;
+
             try
             {
                 isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
@@ -157,6 +177,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             }
 
             bool isFormualValueDirty;          
+
             try
             {
                 isFormualValueDirty = original.Formula[componentIndex] != formulaValue;
@@ -172,6 +193,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             }
 
             bool isComputedValueDirty;
+
             try
             {
                 isComputedValueDirty = original.Computed[componentIndex] != stringComputedValue;
@@ -187,6 +209,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             }
 
             bool isReferenceValueDirty;
+
             try
             {
                 isReferenceValueDirty = original.Reference[componentIndex] != stringReferenceValue;
@@ -255,6 +278,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             var stringReferenceValue = referenceValue.ToValueSetString(parameterType);
 
             bool isManualValueDirty;
+
             try
             {
                 isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
@@ -270,6 +294,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             }
             
             bool isFormualValueDirty;
+
             try
             {
                 isFormualValueDirty = original.Formula[componentIndex] != formulaValue;
@@ -285,6 +310,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             }
             
             bool isComputedValueDirty;            
+
             try
             {
                 isComputedValueDirty = original.Computed[componentIndex] != stringComputedValue;
@@ -300,6 +326,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             }
 
             bool isReferenceValueDirty;            
+
             try
             {
                 isReferenceValueDirty = original.Reference[componentIndex] != stringReferenceValue;
@@ -357,6 +384,7 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
             var stringManualValue = manualValue.ToValueSetString(parameterType);
 
             bool isManualValueDirty;
+
             try
             {
                 isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
@@ -614,22 +642,19 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
                 this.SetClonedThing();
             }
 
-            var clonedParameterValueSet = this.ClonedThing as ParameterValueSet;
-            if (clonedParameterValueSet != null)
+            if (this.ClonedThing is ParameterValueSet clonedParameterValueSet)
             {
                 this.UpdateClone(clonedParameterValueSet, valueSetValues);
                 return;
             }
 
-            var clonedParameterOverrideValueSet = this.ClonedThing as ParameterOverrideValueSet;
-            if (clonedParameterOverrideValueSet != null)
+            if (this.ClonedThing is ParameterOverrideValueSet clonedParameterOverrideValueSet)
             {
                 this.UpdateClone(clonedParameterOverrideValueSet, valueSetValues);
                 return;
             }
 
-            var clonedParameterSubscriptionValueSet = this.ClonedThing as ParameterSubscriptionValueSet;
-            if (clonedParameterSubscriptionValueSet != null)
+            if (this.ClonedThing is ParameterSubscriptionValueSet clonedParameterSubscriptionValueSet)
             {
                 this.UpdateClone(clonedParameterSubscriptionValueSet, valueSetValues);
             }
@@ -640,20 +665,17 @@ namespace CDP4ParameterSheetGenerator.Generator.ParameterSheet
         /// </summary>
         private void SetClonedThing() 
         {
-            var parameterValueSet = this.OriginalThing as ParameterValueSet;
-            if (parameterValueSet != null)
+            if (this.OriginalThing is ParameterValueSet parameterValueSet)
             {
                 this.ClonedThing = parameterValueSet.Clone(false);
             }
 
-            var parameterOverrideValueSet = this.OriginalThing as ParameterOverrideValueSet;
-            if (parameterOverrideValueSet != null)
+            if (this.OriginalThing is ParameterOverrideValueSet parameterOverrideValueSet)
             {
                 this.ClonedThing = parameterOverrideValueSet.Clone(false);
             }
 
-            var parameterSubscriptionValueSet = this.OriginalThing as ParameterSubscriptionValueSet;
-            if (parameterSubscriptionValueSet != null)
+            if (this.OriginalThing is ParameterSubscriptionValueSet parameterSubscriptionValueSet)
             {
                 this.ClonedThing = parameterSubscriptionValueSet.Clone(false);
             }
