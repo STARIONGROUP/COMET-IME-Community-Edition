@@ -28,9 +28,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="6.2.1-2020.10.28.2-pre-release" />
-    <PackageReference Include="CDP4Dal-CE" Version="6.2.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.2.0" />
+    <PackageReference Include="CDP4Common-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.3.0" />
     <PackageReference Include="CommonServiceLocator" Version="1.3" />
     <PackageReference Include="DevExpress.Reporting.Core" Version="20.1.8" />
     <PackageReference Include="DevExpress.Wpf.Reporting" Version="20.1.8" />
