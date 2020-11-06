@@ -50,7 +50,7 @@ namespace CDP4Composition.FilterOperators
         /// <summary>
         /// The name of the IsMemberOfSuperCategory filter operator
         /// </summary>
-        private const string IsMemberOfSuperCategoryName = "IsMemberOfSuperCategory";
+        private const string HasCategoryApplied = "HasCategoryApplied";
 
         /// <summary>
         /// Constructor which starts the static registration of the custom filter operators
@@ -90,14 +90,14 @@ namespace CDP4Composition.FilterOperators
                 new FilterEditorOperatorItem(IsMemberOfCategoryName) { Caption = "Member of Category" });
 
             filterEditorQueryOperatorsEventArgs.Operators.Add(
-                new FilterEditorOperatorItem(IsMemberOfSuperCategoryName) { Caption = "Member of SuperCategory" });
+                new FilterEditorOperatorItem(HasCategoryApplied) { Caption = "Has Category Applied" });
         }
 
         /// <summary>
         /// Get the values to be used in the <see cref="FilterEditorControl"/>'s combobox
         /// </summary>
         /// <returns>
-        /// An <see cref="IEnumerable{object}"/> containing all the found values
+        /// An <see cref="IEnumerable{Object}"/> containing all the found values
         /// </returns>
         public override IEnumerable<object> GetValues()
         {
@@ -128,19 +128,19 @@ namespace CDP4Composition.FilterOperators
                 IsMemberOfCategoryName,
                 (IEnumerable<Category> categories, string categoryName) =>
                 {
-                    return categories?.Any(x => x.Name.ToString().Equals(categoryName)) ?? false;
+                    return categories?.Any(x => x.Name.ToString().Equals(categoryName) || x.AllSuperCategories().Any(y => y.Name.ToString().Equals(categoryName))) ?? false;
                 });
 
             CriteriaOperator.RegisterCustomFunction(isMemberOfCategoryFunction);
 
-            var isMemberOfSuperCategoryFunction = CustomFunctionFactory.Create(
-                IsMemberOfSuperCategoryName,
+            var hasCategoryAppliedFunction = CustomFunctionFactory.Create(
+                HasCategoryApplied,
                 (IEnumerable<Category> categories, string categoryName) =>
                 {
-                    return categories?.Any(x => x.Name.ToString().Equals(categoryName) || x.AllSuperCategories().Any(y => y.Name.ToString().Equals(categoryName))) ?? false;
+                    return categories?.Any(x => x.Name.ToString().Equals(categoryName)) ?? false;
                 });
 
-            CriteriaOperator.RegisterCustomFunction(isMemberOfSuperCategoryFunction);
+            CriteriaOperator.RegisterCustomFunction(hasCategoryAppliedFunction);
         }
     }
 }

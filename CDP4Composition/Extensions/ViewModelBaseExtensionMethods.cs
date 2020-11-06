@@ -50,10 +50,7 @@ namespace CDP4Composition.Extensions
                     return convertedViewModel;
                 }
 
-                if (viewModelBase is IHaveContainerViewModel containerViewModel)
-                {
-                    viewModelBase = containerViewModel.ContainerViewModel;
-                }
+                viewModelBase = (viewModelBase as IHaveContainerViewModel)?.ContainerViewModel;
             }
 
             return null;
