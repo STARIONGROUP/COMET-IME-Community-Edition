@@ -131,34 +131,6 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.AddSubscriptions();
             this.UpdateProperties();
-            this.PopulatePossibleCategory();
-        }
-
-        /// <summary>
-        /// populate the possible <see cref="Category"/>
-        /// </summary>
-        private void PopulatePossibleCategory()
-        {
-            this.PossibleCategory.Clear();
-
-            var container = this.Thing.RequiredRdls.First();
-
-            var allowedCategories = 
-                this.GetAllowedCategoriesByClassName(container, ClassKind.ElementDefinition)
-                    .Union(this.GetAllowedCategoriesByClassName(container, ClassKind.ElementUsage))
-                    .Distinct();
-
-            this.PossibleCategory.AddRange(allowedCategories.OrderBy(c => c.ShortName));
-        }
-
-        private List<Category> GetAllowedCategoriesByClassName(ReferenceDataLibrary container, ClassKind classKind)
-        {
-            var allowedCategories = new List<Category>(container.DefinedCategory.Where(c => c.PermissibleClass.Contains(classKind)));
-
-            allowedCategories.AddRange(container.GetRequiredRdls().SelectMany(rdl => rdl.DefinedCategory)
-                .Where(c => c.PermissibleClass.Contains(classKind)));
-
-            return allowedCategories;
         }
 
         /// <summary>
@@ -263,8 +235,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         /// <remarks>This was made into a list of generic row to use the ReactiveList extension</remarks>
         public DisposableReactiveList<IRowViewModelBase<Thing>> ElementDefinitionRowViewModels { get; private set; }
-
-        public List<Category> PossibleCategory { get; } = new List<Category>();
 
         /// <summary>
         /// Updates the current drag state.
