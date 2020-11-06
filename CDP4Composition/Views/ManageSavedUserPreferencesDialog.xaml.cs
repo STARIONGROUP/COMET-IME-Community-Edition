@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="CustomFilterEditorDialog.cs" company="RHEA System S.A.">
+// <copyright file="ManageSavedUserPreferencesDialog.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
@@ -25,56 +25,38 @@
 
 namespace CDP4Composition.Views
 {
-    using System;
-
     using CDP4Composition.Attributes;
-    using CDP4Composition.Events;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.ViewModels;
 
-    using CDP4Dal;
-
-    using DevExpress.Xpf.Core.FilteringUI;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
-    /// Interaction logic for CustomFilterEditorDialog.xaml
+    /// Interaction logic for ManageSavedUserPreferencesDialog.xaml
     /// </summary>
-    [DialogViewExport("CustomFilterEditorDialog", "The custom filter editor dialog")]
-    public partial class CustomFilterEditorDialog : IDialogView
+    [DialogViewExport("ManageSavedUserPreferencesDialog", "The Dialog to manage saved user preferences")]
+    public partial class ManageSavedUserPreferencesDialog : DXWindow, IDialogView
     {
         /// <summary>
-        /// Instanciates the <see cref="CustomFilterEditorDialog"/>
+        /// Initializes a new instance of the <see cref="ManageSavedUserPreferencesDialog"/> class.
         /// </summary>
-        public CustomFilterEditorDialog()
+        public ManageSavedUserPreferencesDialog()
         {
         }
 
         /// <summary>
-        /// Instanciates the <see cref="CustomFilterEditorDialog"/>
+        /// Initializes a new instance of the <see cref="ManageSavedUserPreferencesDialog"/> class.
         /// </summary>
-        public CustomFilterEditorDialog(bool initializeComponent)
+        /// <param name="initializeComponent">
+        /// a value indicating whether the contained Components shall be loaded
+        /// </param>
+        /// <remarks>
+        /// This constructor is called by the navigation service
+        /// </remarks>
+        public ManageSavedUserPreferencesDialog(bool initializeComponent)
         {
             if (initializeComponent)
             {
                 this.InitializeComponent();
-            }
-
-            CDPMessageBus.Current.Listen<ApplyFilterEvent>()
-                .Subscribe(_ => this.FilterEditor.ApplyFilter());
-        }
-
-        /// <summary>
-        /// EventHandler that routes the <see cref="FilterEditorControl"/>'s OnQueryOperators event to the ViewModel.
-        /// A direct binding using EventToCommand in the view unfortunately doesn't work in all cases.
-        /// That's why a non MVVM construction was used here.
-        /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">The <see cref="FilterEditorQueryOperatorsEventArgs"/></param>
-        private async void FilterEditor_OnQueryOperators(object sender, FilterEditorQueryOperatorsEventArgs e)
-        {
-            if (this.DataContext is CustomFilterEditorDialogViewModel customFilterEditorDialogViewModel)
-            {
-                await customFilterEditorDialogViewModel.QueryOperatorsCommand.ExecuteAsyncTask(e);
             }
         }
     }

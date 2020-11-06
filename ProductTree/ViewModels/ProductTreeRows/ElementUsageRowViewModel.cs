@@ -35,7 +35,7 @@ namespace CDP4ProductTree.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-
+    using CDP4Common.SiteDirectoryData;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
@@ -107,6 +107,11 @@ namespace CDP4ProductTree.ViewModels
         private IThingCreator thingCreator;
 
         /// <summary>
+        /// Backing field for <see cref="Category"/>
+        /// </summary>
+        private IEnumerable<Category> category;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageRowViewModel"/> class
         /// </summary>
         /// <param name="elementUsage">
@@ -133,6 +138,15 @@ namespace CDP4ProductTree.ViewModels
             this.UpdateElementDefinitionProperties();
             this.UpdateProperties();
             this.UpdateTooltip();
+        }
+
+        /// <summary>
+        /// Gets the Category
+        /// </summary>
+        public IEnumerable<Category> Category
+        {
+            get => this.category;
+            private set => this.RaiseAndSetIfChanged(ref this.category, value);
         }
 
         /// <summary>
@@ -399,6 +413,7 @@ namespace CDP4ProductTree.ViewModels
             this.Name = this.Thing.Name + " : " + this.ElementDefinition.Name;
             this.ShortName = this.Thing.ShortName + " : " + this.ElementDefinition.ShortName;
             this.ModelCode = this.Thing.ModelCode();
+            this.Category = this.Thing.Category.Union(this.Thing.ElementDefinition.Category).Distinct().ToList();
 
             this.UpdateOwnerNameAndShortName();
 

@@ -1312,8 +1312,14 @@
     <Compile Update="Views\InformationDialog.xaml.cs">
       <DependentUpon>InformationDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\ManageSavedUserPreferencesDialog.xaml.cs">
+      <DependentUpon>ManageSavedUserPreferencesDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\ManageConfigurationsDialog.xaml.cs">
       <DependentUpon>ManageConfigurationsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SavedUserPreferenceDialog.xaml.cs">
+      <DependentUpon>SavedUserPreferenceDialog.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\SavedConfigurationDialog.xaml.cs">
       <DependentUpon>SavedConfigurationDialog.xaml</DependentUpon>
@@ -1653,7 +1659,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\ManageSavedUserPreferencesDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ManageConfigurationsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SavedUserPreferenceDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1708,7 +1722,9 @@
     <None Remove="Views\CustomFilterEditorDialog.xaml" />
     <None Remove="Views\ElementParameterRowControl.xaml" />
     <None Remove="Views\ManageConfigurationsDialog.xaml" />
+    <None Remove="Views\ManageSavedUserPreferencesDialog.xaml" />
     <None Remove="Views\SavedConfigurationDialog.xaml" />
+    <None Remove="Views\SavedUserPreferenceDialog.xaml" />
     <None Remove="Views\SubmitConfirmation.xaml" />
   </ItemGroup>
 </Project>

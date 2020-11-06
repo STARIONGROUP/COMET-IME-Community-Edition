@@ -29,10 +29,16 @@ namespace CDP4Composition.Views
 
     using System.Windows;
 
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.ViewModels;
+
     using DevExpress.Utils;
     using DevExpress.Xpf.Bars;
 
     using NLog;
+
+    using ServiceLocator = Microsoft.Practices.ServiceLocation.ServiceLocator;
 
     /// <summary>
     /// Interaction logic for CommonThingControl
@@ -47,17 +53,12 @@ namespace CDP4Composition.Views
         /// <summary>
         /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="GridView"/> setter method.
         /// </summary>
-        private static readonly DependencyProperty GridViewProperty = DependencyProperty.Register("GridView", typeof(GridDataViewBase), typeof(CommonThingControl), new PropertyMetadata(OnGridViewChanged));
+        private static readonly DependencyProperty GridViewProperty = DependencyProperty.Register("GridView", typeof(DataViewBase), typeof(CommonThingControl), new PropertyMetadata(OnGridViewChanged));
 
         /// <summary>
         /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="IsFavoriteToggleVisible"/> setter method.
         /// </summary>
         private static readonly DependencyProperty IsFavoriteToggleVisibleProperty = DependencyProperty.Register("IsFavoriteToggleVisible", typeof(bool), typeof(CommonThingControl));
-
-        /// <summary>
-        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="HasCustomFilterPanel"/> setter method.
-        /// </summary>
-        private static readonly DependencyProperty HasCustomFilterPanelProperty = DependencyProperty.Register("HasCustomFilterPanel", typeof(bool), typeof(CommonThingControl), new PropertyMetadata(OnHasCustomFilterPanelChanged));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommonThingControl"/> class.
@@ -67,6 +68,11 @@ namespace CDP4Composition.Views
             this.InitializeComponent();
             this.IsFavoriteToggleVisible = false;
         }
+
+        /// <summary>
+        /// Gets the <see cref="IDialogNavigationService"/> used to navigate to a <see cref="IDialogViewModel"/>
+        /// </summary>
+        public IDialogNavigationService DialogNavigationService { get; private set; }
 
         /// <summary>
         /// The <see cref="GridView"/> this <see cref="CommonThingControl"/> is associated with
@@ -85,15 +91,6 @@ namespace CDP4Composition.Views
             get => this.GetValue(IsFavoriteToggleVisibleProperty) is bool && (bool) this.GetValue(IsFavoriteToggleVisibleProperty);
             set => this.SetValue(IsFavoriteToggleVisibleProperty, value);
         }
-
-        /// <summary>
-        /// The boolean that enables or disables the visibility of a custom FilterPanel instead of the default one.
-        /// </summary>
-        public bool HasCustomFilterPanel
-        {
-            get => this.GetValue(HasCustomFilterPanelProperty) is bool && (bool) this.GetValue(HasCustomFilterPanelProperty);
-            set => this.SetValue(HasCustomFilterPanelProperty, value);
-        }
         
         /// <summary>
         /// Executes when <see cref="GridView"/> property changes.
@@ -104,21 +101,8 @@ namespace CDP4Composition.Views
         {
             if (d is CommonThingControl commonThingControl)
             {
-                SetAllowFilterEditorProperty(commonThingControl, commonThingControl.HasCustomFilterPanel);
+                SetGridViewProperties(commonThingControl);
             } 
-        }
-
-        /// <summary>
-        /// Executes when <see cref="HasCustomFilterPanelProperty"/> value changes.
-        /// </summary>
-        /// <param name="d">The <see cref="DependencyObject"/></param>
-        /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private static void OnHasCustomFilterPanelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is CommonThingControl commonThingControl)
-            {
-                SetAllowFilterEditorProperty(commonThingControl, (bool)e.NewValue);
-            }
         }
 
         /// <summary>
@@ -126,11 +110,15 @@ namespace CDP4Composition.Views
         /// If a custom filtereditor control is used, the default filtereditor control should not be used anymore.
         /// </summary>
         /// <param name="commonThingControl">The <see cref="CommonThingControl"/></param>
-        /// <param name="newValue">The new </param>
-        private static void SetAllowFilterEditorProperty(CommonThingControl commonThingControl, bool newValue)
+        private static void SetGridViewProperties(CommonThingControl commonThingControl)
         {
-            var defaultBoolean = newValue ? DefaultBoolean.True : DefaultBoolean.False;
-            commonThingControl.GridView?.SetValue(DataViewBase.AllowFilterEditorProperty, defaultBoolean);
+            commonThingControl.GridView?.SetValue(DataViewBase.AllowFilterEditorProperty, DefaultBoolean.False);
+
+            if (commonThingControl.GridView is TreeListView treeListView)
+            {
+                treeListView.SetValue(TreeListView.FilteringModeProperty, TreeListFilteringMode.EntireBranch);
+                treeListView.SetValue(TreeListView.EnableDynamicLoadingProperty, false);
+            }
         }
 
         /// <summary>
@@ -140,16 +128,17 @@ namespace CDP4Composition.Views
         /// <param name="sender">The <see cref="sender"/></param>
         /// <param name="e">The <see cref="ItemClickEventArgs"/></param>
         private void OpenFilterPanel(object sender, ItemClickEventArgs e)
-        {   
-            if (!this.HasCustomFilterPanel)
+        {
+            if (this.GridView != null)
             {
-                this.GridView.ShowFilterEditor(null);
-            }
-            else
-            {
-                var customFilterEditorDialog = new CustomFilterEditorDialog(this.GridView.DataControl.FilteringContext);
-                customFilterEditorDialog.DataContext = this.DataContext;
-                customFilterEditorDialog.ShowDialog();
+                if (this.DialogNavigationService == null)
+                {
+                    this.DialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+                }
+
+                var customFilterEditorDialog = new CustomFilterEditorDialogViewModel(this.DialogNavigationService, this.GridView);
+
+                this.DialogNavigationService.NavigateModal(customFilterEditorDialog);
             }
         }
 

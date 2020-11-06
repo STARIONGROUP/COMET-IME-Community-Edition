@@ -6,24 +6,68 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:dxfui="http://schemas.devexpress.com/winfx/2008/xaml/core/filteringui"
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:navigation="clr-namespace:CDP4Composition.Navigation"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     mc:Ignorable="d"
     Title="Filter Editor"
-    Height="350" Width="500"
+    Height="400" Width="500"
     WindowStartupLocation ="CenterScreen"
+    navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
     x:Name="Dialog">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
     <dxlc:LayoutControl View="Group">
         <dxlc:LayoutGroup VerticalAlignment="Stretch"
                           Margin="3"
                           View="Group"
                           Orientation="Vertical">
+            <dxlc:LayoutGroup View="GroupBox"
+              GroupBoxDisplayMode="Light"
+              HorizontalAlignment="Stretch"
+              IsCollapsible="False"
+              Orientation="Vertical"
+              Header="Saved Settings"
+              Visibility ="{Binding IsSaveUserPreferenceAllowed, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <dxlc:LayoutItem>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <dxe:ComboBoxEdit
+                                Grid.Column="0"
+                                EditValue="{Binding SelectedFilterEditorSavedUserPreference, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                ItemsSource="{Binding FilterEditorSavedUserPreferences, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                AutoComplete="True"
+                                AllowNullInput="True"
+                                AllowDefaultButton="True"
+                                DisplayMember="Name">
+                            <dxe:ComboBoxEdit.ItemContainerStyle>
+                                <Style TargetType="dxe:ComboBoxEditItem">
+                                    <Setter Property="ToolTip"
+                                            Value="{Binding Description}" />
+                                </Style>
+                            </dxe:ComboBoxEdit.ItemContainerStyle>
+                        </dxe:ComboBoxEdit>
+                        <dx:SimpleButton Grid.Column="1" Width="40"
+                                             Margin="5,0"
+                                             Command="{Binding ManageSavedFilterEditorSavedUserPreferencesCommand}"
+                                             ToolTip="Manage Saved Filter Editor Settings"
+                                             Glyph="{dx:DXImage Image=ChartXAxisSettings_16x16.png}" />
+                        <dx:SimpleButton Grid.Column="2" Width="40"
+                                             Command="{Binding SaveCurrentFilterEditorSavedUserPreferenceCommand}"
+                                             ToolTip="Save Current Filter Editor Settings"
+                                             Glyph="{dx:DXImage Image=Save_16x16.png}" />
+                    </Grid>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
             <dxlc:LayoutItem VerticalAlignment="Stretch">
-                <dxfui:FilterEditorControl x:Name="FilterEditor" VerticalAlignment="Stretch"  Context="{Binding Path=FilteringContext, ElementName=Dialog}">
-                    <dxmvvm:Interaction.Behaviors>
-                        <dxmvvm:EventToCommand Command="{Binding QueryOperatorsCommand}"  PassEventArgsToCommand="True" EventName="QueryOperators" />
-                    </dxmvvm:Interaction.Behaviors>
-                </dxfui:FilterEditorControl>
+                <dxfui:FilterEditorControl x:Name="FilterEditor" QueryOperators="FilterEditor_OnQueryOperators" VerticalAlignment="Stretch" Context="{Binding Path=FilteringContext}" />
             </dxlc:LayoutItem>
             <dxlc:LayoutGroup HorizontalAlignment="Right"
                               VerticalAlignment =" Bottom"
@@ -31,13 +75,13 @@
                               View="Group"
                               Orientation="Horizontal">
                 <dxlc:LayoutItem>
-                    <Button Width ="75" Content="Ok" Click="OkClicked"/>
+                    <Button Width ="75" Content="Ok" Command="{Binding OkCommand}"/>
                 </dxlc:LayoutItem>
                 <dxlc:LayoutItem>
-                    <Button Width ="75" Content="Cancel" Click="CancelClicked"/>
+                    <Button Width ="75" Content="Cancel" Command="{Binding CancelCommand}"/>
                 </dxlc:LayoutItem>
                 <dxlc:LayoutItem>
-                    <Button Width ="75" Content="Apply" Click="ApplyClicked" />
+                    <Button Width ="75" Content="Apply" Command="{Binding ApplyCommand}" />
                 </dxlc:LayoutItem>
             </dxlc:LayoutGroup>
         </dxlc:LayoutGroup>

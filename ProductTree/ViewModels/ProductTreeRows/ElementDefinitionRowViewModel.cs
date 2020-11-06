@@ -35,7 +35,7 @@ namespace CDP4ProductTree.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-
+    using CDP4Common.SiteDirectoryData;
     using CDP4CommonView.ViewModels;
 
     using CDP4Composition.DragDrop;
@@ -108,6 +108,11 @@ namespace CDP4ProductTree.ViewModels
         private IThingCreator thingCreator;
 
         /// <summary>
+        /// Backing field for <see cref="Category"/>
+        /// </summary>
+        private IEnumerable<Category> category;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionRowViewModel"/> class
         /// </summary>
         /// <param name="elementDefinition">The <see cref="ElementDefinition"/> associated with this row</param>
@@ -124,6 +129,15 @@ namespace CDP4ProductTree.ViewModels
             this.Option = option;
             this.UpdateProperties();
             this.UpdateTooltip();
+        }
+
+        /// <summary>
+        /// Gets the Category
+        /// </summary>
+        public IEnumerable<Category> Category
+        {
+            get => this.category;
+            private set => this.RaiseAndSetIfChanged(ref this.category, value);
         }
 
         /// <summary>
@@ -358,6 +372,7 @@ namespace CDP4ProductTree.ViewModels
         {
             this.UpdateThingStatus();
 
+            this.Category = this.Thing.Category;
             this.UpdateOwnerNameAndShortName();
             this.PopulateElementUsages();
             this.PopulateParameterGroups();

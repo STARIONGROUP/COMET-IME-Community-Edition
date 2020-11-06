@@ -47,6 +47,9 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         private ActualFiniteState state1;
         private ParameterValueSet valueset;
         private ElementDefinition elementdef1;
+        private ElementUsage elementUsage1;
+        private Category category1;
+        private Category category2;
         private Iteration iteration;
         private IterationSetup iterationSetup;
         private EngineeringModel model;
@@ -78,7 +81,23 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri) { GivenName = "test", Surname = "test" };
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person };
             this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
-            this.elementdef1 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
+
+            this.elementdef1 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ShortName = "Def1",
+                Owner = this.domain
+            };
+            
+            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ShortName = "Usage1",
+                Container = this.elementdef1,
+                ElementDefinition = this.elementdef1,
+                Owner = this.domain
+            };
+
+            this.category1 = new Category(Guid.NewGuid(), this.cache, this.uri);
+            this.category2 = new Category(Guid.NewGuid(), this.cache, this.uri);
 
             this.siteDirectory.Model.Add(this.modelSetup);
             this.modelSetup.IterationSetup.Add(this.iterationSetup);
@@ -98,6 +117,10 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             this.valueset = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
             this.stateList.ActualState.Add(this.state1);
             this.elementdef1.Parameter.Add(this.parameter1);
+
+            this.elementdef1.Category.Add(this.category1);
+            this.elementUsage1.Category.Add(this.category2);
+
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
 
@@ -544,6 +567,39 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             vm.DragOver(dropinfo.Object);
 
             this.thingCreator.Verify(x => x.CreateBinaryRelationshipForRequirementVerification(It.IsAny<ISession>(), It.IsAny<Iteration>(), It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()), Times.Never);
+        }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage1()
+        {
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.option, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, elementUsageRow);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1,
+                this.category2
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementDefinition()
+        {
+            var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementdef1, this.option, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, elementDefinitionRow);
+
+            Assert.AreEqual(1, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
         }
     }
 }

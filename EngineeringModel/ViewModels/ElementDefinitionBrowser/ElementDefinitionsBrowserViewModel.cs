@@ -1,6 +1,25 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -40,9 +59,6 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
 
-    using DevExpress.Data.Filtering;
-    using DevExpress.Xpf.Core.FilteringUI;
-    using DevExpress.Xpf.Editors.Settings;
 
     using NLog;
     
@@ -53,10 +69,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ElementDefinitionsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget
     {
-        private string IsMemberOfCategoryName = "IsMemberOfCategory";
-
-        private string IsMemberOfSuperCategoryName = "IsMemberOfSuperCategory";
-
         /// <summary>
         /// The logger for the current class
         /// </summary>
@@ -247,11 +259,6 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveCommand<object> CreateSubscriptionCommand { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="ICommand"/> to extend a list of QueryField names
-        /// </summary>
-        public ReactiveCommand<Unit> QueryOperatorsCommand { get; private set; }
-
-        /// <summary>
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
         /// </summary>
         /// <remarks>This was made into a list of generic row to use the ReactiveList extension</remarks>
@@ -407,26 +414,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.CreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSubscription));
             this.CreateSubscriptionCommand.Subscribe(_ => this.ExecuteCreateSubscriptionCommand());
 
-            var isMemberOfCategoryFunction = CustomFunctionFactory.Create(
-                this.IsMemberOfCategoryName,
-                (IEnumerable<Category> categories, Category category) =>
-                {
-                    return categories?.Any(x => x.Equals(category)) ?? false;
-                });
-
-            CriteriaOperator.RegisterCustomFunction(isMemberOfCategoryFunction);
-
-            var isMemberOfSuperCategoryFunction = CustomFunctionFactory.Create(
-                this.IsMemberOfSuperCategoryName,
-                (IEnumerable<Category> categories, Category category) =>
-                {
-                    return categories?.Any(x => x.Equals(category) || x.AllSuperCategories().Any(y => y.Equals(category))) ?? false;
-                });
-
-            CriteriaOperator.RegisterCustomFunction(isMemberOfSuperCategoryFunction);
-
-            this.QueryOperatorsCommand = ReactiveCommand.CreateAsyncTask(this.SetCategoryFilter, RxApp.MainThreadScheduler);
-
             this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
             this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
 
@@ -435,26 +422,6 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create();
             this.CopyModelCodeToClipboardCommand.Subscribe(_ => this.ExecuteCopyModelCodeToClipboardCommand());
-        }
-
-        private async Task SetCategoryFilter(object obj)
-        {
-            if (obj is FilterEditorQueryOperatorsEventArgs e && e.FieldName == "Category")
-            {
-                e.Operators.Clear();
-
-                var customFunctionEditSettings = new BaseEditSettings[]
-                {
-                    new ComboBoxEditSettings
-                    {
-                        ItemsSource = this.PossibleCategory,
-                        DisplayMember = nameof(Category.Name)
-                    }
-                };
-
-                e.Operators.Add(new FilterEditorOperatorItem(this.IsMemberOfCategoryName, customFunctionEditSettings) { Caption = "Member of Category" });
-                e.Operators.Add(new FilterEditorOperatorItem(this.IsMemberOfSuperCategoryName, customFunctionEditSettings) { Caption = "Member of SuperCategory" });
-            }
         }
 
         /// <summary>

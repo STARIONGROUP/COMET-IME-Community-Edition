@@ -37,6 +37,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.Services.NestedElementTreeService;
@@ -99,6 +100,11 @@ namespace CDP4ProductTree.ViewModels
         private IThingCreator thingCreator;
 
         /// <summary>
+        /// Backing field for <see cref="Category"/>
+        /// </summary>
+        private IEnumerable<Category> category;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOrOverrideBaseRowViewModel"/> class
         /// </summary>
         /// <param name="parameterOrOverride">The <see cref="ParameterOrOverrideBase"/></param>
@@ -149,6 +155,15 @@ namespace CDP4ProductTree.ViewModels
         {
             get => this.usage;
             set => this.RaiseAndSetIfChanged(ref this.usage, value);
+        }
+
+        /// <summary>
+        /// Gets the Category
+        /// </summary>
+        public IEnumerable<Category> Category
+        {
+            get => this.category;
+            protected set => this.RaiseAndSetIfChanged(ref this.category, value);
         }
 
         /// <summary>
@@ -233,6 +248,28 @@ namespace CDP4ProductTree.ViewModels
             this.IsPublishable = false;
             this.UpdateOwnerNameAndShortName();
             this.ModelCode = this.Thing.ModelCode();
+
+            var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
+
+            var categories = new HashSet<Category>();
+
+            if (elementBase != null)
+            {
+                foreach (var category in elementBase.Category)
+                {
+                    categories.Add(category);
+                }
+
+                if (elementBase is ElementUsage elementUsage)
+                {
+                    foreach (var category in elementUsage.ElementDefinition.Category)
+                    {
+                        categories.Add(category);
+                    }
+                }
+            }
+
+            this.Category = categories.ToList();
 
             if (this.StateDependence != this.Thing.StateDependence)
             {
