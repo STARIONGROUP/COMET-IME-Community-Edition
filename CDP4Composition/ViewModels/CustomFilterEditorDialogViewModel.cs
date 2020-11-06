@@ -220,7 +220,7 @@ namespace CDP4Composition.ViewModels
 
             this.FilterEditorSavedUserPreferences.AddRange(
                 this.unfilteredFilterEditorSavedUserPreferences
-                    .Where(x => x.DataControlName.Equals(this.dataViewBase.Name)));
+                    .Where(x => x.DataControlName?.Equals(this.dataViewBase.Name) ?? true));
 
             this.IsBusy = false;
         }
