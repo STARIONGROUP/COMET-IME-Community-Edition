@@ -17,6 +17,7 @@
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:commonData="clr-namespace:CDP4Common.CommonData;assembly=CDP4Common"
+             xmlns:behaviors="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              d:DesignHeight="400"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
@@ -33,7 +34,7 @@
             <converters:ElementUsageOptionsConverter x:Key="ElementUsageOptionsConverter" />
             <converters:DataTypeConverter x:Key="DataTypeConverter" />
             <converters:ElementUsageTypeToVisibilityConverter x:Key="ElementUsageTypeToVisibilityConverter" />
-
+            
             <HierarchicalDataTemplate DataType="{x:Type viewModels:ElementDefinitionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
@@ -197,7 +198,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <views:CommonThingControl HasCustomFilterPanel="true" GridView="{Binding ElementName=View}" />
+            <views:CommonThingControl GridView="{Binding ElementName=View}" />
 
             <views:BrowserHeader Grid.Row="1" />
 
@@ -221,8 +222,6 @@
                                           AutoWidth="False"
                                           EditorShowMode="MouseUpFocused"
                                           ExpandCollapseNodesOnNavigation="True"
-                                          EnableDynamicLoading="False"
-                                          FilteringMode="EntireBranch"
                                           FixedLineWidth="0"
                                           HorizontalScrollbarVisibility="Auto"
                                           NavigationStyle="Cell"
@@ -383,7 +382,12 @@
                         <dxg:TreeListColumn FieldName="Formula" />
                         <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
                         <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
-                        <dxg:TreeListColumn FieldName="Category" Header="Category" Visible ="False" ShowInColumnChooser="False"/>
+                        <dxg:TreeListColumn FieldName="Category" Header="Category" Visible ="False" ShowInColumnChooser="False">
+                            <dxmvvm:Interaction.Behaviors>
+                                <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Category" ItemsSource="{Binding ElementDefinitionRowViewModels}"/>
+                            </dxmvvm:Interaction.Behaviors>
+                        </dxg:TreeListColumn>
+                        <dxg:TreeListColumn FieldName="ParameterTypeName" Header="ParameterTypeName" Visible ="False" ShowInColumnChooser="False" />
                     </dxg:TreeListControl.Columns>
                     <dxg:TreeListControl.InputBindings>
                         <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>

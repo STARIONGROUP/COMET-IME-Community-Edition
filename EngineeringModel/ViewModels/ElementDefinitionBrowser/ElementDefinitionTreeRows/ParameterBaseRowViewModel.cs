@@ -1,6 +1,25 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -17,6 +36,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
@@ -60,7 +80,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
         private string modelCode;
-        
+
+        /// <summary>
+        /// Backing field for <see cref="Category"/>
+        /// </summary>
+        private IEnumerable<Category> category;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}"/> class. 
         /// </summary>
@@ -94,6 +119,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets or sets the owner listener
         /// </summary>
         protected KeyValuePair<DomainOfExpertise, IDisposable> OwnerListener { get; set; }
+
+        /// <summary>
+        /// Gets the parent element, or usages Category
+        /// </summary>
+        public IEnumerable<Category> Category
+        {
+            get { return this.category; }
+            private set { this.RaiseAndSetIfChanged(ref this.category, value); }
+        }
 
         /// <summary>
         /// Gets the model-code
@@ -283,6 +317,28 @@ namespace CDP4EngineeringModel.ViewModels
             this.ModelCode = this.Thing.ModelCode();
             this.Name = this.Thing.ParameterType.Name;
 
+            var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
+
+            var categories = new HashSet<Category>();
+
+            if (elementBase != null)
+            {
+                foreach (var category in elementBase.Category)
+                {
+                    categories.Add(category);
+                }
+
+                if (elementBase is ElementUsage elementUsage)
+                {
+                    foreach (var category in elementUsage.ElementDefinition.Category)
+                    {
+                        categories.Add(category);
+                    }
+                }
+            }
+
+            this.Category = categories.ToList();
+
             this.ClearValues();
             // clear the listener on the unique value set represented
             foreach (var listener in this.valueSetListener)
@@ -331,7 +387,7 @@ namespace CDP4EngineeringModel.ViewModels
                 }
             }
         }
-        
+
         /// <summary>
         /// Sets the option dependent rows contained in this row.
         /// </summary>
