@@ -392,6 +392,14 @@ namespace CDP4ShellDialogs.ViewModels
         /// </returns>
         private async Task ExecuteOk()
         {
+            // when no trailing slash is provided it can lead to loss of nested paths
+            // see https://stackoverflow.com/questions/22543723/create-new-uri-from-base-uri-and-relative-path-slash-makes-a-difference
+            // for consistency, all uri's are now appended, cannot rely on user getting it right.
+            if (this.SelectedDataSourceKind.DalType == DalType.Web && !this.Uri.EndsWith("/"))
+            {
+                this.Uri += "/";
+            }
+
             var providedUri = new Uri(this.Uri);
 
             if (this.IsSessionOpen(this.Uri, this.UserName))
