@@ -48,8 +48,6 @@ namespace CDP4Composition.ViewModels
     using Microsoft.Practices.Prism.Mvvm;
     using Microsoft.Practices.ServiceLocation;
 
-    using NLog;
-
     using ReactiveUI;
 
     /// <summary>
@@ -57,11 +55,6 @@ namespace CDP4Composition.ViewModels
     /// </summary>
     public class CustomFilterEditorDialogViewModel : DialogViewModelBase
     {
-        /// <summary>
-        /// The logger for the current class
-        /// </summary>
-        private readonly Logger logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// The <see cref="IDialogNavigationService"/>
         /// </summary>
@@ -168,7 +161,7 @@ namespace CDP4Composition.ViewModels
             this.dataViewBase = dataViewBase;
             this.currentView = this.dataViewBase?.GetVisualAncestor<IView>();
 
-            this.FilteringContext = dataViewBase?.DataControl.FilteringContext;
+            this.FilteringContext = dataViewBase?.DataControl?.FilteringContext;
             this.customFilterOperatorsViewModel = dataViewBase?.DataContext as IHaveCustomFilterOperators;
             this.InitializeCommands();
             this.InitializeFilterEditorSettings();

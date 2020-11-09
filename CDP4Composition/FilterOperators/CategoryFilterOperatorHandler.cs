@@ -45,12 +45,12 @@ namespace CDP4Composition.FilterOperators
         /// <summary>
         /// The name of the IsMemberOfCategoryName filter operator
         /// </summary>
-        private const string IsMemberOfCategoryName = "IsMemberOfCategory";
+        public const string IsMemberOfCategoryName = "IsMemberOfCategory";
 
         /// <summary>
         /// The name of the IsMemberOfSuperCategory filter operator
         /// </summary>
-        private const string HasCategoryApplied = "HasCategoryApplied";
+        public const string HasCategoryApplied = "HasCategoryApplied";
 
         /// <summary>
         /// Constructor which starts the static registration of the custom filter operators
