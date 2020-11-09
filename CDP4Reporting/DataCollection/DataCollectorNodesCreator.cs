@@ -128,18 +128,18 @@ namespace CDP4Reporting.DataCollection
             DataCollectorNode<T> newNode = null;
             var searchCategory = categoryDecompositionHierarchy;
 
-            if (nestedElement.IsMemberOfCategory(categoryDecompositionHierarchy.Category))
-            {
-                newNode = new DataCollectorNode<T>(categoryDecompositionHierarchy, nestedElement, parentNode);
-                parentNode?.Children.Add(newNode);
-                resultNodes.Add(newNode);
-            }
-            else if (categoryDecompositionHierarchy.Child != null && parentNode?.CountCategoryRecursionLevel(categoryDecompositionHierarchy.Category) > 0 && nestedElement.IsMemberOfCategory(categoryDecompositionHierarchy.Child.Category))
+            if (categoryDecompositionHierarchy.Child != null && parentNode?.CountCategoryRecursionLevel(categoryDecompositionHierarchy.Category) > 0 && nestedElement.IsMemberOfCategory(categoryDecompositionHierarchy.Child.Category))
             {
                 searchCategory = categoryDecompositionHierarchy.Child;
 
                 newNode = new DataCollectorNode<T>(searchCategory, nestedElement, parentNode);
                 parentNode.Children.Add(newNode);
+                resultNodes.Add(newNode);
+            }
+            else if (nestedElement.IsMemberOfCategory(categoryDecompositionHierarchy.Category))
+            {
+                newNode = new DataCollectorNode<T>(categoryDecompositionHierarchy, nestedElement, parentNode);
+                parentNode?.Children.Add(newNode);
                 resultNodes.Add(newNode);
             }
             else if (!(categoryDecompositionHierarchy.Child?.AllowSkipUnknownCategories ?? true))

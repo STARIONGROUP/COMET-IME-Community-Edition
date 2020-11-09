@@ -222,6 +222,15 @@ namespace CDP4Reporting.DataCollection
                     row[columnName] = this.Value;
                 }
             }
+            else
+            {
+                var columnName = this.FieldName;
+
+                if (!table.Columns.Contains(columnName))
+                {
+                    table.Columns.Add(columnName, typeof(TValue));
+                }
+            }
         }
 
         /// <summary>

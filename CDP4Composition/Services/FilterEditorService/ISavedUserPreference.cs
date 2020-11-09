@@ -25,6 +25,9 @@
 
 namespace CDP4Composition.Services.FilterEditorService
 {
+    /// <summary>
+    /// Definition of the <see cref="ISavedUserPreference"/> used to load user filter preferences from the active user.
+    /// </summary>
     public interface ISavedUserPreference
     {
         /// <summary>
