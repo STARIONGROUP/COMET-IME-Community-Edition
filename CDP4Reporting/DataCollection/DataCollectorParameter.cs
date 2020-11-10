@@ -68,8 +68,7 @@ namespace CDP4Reporting.DataCollection
         internal ParameterValueContext ParameterSubscriptionValueContext { get; set; } = ParameterValueContext.PublishedValue;
 
         /// <summary>
-        /// The value of the associated <see cref="ParameterOrOverrideBase"/>.
-        /// The <see cref="IValueSet"/>s of the associated <see cref="ParameterBase"/>.
+        /// The value of the <see cref="IValueSet"/> of the associated <see cref="ParameterBase"/>.
         /// </summary>
         public TValue Value
         {
@@ -81,6 +80,22 @@ namespace CDP4Reporting.DataCollection
                 }
 
                 return default;
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="ParameterSwitchKind"/> of the <see cref="IValueSet"/>s of the associated <see cref="ParameterBase"/>.
+        /// </summary>
+        public string ValueSwitch
+        {
+            get
+            {
+                if (this.ValueSets?.Any() ?? false)
+                { 
+                    return this.ValueSets.FirstOrDefault()?.ValueSwitch.ToString() ?? string.Empty;
+                }
+
+                return string.Empty;
             }
         }
 

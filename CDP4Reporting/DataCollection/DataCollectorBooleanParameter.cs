@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDataCollector.cs" company="RHEA System S.A.">
+// <copyright file="DataCollectorBooleanParameter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,32 +25,34 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+
+    using CDP4Common.Helpers;
 
     /// <summary>
-    /// The interface used for collecting data.
+    /// Abstract base class from which all bool parameter columns
+    /// for a <see cref="DataCollectorRow"/> need to derive.
     /// </summary>
-    public interface IDataCollector
+    /// <typeparam name="TRow">
+    /// The type of the associated <see cref="DataCollectorRow"/>.
+    /// </typeparam>
+    public class DataCollectorBooleanParameter<TRow> : DataCollectorParameter<TRow, bool>
+        where TRow : DataCollectorRow, new()
     {
         /// <summary>
-        /// Gets all Dynamic table fields
+        /// Parses a parameter value as double.
         /// </summary>
-        Dictionary<string, Dictionary<string, string>> DynamicTableFields { get; }
-
-        /// <summary>
-        /// Add a field to the <see cref="DynamicTableFields"/> property
-        /// </summary>
-        /// <param name="tableName">The name of the Table in the report</param>
-        /// <param name="fieldName">The name of the datasource's field to show.</param>
-        /// <param name="columnHeader">The column header of the datasource's field</param>
-        void AddDynamicTableField(string tableName, string fieldName, string columnHeader);
-
-        /// <summary>
-        /// Creates a new data object instance. Could be anything depending on what the data is used for.
-        /// </summary>
+        /// <param name="value">
+        /// The parameter value to be parsed.
+        /// </param>
         /// <returns>
-        /// An object instance.
+        /// The parsed value.
         /// </returns>
-        object CreateDataObject();
+        [ExcludeFromCodeCoverage] // Remove attribute when more logic is added to this method. It's only SDK functionality now and that is fully covered.
+        public override bool Parse(string value)
+        {
+            var parsedValue = (bool?)value.ToValueSetObject(this.ParameterBase?.ParameterType);
+            return parsedValue ?? false;
+        }
     }
 }

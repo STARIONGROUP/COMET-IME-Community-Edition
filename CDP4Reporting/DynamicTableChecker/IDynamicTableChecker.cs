@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDataCollector.cs" company="RHEA System S.A.">
+// <copyright file="IDynamicTableChecker.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -19,38 +19,32 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Reporting.DataCollection
+namespace CDP4Reporting.DynamicTableChecker
 {
-    using System.Collections.Generic;
+
+    using CDP4Reporting.DataCollection;
+
+    using DevExpress.XtraReports.UI;
 
     /// <summary>
-    /// The interface used for collecting data.
+    /// Defines the injectable <see cref="IDynamicTableChecker"/> interface that is used to check dynamic tables in a report
+    /// from an <see cref="XtraReport"/>
     /// </summary>
-    public interface IDataCollector
+    public interface IDynamicTableChecker
     {
         /// <summary>
-        /// Gets all Dynamic table fields
+        /// Check dynamic tables in a report
         /// </summary>
-        Dictionary<string, Dictionary<string, string>> DynamicTableFields { get; }
-
-        /// <summary>
-        /// Add a field to the <see cref="DynamicTableFields"/> property
-        /// </summary>
-        /// <param name="tableName">The name of the Table in the report</param>
-        /// <param name="fieldName">The name of the datasource's field to show.</param>
-        /// <param name="columnHeader">The column header of the datasource's field</param>
-        void AddDynamicTableField(string tableName, string fieldName, string columnHeader);
-
-        /// <summary>
-        /// Creates a new data object instance. Could be anything depending on what the data is used for.
-        /// </summary>
-        /// <returns>
-        /// An object instance.
-        /// </returns>
-        object CreateDataObject();
+        /// <param name="report">
+        /// The <see cref="XtraReport"/>
+        /// </param>
+        /// <param name="dataCollector">
+        /// The <see cref="IDataCollector"/>
+        /// </param>
+        void Check(XtraReport report, IDataCollector dataCollector);
     }
 }

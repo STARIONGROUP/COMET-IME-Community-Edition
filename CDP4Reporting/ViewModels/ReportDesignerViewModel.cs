@@ -30,6 +30,7 @@ namespace CDP4Reporting.ViewModels
     using System.Collections.Generic;
     using System.Data;
     using System.Diagnostics.CodeAnalysis;
+    using System.Drawing.Printing;
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
@@ -58,6 +59,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Dal.Operations;
 
     using CDP4Reporting.DataCollection;
+    using CDP4Reporting.DynamicTableChecker;
     using CDP4Reporting.Parameters;
     using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.Utilities;
@@ -96,6 +98,11 @@ namespace CDP4Reporting.ViewModels
         /// The <see cref="ISubmittableParameterValuesCollector"/> used to collect submittable parameter values from the report previewer.
         /// </summary>
         private readonly ISubmittableParameterValuesCollector submittableParameterValuesCollector = ServiceLocator.Current.GetInstance<ISubmittableParameterValuesCollector>();
+
+        /// <summary>
+        /// The <see cref="IDynamicTableChecker"/> used to check datatables in the report.
+        /// </summary>
+        private readonly IDynamicTableChecker dynamicTableChecker = ServiceLocator.Current.GetInstance<IDynamicTableChecker>();
 
         /// <summary>
         /// The <see cref="IOpenSaveFileDialogService"/> that is used to navigate to the File Open/Save dialog
@@ -360,6 +367,7 @@ namespace CDP4Reporting.ViewModels
             this.WhenAnyValue(x => x.CurrentReport).Subscribe(x =>
             {
                 x.AfterPrint += this.CheckSubmittableParameterValues;
+                x.BeforePrint += this.CheckDynamicTables;
             });
 
             this.Changing
@@ -369,10 +377,18 @@ namespace CDP4Reporting.ViewModels
                     if (this.CurrentReport != null)
                     {
                         this.CurrentReport.AfterPrint -= this.CheckSubmittableParameterValues;
+                        this.CurrentReport.BeforePrint -= this.CheckDynamicTables;
                     }
                 });
 
             this.InitializeDataSetExtensionsUsage();
+        }
+
+        private void CheckDynamicTables(object sender, PrintEventArgs e)
+        {
+            var report = sender as XtraReport;
+
+            this.dynamicTableChecker.Check(report, this.currentDataCollector);
         }
 
         /// <summary>

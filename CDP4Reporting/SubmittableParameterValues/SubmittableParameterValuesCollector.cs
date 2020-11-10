@@ -73,13 +73,9 @@ namespace CDP4Reporting.SubmittableParameterValues
 
                     string path;
 
-                    if (this.TryExtractPath(control.Tag.ToString(), out var tagPath))
+                    if (this.TryExtractPath(visualBrick.Value.ToString(), out var tagPath))
                     {
                         path = tagPath;
-                    }
-                    else if (this.TryExtractPath(visualBrick.Hint, out var hintPath))
-                    {
-                        path = hintPath;
                     }
                     else
                     {
