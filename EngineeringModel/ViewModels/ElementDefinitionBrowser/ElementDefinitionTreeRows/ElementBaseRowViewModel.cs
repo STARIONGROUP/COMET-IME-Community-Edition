@@ -147,6 +147,9 @@ namespace CDP4EngineeringModel.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
         }
 
+        /// <summary>
+        /// Gets the applied categories as an <see cref="IEnumerable{Category}"/>.
+        /// </summary>
         public IEnumerable<Category> Category => this.Thing.Category;
 
         /// <summary>

@@ -63,11 +63,14 @@ namespace CDP4Composition.Mvvm.Behaviours
                 new PropertyMetadata());
 
         /// <summary>
+        /// Fild that holds the <see cref="IHaveCustomFilterOperators"/> viewmodel the <see cref="GridColumnBase"/> belongs to.
+        /// </summary>
+        private IHaveCustomFilterOperators customQueryFilterOperatorsViewModel;
+
+        /// <summary>
         /// Gets the current <see cref="GridColumnBase"/>
         /// </summary>
         private GridColumnBase Column => this.AssociatedObject;
-
-        private IHaveCustomFilterOperators customQueryFilterOperatorsViewModel;
 
         /// <summary>
         /// Gets or sets the <see cref="CustomFilterOperatorType"/>

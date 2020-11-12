@@ -23,11 +23,12 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-using CDP4Composition.ViewModels;
-using DevExpress.Xpf.Core.FilteringUI;
-
 namespace CDP4Composition.Events
 {
+    using CDP4Composition.ViewModels;
+
+    using DevExpress.Xpf.Core.FilteringUI;
+
     /// <summary>
     /// Event specifically used to execute <see cref="FilterEditorControl.ApplyFilter"/> originated from the <see cref="CustomFilterEditorDialogViewModel"/>
     /// </summary>

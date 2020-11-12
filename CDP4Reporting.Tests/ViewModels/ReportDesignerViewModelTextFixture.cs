@@ -50,6 +50,7 @@ namespace CDP4Reporting.Tests.ViewModels
     using CDP4Dal;
     using CDP4Dal.Permission;
 
+    using CDP4Reporting.DynamicTableChecker;
     using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.ViewModels;
 
@@ -175,6 +176,7 @@ namespace CDP4Reporting.Tests.ViewModels
         private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<IOpenSaveFileDialogService> openSaveFileDialogService;
         private Mock<ISubmittableParameterValuesCollector> submittableParameterValuesCollector;
+        private Mock<IDynamicTableChecker> dynamicTableChecker;
         private Mock<IPermissionService> permissionService;
 
         private static readonly Application application = new Application();
@@ -219,12 +221,14 @@ namespace CDP4Reporting.Tests.ViewModels
             this.openSaveFileDialogService = new Mock<IOpenSaveFileDialogService>();
             this.submittableParameterValuesCollector = new Mock<ISubmittableParameterValuesCollector>();
             this.permissionService = new Mock<IPermissionService>();
+            this.dynamicTableChecker = new Mock<IDynamicTableChecker>();
 
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.openSaveFileDialogService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<ISubmittableParameterValuesCollector>()).Returns(this.submittableParameterValuesCollector.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IDynamicTableChecker>()).Returns(this.dynamicTableChecker.Object);
 
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;

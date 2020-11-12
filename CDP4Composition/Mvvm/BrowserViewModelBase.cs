@@ -23,8 +23,6 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-using CDP4Common.SiteDirectoryData;
-
 namespace CDP4Composition.Mvvm
 {
     using System;
@@ -32,9 +30,12 @@ namespace CDP4Composition.Mvvm
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
     using CDP4Common;
+    
     using CDP4Composition.Converters;
     using CDP4Composition.DragDrop;
     using CDP4Composition.FilterOperators;
@@ -42,6 +43,7 @@ namespace CDP4Composition.Mvvm
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.ViewModels;
+    
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -49,6 +51,7 @@ namespace CDP4Composition.Mvvm
     using DevExpress.Xpf.Grid;
 
     using NLog;
+    
     using ReactiveUI;
 
     /// <summary>

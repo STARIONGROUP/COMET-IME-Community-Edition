@@ -42,6 +42,9 @@ namespace CDP4Composition.ViewModels
     /// </summary>
     public class ManageSavedUserPreferencesDialogViewModel<T> : DialogViewModelBase where T : ISavedUserPreference
     {
+        /// <summary>
+        /// The <see cref="Action"/> to be executed to save an <see cref="IEnumerable{T}"/> to the data store.
+        /// </summary>
         private readonly Action<IEnumerable<T>> saveAction;
 
         /// <summary>
