@@ -11,7 +11,7 @@
              Width="500"
              ShowTitle="True"
              Title="{Binding Title}"
-             ShowInTaskbar="False"
+             ShowInTaskbar="True"
              mc:Ignorable="d">
     <dx:ThemedWindow.Resources>
         <DataTemplate x:Key="DefaultColumnTemplate">

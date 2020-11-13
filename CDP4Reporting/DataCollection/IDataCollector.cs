@@ -25,25 +25,14 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    using System.Collections.Generic;
+    using CDP4Reporting.DynamicTableChecker;
 
-    /// <summary>
-    /// The interface used for collecting data.
-    /// </summary>
     public interface IDataCollector
     {
         /// <summary>
-        /// Gets all Dynamic table fields
+        /// The <see cref="IDynamicTableCellsCollector"/> that contains data about table cells that can be added dynamically to the report.
         /// </summary>
-        Dictionary<string, Dictionary<string, string>> DynamicTableFields { get; }
-
-        /// <summary>
-        /// Add a field to the <see cref="DynamicTableFields"/> property
-        /// </summary>
-        /// <param name="tableName">The name of the Table in the report</param>
-        /// <param name="fieldName">The name of the datasource's field to show.</param>
-        /// <param name="columnHeader">The column header of the datasource's field</param>
-        void AddDynamicTableField(string tableName, string fieldName, string columnHeader);
+        IDynamicTableCellsCollector DynamicTableCellsCollector { get; }
 
         /// <summary>
         /// Creates a new data object instance. Could be anything depending on what the data is used for.

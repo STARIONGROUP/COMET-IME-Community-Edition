@@ -30,7 +30,6 @@ namespace CDP4Reporting.ViewModels
     using System.Collections.Generic;
     using System.Data;
     using System.Diagnostics.CodeAnalysis;
-    using System.Drawing.Printing;
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
@@ -367,7 +366,7 @@ namespace CDP4Reporting.ViewModels
             this.WhenAnyValue(x => x.CurrentReport).Subscribe(x =>
             {
                 x.AfterPrint += this.CheckSubmittableParameterValues;
-                x.BeforePrint += this.CheckDynamicTables;
+                x.DataSourceDemanded += this.CheckDynamicTables;
             });
 
             this.Changing
@@ -377,18 +376,11 @@ namespace CDP4Reporting.ViewModels
                     if (this.CurrentReport != null)
                     {
                         this.CurrentReport.AfterPrint -= this.CheckSubmittableParameterValues;
-                        this.CurrentReport.BeforePrint -= this.CheckDynamicTables;
+                        this.CurrentReport.DataSourceDemanded -= this.CheckDynamicTables;
                     }
                 });
 
             this.InitializeDataSetExtensionsUsage();
-        }
-
-        private void CheckDynamicTables(object sender, PrintEventArgs e)
-        {
-            var report = sender as XtraReport;
-
-            this.dynamicTableChecker.Check(report, this.currentDataCollector);
         }
 
         /// <summary>
@@ -1098,6 +1090,22 @@ namespace CDP4Reporting.ViewModels
                     exception = exception.InnerException;
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks the report if dynamic tables need to be updated.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender
+        /// </param>
+        /// <param name="e">
+        /// The <see cref="EventArgs"/>
+        /// </param>
+        private void CheckDynamicTables(object sender, EventArgs e)
+        {
+            var report = sender as XtraReport;
+
+            this.dynamicTableChecker.Check(report, this.currentDataCollector);
         }
 
         /// <summary>

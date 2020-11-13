@@ -486,6 +486,21 @@ namespace CDP4Reporting.DataCollection
             this.parent?.FillCategoryDecompositionHierarchyColumns(row);
 
             row[this.FieldName] = this.ElementBase.Name;
+
+            var rowPresentation = this.GetRowRepresentation();
+
+            foreach (var rowField in this.normalColumns)
+            {
+                var column = rowField.Key.GetValue(rowPresentation) as DataCollectorColumn<T>;
+
+                if (this.categoryDecompositionHierarchy.Child != null 
+                    && column is IDataCollectorParameter dataCollectorColumn 
+                    && dataCollectorColumn.CollectParentValues)
+                {
+                    dataCollectorColumn.ParentValuePrefix = $"{this.FieldName}_";
+                    column.Populate(row.Table, row);
+                }
+            }
         }
 
         /// <summary>

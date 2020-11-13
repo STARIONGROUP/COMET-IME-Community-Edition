@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDataCollectorParameter.cs" company="RHEA System S.A.">
+// <copyright file="CollectParentValuesAttribute.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -25,34 +25,14 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    using System.Collections.Generic;
-
-    using CDP4Common.EngineeringModelData;
+    using System;
 
     /// <summary>
-    /// The interface that defines members of implementing classes of <see cref="IDataCollectorParameter"/>
+    /// Attribute decorating implementations of <see cref="DataCollectorParameter{TRow,TValue}"/>.
+    /// States that a parameter values should be collected recursively from the tree of <see cref="CategoryDecompositionHierarchy"/>s
     /// </summary>
-    internal interface IDataCollectorParameter
+    [AttributeUsage(AttributeTargets.Property)]
+    public class CollectParentValuesAttribute : Attribute
     {
-        /// <summary>
-        /// Gets a flag that indicates whether this instance has <see cref="IValueSet"/>s.
-        /// </summary>
-        bool HasValueSets { get; }
-
-        /// <summary>
-        /// Gets a flag that indicates that a parameter also collects parent values up a tree of <see cref="CategoryDecompositionHierarchy"/>s
-        /// </summary>
-        bool CollectParentValues { get; }
-
-        /// <summary>
-        /// Gets or sets the associated field name prefix in the result Data Object.
-        /// </summary>
-        string ParentValuePrefix { get; set; }
-
-        /// <summary>
-        /// The ValueSets of the associated object.
-        /// The <see cref="IEnumerable{T}"/>s of the associated object/>.
-        /// </summary>
-        IEnumerable<IValueSet> ValueSets { get; set; }
     }
 }

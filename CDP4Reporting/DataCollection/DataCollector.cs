@@ -25,7 +25,7 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    using System.Collections.Generic;
+    using CDP4Reporting.DynamicTableChecker;
 
     /// <summary>
     /// The abstract base class that implements the <see cref="IDataCollector"/>
@@ -33,32 +33,9 @@ namespace CDP4Reporting.DataCollection
     public abstract class DataCollector : IDataCollector
     {
         /// <summary>
-        /// Gets all Dynamic table fields
+        /// The <see cref="IDynamicTableCellsCollector"/> that contains data about table cells that can be added dynamically to the report.
         /// </summary>
-        public Dictionary<string, Dictionary<string, string>> DynamicTableFields { get; } = new Dictionary<string, Dictionary<string, string>>();
-
-        /// <summary>
-        /// Add a field to the <see cref="DynamicTableFields"/> property
-        /// </summary>
-        /// <param name="tableName">The name of the Table in the report</param>
-        /// <param name="fieldName">The name of the datasource's field to show.</param>
-        /// <param name="columnHeader">The column header of the datasource's field</param>
-        public void AddDynamicTableField(string tableName, string fieldName, string columnHeader)
-        {
-            if (!this.DynamicTableFields.ContainsKey(tableName))
-            {
-                this.DynamicTableFields.Add(tableName, new Dictionary<string, string>());
-            }
-
-            if (!this.DynamicTableFields[tableName].ContainsKey(fieldName))
-            {
-                this.DynamicTableFields[tableName].Add(fieldName, columnHeader);
-            }
-            else
-            {
-                this.DynamicTableFields[tableName][fieldName] = columnHeader;
-            }
-        }
+        public IDynamicTableCellsCollector DynamicTableCellsCollector { get; } = new DynamicTableCellsCollector();
 
         /// <summary>
         /// Creates a new data collection instance.

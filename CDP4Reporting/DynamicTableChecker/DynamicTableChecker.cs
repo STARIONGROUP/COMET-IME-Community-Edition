@@ -25,6 +25,7 @@
 
 namespace CDP4Reporting.DynamicTableChecker
 {
+    using System;
     using System.ComponentModel.Composition;
     using System.Diagnostics.CodeAnalysis;
 
@@ -42,43 +43,69 @@ namespace CDP4Reporting.DynamicTableChecker
     {
         public void Check(XtraReport report, IDataCollector dataCollector)
         {
+            var dynamicTableCells = dataCollector.DynamicTableCellsCollector.DynamicTableCells;
+
             foreach (var table in report.AllControls<XRTable>())
             {
-                if (dataCollector.DynamicTableFields.ContainsKey(table.Name))
+                if (dynamicTableCells.ContainsKey(table.Name))
                 {
+                    var orgCell = table.Rows[0].Cells[0];
+
                     table.Rows.Clear();
                     var newRow = new XRTableRow();
                     table.Rows.Add(newRow);
 
-                    foreach (var keyValuePair in dataCollector.DynamicTableFields[table.Name])
-                    {
-                        var newCell = new XRTableCell();
-                        var dataMemberPrefix = !string.IsNullOrWhiteSpace(report.DataMember) ? "" : report.DataMember + ".";
-                        var dataMemberName = $"{dataMemberPrefix}{keyValuePair.Key}";
+                    var orgWidth = table.Width;
+                    var columnCount = Math.Max(dynamicTableCells[table.Name].Count, 1);
+                    var newWidth = orgWidth / columnCount;
 
-                        newCell.DataBindings.Add(new XRBinding("Text", report.DataSource, dataMemberName));
+                    foreach (var dynamicTableCell in dynamicTableCells[table.Name])
+                    {
+                        var newCell = CreateNewTableCell(orgCell);
+                        SetDynamicTableCellProperties(newCell, dynamicTableCell);
+
                         newRow.Cells.Add(newCell);
                     }
-                }
 
-                if (table.Name.Contains("Header"))
-                {
-                    var tableNameHeader = table.Name.Replace("Header", "");
-
-                    if (dataCollector.DynamicTableFields.ContainsKey(tableNameHeader))
+                    foreach (var cell in newRow.Cells)
                     {
-                        table.Rows.Clear();
-                        var newRow = new XRTableRow();
-                        table.Rows.Add(newRow);
-
-                        foreach (var keyValuePair in dataCollector.DynamicTableFields[tableNameHeader])
-                        {
-                            var newCell = new XRTableCell();
-                            newCell.Text = keyValuePair.Value;
-                            newRow.Cells.Add(newCell);
-                        }
+                        ((XRTableCell)cell).WidthF = newWidth;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Create a new <see cref="XRTableCell"/> based on an existing <see cref="XRTableCell"/>
+        /// </summary>
+        /// <param name="baseOnCell">The exisiting <see cref="XRTableCell"/></param>
+        /// <returns>A new <see cref="XRTableCell"/></returns>
+        private static XRTableCell CreateNewTableCell(XRTableCell baseOnCell)
+        {
+            var newCell = new XRTableCell();
+            newCell.TextFormatString = baseOnCell.TextFormatString;
+            newCell.Summary.Running = baseOnCell.Summary.Running;
+            newCell.Summary.FormatString = baseOnCell.Summary.FormatString;
+            return newCell;
+        }
+
+        /// <summary>
+        /// Set specific <see cref="XRTableCell"/> properties using a <see cref="DynamicTableCell"/>
+        /// </summary>
+        /// <param name="newCell">The <see cref="XRTableCell"/></param>
+        /// <param name="dynamicTableCell">The <see cref="DynamicTableCell"/></param>
+        private static void SetDynamicTableCellProperties(XRTableCell newCell, DynamicTableCell dynamicTableCell)
+        {
+            newCell.ExpressionBindings.Add(new ExpressionBinding("BeforePrint", "Text", dynamicTableCell.Expression));
+
+            if (!string.IsNullOrWhiteSpace(dynamicTableCell.ForeColorExpression))
+            {
+                newCell.ExpressionBindings.Add(new ExpressionBinding("BeforePrint", "ForeColor", dynamicTableCell.ForeColorExpression));
+            }
+
+            if (!string.IsNullOrWhiteSpace(dynamicTableCell.BackColorExpression))
+            {
+                newCell.ExpressionBindings.Add(new ExpressionBinding("BeforePrint", "BackColor", dynamicTableCell.BackColorExpression));
             }
         }
     }
