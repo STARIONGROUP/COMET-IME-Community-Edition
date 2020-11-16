@@ -42,7 +42,7 @@ namespace CDP4Reporting.DataCollection
         /// <summary>
         /// The associated <see cref="CDP4Common.EngineeringModelData.ParameterBase"/>.
         /// </summary>
-        protected ParameterBase ParameterBase { get; set; }
+        public ParameterBase ParameterBase { get; set; }
 
         /// <summary>
         /// Gets or sets the associated <see cref="ParameterType"/> short name.
