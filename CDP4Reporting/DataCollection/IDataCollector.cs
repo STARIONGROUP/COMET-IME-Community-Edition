@@ -25,11 +25,15 @@
 
 namespace CDP4Reporting.DataCollection
 {
-    /// <summary>
-    /// The interface used for collecting data.
-    /// </summary>
+    using CDP4Reporting.DynamicTableChecker;
+
     public interface IDataCollector
     {
+        /// <summary>
+        /// The <see cref="IDynamicTableCellsCollector"/> that contains data about table cells that can be added dynamically to the report.
+        /// </summary>
+        IDynamicTableCellsCollector DynamicTableCellsCollector { get; }
+
         /// <summary>
         /// Creates a new data object instance. Could be anything depending on what the data is used for.
         /// </summary>

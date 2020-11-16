@@ -59,18 +59,22 @@
                                Hint="{Binding SelectedThingClassKindString,
             Converter={dx:FormatStringConverter FormatString={}Export {0}}}" />
 
-        <dxb:BarSplitButtonItem IsVisible="False"/>
+        <dxb:BarItemSeparator />
 
         <dxb:BarButtonItem Command="{Binding HelpCommand}"
                            IsVisible="False"
                            Glyph="{dx:DXImage Image=Info_16x16.png}"
                            Hint="Show Help" />
 
-        <dxb:BarSplitButtonItem IsVisible="False"/>
+        <dxb:BarItemSeparator />
 
-        <dxb:BarButtonItem ItemClick="ButtonBase_OnClick"
+        <dxb:BarButtonItem ItemClick="OpenFilterPanel"
+                           Glyph="{dx:DXImage Image=Filter_16x16.png}"
+                           Hint="Show Filter Panel" />
+
+        <dxb:BarButtonItem ItemClick="ToggleSearchPanel" 
                            Glyph="{dx:DXImage Image=Zoom_16x16.png}"
-                           Hint="Show Search Panel" />
+                           Hint="Show/Hide Search Panel" />
 
         <dxb:BarCheckItem 
                           IsChecked="{Binding ShowOnlyFavorites}"
@@ -80,6 +84,6 @@
                           Glyph="{dx:DXImage Image=NewContact_16x16.png}"
                           Hint="Toggle filtering on favorite items."
                           IsEnabled="{Binding HasSession, UpdateSourceTrigger=PropertyChanged}"/>
-        <dxb:BarSplitButtonItem />
+        <dxb:BarItemSeparator />
     </dxb:ToolBarControl>
 </UserControl>

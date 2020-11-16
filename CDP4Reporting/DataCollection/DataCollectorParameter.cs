@@ -42,7 +42,7 @@ namespace CDP4Reporting.DataCollection
         /// <summary>
         /// The associated <see cref="CDP4Common.EngineeringModelData.ParameterBase"/>.
         /// </summary>
-        protected ParameterBase ParameterBase { get; set; }
+        public ParameterBase ParameterBase { get; set; }
 
         /// <summary>
         /// Gets or sets the associated <see cref="ParameterType"/> short name.
@@ -53,6 +53,16 @@ namespace CDP4Reporting.DataCollection
         /// Gets or sets the associated <see cref="ParameterType"/> field name in the result Data Object.
         /// </summary>
         internal string FieldName { get; set; }
+
+        /// <summary>
+        /// Gets a flag that indicates that a parameter also collects parent values up a tree of <see cref="CategoryDecompositionHierarchy"/>s
+        /// </summary>
+        public bool CollectParentValues { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the associated field name prefix in the result Data Object.
+        /// </summary>
+        public string ParentValuePrefix { get; set; } = string.Empty;
 
         /// <summary>
         /// The <see cref="ParameterValueContext"/> for which the value needs to be retrieved
@@ -68,8 +78,7 @@ namespace CDP4Reporting.DataCollection
         internal ParameterValueContext ParameterSubscriptionValueContext { get; set; } = ParameterValueContext.PublishedValue;
 
         /// <summary>
-        /// The value of the associated <see cref="ParameterOrOverrideBase"/>.
-        /// The <see cref="IValueSet"/>s of the associated <see cref="ParameterBase"/>.
+        /// The value of the <see cref="IValueSet"/> of the associated <see cref="ParameterBase"/>.
         /// </summary>
         public TValue Value
         {
@@ -85,11 +94,27 @@ namespace CDP4Reporting.DataCollection
         }
 
         /// <summary>
+        /// The <see cref="ParameterSwitchKind"/> of the <see cref="IValueSet"/>s of the associated <see cref="ParameterBase"/>.
+        /// </summary>
+        public string ValueSwitch
+        {
+            get
+            {
+                if (this.ValueSets?.Any() ?? false)
+                { 
+                    return this.ValueSets.FirstOrDefault()?.ValueSwitch.ToString() ?? string.Empty;
+                }
+
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
         /// Get the correct value of a <see cref="IValueSet"/>.
         /// </summary>
         /// <param name="valueSet">The <see cref="IValueSet"/></param>
         /// <returns>The correct value of the <see cref="IValueSet"/></returns>
-        protected TValue GetValueSetValue(IValueSet valueSet)
+        public TValue GetValueSetValue(IValueSet valueSet)
         {
             if (valueSet is ParameterSubscriptionValueSet valueSetSubscription)
             {
@@ -132,6 +157,24 @@ namespace CDP4Reporting.DataCollection
         public DomainOfExpertise Owner { get; set; }
 
         /// <summary>
+        /// Gets the <see cref="CollectParentValuesAttribute"/> decorating the property described by <paramref name="propertyType"/>.
+        /// </summary>
+        /// <param name="propertyType">
+        /// Describes the current property.
+        /// </param>
+        /// <returns>
+        /// The <see cref="CollectParentValuesAttribute"/> decorating the current parameter class.
+        /// </returns>
+        protected static CollectParentValuesAttribute GetCollectParentValuesAttribute(PropertyInfo propertyType)
+        {
+            var attr = Attribute
+                .GetCustomAttributes(propertyType)
+                .SingleOrDefault(attribute => attribute is CollectParentValuesAttribute);
+
+            return attr as CollectParentValuesAttribute;
+        }
+
+        /// <summary>
         /// Initializes a reported parameter column based on the corresponding
         /// <see cref="CDP4Common.EngineeringModelData.ParameterBase"/> within the associated
         /// <see cref="DataCollectorNode{T}"/>.
@@ -148,6 +191,8 @@ namespace CDP4Reporting.DataCollection
 
             this.ShortName = definedShortNameAttribute?.ShortName;
             this.FieldName = definedShortNameAttribute?.FieldName;
+
+            this.CollectParentValues = GetCollectParentValuesAttribute(propertyInfo) != null;
 
             var parameterValueContext = GetParameterValueContextAttribute(propertyInfo);
 
@@ -208,18 +253,44 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         public override void Populate(DataTable table, DataRow row)
         {
+            var fieldName = $"{this.ParentValuePrefix}{this.FieldName}";
+
             if (this.HasValueSets)
             {
                 foreach (var valueSet in this.ValueSets)
                 {
-                    var columnName = $"{this.FieldName}{valueSet.ActualState?.ShortName ?? ""}";
+                    var columnName = $"{fieldName}{valueSet.ActualState?.ShortName ?? ""}";
 
                     if (!table.Columns.Contains(columnName))
                     {
                         table.Columns.Add(columnName, typeof(TValue));
                     }
 
-                    row[columnName] = this.Value;
+                    if (valueSet.ActualState == null)
+                    {
+                        row[columnName] = this.Value;
+                    }
+                    else
+                    {
+                        var stateDependentValueSet = this.ValueSets.FirstOrDefault(x => x.ActualState == valueSet.ActualState);
+
+                        if (stateDependentValueSet != null)
+                        {
+                            row[columnName] = this.GetValueSetValue(stateDependentValueSet);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(this.ParentValuePrefix))
+                {
+                    var columnName = fieldName;
+
+                    if (!table.Columns.Contains(columnName))
+                    {
+                        table.Columns.Add(columnName, typeof(TValue));
+                    }
                 }
             }
         }

@@ -56,6 +56,7 @@ namespace ProductTree.Tests.ProductTreeRows
         private Option option;
         private ElementDefinition elementDef;
         private ElementDefinition elementDef2;
+        private Category category;
         private DomainOfExpertise domain;
         private ElementUsage elementUsage;
 
@@ -92,7 +93,9 @@ namespace ProductTree.Tests.ProductTreeRows
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
             this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
+            this.category = new Category(Guid.NewGuid(), this.cache, this.uri);
             this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) {Owner = this.domain};
+            this.elementDef.Category.Add(this.category);
 
             this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
             this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain};
@@ -134,6 +137,13 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreEqual("dom", vm.OwnerShortName );
 
             Assert.AreEqual(1, vm.ContainedRows.Count);
+
+            var expected = new List<Category>
+            {
+                this.category
+            };
+
+            CollectionAssert.AreEquivalent(expected, vm.Category);
         }
 
         [Test]

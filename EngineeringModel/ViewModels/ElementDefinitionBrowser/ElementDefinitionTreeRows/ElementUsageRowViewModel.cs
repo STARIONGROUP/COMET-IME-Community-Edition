@@ -1,6 +1,25 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -12,16 +31,18 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
-    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using ReactiveUI;
 
@@ -54,7 +75,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="HasExcludes"/> 
         /// </summary>
         private bool? hasExcludes;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageRowViewModel"/> class
         /// </summary>
@@ -71,29 +92,30 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.WhenAnyValue(vm => vm.SelectedOptions).Subscribe(_ => this.ExcludedOptions = new ReactiveList<Option>(this.AllOptions.Except(this.SelectedOptions)));
 
-            this.WhenAnyValue(vm => vm.ExcludedOptions).Subscribe(_ =>
-            {
-                if (!this.SelectedOptions.Any())
+            this.WhenAnyValue(vm => vm.ExcludedOptions).Subscribe(
+                _ =>
                 {
-                    this.HasExcludes = null;
-                    this.OptionToolTip = "This ElementUsage is not used in any option.";
-                }
-                else
-                {
-                    this.HasExcludes = this.ExcludedOptions.Any();
-
-                    if (this.HasExcludes.Value)
+                    if (!this.SelectedOptions.Any())
                     {
-                        var excludedOptionNames = string.Join("\n", this.ExcludedOptions.Select(o => o.Name));
-
-                        this.OptionToolTip = string.Format("This ElementUsage is excluded from options:\n\r{0}", excludedOptionNames);
+                        this.HasExcludes = null;
+                        this.OptionToolTip = "This ElementUsage is not used in any option.";
                     }
-                    else if (!this.HasExcludes.Value)
+                    else
                     {
-                        this.OptionToolTip = "This ElementUsage is used in all options.";
+                        this.HasExcludes = this.ExcludedOptions.Any();
+
+                        if (this.HasExcludes.Value)
+                        {
+                            var excludedOptionNames = string.Join("\n", this.ExcludedOptions.Select(o => o.Name));
+
+                            this.OptionToolTip = $"This ElementUsage is excluded from options:\n\r{excludedOptionNames}";
+                        }
+                        else if (!this.HasExcludes.Value)
+                        {
+                            this.OptionToolTip = "This ElementUsage is used in all options.";
+                        }
                     }
-                }
-            });
+                });
 
             this.WhenAnyValue(vm => vm.ExcludedOptions).Skip(1).Subscribe(_ => this.SendUpdateExcludedOptionOperation());
 
@@ -101,15 +123,15 @@ namespace CDP4EngineeringModel.ViewModels
             this.PopulateParameterGroups();
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Gets or sets the <see cref="ReactiveList{T}"/> of all <see cref="Option"/>s
         /// in this iteration.
         /// </summary>
         public ReactiveList<Option> AllOptions
         {
-            get { return this.allOptions; }
-            set { this.RaiseAndSetIfChanged(ref this.allOptions, value); }
+            get => this.allOptions;
+            set => this.RaiseAndSetIfChanged(ref this.allOptions, value);
         }
 
         /// <summary>
@@ -117,8 +139,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public ReactiveList<Option> ExcludedOptions
         {
-            get { return this.excludedOptions; }
-            set { this.RaiseAndSetIfChanged(ref this.excludedOptions, value); }
+            get => this.excludedOptions;
+            set => this.RaiseAndSetIfChanged(ref this.excludedOptions, value);
         }
 
         /// <summary>
@@ -126,8 +148,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public override bool? HasExcludes
         {
-            get { return this.hasExcludes; }
-            set { this.RaiseAndSetIfChanged(ref this.hasExcludes, value); }
+            get => this.hasExcludes;
+            set => this.RaiseAndSetIfChanged(ref this.hasExcludes, value);
         }
 
         /// <summary>
@@ -135,8 +157,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string OptionToolTip
         {
-            get { return this.optionToolTip; }
-            set { this.RaiseAndSetIfChanged(ref this.optionToolTip, value); }
+            get => this.optionToolTip;
+            set => this.RaiseAndSetIfChanged(ref this.optionToolTip, value);
         }
 
         /// <summary>
@@ -144,10 +166,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public ReactiveList<Option> SelectedOptions
         {
-            get { return this.selectedOptions; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedOptions, value); }
+            get => this.selectedOptions;
+            set => this.RaiseAndSetIfChanged(ref this.selectedOptions, value);
         }
-        
+
+        /// <summary>
+        /// Gets an <see cref="IEnumerable{T}"/> containing all applied categories for this <see cref="ElementUsage"/>
+        /// and its according <see cref="ElementDefinition"/>.
+        /// </summary>
+        public new IEnumerable<Category> Category => this.Thing.Category.Union(this.Thing.ElementDefinition.Category).Distinct();
+
         /// <summary>
         /// Update the children rows of the current row
         /// </summary>
@@ -155,13 +183,14 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Initializes the subscriptions
         /// </summary>
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
+
             var elementDefListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -170,6 +199,7 @@ namespace CDP4EngineeringModel.ViewModels
             var highlightSubscription = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
+
             this.Disposables.Add(highlightSubscription);
 
             var optionAddListener =
@@ -190,7 +220,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.Disposables.Add(optionRemoveListener);
             this.Disposables.Add(elementDefListener);
         }
-        
+
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -200,7 +230,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Update this row upon a <see cref="ObjectChangedEvent"/> on this <see cref="ElementUsage"/>
         /// </summary>
@@ -242,11 +272,10 @@ namespace CDP4EngineeringModel.ViewModels
                 parameterOrOveride.Where(x => x.ParameterSubscription.Any(s => s.Owner == this.currentDomain)).ToList();
 
             var definedSubscription =
-                definedParameterOverrideWithSubscription.Select(
-                    x => x.ParameterSubscription.Single(s => s.Owner == this.currentDomain)).ToList();
+                definedParameterOverrideWithSubscription.Select(x => x.ParameterSubscription.Single(s => s.Owner == this.currentDomain)).ToList();
 
             var currentSubscription = this.parameterBaseCache.Keys.OfType<ParameterSubscription>().ToList();
-            
+
             // deleted Parameter Subscription
             var deletedSubscription = currentSubscription.Except(definedSubscription).ToList();
             this.RemoveParameterBase(deletedSubscription);
@@ -295,7 +324,6 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-
             var clone = this.Thing.Clone(false);
             clone.ExcludeOption = new List<Option>(this.ExcludedOptions);
 
@@ -305,7 +333,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.DalWrite(transaction);
         }
-        
+
         /// <summary>
         /// Updates the current drag state.
         /// </summary>
@@ -319,8 +347,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            var category = dropInfo.Payload as Category;
-            if (category != null)
+            if (dropInfo.Payload is Category category)
             {
                 this.DragOver(dropInfo, category);
                 return;
@@ -337,8 +364,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            var category = dropInfo.Payload as Category;
-            if (category != null)
+            if (dropInfo.Payload is Category category)
             {
                 this.Drop(dropInfo, category);
             }

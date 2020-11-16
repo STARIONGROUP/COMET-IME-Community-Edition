@@ -53,11 +53,18 @@ namespace ProductTree.Tests.ProductTreeRows
         private Person person;
         private Participant participant;
         private Option option;
+        private Category category1;
+        private Category category2;
         private ElementDefinition elementDef;
         private ElementDefinition elementDef2;
         private ElementDefinition elementDef3;
+        private ElementDefinition elementDef4;
+        private ElementDefinition elementDef5;
         private DomainOfExpertise domain;
         private ElementUsage elementUsage;
+        private ElementUsage elementUsage4;
+        private ElementUsage elementUsage5;
+        private ElementUsage elementUsage6;
         private ParameterValueSet valueSet;
         private ParameterOverrideValueSet valueSetOverride;
 
@@ -94,12 +101,35 @@ namespace ProductTree.Tests.ProductTreeRows
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
             this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
+
+            this.category1 = new Category(Guid.NewGuid(), this.cache, this.uri);
+            this.category2 = new Category(Guid.NewGuid(), this.cache, this.uri);
+
             this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain};
             this.elementDef3 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain};
 
             this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, Name = "Element definition 1", ShortName = "ED1" };
+
+            this.elementDef4 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, Name = "Element definition 4", ShortName = "ED4" };
+            this.elementDef4.Category.Add(this.category1);
+
+            this.elementDef5 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, Name = "Element definition 5", ShortName = "ED5" };
+
             this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
             { ElementDefinition = this.elementDef2, Owner = this.domain, Name = "Element usage 1" ,ShortName = "EU1"};
+
+            this.elementUsage4 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
+                { ElementDefinition = this.elementDef4, Container = this.elementDef4, Owner = this.domain, Name = "Element usage 4" ,ShortName = "EU4"};
+            
+            this.elementUsage4.Category.Add(this.category2);
+
+            this.elementUsage5 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
+                { ElementDefinition = this.elementDef5, Container = this.elementDef5, Owner = this.domain, Name = "Element usage 5" ,ShortName = "EU5"};
+
+            this.elementDef5.Category.Add(this.category1);
+
+            this.elementUsage6 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
+                { ElementDefinition = this.elementDef4, Container = this.elementDef5, Owner = this.domain, Name = "Element usage 6" ,ShortName = "EU6"};
 
             this.valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
             this.valueSet.Published = new ValueArray<string>(new List<string> { "1" });
@@ -385,5 +415,52 @@ namespace ProductTree.Tests.ProductTreeRows
 
             this.thingCreator.Verify(x => x.CreateElementUsage(this.elementUsage.ElementDefinition, It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), It.IsAny<ISession>()));
         }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage4()
+        {
+            var row = new ElementUsageRowViewModel(this.elementUsage4, this.option, this.session.Object, null);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1,
+                this.category2
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage5()
+        {
+            var row = new ElementUsageRowViewModel(this.elementUsage5, this.option, this.session.Object, null);
+
+            Assert.AreEqual(1, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage6()
+        {
+            var row = new ElementUsageRowViewModel(this.elementUsage6, this.option, this.session.Object, null);
+
+            Assert.AreEqual(1, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
     }
 }

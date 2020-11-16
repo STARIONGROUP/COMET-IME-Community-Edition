@@ -58,6 +58,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Dal.Operations;
 
     using CDP4Reporting.DataCollection;
+    using CDP4Reporting.DynamicTableChecker;
     using CDP4Reporting.Parameters;
     using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.Utilities;
@@ -96,6 +97,11 @@ namespace CDP4Reporting.ViewModels
         /// The <see cref="ISubmittableParameterValuesCollector"/> used to collect submittable parameter values from the report previewer.
         /// </summary>
         private readonly ISubmittableParameterValuesCollector submittableParameterValuesCollector = ServiceLocator.Current.GetInstance<ISubmittableParameterValuesCollector>();
+
+        /// <summary>
+        /// The <see cref="IDynamicTableChecker"/> used to check datatables in the report.
+        /// </summary>
+        private readonly IDynamicTableChecker dynamicTableChecker = ServiceLocator.Current.GetInstance<IDynamicTableChecker>();
 
         /// <summary>
         /// The <see cref="IOpenSaveFileDialogService"/> that is used to navigate to the File Open/Save dialog
@@ -360,6 +366,7 @@ namespace CDP4Reporting.ViewModels
             this.WhenAnyValue(x => x.CurrentReport).Subscribe(x =>
             {
                 x.AfterPrint += this.CheckSubmittableParameterValues;
+                x.DataSourceDemanded += this.CheckDynamicTables;
             });
 
             this.Changing
@@ -369,6 +376,7 @@ namespace CDP4Reporting.ViewModels
                     if (this.CurrentReport != null)
                     {
                         this.CurrentReport.AfterPrint -= this.CheckSubmittableParameterValues;
+                        this.CurrentReport.DataSourceDemanded -= this.CheckDynamicTables;
                     }
                 });
 
@@ -1082,6 +1090,22 @@ namespace CDP4Reporting.ViewModels
                     exception = exception.InnerException;
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks the report if dynamic tables need to be updated.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender
+        /// </param>
+        /// <param name="e">
+        /// The <see cref="EventArgs"/>
+        /// </param>
+        private void CheckDynamicTables(object sender, EventArgs e)
+        {
+            var report = sender as XtraReport;
+
+            this.dynamicTableChecker.Check(report, this.currentDataCollector);
         }
 
         /// <summary>

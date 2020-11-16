@@ -25,11 +25,18 @@
 
 namespace CDP4Reporting.DataCollection
 {
+    using CDP4Reporting.DynamicTableChecker;
+
     /// <summary>
     /// The abstract base class that implements the <see cref="IDataCollector"/>
     /// </summary>
     public abstract class DataCollector : IDataCollector
     {
+        /// <summary>
+        /// The <see cref="IDynamicTableCellsCollector"/> that contains data about table cells that can be added dynamically to the report.
+        /// </summary>
+        public IDynamicTableCellsCollector DynamicTableCellsCollector { get; } = new DynamicTableCellsCollector();
+
         /// <summary>
         /// Creates a new data collection instance.
         /// </summary>

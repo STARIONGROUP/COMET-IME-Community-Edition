@@ -40,6 +40,16 @@ namespace CDP4Reporting.DataCollection
         bool HasValueSets { get; }
 
         /// <summary>
+        /// Gets a flag that indicates that a parameter also collects parent values up a tree of <see cref="CategoryDecompositionHierarchy"/>s
+        /// </summary>
+        bool CollectParentValues { get; }
+
+        /// <summary>
+        /// Gets or sets the associated field name prefix in the result Data Object.
+        /// </summary>
+        string ParentValuePrefix { get; set; }
+
+        /// <summary>
         /// The ValueSets of the associated object.
         /// The <see cref="IEnumerable{T}"/>s of the associated object/>.
         /// </summary>

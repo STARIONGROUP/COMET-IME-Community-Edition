@@ -148,6 +148,11 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets the applied categories as an <see cref="IEnumerable{Category}"/>.
+        /// </summary>
+        public IEnumerable<Category> Category => this.Thing.Category;
+
+        /// <summary>
         /// Update the row containment associated to a <see cref="ParameterBase"/>
         /// </summary>
         /// <param name="parameterBase">The <see cref="ParameterBase"/></param>

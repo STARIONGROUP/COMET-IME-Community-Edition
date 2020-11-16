@@ -15,6 +15,7 @@
              xmlns:cdp4ProductTree="clr-namespace:CDP4ProductTree"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -224,6 +225,12 @@
                 <dxg:TreeListColumn FieldName="Description" />
                 <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
                 <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
+                <dxg:TreeListColumn FieldName="Category" Header="Category" Visible ="False" ShowInColumnChooser="False">
+                    <dxmvvm:Interaction.Behaviors>
+                        <behaviours:FilterOperatorBehavior CustomFilterOperatorType="Category" ItemsSource="{Binding TopElement}"/>
+                    </dxmvvm:Interaction.Behaviors>
+                </dxg:TreeListColumn>
+                <dxg:TreeListColumn FieldName="ParameterTypeName" Header="ParameterTypeName" Visible ="False" ShowInColumnChooser="False" />
             </dxg:TreeListControl.Columns>
             <dxg:TreeListControl.InputBindings>
                 <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>

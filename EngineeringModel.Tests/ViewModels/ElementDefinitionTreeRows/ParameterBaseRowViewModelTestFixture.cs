@@ -1,8 +1,27 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 {
@@ -33,6 +52,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private ElementDefinition elementDefinitionForUsage2;
         private ElementUsage elementUsage1;
         private ElementUsage elementUsage2;
+        private Category category1;
+        private Category category2;
         private Parameter parameter1;
         private Parameter parameter5ForSubscription;
         private Parameter parameterCompound;
@@ -145,10 +166,15 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
                 ShortName = "c2"
             });
 
+            this.category1 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.category2 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.activeDomain
             };
+
+            this.elementDefinition.Category.Add(this.category2);
 
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
@@ -161,23 +187,35 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
+                ShortName = "Elem1",
                 Owner = this.someotherDomain
             };
+
+            this.elementDefinitionForUsage1.Category.Add(this.category1);
 
             this.elementDefinitionForUsage2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
+                ShortName = "Elem2",
                 Owner = this.someotherDomain
             };
 
+            this.elementDefinitionForUsage2.Category.Add(this.category1);
+
             this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
+                Container = this.elementDefinitionForUsage1,
+                ShortName = "Usage1",
                 Owner = this.someotherDomain
             };
 
             this.elementUsage2 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
+                Container = this.elementDefinitionForUsage2,
+                ShortName = "Usage2",
                 Owner = this.someotherDomain
             };
+
+            this.elementUsage2.Category.Add(this.category2);
 
             this.elementUsage1.ElementDefinition = this.elementDefinitionForUsage1;
             this.elementUsage2.ElementDefinition = this.elementDefinitionForUsage2;
@@ -213,8 +251,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.parameterCompoundForSubscription.ParameterSubscription.Add(this.parameterSubscriptionCompound);
 
-            this.iteration.Element.Add(elementDefinitionForUsage1);
-            this.iteration.Element.Add(elementDefinitionForUsage2);
+            this.iteration.Element.Add(this.elementDefinitionForUsage1);
+            this.iteration.Element.Add(this.elementDefinitionForUsage2);
 
             this.elementDefinition.Parameter.Add(this.parameter1);
             this.elementDefinition.Parameter.Add(this.parameterCompound);
@@ -590,6 +628,59 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             astate1.Kind = ActualFiniteStateKind.MANDATORY;
             CDPMessageBus.Current.SendObjectChangeEvent(astate1, EventKind.Updated);
             Assert.AreEqual(1, row.ContainedRows.Count);
+        }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage1()
+        {
+            this.elementDefinitionForUsage1.Parameter.Add(this.parameter1);
+
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
+
+            Assert.AreEqual(1, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage2()
+        {
+            this.elementDefinitionForUsage2.Parameter.Add(this.parameter1);
+
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage2, this.activeDomain, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1,
+                this.category2
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementDefinition()
+        {
+            var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementDefinitionRow, false);
+
+            Assert.AreEqual(1, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category2
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
         }
 
         /// <summary>
