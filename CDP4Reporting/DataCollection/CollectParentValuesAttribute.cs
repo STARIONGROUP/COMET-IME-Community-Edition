@@ -29,7 +29,7 @@ namespace CDP4Reporting.DataCollection
 
     /// <summary>
     /// Attribute decorating implementations of <see cref="DataCollectorParameter{TRow,TValue}"/>.
-    /// States that a parameter values should be collected recursively from the tree of <see cref="CategoryDecompositionHierarchy"/>s
+    /// States that a parameter values should be collected recursively from the tree of <see cref="CategoryDecompositionHierarchy"/>s.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class CollectParentValuesAttribute : Attribute
