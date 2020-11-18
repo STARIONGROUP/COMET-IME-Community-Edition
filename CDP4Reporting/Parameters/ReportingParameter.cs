@@ -65,6 +65,11 @@ namespace CDP4Reporting.Parameters
         public Dictionary<object, string> LookUpValues { get; } = new Dictionary<object, string>();
 
         /// <summary>
+        /// Gets or sets a value wheter multiple values should be selectable from the list of lookup values
+        /// </summary>
+        public bool IsMultiValue { get; set; }
+
+        /// <summary>
         /// Gets or sets the default value of the report parameter.
         /// </summary>
         public object DefaultValue { get; set; }

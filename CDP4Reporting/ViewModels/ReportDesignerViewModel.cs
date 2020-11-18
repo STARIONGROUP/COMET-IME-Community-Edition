@@ -854,6 +854,8 @@ namespace CDP4Reporting.ViewModels
                 var staticListLookupSettings = new StaticListLookUpSettings();
                 newReportParameter.LookUpSettings = staticListLookupSettings;
 
+                newReportParameter.MultiValue = reportingParameter.IsMultiValue;
+
                 foreach (var keyValuePair in reportingParameter.LookUpValues)
                 {
                     staticListLookupSettings.LookUpValues.Add(new LookUpValue(keyValuePair.Key, keyValuePair.Value));
