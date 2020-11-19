@@ -43,6 +43,11 @@ namespace CDP4Reporting.DynamicTableChecker
     {
         public void Check(XtraReport report, IDataCollector dataCollector)
         {
+            if (report == null || dataCollector == null)
+            {
+                return;
+            }
+
             var dynamicTableCells = dataCollector.DynamicTableCellsCollector.DynamicTableCells;
 
             foreach (var table in report.AllControls<XRTable>())

@@ -74,6 +74,11 @@ namespace CDP4Reporting.Parameters
         bool ForceDefaultValue { get; set; }
 
         /// <summary>
+        /// Gets or sets a value wheter multiple values should be selectable from the list of lookup values
+        /// </summary>
+        bool IsMultiValue { get; set; }
+
+        /// <summary>
         /// Adds a lookup value to the <see cref="LookUpValues"/> property.
         /// </summary>
         /// <param name="value">
