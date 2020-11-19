@@ -12,8 +12,8 @@
     <Product>CDP4EngineeringModel</Product>
     <Description>CDP4 Engineering Model Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>7.0.0.3</AssemblyVersion>
-    <FileVersion>7.0.0.3</FileVersion>
+    <AssemblyVersion>7.0.0.4</AssemblyVersion>
+    <FileVersion>7.0.0.4</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
