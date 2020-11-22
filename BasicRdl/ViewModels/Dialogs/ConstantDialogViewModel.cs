@@ -1,9 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ConstantDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace BasicRdl.ViewModels
 {
@@ -11,14 +29,19 @@ namespace BasicRdl.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    
     using CDP4CommonView;
+    
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+    using CDP4Dal.Operations;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -32,8 +55,6 @@ namespace BasicRdl.ViewModels
     [ThingDialogViewModelExport(ClassKind.Constant)]
     public class ConstantDialogViewModel : CDP4CommonView.ConstantDialogViewModel, IThingDialogViewModel
     {
-        #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantDialogViewModel"/> class.
         /// </summary>
@@ -87,25 +108,11 @@ namespace BasicRdl.ViewModels
                 this.UpdateOkCanExecute();
             });
         }
-
-        #endregion
-
-        #region Properties & Commands
-
+        
         /// <summary>
         /// Gets a value indicating whether the ParameterType property is ReadOnly.
         /// </summary>
-        public bool IsParameterTypeReadOnly
-        {
-            get
-            {
-                return this.IsReadOnly || this.dialogKind == ThingDialogKind.Update;
-            }
-        }
-
-        #endregion
-
-        #region Methods
+        public bool IsParameterTypeReadOnly => this.IsReadOnly || this.dialogKind == ThingDialogKind.Update;
 
         /// <summary>
         /// Initialize the dialog
@@ -203,7 +210,5 @@ namespace BasicRdl.ViewModels
             base.UpdateOkCanExecute();
             this.OkCanExecute = this.OkCanExecute && this.SelectedParameterType != null && this.Value.Any() && !this.Value.Any(x => string.IsNullOrEmpty(x.Value));
         }
-
-        #endregion
     }
 }

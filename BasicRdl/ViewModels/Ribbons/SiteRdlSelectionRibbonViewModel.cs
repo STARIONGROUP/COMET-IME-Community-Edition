@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SiteRdlSelectionRibbonViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace BasicRdl.ViewModels
 {
@@ -10,17 +29,21 @@ namespace BasicRdl.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Windows.Input;
+
     using CDP4Common.SiteDirectoryData;
+    
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    
     using CDP4Dal;
     using CDP4Dal.Events;
-    using Views;
+   
     using Microsoft.Practices.ServiceLocation;
+    
     using ReactiveUI;
 
     /// <summary>
-    /// The View-Model for <see cref="SiteRdlSelectionRibbon"/>
+    /// The View-Model for <see cref="Views.SiteRdlSelectionRibbon"/>
     /// </summary>
     public class SiteRdlSelectionRibbonViewModel : ReactiveObject
     {
@@ -44,7 +67,6 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private bool hasOpenSiteRdl; 
 
-        #region constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="SiteRdlSelectionRibbonViewModel"/> class.
         /// </summary>
@@ -63,9 +85,7 @@ namespace BasicRdl.ViewModels
             this.CloseSiteRdlCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.HasOpenSiteRdl));
             this.CloseSiteRdlCommand.Subscribe(_ => this.ExecuteCloseSiteRdlSelectorCommand());
         }
-        #endregion
 
-        #region public properties
         /// <summary>
         /// Gets a value indicating whether there are open sessions
         /// </summary>
@@ -97,10 +117,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ICommand"/> to select and close Site Rdls
         /// </summary>
         public ReactiveCommand<object> CloseSiteRdlCommand { get; private set; }
-        #endregion
-
-        #region private method
-
+        
         /// <summary>
         /// Executes the <see cref="OpenSiteRdlSelectorCommand"/> command
         /// </summary>
@@ -141,7 +158,5 @@ namespace BasicRdl.ViewModels
 
             this.HasOpenSiteRdl = this.OpenSessions.SelectMany(x => x.OpenReferenceDataLibraries).Any();
         }
-
-        #endregion
     }
 }

@@ -2,7 +2,7 @@
 // <copyright file="BasicRdlRibbonPartTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -32,20 +32,28 @@ namespace BasicRdl.Tests
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
+
     using BasicRdl.ViewModels;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
     using CDP4Composition.Services.FavoritesService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
     
     /// <summary>
@@ -55,14 +63,9 @@ namespace BasicRdl.Tests
     public class BasicRdlRibbonPartTestFixture
     {
         private Uri uri;
-
-        /// <summary>
-        /// The <see cref="RibbonPart"/> under test
-        /// </summary>
         private BasicRdlRibbonPart ribbonPart;
         private int amountOfRibbonControls;
         private int order;
-        private string ribbonxmlname;
         private Mock<IServiceLocator> serviceLocator;
 
         private Mock<IPanelNavigationService> panelNavigationService;
@@ -78,7 +81,7 @@ namespace BasicRdl.Tests
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.uri = new Uri("http://www.rheageoup.com");
+            this.uri = new Uri("http://www.rheagroup.com");
             this.SetupRecognizePackUir();
 
             this.session = new Mock<ISession>();

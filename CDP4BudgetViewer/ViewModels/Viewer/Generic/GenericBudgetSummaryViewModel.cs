@@ -104,7 +104,7 @@ namespace CDP4Budget.ViewModels
                 }
                 catch (OverflowException e)
                 {
-                    Logger.Error("An overflow exception occurred in the sub-system computation. Value set to 0.");
+                    Logger.Error("An overflow exception occurred in the sub-system computation. Value set to 0.", e);
                     this.TotalWithSystemMargin = 0;
                 }
             }
