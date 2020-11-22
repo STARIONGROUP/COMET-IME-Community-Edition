@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CompoundParameterTypeDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,14 +29,18 @@ namespace BasicRdl.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common;
     using CDP4Common.CommonData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    
     using CDP4Dal;
+    using CDP4Dal.Operations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,7 +50,6 @@ namespace BasicRdl.ViewModels
     [ThingDialogViewModelExport(ClassKind.CompoundParameterType)]
     public class CompoundParameterTypeDialogViewModel : CDP4CommonView.CompoundParameterTypeDialogViewModel, IThingDialogViewModel
     {
-        #region Constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="CompoundParameterTypeDialogViewModel"/> class.
         /// </summary>
@@ -56,15 +78,11 @@ namespace BasicRdl.ViewModels
             : base(compoundParameterType, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
         }
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Gets the possible <see cref="ParameterType"/> to be used for the components
         /// </summary>
         public ReactiveList<ParameterType> PossibleParameterType { get; private set; }
-
-        #endregion
 
         /// <summary>
         /// Update the <see cref="OkCanExecute"/> property
@@ -74,7 +92,6 @@ namespace BasicRdl.ViewModels
             this.UpdateOkCanExecute();
         }
 
-        #region Dialog Base
         /// <summary>
         /// Initializes the dialog
         /// </summary>
@@ -181,8 +198,6 @@ namespace BasicRdl.ViewModels
 
             this.OkCanExecute = this.OkCanExecute && this.Component.Count > 0 && isAllComponentInRdl && isAllComponentValidated;
         }
-
-        #endregion
 
         /// <summary>
         /// Populate the possible <see cref="ScalarParameterType"/> to be used as <see cref="ParameterTypeComponent"/>

@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TermRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,20 +29,21 @@ namespace BasicRdl.ViewModels
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     /// <summary>
     /// The term row view model.
     /// </summary>
     public class TermRowViewModel : CDP4CommonView.TermRowViewModel, IDropTarget
     {
-        #region constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="TermRowViewModel"/> class.
         /// </summary>
@@ -35,9 +55,7 @@ namespace BasicRdl.ViewModels
         {
             this.UpdateProperties();
         }
-        #endregion
-
-        #region RowViewModelBase
+        
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -50,7 +68,6 @@ namespace BasicRdl.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
 
         /// <summary>
         /// Updates this row values
@@ -64,7 +81,6 @@ namespace BasicRdl.ViewModels
             }
         }
 
-        #region IDragSource, IDropTarget
         /// <summary>
         /// Queries whether a drag can be started
         /// </summary>
@@ -163,6 +179,5 @@ namespace BasicRdl.ViewModels
                 throw new NotImplementedException("drag and drop on a different data-source is not implemented yet.");
             }
         }
-        #endregion
     }
 }

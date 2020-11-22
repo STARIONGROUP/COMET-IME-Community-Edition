@@ -273,7 +273,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        public async Task VerifyMoveUpFileType()
+        public void VerifyMoveUpFileType()
         {
             var vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.file);
             Assert.IsFalse(vm.CanMoveUpFileType);
@@ -295,7 +295,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        public async Task VerifyMoveDownFileType()
+        public void VerifyMoveDownFileType()
         {
             var vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.file);
             Assert.IsFalse(vm.CanMoveDownFileType);
@@ -318,7 +318,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        public async Task VerifyDeleteFileType()
+        public void VerifyDeleteFileType()
         {
             var vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.file);
 
@@ -337,7 +337,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        public async Task VerifyAddFileType()
+        public void VerifyAddFileType()
         {
             var vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.file);
 

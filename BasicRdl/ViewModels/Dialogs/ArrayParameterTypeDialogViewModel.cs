@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ArrayParameterTypeDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2016 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,14 +29,18 @@ namespace BasicRdl.ViewModels
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Operations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,8 +50,6 @@ namespace BasicRdl.ViewModels
     [ThingDialogViewModelExport(ClassKind.ArrayParameterType)]
     public class ArrayParameterTypeDialogViewModel : CompoundParameterTypeDialogViewModel
     {
-        #region Fields
-
         /// <summary>
         /// Backing field for <see cref="IsTensor"/>
         /// </summary>
@@ -59,10 +80,6 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private int[] indexDenominator;
 
-        #endregion
-
-        #region Constructor
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ArrayParameterTypeDialogViewModel"/> class.
         /// </summary>
@@ -92,17 +109,13 @@ namespace BasicRdl.ViewModels
         {
         }
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the IsTensor
         /// </summary>
         public bool IsTensor
         {
-            get { return this.isTensor; }
-            set { this.RaiseAndSetIfChanged(ref this.isTensor, value); }
+            get => this.isTensor;
+            set => this.RaiseAndSetIfChanged(ref this.isTensor, value);
         }
 
         /// <summary>
@@ -110,8 +123,8 @@ namespace BasicRdl.ViewModels
         /// </summary>
         public string DimensionString
         {
-            get { return this.dimensionString; }
-            set { this.RaiseAndSetIfChanged(ref this.dimensionString, value); }
+            get => this.dimensionString;
+            set => this.RaiseAndSetIfChanged(ref this.dimensionString, value);
         }
 
         /// <summary>
@@ -119,14 +132,10 @@ namespace BasicRdl.ViewModels
         /// </summary>
         public int NumberOfComponents
         {
-            get { return this.numberOfComponents; }
-            private set { this.RaiseAndSetIfChanged(ref this.numberOfComponents, value); }
+            get => this.numberOfComponents;
+            private set => this.RaiseAndSetIfChanged(ref this.numberOfComponents, value);
         }
 
-        #endregion
-
-        #region Dialog Base
-        
         /// <summary>
         /// Gets the error message for the property with the given name.
         /// </summary>
@@ -259,9 +268,6 @@ namespace BasicRdl.ViewModels
             clone.Dimension.AddRange(this.currentDimension);
         }
 
-        #endregion
-
-        #region Compute Coordinate methods
         /// <summary>
         /// Compute the coordinates of a component from its index in the array
         /// </summary>
@@ -329,6 +335,5 @@ namespace BasicRdl.ViewModels
 
             return offsetSum;
         }
-        #endregion
     }
 }

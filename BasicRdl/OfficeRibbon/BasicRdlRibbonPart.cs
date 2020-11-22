@@ -29,15 +29,20 @@ namespace BasicRdl
     using System.Drawing;
     using System.Reflection;
     using System.Threading.Tasks;
+    
     using BasicRdl.ViewModels;
+    
     using CDP4Common.CommonData;
+    
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.FavoritesService;
+    
     using CDP4Dal;
     using CDP4Dal.Events;
+    
     using NLog;
 
     /// <summary>

@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SiteRdlClosingDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace BasicRdl.ViewModels
 {
@@ -12,17 +31,20 @@ namespace BasicRdl.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
+
     using CDP4Dal;
+
     using ReactiveUI;
-    using Views;
 
     /// <summary>
-    /// The ViewModel for the <see cref="SiteRdlOpeningDialog"/> Dialog
+    /// The ViewModel for the <see cref="Views.SiteRdlOpeningDialog"/> Dialog
     /// </summary>
     public class SiteRdlClosingDialogViewModel : DialogViewModelBase
     {
@@ -54,8 +76,8 @@ namespace BasicRdl.ViewModels
         /// </summary>
         public IRowViewModelBase<Thing> SelectedSiteRdlToClose
         {
-            get { return this.selectedSiteRdlToClose; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSiteRdlToClose, value); }
+            get => this.selectedSiteRdlToClose;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSiteRdlToClose, value);
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 // <copyright file="ParameterTypesBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -15,8 +15,8 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -31,8 +31,10 @@ namespace BasicRdl.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
@@ -42,9 +44,12 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
     using CDP4Composition.Services.FavoritesService;
+    
     using CDP4Dal;
     using CDP4Dal.Events;
+    
     using Microsoft.Practices.ServiceLocation;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -119,18 +124,15 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ParameterTypeRowViewModel"/> that are contained by this view-model
         /// </summary>
-        public DisposableReactiveList<ParameterTypeRowViewModel> ParameterTypes
-        {
-            get { return this.parameterTypes; }
-        }
+        public DisposableReactiveList<ParameterTypeRowViewModel> ParameterTypes => this.parameterTypes;
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="ISession"/> can create a <see cref="ParameterType"/>
         /// </summary>
         public bool CanCreateParameterType
         {
-            get { return this.canCreateParameterType; }
-            set { this.RaiseAndSetIfChanged(ref this.canCreateParameterType, value); }
+            get => this.canCreateParameterType;
+            set => this.RaiseAndSetIfChanged(ref this.canCreateParameterType, value);
         }
 
         /// <summary>
@@ -138,8 +140,8 @@ namespace BasicRdl.ViewModels
         /// </summary>
         public bool ShowOnlyFavorites
         {
-            get { return this.showOnlyFavorites; }
-            set { this.RaiseAndSetIfChanged(ref this.showOnlyFavorites, value); }
+            get => this.showOnlyFavorites;
+            set => this.RaiseAndSetIfChanged(ref this.showOnlyFavorites, value);
         }
 
         /// <summary>

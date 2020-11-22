@@ -2,7 +2,7 @@
 // <copyright file="BasicRdlModule.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -26,13 +26,16 @@
 namespace BasicRdl
 {
     using System.ComponentModel.Composition;
+
     using BasicRdl.Views;
+    
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.FavoritesService;
+    
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
 
