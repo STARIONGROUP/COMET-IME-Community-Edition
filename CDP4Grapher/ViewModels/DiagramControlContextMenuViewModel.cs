@@ -27,7 +27,6 @@ namespace CDP4Grapher.ViewModels
 {
     using System.Collections.Generic;
     using System;
-    using System.Linq;
     using System.Reactive.Linq;
     using System.Windows.Input;
 

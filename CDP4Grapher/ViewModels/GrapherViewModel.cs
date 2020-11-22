@@ -26,11 +26,9 @@
 namespace CDP4Grapher.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
@@ -90,11 +88,6 @@ namespace CDP4Grapher.ViewModels
         /// Holds the current <see cref="Option"/>
         /// </summary>
         private readonly Option option;
-
-        /// <summary>
-        /// Holds the current <see cref="DomainOfExpertise"/>
-        /// </summary>
-        private readonly DomainOfExpertise currentDomainOfExpertise;
 
         /// <summary>
         /// The Panel Caption
@@ -157,11 +150,6 @@ namespace CDP4Grapher.ViewModels
         }
 
         /// <summary>
-        /// The active <see cref="Participant"/>
-        /// </summary>
-        public readonly Participant ActiveParticipant;
-
-        /// <summary>
         /// Gets or sets the collection of <see cref="GraphElementViewModel"/> to display.
         /// </summary>
         public ReactiveList<GraphElementViewModel> GraphElements { get; } = new ReactiveList<GraphElementViewModel>();
@@ -185,14 +173,11 @@ namespace CDP4Grapher.ViewModels
         {
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
             this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
-            this.currentDomainOfExpertise = this.Session.QueryCurrentDomainOfExpertise();
             this.option = option;
 
             this.modelSetup = ((EngineeringModel)this.Thing.TopContainer).EngineeringModelSetup;
 
             this.iterationSetup = ((Iteration)this.Thing.Container).IterationSetup;
-
-            this.ActiveParticipant = this.modelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
 
             this.AddSubscriptions();
 
@@ -258,7 +243,9 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void PopulateElementUsages()
         {
-            var elements = new NestedElementTreeGenerator().Generate(this.option, this.currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Thing.Container);
+
+            var elements = new NestedElementTreeGenerator().Generate(this.option, currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
             this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e)));
         }
 
@@ -268,7 +255,9 @@ namespace CDP4Grapher.ViewModels
         /// <param name="graphElement">The Graph Element</param>
         public void Isolate(GraphElementViewModel graphElement)
         {
-            var newTree = new NestedElementTreeGenerator().GenerateNestedElements(this.option, this.currentDomainOfExpertise, graphElement.Thing.ElementUsage.Last().ElementDefinition)
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Thing.Container);
+
+            var newTree = new NestedElementTreeGenerator().GenerateNestedElements(this.option, currentDomainOfExpertise, graphElement.Thing.ElementUsage.Last().ElementDefinition)
                 .OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
             
             this.GraphElements.Clear();
@@ -293,18 +282,8 @@ namespace CDP4Grapher.ViewModels
             this.CurrentIteration = this.iterationSetup.IterationNumber;
             this.CurrentOption = this.Thing.Name;
 
-            var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing.Container);
-
-            if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
-            {
-                this.DomainOfExpertise = "None";
-            }
-            else
-            {
-                this.DomainOfExpertise = iterationDomainPair.Value.Item1 == null
-                                        ? "None"
-                                        : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
-            }
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Thing.Container);
+            this.DomainOfExpertise = currentDomainOfExpertise == null ? "None" : $"{currentDomainOfExpertise.Name} [{currentDomainOfExpertise.ShortName}]";
 
             this.ClearNestedElementsAndDisposeSubscriptions();
             this.PopulateElementUsages();

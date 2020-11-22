@@ -2,8 +2,7 @@
 // <copyright file="DomainFileStoreBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -27,7 +26,6 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -74,11 +72,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="CurrentIteration"/>
         /// </summary>
         private int currentIteration;
-
-        /// <summary>
-        /// The currently known <see cref="Person"/>
-        /// </summary>
-        private Person currentPerson;
 
         /// <summary>
         /// Backing field for <see cref="CancreateFolder"/>
@@ -311,7 +304,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.CanWriteSelectedThing && this.SelectedThing.Thing is File file && (file.LockedBy != null))
             {
-                if (this.currentPerson != file.LockedBy)
+                if (this.Session.ActivePerson != file.LockedBy)
                 {
                     this.CanWriteSelectedThing = false;
                 }
@@ -451,25 +444,9 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.CurrentModel = this.CurrentEngineeringModelSetup.Name;
             this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
-            this.currentPerson = null;
 
-            if (this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple))
-            {
-                this.currentPerson = tuple?.Item2.Person;
-            }
-
-            var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
-
-            if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
-            {
-                this.DomainOfExpertise = "None";
-            }
-            else
-            {
-                this.DomainOfExpertise = iterationDomainPair.Value?.Item1 == null
-                    ? "None"
-                    : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
-            }
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
+            this.DomainOfExpertise = currentDomainOfExpertise == null ? "None" : $"{currentDomainOfExpertise.Name} [{currentDomainOfExpertise.ShortName}]";
 
             this.UpdateFileStoreRows();
         }

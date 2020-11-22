@@ -130,8 +130,7 @@ namespace CDP4Grapher.Tests.Data
             this.Session = new Mock<ISession>();
             this.Session.Setup(x => x.Assembler).Returns(this.Assembler);
             this.Session.Setup(x => x.ActivePerson).Returns(this.Person);
-            this.Session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(this.Domain);
-            this.Session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>() { { this.Iteration, new Tuple<DomainOfExpertise, Participant>(this.Domain, this.Participant) } });
+            this.Session.Setup(x => x.QuerySelectedDomainOfExpertise(this.Iteration)).Returns(this.Domain);
         }
 
         private void SetupElements()

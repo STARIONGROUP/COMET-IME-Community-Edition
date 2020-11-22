@@ -30,7 +30,6 @@ namespace CDP4Grapher.Tests
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
-    using CDP4Grapher.ViewModels;
     using CDP4Grapher.Views;
 
     using Microsoft.Practices.Prism.Regions;
@@ -40,6 +39,9 @@ namespace CDP4Grapher.Tests
 
     using NUnit.Framework;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="GrapherModule"/> class.
+    /// </summary>
     [TestFixture]
     public class GrapherModuleTestFixture
     {

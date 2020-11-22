@@ -2,8 +2,7 @@
 // <copyright file="ProductTreeViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -58,6 +57,9 @@ namespace ProductTree.Tests
 
     using ReactiveUI;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="ProductTreeViewModel"/> class.
+    /// </summary>
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     internal class ProductTreeViewModelTestFixture
@@ -143,12 +145,14 @@ namespace ProductTree.Tests
             this.iteration.Option.Add(this.option);
             this.iteration.TopElement = this.elementDef;
 
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(new BaseDialogResult(true));
+
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(new BaseDialogResult(true));
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
 
             this.session.Setup(x => x.OpenIterations).Returns(
                 new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -401,25 +405,12 @@ namespace ProductTree.Tests
         [Test]
         public void VerifyThatActiveDomainIsDisplayed()
         {
-            this.session.Setup(x => x.OpenIterations).Returns(
-                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
-                });
-
             var vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
             Assert.AreEqual("domain [domainshortname]", vm.DomainOfExpertise);
 
-            this.session.Setup(x => x.OpenIterations).Returns(
-                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null) }
-                });
-
-            vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
-            Assert.AreEqual("None", vm.DomainOfExpertise);
-
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.domain = null;
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
+            
             vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }

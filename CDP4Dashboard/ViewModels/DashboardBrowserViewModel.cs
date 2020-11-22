@@ -1,13 +1,29 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DashboardBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2020 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Smiechowski Nathanael
+//
+//    This file is part of CDP4-IME Community Edition
+//
+//    The CDP4-IME Community Edition is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU Affero General Public License as
+//    published by the Free Software Foundation, either version 3 of the
+//    License, or(at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU Affero General Public License for more details
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program; If not, see http://www.gnu.org/licenses/
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Dashboard.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -142,7 +158,7 @@ namespace CDP4Dashboard.ViewModels
             this.CurrentModel = this.CurrentEngineeringModelSetup.Name;
             this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
 
-            var currentDomainOfExpertise = this.QueryCurrentDomainOfExpertise();
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
             this.DomainOfExpertise = currentDomainOfExpertise == null ? "None" : $"{currentDomainOfExpertise.Name} [{currentDomainOfExpertise.ShortName}]";
             this.Widgets = new ReactiveList<UserControl>();
 
@@ -478,24 +494,6 @@ namespace CDP4Dashboard.ViewModels
 
                 return null;
             }
-        }
-
-        /// <summary>
-        /// Queries the current <see cref="DomainOfExpertise"/> from the session for the current <see cref="Iteration"/>
-        /// </summary>
-        /// <returns>
-        /// The <see cref="DomainOfExpertise"/> if selected, null otherwise.
-        /// </returns>
-        private DomainOfExpertise QueryCurrentDomainOfExpertise()
-        {
-            var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
-
-            if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
-            {
-                return null;
-            }
-
-            return iterationDomainPair.Value?.Item1;
         }
     }
 }

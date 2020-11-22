@@ -25,15 +25,9 @@
 
 namespace CDP4Grapher.ViewModels
 {
-    using System.Collections.Generic;
-
-    using CDP4Common.EngineeringModelData;
-
     using CDP4Composition.ViewModels;
 
     using CDP4Grapher.Behaviors;
-
-    using DevExpress.Xpf.Bars;
 
     using ReactiveUI;
 

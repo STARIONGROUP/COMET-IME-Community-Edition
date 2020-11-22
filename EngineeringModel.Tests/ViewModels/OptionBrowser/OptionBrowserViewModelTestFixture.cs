@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="OptionBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -16,8 +15,8 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -28,7 +27,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -50,6 +48,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
     using NUnit.Framework;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="OptionBrowserViewModel"/> class.
+    /// </summary>
     [TestFixture]
     internal class OptionBrowserViewModelTestFixture
     {
@@ -101,7 +102,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -240,25 +241,15 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatActiveDomainIsDisplayed()
         {
-            var domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domain" };
-
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null) }
-            });
+            var testDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domain" };
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(testDomain);
 
             var vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                { this.iteration, null }
-            });
+            testDomain = null;
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(testDomain);
 
-            vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
-            Assert.AreEqual("None", vm.DomainOfExpertise);
-
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             vm = new OptionBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }

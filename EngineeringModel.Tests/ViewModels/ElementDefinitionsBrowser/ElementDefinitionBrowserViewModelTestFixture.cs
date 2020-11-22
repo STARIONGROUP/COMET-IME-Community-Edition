@@ -2,8 +2,7 @@
 // <copyright file="ElementDefinitionBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -62,6 +61,9 @@ namespace CDP4EngineeringModel.Tests
     
     using ElementUsageRowViewModel = CDP4EngineeringModel.ViewModels.ElementUsageRowViewModel;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="ElementDefinitionBrowserViewModel"/> class.
+    /// </summary>
     [TestFixture]
     public class ElementDefinitionBrowserViewModelTestFixture
     {
@@ -158,6 +160,7 @@ namespace CDP4EngineeringModel.Tests
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
 
             this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.assembler.Cache.TryAdd(new CacheKey(this.model.Iid, null), new Lazy<Thing>(() => this.model));
@@ -240,16 +243,6 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatNoneIsReturnedUponNullDomain()
-        {
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> {{ this.iteration, new Tuple<DomainOfExpertise, Participant>(null,null) }} );
-            this.iteration.Element.Add(this.elementDef);
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
-
-            Assert.AreEqual("None", vm.DomainOfExpertise);
-        }
-
-        [Test]
         public void VerifyThatParticipantWithoutDomainSelectedCannotDropOnElementDefBrowser()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
@@ -297,7 +290,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatDropsWorkIfNoDomain()
+        public async Task VerifyThatDropsWorkIfNoDomain()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             var dropinfo = new Mock<IDropInfo>();
@@ -305,7 +298,7 @@ namespace CDP4EngineeringModel.Tests
 
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
 
-            vm.Drop(dropinfo.Object);
+            await vm.Drop(dropinfo.Object);
             droptarget.Verify(x => x.Drop(dropinfo.Object), Times.Once);
         }
 
@@ -356,19 +349,13 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatActiveDomainIsDisplayed()
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain" };
-
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, this.participant) }
-            });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null) }
-            });
+            domainOfExpertise = null;
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
             vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
@@ -378,12 +365,8 @@ namespace CDP4EngineeringModel.Tests
         public void VerifThatIfDomainIsRenamedBrowserIsUpdated()
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
-
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, null) }
-            });
-
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
+            
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("System [SYS]", vm.DomainOfExpertise);
 
@@ -398,11 +381,7 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatIfEngineeringModelSetupIsChangedBrowserIsUpdated()
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
-
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domainOfExpertise, null) }
-            });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("ModelSetup", vm.CurrentModel);
@@ -420,12 +399,7 @@ namespace CDP4EngineeringModel.Tests
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
 
             var dropinfo = new Mock<IDropInfo>();
-            this.session.Setup(x => x.OpenIterations)
-                .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(new DomainOfExpertise(), null)}
-                });
-
+            
             var target = new Mock<IDropTarget>();
             dropinfo.Setup(x => x.TargetItem).Returns(target.Object);
 
@@ -441,22 +415,14 @@ namespace CDP4EngineeringModel.Tests
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
 
             var dropinfo = new Mock<IDropInfo>();
-            this.session.Setup(x => x.OpenIterations)
-                .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(new DomainOfExpertise(), null)}
-                });
-
 
             dropinfo.Setup(x => x.Payload).Returns(this.elementDef);
-
             dropinfo.SetupProperty(x => x.Effects);
             dropinfo.Object.Effects = DragDropEffects.All;
 
             vm.DragOver(dropinfo.Object);
             Assert.AreNotEqual(DragDropEffects.All, dropinfo.Object.Effects);
         }
-
 
         [Test]
         public async Task VerifyDropElementDef()

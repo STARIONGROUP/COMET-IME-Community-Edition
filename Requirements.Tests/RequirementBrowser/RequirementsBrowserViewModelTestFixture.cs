@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests.RequirementBrowser
 {
@@ -11,8 +30,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
-    using System.Threading.Tasks;
-
+    
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -36,6 +54,9 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
     using ReactiveUI;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="RequirementsBrowserViewModel"/> class.
+    /// </summary>
     [TestFixture]
     public class RequirementBrowserViewModelTestFixture
     {
@@ -87,9 +108,10 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.panelNavigation = new Mock<IPanelNavigationService>();
             this.dialogNavigation = new Mock<IThingDialogNavigationService>();
 
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "test" };
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "test", ShortName = "test"};
             this.reqSpec.Owner = this.domain;
-
+            this.participant.Domain.Add(this.domain);
+            
             this.iteration.RequirementsSpecification.Add(this.reqSpec);
             this.iteration.IterationSetup = this.iterationSetup;
             this.model.EngineeringModelSetup = this.modelSetup;
@@ -99,7 +121,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString());
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, this.participant) } });
+            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
         }
 
         [TearDown]
@@ -138,7 +161,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             Assert.AreEqual(this.participant, vm.ActiveParticipant);
             Assert.AreEqual("Requirements, iteration_0", vm.Caption);
             Assert.AreEqual("model", vm.CurrentModel);
-            Assert.AreEqual("None", vm.DomainOfExpertise);
+            Assert.AreEqual("test [test]", vm.DomainOfExpertise);
             Assert.AreEqual("model\nhttp://www.rheagroup.com/\n ", vm.ToolTip);
         }
 
@@ -151,12 +174,10 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             });
 
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
-            Assert.AreEqual("test []", vm.DomainOfExpertise);
+            Assert.AreEqual("test [test]", vm.DomainOfExpertise);
 
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                { this.iteration, null }
-            });
+            DomainOfExpertise domainOfExpertise = null;
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
             vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);

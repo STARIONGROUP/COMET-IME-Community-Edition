@@ -2,8 +2,7 @@
 // <copyright file="CommonFileStoreBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -50,6 +49,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     
     using NUnit.Framework;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="CommonFileStoreBrowserViewModel"/> class.
+    /// </summary>
     [TestFixture]
     public class CommonFileStoreBrowserViewModelTestFixture
     {
@@ -199,7 +201,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             
             Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
-            Assert.That(vm.DomainOfExpertise, Is.Not.Null.Or.Empty);
+            Assert.That(vm.DomainOfExpertise, Is.Null.Or.Empty);
             Assert.AreEqual(this.engineeringModelSetup.Name, vm.CurrentModel);
             Assert.AreEqual(this.iterationSetup.IterationNumber, vm.CurrentIteration);
 

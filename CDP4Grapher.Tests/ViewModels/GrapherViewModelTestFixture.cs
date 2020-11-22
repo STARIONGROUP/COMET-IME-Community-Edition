@@ -23,18 +23,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Grapher.Tests.ViewModels
 {
     using System;
     using System.Linq;
     using System.Reactive.Concurrency;
-    using System.Security.Policy;
     using System.Threading;
 
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
+    
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -53,6 +50,9 @@ namespace CDP4Grapher.Tests.ViewModels
 
     using Assert = NUnit.Framework.Assert;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="GrapherViewModel"/> class.
+    /// </summary>
     [TestFixture, Apartment(ApartmentState.STA)]
     public class GrapherViewModelTestFixture : GrapherBaseTestData
     {

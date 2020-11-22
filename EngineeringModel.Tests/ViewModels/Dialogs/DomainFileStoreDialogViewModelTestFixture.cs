@@ -2,8 +2,7 @@
 // <copyright file="DomainFileStoreDialogViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -54,7 +53,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using ReactiveUI;
 
     /// <summary>
-    /// Suite of tests for the <see cref="DomainFileStoreDialogViewModel"/>
+    /// Suite of tests for the <see cref="DomainFileStoreDialogViewModel"/> class.
     /// </summary>
     [TestFixture]
     public class DomainFileStoreDialogViewModelTestFixture
@@ -65,6 +64,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private Mock<ISession> session;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
 
+        private Iteration iteration;
         private Iteration iterationClone;
         private EngineeringModel engineeringModel;
         private DomainOfExpertise domainOfExpertise;
@@ -98,15 +98,15 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             srdl.DefinedCategory.Add(new Category(Guid.NewGuid(), this.cache, this.uri));
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.engineeringModel.EngineeringModelSetup = engineeringModelSetup;
-            var iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = new IterationSetup() };
+            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = new IterationSetup() };
             this.engineeringModel.Iteration.Add(iteration);
             this.domainFileStore = new DomainFileStore(Guid.NewGuid(), this.cache, this.uri);
-            iteration.DomainFileStore.Add(this.domainFileStore);
+            this.iteration.DomainFileStore.Add(this.domainFileStore);
 
-            this.cache.TryAdd(new CacheKey(iteration.Iid, null), new Lazy<Thing>(() => iteration));
-            this.iterationClone = iteration.Clone(false);
+            this.cache.TryAdd(new CacheKey(iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.iterationClone = this.iteration.Clone(false);
 
-            var transactionContext = TransactionContextResolver.ResolveContext(iteration);
+            var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
             this.thingTransaction = new ThingTransaction(transactionContext, this.iterationClone);
 
             var dal = new Mock<IDal>();
@@ -114,10 +114,10 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.session.Setup(x => x.Dal).Returns(dal.Object);
 
             var openIterations = new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>();
-            openIterations.Add(iteration, new Tuple<DomainOfExpertise, Participant>(this.domainOfExpertise, this.participant));
+            openIterations.Add(this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domainOfExpertise, this.participant));
 
             this.session.Setup(x => x.OpenIterations).Returns(openIterations);
-            this.session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(this.domainOfExpertise);
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domainOfExpertise);
 
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }

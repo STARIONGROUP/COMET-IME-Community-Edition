@@ -1,34 +1,63 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BudgetViewerViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Smiechowski Nathanael
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Budget.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reactive.Linq;
+
+    using Config;
+    using ConfigFile;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using Config;
-    using ConfigFile;
+
     using Microsoft.Practices.ServiceLocation;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
+    
     using NLog;
+    
     using ReactiveUI;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class BudgetViewerViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel
     {
         /// <summary>
@@ -88,7 +117,7 @@ namespace CDP4Budget.ViewModels
             this.CurrentModel = this.CurrentEngineeringModelSetup.Name;
             this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
 
-            var currentDomainOfExpertise = this.QueryCurrentDomainOfExpertise();
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
             this.DomainOfExpertise = currentDomainOfExpertise == null ? "None" : $"{currentDomainOfExpertise.Name} [{currentDomainOfExpertise.ShortName}]";
 
             this.OptionOverviewViewModel = new OptionOverviewViewModel();
@@ -109,7 +138,6 @@ namespace CDP4Budget.ViewModels
             this.ComputeBudgets();
         }
 
-        #region Header Properties
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
@@ -135,16 +163,6 @@ namespace CDP4Budget.ViewModels
             get { return this.currentIteration; }
             private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
         }
-
-        /// <summary>
-        /// Gets the current <see cref="DomainOfExpertise"/> name
-        /// </summary>
-        public string DomainOfExpertise
-        {
-            get { return this.domainOfExpertise; }
-            private set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
-        }
-#endregion
 
         /// <summary>
         /// Gets the <see cref="BudgetConfig"/>
@@ -325,23 +343,6 @@ namespace CDP4Budget.ViewModels
             {
                 logger.Error("An exception occurred when reading the configuration file {0}", e.Message);
             }
-        }
-
-        /// <summary>
-        /// Queries the current <see cref="DomainOfExpertise"/> from the session for the current <see cref="Iteration"/>
-        /// </summary>
-        /// <returns>
-        /// The <see cref="DomainOfExpertise"/> if selected, null otherwise.
-        /// </returns>
-        private DomainOfExpertise QueryCurrentDomainOfExpertise()
-        {
-            var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
-            if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
-            {
-                return null;
-            }
-
-            return iterationDomainPair.Value?.Item1;
         }
     }
 }
