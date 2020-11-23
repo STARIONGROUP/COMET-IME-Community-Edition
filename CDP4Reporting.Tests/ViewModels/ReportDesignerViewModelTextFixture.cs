@@ -520,7 +520,7 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             this.iteration.DefaultOption = tuple.option;
 
-            this.session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(tuple.domain);
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(tuple.domain);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 

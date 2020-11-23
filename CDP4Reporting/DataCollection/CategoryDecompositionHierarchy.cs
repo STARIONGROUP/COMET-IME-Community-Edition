@@ -110,8 +110,15 @@ namespace CDP4Reporting.DataCollection
             /// </returns>
             private Category GetCategoryByShortName(string shortName)
             {
-                return this.categoriesInRequiredRdl
-                    .Single(x => x.ShortName == shortName);
+                var category = this.categoriesInRequiredRdl
+                    .SingleOrDefault(x => x.ShortName == shortName);
+
+                if (category == null)
+                {
+                    throw new NotSupportedException($"Category {shortName} not found.");
+                }
+
+                return category;
             }
 
             /// <summary>

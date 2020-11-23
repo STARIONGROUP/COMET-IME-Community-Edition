@@ -145,7 +145,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
                 ShortName = "d"
             };
 
-            this.session.Setup(x => x.QueryDomainOfExpertise()).Returns(new List<DomainOfExpertise>() { this.domain });
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(new List<DomainOfExpertise>() { this.domain });
 
             this.fileType1 = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Extension = "jpg" };
             this.fileType2 = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Extension = "zip" };

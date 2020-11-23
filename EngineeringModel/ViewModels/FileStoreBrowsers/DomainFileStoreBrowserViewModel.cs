@@ -323,7 +323,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             if (this.SelectedThing is IOwnedThingViewModel ownedThing)
             {
-                return this.Session.QueryDomainOfExpertise().Contains(ownedThing.Owner);
+                return this.Session.QueryDomainOfExpertise(this.Thing).Contains(ownedThing.Owner);
             }
 
             return null;

@@ -121,7 +121,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             openIterations.Add(iteration, new Tuple<DomainOfExpertise, Participant>(this.domainOfExpertise, this.participant));
 
             this.session.Setup(x => x.OpenIterations).Returns(openIterations);
-            this.session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(this.domainOfExpertise);
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domainOfExpertise);
 
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }

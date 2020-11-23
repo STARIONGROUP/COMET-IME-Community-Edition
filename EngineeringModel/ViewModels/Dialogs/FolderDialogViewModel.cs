@@ -124,10 +124,10 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreatedOn = this.Thing.CreatedOn.Equals(DateTime.MinValue) ? DateTime.UtcNow : this.Thing.CreatedOn;
 
+            var iteration = this.Container.GetContainerOfType<Iteration>();
+
             if (this.SelectedCreator == null)
             {
-                var iteration = this.Container.GetContainerOfType<Iteration>();
-
                 if (iteration != null)
                 {
                     this.Session.OpenIterations.TryGetValue(iteration, out var tuple);
@@ -135,7 +135,9 @@ namespace CDP4EngineeringModel.ViewModels
                 }
             }
 
-            this.SelectedOwner = this.SelectedOwner ?? this.Session.QueryCurrentDomainOfExpertise();
+            this.SelectedOwner = 
+                this.SelectedOwner ?? 
+                (iteration == null ? null : this.Session.QuerySelectedDomainOfExpertise(iteration));
         }
 
         /// <summary>

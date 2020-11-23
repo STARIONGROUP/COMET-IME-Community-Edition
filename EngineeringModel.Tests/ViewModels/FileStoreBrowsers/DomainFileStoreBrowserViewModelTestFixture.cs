@@ -144,7 +144,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
                 ShortName = "d"
             };
 
-            this.session.Setup(x => x.QueryDomainOfExpertise()).Returns(new List<DomainOfExpertise>() { this.domain });
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(new List<DomainOfExpertise>() { this.domain });
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -356,7 +356,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             this.vm.SelectedThing = storeRow;
             Assert.IsTrue(this.vm.CanWriteSelectedThing);
 
-            this.session.Setup(x => x.QueryDomainOfExpertise()).Returns(new[] { this.domain });
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(new[] { this.domain });
 
             Assert.IsTrue(this.vm.CanWriteSelectedThing);
 
