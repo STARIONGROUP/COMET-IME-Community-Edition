@@ -28,6 +28,7 @@ namespace BasicRdl.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+
     using BasicRdl.ViewModels;
 
     using CDP4Common.CommonData;

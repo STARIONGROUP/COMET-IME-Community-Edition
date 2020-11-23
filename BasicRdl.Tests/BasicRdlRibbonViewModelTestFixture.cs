@@ -28,19 +28,27 @@ namespace BasicRdl.Tests
     using System;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+
     using BasicRdl.ViewModels;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services;
     using CDP4Composition.Services.FavoritesService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]

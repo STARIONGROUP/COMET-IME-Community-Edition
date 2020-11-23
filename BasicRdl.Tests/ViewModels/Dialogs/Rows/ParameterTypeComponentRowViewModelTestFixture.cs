@@ -29,18 +29,25 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    
     using BasicRdl.ViewModels;
+    
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+    
     using CDP4Composition.Navigation;
+    
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+    
     using Moq;
+    
     using NUnit.Framework;
+    
     using ReactiveUI;
 
     [TestFixture]
