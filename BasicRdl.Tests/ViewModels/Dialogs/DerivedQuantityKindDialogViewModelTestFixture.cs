@@ -45,7 +45,6 @@ namespace BasicRdl.Tests.ViewModels
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
-    
     using CDP4Dal.Permission;
 
     using Moq;

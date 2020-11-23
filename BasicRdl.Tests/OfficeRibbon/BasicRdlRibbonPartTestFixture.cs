@@ -67,7 +67,6 @@ namespace BasicRdl.Tests
         private int amountOfRibbonControls;
         private int order;
         private Mock<IServiceLocator> serviceLocator;
-
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> dialogNavigationService;
         private Mock<IPermissionService> permittingPermissionService;

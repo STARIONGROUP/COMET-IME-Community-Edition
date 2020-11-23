@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ConstantsBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,7 +29,9 @@ namespace BasicRDL.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+
     using BasicRdl.ViewModels;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
 
@@ -20,8 +41,11 @@ namespace BasicRDL.Tests.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
     
     /// <summary>
@@ -30,37 +54,15 @@ namespace BasicRDL.Tests.ViewModels
     [TestFixture]
     public class ConstantsBrowserViewModelTestFixture
     {
-        /// <summary>
-        /// A mock of the session.
-        /// </summary>
         private Mock<ISession> session;
-
         private Mock<IThingDialogNavigationService> dialogNavigation;
         private Mock<IPanelNavigationService> navigation;
         private Mock<IPermissionService> permissionService;
-
-        /// <summary>
-        /// The uri.
-        /// </summary>
         private Uri uri;
-
-        /// <summary>
-        /// The <see cref="SiteDirectory"/> that is being represented by the <see cref="ConstantsBrowserViewModel"/> under test
-        /// </summary>
         private SiteDirectory siteDirectory;
-
-        /// <summary>
-        /// The glossary tree view model.
-        /// </summary>
         private ConstantsBrowserViewModel browser;
-
-        /// <summary>
-        /// The list of all open (Site and Model) RDLs 
-        /// </summary>
         private List<ReferenceDataLibrary> openRdlList;
-
         private Person person;
-
         private Assembler assembler;
 
         [SetUp]

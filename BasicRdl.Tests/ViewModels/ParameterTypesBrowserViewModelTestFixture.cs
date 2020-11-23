@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypesBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,19 +28,25 @@ namespace BasicRdl.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using BasicRdl.ViewModels;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.FavoritesService;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -37,24 +62,10 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IThingDialogNavigationService> dialogNavigationService;
         private Mock<IFilterStringService> filterStringService;
         private Mock<IServiceLocator> serviceLocator;
-
-        /// <summary>
-        /// The uri.
-        /// </summary>
         private Uri uri;
-
-        /// <summary>
-        /// The <see cref="SiteDirectory"/> that is being represented by the <see cref="ParameterTypesBrowserViewModel"/> under test
-        /// </summary>
         private SiteDirectory siteDirectory;
-
-        /// <summary>
-        /// The <see cref="ParameterTypesBrowserViewModel"/> that is the subject of the test-fixture
-        /// </summary>
         private ParameterTypesBrowserViewModel ParameterTypesBrowserViewModel;
-
         private Person person;
-
         private Assembler assembler;
 
         [SetUp]
@@ -76,17 +87,22 @@ namespace BasicRdl.Tests.ViewModels
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.favoritesService = new Mock<IFavoritesService>();
+
             this.favoritesService.Setup(x => x.GetFavoriteItemsCollectionByType(It.IsAny<ISession>(), It.IsAny<Type>()))
                 .Returns(new HashSet<Guid>());
+
             this.favoritesService.Setup(x =>
                 x.SubscribeToChanges(It.IsAny<ISession>(), It.IsAny<Type>(), It.IsAny<Action<HashSet<Guid>>>())).Returns(new Mock<IDisposable>().Object);
+
             this.uri = new Uri("http://test.com");
             this.assembler = new Assembler(this.uri);
 
             this.siteDirectory =
-                new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "site directory"};
+                new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
+
             this.person =
-                new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) {GivenName = "John", Surname = "Doe"};
+                new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
+
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
@@ -129,8 +145,10 @@ namespace BasicRdl.Tests.ViewModels
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
             var defaultScale = new CyclicRatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             var simpleQuantityKind =
-                new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) {DefaultScale = defaultScale};
+                new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale };
+
             CDPMessageBus.Current.SendObjectChangeEvent(simpleQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             CDPMessageBus.Current.SendObjectChangeEvent(simpleQuantityKind, EventKind.Removed);
@@ -141,13 +159,15 @@ namespace BasicRdl.Tests.ViewModels
                 {
                     DefaultScale = defaultScale
                 };
+
             CDPMessageBus.Current.SendObjectChangeEvent(specializedQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             CDPMessageBus.Current.SendObjectChangeEvent(specializedQuantityKind, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
             var derivedQuantityKind =
-                new DerivedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) {DefaultScale = defaultScale};
+                new DerivedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale };
+
             CDPMessageBus.Current.SendObjectChangeEvent(derivedQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             CDPMessageBus.Current.SendObjectChangeEvent(derivedQuantityKind, EventKind.Removed);
@@ -172,6 +192,7 @@ namespace BasicRdl.Tests.ViewModels
             modelReferenceDataLibrary.ParameterType.Add(pt4);
             engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
             this.siteDirectory.Model.Add(engineeringModelSetup);
+
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(
                 new HashSet<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary)
                 {
@@ -180,6 +201,7 @@ namespace BasicRdl.Tests.ViewModels
 
             var browser = new ParameterTypesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null,
                 null, this.favoritesService.Object);
+
             Assert.AreEqual(4, browser.ParameterTypes.Count);
             Assert.IsNotNull(browser.ParameterTypes.First().Thing);
 
@@ -202,6 +224,7 @@ namespace BasicRdl.Tests.ViewModels
                 ShortName = "1",
                 Container = sRdl
             };
+            
             var cat2 = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "cat2",
