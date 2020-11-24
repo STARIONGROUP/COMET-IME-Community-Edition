@@ -1,10 +1,10 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
-//    This file is part of CDP4-IME Community Edition.
+//    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -21,14 +21,12 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -58,7 +56,6 @@ namespace CDP4EngineeringModel.ViewModels
     
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
-
 
     using NLog;
     
@@ -124,7 +121,7 @@ namespace CDP4EngineeringModel.ViewModels
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = "Element Definitions";
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.ElementDefinitionRowViewModels = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.UpdateElementDefinition();
@@ -864,25 +861,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.CurrentModel = this.CurrentEngineeringModelSetup.Name;
             this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
 
-            var currentDomainOfExpertise = this.QueryCurrentDomainOfExpertise();
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
             this.DomainOfExpertise = currentDomainOfExpertise == null ? "None" : $"{currentDomainOfExpertise.Name} [{currentDomainOfExpertise.ShortName}]";
-        }
-
-        /// <summary>
-        /// Queries the current <see cref="DomainOfExpertise"/> from the session for the current <see cref="Iteration"/>
-        /// </summary>
-        /// <returns>
-        /// The <see cref="DomainOfExpertise"/> if selected, null otherwise.
-        /// </returns>
-        private DomainOfExpertise QueryCurrentDomainOfExpertise()
-        {
-            var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
-            if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
-            {
-                return null;
-            }
-
-            return (iterationDomainPair.Value == null) || (iterationDomainPair.Value.Item1 == null) ? null : iterationDomainPair.Value.Item1;
         }
 
         /// <summary>

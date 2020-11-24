@@ -23,7 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Grapher.Tests.ViewModels
 {
     using System;
@@ -48,6 +47,9 @@ namespace CDP4Grapher.Tests.ViewModels
 
     using ReactiveUI;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="DiagramControlContextMenuViewModel"/> class.
+    /// </summary>
     [TestFixture, Apartment(ApartmentState.STA)]
     public class DiagramControlContextMenuViewModelTestFixture
     {

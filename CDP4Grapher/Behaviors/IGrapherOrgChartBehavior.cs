@@ -29,7 +29,6 @@ namespace CDP4Grapher.Behaviors
     using System;
 
     using CDP4Grapher.Utilities;
-    using CDP4Grapher.ViewModels;
 
     using DevExpress.Diagram.Core;
 

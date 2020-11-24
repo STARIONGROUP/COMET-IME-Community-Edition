@@ -23,7 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Grapher.Tests.ViewModels
 {
     using CDP4Dal;
@@ -34,6 +33,9 @@ namespace CDP4Grapher.Tests.ViewModels
 
     using NUnit.Framework;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="GraphElementViewModel"/> class.
+    /// </summary>
     [TestFixture]
     public class GraphElementViewModelTestFixture : GrapherBaseTestData
     {

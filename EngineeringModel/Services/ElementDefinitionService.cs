@@ -1,17 +1,36 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ElementDef1initionService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2018 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ElementDefinitionService.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Services
 {
-    using System;
     using System.Linq;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using CDP4Common.SiteDirectoryData;
+
     using CDP4Common.EngineeringModelData;
+
     using CDP4Dal;
     using CDP4Dal.Operations;
 
@@ -38,7 +57,7 @@ namespace CDP4EngineeringModel.Services
         /// </returns>
         public static async Task CreateElementDefinitionFromTemplate(ISession session, Iteration iteration, ElementDefinition elementDefinition)
         {
-            var owner = QueryCurrentDomainOfExpertise(session, iteration);
+            var owner = session.QuerySelectedDomainOfExpertise(iteration);
             if (owner == null)
             {
                 return;
@@ -88,23 +107,6 @@ namespace CDP4EngineeringModel.Services
                 var updateOperationContainer = updateTransaction.FinalizeTransaction();
                 await session.Write(updateOperationContainer);
             }
-        }
-
-        /// <summary>
-        /// Queries the current <see cref="DomainOfExpertise"/> from the session for the current <see cref="Iteration"/>
-        /// </summary>
-        /// <returns>
-        /// The <see cref="DomainOfExpertise"/> if selected, null otherwise.
-        /// </returns>
-        private static DomainOfExpertise QueryCurrentDomainOfExpertise(ISession session, Iteration iteration)
-        {
-            var iterationDomainPair = session.OpenIterations.SingleOrDefault(x => x.Key == iteration);
-            if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
-            {
-                return null;
-            }
-
-            return (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null) ? null : iterationDomainPair.Value.Item1;
         }
     }
 }

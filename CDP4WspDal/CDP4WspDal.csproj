@@ -41,7 +41,7 @@
       <IncludeAssets></IncludeAssets>
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="6.3.0">
+    <PackageReference Include="CDP4Dal-CE" Version="7.0.0">
       <IncludeAssets></IncludeAssets>
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -49,7 +49,7 @@
       <IncludeAssets></IncludeAssets>
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4WspDal-CE" Version="6.3.0">
+    <PackageReference Include="CDP4WspDal-CE" Version="7.0.0">
       <IncludeAssets></IncludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">

@@ -407,8 +407,13 @@ namespace CDP4EngineeringModel.ViewModels
             var isOwner = false;
 
             if (this.Container is File file)
-            {
-                isOwner = this.Session.QueryDomainOfExpertise().Contains(file.Owner);
+            {                
+                var iteration = this.Container.GetContainerOfType<Iteration>();
+
+                if (iteration != null)
+                {
+                    isOwner = this.Session.QueryDomainOfExpertise(iteration).Contains(file.Owner);
+                }
             }
 
             this.CanDownloadFile = (this.Thing != null) && isOwner && (this.dialogKind != ThingDialogKind.Create) && this.PermissionService.CanRead(this.Thing);

@@ -266,7 +266,9 @@ namespace CDP4EngineeringModel.ViewModels
             this.IsLocked = this.SelectedLockedBy != null;
             this.LockedBy = this.SelectedLockedBy?.Name;
 
-            this.SelectedOwner = this.SelectedOwner ?? this.Session.QueryCurrentDomainOfExpertise();
+            this.SelectedOwner = 
+                this.SelectedOwner ?? 
+                (iteration == null ? null : this.Session.QuerySelectedDomainOfExpertise(iteration));
 
             this.CurrentFileRevision = this.Thing.CurrentFileRevision;
         }

@@ -28,8 +28,7 @@ namespace CDP4Grapher.ViewModels
     using System;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Text;
-
+    
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 

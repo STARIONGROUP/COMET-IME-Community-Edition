@@ -179,7 +179,7 @@ namespace CDP4Reporting.Tests.DataCollection
             };
 
             this.session = new Mock<ISession>();
-            this.session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(this.domain);
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domain);
 
             // Element Definitions
             this.ed1 = new ElementDefinition(Guid.NewGuid(), this.cache, null)

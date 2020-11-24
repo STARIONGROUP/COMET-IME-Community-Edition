@@ -27,7 +27,6 @@ namespace CDP4Grapher.Tests.ViewModels
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using System.Threading;
 
     using CDP4Common.CommonData;
@@ -47,6 +46,9 @@ namespace CDP4Grapher.Tests.ViewModels
 
     using NUnit.Framework;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="GrapherRibbonViewModel"/> class.
+    /// </summary>
     [TestFixture, Apartment(ApartmentState.STA)]
     public class GrapherRibbonViewModelTestFixture
     {
@@ -120,8 +122,7 @@ namespace CDP4Grapher.Tests.ViewModels
             this.engineeringModel.Iteration.Add(this.iteration);
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(this.domain);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>() { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
             this.thingNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();

@@ -2,8 +2,7 @@
 // <copyright file="DomainFileStoreBrowserRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -54,8 +53,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
     
     using ReactiveUI;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="DomainFileStoreBrowserRibbonViewModel"/> class.
+    /// </summary>
     [TestFixture]
-    class DomainFileStoreBrowserRibbonViewModelTestFixture
+    public class DomainFileStoreBrowserRibbonViewModelTestFixture
     {
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;

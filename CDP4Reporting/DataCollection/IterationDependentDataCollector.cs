@@ -74,7 +74,7 @@ namespace CDP4Reporting.DataCollection
         {
             this.Iteration = iteration;
             this.Session = session;
-            this.DomainOfExpertise = session.QueryCurrentDomainOfExpertise();
+            this.DomainOfExpertise = session.QuerySelectedDomainOfExpertise(iteration);
             this.OpenReferenceDataLibraries = session.OpenReferenceDataLibraries;
             this.SiteDirectory = session.RetrieveSiteDirectory();
         }

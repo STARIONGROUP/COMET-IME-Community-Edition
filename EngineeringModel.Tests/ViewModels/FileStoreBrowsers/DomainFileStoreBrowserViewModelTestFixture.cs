@@ -59,8 +59,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
 
     using ReactiveUI;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="DomainFileStoreBrowserViewModel"/> class.
+    /// </summary>
     [TestFixture]
-    class DomainFileStoreBrowserViewModelTestFixture
+    public class DomainFileStoreBrowserViewModelTestFixture
     {
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -141,7 +144,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
                 ShortName = "d"
             };
 
-            this.session.Setup(x => x.QueryDomainOfExpertise()).Returns(new List<DomainOfExpertise>() { this.domain });
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(new List<DomainOfExpertise>() { this.domain });
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -176,14 +179,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            this.session.Setup(x => x.OpenIterations)
-                .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) }
-                });
-
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
 
             this.store = new DomainFileStore(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -359,7 +356,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             this.vm.SelectedThing = storeRow;
             Assert.IsTrue(this.vm.CanWriteSelectedThing);
 
-            this.session.Setup(x => x.QueryDomainOfExpertise()).Returns(new[] { this.domain });
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(new[] { this.domain });
 
             Assert.IsTrue(this.vm.CanWriteSelectedThing);
 

@@ -104,7 +104,7 @@ namespace CDP4Reporting.Tests.DataCollection
         [Test]
         public void VerifyThatBuilderThrowsOnUnkownCategory()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<NotSupportedException>(() =>
                 new CategoryDecompositionHierarchy.Builder(this.iteration, "unknown_cat"));
         }
 

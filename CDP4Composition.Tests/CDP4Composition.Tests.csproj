@@ -30,7 +30,7 @@
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
     <PackageReference Include="CDP4Common-CE" Version="6.3.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="7.0.0" />
     <PackageReference Include="CDP4JsonSerializer-CE" Version="6.3.0" />
     <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.5.0" />
     <PackageReference Include="CommonServiceLocator" Version="1.3" />

@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,21 +32,28 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;    
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
+    
     using CDP4Dal;    
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+    
     using CDP4EngineeringModel.ViewModels;
+    
     using Microsoft.Practices.ServiceLocation;
+    
     using Moq;
+    
     using NUnit.Framework;
 
     /// <summary>
@@ -98,7 +124,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
@@ -150,11 +176,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [Test]
         public void VerifyThatViewModelPropertiesAreSet()
         {
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
-            });
-
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             Assert.AreEqual("Rule Verification Lists, iteration_0", viewmodel.Caption);
             Assert.AreEqual("model\nhttp://test.com/\n ", viewmodel.ToolTip);
@@ -315,23 +336,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [Test]
         public void VerifyThatActiveDomainIsDisplayed()
         {
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
-            });
-
             var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null) }
-            });
+            this.domain = null;
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
 
-            vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
-            Assert.AreEqual("None", vm.DomainOfExpertise);
-
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
@@ -359,12 +369,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [Test]
         public void VerifyThatIfRuleVerificationListIsSelecedTheRulesCanBeVerified()
         {
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
-            });
-
-
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri)
             {
                 Owner = this.domain
