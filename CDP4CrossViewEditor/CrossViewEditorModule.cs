@@ -26,12 +26,14 @@
 namespace CDP4CrossViewEditor
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.PluginSettingService;
+
     using CDP4OfficeInfrastructure;
+
     using Microsoft.Practices.Prism.Modularity;
 
     /// <summary>
@@ -90,11 +92,6 @@ namespace CDP4CrossViewEditor
         internal IDialogNavigationService DialogNavigationService { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
-        /// </summary>
-        internal IPluginSettingsService PluginSettingsService { get; private set; }
-
-        /// <summary>
         /// Gets the <see cref="IOfficeApplicationWrapper"/> used in the application
         /// </summary>
         internal IOfficeApplicationWrapper OfficeApplicationWrapper { get; private set; }
@@ -112,7 +109,7 @@ namespace CDP4CrossViewEditor
         /// </summary>
         private void RegisterRibbonPart()
         {
-            var ribbonPart = new CrossViewEditorRibbonPart(3000, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.OfficeApplicationWrapper);
+            var ribbonPart = new CrossViewEditorRibbonPart(3000, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, null, this.OfficeApplicationWrapper);
             this.RibbonManager.RegisterRibbonPart(ribbonPart);
         }
     }

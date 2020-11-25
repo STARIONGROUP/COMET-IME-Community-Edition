@@ -225,27 +225,28 @@ namespace CDP4CrossViewEditor
         {
             var menuxml = string.Empty;
 
-            if (ribbonControlId == "Editor")
+            if (ribbonControlId != "Editor")
             {
-                var sb = new StringBuilder();
-                sb.Append(@"<menu xmlns=""http://schemas.microsoft.com/office/2006/01/customui"">");
-
-                foreach (var iteration in this.Iterations)
-                {
-                    var engineeringModel = (EngineeringModel) iteration.Container;
-
-                    var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
-
-                    var domainShortName = selectedDomainOfExpertise == null ? string.Empty : selectedDomainOfExpertise.ShortName;
-                    var label = $"{engineeringModel.EngineeringModelSetup.ShortName} - {iteration.IterationSetup.IterationNumber} : [{domainShortName}]";
-
-                    var menuContent = string.Format("<button id=\"Editor_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />", iteration.Iid, label);
-                    sb.Append(menuContent);
-                }
-
-                sb.Append(@"</menu>");
-                menuxml = sb.ToString();
+                return menuxml;
             }
+
+            var sb = new StringBuilder(@"<menu xmlns=""http://schemas.microsoft.com/office/2006/01/customui"">");
+
+            foreach (var iteration in this.Iterations)
+            {
+                var engineeringModel = (EngineeringModel) iteration.Container;
+
+                var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
+
+                var domainShortName = selectedDomainOfExpertise == null ? string.Empty : selectedDomainOfExpertise.ShortName;
+                var label = $"{engineeringModel.EngineeringModelSetup.ShortName} - {iteration.IterationSetup.IterationNumber} : [{domainShortName}]";
+
+                var menuContent = $"<button id=\"Editor_{iteration.Iid}\" label=\"{label}\" onAction=\"OnAction\" tag=\"{0}\" />";
+                sb.Append(menuContent);
+            }
+
+            sb.Append(@"</menu>");
+            menuxml = sb.ToString();
 
             this.UpdateControlIdentifiers(menuxml);
 
