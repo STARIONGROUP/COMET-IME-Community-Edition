@@ -24,7 +24,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
 [assembly: AssemblyTrademark("CDP")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -34,3 +36,4 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("EEDA825A-37FB-4293-9FB0-466FED4E40F1")]
+[assembly: InternalsVisibleTo("CDP4CrossViewEditor.Tests")]
