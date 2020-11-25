@@ -82,7 +82,6 @@
     <ProjectReference Include="..\CDP4OfficeInfrastructure\CDP4OfficeInfrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="OfficeRibbon\" />
     <Folder Include="RowModels\" />
     <Folder Include="TestData\" />
     <Folder Include="ViewModels\" />
