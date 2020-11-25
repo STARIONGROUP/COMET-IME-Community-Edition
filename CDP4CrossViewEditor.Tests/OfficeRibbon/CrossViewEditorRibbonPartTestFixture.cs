@@ -26,14 +26,11 @@
 namespace CDP4CrossViewEditor.Tests.OfficeRibbon
 {
     using System;
-    using System.Collections.Generic;
     using System.Reactive.Concurrency;
     using System.Threading;
-    using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -124,25 +121,13 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         private Mock<ISession> session;
 
         [SetUp]
-        public async Task SetUp()
+        public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
             this.uri = new Uri("http://www.rheageoup.com");
             this.assembler = new Assembler(this.uri);
             this.session = new Mock<ISession>();
-
-            var dtos = new List<CDP4Common.DTO.Thing>();
-            var siteDirectory = new CDP4Common.DTO.SiteDirectory(Guid.NewGuid(), 0);
-            dtos.Add(siteDirectory);
-            var engineeringModel = new CDP4Common.DTO.EngineeringModel(Guid.NewGuid(), 0);
-            dtos.Add(engineeringModel);
-            var iteration = new CDP4Common.DTO.Iteration(Guid.NewGuid(), 0);
-            engineeringModel.Iteration.Add(iteration.Iid);
-            dtos.Add(iteration);
-
-            await this.assembler.Synchronize(dtos);
-
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -268,10 +253,40 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
         }
 
+        [Test]
+        public void VerifyThatOnActionEditorWorks()
+        {
+            var fluentRibbonManager = new FluentRibbonManager { IsActive = true };
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            var iteration = this.CreateIteration();
+
+            CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Added);
+            Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
+
+            this.ribbonPart.GetContent(RibbonButtonId);
+
+            Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
+
+            CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Removed);
+            Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
+        }
+
+        /// <summary>
+        /// Create new iteration in order to simulate model openning
+        /// </summary>
+        /// <returns></returns>
         private Iteration CreateIteration()
         {
             return new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
+                Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                },
                 IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
                 {
                     IterationNumber = 1
