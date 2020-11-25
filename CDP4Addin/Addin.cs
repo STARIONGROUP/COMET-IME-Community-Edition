@@ -2,7 +2,7 @@
 // <copyright file="Addin.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -142,7 +142,7 @@ namespace CDP4AddinCE
         [RegisterErrorHandler]
         public static void RegisterErrorHandler(RegisterErrorMethodKind methodKind, Exception exception)
         {
-            MessageBox.Show("An register error occurend in " + methodKind.ToString(), "CDP4-CE.Addin");
+            MessageBox.Show($"An register error occurend in {methodKind.ToString()}", "CDP4-CE.Addin");
         }
 
         /// <summary>
@@ -171,6 +171,7 @@ namespace CDP4AddinCE
         public async void OnAction(NetOffice.OfficeApi.IRibbonControl control)
         {
             logger.Trace("{0} OnAction", control.Id);
+
             try
             {
                 await this.FluentRibbonManager.OnAction(control.Id, control.Tag);
@@ -202,6 +203,7 @@ namespace CDP4AddinCE
         public string GetContent(NetOffice.OfficeApi.IRibbonControl control)
         {
             logger.Trace("{0} GetContent", control.Id);
+
             try
             {
                 var content = this.FluentRibbonManager.GetContent(control.Id, control.Tag);
@@ -362,10 +364,12 @@ namespace CDP4AddinCE
         private void RedirectAssembly(string shortName, Version targetVersion, string publicKeyToken)
         {
             ResolveEventHandler handler = null;
+
             handler = (sender, args) =>
             {
                 // Use latest strong name & version when trying to load SDK assemblies
                 var requestedAssembly = new AssemblyName(args.Name);
+
                 if (requestedAssembly.Name != shortName)
                 {
                     return null;
@@ -382,6 +386,7 @@ namespace CDP4AddinCE
 
                 return Assembly.Load(requestedAssembly);
             };
+
             AppDomain.CurrentDomain.AssemblyResolve += handler;
         }
 
@@ -393,7 +398,6 @@ namespace CDP4AddinCE
             this.OnConnection += this.AddinOnConnection;
             this.OnAddInsUpdate += this.AddinOnAddInsUpdate;
             this.OnStartupComplete += this.AddinOnStartupComplete;
-
             this.OnBeginShutdown += this.AddinOnBeginShutdown;
             this.OnDisconnection += this.AddinOnDisconnection;
         }
@@ -432,12 +436,14 @@ namespace CDP4AddinCE
             try
             {
                 var uiElement = navigationPanelEvent.View as UIElement;
+
                 if (uiElement != null)
                 {
                     var identifier = navigationPanelEvent.ViewModel.Identifier;
 
                     IdentifiableCustomTaskPane identifiableCustomTaskPane = null;
                     var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out identifiableCustomTaskPane);
+
                     if (taskPaneExists)
                     {
                         identifiableCustomTaskPane.CustomTaskPane.Visible = !identifiableCustomTaskPane.CustomTaskPane.Visible;
@@ -453,6 +459,7 @@ namespace CDP4AddinCE
                         taskPane.Width = 300;
                         taskPane.Visible = true;
                         var wpfHostControl = taskPane.ContentControl as TaskPaneWpfHostControl;
+
                         if (wpfHostControl != null)
                         {
                             wpfHostControl.SetContent(uiElement);
@@ -468,7 +475,7 @@ namespace CDP4AddinCE
             {
                 var innerExceptionMessage = ex.InnerException != null ? ex.InnerException.Message : string.Empty;
 
-                logger.Fatal(ex, string.Format("handle open panel failed: {0} - {1}", ex.Message, innerExceptionMessage));
+                logger.Fatal(ex, $"handle open panel failed: {ex.Message} - {innerExceptionMessage}");
             }
         }
 
@@ -488,6 +495,7 @@ namespace CDP4AddinCE
 
                 IdentifiableCustomTaskPane identifiableCustomTaskPane = null;
                 var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out identifiableCustomTaskPane);
+
                 if (taskPaneExists)
                 {
                     identifiableCustomTaskPane.CustomTaskPane.Visible = false;
@@ -602,6 +610,7 @@ namespace CDP4AddinCE
         private void InitializeApplication(object application)
         {
             var excel = application as NetOffice.ExcelApi.Application;
+
             if (excel != null)
             {
                 // set the excel application object
@@ -647,6 +656,7 @@ namespace CDP4AddinCE
         private void OnWorkbookActivateEvent(NetOffice.ExcelApi.Workbook workbook)
         {
             logger.Debug("Workbook {0} activated", workbook.Name);
+
             if (this.RibbonUI != null)
             {
                 this.RibbonUI.Invalidate();
@@ -662,6 +672,7 @@ namespace CDP4AddinCE
         private void OnWorkbookDeactivateEvent(NetOffice.ExcelApi.Workbook workbook)
         {
             logger.Debug("Workbook {0} deactivated", workbook.Name);
+
             if (this.RibbonUI != null)
             {
                 this.RibbonUI.Invalidate();

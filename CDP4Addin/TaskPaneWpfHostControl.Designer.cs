@@ -2,7 +2,7 @@
 // <copyright file="TaskPaneWpfHostControl.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -45,8 +45,6 @@ namespace CDP4AddinCE
             base.Dispose(disposing);
         }
 
-        #region Component Designer generated code
-
         /// <summary> 
         /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
@@ -75,8 +73,6 @@ namespace CDP4AddinCE
             this.ResumeLayout(false);
 
         }
-
-        #endregion
 
         private System.Windows.Forms.Integration.ElementHost wpfElementHost;
     }

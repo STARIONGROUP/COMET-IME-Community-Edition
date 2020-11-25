@@ -2,7 +2,7 @@
 // <copyright file="AddinTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -26,9 +26,13 @@
 namespace CDP4AddinCE.Tests
 {
     using System.Threading;
+
     using CDP4Composition;
+
     using Moq;
+
     using NetOffice.OfficeApi;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -50,8 +54,6 @@ namespace CDP4AddinCE.Tests
         [SetUp]
         public void SetUp()
         {
-           
-            
             this.ribbonId = "ribbonId";
             this.ribbbonTag = "ribbonTag";
 
@@ -115,7 +117,5 @@ namespace CDP4AddinCE.Tests
             this.addin.GetVisible(this.ribbonControl.Object);
             this.fluentRibbonManager.Verify(x => x.GetVisible(this.ribbonId, this.ribbbonTag));
         }
-
-
     }
 }
