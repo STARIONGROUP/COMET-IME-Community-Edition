@@ -276,7 +276,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         }
 
         /// <summary>
-        /// Create a new iteration in order to simulate model openning
+        /// Create a new iteration in order to simulate model opening
         /// </summary>
         /// <returns></returns>
         private Iteration CreateIteration()
