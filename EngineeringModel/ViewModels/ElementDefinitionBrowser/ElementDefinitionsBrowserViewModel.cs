@@ -26,6 +26,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -56,6 +57,7 @@ namespace CDP4EngineeringModel.ViewModels
     
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
+    using CDP4EngineeringModel.ViewModels.Dialogs;
 
     using NLog;
     
@@ -75,6 +77,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// a <see cref="ElementDefinitionBrowserChildComparer"/> that is used to assist in sorted inserts
         /// </summary>
         private static readonly ElementDefinitionBrowserChildComparer rowComparer = new ElementDefinitionBrowserChildComparer();
+
+        /// <summary>
+        /// The <see cref="IParameterSubscriptionBatchService"/> used to create multiple <see cref="ParameterSubscription"/>s in a batch operation
+        /// </summary>
+        private readonly IParameterSubscriptionBatchService parameterSubscriptionBatchService;
 
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -102,6 +109,11 @@ namespace CDP4EngineeringModel.ViewModels
         private bool canCreateSubscription;
 
         /// <summary>
+        /// Backing field for <see cref="canCreateBatchSubscriptions"/>
+        /// </summary>
+        private bool canCreateBatchSubscriptions;
+
+        /// <summary>
         /// Backing field for <see cref="CanCreateOverride"/>
         /// </summary>
         private bool canCreateOverride;
@@ -117,11 +129,23 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public ElementDefinitionsBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        /// <param name="parameterSubscriptionBatchService">
+        /// The <see cref="IParameterSubscriptionBatchService"/> used to create multiple <see cref="ParameterSubscription"/>s in a batch operation
+        /// </param>
+        public ElementDefinitionsBrowserViewModel(
+            Iteration iteration,
+            ISession session,
+            IThingDialogNavigationService thingDialogNavigationService,
+            IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService,
+            IPluginSettingsService pluginSettingsService,
+            IParameterSubscriptionBatchService parameterSubscriptionBatchService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = "Element Definitions";
             this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+
+            this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
 
             this.ElementDefinitionRowViewModels = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.UpdateElementDefinition();
@@ -184,6 +208,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the batch create subscription command shall be enabled
+        /// </summary>
+        public bool CanCreateBatchSubscriptions
+        {
+            get { return this.canCreateBatchSubscriptions; }
+            private set { this.RaiseAndSetIfChanged(ref this.canCreateBatchSubscriptions, value); }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the create override command shall be enabled
         /// </summary>
         public bool CanCreateOverride
@@ -226,6 +259,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterSubscription"/>
         /// </summary>
         public ReactiveCommand<object> CreateSubscriptionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to create multiple <see cref="ParameterSubscription"/> in batch operation mode
+        /// </summary>
+        public ReactiveCommand<object> BatchCreateSubscriptionCommand { get; private set; }
 
         /// <summary>
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
@@ -369,6 +407,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.InitializeCommands();
 
             this.ComputeNotContextDependentPermission();
+
             this.CreateParameterGroup = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
             this.CreateParameterGroup.Subscribe(_ => this.ExecuteCreateParameterGroup());
 
@@ -380,6 +419,9 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSubscription));
             this.CreateSubscriptionCommand.Subscribe(_ => this.ExecuteCreateSubscriptionCommand());
+            
+            this.BatchCreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
+            this.BatchCreateSubscriptionCommand.Subscribe(_ => this.ExecuteBatchCreateSubscriptionCommand());
 
             this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
             this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
@@ -397,6 +439,7 @@ namespace CDP4EngineeringModel.ViewModels
         public override void ComputePermission()
         {
             base.ComputePermission();
+
             if (this.SelectedThing == null)
             {
                 return;
@@ -447,6 +490,8 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Element Definition", "", this.CreateElementDefinition, MenuItemKind.Create, ClassKind.ElementDefinition));
                 return;
             }
+
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Subscriptions", "", this.BatchCreateSubscriptionCommand, MenuItemKind.Create, ClassKind.NotThing));
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
@@ -535,7 +580,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var overrideRow = this.SelectedThing as ParameterOverrideRowViewModel;
-
             if (overrideRow != null)
             {
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Subscribe to this Override", "", this.CreateSubscriptionCommand, MenuItemKind.Create, ClassKind.ParameterSubscription));
@@ -712,6 +756,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.CanCreateElementDefinition = this.PermissionService.CanWrite(ClassKind.ElementDefinition, this.Thing);
             this.CanCreateParameterGroup = this.PermissionService.CanWrite(ClassKind.ParameterGroup, this.Thing);
+            this.CanCreateBatchSubscriptions = this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.Thing);
         }
 
         /// <summary>
@@ -822,6 +867,46 @@ namespace CDP4EngineeringModel.ViewModels
             catch (Exception exception)
             {
                 logger.Error(exception, "An error occured when creating a copy of an Element Definition");
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Execute the <see cref="BatchCreateSubscriptionCommand"/>
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ExecuteBatchCreateSubscriptionCommand()
+        {
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
+            var model = (EngineeringModel)this.Thing.Container;
+            var allowedDomainOfExpertises = model.EngineeringModelSetup.ActiveDomain.Where(x => x != currentDomainOfExpertise);
+
+            var requiredRls = model.RequiredRdls;
+            var allowedCategories = requiredRls.SelectMany(rdl => rdl.DefinedCategory).Where(c => c.PermissibleClass.Contains(ClassKind.ElementDefinition));
+            var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
+
+            var parameteterSubscriptionFilterSelectionDialogViewModel = new ParameterSubscriptionFilterSelectionDialogViewModel(allowedParameterTypes, allowedCategories, allowedDomainOfExpertises);
+            var result = this.DialogNavigationService.NavigateModal(parameteterSubscriptionFilterSelectionDialogViewModel) as ParameterSubscriptionFilterSelectionResult;
+
+            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            {
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+
+                await this.parameterSubscriptionBatchService.Create(this.Session, this.Thing, result.IsUncategorizedIncluded, result.Categories, result.DomainOfExpertises, result.ParameterTypes);
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "An error occured when creating ParameterSubscriptions in a batch operation");
             }
             finally
             {

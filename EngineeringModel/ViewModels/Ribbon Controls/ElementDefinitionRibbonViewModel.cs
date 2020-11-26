@@ -13,6 +13,11 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Dal;
+
+    using CDP4EngineeringModel.Services;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using NLog;
 
     /// <summary>
@@ -43,7 +48,10 @@ namespace CDP4EngineeringModel.ViewModels
         public static ElementDefinitionsBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
             var stopWatch = Stopwatch.StartNew();
-            var viewModel = new ElementDefinitionsBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
+
+            var parameterSubscriptionBatchService = ServiceLocator.Current.GetInstance<IParameterSubscriptionBatchService>();
+
+            var viewModel = new ElementDefinitionsBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService, parameterSubscriptionBatchService);
             stopWatch.Stop();
             logger.Info("Open ElementDefinitionsBrowserViewModel took {0}", stopWatch.Elapsed);
             return viewModel;

@@ -2,7 +2,7 @@
 // <copyright file="EngineeringModelModule.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -15,24 +15,29 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    
     using CDP4Dal.Permission;
+
+    using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Views;
+    
     using Microsoft.Practices.Prism.Modularity;
     using Microsoft.Practices.Prism.Regions;
 
@@ -68,8 +73,11 @@ namespace CDP4EngineeringModel
         /// <param name="thingDialogNavigationService">
         /// The (MEF injected) instance of <see cref="IThingDialogNavigationService"/>
         /// </param>
+        /// <param name="parameterSubscriptionBatchService">
+        /// The (MEF injected) instance of <see cref="IParameterSubscriptionBatchService"/>
+        /// </param>
         [ImportingConstructor]
-        public EngineeringModelModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService)
+        public EngineeringModelModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService)
         {
             this.regionManager = regionManager;
             this.RibbonManager = ribbonManager;
@@ -77,6 +85,7 @@ namespace CDP4EngineeringModel
             this.DialogNavigationService = dialogNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.PluginSettingsService = pluginSettingsService;
+            this.ParameterSubscriptionBatchService = parameterSubscriptionBatchService;
         }
 
         /// <summary>
@@ -103,6 +112,12 @@ namespace CDP4EngineeringModel
         /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </summary>
         internal IPluginSettingsService PluginSettingsService { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IParameterSubscriptionBatchService"/> used to create multiple <see cref="ParameterSubscription"/>s
+        /// in a batch operation
+        /// </summary>
+        internal IParameterSubscriptionBatchService ParameterSubscriptionBatchService { get; private set; }
 
         /// <summary>
         /// Initialize the <see cref="EngineeringModelModule"/> by registering the <see cref="Region"/>s and the <see cref="RibbonPart"/>s
@@ -133,7 +148,7 @@ namespace CDP4EngineeringModel
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new EngineeringModelRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService);
+            var rdlRibbonPart = new EngineeringModelRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService, this.ParameterSubscriptionBatchService);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }
