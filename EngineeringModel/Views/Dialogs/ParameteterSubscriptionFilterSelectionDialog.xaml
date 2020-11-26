@@ -1,0 +1,86 @@
+﻿<dx:DXWindow x:Class="CDP4EngineeringModel.Views.Dialogs.ParameteterSubscriptionFilterSelectionDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             Height="250"
+             Width="400"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             mc:Ignorable="d">
+    <dx:DXWindow.Resources>
+        <ResourceDictionary>
+            <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
+            <converters:ReactiveDomainOfExpertiseToObjectListConverter x:Key="ReactiveDomainOfExpertiseToObjectListConverter" />
+            <converters:ReactiveParameterTypeToObjectListConverter x:Key="ReactiveParameterTypeToObjectListConverter" />
+        </ResourceDictionary>
+    </dx:DXWindow.Resources>
+    <lc:LayoutControl Margin="5"
+                      Orientation="Vertical"
+                      ScrollBars="None">
+        <lc:LayoutGroup Margin="-10,-7,-10,-5"
+                        Orientation="Vertical"
+                        lc:LayoutControl.AllowHorizontalSizing="True">
+            <lc:LayoutItem Label="Parameter Types:">
+                <dxe:ComboBoxEdit Name="ParameterTypesList"
+                                  MaxHeight="80"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="5"
+                                  DisplayMember="Name"
+                                  EditValue="{Binding SelectedParameterTypes,
+                                            Converter={StaticResource ReactiveParameterTypeToObjectListConverter},
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding PossibleParameterTypes}">
+                    <dxe:ComboBoxEdit.StyleSettings>
+                        <dxe:CheckedComboBoxStyleSettings />
+                    </dxe:ComboBoxEdit.StyleSettings>
+                </dxe:ComboBoxEdit>
+            </lc:LayoutItem>
+
+            <lc:LayoutItem Label="Include Uncategorized:">
+                <CheckBox HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="5" IsChecked="{Binding IsUncategorizedIncluded}"></CheckBox>
+            </lc:LayoutItem>
+
+            <lc:LayoutItem Label="Categories:">
+                <dxe:ComboBoxEdit Name="CategoriesList"
+                                  MaxHeight="80"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="5"
+                                  DisplayMember="Name"
+                                  EditValue="{Binding SelectedCategories,
+                                        Converter={StaticResource ReactiveCategoryToObjectListConverter},
+                                        UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding PossibleCategories}">
+                    <dxe:ComboBoxEdit.StyleSettings>
+                        <dxe:CheckedComboBoxStyleSettings />
+                    </dxe:ComboBoxEdit.StyleSettings>
+                </dxe:ComboBoxEdit>
+            </lc:LayoutItem>
+
+            <lc:LayoutItem Label="Owner:">
+                <dxe:ComboBoxEdit Name="OwnersList"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="5"
+                                  DisplayMember="Name"
+                                  EditValue="{Binding SelectedOwners,
+                                        Converter={StaticResource ReactiveDomainOfExpertiseToObjectListConverter},
+                                        UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding PossibleOwner}">
+                    <dxe:ComboBoxEdit.StyleSettings>
+                        <dxe:CheckedComboBoxStyleSettings />
+                    </dxe:ComboBoxEdit.StyleSettings>
+                </dxe:ComboBoxEdit>
+            </lc:LayoutItem>
+        </lc:LayoutGroup>
+        
+        <items:UserValidationButtonsLayoutGroup/>
+    </lc:LayoutControl>
+</dx:DXWindow>

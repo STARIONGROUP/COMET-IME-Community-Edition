@@ -48,9 +48,9 @@ namespace CDP4EngineeringModel.Tests
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-    
-    using CDP4EngineeringModel.ViewModels;
-    
+
+    using CDP4EngineeringModel.Services;
+    using CDP4EngineeringModel.ViewModels;    
     using Moq;
     
     using NUnit.Framework;
@@ -69,6 +69,9 @@ namespace CDP4EngineeringModel.Tests
     {
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
+        private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IParameterSubscriptionBatchService> parameterSubscriptionBatchService;
+
         private SiteDirectory sitedir;
         private EngineeringModel model;
         private Person person;
@@ -167,6 +170,9 @@ namespace CDP4EngineeringModel.Tests
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
+            this.dialogNavigationService = new Mock<IDialogNavigationService>();
+
+            this.parameterSubscriptionBatchService = new Mock<IParameterSubscriptionBatchService>();
         }
 
         [TearDown]
@@ -178,7 +184,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatElementDefArePopulatedFromEvent()
         {
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
 
             this.rev.SetValue(this.iteration, 50);
             this.iteration.Element.Add(this.elementDef);
@@ -196,7 +202,7 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatElementDefArePopulated()
         {
             this.iteration.Element.Add(this.elementDef);
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
 
             Assert.AreEqual(1, vm.ElementDefinitionRowViewModels.Count);
 
@@ -245,7 +251,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatParticipantWithoutDomainSelectedCannotDropOnElementDefBrowser()
         {
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
 
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var ratioScale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -263,7 +269,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatDragWorks()
         {
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, this.panelNavigationService.Object, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, this.panelNavigationService.Object, null, null, null);
             var draginfo = new Mock<IDragInfo>();
             var dragSource = new Mock<IDragSource>();
 
@@ -276,7 +282,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public async Task VerifyThatDropsWorkDomain()
         {
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             var dropinfo = new Mock<IDropInfo>();
             var droptarget = new Mock<IDropTarget>();
 
@@ -292,7 +298,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public async Task VerifyThatDropsWorkIfNoDomain()
         {
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             var dropinfo = new Mock<IDropInfo>();
             var droptarget = new Mock<IDropTarget>();
 
@@ -305,7 +311,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyCreateParameterOverride()
         {
-            var browser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, this.panelNavigationService.Object, null, null);
+            var browser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, this.panelNavigationService.Object, null, null, null);
             var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.elementDef.Owner, ElementDefinition = this.elementDef, Container = this.elementDef };
             var usageRow = new ElementUsageRowViewModel(elementUsage, this.elementDef.Owner, this.session.Object, null);
             var qk = new SimpleQuantityKind();
@@ -351,13 +357,13 @@ namespace CDP4EngineeringModel.Tests
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain" };
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
             domainOfExpertise = null;
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
-            vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
@@ -367,7 +373,7 @@ namespace CDP4EngineeringModel.Tests
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
             
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             Assert.AreEqual("System [SYS]", vm.DomainOfExpertise);
 
             domainOfExpertise.Name = "Systems";
@@ -383,7 +389,7 @@ namespace CDP4EngineeringModel.Tests
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             Assert.AreEqual("ModelSetup", vm.CurrentModel);
 
             this.engineeringModelSetup.Name = "testing";
@@ -396,7 +402,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatDragOverWorksWithDropTarget()
         {
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
 
             var dropinfo = new Mock<IDropInfo>();
             
@@ -412,7 +418,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatDragOverWorksWithoutDropTarget()
         {
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
 
             var dropinfo = new Mock<IDropInfo>();
 
@@ -457,7 +463,7 @@ namespace CDP4EngineeringModel.Tests
             this.assembler.Cache.TryAdd(new CacheKey(model2Iteration.Iid, null), new Lazy<Thing>(() => model2Iteration));
             this.assembler.Cache.TryAdd(new CacheKey(def.Iid, model2Iteration.Iid), new Lazy<Thing>(() => def));
 
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
 
             var dropinfo = new Mock<IDropInfo>();
 
@@ -513,7 +519,7 @@ namespace CDP4EngineeringModel.Tests
             this.assembler.Cache.TryAdd(new CacheKey(model2Iteration.Iid, null), new Lazy<Thing>(() => model2Iteration));
             this.assembler.Cache.TryAdd(new CacheKey(def.Iid, model2Iteration.Iid), new Lazy<Thing>(() => def));
 
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
 
             var dropinfo = new Mock<IDropInfo>();
             this.session.Setup(x => x.OpenIterations)
@@ -575,7 +581,7 @@ namespace CDP4EngineeringModel.Tests
             this.iteration.Element.Add(this.elementDef);
             this.iteration.Element.Add(def2);
 
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             vm.PopulateContextMenu();
 
             Assert.AreEqual(2, vm.ContextMenu.Count);
@@ -584,15 +590,15 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = defRow;
             vm.PopulateContextMenu();
-            Assert.AreEqual(14, vm.ContextMenu.Count);
+            Assert.AreEqual(15, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[0];
             vm.PopulateContextMenu();
-            Assert.AreEqual(10, vm.ContextMenu.Count);
+            Assert.AreEqual(11, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[1];
             vm.PopulateContextMenu();
-            Assert.AreEqual(9, vm.ContextMenu.Count);
+            Assert.AreEqual(10, vm.ContextMenu.Count);
 
             var usageRow = defRow.ContainedRows[2];
             var usage2Row = defRow.ContainedRows[3];
@@ -603,11 +609,11 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = usageRow.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(10, vm.ContextMenu.Count);
+            Assert.AreEqual(11, vm.ContextMenu.Count);
 
             vm.SelectedThing = usage2Row.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(10, vm.ContextMenu.Count);
+            Assert.AreEqual(11, vm.ContextMenu.Count);
 
             vm.Dispose();
         }
@@ -622,7 +628,7 @@ namespace CDP4EngineeringModel.Tests
 
             this.iteration.TopElement = this.elementDef;
 
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             var defRow = (ElementDefinitionRowViewModel)vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid);
             var def2Row = (ElementDefinitionRowViewModel)vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid);
             Assert.IsTrue(defRow.IsTopElement);
@@ -657,7 +663,7 @@ namespace CDP4EngineeringModel.Tests
             this.elementDef.Parameter.Add(parameter);
             this.iteration.Element.Add(this.elementDef);
 
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             Assert.IsFalse(vm.CreateSubscriptionCommand.CanExecute(null));
 
             var defRow = vm.ElementDefinitionRowViewModels.First();
@@ -700,7 +706,7 @@ namespace CDP4EngineeringModel.Tests
             this.elementDef.ParameterGroup.Add(group);
             this.iteration.Element.Add(this.elementDef);
 
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null, null);
 
             var defRow = vm.ElementDefinitionRowViewModels.Single();
             vm.SelectedThing = defRow.ContainedRows.Single(x => x.Thing is ParameterGroup);
@@ -713,7 +719,7 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatCreateChangeRequestWorks()
         {
             this.iteration.Element.Add(this.elementDef);
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, null, null, null, null);
 
             vm.SelectedThing = vm.ElementDefinitionRowViewModels.First();
 
@@ -759,7 +765,7 @@ namespace CDP4EngineeringModel.Tests
             this.iteration.Element.Add(this.elementDef);
             this.iteration.Element.Add(def2);
 
-            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             vm.PopulateContextMenu();
 
             Assert.AreEqual(2, vm.ContextMenu.Count);
@@ -774,6 +780,24 @@ namespace CDP4EngineeringModel.Tests
 
             Assert.IsTrue(vm.SelectedThing == def2Row);
             Assert.IsTrue(vm.FocusedRow == def2Row);
+        }
+
+        [Test]
+        public async Task Verify_that_ExecuteBatchCreateSubscriptionCommand_works_as_expected()
+        {
+            var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.ParameteterSubscriptionFilterSelectionResult(true, false, Enumerable.Empty<ParameterType>(), Enumerable.Empty<Category>(), Enumerable.Empty<DomainOfExpertise>());
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object);
+            vm.PopulateContextMenu();
+
+            Assert.AreEqual(2, vm.ContextMenu.Count);
+
+            vm.BatchCreateSubscriptionCommand.Execute(null);
+
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Exactly(1));
+
+            this.parameterSubscriptionBatchService.Verify(x => x.Create(this.session.Object, this.iteration, false, It.IsAny<IEnumerable<Category>>(), It.IsAny<IEnumerable<DomainOfExpertise>>(), It.IsAny<IEnumerable<ParameterType>>()), Times.Exactly(1));
         }
     }
 }

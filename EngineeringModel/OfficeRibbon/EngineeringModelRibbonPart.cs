@@ -24,6 +24,9 @@ namespace CDP4EngineeringModel
     using ViewModels;
     using ReactiveUI;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4EngineeringModel.Services;
+
     using NLog;
 
     /// <summary>
@@ -58,6 +61,11 @@ namespace CDP4EngineeringModel
         private readonly List<PublicationBrowserViewModel> publicationBrowserViewModel;
 
         /// <summary>
+        /// The <see cref="IParameterSubscriptionBatchService"/> used to create multiple <see cref="ParameterSubscription"/>s in a batch operation
+        /// </summary>
+        private readonly IParameterSubscriptionBatchService parameterSubscriptionBatchService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EngineeringModelRibbonPart"/> class.
         /// </summary>
         /// <param name="order">
@@ -73,9 +81,11 @@ namespace CDP4EngineeringModel
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService)
+        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
+            this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
+
             this.openElementDefinitionBrowser = new List<ElementDefinitionsBrowserViewModel>();
             this.openOptionBrowser = new List<OptionBrowserViewModel>();
             this.finiteStateBrowserViewModel = new List<FiniteStateBrowserViewModel>();
@@ -465,7 +475,7 @@ namespace CDP4EngineeringModel
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
             }
 
-            browser = new ElementDefinitionsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+            browser = new ElementDefinitionsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.parameterSubscriptionBatchService);
 
             this.openElementDefinitionBrowser.Add(browser);
             this.PanelNavigationService.Open(browser, false);

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionsBrowser.cs" company="RHEA System S.A.">
+// <copyright file="ParameteterSubscriptionFilterSelectionDialog.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
@@ -23,26 +23,28 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.Views
+namespace CDP4EngineeringModel.Views.Dialogs
 {
-    using CDP4Composition;
     using CDP4Composition.Attributes;
-
+    using CDP4Composition.Navigation.Interfaces;
+   
+    using DevExpress.Xpf.Core;
+    
     /// <summary>
-    /// Interaction logic for ElementDefinitions view
+    /// Interaction logic for ParameteterSubscriptionFilterSelectionDialog.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.EditorPanel)]
-    public partial class ElementDefinitionsBrowser : IPanelView
+    [DialogViewExport("ParameteterSubscriptionFilterSelectionDialog", "The Engineering Model Setup Iteration Selection")]
+    public partial class ParameteterSubscriptionFilterSelectionDialog : DXWindow, IDialogView
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ElementDefinitionsBrowser"/> class
+        // <summary>
+        /// Initializes a new instance of the <see cref="ParameteterSubscriptionFilterSelectionDialog"/> class
         /// </summary>
-        public ElementDefinitionsBrowser()
+        public ParameteterSubscriptionFilterSelectionDialog()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ElementDefinitionsBrowser"/> class.
+        /// Initializes a new instance of the <see cref="ParameteterSubscriptionFilterSelectionDialog"/> class.
         /// </summary>
         /// <param name="initializeComponent">
         /// a value indicating whether the contained Components shall be loaded
@@ -50,7 +52,7 @@ namespace CDP4EngineeringModel.Views
         /// <remarks>
         /// This constructor is called by the navigation service
         /// </remarks>
-        public ElementDefinitionsBrowser(bool initializeComponent)
+        public ParameteterSubscriptionFilterSelectionDialog(bool initializeComponent)
         {
             if (initializeComponent)
             {

@@ -252,6 +252,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\Dialogs\ParameteterSubscriptionFilterSelectionDialog.xaml.cs">
+      <DependentUpon>ParameteterSubscriptionFilterSelectionDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\Dialogs\ActualFiniteStateDialog.xaml.cs">
       <DependentUpon>ActualFiniteStateDialog.xaml</DependentUpon>
     </Compile>
@@ -368,6 +371,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\Dialogs\ParameteterSubscriptionFilterSelectionDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Dialogs\ActualFiniteStateDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -562,6 +569,8 @@
     <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterOverrideDialog.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterSubscriptionDialog.g.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterSubscriptionDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameteterSubscriptionFilterSelectionDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameteterSubscriptionFilterSelectionDialog.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateDialog.g.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateDialog.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateListDialog.g.cs" />
