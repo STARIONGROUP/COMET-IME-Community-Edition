@@ -1,0 +1,5 @@
+﻿<ribbonxml>
+  <group id="CrossViewEditorSheet" label="Cross View">
+    <dynamicMenu id="Editor" size="large" getLabel="GetLabel" supertip="Cross View Editor" imageMso="DatasheetView" getEnabled="GetEnabled" getContent="GetContent"/>
+  </group>
+</ribbonxml>
