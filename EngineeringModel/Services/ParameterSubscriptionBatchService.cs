@@ -163,7 +163,10 @@ namespace CDP4EngineeringModel.Services
                     foreach (var category in categories)
                     {
                         isCategorized = elementDefinition.IsMemberOfCategory(category);
-                        break;
+                        if (isCategorized)
+                        {
+                            break;
+                        }
                     }
                     
                     if (domainOfExpertises.Contains(parameter.Owner) && 
