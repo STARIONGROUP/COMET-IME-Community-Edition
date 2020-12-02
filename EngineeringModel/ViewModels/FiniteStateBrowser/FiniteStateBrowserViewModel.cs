@@ -487,22 +487,19 @@ namespace CDP4EngineeringModel.ViewModels
         private async Task ExecuteBatchUpdateParameterCommand()
         {
             var actualFiniteStateListRowViewModel = this.SelectedThing as ActualFiniteStateListRowViewModel;
+
             if (actualFiniteStateListRowViewModel == null)
             {
                 return;
             }
 
-            var actualFiniteStateList = (ActualFiniteStateList)actualFiniteStateListRowViewModel.Thing;
-
-            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
             var model = (EngineeringModel)this.Thing.Container;
-            var allowedDomainOfExpertises = model.EngineeringModelSetup.ActiveDomain.Where(x => x != currentDomainOfExpertise);
-
+            
             var requiredRls = model.RequiredRdls;
             var allowedCategories = requiredRls.SelectMany(rdl => rdl.DefinedCategory).Where(c => c.PermissibleClass.Contains(ClassKind.ElementDefinition));
             var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
 
-            var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(allowedParameterTypes, allowedCategories, allowedDomainOfExpertises);
+            var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(allowedParameterTypes, allowedCategories, model.EngineeringModelSetup.ActiveDomain);
             var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
@@ -514,7 +511,7 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.IsBusy = true;
 
-                await this.parameterActualFiniteStateListApplicationBatchService.Update(this.Session, this.Thing, actualFiniteStateList, result.IsUncategorizedIncluded, result.Categories, result.DomainOfExpertises, result.ParameterTypes);
+                await this.parameterActualFiniteStateListApplicationBatchService.Update(this.Session, this.Thing, actualFiniteStateListRowViewModel.Thing, result.IsUncategorizedIncluded, result.Categories, result.DomainOfExpertises, result.ParameterTypes);
             }
             catch (Exception exception)
             {
