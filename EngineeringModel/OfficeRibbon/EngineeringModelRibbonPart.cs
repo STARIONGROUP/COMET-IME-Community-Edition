@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelRibbonPart.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,18 +33,23 @@ namespace CDP4EngineeringModel
     using System.Text;
     using System.Threading.Tasks;
     using System.Xml.Linq;
+
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    using CDP4Dal;
-    using CDP4Dal.Events;
-    using ViewModels;
-    using ReactiveUI;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4EngineeringModel.Services;
+
+    using CDP4Dal;
+    using CDP4Dal.Events;
+
+    using ViewModels;
+
+    using ReactiveUI;
 
     using NLog;
 
@@ -66,6 +90,12 @@ namespace CDP4EngineeringModel
         private readonly IParameterSubscriptionBatchService parameterSubscriptionBatchService;
 
         /// <summary>
+        /// The <see cref="IParameterActualFiniteStateListApplicationBatchService"/> used to update multiple <see cref="Parameter"/>s
+        /// to set the <see cref="ActualFiniteStateList"/> in a batch operation
+        /// </summary>
+        private readonly IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EngineeringModelRibbonPart"/> class.
         /// </summary>
         /// <param name="order">
@@ -81,10 +111,11 @@ namespace CDP4EngineeringModel
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService)
+        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
+            this.parameterActualFiniteStateListApplicationBatchService = parameterActualFiniteStateListApplicationBatchService;
 
             this.openElementDefinitionBrowser = new List<ElementDefinitionsBrowserViewModel>();
             this.openOptionBrowser = new List<OptionBrowserViewModel>();
@@ -93,6 +124,7 @@ namespace CDP4EngineeringModel
             this.Iterations = new List<Iteration>();
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+
             CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.IterationChangeEventHandler);
@@ -547,7 +579,7 @@ namespace CDP4EngineeringModel
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
             }
 
-            browser = new FiniteStateBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+            browser = new FiniteStateBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.parameterActualFiniteStateListApplicationBatchService);
 
             this.finiteStateBrowserViewModel.Add(browser);
             this.PanelNavigationService.Open(browser, false);

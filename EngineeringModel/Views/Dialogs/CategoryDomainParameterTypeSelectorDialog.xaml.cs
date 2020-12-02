@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterSubscriptionFilterSelectionDialog.xaml.cs" company="RHEA System S.A.">
+// <copyright file="CategoryDomainParameterTypeSelectorDialog.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
@@ -33,13 +33,13 @@ namespace CDP4EngineeringModel.Views.Dialogs
     /// <summary>
     /// Interaction logic for ParameteterSubscriptionFilterSelectionDialog.xaml
     /// </summary>
-    [DialogViewExport("ParameterSubscriptionFilterSelectionDialog", "The Engineering Model Setup Iteration Selection")]
-    public partial class ParameterSubscriptionFilterSelectionDialog : DXWindow, IDialogView
+    [DialogViewExport("CategoryDomainParameterTypeSelectorDialog", "Category, DomainOfExpertise and ParameterType Selector")]
+    public partial class CategoryDomainParameterTypeSelectorDialog : DXWindow, IDialogView
     {
         // <summary>
         /// Initializes a new instance of the <see cref="ParameterSubscriptionFilterSelectionDialog"/> class
         /// </summary>
-        public ParameterSubscriptionFilterSelectionDialog()
+        public CategoryDomainParameterTypeSelectorDialog()
         {
         }
 
@@ -52,7 +52,7 @@ namespace CDP4EngineeringModel.Views.Dialogs
         /// <remarks>
         /// This constructor is called by the navigation service
         /// </remarks>
-        public ParameterSubscriptionFilterSelectionDialog(bool initializeComponent)
+        public CategoryDomainParameterTypeSelectorDialog(bool initializeComponent)
         {
             if (initializeComponent)
             {

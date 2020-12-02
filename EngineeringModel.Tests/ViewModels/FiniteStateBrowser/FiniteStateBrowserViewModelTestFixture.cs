@@ -2,7 +2,7 @@
 // <copyright file="FiniteStateBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -27,6 +27,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
@@ -42,7 +43,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-    
+
+    using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
     
     using Moq;
@@ -61,6 +63,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> panelNavigationService;
+        private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IParameterActualFiniteStateListApplicationBatchService> parameterActualFiniteStateListApplicationBatchService;
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
 
@@ -85,6 +89,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
+            this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -109,6 +114,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+
+            this.parameterActualFiniteStateListApplicationBatchService = new Mock<IParameterActualFiniteStateListApplicationBatchService>();
         }
 
         [TearDown]
@@ -120,7 +127,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null, null);
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.CurrentModel, Is.Not.Null.Or.Empty);
@@ -131,7 +138,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [Test]
         public void VerifyThatTreeIsBuiltCorrectly()
         {
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null, null);
             Assert.IsNotEmpty(viewmodel.FiniteStateList);
 
             var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
@@ -175,13 +182,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             var testDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain" };
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(testDomain);
             
-            var vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            var vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
             testDomain = null;
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(testDomain);
 
-            vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
@@ -190,7 +197,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
-
 
             var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
             var ps = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri);
@@ -207,7 +213,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             this.iteration.ActualFiniteStateList.Add(actualList);
 
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null, null);
 
             //no row selected. SelectedThing is null
             Assert.AreEqual(0, viewmodel.ContextMenu.Count);
@@ -266,7 +272,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             this.iteration.ActualFiniteStateList.Add(actualList);
 
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null, null);
 
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
@@ -290,10 +296,41 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [Test]
         public void VerifyThatDisposeWorks()
         {
-            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var viewmodel = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null, null);
             viewmodel.Dispose();
 
             Assert.IsNull(viewmodel.Thing);
+        }
+
+        [Test]
+        public void Verify_that_ExecuteBatchUpdateParameterCommand_works_as_expected()
+        {
+            var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
+            var ps = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri);
+            possibleList.PossibleState.Add(ps);
+
+            this.iteration.PossibleFiniteStateList.Add(possibleList);
+
+            var actualList = new ActualFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
+            actualList.PossibleFiniteStateList.Add(possibleList);
+            var astate = new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri);
+            astate.PossibleState.Add(ps);
+
+            actualList.ActualState.Add(astate);
+
+            this.iteration.ActualFiniteStateList.Add(actualList);
+            var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.CategoryDomainParameterTypeSelectorResult(true, false, Enumerable.Empty<ParameterType>(), Enumerable.Empty<Category>(), Enumerable.Empty<DomainOfExpertise>());
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
+
+            var vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterActualFiniteStateListApplicationBatchService.Object);
+
+            vm.SelectedThing = new ActualFiniteStateListRowViewModel(actualList, this.session.Object, null);
+
+            vm.BatchUpdateParameterCommand.Execute(null);
+
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Exactly(1));
+
+            this.parameterActualFiniteStateListApplicationBatchService.Verify(x => x.Update(this.session.Object, this.iteration, It.IsAny<ActualFiniteStateList>(), false, It.IsAny<IEnumerable<Category>>(), It.IsAny<IEnumerable<DomainOfExpertise>>(), It.IsAny<IEnumerable<ParameterType>>()), Times.Exactly(1));
         }
     }
 }

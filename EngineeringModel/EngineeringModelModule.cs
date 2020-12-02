@@ -76,8 +76,11 @@ namespace CDP4EngineeringModel
         /// <param name="parameterSubscriptionBatchService">
         /// The (MEF injected) instance of <see cref="IParameterSubscriptionBatchService"/>
         /// </param>
+        /// <param name="parameterActualFiniteStateListApplicationBatchService">
+        /// The (MEF injected) instance of <see cref="IParameterActualFiniteStateListApplicationBatchService"/>
+        /// </param>
         [ImportingConstructor]
-        public EngineeringModelModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService)
+        public EngineeringModelModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService)
         {
             this.regionManager = regionManager;
             this.RibbonManager = ribbonManager;
@@ -86,6 +89,7 @@ namespace CDP4EngineeringModel
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.PluginSettingsService = pluginSettingsService;
             this.ParameterSubscriptionBatchService = parameterSubscriptionBatchService;
+            this.ParameterActualFiniteStateListApplicationBatchService = parameterActualFiniteStateListApplicationBatchService;
         }
 
         /// <summary>
@@ -120,6 +124,12 @@ namespace CDP4EngineeringModel
         internal IParameterSubscriptionBatchService ParameterSubscriptionBatchService { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="IParameterActualFiniteStateListApplicationBatchService"/> used to update multiple <see cref="Parameter"/>s state dependency
+        /// in a batch operation
+        /// </summary>
+        internal IParameterActualFiniteStateListApplicationBatchService ParameterActualFiniteStateListApplicationBatchService { get; private set; }
+
+        /// <summary>
         /// Initialize the <see cref="EngineeringModelModule"/> by registering the <see cref="Region"/>s and the <see cref="RibbonPart"/>s
         /// </summary>
         public void Initialize()
@@ -148,7 +158,7 @@ namespace CDP4EngineeringModel
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new EngineeringModelRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService, this.ParameterSubscriptionBatchService);
+            var rdlRibbonPart = new EngineeringModelRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService, this.ParameterSubscriptionBatchService, this.ParameterActualFiniteStateListApplicationBatchService);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }

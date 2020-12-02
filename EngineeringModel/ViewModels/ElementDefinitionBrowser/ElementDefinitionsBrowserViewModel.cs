@@ -2,7 +2,7 @@
 // <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -109,7 +109,7 @@ namespace CDP4EngineeringModel.ViewModels
         private bool canCreateSubscription;
 
         /// <summary>
-        /// Backing field for <see cref="canCreateBatchSubscriptions"/>
+        /// Backing field for <see cref="CanCreateBatchSubscriptions"/>
         /// </summary>
         private bool canCreateBatchSubscriptions;
 
@@ -261,7 +261,7 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveCommand<object> CreateSubscriptionCommand { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="ICommand"/> to create multiple <see cref="ParameterSubscription"/> in batch operation mode
+        /// Gets the <see cref="ICommand"/> to create multiple <see cref="ParameterSubscription"/>s in batch operation mode
         /// </summary>
         public ReactiveCommand<object> BatchCreateSubscriptionCommand { get; private set; }
 
@@ -492,7 +492,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Subscriptions", "", this.BatchCreateSubscriptionCommand, MenuItemKind.Create, ClassKind.NotThing));
-
+            
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
@@ -890,8 +890,8 @@ namespace CDP4EngineeringModel.ViewModels
             var allowedCategories = requiredRls.SelectMany(rdl => rdl.DefinedCategory).Where(c => c.PermissibleClass.Contains(ClassKind.ElementDefinition));
             var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
 
-            var parameteterSubscriptionFilterSelectionDialogViewModel = new ParameterSubscriptionFilterSelectionDialogViewModel(allowedParameterTypes, allowedCategories, allowedDomainOfExpertises);
-            var result = this.DialogNavigationService.NavigateModal(parameteterSubscriptionFilterSelectionDialogViewModel) as ParameterSubscriptionFilterSelectionResult;
+            var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(allowedParameterTypes, allowedCategories, allowedDomainOfExpertises);
+            var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
             {

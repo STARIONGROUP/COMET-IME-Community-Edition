@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterSubscriptionFilterSelectionResult.cs" company="RHEA System S.A.">
+// <copyright file="CategoryDomainParameterTypeSelectorResult.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
@@ -32,9 +32,9 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using CDP4Composition.Navigation;
 
     /// <summary>
-    /// The <see cref="IDialogResult"/> for the <see cref="ParameterSubscriptionFilterSelectionResult"/> dialog
+    /// The <see cref="IDialogResult"/> for the <see cref="CategoryDomainParameterTypeSelectorResult"/> dialog
     /// </summary>
-    public class ParameterSubscriptionFilterSelectionResult : BaseDialogResult
+    public class CategoryDomainParameterTypeSelectorResult : BaseDialogResult
     {
         /// <summary>
         /// Initializes an instance of the <see cref="ParameteterSubscriptionFilterSelectionResult"/> class
@@ -55,7 +55,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// <param name="domainOfExpertises">
         /// The selected instances of <see cref="DomainOfExpertise"/>
         /// </param>
-        public ParameterSubscriptionFilterSelectionResult(bool? messageBoxResult, bool isUncategorizedIncluded, IEnumerable<ParameterType> parameterTypes, IEnumerable<Category> categories, IEnumerable<DomainOfExpertise> domainOfExpertises) : base(messageBoxResult)
+        public CategoryDomainParameterTypeSelectorResult(bool? messageBoxResult, bool isUncategorizedIncluded, IEnumerable<ParameterType> parameterTypes, IEnumerable<Category> categories, IEnumerable<DomainOfExpertise> domainOfExpertises) : base(messageBoxResult)
         {
             this.IsUncategorizedIncluded = isUncategorizedIncluded;
             this.ParameterTypes = parameterTypes;

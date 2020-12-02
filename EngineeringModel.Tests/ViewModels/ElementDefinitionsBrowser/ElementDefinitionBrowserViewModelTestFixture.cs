@@ -51,14 +51,14 @@ namespace CDP4EngineeringModel.Tests
 
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;    
+
     using Moq;
     
     using NUnit.Framework;
     
     using ReactiveUI;
-    
+
     using ElementDefinitionRowViewModel = CDP4EngineeringModel.ViewModels.ElementDefinitionRowViewModel;
-    
     using ElementUsageRowViewModel = CDP4EngineeringModel.ViewModels.ElementUsageRowViewModel;
 
     /// <summary>
@@ -785,7 +785,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public async Task Verify_that_ExecuteBatchCreateSubscriptionCommand_works_as_expected()
         {
-            var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.ParameterSubscriptionFilterSelectionResult(true, false, Enumerable.Empty<ParameterType>(), Enumerable.Empty<Category>(), Enumerable.Empty<DomainOfExpertise>());
+            var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.CategoryDomainParameterTypeSelectorResult(true, false, Enumerable.Empty<ParameterType>(), Enumerable.Empty<Category>(), Enumerable.Empty<DomainOfExpertise>());
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object);
