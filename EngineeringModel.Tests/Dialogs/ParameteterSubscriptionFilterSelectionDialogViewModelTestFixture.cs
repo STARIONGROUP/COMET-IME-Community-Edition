@@ -2,7 +2,7 @@
 // <copyright file="ParameteterSubscriptionFilterSelectionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -38,7 +38,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using NUnit.Framework;
 
     /// <summary>
-    /// Suite of tests for the <see cref="ParameteterSubscriptionFilterSelectionDialogViewModel"/> class
+    /// Suite of tests for the <see cref="ParameterSubscriptionFilterSelectionDialogViewModel"/> class
     /// </summary>
     [TestFixture]
     public class ParameteterSubscriptionFilterSelectionDialogViewModelTestFixture
@@ -66,7 +66,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [Test]
         public void Verify_that_constructor_does_expected_setup()
         {
-            var vm = new ParameteterSubscriptionFilterSelectionDialogViewModel(this.parameterTypes, this.categories, this.domains);
+            var vm = new ParameterSubscriptionFilterSelectionDialogViewModel(this.parameterTypes, this.categories, this.domains);
 
             CollectionAssert.AreEquivalent(this.categories, vm.PossibleCategories);
             CollectionAssert.AreEquivalent(this.domains, vm.PossibleOwner);
@@ -79,7 +79,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [Test]
         public void Verify_that_when_a_selection_is_made_canok_can_execute()
         {
-            var vm = new ParameteterSubscriptionFilterSelectionDialogViewModel(this.parameterTypes, this.categories, this.domains);
+            var vm = new ParameterSubscriptionFilterSelectionDialogViewModel(this.parameterTypes, this.categories, this.domains);
 
             Assert.That(vm.OkCommand.CanExecute(null), Is.False);
 
@@ -93,7 +93,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [Test]
         public void Verify_that_when_OkCommand_is_executed_the_Result_is_as_expected()
         {
-            var vm = new ParameteterSubscriptionFilterSelectionDialogViewModel(this.parameterTypes, this.categories, this.domains);
+            var vm = new ParameterSubscriptionFilterSelectionDialogViewModel(this.parameterTypes, this.categories, this.domains);
 
             vm.SelectedCategories.Add(this.categories.First());
             vm.SelectedOwners.Add(this.domains.First());
@@ -104,7 +104,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             Assert.That(dialogResult.Result.HasValue, Is.True);
 
-            var subscriptionFilterSelectionResult = dialogResult as ParameteterSubscriptionFilterSelectionResult;
+            var subscriptionFilterSelectionResult = dialogResult as ParameterSubscriptionFilterSelectionResult;
 
             CollectionAssert.AreEquivalent(vm.SelectedCategories, subscriptionFilterSelectionResult.Categories);
             CollectionAssert.AreEquivalent(vm.SelectedOwners, subscriptionFilterSelectionResult.DomainOfExpertises);
@@ -114,7 +114,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [Test]
         public void Verify_that_when_CancelCommand_is_executed_the_Result_is_as_expected()
         {
-            var vm = new ParameteterSubscriptionFilterSelectionDialogViewModel(this.parameterTypes, this.categories, this.domains);
+            var vm = new ParameterSubscriptionFilterSelectionDialogViewModel(this.parameterTypes, this.categories, this.domains);
 
             vm.SelectedCategories.Add(this.categories.First());
             vm.SelectedOwners.Add(this.domains.First());

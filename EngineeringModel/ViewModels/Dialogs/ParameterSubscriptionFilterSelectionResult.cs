@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameteterSubscriptionFilterSelectionResult.cs" company="RHEA System S.A.">
+// <copyright file="ParameterSubscriptionFilterSelectionResult.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -32,9 +32,9 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using CDP4Composition.Navigation;
 
     /// <summary>
-    /// The <see cref="IDialogResult"/> for the <see cref="ParameteterSubscriptionFilterSelectionDialogViewModel"/> dialog
+    /// The <see cref="IDialogResult"/> for the <see cref="ParameterSubscriptionFilterSelectionResult"/> dialog
     /// </summary>
-    public class ParameteterSubscriptionFilterSelectionResult : BaseDialogResult
+    public class ParameterSubscriptionFilterSelectionResult : BaseDialogResult
     {
         /// <summary>
         /// Initializes an instance of the <see cref="ParameteterSubscriptionFilterSelectionResult"/> class
@@ -55,7 +55,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// <param name="domainOfExpertises">
         /// The selected instances of <see cref="DomainOfExpertise"/>
         /// </param>
-        public ParameteterSubscriptionFilterSelectionResult(bool? messageBoxResult, bool isUncategorizedIncluded, IEnumerable<ParameterType> parameterTypes, IEnumerable<Category> categories, IEnumerable<DomainOfExpertise> domainOfExpertises) : base(messageBoxResult)
+        public ParameterSubscriptionFilterSelectionResult(bool? messageBoxResult, bool isUncategorizedIncluded, IEnumerable<ParameterType> parameterTypes, IEnumerable<Category> categories, IEnumerable<DomainOfExpertise> domainOfExpertises) : base(messageBoxResult)
         {
             this.IsUncategorizedIncluded = isUncategorizedIncluded;
             this.ParameterTypes = parameterTypes;

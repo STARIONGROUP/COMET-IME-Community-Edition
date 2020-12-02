@@ -890,8 +890,8 @@ namespace CDP4EngineeringModel.ViewModels
             var allowedCategories = requiredRls.SelectMany(rdl => rdl.DefinedCategory).Where(c => c.PermissibleClass.Contains(ClassKind.ElementDefinition));
             var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
 
-            var parameteterSubscriptionFilterSelectionDialogViewModel = new ParameteterSubscriptionFilterSelectionDialogViewModel(allowedParameterTypes, allowedCategories, allowedDomainOfExpertises);
-            var result = this.DialogNavigationService.NavigateModal(parameteterSubscriptionFilterSelectionDialogViewModel) as ParameteterSubscriptionFilterSelectionResult;
+            var parameteterSubscriptionFilterSelectionDialogViewModel = new ParameterSubscriptionFilterSelectionDialogViewModel(allowedParameterTypes, allowedCategories, allowedDomainOfExpertises);
+            var result = this.DialogNavigationService.NavigateModal(parameteterSubscriptionFilterSelectionDialogViewModel) as ParameterSubscriptionFilterSelectionResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
             {

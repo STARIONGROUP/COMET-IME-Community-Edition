@@ -2,7 +2,7 @@
 // <copyright file="ElementDefinitionBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -785,7 +785,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public async Task Verify_that_ExecuteBatchCreateSubscriptionCommand_works_as_expected()
         {
-            var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.ParameteterSubscriptionFilterSelectionResult(true, false, Enumerable.Empty<ParameterType>(), Enumerable.Empty<Category>(), Enumerable.Empty<DomainOfExpertise>());
+            var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.ParameterSubscriptionFilterSelectionResult(true, false, Enumerable.Empty<ParameterType>(), Enumerable.Empty<Category>(), Enumerable.Empty<DomainOfExpertise>());
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object);

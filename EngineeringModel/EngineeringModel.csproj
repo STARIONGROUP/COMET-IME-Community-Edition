@@ -252,8 +252,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\Dialogs\ParameteterSubscriptionFilterSelectionDialog.xaml.cs">
-      <DependentUpon>ParameteterSubscriptionFilterSelectionDialog.xaml</DependentUpon>
+    <Compile Update="Views\Dialogs\ParameterSubscriptionFilterSelectionDialog.xaml.cs">
+      <DependentUpon>ParameterSubscriptionFilterSelectionDialog.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\Dialogs\ActualFiniteStateDialog.xaml.cs">
       <DependentUpon>ActualFiniteStateDialog.xaml</DependentUpon>
@@ -371,7 +371,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\Dialogs\ParameteterSubscriptionFilterSelectionDialog.xaml">
+    <Page Include="Views\Dialogs\ParameterSubscriptionFilterSelectionDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

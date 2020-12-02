@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameteterSubscriptionFilterSelectionDialogViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ParameterSubscriptionFilterSelectionDialogViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -36,10 +36,10 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="ParameteterSubscriptionFilterSelectionDialogViewModel"/> is to provide selection criteria
+    /// The purpose of the <see cref="ParameterSubscriptionFilterSelectionDialogViewModel"/> is to provide selection criteria
     /// to select Parameters for which <see cref="ParameterSubscription"/>s need to be created
     /// </summary>
-    public class ParameteterSubscriptionFilterSelectionDialogViewModel : DialogViewModelBase
+    public class ParameterSubscriptionFilterSelectionDialogViewModel : DialogViewModelBase
     {
         /// <summary>
         /// Backing field for <see cref="SelectedCategories"/> property
@@ -62,12 +62,12 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         private bool isUncategorizedIncluded;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameteterSubscriptionFilterSelectionDialogViewModel"/> class
+        /// Initializes a new instance of the <see cref="ParameterSubscriptionFilterSelectionDialogViewModel"/> class
         /// </summary>
         /// <param name="parameterTypes"></param>
         /// <param name="categories"></param>
         /// <param name="domainOfExpertises"></param>
-        public ParameteterSubscriptionFilterSelectionDialogViewModel(IEnumerable<ParameterType> parameterTypes, IEnumerable<Category> categories, IEnumerable<DomainOfExpertise> domainOfExpertises)
+        public ParameterSubscriptionFilterSelectionDialogViewModel(IEnumerable<ParameterType> parameterTypes, IEnumerable<Category> categories, IEnumerable<DomainOfExpertise> domainOfExpertises)
         {
             this.PossibleParameterTypes = parameterTypes.OrderBy(x => x.Name);
             this.PossibleCategories = categories.OrderBy(x => x.Name);
@@ -174,7 +174,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// </summary>
         private void ExecuteOk()
         {
-            this.DialogResult = new ParameteterSubscriptionFilterSelectionResult(true, this.IsUncategorizedIncluded, this.selectedParameterTypes, this.selectedCategories, this.selectedOwners);
+            this.DialogResult = new ParameterSubscriptionFilterSelectionResult(true, this.IsUncategorizedIncluded, this.selectedParameterTypes, this.selectedCategories, this.selectedOwners);
         }
     }
 }

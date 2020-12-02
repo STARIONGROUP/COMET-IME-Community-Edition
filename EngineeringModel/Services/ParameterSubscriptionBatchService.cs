@@ -2,7 +2,7 @@
 // <copyright file="ParameterSubscriptionBatchService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -87,17 +87,17 @@ namespace CDP4EngineeringModel.Services
 
             if (parameterTypes == null)
             {
-                throw new ArgumentNullException(nameof(iteration), $"The {nameof(parameterTypes)} may not be null");
+                throw new ArgumentNullException(nameof(parameterTypes), $"The {nameof(parameterTypes)} may not be null");
             }
 
             if (categories == null)
             {
-                throw new ArgumentNullException(nameof(iteration), $"The {nameof(categories)} may not be null");
+                throw new ArgumentNullException(nameof(categories), $"The {nameof(categories)} may not be null");
             }
 
             if (domainOfExpertises == null)
             {
-                throw new ArgumentNullException(nameof(iteration), $"The {nameof(categories)} may not be null");
+                throw new ArgumentNullException(nameof(domainOfExpertises), $"The {nameof(domainOfExpertises)} may not be null");
             }
 
             var owner = session.QuerySelectedDomainOfExpertise(iteration);

@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameteterSubscriptionFilterSelectionDialog.xaml.cs" company="RHEA System S.A.">
+// <copyright file="ParameterSubscriptionFilterSelectionDialog.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -33,18 +33,18 @@ namespace CDP4EngineeringModel.Views.Dialogs
     /// <summary>
     /// Interaction logic for ParameteterSubscriptionFilterSelectionDialog.xaml
     /// </summary>
-    [DialogViewExport("ParameteterSubscriptionFilterSelectionDialog", "The Engineering Model Setup Iteration Selection")]
-    public partial class ParameteterSubscriptionFilterSelectionDialog : DXWindow, IDialogView
+    [DialogViewExport("ParameterSubscriptionFilterSelectionDialog", "The Engineering Model Setup Iteration Selection")]
+    public partial class ParameterSubscriptionFilterSelectionDialog : DXWindow, IDialogView
     {
         // <summary>
-        /// Initializes a new instance of the <see cref="ParameteterSubscriptionFilterSelectionDialog"/> class
+        /// Initializes a new instance of the <see cref="ParameterSubscriptionFilterSelectionDialog"/> class
         /// </summary>
-        public ParameteterSubscriptionFilterSelectionDialog()
+        public ParameterSubscriptionFilterSelectionDialog()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameteterSubscriptionFilterSelectionDialog"/> class.
+        /// Initializes a new instance of the <see cref="ParameterSubscriptionFilterSelectionDialog"/> class.
         /// </summary>
         /// <param name="initializeComponent">
         /// a value indicating whether the contained Components shall be loaded
@@ -52,7 +52,7 @@ namespace CDP4EngineeringModel.Views.Dialogs
         /// <remarks>
         /// This constructor is called by the navigation service
         /// </remarks>
-        public ParameteterSubscriptionFilterSelectionDialog(bool initializeComponent)
+        public ParameterSubscriptionFilterSelectionDialog(bool initializeComponent)
         {
             if (initializeComponent)
             {
