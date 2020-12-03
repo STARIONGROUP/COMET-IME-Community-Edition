@@ -79,8 +79,11 @@ namespace CDP4EngineeringModel
         /// <param name="parameterActualFiniteStateListApplicationBatchService">
         /// The (MEF injected) instance of <see cref="IParameterActualFiniteStateListApplicationBatchService"/>
         /// </param>
+        /// <param name="changeOwnerShipBatchService">
+        /// The (MEF injected) instance of <see cref="IChangeOwnerShipBatchService"/>
+        /// </param>
         [ImportingConstructor]
-        public EngineeringModelModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService)
+        public EngineeringModelModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService, IChangeOwnerShipBatchService changeOwnerShipBatchService)
         {
             this.regionManager = regionManager;
             this.RibbonManager = ribbonManager;
@@ -90,6 +93,7 @@ namespace CDP4EngineeringModel
             this.PluginSettingsService = pluginSettingsService;
             this.ParameterSubscriptionBatchService = parameterSubscriptionBatchService;
             this.ParameterActualFiniteStateListApplicationBatchService = parameterActualFiniteStateListApplicationBatchService;
+            this.ChangeOwnerShipBatchService = changeOwnerShipBatchService;
         }
 
         /// <summary>
@@ -130,6 +134,11 @@ namespace CDP4EngineeringModel
         internal IParameterActualFiniteStateListApplicationBatchService ParameterActualFiniteStateListApplicationBatchService { get; private set; }
 
         /// <summary>
+        /// The <see cref="IChangeOwnerShipBatchService"/> used to change the ownership of multiple <see cref="IOwnedThing"/>s in a batch operation
+        /// </summary>
+        internal IChangeOwnerShipBatchService ChangeOwnerShipBatchService { get; private set; }
+
+        /// <summary>
         /// Initialize the <see cref="EngineeringModelModule"/> by registering the <see cref="Region"/>s and the <see cref="RibbonPart"/>s
         /// </summary>
         public void Initialize()
@@ -158,7 +167,7 @@ namespace CDP4EngineeringModel
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new EngineeringModelRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService, this.ParameterSubscriptionBatchService, this.ParameterActualFiniteStateListApplicationBatchService);
+            var rdlRibbonPart = new EngineeringModelRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService, this.ParameterSubscriptionBatchService, this.ParameterActualFiniteStateListApplicationBatchService, this.ChangeOwnerShipBatchService);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }

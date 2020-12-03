@@ -72,8 +72,9 @@ namespace CDP4EngineeringModel.ViewModels
             var stopWatch = Stopwatch.StartNew();
 
             var parameterSubscriptionBatchService = ServiceLocator.Current.GetInstance<IParameterSubscriptionBatchService>();
-            
-            var viewModel = new ElementDefinitionsBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService, parameterSubscriptionBatchService);
+            var changeOwnerShipBatchService = ServiceLocator.Current.GetInstance<IChangeOwnerShipBatchService>();
+
+            var viewModel = new ElementDefinitionsBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService, parameterSubscriptionBatchService, changeOwnerShipBatchService);
             stopWatch.Stop();
             Logger.Info("Open ElementDefinitionsBrowserViewModel took {0}", stopWatch.Elapsed);
             return viewModel;

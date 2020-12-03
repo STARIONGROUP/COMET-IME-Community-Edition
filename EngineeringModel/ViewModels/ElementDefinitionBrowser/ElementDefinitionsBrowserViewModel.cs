@@ -84,6 +84,11 @@ namespace CDP4EngineeringModel.ViewModels
         private readonly IParameterSubscriptionBatchService parameterSubscriptionBatchService;
 
         /// <summary>
+        /// The <see cref="IChangeOwnerShipBatchService"/> used to change the ownership of multiple <see cref="IOwnedThing"/>s in a batch operation
+        /// </summary>
+        private readonly IChangeOwnerShipBatchService changeOwnerShipBatchService;
+
+        /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
         /// </summary>
         private string currentModel;
@@ -132,6 +137,9 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="parameterSubscriptionBatchService">
         /// The <see cref="IParameterSubscriptionBatchService"/> used to create multiple <see cref="ParameterSubscription"/>s in a batch operation
         /// </param>
+        /// <param name="changeOwnerShipBatchService">
+        /// The <see cref="IChangeOwnerShipBatchService"/> used to change the ownership of multiple <see cref="IOwnedThing"/>s in a batch operation
+        /// </param>
         public ElementDefinitionsBrowserViewModel(
             Iteration iteration,
             ISession session,
@@ -139,13 +147,15 @@ namespace CDP4EngineeringModel.ViewModels
             IPanelNavigationService panelNavigationService,
             IDialogNavigationService dialogNavigationService,
             IPluginSettingsService pluginSettingsService,
-            IParameterSubscriptionBatchService parameterSubscriptionBatchService)
+            IParameterSubscriptionBatchService parameterSubscriptionBatchService,
+            IChangeOwnerShipBatchService changeOwnerShipBatchService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = "Element Definitions";
             this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
+            this.changeOwnerShipBatchService = changeOwnerShipBatchService;
 
             this.ElementDefinitionRowViewModels = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.UpdateElementDefinition();
@@ -264,6 +274,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to create multiple <see cref="ParameterSubscription"/>s in batch operation mode
         /// </summary>
         public ReactiveCommand<object> BatchCreateSubscriptionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to change the ownership of an <see cref="IOwnedThing"/> and its contained items
+        /// </summary>
+        public ReactiveCommand<object> ChangeOwnerShipCommand { get; private set; }
 
         /// <summary>
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
@@ -423,6 +438,9 @@ namespace CDP4EngineeringModel.ViewModels
             this.BatchCreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
             this.BatchCreateSubscriptionCommand.Subscribe(_ => this.ExecuteBatchCreateSubscriptionCommand());
 
+            this.ChangeOwnerShipCommand = ReactiveCommand.Create();
+            this.ChangeOwnerShipCommand.Subscribe(_ => this.ExecuteChangeOwnerShipCommand());
+
             this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
             this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
 
@@ -510,6 +528,8 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Insert(1, new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
                 this.ContextMenu.Insert(2, new ContextMenuItemViewModel("Copy the Element Definition", "", this.CopyElementDefinitionCommand, MenuItemKind.Copy, ClassKind.ElementDefinition));
                 this.ContextMenu.Insert(3, new ContextMenuItemViewModel("Highlight Element Usages", "", this.HighlightElementUsagesCommand, MenuItemKind.Highlight, ClassKind.ElementUsage));
+                this.ContextMenu.Insert(4, new ContextMenuItemViewModel("Change OwnerShip", "", this.ChangeOwnerShipCommand , MenuItemKind.Edit, ClassKind.NotThing));
+
                 return;
             }
 
@@ -907,6 +927,46 @@ namespace CDP4EngineeringModel.ViewModels
             catch (Exception exception)
             {
                 logger.Error(exception, "An error occured when creating ParameterSubscriptions in a batch operation");
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Execute the <see cref="ChangeOwnerShipCommand"/>
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ExecuteChangeOwnerShipCommand()
+        {
+            var model = (EngineeringModel)this.Thing.Container;
+            var allowedDomainOfExpertises = model.EngineeringModelSetup.ActiveDomain;
+
+            var changeOwnerShipSelectionDialogViewModel = new ChangeOwnerShipSelectionDialogViewModel(allowedDomainOfExpertises);
+            var result = this.DialogNavigationService.NavigateModal(changeOwnerShipSelectionDialogViewModel) as ChangeOwnerShipSelectionResult;
+
+            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            {
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+
+                await this.changeOwnerShipBatchService.Update(
+                    this.Session,
+                    this.SelectedThing.Thing,
+                    result.DomainOfExpertise,
+                    result.IsContainedItemChangeOwnerShipSelected,
+                    new List<ClassKind> { ClassKind.ElementDefinition , ClassKind.Parameter});
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "An error occured when chaning OwnerShip of an Element Definition and contained Parameters in a batch operation");
             }
             finally
             {
