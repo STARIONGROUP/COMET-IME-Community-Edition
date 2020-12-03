@@ -2,7 +2,7 @@
 // <copyright file="ParameteterSubscriptionFilterSelectionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -25,12 +25,9 @@
 
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-
+    
     using CDP4Common.SiteDirectoryData;
 
     using CDP4EngineeringModel.ViewModels.Dialogs;
@@ -41,7 +38,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     /// Suite of tests for the <see cref="CategoryDomainParameterTypeSelectorDialogViewModel"/> class
     /// </summary>
     [TestFixture]
-    public class ParameteterSubscriptionFilterSelectionDialogViewModelTestFixture
+    public class CategoryDomainParameterTypeSelectorDialogViewModelTestFixture
     {
         private List<Category> categories;
         private List<DomainOfExpertise> domains;
