@@ -186,7 +186,7 @@ namespace CDP4EngineeringModel.Services
 
                     if (domainOfExpertises.Contains(parameter.Owner) &&
                         parameterTypes.Contains(parameter.ParameterType) &&
-                        (isCategorized | isUncategorizedIncluded))
+                        (isCategorized || isUncategorizedIncluded))
                     {
                         parameters.Add(parameter);
                     }

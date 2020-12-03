@@ -96,7 +96,7 @@ namespace CDP4EngineeringModel.Tests.Services
         }
 
         [Test]
-        public async Task Verify_that_Create_throws_ArgumentNullExceptions()
+        public void Verify_that_Create_throws_ArgumentNullExceptions()
         {
             Assert.ThrowsAsync<ArgumentNullException>(async () => await this.parameterActualFiniteStateListApplicationBatchService.Update(null, null, null, false, null, null, null));
             Assert.ThrowsAsync<ArgumentNullException>(async () => await this.parameterActualFiniteStateListApplicationBatchService.Update(this.session.Object, null, null, false, null, null, null));
