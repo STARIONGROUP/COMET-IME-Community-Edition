@@ -96,6 +96,11 @@ namespace CDP4EngineeringModel
         private readonly IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService;
 
         /// <summary>
+        /// The <see cref="IChangeOwnershipBatchService"/> used to change the ownership of multiple <see cref="IOwnedThing"/>s in a batch operation
+        /// </summary>
+        private readonly IChangeOwnershipBatchService changeOwnershipBatchService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EngineeringModelRibbonPart"/> class.
         /// </summary>
         /// <param name="order">
@@ -111,11 +116,19 @@ namespace CDP4EngineeringModel
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService)
+        /// <param name="parameterActualFiniteStateListApplicationBatchService">
+        /// The <see cref="IParameterActualFiniteStateListApplicationBatchService"/> used to update multiple <see cref="Parameter"/>s
+        /// to set the <see cref="ActualFiniteStateList"/> in a batch operation
+        /// </param>
+        /// <param name="changeOwnershipBatchService">
+        /// The <see cref="IChangeOwnershipBatchService"/> used to change the ownership of multiple <see cref="IOwnedThing"/>s in a batch operation
+        /// </param>
+        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService, IChangeOwnershipBatchService changeOwnershipBatchService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
             this.parameterActualFiniteStateListApplicationBatchService = parameterActualFiniteStateListApplicationBatchService;
+            this.changeOwnershipBatchService = changeOwnershipBatchService;
 
             this.openElementDefinitionBrowser = new List<ElementDefinitionsBrowserViewModel>();
             this.openOptionBrowser = new List<OptionBrowserViewModel>();
@@ -507,7 +520,7 @@ namespace CDP4EngineeringModel
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
             }
 
-            browser = new ElementDefinitionsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.parameterSubscriptionBatchService);
+            browser = new ElementDefinitionsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.parameterSubscriptionBatchService, this.changeOwnershipBatchService);
 
             this.openElementDefinitionBrowser.Add(browser);
             this.PanelNavigationService.Open(browser, false);

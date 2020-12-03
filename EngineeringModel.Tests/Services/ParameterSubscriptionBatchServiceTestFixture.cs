@@ -109,7 +109,7 @@ namespace CDP4EngineeringModel.Tests.Services
 
             await this.parameterSubscriptionBatchService.Create(this.session.Object, this.iteration, false, categories, domains, parameterTypes);
 
-            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1))  ;
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
         }
     }
 }

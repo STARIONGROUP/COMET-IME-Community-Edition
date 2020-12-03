@@ -2,7 +2,7 @@
 // <copyright file="EngineeringModelModuleTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -49,6 +49,7 @@ namespace CDP4EngineeringModel.Tests
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IParameterSubscriptionBatchService> parameterSubscriptionBatchService;
         private Mock<IParameterActualFiniteStateListApplicationBatchService> parameterActualFiniteStateListApplicationBatchService;
+        private Mock<IChangeOwnershipBatchService> changeOwnershipBatchService;
 
         [SetUp]
         public void SetUp()
@@ -59,13 +60,14 @@ namespace CDP4EngineeringModel.Tests
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.parameterSubscriptionBatchService = new Mock<IParameterSubscriptionBatchService>();
             this.parameterActualFiniteStateListApplicationBatchService = new Mock<IParameterActualFiniteStateListApplicationBatchService>();
+            this.changeOwnershipBatchService = new Mock<IChangeOwnershipBatchService>();
         }
 
         [Test]
         public void VerifyThatServicesAreSetByConstructor()
         {
             var regionManager = new RegionManager();
-            var module = new EngineeringModelModule(regionManager, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, this.parameterActualFiniteStateListApplicationBatchService.Object);
+            var module = new EngineeringModelModule(regionManager, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, this.parameterActualFiniteStateListApplicationBatchService.Object, this.changeOwnershipBatchService.Object);
             
             Assert.AreEqual(this.fluentRibbonManager.Object, module.RibbonManager);
             Assert.AreEqual(this.panelNavigationService.Object, module.PanelNavigationService);
@@ -74,6 +76,7 @@ namespace CDP4EngineeringModel.Tests
 
             Assert.That(module.ParameterSubscriptionBatchService, Is.EqualTo(this.parameterSubscriptionBatchService.Object));
             Assert.That(module.ParameterActualFiniteStateListApplicationBatchService, Is.EqualTo(this.parameterActualFiniteStateListApplicationBatchService.Object));
+            Assert.That(module.ChangeOwnershipBatchService, Is.EqualTo(this.changeOwnershipBatchService.Object));
         }
     }
 }
