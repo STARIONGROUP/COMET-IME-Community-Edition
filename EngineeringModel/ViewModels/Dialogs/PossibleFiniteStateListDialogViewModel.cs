@@ -121,7 +121,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.PopulatePossibleOwner();
             var iteration = (Iteration)this.Container;
             var model = (EngineeringModel)iteration.Container;
-            this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain);
+            this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain.OrderBy(d => d.Name));
         }
 
         /// <summary>
