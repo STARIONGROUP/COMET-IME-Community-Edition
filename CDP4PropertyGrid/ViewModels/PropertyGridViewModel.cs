@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="PanelNavigationService.cs" company="RHEA System S.A.">
+// <copyright file="PropertyGridViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -30,7 +30,7 @@ namespace CDP4PropertyGrid.ViewModels
     using System.Windows.Threading;
 
     using CDP4Common.CommonData;
-    
+
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation.Events;
@@ -145,7 +145,8 @@ namespace CDP4PropertyGrid.ViewModels
                     };
 
                     CDPMessageBus.Current.SendMessage(new ViewModelChangeEvent(newVm));
-                }, DispatcherPriority.Background);
+                },
+                DispatcherPriority.Background);
         }
     }
 }
