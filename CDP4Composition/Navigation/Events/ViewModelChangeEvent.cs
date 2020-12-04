@@ -23,7 +23,6 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Composition.Navigation.Events
 {
     /// <summary>
