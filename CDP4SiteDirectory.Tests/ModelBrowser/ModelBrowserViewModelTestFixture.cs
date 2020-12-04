@@ -1,6 +1,25 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ModelBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -15,6 +34,7 @@ namespace CDP4SiteDirectory.Tests
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -85,8 +105,11 @@ namespace CDP4SiteDirectory.Tests
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
+            var selectedThingChangedRaised = false;
+            CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
+
             viewmodel.SelectedThing = viewmodel.ModelSetup.First();
-            this.navigationService.Verify(x => x.Open(It.IsAny<Thing>(), this.session.Object));
+            Assert.IsTrue(selectedThingChangedRaised);
 
             Assert.AreEqual("Engineering Model Setup", viewmodel.SelectedThingClassKindString);
         }
@@ -110,8 +133,12 @@ namespace CDP4SiteDirectory.Tests
             Assert.AreEqual("Phase: Preparation Phase, Kind: Study Model", modelrow.Description);
             var iterationFolderRow = modelrow.ContainedRows[1];
 
+            var selectedThingChangedRaised = false;
+            CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
+
             viewmodel.SelectedThing = iterationFolderRow.ContainedRows.First();
-            this.navigationService.Verify(x => x.Open(It.IsAny<Thing>(), this.session.Object));
+            Assert.IsTrue(selectedThingChangedRaised);
+
             Assert.AreEqual("IterationSetup", viewmodel.SelectedThing.Thing.ClassKind.ToString());
         }
 
@@ -137,11 +164,14 @@ namespace CDP4SiteDirectory.Tests
             var modelrow = viewmodel.ModelSetup.First();
             var participantFolderRow = modelrow.ContainedRows.First();
 
+            var selectedThingChangedRaised = false;
+            CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
+
             viewmodel.SelectedThing = participantFolderRow.ContainedRows.First();
             var participantRow = participantFolderRow.ContainedRows.First() as ModelParticipantRowViewModel;
             Assert.NotNull(participantRow);
             Assert.AreEqual("DoE: Thermal, Organization: RHEA", participantRow.Description);
-            this.navigationService.Verify(x => x.Open(It.IsAny<Thing>(), this.session.Object));
+            Assert.IsTrue(selectedThingChangedRaised);
         }
 
         [Test]

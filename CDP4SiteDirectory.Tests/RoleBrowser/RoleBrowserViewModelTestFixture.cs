@@ -1,8 +1,27 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RoleBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Tests
 {
@@ -10,16 +29,24 @@ namespace CDP4SiteDirectory.Tests
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Events;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+    
     using CDP4SiteDirectory.ViewModels;
+    
     using Moq;
+    
     using NUnit.Framework;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -77,8 +104,11 @@ namespace CDP4SiteDirectory.Tests
         {
             var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null, null);
 
+            var selectedThingChangedRaised = false;
+            CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
+
             viewmodel.SelectedThing = viewmodel.Roles.First();
-            this.navigation.Verify(x => x.Open(It.IsAny<Thing>(), this.session.Object));
+            Assert.IsTrue(selectedThingChangedRaised);
         }
 
         [Test]
