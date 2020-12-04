@@ -9,7 +9,7 @@ environment:
   SONARCLOUD_ORGANIZATION: rheagroup
   SONARCLOUD_URL: 'https://sonarcloud.io'
   SONARCLOUD_TOKEN:
-    secure: SusLBtRCNeSFMhatgx83owIfxgme9yjV8PxhORbPZ0Mz/aixNIbXWZlSz4Zxc05u
+    secure: 67KNIhsvMPwHylkTvfGtu39hYkK94X8svR0pxSBeqbm92ffGeViAv7SVDHnC+kbv
 
 skip_branch_with_pr: true
 for:
