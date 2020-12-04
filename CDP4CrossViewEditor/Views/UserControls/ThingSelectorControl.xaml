@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="CDP4CrossViewEditor.Views.UserControls.ThingSelectorControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             mc:Ignorable="d"
+             d:DesignHeight="100" d:DesignWidth="100">
+    <dxlc:LayoutGroup Orientation="Vertical" HorizontalAlignment="Center">
+        <Button MinWidth="75"
+                MinHeight="25"
+                MaxWidth="75"
+                MaxHeight="25"
+                HorizontalAlignment="Right"
+                Command="{Binding Path=MoveToTarget}"
+                IsDefault="True">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{dx:DXImage Image=Next_16x16.png}" Stretch="Uniform" />
+            </StackPanel>
+        </Button>
+        <Button MinWidth="75"
+                MinHeight="25"
+                MaxWidth="75"
+                MaxHeight="25"
+                HorizontalAlignment="Right"
+                Command="{Binding Path=MoveToSource}">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{dx:DXImage Image=Prev_16x16.png}" Stretch="Uniform" />
+            </StackPanel>
+        </Button>
+    </dxlc:LayoutGroup>
+</UserControl>

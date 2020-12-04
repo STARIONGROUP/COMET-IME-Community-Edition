@@ -27,6 +27,7 @@ namespace CDP4CrossViewEditor
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Text;
@@ -36,9 +37,14 @@ namespace CDP4CrossViewEditor
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
+    using CDP4CrossViewEditor.ViewModels;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4OfficeInfrastructure;
+    using CDP4OfficeInfrastructure.OfficeDal;
+    using NetOffice.ExcelApi;
     using NLog;
     using ReactiveUI;
 
@@ -201,12 +207,77 @@ namespace CDP4CrossViewEditor
 
             if (ribbonControlId.StartsWith("Editor_"))
             {
-                await Task.Delay(1000);
+                this.LaunchCrossViewEditorAsync(ribbonControlTag);
             }
             else
             {
                 logger.Debug($"The ribbon control with Id {ribbonControlId} and Tag {ribbonControlTag} is not handled by the current RibbonPart");
             }
+        }
+
+        /// <summary>
+        /// Launch parameter editor for the specified iteration
+        /// </summary>
+        /// <param name="iterationId">
+        /// The unique id of the <see cref="Iteration"/>
+        /// </param>
+        private void LaunchCrossViewEditorAsync(string iterationId)
+        {
+            if (iterationId == string.Empty)
+            {
+                logger.Debug("The workbook cannot be rebuilt: the iteration id is empty");
+                return;
+            }
+
+            var uniqueId = Guid.Parse(iterationId);
+            var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+            if (iteration == null)
+            {
+                logger.Debug("The workbook cannot be rebuilt: iteration {0} cannot be found", uniqueId);
+                return;
+            }
+
+            var workbook = this.QueryIterationWorkbook(this.officeApplicationWrapper.Excel, iteration);
+
+            if (workbook == null && iteration.Container is EngineeringModel)
+            {
+                var crossViewDialogViewModel = new CrossViewDialogViewModel(iteration);
+                this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
+            }
+
+        }
+
+        /// <summary>
+        /// Gets the workbook that corresponds to the specified <see cref="Iteration"/>
+        /// </summary>
+        /// <param name="application">
+        /// The Excel application
+        /// </param>
+        /// <param name="iteration">
+        /// The <see cref="Iteration"/> for which the workbook is queried
+        /// </param>
+        /// <returns>
+        /// The <see cref="Workbook"/> that corresponds to the queried Iteration, null if the workbook cannot be found.
+        /// </returns>
+        private Workbook QueryIterationWorkbook(Application application, Iteration iteration)
+        {
+            foreach (var workbook in application.Workbooks)
+            {
+                var workbookSessionDal = new WorkbookSessionDal(workbook);
+                var workbookSession = workbookSessionDal.Read();
+
+                if (workbookSession == null)
+                {
+                    continue;
+                }
+
+                if (workbookSession.IterationSetup.IterationIid == iteration.Iid)
+                {
+                    return workbook;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -241,7 +312,7 @@ namespace CDP4CrossViewEditor
                 var domainShortName = selectedDomainOfExpertise == null ? string.Empty : selectedDomainOfExpertise.ShortName;
                 var label = $"{engineeringModel.EngineeringModelSetup.ShortName} - {iteration.IterationSetup.IterationNumber} : [{domainShortName}]";
 
-                var menuContent = $"<button id=\"Editor_{iteration.Iid}\" label=\"{label}\" onAction=\"OnAction\" tag=\"{0}\" />";
+                var menuContent = $"<button id=\"Editor_{iteration.Iid}\" label=\"{label}\" onAction=\"OnAction\" tag=\"{iteration.Iid}\" />";
                 sb.Append(menuContent);
             }
 

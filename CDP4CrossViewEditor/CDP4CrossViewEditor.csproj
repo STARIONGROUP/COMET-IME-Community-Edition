@@ -249,6 +249,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\CrossViewDialog.xaml.cs">
+      <DependentUpon>CrossViewDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\UserControls\ThingSelector.xaml.cs">
+      <DependentUpon>ThingSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\UserControls\ThingSelectorSource.xaml.cs">
+      <DependentUpon>ThingSelectorSource.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\UserControls\ThingSelectorTarget.xaml.cs">
+      <DependentUpon>ThingSelectorTarget.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\UserControls\ThingSelectorControl.xaml.cs">
+      <DependentUpon>ThingSelectorControl.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
@@ -264,15 +281,26 @@
     <EmbeddedResource Include="Resources\RibbonXml\CrossViewEditorRibbon.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="Validation\ValueValidator.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SubmitConfirmation.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SubmitConfirmation.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\WorkbookRebuild.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\WorkbookRebuild.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\WorkbookSelection.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\WorkbookSelection.g.i.cs" />
+    <Page Include="Views\CrossViewDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\ThingSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\ThingSelectorSource.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\ThingSelectorTarget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\ThingSelectorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Reference Update="System">
@@ -321,7 +349,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RowModels\" />
-    <Folder Include="ViewModels\" />
-    <Folder Include="Views\" />
   </ItemGroup>
 </Project>
