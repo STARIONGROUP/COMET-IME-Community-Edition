@@ -7,6 +7,7 @@
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Concurrent;
     using System.Linq;
     using CDP4Common.CommonData;
@@ -39,7 +40,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private ModelReferenceDataLibrary mrdl;
         private SiteReferenceDataLibrary srdl;
         private Category cat;
-        private DomainOfExpertise owner;
+
+        private DomainOfExpertise alphaOwner;
+        private DomainOfExpertise betaOwner;
+        private DomainOfExpertise gammaOwner;
+        private IEnumerable<DomainOfExpertise> possibleOwners;
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Uri uri = new Uri("http://test.com");
@@ -61,12 +66,18 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri){EngineeringModelSetup = this.modelsetup};
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
             this.model.Iteration.Add(this.iteration);
-            this.owner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
-            this.sitedir.Domain.Add(this.owner);
+
+            this.alphaOwner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "Alpha Owner" };
+            this.betaOwner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "Beta Owner" };
+            this.gammaOwner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "Gamma Owner" };
+            this.possibleOwners = new List<DomainOfExpertise> { this.gammaOwner, this.alphaOwner, this.betaOwner };
+
+            this.sitedir.Domain.AddRange(this.possibleOwners);
+            this.modelsetup.ActiveDomain.AddRange(this.possibleOwners);
+
             this.cat = new Category();
             this.cat.PermissibleClass.Add(ClassKind.PossibleFiniteStateList);
             this.srdl.DefinedCategory.Add(this.cat);
-            this.modelsetup.ActiveDomain.Add(this.owner);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
@@ -94,7 +105,10 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual(statelist.Name, vm.Name);
             Assert.AreEqual(statelist.ShortName, vm.ShortName);
 
-            Assert.AreEqual(1, vm.PossibleOwner.Count);
+            Assert.AreEqual(3, vm.PossibleOwner.Count);
+            Assert.That(vm.PossibleOwner, Is.Ordered.By(nameof(DomainOfExpertise.Name)));
+            Assert.That(this.possibleOwners, Is.Not.Ordered.By(nameof(DomainOfExpertise.Name)));
+
             Assert.AreEqual(1, vm.PossibleCategory.Count);
 
             Assert.IsFalse(vm.OkCanExecute);

@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionsBrowser.cs" company="RHEA System S.A.">
+// <copyright file="CategoryDomainParameterTypeSelectorDialog.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -23,26 +23,28 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.Views
+namespace CDP4EngineeringModel.Views.Dialogs
 {
-    using CDP4Composition;
     using CDP4Composition.Attributes;
-
+    using CDP4Composition.Navigation.Interfaces;
+   
+    using DevExpress.Xpf.Core;
+    
     /// <summary>
-    /// Interaction logic for ElementDefinitions view
+    /// Interaction logic for ParameteterSubscriptionFilterSelectionDialog.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.EditorPanel)]
-    public partial class ElementDefinitionsBrowser : IPanelView
+    [DialogViewExport("CategoryDomainParameterTypeSelectorDialog", "Category, DomainOfExpertise and ParameterType Selector")]
+    public partial class CategoryDomainParameterTypeSelectorDialog : DXWindow, IDialogView
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ElementDefinitionsBrowser"/> class
+        // <summary>
+        /// Initializes a new instance of the <see cref="ParameterSubscriptionFilterSelectionDialog"/> class
         /// </summary>
-        public ElementDefinitionsBrowser()
+        public CategoryDomainParameterTypeSelectorDialog()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ElementDefinitionsBrowser"/> class.
+        /// Initializes a new instance of the <see cref="ParameterSubscriptionFilterSelectionDialog"/> class.
         /// </summary>
         /// <param name="initializeComponent">
         /// a value indicating whether the contained Components shall be loaded
@@ -50,7 +52,7 @@ namespace CDP4EngineeringModel.Views
         /// <remarks>
         /// This constructor is called by the navigation service
         /// </remarks>
-        public ElementDefinitionsBrowser(bool initializeComponent)
+        public CategoryDomainParameterTypeSelectorDialog(bool initializeComponent)
         {
             if (initializeComponent)
             {

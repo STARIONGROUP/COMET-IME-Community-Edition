@@ -214,7 +214,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.iteration.Element.Add(elementDefinition);
 
-            var browser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, null, this.dialogNavigationService.Object, null);
+            var browser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, null, this.dialogNavigationService.Object, null, null, null);
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, browser);
 
             var dropInfo = new Mock<IDropInfo>();

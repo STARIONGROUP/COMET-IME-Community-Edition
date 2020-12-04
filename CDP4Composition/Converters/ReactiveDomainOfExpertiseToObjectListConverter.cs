@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionsBrowser.cs" company="RHEA System S.A.">
+// <copyright file="ReactiveDomainOfExpertiseToObjectListConverter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
@@ -23,39 +23,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4EngineeringModel.Views
+namespace CDP4Composition.Converters
 {
-    using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using System.Collections.Generic;
+
+    using CDP4Common.SiteDirectoryData;
+
+    using ReactiveUI;
 
     /// <summary>
-    /// Interaction logic for ElementDefinitions view
+    /// Converts the <see cref="ReactiveList{T}"/> of <see cref="Category"/> to <see cref="List{T}"/> of <see cref="object"/> and back.
     /// </summary>
-    [PanelViewExport(RegionNames.EditorPanel)]
-    public partial class ElementDefinitionsBrowser : IPanelView
+    public class ReactiveDomainOfExpertiseToObjectListConverter : GenericListToObjectListConverter<DomainOfExpertise>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ElementDefinitionsBrowser"/> class
-        /// </summary>
-        public ElementDefinitionsBrowser()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ElementDefinitionsBrowser"/> class.
-        /// </summary>
-        /// <param name="initializeComponent">
-        /// a value indicating whether the contained Components shall be loaded
-        /// </param>
-        /// <remarks>
-        /// This constructor is called by the navigation service
-        /// </remarks>
-        public ElementDefinitionsBrowser(bool initializeComponent)
-        {
-            if (initializeComponent)
-            {
-                this.InitializeComponent();
-            }
-        }
     }
 }

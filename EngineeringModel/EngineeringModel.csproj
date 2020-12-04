@@ -5,7 +5,6 @@
     <RootNamespace>CDP4EngineeringModel</RootNamespace>
     <AssemblyName>CDP4EngineeringModel</AssemblyName>
     <TargetFramework>net452</TargetFramework>
-   
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4EngineeringModel</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -252,6 +251,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\Dialogs\CategoryDomainParameterTypeSelectorDialog.xaml.cs">
+      <DependentUpon>CategoryDomainParameterTypeSelectorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Dialogs\ChangeOwnershipSelectionDialog.xaml.cs">
+      <DependentUpon>ChangeOwnershipselectionDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\Dialogs\ActualFiniteStateDialog.xaml.cs">
       <DependentUpon>ActualFiniteStateDialog.xaml</DependentUpon>
     </Compile>
@@ -368,6 +373,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\Dialogs\CategoryDomainParameterTypeSelectorDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Dialogs\ActualFiniteStateDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -460,6 +469,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Dialogs\ChangeOwnershipselectionDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\FileStoreBrowsers\CommonFileStoreBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -544,6 +557,8 @@
     <Compile Remove="obj\x64\Debug\Views\Dialogs\BinaryRelationshipDialog.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\BuiltInRuleVerificationDialog.g.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\BuiltInRuleVerificationDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ChangeOwnershipSelectionDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ChangeOwnershipSelectionDialog.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\ElementDefinitionDialog.g.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\ElementDefinitionDialog.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\ElementUsageDialog.g.cs" />
@@ -562,6 +577,8 @@
     <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterOverrideDialog.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterSubscriptionDialog.g.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterSubscriptionDialog.g.i.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameteterSubscriptionFilterSelectionDialog.g.cs" />
+    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameteterSubscriptionFilterSelectionDialog.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateDialog.g.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateDialog.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\Dialogs\PossibleFiniteStateListDialog.g.cs" />

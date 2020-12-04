@@ -2,7 +2,7 @@
 // <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -26,6 +26,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -56,6 +57,7 @@ namespace CDP4EngineeringModel.ViewModels
     
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
+    using CDP4EngineeringModel.ViewModels.Dialogs;
 
     using NLog;
     
@@ -75,6 +77,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// a <see cref="ElementDefinitionBrowserChildComparer"/> that is used to assist in sorted inserts
         /// </summary>
         private static readonly ElementDefinitionBrowserChildComparer rowComparer = new ElementDefinitionBrowserChildComparer();
+
+        /// <summary>
+        /// The <see cref="IParameterSubscriptionBatchService"/> used to create multiple <see cref="ParameterSubscription"/>s in a batch operation
+        /// </summary>
+        private readonly IParameterSubscriptionBatchService parameterSubscriptionBatchService;
+
+        /// <summary>
+        /// The <see cref="IChangeOwnershipBatchService"/> used to change the ownership of multiple <see cref="IOwnedThing"/>s in a batch operation
+        /// </summary>
+        private readonly IChangeOwnershipBatchService changeOwnershipBatchService;
 
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -102,6 +114,11 @@ namespace CDP4EngineeringModel.ViewModels
         private bool canCreateSubscription;
 
         /// <summary>
+        /// Backing field for <see cref="CanCreateBatchSubscriptions"/>
+        /// </summary>
+        private bool canCreateBatchSubscriptions;
+
+        /// <summary>
         /// Backing field for <see cref="CanCreateOverride"/>
         /// </summary>
         private bool canCreateOverride;
@@ -117,11 +134,28 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public ElementDefinitionsBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        /// <param name="parameterSubscriptionBatchService">
+        /// The <see cref="IParameterSubscriptionBatchService"/> used to create multiple <see cref="ParameterSubscription"/>s in a batch operation
+        /// </param>
+        /// <param name="changeOwnershipBatchService">
+        /// The <see cref="IChangeOwnershipBatchService"/> used to change the ownership of multiple <see cref="IOwnedThing"/>s in a batch operation
+        /// </param>
+        public ElementDefinitionsBrowserViewModel(
+            Iteration iteration,
+            ISession session,
+            IThingDialogNavigationService thingDialogNavigationService,
+            IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService,
+            IPluginSettingsService pluginSettingsService,
+            IParameterSubscriptionBatchService parameterSubscriptionBatchService,
+            IChangeOwnershipBatchService changeOwnershipBatchService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = "Element Definitions";
             this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+
+            this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
+            this.changeOwnershipBatchService = changeOwnershipBatchService;
 
             this.ElementDefinitionRowViewModels = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.UpdateElementDefinition();
@@ -184,6 +218,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the batch create subscription command shall be enabled
+        /// </summary>
+        public bool CanCreateBatchSubscriptions
+        {
+            get { return this.canCreateBatchSubscriptions; }
+            private set { this.RaiseAndSetIfChanged(ref this.canCreateBatchSubscriptions, value); }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the create override command shall be enabled
         /// </summary>
         public bool CanCreateOverride
@@ -226,6 +269,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterSubscription"/>
         /// </summary>
         public ReactiveCommand<object> CreateSubscriptionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to create multiple <see cref="ParameterSubscription"/>s in batch operation mode
+        /// </summary>
+        public ReactiveCommand<object> BatchCreateSubscriptionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to change the ownership of an <see cref="IOwnedThing"/> and its contained items
+        /// </summary>
+        public ReactiveCommand<object> ChangeOwnershipCommand { get; private set; }
 
         /// <summary>
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
@@ -369,6 +422,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.InitializeCommands();
 
             this.ComputeNotContextDependentPermission();
+
             this.CreateParameterGroup = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
             this.CreateParameterGroup.Subscribe(_ => this.ExecuteCreateParameterGroup());
 
@@ -380,6 +434,12 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSubscription));
             this.CreateSubscriptionCommand.Subscribe(_ => this.ExecuteCreateSubscriptionCommand());
+            
+            this.BatchCreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
+            this.BatchCreateSubscriptionCommand.Subscribe(_ => this.ExecuteBatchCreateSubscriptionCommand());
+
+            this.ChangeOwnershipCommand = ReactiveCommand.Create();
+            this.ChangeOwnershipCommand.Subscribe(_ => this.ExecuteChangeOwnershipCommand());
 
             this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
             this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
@@ -397,6 +457,7 @@ namespace CDP4EngineeringModel.ViewModels
         public override void ComputePermission()
         {
             base.ComputePermission();
+
             if (this.SelectedThing == null)
             {
                 return;
@@ -448,6 +509,8 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Subscriptions", "", this.BatchCreateSubscriptionCommand, MenuItemKind.Create, ClassKind.NotThing));
+            
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
@@ -465,6 +528,8 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Insert(1, new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
                 this.ContextMenu.Insert(2, new ContextMenuItemViewModel("Copy the Element Definition", "", this.CopyElementDefinitionCommand, MenuItemKind.Copy, ClassKind.ElementDefinition));
                 this.ContextMenu.Insert(3, new ContextMenuItemViewModel("Highlight Element Usages", "", this.HighlightElementUsagesCommand, MenuItemKind.Highlight, ClassKind.ElementUsage));
+                this.ContextMenu.Insert(4, new ContextMenuItemViewModel("Change Ownership", "", this.ChangeOwnershipCommand , MenuItemKind.Edit, ClassKind.NotThing));
+
                 return;
             }
 
@@ -535,7 +600,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var overrideRow = this.SelectedThing as ParameterOverrideRowViewModel;
-
             if (overrideRow != null)
             {
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Subscribe to this Override", "", this.CreateSubscriptionCommand, MenuItemKind.Create, ClassKind.ParameterSubscription));
@@ -712,6 +776,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.CanCreateElementDefinition = this.PermissionService.CanWrite(ClassKind.ElementDefinition, this.Thing);
             this.CanCreateParameterGroup = this.PermissionService.CanWrite(ClassKind.ParameterGroup, this.Thing);
+            this.CanCreateBatchSubscriptions = this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.Thing);
         }
 
         /// <summary>
@@ -822,6 +887,86 @@ namespace CDP4EngineeringModel.ViewModels
             catch (Exception exception)
             {
                 logger.Error(exception, "An error occured when creating a copy of an Element Definition");
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Execute the <see cref="BatchCreateSubscriptionCommand"/>
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ExecuteBatchCreateSubscriptionCommand()
+        {
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
+            var model = (EngineeringModel)this.Thing.Container;
+            var allowedDomainOfExpertises = model.EngineeringModelSetup.ActiveDomain.Where(x => x != currentDomainOfExpertise);
+
+            var requiredRls = model.RequiredRdls;
+            var allowedCategories = requiredRls.SelectMany(rdl => rdl.DefinedCategory).Where(c => c.PermissibleClass.Contains(ClassKind.ElementDefinition));
+            var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
+
+            var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(allowedParameterTypes, allowedCategories, allowedDomainOfExpertises);
+            var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
+
+            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            {
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+
+                await this.parameterSubscriptionBatchService.Create(this.Session, this.Thing, result.IsUncategorizedIncluded, result.Categories, result.DomainOfExpertises, result.ParameterTypes);
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "An error occured when creating ParameterSubscriptions in a batch operation");
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Execute the <see cref="ChangeOwnershipCommand"/>
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ExecuteChangeOwnershipCommand()
+        {
+            var model = (EngineeringModel)this.Thing.Container;
+            var allowedDomainOfExpertises = model.EngineeringModelSetup.ActiveDomain;
+
+            var changeOwnershipSelectionDialogViewModel = new ChangeOwnershipSelectionDialogViewModel(allowedDomainOfExpertises);
+            var result = this.DialogNavigationService.NavigateModal(changeOwnershipSelectionDialogViewModel) as ChangeOwnershipSelectionResult;
+
+            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            {
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+
+                await this.changeOwnershipBatchService.Update(
+                    this.Session,
+                    this.SelectedThing.Thing,
+                    result.DomainOfExpertise,
+                    result.IsContainedItemChangeOwnershipSelected,
+                    new List<ClassKind> { ClassKind.ElementDefinition , ClassKind.Parameter});
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "An error occured when chaning Ownership of an Element Definition and contained Parameters in a batch operation");
             }
             finally
             {

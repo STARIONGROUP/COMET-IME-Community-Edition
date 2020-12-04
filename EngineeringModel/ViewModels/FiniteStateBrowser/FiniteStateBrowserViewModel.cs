@@ -30,6 +30,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+    using System.Windows.Controls;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -47,6 +48,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
+    using CDP4EngineeringModel.Services;
+    using CDP4EngineeringModel.ViewModels.Dialogs;
     using CDP4EngineeringModel.Views;
 
     using ReactiveUI;
@@ -97,6 +100,11 @@ namespace CDP4EngineeringModel.ViewModels
         private bool canExecuteCreateActualFiniteStateListCommand;
 
         /// <summary>
+        /// Backing field for <see cref="CanUpdateBatchParameters"/>
+        /// </summary>
+        private bool canUpdateBatchParameters;
+
+        /// <summary>
         /// Backing field for <see cref="CanSetAsDefault"/>
         /// </summary>
         private bool canSetAsDefault;
@@ -110,6 +118,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="CurrentIteration"/>
         /// </summary>
         private int currentIteration;
+
+        /// <summary>
+        /// The <see cref="IParameterActualFiniteStateListApplicationBatchService"/> used to update multiple <see cref="Parameter"/>s to set the <see cref="ActualFiniteStateList"/> in a batch operation
+        /// </summary>
+        private readonly IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FiniteStateBrowserViewModel"/> class
@@ -132,11 +145,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public FiniteStateBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        /// <param name="parameterActualFiniteStateListApplicationBatchService">
+        /// The <see cref="IParameterActualFiniteStateListApplicationBatchService"/> used to update multiple <see cref="Parameter"/>s to set the <see cref="ActualFiniteStateList"/> in a batch operation
+        /// </param>
+        public FiniteStateBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+
+            this.parameterActualFiniteStateListApplicationBatchService = parameterActualFiniteStateListApplicationBatchService;
 
             this.UpdatePossibleFiniteStatesList();
             this.UpdateActualFiniteStatesList();
@@ -212,6 +230,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the batch update parameters command shall be enabled
+        /// </summary>
+        public bool CanUpdateBatchParameters
+        {
+            get { return this.canUpdateBatchParameters; }
+            private set { this.RaiseAndSetIfChanged(ref this.canUpdateBatchParameters, value); }
+        }
+
+        /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="PossibleFiniteStateList"/>
         /// </summary>
         public ReactiveCommand<object> CreatePossibleFiniteStateListCommand { get; private set; }
@@ -229,8 +256,13 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="PossibleFiniteState"/> 
         /// </summary>
-        public ReactiveCommand<object> CreatePossibleStateCommand { get; private set; } 
-        
+        public ReactiveCommand<object> CreatePossibleStateCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to update multiple <see cref="Parameter"/>s in batch operation mode
+        /// </summary>
+        public ReactiveCommand<object> BatchUpdateParameterCommand { get; private set; }
+
         /// <summary>
         /// Initializes the browser
         /// </summary>
@@ -262,8 +294,10 @@ namespace CDP4EngineeringModel.ViewModels
             this.SetDefaultStateCommand.Subscribe(_ => this.ExecuteSetDefaultCommand());
 
             this.CreatePossibleStateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreatePossibleState));
-            this.CreatePossibleStateCommand.Subscribe(
-                _ => this.ExecuteCreateCommand<PossibleFiniteState>(this.SelectedThing.Thing.GetContainerOfType<PossibleFiniteStateList>()));
+            this.CreatePossibleStateCommand.Subscribe(_ => this.ExecuteCreateCommand<PossibleFiniteState>(this.SelectedThing.Thing.GetContainerOfType<PossibleFiniteStateList>()));
+
+            this.BatchUpdateParameterCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanUpdateBatchParameters));
+            this.BatchUpdateParameterCommand.Subscribe(_ => this.ExecuteBatchUpdateParameterCommand());
         }
 
         /// <summary>
@@ -303,6 +337,12 @@ namespace CDP4EngineeringModel.ViewModels
                 this.CanCreatePossibleState = this.PermissionService.CanWrite(possibleList);
             }
 
+            var actualFiniteStateListRowViewModel = this.SelectedThing as ActualFiniteStateListRowViewModel;
+            if (actualFiniteStateListRowViewModel != null)
+            {
+                this.CanUpdateBatchParameters = this.PermissionService.CanWrite(ClassKind.Parameter, this.Thing);
+            }
+
             this.CanSetAsDefault = false;
         }
 
@@ -338,6 +378,12 @@ namespace CDP4EngineeringModel.ViewModels
             if (possibleListRow != null)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Possible Finite State", "", this.CreatePossibleStateCommand, MenuItemKind.Create, ClassKind.PossibleFiniteState));
+            }
+
+            var actualFiniteStateListRowViewModel = this.SelectedThing as ActualFiniteStateListRowViewModel;
+            if (actualFiniteStateListRowViewModel != null)
+            {
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Apply Actual Finite State List to multiple Parameters", "", this.BatchUpdateParameterCommand, MenuItemKind.Edit, ClassKind.NotThing));
             }
         }
 
@@ -430,6 +476,51 @@ namespace CDP4EngineeringModel.ViewModels
 
             transaction.CreateOrUpdate(clone);
             await this.DalWrite(transaction);
+        }
+
+        /// <summary>
+        /// Execute the <see cref="BatchUpdateParameterCommand"/>
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ExecuteBatchUpdateParameterCommand()
+        {
+            var actualFiniteStateListRowViewModel = this.SelectedThing as ActualFiniteStateListRowViewModel;
+
+            if (actualFiniteStateListRowViewModel == null)
+            {
+                return;
+            }
+
+            var model = (EngineeringModel)this.Thing.Container;
+            
+            var requiredRls = model.RequiredRdls;
+            var allowedCategories = requiredRls.SelectMany(rdl => rdl.DefinedCategory).Where(c => c.PermissibleClass.Contains(ClassKind.ElementDefinition));
+            var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
+
+            var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(allowedParameterTypes, allowedCategories, model.EngineeringModelSetup.ActiveDomain);
+            var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
+
+            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            {
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+
+                await this.parameterActualFiniteStateListApplicationBatchService.Update(this.Session, this.Thing, actualFiniteStateListRowViewModel.Thing, result.IsUncategorizedIncluded, result.Categories, result.DomainOfExpertises, result.ParameterTypes);
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "An error occured when applying an ActualFiniteState to multiple Parameters in a batch operation");
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
         }
 
         /// <summary>

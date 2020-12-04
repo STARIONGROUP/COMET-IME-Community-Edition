@@ -7,6 +7,7 @@
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
@@ -30,7 +31,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     [TestFixture]
     internal class ActualFiniteStateListDialogViewModelTestFixture
     {
-        private Mock<ISession> session;        
+        private Mock<ISession> session;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
 
         private Iteration iteration;
@@ -41,7 +42,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private ModelReferenceDataLibrary mrdl;
         private SiteReferenceDataLibrary srdl;
         private Category cat;
-        private DomainOfExpertise owner;
+
+        private DomainOfExpertise alphaOwner;
+        private DomainOfExpertise betaOwner;
+        private DomainOfExpertise gammaOwner;
+        private IEnumerable<DomainOfExpertise> possibleOwners;
 
         private PossibleFiniteStateList possibleList1;
         private PossibleFiniteStateList possibleList2;
@@ -60,7 +65,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.session = new Mock<ISession>();            
+            this.session = new Mock<ISession>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
 
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
@@ -70,15 +75,21 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
             this.sitedir.Model.Add(this.modelsetup);
             this.modelsetup.RequiredRdl.Add(this.mrdl);
-            this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri){EngineeringModelSetup = this.modelsetup};
+            this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.modelsetup };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
             this.model.Iteration.Add(this.iteration);
-            this.owner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
-            this.sitedir.Domain.Add(this.owner);
+
+            this.alphaOwner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "Alpha Owner" };
+            this.betaOwner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "Beta Owner" };
+            this.gammaOwner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "Gamma Owner" };
+            this.possibleOwners = new List<DomainOfExpertise> { this.gammaOwner, this.alphaOwner, this.betaOwner };
+
+            this.sitedir.Domain.AddRange(this.possibleOwners);
+            this.modelsetup.ActiveDomain.AddRange(this.possibleOwners);
+
             this.cat = new Category();
             this.cat.PermissibleClass.Add(ClassKind.PossibleFiniteStateList);
             this.srdl.DefinedCategory.Add(this.cat);
-            this.modelsetup.ActiveDomain.Add(this.owner);
 
             this.possibleList1 = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri) { Name = "list1" };
             this.state11 = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "s11" };
@@ -122,7 +133,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var vm = new ActualFiniteStateListDialogViewModel(statelist, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, containerClone);
 
             Assert.IsFalse(vm.OkCanExecute);
-            Assert.AreEqual(1, vm.PossibleOwner.Count);
+
+            Assert.AreEqual(3, vm.PossibleOwner.Count);
+            Assert.That(vm.PossibleOwner, Is.Ordered.By(nameof(DomainOfExpertise.Name)));
+            Assert.That(this.possibleOwners, Is.Not.Ordered.By(nameof(DomainOfExpertise.Name)));
+
             Assert.AreEqual(0, vm.PossibleFiniteStateListRow.Count);
             Assert.AreEqual(0, vm.ActualState.Count);
 
@@ -141,7 +156,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual(1, pfsl2.PossiblePossibleFiniteStateList.Count);
             Assert.AreEqual(1, pfsl1.PossiblePossibleFiniteStateList.Count);
 
-            vm.SelectedOwner = vm.PossibleOwner.Single();
+            vm.SelectedOwner = vm.PossibleOwner.First();
 
             Assert.IsTrue(vm.OkCanExecute);
         }
