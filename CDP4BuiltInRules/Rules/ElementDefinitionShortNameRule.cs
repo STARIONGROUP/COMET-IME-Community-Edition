@@ -2,7 +2,7 @@
 // <copyright file="ElementDefinitionShortNameRule.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -29,8 +29,10 @@ namespace CDP4BuiltInRules
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Services;
 
     /// <summary>
@@ -39,6 +41,9 @@ namespace CDP4BuiltInRules
     [BuiltInRuleMetaDataExport("RHEA", "ElementDefinitionShortName", "A rule that verifies whether the shortname property of all ElementDefinition objects in an Iteration is valid")]
     public class ElementDefinitionShortNameRule : BuiltInRule
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ElementDefinitionShortNameRule"/> class.
+        /// </summary>
         public ElementDefinitionShortNameRule()
         {
         }
@@ -56,7 +61,7 @@ namespace CDP4BuiltInRules
         {
             if (iteration == null)
             {
-                throw new ArgumentNullException("iteration", "The iteration may not be null");
+                throw new ArgumentNullException(nameof(iteration), "The iteration may not be null");
             }
 
             if (!iteration.Element.Any())
@@ -69,6 +74,7 @@ namespace CDP4BuiltInRules
             foreach (var elementDefinition in iteration.Element)
             {
                 var validationPass = Regex.IsMatch(elementDefinition.ShortName, @"^[a-zA-Z][a-zA-Z0-9_]*$");
+
                 if (!validationPass)
                 {
                     var violation = new RuleViolation(Guid.NewGuid(), elementDefinition.Cache, elementDefinition.IDalUri);
