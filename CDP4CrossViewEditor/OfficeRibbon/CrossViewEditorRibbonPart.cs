@@ -231,19 +231,27 @@ namespace CDP4CrossViewEditor
 
             var uniqueId = Guid.Parse(iterationId);
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+
             if (iteration == null)
             {
                 logger.Debug("The workbook cannot be rebuilt: iteration {0} cannot be found", uniqueId);
                 return;
             }
 
+            if (this.officeApplicationWrapper.Excel == null)
+            {
+                throw new NullReferenceException("The Excel Application object is null");
+            }
+
             var workbook = this.QueryIterationWorkbook(this.officeApplicationWrapper.Excel, iteration);
 
-            if (workbook == null && iteration.Container is EngineeringModel)
+            if (workbook != null || !(iteration.Container is EngineeringModel))
             {
-                var crossViewDialogViewModel = new CrossViewDialogViewModel(iteration);
-                this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
+                return;
             }
+
+            var crossViewDialogViewModel = new CrossViewDialogViewModel(iteration);
+            this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
 
         }
 

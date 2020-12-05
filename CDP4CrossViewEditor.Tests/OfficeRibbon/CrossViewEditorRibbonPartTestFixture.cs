@@ -122,11 +122,6 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         /// </summary>
         private Mock<ISession> session;
 
-        /// <summary>
-        /// Excel application
-        /// </summary>
-        private Application excelApplication;
-
         [SetUp]
         public void SetUp()
         {
@@ -136,14 +131,13 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             this.assembler = new Assembler(this.uri);
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
-            this.excelApplication = new Application();
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.officeApplicationWrapper = new Mock<IOfficeApplicationWrapper>();
-            this.officeApplicationWrapper.SetupProperty(x => x.Excel, this.excelApplication);
+            this.officeApplicationWrapper.SetupProperty(x => x.Excel);
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
 
             this.amountOfRibbonControls = 2;
@@ -161,7 +155,6 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         public void TearDown()
         {
             CDPMessageBus.Current.ClearSubscriptions();
-            this.excelApplication.Dispose();
         }
 
         [Test]
@@ -279,7 +272,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
 
             this.ribbonPart.GetContent(RibbonButtonId);
 
-            Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
+            Assert.ThrowsAsync<NullReferenceException>(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
 
             CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Removed);
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
