@@ -45,6 +45,8 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
 
     using Moq;
 
+    using NetOffice.ExcelApi;
+
     using NUnit.Framework;
 
     using ReactiveUI;
@@ -120,6 +122,11 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         /// </summary>
         private Mock<ISession> session;
 
+        /// <summary>
+        /// Excel application
+        /// </summary>
+        private Application excelApplication;
+
         [SetUp]
         public void SetUp()
         {
@@ -129,12 +136,14 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             this.assembler = new Assembler(this.uri);
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.excelApplication = new Application();
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.officeApplicationWrapper = new Mock<IOfficeApplicationWrapper>();
+            this.officeApplicationWrapper.SetupProperty(x => x.Excel, this.excelApplication);
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
 
             this.amountOfRibbonControls = 2;
@@ -152,6 +161,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         public void TearDown()
         {
             CDPMessageBus.Current.ClearSubscriptions();
+            this.excelApplication.Dispose();
         }
 
         [Test]

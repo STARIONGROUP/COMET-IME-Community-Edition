@@ -84,6 +84,5 @@
   <ItemGroup>
     <Folder Include="RowModels\" />
     <Folder Include="TestData\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
 </Project>
