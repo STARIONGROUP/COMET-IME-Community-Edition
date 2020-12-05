@@ -35,8 +35,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
     using CDP4Dal;
 
-    using DevExpress.Mvvm.POCO;
-
     using Moq;
 
     using NUnit.Framework;
@@ -93,6 +91,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.AreEqual(0, viewModel.TargetThingList.Count);
         }
 
+        [Test]
         public void VerifyThatCommandsWorks()
         {
             var viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ElementBase);
@@ -111,7 +110,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             viewModel.BindData();
             viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ParameterBase);
             viewModel.BindData();
-
         }
 
         private Iteration CreateIteration()
