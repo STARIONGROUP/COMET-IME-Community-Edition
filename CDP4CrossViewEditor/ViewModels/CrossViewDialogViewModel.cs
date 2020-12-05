@@ -59,12 +59,12 @@ namespace CDP4CrossViewEditor.ViewModels
         public ReactiveCommand<object> CancelCommand { get; private set; }
 
         /// <summary>
-        ///
+        /// ViewModel that corresponds to the element selector area
         /// </summary>
         public ThingSelectorViewModel ElementSelectorViewModel { get; private set; }
 
         /// <summary>
-        ///
+        /// ViewModel that corresponds to the element selector area
         /// </summary>
         public ThingSelectorViewModel ParameterSelectorViewModel { get; private set; }
 
@@ -102,6 +102,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteOk()
         {
+            this.DialogResult = new BaseDialogResult(true);
         }
     }
 }

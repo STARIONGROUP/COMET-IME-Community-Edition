@@ -153,7 +153,7 @@ namespace CDP4CrossViewEditor
             {
                 case SessionStatus.Open:
                     this.Session = sessionChange.Session;
-                    return;
+                    break;
 
                 case SessionStatus.Closed:
                     this.Iterations.Clear();

@@ -188,7 +188,6 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMoveUp()
         {
-
         }
 
         /// <summary>
@@ -196,23 +195,20 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMoveItemsDown()
         {
-
         }
 
         /// <summary>
-        /// Executes move to target command <see cref="ClearItems"/>
+        /// Executes clear items command <see cref="ClearItems"/>
         /// </summary>
         private void ExecuteClearItems()
         {
-
         }
 
         /// <summary>
-        /// Executes move to target command <see cref="SortItems"/>
+        /// Executes sort items command <see cref="SortItems"/>
         /// </summary>
         private void ExecuteSortItems()
         {
-
         }
 
         /// <summary>
@@ -220,7 +216,6 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void BindElements()
         {
-
         }
 
         /// <summary>
