@@ -25,6 +25,7 @@
 
 namespace CDP4CrossViewEditor.Views.UserControls
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using System.Windows.Controls;
     using CDP4Common.CommonData;
@@ -32,6 +33,7 @@ namespace CDP4CrossViewEditor.Views.UserControls
     /// <summary>
     /// Base class for all things selector user controls
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ThingUserControl : UserControl
     {
         /// <summary>
