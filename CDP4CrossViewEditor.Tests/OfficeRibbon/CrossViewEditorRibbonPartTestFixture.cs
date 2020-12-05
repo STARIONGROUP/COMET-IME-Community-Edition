@@ -272,7 +272,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
 
             this.ribbonPart.GetContent(RibbonButtonId);
 
-            Assert.ThrowsAsync<NullReferenceException>(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
+            Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
 
             CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Removed);
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);

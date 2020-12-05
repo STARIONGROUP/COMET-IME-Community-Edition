@@ -25,7 +25,20 @@
 
 namespace CDP4CrossViewEditor.Tests.ViewModels
 {
+    using System;
+
+    using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4CrossViewEditor.ViewModels;
+
+    using CDP4Dal;
+
+    using DevExpress.Mvvm.POCO;
+
+    using Moq;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -34,14 +47,86 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
     [TestFixture]
     public class ThingSelectorViewModelTestFixture
     {
+        /// <summary>
+        /// The current session associated <see cref="Assembler"></see>
+        /// </summary>
+        private Assembler assembler;
+
+        /// <summary>
+        /// The current assembler <see cref="Uri"/>
+        /// </summary>
+        private Uri uri;
+
+        /// <summary>
+        /// Mock <see cref="ISession"/>
+        /// </summary>
+        private Mock<ISession> session;
+
+        /// <summary>
+        /// Current iteration used for test
+        /// </summary>
+        private Iteration iteration;
+
         [SetUp]
         public void SetUp()
         {
+            this.uri = new Uri("http://www.rheageoup.com");
+            this.assembler = new Assembler(this.uri);
+            this.session = new Mock<ISession>();
+            this.session.Setup(x => x.Assembler).Returns(this.assembler);
+
+            this.iteration = this.CreateIteration();
         }
 
         [TearDown]
         public void TearDown()
         {
+        }
+
+        [Test]
+        public void VerifyThatPropertiesAreSet()
+        {
+            var viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ElementBase);
+
+            Assert.AreEqual(this.iteration, viewModel.Iteration);
+            Assert.AreEqual(0, viewModel.SourceThingList.Count);
+            Assert.AreEqual(0, viewModel.TargetThingList.Count);
+        }
+
+        public void VerifyThatCommandsWorks()
+        {
+            var viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ElementBase);
+
+            Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.MoveItemsUp.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.MoveItemsDown.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));
+        }
+
+        [Test]
+        public void VerifyBindings()
+        {
+            var viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ElementBase);
+            viewModel.BindData();
+            viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ParameterBase);
+            viewModel.BindData();
+
+        }
+
+        private Iteration CreateIteration()
+        {
+            return new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                },
+                IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    IterationNumber = 1
+                }
+            };
         }
     }
 }

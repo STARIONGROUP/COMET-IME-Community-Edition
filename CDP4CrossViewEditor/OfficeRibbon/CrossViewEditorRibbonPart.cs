@@ -207,7 +207,7 @@ namespace CDP4CrossViewEditor
 
             if (ribbonControlId.StartsWith("Editor_"))
             {
-                this.LaunchCrossViewEditorAsync(ribbonControlTag);
+                await Task.Run(() => this.LaunchCrossViewEditorAsync(ribbonControlTag));
             }
             else
             {
@@ -225,7 +225,7 @@ namespace CDP4CrossViewEditor
         {
             if (iterationId == string.Empty)
             {
-                logger.Debug("The workbook cannot be rebuilt: the iteration id is empty");
+                logger.Debug("The cross editor workbook cannot be build: the iteration id is empty");
                 return;
             }
 
@@ -234,13 +234,14 @@ namespace CDP4CrossViewEditor
 
             if (iteration == null)
             {
-                logger.Debug("The workbook cannot be rebuilt: iteration {0} cannot be found", uniqueId);
+                logger.Debug($"The cross editor workbook cannot be build: iteration {uniqueId} cannot be found");
                 return;
             }
 
             if (this.officeApplicationWrapper.Excel == null)
             {
-                throw new NullReferenceException("The Excel Application object is null");
+                logger.Error("The cross editor workbook cannot be build: The Excel Application object is null");
+                return;
             }
 
             var workbook = this.QueryIterationWorkbook(this.officeApplicationWrapper.Excel, iteration);
@@ -252,7 +253,6 @@ namespace CDP4CrossViewEditor
 
             var crossViewDialogViewModel = new CrossViewDialogViewModel(iteration);
             this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
-
         }
 
         /// <summary>
