@@ -1291,6 +1291,9 @@
     <Compile Update="CommonView\Views\YesNoDialog.xaml.cs">
       <DependentUpon>YesNoDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\BrowserHeader - Copy.xaml.cs">
+      <DependentUpon>BrowserHeader.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\BrowserHeader.xaml.cs">
       <DependentUpon>BrowserHeader.xaml</DependentUpon>
     </Compile>
@@ -1631,6 +1634,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\SelectedThingGroupControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\BrowserHeader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1725,6 +1732,7 @@
     <None Remove="Views\ManageSavedUserPreferencesDialog.xaml" />
     <None Remove="Views\SavedConfigurationDialog.xaml" />
     <None Remove="Views\SavedUserPreferenceDialog.xaml" />
+    <None Remove="Views\SelectedThingGroupControl.xaml" />
     <None Remove="Views\SubmitConfirmation.xaml" />
   </ItemGroup>
 </Project>

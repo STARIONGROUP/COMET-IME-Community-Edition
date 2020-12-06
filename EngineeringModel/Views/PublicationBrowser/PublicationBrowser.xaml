@@ -238,6 +238,8 @@
                     </dxg:TreeListControl.InputBindings>
                 </dxg:TreeListControl>
             </Grid>
+
+            <views:SelectedThingGroupControl Grid.Row="3"/>
         </Grid>
 
     </dx:LoadingDecorator>

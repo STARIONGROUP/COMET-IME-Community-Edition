@@ -31,6 +31,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <views:CommonThingControl GridView="{Binding ElementName=View}" />
@@ -106,5 +107,7 @@
                 <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
             </dxg:GridControl.InputBindings>
         </dxg:GridControl>
+
+        <views:SelectedThingGroupControl Grid.Row="3"/>
     </Grid>
 </UserControl>
