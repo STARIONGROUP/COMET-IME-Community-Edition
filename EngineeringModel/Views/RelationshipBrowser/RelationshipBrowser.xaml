@@ -86,6 +86,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <views:CommonThingControl Grid.Row="0" GridView="{Binding ElementName=View}" />
@@ -288,5 +289,7 @@
                           Content="{Binding ElementName=RelationshipCreatorSwitch, Path=EditValue}"
                           ContentTemplateSelector="{StaticResource RelationshipCreatorTemplateSelector}"/>
         </dxlc:LayoutGroup>
+
+        <views:SelectedThingGroupControl Grid.Row="4"/>
     </Grid>
 </UserControl>
