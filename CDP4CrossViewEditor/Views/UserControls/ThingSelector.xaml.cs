@@ -37,6 +37,14 @@ namespace CDP4CrossViewEditor.Views.UserControls
     public partial class ThingSelector : ThingUserControl
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ThingSelector"/> class.
+        /// </summary>
+        public ThingSelector()
+        {
+            this.InitializeComponent();
+        }
+
+        /// <summary>
         /// Instance handler which will handle any changes that occur to a particular instance.
         /// </summary>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
@@ -62,16 +70,11 @@ namespace CDP4CrossViewEditor.Views.UserControls
             }
         }
 
-        public ThingSelector()
-        {
-            this.InitializeComponent();
-        }
-
         /// <summary>
         /// Bind view model when context is available
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The arguments.</param>
         private void ThingUserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (this.DataContext is ThingSelectorViewModel viewModel)

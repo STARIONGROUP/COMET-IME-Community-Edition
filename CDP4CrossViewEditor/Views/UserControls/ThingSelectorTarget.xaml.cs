@@ -25,15 +25,13 @@
 
 namespace CDP4CrossViewEditor.Views.UserControls
 {
-    using CDP4CrossViewEditor.ViewModels;
-
     /// <summary>
     /// Interaction logic for ThingSelectorTarget.xaml
     /// </summary>
     public partial class ThingSelectorTarget : ThingUserControl
     {
         /// <summary>
-        ///
+        /// Initializes a new instance of the <see cref="ThingSelectorTarget"/> class.
         /// </summary>
         public ThingSelectorTarget()
         {

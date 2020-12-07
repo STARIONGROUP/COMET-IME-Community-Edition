@@ -37,6 +37,30 @@ namespace CDP4CrossViewEditor.ViewModels
     public class ThingSelectorViewModel : DialogViewModelBase
     {
         /// <summary>
+        /// Backing field for the <see cref="SourceThingList"/> property
+        /// </summary>
+        private ReactiveList<Thing> sourceThingList;
+
+        /// <summary>
+        /// Backing field for the <see cref="TargetThingList"/> property
+        /// </summary>
+        private ReactiveList<Thing> targetThingList;
+
+        /// <summary>
+        /// Backing field for the <see cref="ClassKind"/> property
+        /// </summary>
+        private ClassKind thingClassKind;
+
+        /// <summary>
+        /// Gets or sets thing type
+        /// </summary>
+        private ClassKind ThingClassKind
+        {
+            get => this.thingClassKind;
+            set => this.RaiseAndSetIfChanged(ref this.thingClassKind, value);
+        }
+
+        /// <summary>
         /// Gets the <see cref="Iteration"/>
         /// </summary>
         public Iteration Iteration { get; private set; }
@@ -72,11 +96,6 @@ namespace CDP4CrossViewEditor.ViewModels
         public ReactiveCommand<object> ClearItems { get; private set; }
 
         /// <summary>
-        /// Backing field for the <see cref="SourceThingList"/> property
-        /// </summary>
-        private ReactiveList<Thing> sourceThingList;
-
-        /// <summary>
         /// Gets or sets source list(element/parameter list)
         /// </summary>
         public ReactiveList<Thing> SourceThingList
@@ -86,31 +105,12 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the <see cref="TargetThingList"/> property
-        /// </summary>
-        private ReactiveList<Thing> targetThingList;
-
-        /// <summary>
         /// Gets or sets source list(element/parameter list)
         /// </summary>
         public ReactiveList<Thing> TargetThingList
         {
             get => this.targetThingList;
             private set => this.RaiseAndSetIfChanged(ref this.targetThingList, value);
-        }
-
-        /// <summary>
-        /// Backing field for the <see cref="ClassKind"/> property
-        /// </summary>
-        private ClassKind thingClassKind;
-
-        /// <summary>
-        /// Gets or sets thing type
-        /// </summary>
-        private ClassKind ThingClassKind
-        {
-            get => this.thingClassKind;
-            set => this.RaiseAndSetIfChanged(ref this.thingClassKind, value);
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        /// Bind data
+        /// Bind source data depends on thing type <see cref="ClassKind"/>
         /// </summary>
         public void BindData()
         {
@@ -171,6 +171,7 @@ namespace CDP4CrossViewEditor.ViewModels
 
         /// <summary>
         /// Executes move to source command <see cref="MoveItemsToSource"/>
+        /// Things will be moved back to selection source
         /// </summary>
         private void ExecuteMoveToSource()
         {
@@ -179,6 +180,7 @@ namespace CDP4CrossViewEditor.ViewModels
 
         /// <summary>
         /// Executes move to target command <see cref="MoveItemsToTarget"/>
+        /// Things will be selected for Cross View Editor table/report
         /// </summary>
         private void ExecuteMoveToTarget()
         {
@@ -187,6 +189,7 @@ namespace CDP4CrossViewEditor.ViewModels
 
         /// <summary>
         /// Executes move items command <see cref="MoveItemsUp"/>
+        /// Move selected <see cref="Thing"/> one position up inside selection list
         /// </summary>
         private void ExecuteMoveUp()
         {
@@ -195,6 +198,7 @@ namespace CDP4CrossViewEditor.ViewModels
 
         /// <summary>
         /// Executes move items command <see cref="MoveItemsDown"/>
+        /// Move selected <see cref="Thing"/> one position down inside selection list
         /// </summary>
         private void ExecuteMoveItemsDown()
         {
@@ -202,7 +206,7 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        /// Executes clear items command <see cref="ClearItems"/>
+        /// Executes clear selected items command <see cref="ClearItems"/>
         /// </summary>
         private void ExecuteClearItems()
         {
@@ -210,7 +214,7 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        /// Executes sort items command <see cref="SortItems"/>
+        /// Executes alphabetical sort items command <see cref="SortItems"/>
         /// </summary>
         private void ExecuteSortItems()
         {
@@ -218,7 +222,7 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        /// Bind elements
+        /// Bind element definition/element usage list based on the selected category
         /// </summary>
         private void BindElements()
         {
@@ -226,7 +230,7 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        /// Bind parameters
+        /// Bind parameter type list which are linked to the elements list
         /// </summary>
         private void BindParameters()
         {

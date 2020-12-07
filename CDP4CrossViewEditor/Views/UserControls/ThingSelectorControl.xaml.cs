@@ -32,6 +32,9 @@ namespace CDP4CrossViewEditor.Views.UserControls
     /// </summary>
     public partial class ThingSelectorControl : UserControl
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ThingSelectorControl"/> class.
+        /// </summary>
         public ThingSelectorControl()
         {
             this.InitializeComponent();
