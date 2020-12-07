@@ -25,8 +25,13 @@
 
 namespace CDP4Composition.Tests.Navigation
 {
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Composition;
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
@@ -34,21 +39,18 @@ namespace CDP4Composition.Tests.Navigation
     using CDP4Composition.Services;
     using CDP4Composition.Tests.ViewModels;
     using CDP4Composition.Tests.Views;
+
     using CDP4Dal;
-    using CDP4Dal.Permission;
-    using CDP4PropertyGrid.ViewModels;
-    using CDP4PropertyGrid.Views;
-    using Microsoft.Practices.Prism.Regions;
-    using Moq;
-    using NUnit.Framework;
-    using ReactiveUI;
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.Linq;
-    using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
     using CDP4Dal.Composition;
+    using CDP4Dal.Permission;
+
+    using Microsoft.Practices.Prism.Regions;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using ReactiveUI;
 
     [TestFixture]
     public class PanelNavigationServiceTestFixture
@@ -57,7 +59,7 @@ namespace CDP4Composition.Tests.Navigation
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IFilterStringService> filterStringService;
         private Mock<ISession> session;
-        private Mock<IPermissionService> permissionService; 
+        private Mock<IPermissionService> permissionService;
         private Mock<IRegionManager> regionManager;
         private Mock<IRegion> region;
         private Mock<IViewsCollection> viewsCollection;
@@ -99,7 +101,7 @@ namespace CDP4Composition.Tests.Navigation
             this.describeMetaData.Setup(x => x.Name).Returns("MockedPanelDecorated");
 
             this.regionCollectionSearcher = new Mock<IRegionCollectionSearcher>();
-            this.regionCollectionSearcher.Setup(x => x.GetRegionsByView(It.IsAny<IRegionCollection>(), It.IsAny<IPanelView>())).Returns(new [] { this.region.Object });
+            this.regionCollectionSearcher.Setup(x => x.GetRegionsByView(It.IsAny<IRegionCollection>(), It.IsAny<IPanelView>())).Returns(new[] { this.region.Object });
             this.regionManager.Setup(x => x.Regions[It.IsAny<string>()]).Returns(this.region.Object);
             this.region.Setup(x => x.Views).Returns(this.viewsCollection.Object);
 
@@ -109,14 +111,14 @@ namespace CDP4Composition.Tests.Navigation
 
             this.viewList = new List<Lazy<IPanelView, IRegionMetaData>>();
             this.viewList.Add(new Lazy<IPanelView, IRegionMetaData>(() => this.panelView, this.metadata.Object));
-            this.viewList.Add(new Lazy<IPanelView, IRegionMetaData>(() => new PropertyGrid(), this.metadata.Object));
+            this.viewList.Add(new Lazy<IPanelView, IRegionMetaData>(() => new TestGrid(), this.metadata.Object));
 
             this.viewModelDecoratedList = new List<Lazy<IPanelViewModel, INameMetaData>>();
             this.viewModelDecoratedList.Add(new Lazy<IPanelViewModel, INameMetaData>(() => this.panelViewModel2, this.describeMetaData.Object));
 
             this.viewModelList = new List<IPanelViewModel>();
             this.viewModelList.Add(this.panelViewModel);
-            this.viewModelList.Add(new PropertyGridViewModel());
+            this.viewModelList.Add(new TestGridViewModel());
 
             this.NavigationService = new PanelNavigationService(this.viewList, this.viewModelList, this.regionManager.Object, this.viewModelDecoratedList, this.filterStringService.Object, this.regionCollectionSearcher.Object);
 
@@ -141,7 +143,7 @@ namespace CDP4Composition.Tests.Navigation
         [Test]
         public void VerifyThatOpenViewModelByNameWorks()
         {
-            this.NavigationService.Open(this.describeMetaData.Object.Name, this.session.Object, true, 
+            this.NavigationService.Open(this.describeMetaData.Object.Name, this.session.Object, true,
                 this.thingDialogNavigationService.Object, this.dialogNavigationService.Object);
 
             this.region.Verify(x => x.Add(It.IsAny<object>(), It.IsAny<string>()));
@@ -159,11 +161,11 @@ namespace CDP4Composition.Tests.Navigation
         [Test]
         public void VerifyThatCloseAllPanelTypeWorks()
         {
-            this.NavigationService.Open(new PropertyGridViewModel(), true);
+            this.NavigationService.Open(new TestGridViewModel(), true);
 
             Assert.AreEqual(1, this.NavigationService.ViewModelViewPairs.Count);
 
-            this.NavigationService.Close(typeof(PropertyGridViewModel));
+            this.NavigationService.Close(typeof(TestGridViewModel));
             this.region.Verify(x => x.Remove(It.IsAny<object>()));
         }
 
@@ -189,7 +191,7 @@ namespace CDP4Composition.Tests.Navigation
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => this.NavigationService.Open(new ExceptionViewModel(), true));
         }
-         
+
         [Test]
         public void VerifyThatCloseDataSourceWorks()
         {
@@ -219,14 +221,32 @@ namespace CDP4Composition.Tests.Views
 
         public object DataContext { get; set; }
     }
+
+    public class TestGrid : IPanelView
+    {
+        public TestGrid()
+        {
+        }
+
+        public TestGrid(bool initializeComponent)
+        {
+        }
+
+        public object DataContext { get; set; }
+    }
+
 }
 
 namespace CDP4Composition.Tests.ViewModels
 {
     using System;
+
+    using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
 
     public class TestViewModel : IPanelViewModel
@@ -252,10 +272,7 @@ namespace CDP4Composition.Tests.ViewModels
         /// <summary>
         /// Gets a value indicating whether this is dirty
         /// </summary>
-        public bool IsDirty
-        {
-            get { return false; }
-        }
+        public bool IsDirty => false;
 
         /// <summary>
         /// Gets the unique identifier of the view-model
@@ -263,12 +280,19 @@ namespace CDP4Composition.Tests.ViewModels
         public Guid Identifier { get; private set; }
 
         public string ToolTip { get; private set; }
+
         public string DataSource { get; private set; }
-        public ISession Session { get; private set;}
+
+        public ISession Session { get; private set; }
+
         public SiteDirectory SiteDirectory { get; private set; }
+
         public IThingDialogNavigationService ThingDialogNavigationService { get; private set; }
+
         public IPanelNavigationService PanelNavigationService { get; private set; }
+
         public IDialogNavigationService DialogNavigationService { get; private set; }
+
         public void Dispose()
         {
         }
@@ -287,10 +311,7 @@ namespace CDP4Composition.Tests.ViewModels
         /// <summary>
         /// Gets a value indicating whether this is dirty
         /// </summary>
-        public bool IsDirty
-        {
-            get { return false; }
-        }
+        public bool IsDirty => false;
 
         /// <summary>
         /// Gets the unique identifier of the view-model
@@ -298,31 +319,23 @@ namespace CDP4Composition.Tests.ViewModels
         public Guid Identifier { get; private set; }
 
         public string ToolTip { get; private set; }
+
         public string DataSource { get; private set; }
+
         public void Dispose()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
-}
 
-namespace CDP4PropertyGrid.ViewModels
-{
-    using System;
-
-    using CDP4Common.CommonData;
-    using CDP4Composition;
-
-    using CDP4Dal;
-
-    public class PropertyGridViewModel : IPanelViewModel
+    public class TestGridViewModel : IPanelViewModel
     {
-        public PropertyGridViewModel()
+        public TestGridViewModel()
         {
             this.Identifier = Guid.NewGuid();
         }
 
-        public PropertyGridViewModel(Thing thing, ISession session)
+        public TestGridViewModel(Thing thing, ISession session)
         {
             this.Thing = thing;
         }
@@ -330,10 +343,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// <summary>
         /// Gets a value indicating whether this is dirty
         /// </summary>
-        public bool IsDirty
-        {
-            get { return false; }
-        }
+        public bool IsDirty => false;
 
         public Thing Thing { get; private set; }
 
@@ -345,28 +355,12 @@ namespace CDP4PropertyGrid.ViewModels
         public Guid Identifier { get; private set; }
 
         public string ToolTip { get; private set; }
+
         public string DataSource { get; private set; }
+
         public void Dispose()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
-    }
-}
-
-namespace CDP4PropertyGrid.Views
-{
-    using CDP4Composition;
-
-    public class PropertyGrid : IPanelView
-    {
-        public PropertyGrid()
-        {
-        }
-
-        public PropertyGrid(bool initializeComponent)
-        {
-        }
-
-        public object DataContext { get; set; }
     }
 }
