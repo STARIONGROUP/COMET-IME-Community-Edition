@@ -277,33 +277,6 @@ namespace CDP4Composition.Navigation
         }
 
         /// <summary>
-        /// Changes an existing view's DataContext and changes the <see cref="ViewModelViewPairs"/> property
-        /// according to data in a <see cref="ViewModelChangeEvent"/>
-        /// </summary>
-        /// <param name="viewModelChangeEvent">
-        /// The <see cref="ViewModelChangeEvent"/> that holds information on the viewmodel change
-        /// </param>
-        private void PanelViewModelChanged(ViewModelChangeEvent viewModelChangeEvent)
-        {
-            var identifier = viewModelChangeEvent.ViewModel.Identifier;
-
-            var currentlyOpenViewAndViewModels = 
-                this.ViewModelViewPairs
-                    .Where(x => x.Key.Identifier.Equals(identifier))
-                    .ToList();
-
-            if (currentlyOpenViewAndViewModels.Any())
-            {
-                foreach (var currentlyOpenViewAndViewModel in currentlyOpenViewAndViewModels)
-                {
-                    this.ViewModelViewPairs.Remove(currentlyOpenViewAndViewModel.Key);
-                    currentlyOpenViewAndViewModel.Value.DataContext = viewModelChangeEvent.ViewModel;
-                    this.ViewModelViewPairs.Add(viewModelChangeEvent.ViewModel, currentlyOpenViewAndViewModel.Value);
-                }
-            }
-        }
-
-        /// <summary>
         /// Opens the view associated to a view-model. The view-model is identified by its <see cref="INameMetaData.Name"/>.
         /// </summary>
         /// <param name="viewModelName">The name we want to compare to the <see cref="INameMetaData.Name"/> of the view-models.</param>
@@ -410,6 +383,33 @@ namespace CDP4Composition.Navigation
             foreach (var panel in panelsToClose)
             {
                 this.Close(panel);
+            }
+        }
+
+        /// <summary>
+        /// Changes an existing view's DataContext and changes the <see cref="ViewModelViewPairs"/> property
+        /// according to data in a <see cref="ViewModelChangeEvent"/>
+        /// </summary>
+        /// <param name="viewModelChangeEvent">
+        /// The <see cref="ViewModelChangeEvent"/> that holds information on the viewmodel change
+        /// </param>
+        private void PanelViewModelChanged(ViewModelChangeEvent viewModelChangeEvent)
+        {
+            var identifier = viewModelChangeEvent.ViewModel.Identifier;
+
+            var currentlyOpenViewAndViewModels = 
+                this.ViewModelViewPairs
+                    .Where(x => x.Key.Identifier.Equals(identifier))
+                    .ToList();
+
+            if (currentlyOpenViewAndViewModels.Any())
+            {
+                foreach (var currentlyOpenViewAndViewModel in currentlyOpenViewAndViewModels)
+                {
+                    this.ViewModelViewPairs.Remove(currentlyOpenViewAndViewModel.Key);
+                    currentlyOpenViewAndViewModel.Value.DataContext = viewModelChangeEvent.ViewModel;
+                    this.ViewModelViewPairs.Add(viewModelChangeEvent.ViewModel, currentlyOpenViewAndViewModel.Value);
+                }
             }
         }
 
