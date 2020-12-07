@@ -28,7 +28,6 @@ namespace CDP4Composition.Navigation.Events
     /// <summary>
     /// The event carrying information for a viewmodel change.
     /// </summary>
-    /// <typeparam name="T">The type of the payload for this event</typeparam>
     public class ViewModelChangeEvent
     {
         /// <summary>

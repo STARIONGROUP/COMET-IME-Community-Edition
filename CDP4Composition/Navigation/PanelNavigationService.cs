@@ -171,10 +171,10 @@ namespace CDP4Composition.Navigation
                 logger.Debug("The {0} does not exist", RegionNames.RightPanel);
             }
 
+            CDPMessageBus.Current.Listen<ViewModelChangeEvent>().Subscribe(this.PanelViewModelChanged);
+
             sw.Stop();
             logger.Debug("The PanelNavigationService was instantiated in {0} [ms]", sw.ElapsedMilliseconds);
-
-            CDPMessageBus.Current.Listen<ViewModelChangeEvent>().Subscribe(this.PanelViewModelChanged);
         }
 
         /// <summary>

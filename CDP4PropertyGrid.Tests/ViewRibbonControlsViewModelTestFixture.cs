@@ -57,7 +57,7 @@ namespace CDP4PropertyGrid.Tests
 
             // Verify PanelEVentClosed
             vm.IsChecked = true;
-            CDPMessageBus.Current.SendMessage(new NavigationPanelEvent(new PropertyGridViewModel(), this.panelView.Object, PanelStatus.Closed));
+            CDPMessageBus.Current.SendMessage(new NavigationPanelEvent(new PropertyGridViewModel(false), this.panelView.Object, PanelStatus.Closed));
             Assert.IsFalse(vm.IsChecked);
         }
     }

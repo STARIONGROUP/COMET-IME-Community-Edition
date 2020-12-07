@@ -53,17 +53,17 @@ namespace CDP4PropertyGrid.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyGridViewModel"/> class
         /// </summary>
-        public PropertyGridViewModel()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyGridViewModel"/> class
-        /// </summary>
+        /// <param name="initialize">
+        /// a value indicating whether the viewmodel should be initialized
+        /// </param>
+        [ImportingConstructor]
         public PropertyGridViewModel(bool initialize)
         {
-            this.Identifier = Guid.NewGuid();
-            this.Initialize();
+            if (initialize)
+            {
+                this.Identifier = Guid.NewGuid();
+                this.Initialize();
+            }
         }
 
         /// <summary>
