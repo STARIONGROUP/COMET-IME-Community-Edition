@@ -21,7 +21,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Tests.Navigation
 {
@@ -204,6 +204,27 @@ namespace CDP4Composition.Tests.Navigation
             this.NavigationService.Close("uri");
             this.region.Verify(x => x.Remove(It.IsAny<IPanelView>()), Times.Exactly(2));
         }
+
+        [Test]
+        public void VerifyThatChangeViewModelWorks()
+        {
+            var viewModel = new TestViewModel();
+            Assert.AreEqual(0, this.NavigationService.ViewModelViewPairs.Count);
+            this.NavigationService.Open(viewModel, true);
+            Assert.AreEqual(1, this.NavigationService.ViewModelViewPairs.Count);
+
+            var newViewModel1 = new TestViewModel();
+            CDPMessageBus.Current.SendMessage(new ViewModelChangeEvent(newViewModel1));
+
+            Assert.AreEqual(1, this.NavigationService.ViewModelViewPairs.Count);
+            Assert.AreEqual(viewModel, this.NavigationService.ViewModelViewPairs.First().Key);
+
+            var newViewModel2 = viewModel.CreateNewTestViewModel();
+            CDPMessageBus.Current.SendMessage(new ViewModelChangeEvent(newViewModel2));
+
+            Assert.AreEqual(1, this.NavigationService.ViewModelViewPairs.Count);
+            Assert.AreEqual(newViewModel2, this.NavigationService.ViewModelViewPairs.First().Key);
+        }
     }
 }
 
@@ -295,6 +316,12 @@ namespace CDP4Composition.Tests.ViewModels
 
         public void Dispose()
         {
+        }
+
+        public TestViewModel CreateNewTestViewModel()
+        {
+            this.Dispose();
+            return new TestViewModel {Identifier = this.Identifier};
         }
     }
 
