@@ -2,7 +2,7 @@
 // <copyright file="BrowserViewModelBase.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -30,6 +30,8 @@ namespace CDP4Composition.Mvvm
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Threading;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -40,6 +42,7 @@ namespace CDP4Composition.Mvvm
     using CDP4Composition.DragDrop;
     using CDP4Composition.FilterOperators;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.ViewModels;
@@ -675,21 +678,6 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Show the <see cref="SelectedThing"/> in the Property Grid
-        /// </summary>
-        protected virtual void ShowInPropertyGrid()
-        {
-            try
-            {
-                this.panelNavigationService.Open(this.SelectedThing.Thing, this.Session);
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex);
-            }
-        }
-
-        /// <summary>
         /// Gets a value indicating whether it is possible to Delete the Selected Thing />
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> that needs to be checked</param>
@@ -736,19 +724,14 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         private void OnSelectedThingChanged()
         {
-            if (this.SelectedThing == null)
-            {
-                return;
-            }
-
-            var thing = this.SelectedThing.Thing;
+            var thing = this.SelectedThing?.Thing;
 
             if (thing == null)
             {
                 return;
             }
 
-            this.ShowInPropertyGrid();
+            CDPMessageBus.Current.SendMessage(new SelectedThingChangedEvent(thing, this.Session));
 
             this.SelectedThingClassKindString = thing.ClassKind == ClassKind.NotThing ? string.Empty
                 : this.camelCaseToSpaceConverter.Convert(thing.ClassKind, null, null, null).ToString();
