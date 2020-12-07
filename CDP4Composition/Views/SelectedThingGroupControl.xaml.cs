@@ -33,7 +33,7 @@ namespace CDP4Composition.Views
     public partial class SelectedThingGroupControl : UserControl
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowserHeader"/> class.
+        /// Initializes a new instance of the <see cref="SelectedThingGroupControl"/> class.
         /// </summary>
         public SelectedThingGroupControl()
         {
