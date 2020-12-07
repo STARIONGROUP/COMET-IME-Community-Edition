@@ -27,6 +27,7 @@ namespace CDP4PropertyGrid.ViewModels
 {
     using System;
     using System.ComponentModel.Composition;
+    using System.Windows;
     using System.Windows.Threading;
 
     using CDP4Common.CommonData;
@@ -136,7 +137,7 @@ namespace CDP4PropertyGrid.ViewModels
         {
             this.Dispose();
 
-            Dispatcher.CurrentDispatcher.InvokeAsync(
+            Application.Current.Dispatcher.Invoke(
                 () =>
                 {
                     var newVm = new PropertyGridViewModel(selectedThingChangedEvent.SelectedThing, selectedThingChangedEvent.Session)
