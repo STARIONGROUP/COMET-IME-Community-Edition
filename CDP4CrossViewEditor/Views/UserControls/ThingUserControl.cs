@@ -51,7 +51,6 @@ namespace CDP4CrossViewEditor.Views.UserControls
         public ClassKind Mode
         {
             get => (ClassKind)this.GetValue(ModeDependencyProperty);
-
             set => this.SetValue(ModeDependencyProperty, value);
         }
 
@@ -71,7 +70,6 @@ namespace CDP4CrossViewEditor.Views.UserControls
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         protected virtual void ThingSelectionChanged(DependencyPropertyChangedEventArgs e)
         {
-
         }
     }
 }

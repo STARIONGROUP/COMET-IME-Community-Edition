@@ -6,7 +6,8 @@
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              mc:Ignorable="d"
-             d:DesignHeight="100" d:DesignWidth="100">
+             d:DesignHeight="100"
+             d:DesignWidth="100">
     <dxlc:LayoutGroup Orientation="Vertical" HorizontalAlignment="Center">
         <Button MinWidth="75"
                 MinHeight="25"

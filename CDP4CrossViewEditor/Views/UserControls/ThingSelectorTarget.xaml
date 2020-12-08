@@ -24,8 +24,8 @@
                          SelectionMode="Multiple"
                          DisplayMember="UserFriendlyShortName"
                          EditValue="{Binding SelectedList,
-                                            Mode=TwoWay,
-                                            UpdateSourceTrigger=PropertyChanged}"
+                                             Mode=TwoWay,
+                                             UpdateSourceTrigger=PropertyChanged}"
                          ItemsSource="{Binding TargetThingList}"
                          Grid.Row="0"
                          Grid.Column="0">
