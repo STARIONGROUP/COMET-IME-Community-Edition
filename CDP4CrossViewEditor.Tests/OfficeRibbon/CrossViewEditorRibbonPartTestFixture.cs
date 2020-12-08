@@ -45,6 +45,8 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
 
     using Moq;
 
+    using NetOffice.ExcelApi;
+
     using NUnit.Framework;
 
     using ReactiveUI;
@@ -135,6 +137,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.officeApplicationWrapper = new Mock<IOfficeApplicationWrapper>();
+            this.officeApplicationWrapper.Setup(x => x.Excel).Returns(It.IsAny<Application>);
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
 
             this.amountOfRibbonControls = 2;
@@ -254,7 +257,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         }
 
         [Test]
-        public void VerifyThatOnActionEditorWorks()
+        public void VerifyThatOnActionIsExecuted()
         {
             var fluentRibbonManager = new FluentRibbonManager { IsActive = true };
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
@@ -272,6 +275,46 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
 
             CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Removed);
+            Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
+        }
+
+        [Test]
+        public void VerifyThatOnActionIsNotExecutedWhenSessionIsNull()
+        {
+            var fluentRibbonManager = new FluentRibbonManager { IsActive = true };
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            var iteration = this.CreateIteration();
+
+            Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
+
+            Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
+        }
+
+        [Test]
+        public void VerifyThatOnActionIsNotExecutedWhenInvalidControlIsSpecified()
+        {
+            var fluentRibbonManager = new FluentRibbonManager { IsActive = true };
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var iteration = this.CreateIteration();
+
+            Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor", iteration.Iid.ToString()));
+
+            Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
+        }
+
+        [Test]
+        public void VerifyThatOnActionIsNotExecutedWhenInterationIsNull()
+        {
+            var fluentRibbonManager = new FluentRibbonManager { IsActive = true };
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor_", string.Empty));
+
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
         }
 

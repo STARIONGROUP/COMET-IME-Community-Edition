@@ -82,8 +82,8 @@
     <ProjectReference Include="..\CDP4OfficeInfrastructure\CDP4OfficeInfrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Converters\" />
     <Folder Include="RowModels\" />
     <Folder Include="TestData\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
 </Project>

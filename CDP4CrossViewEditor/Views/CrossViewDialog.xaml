@@ -1,0 +1,48 @@
+﻿<dx:DXWindow x:Class="CDP4CrossViewEditor.Views.CrossViewDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:uc="clr-namespace:CDP4CrossViewEditor.Views.UserControls"
+             Title="{Binding DialogTitle}"
+             Width="700"
+             Height="500"
+             dx:ThemeManager.ThemeName="Seven"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             DataContextChanged="DXWindow_DataContextChanged"
+             mc:Ignorable="d">
+    <dxlc:LayoutControl Height="Auto"
+                        Background="White"
+                        Orientation="Vertical">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <uc:ThingSelector Grid.Row="0" Mode="ElementBase" VerticalAlignment="Stretch" x:Name="ElementThingSelector" />
+            <uc:ThingSelector Grid.Row="1" Mode="ParameterBase" VerticalAlignment="Stretch" x:Name="ParameterThingSelector" />
+        </Grid>
+        <dxlc:LayoutGroup Orientation="Horizontal">
+            <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=OkCommand}"
+                    Content="OK" IsDefault="True" />
+            <Button MinWidth="75"
+                    MinHeight="25"
+                    MaxWidth="75"
+                    MaxHeight="25"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Path=CancelCommand}"
+                    Content="Cancel" IsCancel="True" />
+        </dxlc:LayoutGroup>
+    </dxlc:LayoutControl>
+</dx:DXWindow>
