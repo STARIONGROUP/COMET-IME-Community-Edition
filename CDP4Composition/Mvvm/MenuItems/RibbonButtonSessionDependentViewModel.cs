@@ -1,19 +1,41 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RibbonButtonSessionDependentViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Mvvm
 {
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
@@ -34,7 +56,6 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Initializes a new instance of the <see cref="RibbonButtonSessionDependentViewModel"/> class
         /// </summary>
-
         protected RibbonButtonSessionDependentViewModel(Func<ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModel)
         {
             this.InstantiatePanelViewModelFunction = instantiatePanelViewModel;
@@ -52,10 +73,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets a value indicating whether there are open sessions
         /// </summary>
-        public bool HasSession
-        {
-            get { return this.hasSession.Value; }
-        }
+        public bool HasSession => this.hasSession.Value;
 
         /// <summary>
         /// Gets the open or close the browser
@@ -74,10 +92,10 @@ namespace CDP4Composition.Mvvm
         protected void RemoveOpenSession(ISession session)
         {
             var currentSession = this.OpenSessions.Single(x => x.Session == session);
-            currentSession.IsChecked = false;
-            currentSession.ShowOrClosePanelCommand.Execute(null);
+            currentSession.ClosePanelsCommand.Execute(null);
 
             var sessionToRemove = this.OpenSessions.SingleOrDefault(x => x.Session == session);
+
             if (sessionToRemove != null)
             {
                 this.OpenSessions.Remove(sessionToRemove);
@@ -94,10 +112,7 @@ namespace CDP4Composition.Mvvm
                 return;
             }
 
-            var status = this.OpenSessions.Single().IsChecked;
-            this.OpenSessions.Single().IsChecked = !status;
-
-            this.OpenSessions.Single().ShowOrClosePanelCommand.Execute(null);
+            this.OpenSessions.Single().ShowPanelCommand.Execute(null);
         }
 
         /// <summary>
@@ -111,8 +126,7 @@ namespace CDP4Composition.Mvvm
         {
             if (sessionChange.Status == SessionStatus.Open)
             {
-                this.OpenSessions.Add(
-                    new RibbonMenuItemSessionDependentViewModel(sessionChange.Session.Name, sessionChange.Session, this.InstantiatePanelViewModelFunction));
+                this.OpenSessions.Add(new RibbonMenuItemSessionDependentViewModel(sessionChange.Session.Name, sessionChange.Session, this.InstantiatePanelViewModelFunction));
             }
             else if (sessionChange.Status == SessionStatus.Closed)
             {

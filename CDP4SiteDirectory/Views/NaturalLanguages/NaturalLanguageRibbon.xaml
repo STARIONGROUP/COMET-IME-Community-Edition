@@ -15,7 +15,7 @@
         <DataTemplate DataType="{x:Type viewModels1:RibbonMenuItemViewModelBase}">
             <ContentControl>
                 <dxb:BarCheckItem IsChecked="{Binding Path=IsChecked}"
-                                  Command="{Binding Path=ShowOrClosePanelCommand}"
+                                  Command="{Binding Path=ShowPanelCommand}"
                                    Content="{Binding MenuItemContent}"/>
             </ContentControl>
         </DataTemplate>

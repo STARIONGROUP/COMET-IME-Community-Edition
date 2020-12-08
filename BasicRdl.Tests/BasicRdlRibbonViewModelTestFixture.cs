@@ -144,7 +144,7 @@ namespace BasicRdl.Tests
             ribbon4.OpenSingleBrowserCommand.Execute(null);
             ribbon5.OpenSingleBrowserCommand.Execute(null);
 
-            this.navigation.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), true), Times.Exactly(5));
+            this.navigation.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(10));
         }
 
         [Test]

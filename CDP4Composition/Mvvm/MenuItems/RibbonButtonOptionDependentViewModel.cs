@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RibbonButtonOptionDependentViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Mvvm
 {
@@ -10,12 +29,16 @@ namespace CDP4Composition.Mvvm
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    using CDP4Common.EngineeringModelData;    
+
+    using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using Navigation;
-    using Navigation.Interfaces;
-    using PluginSettingService;
+
     using ReactiveUI;
 
     /// <summary>
@@ -62,7 +85,7 @@ namespace CDP4Composition.Mvvm
                 .Select(x => x.ChangedThing as Iteration)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.IterationRemovedEventHandler);
-            
+
             // react to options
             CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
                 .Where(x => x.EventKind == EventKind.Added)
@@ -80,10 +103,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets a value indicating whether there are open sessions
         /// </summary>
-        public bool HasModels
-        {
-            get { return this.hasModels.Value; }
-        }
+        public bool HasModels => this.hasModels.Value;
 
         /// <summary>
         /// Gets the list of groups of <see cref="Iteration"/> based on the ones available in the application
@@ -102,12 +122,14 @@ namespace CDP4Composition.Mvvm
         private void IterationAddedEventHandler(Iteration iteration)
         {
             var session = this.Sessions.SingleOrDefault(s => s.Assembler.Cache == iteration.Cache);
+
             if (session == null)
             {
                 throw new InvalidOperationException("There is no ISession associated with an Iteration.");
             }
 
             var modelGroupViewModel = this.OpenIterations.SingleOrDefault(x => x.Thing == iteration);
+
             if (modelGroupViewModel == null)
             {
                 modelGroupViewModel = new IterationMenuGroupViewModel(iteration, session);
@@ -117,7 +139,7 @@ namespace CDP4Composition.Mvvm
             foreach (var option in iteration.Option)
             {
                 var menuItem = new RibbonMenuItemOptionDependentViewModel((Option)option, session, this.InstantiatePanelViewModelFunction);
-                modelGroupViewModel.SelectedOptions.Add(menuItem); 
+                modelGroupViewModel.SelectedOptions.Add(menuItem);
             }
         }
 
@@ -129,6 +151,7 @@ namespace CDP4Composition.Mvvm
         {
             // remove one by one the option panels, items and then remove the iteration group itself
             var groupViewModel = this.OpenIterations.SingleOrDefault(x => x.Thing == iteration);
+
             if (groupViewModel != null)
             {
                 var menuItemsToRemove = groupViewModel.SelectedOptions.Where(x => x.Option.Container == iteration).ToList();
@@ -136,9 +159,7 @@ namespace CDP4Composition.Mvvm
                 foreach (var item in menuItemsToRemove)
                 {
                     groupViewModel.SelectedOptions.Remove(item);
-                    item.IsChecked = false;
-                    item.ShowOrClosePanelCommand.Execute(null);
-                    item.Dispose();
+                    item.ClosePanelsCommand.Execute(null);
                 }
 
                 this.OpenIterations.Remove(groupViewModel);
@@ -152,6 +173,7 @@ namespace CDP4Composition.Mvvm
         private void OptionAddedEventHandler(Option option)
         {
             var session = this.Sessions.SingleOrDefault(s => s.Assembler.Cache == option.Cache);
+
             if (session == null)
             {
                 throw new InvalidOperationException("There is no ISession associated with an option.");
@@ -182,12 +204,11 @@ namespace CDP4Composition.Mvvm
             if (groupViewModel != null)
             {
                 var menuItemToRemove = groupViewModel.SelectedOptions.SingleOrDefault(x => x.Option == option);
+
                 if (menuItemToRemove != null)
                 {
                     groupViewModel.SelectedOptions.Remove(menuItemToRemove);
-                    menuItemToRemove.IsChecked = false;
-                    menuItemToRemove.ShowOrClosePanelCommand.Execute(null);
-                    menuItemToRemove.Dispose();
+                    menuItemToRemove.ClosePanelsCommand.Execute(null);
                 }
 
                 // removes the group if there are no more of its options opened

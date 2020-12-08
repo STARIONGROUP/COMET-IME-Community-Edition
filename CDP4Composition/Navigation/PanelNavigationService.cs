@@ -21,7 +21,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Navigation
 {
@@ -249,26 +249,19 @@ namespace CDP4Composition.Navigation
             }
             else
             {
-                this.ViewModelViewPairs.TryGetValue(viewModel, out var view);
+                var lazyView = this.GetViewType(viewModel);
+                var regionName = lazyView.Metadata.Region;
 
-                var regionName = string.Empty;
+                var parameters = new object[] { true };
+                var view = Activator.CreateInstance(lazyView.Value.GetType(), parameters) as IPanelView;
 
-                if (view == null)
+                if (view != null)
                 {
-                    var lazyView = this.GetViewType(viewModel);
-                    regionName = lazyView.Metadata.Region;
+                    view.DataContext = viewModel;
+                    this.ViewModelViewPairs.Add(viewModel, view);
 
-                    var parameters = new object[] { true };
-                    view = Activator.CreateInstance(lazyView.Value.GetType(), parameters) as IPanelView;
-
-                    if (view != null)
-                    {
-                        view.DataContext = viewModel;
-                        this.ViewModelViewPairs.Add(viewModel, view);
-
-                        // register for Filter Service
-                        this.filterStringService.RegisterForService(view, viewModel);
-                    }
+                    // register for Filter Service
+                    this.filterStringService.RegisterForService(view, viewModel);
                 }
 
                 var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open, regionName);
@@ -312,7 +305,7 @@ namespace CDP4Composition.Navigation
         /// Closes the <see cref="IPanelView"/> associated to the <see cref="IPanelViewModel"/>
         /// </summary>
         /// <param name="viewModel">The <see cref="IPanelViewModel"/></param>
-        private void Close(IPanelViewModel viewModel)
+        private void CloseByRegion(IPanelViewModel viewModel)
         {
             logger.Debug("Starting to Close view-model {0} of type {1}", viewModel.Caption, viewModel);
 
@@ -343,7 +336,7 @@ namespace CDP4Composition.Navigation
         {
             if (useRegionManager)
             {
-                this.Close(viewModel);
+                this.CloseByRegion(viewModel);
             }
             else
             {
@@ -366,7 +359,7 @@ namespace CDP4Composition.Navigation
 
             foreach (var panelViewModel in openViewModel)
             {
-                this.Close(panelViewModel);
+                this.CloseByRegion(panelViewModel);
             }
 
             logger.Debug("All view-models related to data-source {0} closed", datasourceUri);
@@ -382,7 +375,7 @@ namespace CDP4Composition.Navigation
 
             foreach (var panel in panelsToClose)
             {
-                this.Close(panel);
+                this.CloseByRegion(panel);
             }
         }
 
