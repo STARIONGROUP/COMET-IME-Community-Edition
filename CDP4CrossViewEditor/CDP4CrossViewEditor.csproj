@@ -348,6 +348,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Converters\" />
     <Folder Include="RowModels\" />
   </ItemGroup>
 </Project>

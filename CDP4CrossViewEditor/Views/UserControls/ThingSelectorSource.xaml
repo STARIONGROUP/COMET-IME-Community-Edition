@@ -5,13 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:uc="clr-namespace:CDP4CrossViewEditor.Views.UserControls"
-             xmlns:converters="clr-namespace:CDP4CrossViewEditor.Converters"
              mc:Ignorable="d">
-    <uc:ThingUserControl.Resources>
-        <ResourceDictionary>
-            <converters:ReactiveThingToObjectListConverter x:Key="ReactiveThingToObjectListConverter" />
-        </ResourceDictionary>
-    </uc:ThingUserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -27,7 +21,6 @@
                          DisplayMember="UserFriendlyShortName"
                          EditValue="{Binding SelectedList,
                                             Mode=TwoWay,
-                                            Converter={StaticResource ReactiveThingToObjectListConverter},
                                             UpdateSourceTrigger=PropertyChanged}"
                          ItemsSource="{Binding SourceThingList}"
                          Grid.Row="0"
