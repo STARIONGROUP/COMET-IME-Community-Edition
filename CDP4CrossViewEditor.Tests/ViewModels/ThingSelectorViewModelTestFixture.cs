@@ -73,7 +73,17 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.iteration = this.CreateIteration();
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                },
+                IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    IterationNumber = 1
+                }
+            };
         }
 
         [TearDown]
@@ -110,21 +120,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             viewModel.BindData();
             viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ParameterBase);
             viewModel.BindData();
-        }
-
-        private Iteration CreateIteration()
-        {
-            return new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            {
-                Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri)
-                {
-                    EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
-                },
-                IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
-                {
-                    IterationNumber = 1
-                }
-            };
         }
     }
 }
