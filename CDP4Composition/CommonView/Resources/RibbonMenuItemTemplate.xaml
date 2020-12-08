@@ -11,7 +11,7 @@
             <dxb:GalleryItem Caption="{Binding MenuItemContent}"
                                  Glyph="{dx:DXImage Image=GroupFieldCollection_32x32.png}"
                                  Description="{Binding Description}"
-                                 Command="{Binding ShowOrClosePanelCommand}"
+                                 Command="{Binding ShowPanelCommand}"
                                  IsChecked="{Binding IsChecked, Mode=TwoWay}">
             </dxb:GalleryItem>
         </ContentControl>
@@ -21,7 +21,7 @@
             <dxb:GalleryItem Caption="{Binding MenuItemContent}"
                             Glyph="{dx:DXImage Image=Properties_32x32.png}"
                             Description="{Binding Description}"
-                            Command="{Binding ShowOrClosePanelCommand}"
+                            Command="{Binding ShowPanelCommand}"
                             IsChecked="{Binding IsChecked, Mode=TwoWay}">
             </dxb:GalleryItem>
         </ContentControl>
@@ -32,7 +32,7 @@
             <dxb:GalleryItem Caption="{Binding Name}"
                              Glyph="{dx:DXImage Image=Technology_32x32.png}"
                              Description="{Binding Description}"
-                             Command="{Binding ShowOrClosePanelCommand}"
+                             Command="{Binding ShowPanelCommand}"
                              IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
         </ContentControl>
     </DataTemplate>
@@ -41,7 +41,7 @@
         <ContentControl>
             <dxb:GalleryItem Caption="{Binding MenuItemContent}"
                              Glyph="{dx:DXImage Image=Team_32x32.png}"
-                             Command="{Binding ShowOrClosePanelCommand}"
+                             Command="{Binding ShowPanelCommand}"
                              IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
         </ContentControl>
     </DataTemplate>

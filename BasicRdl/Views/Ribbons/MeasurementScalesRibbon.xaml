@@ -18,7 +18,7 @@
     <dxb:BarSplitButtonItem.Resources>
         <DataTemplate DataType="{x:Type mvvm:RibbonMenuItemViewModelBase}">
             <ContentControl>
-                <dxb:BarCheckItem Command="{Binding Path=ShowOrClosePanelCommand}"
+                <dxb:BarCheckItem Command="{Binding Path=ShowPanelCommand}"
                                   Content="{Binding MenuItemContent}"
                                   IsChecked="{Binding Path=IsChecked}" />
             </ContentControl>

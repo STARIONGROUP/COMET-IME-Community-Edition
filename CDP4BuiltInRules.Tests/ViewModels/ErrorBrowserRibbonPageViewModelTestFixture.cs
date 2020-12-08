@@ -125,10 +125,10 @@ namespace CDP4BuiltInRules.Tests.ViewModels
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
             vm.OpenSingleBrowserCommand.Execute(null);
 
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true));
+            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(1));
 
             vm.OpenSingleBrowserCommand.Execute(null);
-            this.navigationService.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), true));
+            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(2));
         }
     }
 }
