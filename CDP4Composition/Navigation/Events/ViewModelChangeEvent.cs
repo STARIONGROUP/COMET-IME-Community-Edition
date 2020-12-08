@@ -1,10 +1,10 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ErrorBrowserRibbon.xaml.cs" company="RHEA System S.A.">
+﻿// ------------------------------------------------------------------------------------------------
+// <copyright file="ViewModelChangeEvent.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -21,29 +21,29 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 
-namespace CDP4BuiltInRules.Views
+namespace CDP4Composition.Navigation.Events
 {
-    using System.ComponentModel.Composition;
-
-    using CDP4BuiltInRules.ViewModels;
-
-    using Microsoft.Practices.Prism.Mvvm;
-
     /// <summary>
-    /// Interaction logic for ErrorBrowserRibbon.xaml
+    /// The event carrying information for a viewmodel change.
     /// </summary>
-    [Export(typeof(ErrorBrowserRibbon))]
-    public partial class ErrorBrowserRibbon : IView
+    public class ViewModelChangeEvent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorBrowserRibbon"/> class.
+        /// Initializes a new instance of the <see cref="ViewModelChangeEvent"/> class
         /// </summary>
-        public ErrorBrowserRibbon()
+        /// <param name="viewModel">
+        /// The event's <see cref="IPanelViewModel"/>
+        /// </param>
+        public ViewModelChangeEvent(IPanelViewModel viewModel)
         {
-            this.InitializeComponent();
-            this.DataContext = new ErrorBrowserRibbonViewModel();
+            this.ViewModel = viewModel;
         }
+
+        /// <summary>
+        /// Gets the <see cref="IPanelViewModel"/>
+        /// </summary>
+        public IPanelViewModel ViewModel { get; private set; }
     }
 }

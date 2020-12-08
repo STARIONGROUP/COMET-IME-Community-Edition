@@ -1,19 +1,41 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BuiltInRulesBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4BuiltInRules.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Reactive.Linq;
+
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services;
+
     using NLog;
+
     using ReactiveUI;
     
     /// <summary>
@@ -44,10 +66,7 @@ namespace CDP4BuiltInRules.ViewModels
         /// <summary>
         /// Gets the caption of the browser
         /// </summary>
-        public string Caption
-        {
-            get { return "Built-In Rules Browser"; }
-        }
+        public string Caption => "Built-In Rules Browser";
 
         /// <summary>
         /// Gets the unique identifier of the view-model
@@ -57,18 +76,12 @@ namespace CDP4BuiltInRules.ViewModels
         /// <summary>
         /// Gets the tooltip
         /// </summary>
-        public string ToolTip
-        {
-            get { return "Display available Built-in Rules"; }
-        }
+        public string ToolTip => "Display available Built-in Rules";
 
         /// <summary>
         /// Gets a value indicating whether this is dirty
         /// </summary>
-        public bool IsDirty
-        {
-            get { return false; }
-        }
+        public bool IsDirty => false;
 
         /// <summary>
         /// Gets the Data-Source
@@ -76,13 +89,7 @@ namespace CDP4BuiltInRules.ViewModels
         /// <remarks>
         /// The data source is not relevant in the case of the <see cref="BuiltInRulesBrowserViewModel"/>
         /// </remarks>
-        public string DataSource 
-        {
-            get
-            {
-                return string.Empty;
-            } 
-        }
+        public string DataSource => string.Empty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BuiltInRulesBrowserViewModel"/> class.
@@ -112,8 +119,8 @@ namespace CDP4BuiltInRules.ViewModels
         /// </summary>
         public BuiltInRuleRowViewModel SelectedRule
         {
-            get { return this.selectedRule; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedRule, value); }
+            get => this.selectedRule;
+            set => this.RaiseAndSetIfChanged(ref this.selectedRule, value);
         }
 
         /// <summary>
@@ -139,6 +146,7 @@ namespace CDP4BuiltInRules.ViewModels
         public void StartDrag(IDragInfo dragInfo)
         {
             var dragSource = dragInfo.Payload as IDragSource;
+
             if (dragSource != null)
             {
                 dragSource.StartDrag(dragInfo);

@@ -197,6 +197,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <views:CommonThingControl GridView="{Binding ElementName=View}" />
@@ -396,6 +397,8 @@
                     </dxg:TreeListControl.InputBindings>
                 </dxg:TreeListControl>
             </Grid>
+
+            <views:SelectedThingGroupControl Grid.Row="3"/>
         </Grid>
     </dx:LoadingDecorator>
 </UserControl>

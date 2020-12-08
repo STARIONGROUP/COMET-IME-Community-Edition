@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ErrorBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4BuiltInRules.ViewModels
 {
@@ -11,17 +30,22 @@ namespace CDP4BuiltInRules.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Windows;
+
     using CDP4Common;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Events;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4Errors.ViewModels;
+
     using ReactiveUI;
 
     /// <summary>
@@ -45,8 +69,8 @@ namespace CDP4BuiltInRules.ViewModels
         public ErrorBrowserViewModel(ISession session, SiteDirectory siteDir, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, {this.Thing.Name}";
+            this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
             this.Errors = new List<ErrorRowViewModel>();
             this.PopulateErrors();
         }
@@ -128,6 +152,7 @@ namespace CDP4BuiltInRules.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var error in this.Errors)
             {
                 error.Dispose();
@@ -145,6 +170,7 @@ namespace CDP4BuiltInRules.ViewModels
             }
 
             this.Errors.Clear();
+
             foreach (var thing in this.Session.Assembler.Cache.Select(item => item.Value.Value).Where(t => t.ValidationErrors.Any()))
             {
                 foreach (var error in thing.ValidationErrors)
@@ -161,6 +187,7 @@ namespace CDP4BuiltInRules.ViewModels
         private void ExecuteCopyErrorCommand()
         {
             var selectedErrorRow = this.SelectedThing as ErrorRowViewModel;
+
             if (selectedErrorRow != null)
             {
                 Clipboard.SetDataObject(string.Format("{1} of type {0} has an error: {2}", selectedErrorRow.ContainerThingClassKind, selectedErrorRow.Path, selectedErrorRow.Content));

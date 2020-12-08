@@ -2,7 +2,7 @@
 // <copyright file="AddinRibbonPart.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -54,7 +54,7 @@ namespace CDP4AddinCE
         /// <summary>
         /// The NLog logger
         /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// The <see cref="ISession"/> that is active in the addin
@@ -98,7 +98,7 @@ namespace CDP4AddinCE
         /// </param>
         /// <param name="ribbonControlTag">
         /// The Tag property of the associated RibbonControl
-        /// </param>        
+        /// </param>
         public override async Task OnAction(string ribbonControlId, string ribbonControlTag = "")
         {
             switch (ribbonControlId)

@@ -2,7 +2,7 @@
 // <copyright file="IdentifiableCustomTaskPane.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -35,6 +35,15 @@ namespace CDP4AddinCE
     /// </summary>
     public class IdentifiableCustomTaskPane : IDisposable
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IdentifiableCustomTaskPane"/> class.
+        /// </summary>
+        /// <param name="identifier">
+        /// The unique identifier of the custom task pane
+        /// </param>
+        /// <param name="customTaskPane">
+        /// The <see cref="_CustomTaskPane"/> that is decorated by the current class.
+        /// </param>
         public IdentifiableCustomTaskPane(Guid identifier, _CustomTaskPane customTaskPane)
         {
             this.Identifier = identifier;
