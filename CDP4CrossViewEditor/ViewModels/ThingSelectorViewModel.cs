@@ -175,7 +175,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMoveToSource()
         {
-            // Deliberate empty, the method behaviour will be defined shortly
+            // TODO #625: Implement ordering and sorting support for selected elements
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMoveToTarget()
         {
-            // Deliberate empty, the method behaviour will be defined shortly
+            // TODO #625: Implement ordering and sorting support for selected elements
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMoveUp()
         {
-            // Deliberate empty, the method behaviour will be defined shortly
+            // TODO #625: Implement ordering and sorting support for selected elements
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMoveItemsDown()
         {
-            // Deliberate empty, the method behaviour will be defined shortly
+            // TODO #625: Implement ordering and sorting support for selected elements
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteClearItems()
         {
-            // Deliberate empty, the method behaviour will be defined shortly
+            // TODO #623 Implement core functionality
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteSortItems()
         {
-            // Deliberate empty, the method behaviour will be defined shortly
+            // TODO #624 Implement filtering for initially displayed elements
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void BindElements()
         {
-            // Deliberate empty, the method behaviour will be defined shortly
+            // TODO #623 Implement core functionality
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void BindParameters()
         {
-            // Deliberate empty, the method behaviour will be defined shortly
+            // TODO #623 Implement core functionality
         }
     }
 }
