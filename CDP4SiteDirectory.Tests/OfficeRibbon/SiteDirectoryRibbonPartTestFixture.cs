@@ -186,25 +186,25 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             CDPMessageBus.Current.SendMessage(openSessionEvent);
 
             this.ribbonPart.OnAction("ShowDomainsOfExpertise");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<DomainOfExpertiseBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<DomainOfExpertiseBrowserViewModel>(), false));
 
             this.ribbonPart.OnAction("ShowModels");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<ModelBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<ModelBrowserViewModel>(), false));
 
             this.ribbonPart.OnAction("ShowLanguages");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<NaturalLanguageBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<NaturalLanguageBrowserViewModel>(), false));
 
             this.ribbonPart.OnAction("ShowOrganizations");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<OrganizationBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<OrganizationBrowserViewModel>(), false));
 
             this.ribbonPart.OnAction("ShowRoles");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<RoleBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<RoleBrowserViewModel>(), false));
 
             this.ribbonPart.OnAction("ShowPersons");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<PersonBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<PersonBrowserViewModel>(), false));
 
             this.ribbonPart.OnAction("ShowSiteRDLs");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<SiteRdlBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<SiteRdlBrowserViewModel>(), false));
 
             // close viewmodels
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);

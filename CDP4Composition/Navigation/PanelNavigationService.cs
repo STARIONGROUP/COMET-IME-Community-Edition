@@ -300,6 +300,38 @@ namespace CDP4Composition.Navigation
 
             this.Open(viewModel, useRegionManager);
         }
+        
+        /// <summary>
+        /// Re-opens an exisiting View associated to the provided view-model, or opens a new View
+        /// Re-opening is done by sending a <see cref="CDPMessageBus"/> event.
+        /// This event can be handled by more specific code,  for example in the addin, where some
+        /// ViewModels should not close at all. For those viewmodels visibility is toggled on every
+        /// <see cref="NavigationPanelEvent"/> event that has <see cref="PanelStatus.Open"/> set.
+        /// </summary>
+        /// <param name="viewModel">
+        /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened, or closed
+        /// </param>
+        /// <param name="useRegionManager">
+        /// A value indicating whether handling the opening of the view shall be message-based or not. In case it is
+        /// NOT message-based, the <see cref="IRegionManager"/> handles opening and placement of the view.
+        /// </param>
+        /// <remarks>
+        /// The data context of the view is the <see cref="IPanelViewModel"/>
+        /// </remarks>
+        public void OpenExistingOrOpen(IPanelViewModel viewModel, bool useRegionManager)
+        {
+            if (this.ViewModelViewPairs.TryGetValue(viewModel, out var view))
+            {
+                var lazyView = this.GetViewType(viewModel);
+                var regionName = lazyView.Metadata.Region;
+                var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open, regionName);
+                CDPMessageBus.Current.SendMessage(openPanelEvent);
+            }
+            else
+            {
+                this.Open(viewModel, useRegionManager);
+            }
+        }
 
         /// <summary>
         /// Closes the <see cref="IPanelView"/> associated to the <see cref="IPanelViewModel"/>

@@ -30,6 +30,7 @@ namespace CDP4AddinCE
     using System.ComponentModel.Composition;
     using System.Drawing;
     using System.Globalization;
+    using System.Linq;
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Runtime.InteropServices;
@@ -49,18 +50,20 @@ namespace CDP4AddinCE
     using CDP4Dal.Events;
 
     using CDP4OfficeInfrastructure;
-    
+
     using DevExpress.Xpf.Core;
-    
+
     using Microsoft.Practices.ServiceLocation;
 
     using NetOffice.ExcelApi.Tools;
+    using NetOffice.OfficeApi;
     using NetOffice.Tools;
-    
+    using NetOffice.Tools.Native;
+
     using NLog;
-    
+
     using ReactiveUI;
-    
+
     using MessageBox = System.Windows.Forms.MessageBox;
 
     /// <summary>
@@ -68,7 +71,8 @@ namespace CDP4AddinCE
     /// provides the Fluent XML Ribbon and call-back implementations for the Fluent XML Ribbon controls
     /// </summary>
     [COMAddin("CDP4-CE Office Add-in", "The CDP4-CE Office Add-in provides CDP4 application integration with Microsoft Office Suite", 3)]
-    [Guid("FD48B640-1D3F-4922-854B-C69028CA469E"), ProgId("CDP4CE.Addin")]
+    [Guid("FD48B640-1D3F-4922-854B-C69028CA469E")]
+    [ProgId("CDP4CE.Addin")]
     [RegistryLocation(RegistrySaveLocation.CurrentUser)]
     public class Addin : COMAddin
     {
@@ -95,7 +99,7 @@ namespace CDP4AddinCE
         /// <summary>
         /// The list of current loaded custom task panes
         /// </summary>
-        private Dictionary<Guid, IdentifiableCustomTaskPane> customTaskPanes = new Dictionary<Guid, IdentifiableCustomTaskPane>();
+        private readonly Dictionary<Guid, IdentifiableCustomTaskPane> customTaskPanes = new Dictionary<Guid, IdentifiableCustomTaskPane>();
 
         /// <summary>
         /// A wrapper class that provides access to the different office application instances
@@ -168,7 +172,7 @@ namespace CDP4AddinCE
         /// <param name="control">
         /// The ribbon control that invokes the callback
         /// </param>
-        public async void OnAction(NetOffice.OfficeApi.IRibbonControl control)
+        public async void OnAction(IRibbonControl control)
         {
             logger.Trace("{0} OnAction", control.Id);
 
@@ -200,7 +204,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// ribbon XML containing the controls 
         /// </returns>
-        public string GetContent(NetOffice.OfficeApi.IRibbonControl control)
+        public string GetContent(IRibbonControl control)
         {
             logger.Trace("{0} GetContent", control.Id);
 
@@ -226,7 +230,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// a string with the content of the label
         /// </returns>
-        public string GetLabel(NetOffice.OfficeApi.IRibbonControl control)
+        public string GetLabel(IRibbonControl control)
         {
             logger.Trace("{0} GetLabel", control.Id);
             return this.FluentRibbonManager.GetLabel(control.Id, control.Tag);
@@ -241,7 +245,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// true if enabled, false if not enabled
         /// </returns>
-        public bool GetEnabled(NetOffice.OfficeApi.IRibbonControl control)
+        public bool GetEnabled(IRibbonControl control)
         {
             logger.Trace("{0} GetEnabled", control.Id);
             return this.FluentRibbonManager.GetEnabled(control.Id, control.Tag);
@@ -256,7 +260,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// true if pressed, false if not pressed
         /// </returns>
-        public bool GetPressed(NetOffice.OfficeApi.IRibbonControl control)
+        public bool GetPressed(IRibbonControl control)
         {
             logger.Trace("{0} GetPressed", control.Id);
             return this.FluentRibbonManager.GetPressed(control.Id, control.Tag);
@@ -271,7 +275,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// returns true if visible, false if not
         /// </returns>
-        public bool GetVisible(NetOffice.OfficeApi.IRibbonControl control)
+        public bool GetVisible(IRibbonControl control)
         {
             logger.Trace("{0} GetVisible", control.Id);
             return this.FluentRibbonManager.GetVisible(control.Id, control.Tag);
@@ -286,7 +290,7 @@ namespace CDP4AddinCE
         /// <returns>
         /// an image if found, null otherwise
         /// </returns>
-        public Image GetImage(NetOffice.OfficeApi.IRibbonControl control)
+        public Image GetImage(IRibbonControl control)
         {
             logger.Trace("{0} GetImage", control.Id);
             return this.FluentRibbonManager.GetImage(control.Id, control.Tag);
@@ -301,7 +305,7 @@ namespace CDP4AddinCE
         public override void CTPFactoryAvailable(object CTPFactoryInst)
         {
             base.CTPFactoryAvailable(CTPFactoryInst);
-            this.TaskPaneFactory = new NetOffice.OfficeApi.ICTPFactory(Factory, null, CTPFactoryInst);
+            this.TaskPaneFactory = new ICTPFactory(this.Factory, null, CTPFactoryInst);
         }
 
         /// <summary>
@@ -311,7 +315,7 @@ namespace CDP4AddinCE
         /// <param name="exception">The exception that occurred.</param>
         protected override void OnError(ErrorMethodKind methodKind, Exception exception)
         {
-            Utils.Dialog.ShowError(exception, "Unexpected state in CDP4-CE.Addin " + methodKind.ToString());
+            this.Utils.Dialog.ShowError(exception, "Unexpected state in CDP4-CE.Addin " + methodKind.ToString());
         }
 
         /// <summary>
@@ -458,9 +462,13 @@ namespace CDP4AddinCE
                         taskPane.DockPosition = dockPosition;
                         taskPane.Width = 300;
                         taskPane.Visible = true;
-                        var wpfHostControl = taskPane.ContentControl as TaskPaneWpfHostControl;
 
-                        if (wpfHostControl != null)
+                        if (taskPane is CustomTaskPane customTaskPane)
+                        {
+                            customTaskPane.VisibleStateChangeEvent += this.CustomTaskPane_VisibleStateChangeEvent;
+                        }
+
+                        if (taskPane.ContentControl is TaskPaneWpfHostControl wpfHostControl)
                         {
                             wpfHostControl.SetContent(uiElement);
                         }
@@ -480,6 +488,22 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
+        /// Handles a <see cref="CustomTaskPane"/>'s VisibleStateChangeEvent
+        /// </summary>
+        /// <param name="customTaskPaneInst">
+        /// The <see cref="_CustomTaskPane"/>
+        /// </param>
+        private void CustomTaskPane_VisibleStateChangeEvent(_CustomTaskPane customTaskPaneInst)
+        {
+            if (!customTaskPaneInst.Visible)
+            {
+                var identifier = this.customTaskPanes.SingleOrDefault(x => x.Value.CustomTaskPane == customTaskPaneInst).Key;
+                var hidePanelEvent = new HidePanelEvent(identifier);
+                CDPMessageBus.Current.SendMessage(hidePanelEvent);
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="NavigationPanelEvent"/> with <see cref="PanelStatus.Closed"/>
         /// </summary>
         /// <param name="navigationPanelEvent">
@@ -493,8 +517,7 @@ namespace CDP4AddinCE
             {
                 var identifier = navigationPanelEvent.ViewModel.Identifier;
 
-                IdentifiableCustomTaskPane identifiableCustomTaskPane = null;
-                var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out identifiableCustomTaskPane);
+                var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out var identifiableCustomTaskPane);
 
                 if (taskPaneExists)
                 {
@@ -562,7 +585,7 @@ namespace CDP4AddinCE
         /// </param>
         private void AddinOnConnection(object application, ext_ConnectMode connectMode, object addInInst, ref Array custom)
         {
-            Factory.Console.WriteLine("AddinOnConnection");
+            this.Factory.Console.WriteLine("AddinOnConnection");
             logger.Trace("AddinOnConnection");
 
             try
@@ -587,11 +610,11 @@ namespace CDP4AddinCE
             }
             catch (CompositionException compositionException)
             {
-                logger.Fatal(compositionException, string.Format("CompositionException: {0}", compositionException.Message));
+                logger.Fatal(compositionException, $"CompositionException: {compositionException.Message}");
 
                 foreach (var error in compositionException.Errors)
                 {
-                    logger.Fatal(error.Exception, string.Format("CompositionException Error: {0} {1}", error.Element.DisplayName, error.Description));
+                    logger.Fatal(error.Exception, $"CompositionException Error: {error.Element.DisplayName} {error.Description}");
                 }
             }
             catch (Exception ex)
@@ -691,7 +714,7 @@ namespace CDP4AddinCE
             var pluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
 
             this.FluentRibbonManager.IsActive = true;
-            var appSettingsService= ServiceLocator.Current.GetInstance<IAppSettingsService<AddinAppSettings>>();
+            var appSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<AddinAppSettings>>();
             var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService);
             this.FluentRibbonManager.RegisterRibbonPart(ribbonpart);
             this.fluentRibbonXml = this.FluentRibbonManager.GetFluentXml();
@@ -707,7 +730,7 @@ namespace CDP4AddinCE
         /// </param>
         private void AddinOnAddInsUpdate(ref Array custom)
         {
-            Factory.Console.WriteLine("AddinOnAddInsUpdate");
+            this.Factory.Console.WriteLine("AddinOnAddInsUpdate");
             logger.Trace("AddinOnAddInsUpdate");
         }
 
@@ -720,7 +743,7 @@ namespace CDP4AddinCE
         /// </param>
         private void AddinOnStartupComplete(ref Array custom)
         {
-            Factory.Console.WriteLine("AddinOnStartupComplete");
+            this.Factory.Console.WriteLine("AddinOnStartupComplete");
             logger.Trace("AddinOnStartupComplete");
         }
 
@@ -732,7 +755,7 @@ namespace CDP4AddinCE
         /// </param>
         private void AddinOnBeginShutdown(ref Array custom)
         {
-            Factory.Console.WriteLine("AddinOnBeginShutdown");
+            this.Factory.Console.WriteLine("AddinOnBeginShutdown");
             logger.Trace("AddinOnBeginShutdown");
         }
 
@@ -750,7 +773,7 @@ namespace CDP4AddinCE
         {
             this.DestructApplication();
 
-            Factory.Console.WriteLine("AddinOnDisconnection");
+            this.Factory.Console.WriteLine("AddinOnDisconnection");
             logger.Trace("AddinOnDisconnection");
         }
     }

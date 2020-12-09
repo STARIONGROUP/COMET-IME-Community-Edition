@@ -109,6 +109,7 @@ namespace CDP4Requirements.Tests.Controls
             this.req2.Group = this.group2;
             this.iteration.RequirementsSpecification.Add(this.resSpec);
             this.iteration.IterationSetup = this.iterationSetup;
+            this.modelSetup.IterationSetup.Add(this.iterationSetup);
             this.model.EngineeringModelSetup = this.modelSetup;
             this.model.Iteration.Add(this.iteration);
 
@@ -125,7 +126,10 @@ namespace CDP4Requirements.Tests.Controls
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString());
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+
+            var openIterationResult = new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>();
+            openIterationResult.Add(this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant));
+            this.session.Setup(x => x.OpenIterations).Returns(openIterationResult);
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
         }
 
