@@ -28,12 +28,14 @@ namespace CDP4AddinCE
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.Globalization;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Runtime.InteropServices;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4AddinCE.Settings;
@@ -172,7 +174,7 @@ namespace CDP4AddinCE
         /// <param name="control">
         /// The ribbon control that invokes the callback
         /// </param>
-        public async void OnAction(IRibbonControl control)
+        public async Task OnAction(IRibbonControl control)
         {
             logger.Trace("{0} OnAction", control.Id);
 
@@ -433,20 +435,18 @@ namespace CDP4AddinCE
         /// <param name="navigationPanelEvent">
         /// The event that carries the view, view-model combination and <see cref="PanelStatus"/>
         /// </param>
+        [ExcludeFromCodeCoverage]
         private void HandleOpenPanel(NavigationPanelEvent navigationPanelEvent)
         {
             logger.Debug("Opening Panel {0}", navigationPanelEvent.ViewModel);
 
             try
             {
-                var uiElement = navigationPanelEvent.View as UIElement;
-
-                if (uiElement != null)
+                if (navigationPanelEvent.View is UIElement uiElement)
                 {
                     var identifier = navigationPanelEvent.ViewModel.Identifier;
 
-                    IdentifiableCustomTaskPane identifiableCustomTaskPane = null;
-                    var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out identifiableCustomTaskPane);
+                    var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out var identifiableCustomTaskPane);
 
                     if (taskPaneExists)
                     {
