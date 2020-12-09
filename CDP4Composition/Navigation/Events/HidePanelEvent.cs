@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AssemblyInfo.cs" company="RHEA System S.A.">
+// <copyright file="HidePanelEvent.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -23,16 +23,23 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-[assembly: AssemblyTrademark("CDP")]
+namespace CDP4Composition.Navigation.Events
+{
+    using System;
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
+    /// <summary>
+    /// The event that is fired when a <see cref="IPanelView"/> is hidden
+    /// </summary>
+    public class HidePanelEvent
+    {
+        /// <summary>
+        /// The attached <see cref="IPanelViewModel"/>'s identifier
+        /// </summary>
+        public Guid Identifier { get; }
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f3cef2eb-fc4e-4e13-8917-4a542026d04e")]
-[assembly: InternalsVisibleTo("ProductTree.Tests")]
+        public HidePanelEvent(Guid identifier)
+        {
+            this.Identifier = identifier;
+        }
+    }
+}

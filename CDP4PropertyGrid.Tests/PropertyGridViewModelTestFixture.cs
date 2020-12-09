@@ -28,7 +28,6 @@ namespace CDP4PropertyGrid.Tests
     using System;
     using System.Reactive.Concurrency;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.SiteDirectoryData;
@@ -49,13 +48,17 @@ namespace CDP4PropertyGrid.Tests
     [TestFixture, Apartment(ApartmentState.STA)]
     public class PropertyGridViewModelTestFixture
     {
-        private static readonly Application application = new Application();
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
 
         [SetUp]
         public void SetUp()
         {
+            if (Application.Current == null)
+            {
+                new Application();
+            }
+
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();

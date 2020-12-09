@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeRibbonPart.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,17 +33,24 @@ namespace CDP4ProductTree
     using System.Text;
     using System.Threading.Tasks;
     using System.Xml.Linq;
+
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using ViewModels;
-    using ReactiveUI;
-    using CDP4Common.SiteDirectoryData;
+
+    using CDP4ProductTree.ViewModels;
+
     using NLog;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The purpose of the <see cref="ProductTreeRibbonPart"/> class is to describe and provide a part of the Fluent Ribbon
@@ -65,9 +91,13 @@ namespace CDP4ProductTree
             this.Iterations = new List<Iteration>();
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+
             CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.IterationChangeEventHandler);
+
+            CDPMessageBus.Current.Listen<HidePanelEvent>()
+                .Subscribe(this.CloseHiddenPanel);
         }
 
         /// <summary>
@@ -78,7 +108,7 @@ namespace CDP4ProductTree
         /// <summary>
         /// Gets a List of <see cref="Iteration"/> that are opened
         /// </summary>
-        public List<Iteration> Iterations { get; private set; } 
+        public List<Iteration> Iterations { get; private set; }
 
         /// <summary>
         /// Invokes the action as a result of a ribbon control being clicked, selected, etc.
@@ -165,14 +195,21 @@ namespace CDP4ProductTree
                         Tuple<DomainOfExpertise, Participant> tuple;
                         this.Session.OpenIterations.TryGetValue(iteration, out tuple);
 
-                        var label = string.Format("{0} - {1} - {2}: [{3}]", engineeringModel.EngineeringModelSetup.ShortName,
-                            iteration.IterationSetup.IterationNumber, option.ShortName, tuple.Item1 == null ? String.Empty : tuple.Item1.ShortName);
+                        var label = string.Format(
+                            "{0} - {1} - {2}: [{3}]",
+                            engineeringModel.EngineeringModelSetup.ShortName,
+                            iteration.IterationSetup.IterationNumber,
+                            option.ShortName,
+                            tuple.Item1 == null ? string.Empty : tuple.Item1.ShortName);
 
                         // format of tag : iterationId_OptionId
                         var menuContent =
                             string.Format(
                                 "<button id=\"ShowProductTree_{0}_{1}\" label=\"{2}\" onAction=\"OnAction\" tag=\"{0}_{1}\" />",
-                                iteration.Iid, option.Iid, label);
+                                iteration.Iid,
+                                option.Iid,
+                                label);
+
                         sb.Append(menuContent);
                     }
                 }
@@ -181,7 +218,7 @@ namespace CDP4ProductTree
                 menuxml = sb.ToString();
             }
 
-            this.UpdateControlIdentifier(menuxml);      
+            this.UpdateControlIdentifier(menuxml);
             return menuxml;
         }
 
@@ -280,6 +317,7 @@ namespace CDP4ProductTree
             {
                 var iteration = iterationEvent.ChangedThing as Iteration;
                 var browser = this.openProductTree.SingleOrDefault(x => x.Thing.Container == iteration);
+
                 if (browser != null)
                 {
                     this.PanelNavigationService.Close(browser, false);
@@ -304,6 +342,43 @@ namespace CDP4ProductTree
         }
 
         /// <summary>
+        /// Close a panel when it is being hidden.
+        /// </summary>
+        /// <param name="hidePanelEvent">
+        /// The <see cref="HidePanelEvent"/>
+        /// </param>
+        private void CloseHiddenPanel(HidePanelEvent hidePanelEvent)
+        {
+            var allBrowsers = this.GetAllOpenBrowsers().SelectMany(x => x);
+            var browser = allBrowsers.SingleOrDefault(x => x.Identifier == hidePanelEvent.Identifier);
+
+            if (browser != null)
+            {
+                this.PanelNavigationService.Close(browser, false);
+
+                if (this.openProductTree.Contains(browser))
+                {
+                    this.openProductTree.Remove(browser as ProductTreeViewModel);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieve all <see cref="IPanelViewModel"/>s related to this <see cref="ProductTreeRibbonPart"/> that are currently open,
+        /// grouped by the original private list they belong to.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="List{T}"/> of type <see cref="List{IPanelViewModel}"/> containing all <see cref="IPanelViewModel"/>s.
+        /// </returns>
+        internal List<List<IPanelViewModel>> GetAllOpenBrowsers()
+        {
+            return new List<List<IPanelViewModel>>
+            {
+                this.openProductTree.Cast<IPanelViewModel>().ToList()
+            };
+        }
+
+        /// <summary>
         /// Show or close the <see cref="ProductTreeViewModel"/>
         /// </summary>
         /// <param name="optionId">
@@ -318,12 +393,14 @@ namespace CDP4ProductTree
             var optionGuid = Guid.Parse(iids[1]);
 
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == iterationUniqueId);
+
             if (iteration == null)
             {
                 return;
             }
 
             var option = iteration.Option.SingleOrDefault(x => x.Iid == optionGuid);
+
             if (option == null)
             {
                 return;
@@ -331,6 +408,7 @@ namespace CDP4ProductTree
 
             // close the brower if it exists
             var browser = this.openProductTree.SingleOrDefault(x => x.Thing == option);
+
             if (browser != null)
             {
                 this.PanelNavigationService.Close(browser, false);

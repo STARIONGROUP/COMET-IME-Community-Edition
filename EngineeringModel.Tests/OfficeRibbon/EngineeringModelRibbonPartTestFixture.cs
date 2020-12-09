@@ -2,9 +2,9 @@
 // <copyright file="EngineeringModelRibbonPartTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski, Ahmed Abulwafa Ahmed
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -28,34 +28,37 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
     using System;
     using System.Collections.Generic;
     using System.IO.Packaging;
+    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading;
-    using System.Threading.Tasks;    
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
-    
+
     using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="EngineeringModelRibbonPart"/> class
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]   
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class EngineeringModelRibbonPartTestFixture
     {
         private EngineeringModelRibbonPart ribbonPart;
@@ -63,7 +66,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         private int order;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IDialogNavigationService> positiveDialogNavigationService;
-        private Mock<IPermissionService> permissionService; 
+        private Mock<IPermissionService> permissionService;
         private Mock<IDialogResult> negativeDialogResult;
         private Mock<IDialogNavigationService> negativeDialogNavigationService;
         private Mock<ISession> session;
@@ -100,16 +103,16 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
             this.domain.ShortName = "SYS";
 
-            this.participant = new Participant(Guid.NewGuid(), null, this.uri){Person = this.person};
-            
+            this.participant = new Participant(Guid.NewGuid(), null, this.uri) { Person = this.person };
+
             this.sitedir.Model.Add(this.modelSetup);
             this.sitedir.Person.Add(this.person);
             this.sitedir.Domain.Add(this.domain);
             this.modelSetup.IterationSetup.Add(this.iterationSetup);
             this.modelSetup.Participant.Add(this.participant);
 
-            this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri){EngineeringModelSetup = this.modelSetup};
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri){IterationSetup = this.iterationSetup};
+            this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri) { EngineeringModelSetup = this.modelSetup };
+            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri) { IterationSetup = this.iterationSetup };
             this.model.Iteration.Add(this.iteration);
 
             var siteDirectory = new Lazy<Thing>(() => this.sitedir);
@@ -126,9 +129,10 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             // Setup negative dialog result - selection of iterationsetup
             this.SetupNegativeDialogResult();
             this.positiveDialogNavigationService = new Mock<IDialogNavigationService>();
+
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
             });
         }
 
@@ -141,6 +145,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             this.negativeDialogResult = new Mock<IDialogResult>();
             this.negativeDialogResult.Setup(x => x.Result).Returns(nullnegresult);
             this.negativeDialogNavigationService = new Mock<IDialogNavigationService>();
+
             this.negativeDialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>()))
                 .Returns(this.negativeDialogResult.Object);
         }
@@ -301,6 +306,36 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         }
 
         [Test]
+        public async Task VerifyThatHideElementDefWorks()
+        {
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null, null, null, null);
+
+            var fluentRibbonManager = new FluentRibbonManager();
+            fluentRibbonManager.IsActive = true;
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
+
+            var content = this.ribbonPart.GetContent("ShowElementDefinitionsBrowser_");
+            await this.ribbonPart.OnAction("ShowElementDefinitionsBrowser_" + this.iteration.Iid, this.iteration.Iid.ToString());
+
+            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+
+            var allBrowsers = this.ribbonPart.GetAllOpenBrowsers();
+            CDPMessageBus.Current.SendMessage(new HidePanelEvent(allBrowsers.SelectMany(x => x).First().Identifier));
+
+            this.panelNavigationService.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), false), Times.Once);
+
+            CollectionAssert.IsEmpty(this.ribbonPart.GetAllOpenBrowsers().SelectMany(x => x));
+        }
+
+        [Test]
         public async Task VerifyThatOnActionShowOptionsWorks()
         {
             this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null, null, null, null);
@@ -327,7 +362,37 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         }
 
         [Test]
-        public async Task VerifyThatOnActionShowShowFiniteStatesWorks()
+        public async Task VerifyThatHideOptionsWorks()
+        {
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null, null, null, null);
+
+            var fluentRibbonManager = new FluentRibbonManager();
+            fluentRibbonManager.IsActive = true;
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
+
+            var content = this.ribbonPart.GetContent("ShowOptionBrowser_");
+            await this.ribbonPart.OnAction("ShowOptionBrowser_" + this.iteration.Iid, this.iteration.Iid.ToString());
+
+            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+
+            var allBrowsers = this.ribbonPart.GetAllOpenBrowsers();
+            CDPMessageBus.Current.SendMessage(new HidePanelEvent(allBrowsers.SelectMany(x => x).First().Identifier));
+
+            this.panelNavigationService.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), false), Times.Once);
+
+            CollectionAssert.IsEmpty(this.ribbonPart.GetAllOpenBrowsers().SelectMany(x => x));
+        }
+
+        [Test]
+        public async Task VerifyThatOnActionShowFiniteStatesWorks()
         {
             this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null, null, null, null);
 
@@ -353,7 +418,37 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         }
 
         [Test]
-        public async Task VerifyThatOnActionShowShowPublicationsWorks()
+        public async Task VerifyThatHideFiniteStatesWorks()
+        {
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null, null, null, null);
+
+            var fluentRibbonManager = new FluentRibbonManager();
+            fluentRibbonManager.IsActive = true;
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
+
+            var content = this.ribbonPart.GetContent("ShowFiniteStateBrowser_");
+            await this.ribbonPart.OnAction("ShowFiniteStateBrowser_" + this.iteration.Iid, this.iteration.Iid.ToString());
+
+            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+
+            var allBrowsers = this.ribbonPart.GetAllOpenBrowsers();
+            CDPMessageBus.Current.SendMessage(new HidePanelEvent(allBrowsers.SelectMany(x => x).First().Identifier));
+
+            this.panelNavigationService.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), false), Times.Once);
+
+            CollectionAssert.IsEmpty(this.ribbonPart.GetAllOpenBrowsers().SelectMany(x => x));
+        }
+
+        [Test]
+        public async Task VerifyThatOnActionShowPublicationsWorks()
         {
             this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null, null, null, null);
 
@@ -378,6 +473,36 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
         }
 
+        [Test]
+        public async Task VerifyThatHidePublicationsWorks()
+        {
+            this.ribbonPart = new EngineeringModelRibbonPart(this.order, this.panelNavigationService.Object, this.positiveDialogNavigationService.Object, null, null, null, null, null);
+
+            var fluentRibbonManager = new FluentRibbonManager();
+            fluentRibbonManager.IsActive = true;
+            fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
+
+            var content = this.ribbonPart.GetContent("ShowPublicationBrowser_");
+            await this.ribbonPart.OnAction("ShowPublicationBrowser_" + this.iteration.Iid, this.iteration.Iid.ToString());
+
+            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+
+            var allBrowsers = this.ribbonPart.GetAllOpenBrowsers();
+            CDPMessageBus.Current.SendMessage(new HidePanelEvent(allBrowsers.SelectMany(x => x).First().Identifier));
+
+            this.panelNavigationService.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), false), Times.Once);
+
+            CollectionAssert.IsEmpty(this.ribbonPart.GetAllOpenBrowsers().SelectMany(x => x));
+        }
+
         /// <summary>
         /// Pack Uri's are not recognized untill they have been registered in the appl domain
         /// This method makes sure pack Uri's do no throw an exception regarding incorrect port.
@@ -386,7 +511,7 @@ namespace CDP4EngineeringModel.Tests.OfficeRibbon
         {
             PackUriHelper.Create(new Uri("reliable://0"));
             new FrameworkElement();
-            
+
             try
             {
                 Application.ResourceAssembly = typeof(EngineeringModelRibbonPart).Assembly;
