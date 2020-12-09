@@ -26,6 +26,7 @@
 namespace CDP4AddinCE.Tests
 {
     using System.Threading;
+    using System.Threading.Tasks;
 
     using CDP4Composition;
 
@@ -70,9 +71,9 @@ namespace CDP4AddinCE.Tests
         }
 
         [Test]
-        public void VerifyAddinOnActionCallback()
+        public async Task VerifyAddinOnActionCallback()
         {
-            this.addin.OnAction(this.ribbonControl.Object);
+            await this.addin.OnAction(this.ribbonControl.Object);
             this.fluentRibbonManager.Verify(x => x.OnAction(this.ribbonId, this.ribbbonTag));
         }
 
