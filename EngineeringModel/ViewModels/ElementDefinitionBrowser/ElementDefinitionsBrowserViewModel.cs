@@ -28,6 +28,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -283,12 +284,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to set an <see cref="ElementDefinition"/> as the top element of the selected iteration
         /// </summary>
-        public ReactiveCommand<object> SetAsTopElementDefinitionCommand { get; private set; }
+        public ReactiveCommand<Unit> SetAsTopElementDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to unset an <see cref="ElementDefinition"/> as the top element of the selected iteration
         /// </summary>
-        public ReactiveCommand<object> UnsetAsTopElementDefinitionCommand { get; private set; }
+        public ReactiveCommand<Unit> UnsetAsTopElementDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
@@ -451,11 +452,9 @@ namespace CDP4EngineeringModel.ViewModels
             this.ChangeOwnershipCommand = ReactiveCommand.Create();
             this.ChangeOwnershipCommand.Subscribe(_ => this.ExecuteChangeOwnershipCommand());
 
-            this.SetAsTopElementDefinitionCommand = ReactiveCommand.Create();
-            this.SetAsTopElementDefinitionCommand.Subscribe(_ => this.ExecuteSetAsTopElementDefinitionCommand());
+            this.SetAsTopElementDefinitionCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteSetAsTopElementDefinitionCommandAsync());
 
-            this.UnsetAsTopElementDefinitionCommand = ReactiveCommand.Create();
-            this.UnsetAsTopElementDefinitionCommand.Subscribe(_ => this.ExecuteUnsetAsTopElementDefinitionCommand());
+            this.UnsetAsTopElementDefinitionCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteUnsetAsTopElementDefinitionCommandAsync());
 
             this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
             this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
@@ -548,7 +547,7 @@ namespace CDP4EngineeringModel.ViewModels
 
                 if (elementDefRow.IsTopElement)
                 {
-                    this.ContextMenu.Insert(5, new ContextMenuItemViewModel("Unset as Top Element", "", this.UnsetAsTopElementDefinitionCommand, MenuItemKind.Delete, ClassKind.NotThing));
+                    this.ContextMenu.Insert(5, new ContextMenuItemViewModel("Unset as Top Element", "", this.UnsetAsTopElementDefinitionCommand, MenuItemKind.Edit, ClassKind.NotThing));
                 }
                 else
                 {
@@ -962,7 +961,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Executes the <see cref="SetAsTopElementDefinitionCommand"/>
         /// </summary>
-        private async Task ExecuteSetAsTopElementDefinitionCommand()
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns> 
+        private async Task ExecuteSetAsTopElementDefinitionCommandAsync()
         {
             var elementDefRow = this.SelectedThing as ElementDefinitionRowViewModel;
             if (elementDefRow?.Thing != null && (this.Thing.TopElement == null || this.Thing.TopElement != elementDefRow.Thing))
@@ -979,9 +981,12 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Executes the <see cref="UnsetAsTopElementDefinitionCommandAsTopElementDefinitionCommand"/>
+        /// Executes the <see cref="UnsetAsTopElementDefinitionCommand"/>
         /// </summary>
-        private async Task ExecuteUnsetAsTopElementDefinitionCommand()
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ExecuteUnsetAsTopElementDefinitionCommandAsync()
         {
             var iteration = this.Thing;
             var elementDefRow = this.SelectedThing as ElementDefinitionRowViewModel;

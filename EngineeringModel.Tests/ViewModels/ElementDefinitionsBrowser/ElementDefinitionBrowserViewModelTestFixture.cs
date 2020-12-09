@@ -821,7 +821,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatExecuteSetAsTopeElementDefinitionCommandWorks()
+        public void VerifyThatExecuteSetAsTopElementDefinitionCommandWorks()
         {
             var def2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             
@@ -832,8 +832,8 @@ namespace CDP4EngineeringModel.Tests
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
 
-            var defRow = (ElementDefinitionRowViewModel)vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid);
-            var def2Row = (ElementDefinitionRowViewModel)vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid);
+            var defRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid) as ElementDefinitionRowViewModel;
+            var def2Row = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid) as ElementDefinitionRowViewModel;
 
             vm.SelectedThing = null;
             vm.UnsetAsTopElementDefinitionCommand.Execute(null);
@@ -849,7 +849,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatExecuteUnsetAsTopeElementDefinitionCommandWorks()
+        public void VerifyThatExecuteUnsetAsTopElementDefinitionCommandWorks()
         {
             var def2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             
@@ -860,8 +860,8 @@ namespace CDP4EngineeringModel.Tests
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
 
-            var defRow = (ElementDefinitionRowViewModel)vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid);
-            var def2Row = (ElementDefinitionRowViewModel)vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid);
+            var defRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid) as ElementDefinitionRowViewModel;
+            var def2Row = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid) as ElementDefinitionRowViewModel;
 
             vm.SelectedThing = null;
             vm.UnsetAsTopElementDefinitionCommand.Execute(null);
