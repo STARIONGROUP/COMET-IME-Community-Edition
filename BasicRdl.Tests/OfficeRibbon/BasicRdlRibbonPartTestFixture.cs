@@ -199,19 +199,19 @@ namespace BasicRdl.Tests
             CDPMessageBus.Current.SendMessage(openSessionEvent);
 
             await this.ribbonPart.OnAction("ShowMeasurementUnits");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<MeasurementUnitsBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<MeasurementUnitsBrowserViewModel>(), false));
 
             await this.ribbonPart.OnAction("ShowMeasurementScales");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<MeasurementScalesBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<MeasurementScalesBrowserViewModel>(), false));
 
             await this.ribbonPart.OnAction("ShowParameterTypes");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<ParameterTypesBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<ParameterTypesBrowserViewModel>(), false));
 
             await this.ribbonPart.OnAction("ShowRules");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<RulesBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<RulesBrowserViewModel>(), false));
 
             await this.ribbonPart.OnAction("ShowCategories");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<CategoryBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<CategoryBrowserViewModel>(), false));
 
             // close viewmodels
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);

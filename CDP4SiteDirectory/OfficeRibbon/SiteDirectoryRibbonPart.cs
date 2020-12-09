@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SiteDirectoryRibbonPart.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -15,8 +15,8 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -26,20 +26,23 @@
 namespace CDP4SiteDirectory
 {
     using System;
+    using System.Drawing;
     using System.Reflection;
     using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using ViewModels;
-    using NLog;
 
-    using Image = System.Drawing.Image;
+    using CDP4SiteDirectory.ViewModels;
+
+    using NLog;
 
     /// <summary>
     /// The purpose of the <see cref="SiteDirectoryRibbonPart"/> class is to describe and provide a part of the Fluent Ribbon
@@ -162,14 +165,14 @@ namespace CDP4SiteDirectory
                 var session = sessionChange.Session;
                 var siteDirectory = session.RetrieveSiteDirectory();
 
-                this.domainOfExpertiseBrowserViewModel = new DomainOfExpertiseBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService );
+                this.domainOfExpertiseBrowserViewModel = new DomainOfExpertiseBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.modelBrowserViewModel = new ModelBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.naturalLanguageBrowserViewModel = new NaturalLanguageBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.organizationBrowserViewModel = new OrganizationBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.personBrowserViewModel = new PersonBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.roleBrowserViewModel = new RoleBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
                 this.siteRdlBrowserViewModel = new SiteRdlBrowserViewModel(session, siteDirectory, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
-                
+
                 this.Session = session;
             }
 
@@ -226,28 +229,28 @@ namespace CDP4SiteDirectory
             switch (ribbonControlId)
             {
                 case "ShowDomainsOfExpertise":
-                    this.PanelNavigationService.Open(this.domainOfExpertiseBrowserViewModel, false); 
+                    this.PanelNavigationService.OpenExistingOrOpen(this.domainOfExpertiseBrowserViewModel, false);
                     break;
                 case "ShowModels":
-                    this.PanelNavigationService.Open(this.modelBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.modelBrowserViewModel, false);
                     break;
                 case "ShowLanguages":
-                    this.PanelNavigationService.Open(this.naturalLanguageBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.naturalLanguageBrowserViewModel, false);
                     break;
                 case "ShowOrganizations":
-                    this.PanelNavigationService.Open(this.organizationBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.organizationBrowserViewModel, false);
                     break;
                 case "ShowPersons":
-                    this.PanelNavigationService.Open(this.personBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.personBrowserViewModel, false);
                     break;
                 case "ShowRoles":
-                    this.PanelNavigationService.Open(this.roleBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.roleBrowserViewModel, false);
                     break;
                 case "ShowSiteRDLs":
-                    this.PanelNavigationService.Open(this.siteRdlBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.siteRdlBrowserViewModel, false);
                     break;
                 case "ShowHideDeprecatedThings":
-                    this.showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings = !showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings;
+                    this.showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings = !this.showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings;
                     break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
@@ -289,7 +292,7 @@ namespace CDP4SiteDirectory
                     return this.showDeprecatedBrowserRibbonViewModel.HasSession;
                 default:
                     return false;
-            }            
+            }
         }
 
         /// <summary>
@@ -307,7 +310,7 @@ namespace CDP4SiteDirectory
         public override Image GetImage(string ribbonControlId, string ribbonControlTag = "")
         {
             var converter = new ThingToIconUriConverter();
-            
+
             switch (ribbonControlId)
             {
                 case "ShowDomainsOfExpertise":

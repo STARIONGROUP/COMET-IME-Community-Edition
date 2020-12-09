@@ -150,6 +150,34 @@ namespace CDP4Composition.Tests.Navigation
         }
 
         [Test]
+        public void VerifyThatOpenExisitngOrOpenWorksForRegionManager()
+        {
+            this.NavigationService.OpenExistingOrOpen(this.panelViewModel, true);
+            var opened = false;
+            CDPMessageBus.Current.Listen<NavigationPanelEvent>().Subscribe(x => { opened = true; });
+            this.region.Verify(x => x.Add(It.IsAny<object>(), It.IsAny<string>()));
+            Assert.IsFalse(opened);
+
+            this.NavigationService.OpenExistingOrOpen(this.panelViewModel, true);
+
+            Assert.IsTrue(opened);
+        }
+
+        [Test]
+        public void VerifyThatOpenExisitngOrOpenWorks()
+        {
+            var opened = false;
+            CDPMessageBus.Current.Listen<NavigationPanelEvent>().Subscribe(x => { opened = true; });
+
+            this.NavigationService.OpenExistingOrOpen(this.panelViewModel, false);
+            Assert.IsTrue(opened);
+
+            opened = false;
+            this.NavigationService.OpenExistingOrOpen(this.panelViewModel, false);
+            Assert.IsTrue(opened);
+        }
+
+        [Test]
         public void VerifyThatCloseViewModelWorks()
         {
             this.NavigationService.Open(this.panelViewModel, true);
