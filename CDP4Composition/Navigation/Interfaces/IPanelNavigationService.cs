@@ -25,10 +25,10 @@
 namespace CDP4Composition.Navigation
 {
     using System;
-    using CDP4Dal;
 
+    using CDP4Dal;
     using CDP4Dal.Composition;
-    
+
     using Interfaces;
     
     using Microsoft.Practices.Prism.Regions;
@@ -63,6 +63,21 @@ namespace CDP4Composition.Navigation
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/>.</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/>.</param>
         void Open(string viewModelName, ISession session, bool useRegionManager, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService);
+
+        /// <summary>
+        /// Opens or closes the view associated to the provided view-model
+        /// </summary>
+        /// <param name="viewModel">
+        /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened
+        /// </param>
+        /// <param name="useRegionManager">
+        /// A value indicating whether handling the opening of the view shall be message-based or not. In case it is
+        /// NOT message-based, the <see cref="IRegionManager"/> handles opening and placement of the view.
+        /// </param>
+        /// <remarks>
+        /// The data context of the view is the <see cref="IPanelViewModel"/>
+        /// </remarks>
+        void OpenExistingOrOpen(IPanelViewModel viewModel, bool useRegionManager);
 
         /// <summary>
         /// Closes the <see cref="IPanelView"/> associated to the <see cref="IPanelViewModel"/>

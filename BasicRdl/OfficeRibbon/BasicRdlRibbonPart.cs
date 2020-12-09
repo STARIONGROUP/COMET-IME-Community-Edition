@@ -2,9 +2,9 @@
 // <copyright file="BasicRdlRibbonPart.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -29,20 +29,20 @@ namespace BasicRdl
     using System.Drawing;
     using System.Reflection;
     using System.Threading.Tasks;
-    
+
     using BasicRdl.ViewModels;
-    
+
     using CDP4Common.CommonData;
-    
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.FavoritesService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    
+
     using NLog;
 
     /// <summary>
@@ -213,19 +213,19 @@ namespace BasicRdl
             switch (ribbonControlId)
             {
                 case "ShowMeasurementUnits":
-                    this.PanelNavigationService.Open(this.measurementUnitsBrowserViewModel, false); 
+                    this.PanelNavigationService.OpenExistingOrOpen(this.measurementUnitsBrowserViewModel, false);
                     break;
                 case "ShowMeasurementScales":
-                    this.PanelNavigationService.Open(this.measurementScalesBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.measurementScalesBrowserViewModel, false);
                     break;
                 case "ShowParameterTypes":
-                    this.PanelNavigationService.Open(this.parameterTypesBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.parameterTypesBrowserViewModel, false);
                     break;
                 case "ShowRules":
-                    this.PanelNavigationService.Open(this.rulesBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.rulesBrowserViewModel, false);
                     break;
                 case "ShowCategories":
-                    this.PanelNavigationService.Open(this.categoryBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpen(this.categoryBrowserViewModel, false);
                     break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
@@ -261,7 +261,7 @@ namespace BasicRdl
                     return this.categoryBrowserViewModel != null;
                 default:
                     return false;
-            }            
+            }
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace BasicRdl
         public override Image GetImage(string ribbonControlId, string ribbonControlTag = "")
         {
             var converter = new ThingToIconUriConverter();
-            
+
             switch (ribbonControlId)
             {
                 case "ShowMeasurementUnits":
