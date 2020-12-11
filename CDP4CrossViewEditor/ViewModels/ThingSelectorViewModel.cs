@@ -313,18 +313,21 @@ namespace CDP4CrossViewEditor.ViewModels
                 {"ang_random_walk", ClassKind.SimpleQuantityKind },
                 {"area", ClassKind.DerivedQuantityKind }
             };
+
             for (var i = 0; i < parameterDictionary.Count; i++)
             {
                 ParameterType parameterType = null;
+
                 switch (parameterDictionary.Values.ToList()[i])
                 {
                     case ClassKind.SimpleQuantityKind:
                         parameterType = new SimpleQuantityKind();
-
                         break;
+
                     case ClassKind.SpecializedQuantityKind:
                         parameterType = new SpecializedQuantityKind();
                         break;
+
                     case ClassKind.DerivedQuantityKind:
                         parameterType = new SpecializedQuantityKind();
                         break;

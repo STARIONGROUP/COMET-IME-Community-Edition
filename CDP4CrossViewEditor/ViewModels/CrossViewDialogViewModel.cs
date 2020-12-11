@@ -27,10 +27,13 @@ namespace CDP4CrossViewEditor.ViewModels
 {
     using System;
     using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Navigation;
+
     using ReactiveUI;
 
     /// <summary>
