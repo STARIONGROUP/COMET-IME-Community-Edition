@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ThingSelectorTarget.xaml.cs" company="RHEA System S.A.">
+// <copyright file="ElementThingSelector.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
@@ -26,14 +26,14 @@
 namespace CDP4CrossViewEditor.Views.UserControls
 {
     /// <summary>
-    /// Interaction logic for ThingSelectorTarget.xaml
+    /// Interaction logic for ElementThingSelector.xaml
     /// </summary>
-    public partial class ThingSelectorTarget : ThingUserControl
+    public partial class ParameterThingSelector : ThingUserControl
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ThingSelectorTarget"/> class.
+        /// Initializes a new instance of the <see cref="ParameterThingSelector"/> class.
         /// </summary>
-        public ThingSelectorTarget()
+        public ParameterThingSelector()
         {
             this.InitializeComponent();
         }

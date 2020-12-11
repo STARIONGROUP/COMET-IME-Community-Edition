@@ -26,9 +26,17 @@
 namespace CDP4CrossViewEditor.ViewModels
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Navigation;
+
+    using CDP4CrossViewEditor.RowModels;
+
     using ReactiveUI;
 
     /// <summary>
@@ -37,14 +45,24 @@ namespace CDP4CrossViewEditor.ViewModels
     public class ThingSelectorViewModel : DialogViewModelBase
     {
         /// <summary>
-        /// Backing field for the <see cref="SourceThingList"/> property
+        /// Backing field for the <see cref="ElementDefinitionSourceList"/> property
         /// </summary>
-        private ReactiveList<Thing> sourceThingList;
+        private ReactiveList<ElementDefinitionRowViewModel> elementDefinitionSourceList;
 
         /// <summary>
-        /// Backing field for the <see cref="TargetThingList"/> property
+        /// Backing field for the <see cref="ElementDefinitionTargetList"/> property
         /// </summary>
-        private ReactiveList<Thing> targetThingList;
+        private ReactiveList<ElementDefinitionRowViewModel> elementDefinitionTargetList;
+
+        /// <summary>
+        /// Backing field for the <see cref="ParameterTypeSourceList"/> property
+        /// </summary>
+        private ReactiveList<ParameterTypeRowViewModel> parameterTypeSourceList;
+
+        /// <summary>
+        /// Backing field for the <see cref="ParameterTypeTargetList"/> property
+        /// </summary>
+        private ReactiveList<ParameterTypeRowViewModel> parameterTypeTargetList;
 
         /// <summary>
         /// Backing field for the <see cref="ClassKind"/> property
@@ -96,21 +114,39 @@ namespace CDP4CrossViewEditor.ViewModels
         public ReactiveCommand<object> ClearItems { get; private set; }
 
         /// <summary>
-        /// Gets or sets source list(element/parameter list)
+        /// Gets or sets source element list
         /// </summary>
-        public ReactiveList<Thing> SourceThingList
+        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionSourceList
         {
-            get => this.sourceThingList;
-            private set => this.RaiseAndSetIfChanged(ref this.sourceThingList, value);
+            get => this.elementDefinitionSourceList;
+            private set => this.RaiseAndSetIfChanged(ref this.elementDefinitionSourceList, value);
         }
 
         /// <summary>
-        /// Gets or sets source list(element/parameter list)
+        /// Gets or sets target element list
         /// </summary>
-        public ReactiveList<Thing> TargetThingList
+        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionTargetList
         {
-            get => this.targetThingList;
-            private set => this.RaiseAndSetIfChanged(ref this.targetThingList, value);
+            get => this.elementDefinitionTargetList;
+            private set => this.RaiseAndSetIfChanged(ref this.elementDefinitionTargetList, value);
+        }
+
+        /// <summary>
+        /// Gets or sets source parameter list
+        /// </summary>
+        public ReactiveList<ParameterTypeRowViewModel> ParameterTypeSourceList
+        {
+            get => this.parameterTypeSourceList;
+            private set => this.RaiseAndSetIfChanged(ref this.parameterTypeSourceList, value);
+        }
+
+        /// <summary>
+        /// Gets or sets target parameter list
+        /// </summary>
+        public ReactiveList<ParameterTypeRowViewModel> ParameterTypeTargetList
+        {
+            get => this.parameterTypeTargetList;
+            private set => this.RaiseAndSetIfChanged(ref this.parameterTypeTargetList, value);
         }
 
         /// <summary>
@@ -123,33 +159,27 @@ namespace CDP4CrossViewEditor.ViewModels
             this.Iteration = iteration;
             this.ThingClassKind = thingClassKind;
 
-            this.SourceThingList = new ReactiveList<Thing>
+            this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>
             {
                 ChangeTrackingEnabled = true
             };
 
-            this.TargetThingList = new ReactiveList<Thing>
+            this.ElementDefinitionTargetList = new ReactiveList<ElementDefinitionRowViewModel>
             {
                 ChangeTrackingEnabled = true
             };
 
-            this.MoveItemsToSource = ReactiveCommand.Create();
-            this.MoveItemsToSource.Subscribe(_ => this.ExecuteMoveToSource());
+            this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>
+            {
+                ChangeTrackingEnabled = true
+            };
 
-            this.MoveItemsToTarget = ReactiveCommand.Create();
-            this.MoveItemsToTarget.Subscribe(_ => this.ExecuteMoveToTarget());
+            this.ParameterTypeTargetList = new ReactiveList<ParameterTypeRowViewModel>
+            {
+                ChangeTrackingEnabled = true
+            };
 
-            this.MoveItemsUp = ReactiveCommand.Create();
-            this.MoveItemsUp.Subscribe(_ => this.ExecuteMoveUp());
-
-            this.MoveItemsDown = ReactiveCommand.Create();
-            this.MoveItemsDown.Subscribe(_ => this.ExecuteMoveItemsDown());
-
-            this.ClearItems = ReactiveCommand.Create();
-            this.ClearItems.Subscribe(_ => this.ExecuteClearItems());
-
-            this.SortItems = ReactiveCommand.Create();
-            this.SortItems.Subscribe(_ => this.ExecuteSortItems());
+            this.AddSubscriptions();
         }
 
         /// <summary>
@@ -167,6 +197,30 @@ namespace CDP4CrossViewEditor.ViewModels
                     this.BindParameters();
                     break;
             }
+        }
+
+        /// <summary>
+        /// Add subscriptions
+        /// </summary>
+        private void AddSubscriptions()
+        {
+            this.MoveItemsToSource = ReactiveCommand.Create();
+            this.MoveItemsToSource.Subscribe(_ => this.ExecuteMoveToSource());
+
+            this.MoveItemsToTarget = ReactiveCommand.Create();
+            this.MoveItemsToTarget.Subscribe(_ => this.ExecuteMoveToTarget());
+
+            this.MoveItemsUp = ReactiveCommand.Create();
+            this.MoveItemsUp.Subscribe(_ => this.ExecuteMoveUp());
+
+            this.MoveItemsDown = ReactiveCommand.Create();
+            this.MoveItemsDown.Subscribe(_ => this.ExecuteMoveItemsDown());
+
+            this.ClearItems = ReactiveCommand.Create();
+            this.ClearItems.Subscribe(_ => this.ExecuteClearItems());
+
+            this.SortItems = ReactiveCommand.Create();
+            this.SortItems.Subscribe(_ => this.ExecuteSortItems());
         }
 
         /// <summary>
@@ -227,6 +281,23 @@ namespace CDP4CrossViewEditor.ViewModels
         private void BindElements()
         {
             // TODO #623 Implement core functionality
+            var de = new DomainOfExpertise
+            {
+                Iid = new Guid(),
+                Name = "Domain1",
+                ShortName = "DomainOfExpertise1",
+            };
+
+            for (var i = 0; i < 10; i++)
+            {
+                this.ElementDefinitionSourceList.Add(new ElementDefinitionRowViewModel(new ElementDefinition
+                {
+                    Iid = new Guid(),
+                    Name = $"ElementDefinition{i}",
+                    ShortName = $"ED{i}",
+                    Owner = de
+                }));
+            }
         }
 
         /// <summary>
@@ -234,7 +305,42 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void BindParameters()
         {
-            // TODO #623 Implement core functionality
+            var parameterDictionary = new Dictionary<string, ClassKind>()
+            {
+                { "m", ClassKind.SimpleQuantityKind },
+                { "acceleration", ClassKind.SimpleQuantityKind },
+                { "absorptance", ClassKind.SpecializedQuantityKind },
+                {"ang_random_walk", ClassKind.SimpleQuantityKind },
+                {"area", ClassKind.DerivedQuantityKind }
+            };
+            for (var i = 0; i < parameterDictionary.Count; i++)
+            {
+                ParameterType parameterType = null;
+                switch (parameterDictionary.Values.ToList()[i])
+                {
+                    case ClassKind.SimpleQuantityKind:
+                        parameterType = new SimpleQuantityKind();
+
+                        break;
+                    case ClassKind.SpecializedQuantityKind:
+                        parameterType = new SpecializedQuantityKind();
+                        break;
+                    case ClassKind.DerivedQuantityKind:
+                        parameterType = new SpecializedQuantityKind();
+                        break;
+                }
+
+                if (parameterType == null)
+                {
+                    continue;
+                }
+
+                parameterType.Iid = Guid.NewGuid();
+                parameterType.Name = parameterDictionary.Keys.ToList()[i];
+                parameterType.ShortName = parameterDictionary.Keys.ToList()[i];
+
+                this.ParameterTypeSourceList.Add(new ParameterTypeRowViewModel(parameterType));
+            }
         }
     }
 }

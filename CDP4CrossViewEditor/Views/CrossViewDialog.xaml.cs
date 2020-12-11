@@ -67,11 +67,13 @@ namespace CDP4CrossViewEditor.Views
         /// <param name="e"></param>
         private void DXWindow_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            if (this.DataContext is CrossViewDialogViewModel viewModel)
+            if (!(this.DataContext is CrossViewDialogViewModel viewModel))
             {
-                this.ElementThingSelector.DataContext = viewModel.ElementSelectorViewModel;
-                this.ParameterThingSelector.DataContext = viewModel.ParameterSelectorViewModel;
+                return;
             }
+
+            this.ElementThingSelector.DataContext = viewModel.ElementSelectorViewModel;
+            this.ParameterThingSelector.DataContext = viewModel.ParameterSelectorViewModel;
         }
     }
 }

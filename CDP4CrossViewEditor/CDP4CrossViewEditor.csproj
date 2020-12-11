@@ -35,6 +35,15 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
+    <Compile Remove="Views\UserControls\ElementSelectorSource.xaml.cs" />
+    <Compile Remove="Views\UserControls\ElementSelectorTarget.xaml.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Views\UserControls\ElementSelectorSource.xaml" />
+    <None Remove="Views\UserControls\ElementSelectorTarget.xaml" />
+    <None Remove="Views\UserControls\ParameterThingSelector.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="6.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -252,14 +261,11 @@
     <Compile Update="Views\CrossViewDialog.xaml.cs">
       <DependentUpon>CrossViewDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\UserControls\ThingSelector.xaml.cs">
-      <DependentUpon>ThingSelector.xaml</DependentUpon>
+    <Compile Update="Views\UserControls\ElementThingSelector - Copy.xaml.cs">
+      <DependentUpon>ElementThingSelector.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\UserControls\ThingSelectorSource.xaml.cs">
-      <DependentUpon>ThingSelectorSource.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UserControls\ThingSelectorTarget.xaml.cs">
-      <DependentUpon>ThingSelectorTarget.xaml</DependentUpon>
+    <Compile Update="Views\UserControls\ElementThingSelector.xaml.cs">
+      <DependentUpon>ElementThingSelector.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\UserControls\ThingSelectorControl.xaml.cs">
       <DependentUpon>ThingSelectorControl.xaml</DependentUpon>
@@ -285,15 +291,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\UserControls\ThingSelector.xaml">
+    <Page Include="Views\UserControls\ParameterThingSelector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\UserControls\ThingSelectorSource.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\UserControls\ThingSelectorTarget.xaml">
+    <Page Include="Views\UserControls\ElementThingSelector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -349,6 +351,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
-    <Folder Include="RowModels\" />
   </ItemGroup>
 </Project>
