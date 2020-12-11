@@ -592,7 +592,7 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = defRow;
             vm.PopulateContextMenu();
-            Assert.AreEqual(16, vm.ContextMenu.Count);
+            Assert.AreEqual(17, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[0];
             vm.PopulateContextMenu();
@@ -818,6 +818,62 @@ namespace CDP4EngineeringModel.Tests
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Exactly(1));
 
             this.changeOwnershipBatchService.Verify(x => x.Update(this.session.Object, It.IsAny<ElementDefinition>(), this.domain, true, It.IsAny<IEnumerable<ClassKind>>()), Times.Exactly(1));
+        }
+
+        [Test]
+        public void VerifyThatExecuteSetAsTopElementDefinitionCommandWorks()
+        {
+            var def2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
+            this.iteration.Element.Add(this.elementDef);
+            this.iteration.Element.Add(def2);
+
+            this.iteration.TopElement = this.elementDef;
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+
+            var defRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid) as ElementDefinitionRowViewModel;
+            var def2Row = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid) as ElementDefinitionRowViewModel;
+
+            vm.SelectedThing = null;
+            vm.UnsetAsTopElementDefinitionCommand.Execute(null);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+
+            vm.SelectedThing = defRow;
+            vm.SetAsTopElementDefinitionCommand.Execute(null);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+
+            vm.SelectedThing = def2Row;
+            vm.SetAsTopElementDefinitionCommand.Execute(null);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+        }
+
+        [Test]
+        public void VerifyThatExecuteUnsetAsTopElementDefinitionCommandWorks()
+        {
+            var def2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
+            this.iteration.Element.Add(this.elementDef);
+            this.iteration.Element.Add(def2);
+
+            this.iteration.TopElement = this.elementDef;
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+
+            var defRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid) as ElementDefinitionRowViewModel;
+            var def2Row = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid) as ElementDefinitionRowViewModel;
+
+            vm.SelectedThing = null;
+            vm.UnsetAsTopElementDefinitionCommand.Execute(null);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+
+            vm.SelectedThing = def2Row;
+            vm.UnsetAsTopElementDefinitionCommand.Execute(null);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+
+            vm.SelectedThing = defRow;
+            vm.UnsetAsTopElementDefinitionCommand.Execute(null);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
         }
     }
 }

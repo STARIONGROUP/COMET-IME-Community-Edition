@@ -28,6 +28,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -39,9 +40,9 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4CommonView.ViewModels;
-    
+
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
@@ -50,17 +51,17 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-    
+
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels.Dialogs;
 
     using NLog;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -152,7 +153,7 @@ namespace CDP4EngineeringModel.ViewModels
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = "Element Definitions";
-            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
             this.changeOwnershipBatchService = changeOwnershipBatchService;
@@ -279,6 +280,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to change the ownership of an <see cref="IOwnedThing"/> and its contained items
         /// </summary>
         public ReactiveCommand<object> ChangeOwnershipCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to set an <see cref="ElementDefinition"/> as the top element of the selected iteration
+        /// </summary>
+        public ReactiveCommand<Unit> SetAsTopElementDefinitionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to unset an <see cref="ElementDefinition"/> as the top element of the selected iteration
+        /// </summary>
+        public ReactiveCommand<Unit> UnsetAsTopElementDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
@@ -434,12 +445,16 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSubscription));
             this.CreateSubscriptionCommand.Subscribe(_ => this.ExecuteCreateSubscriptionCommand());
-            
+
             this.BatchCreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
             this.BatchCreateSubscriptionCommand.Subscribe(_ => this.ExecuteBatchCreateSubscriptionCommand());
 
             this.ChangeOwnershipCommand = ReactiveCommand.Create();
             this.ChangeOwnershipCommand.Subscribe(_ => this.ExecuteChangeOwnershipCommand());
+
+            this.SetAsTopElementDefinitionCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteSetAsTopElementDefinitionCommandAsync());
+
+            this.UnsetAsTopElementDefinitionCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteUnsetAsTopElementDefinitionCommandAsync());
 
             this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
             this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
@@ -510,7 +525,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Subscriptions", "", this.BatchCreateSubscriptionCommand, MenuItemKind.Create, ClassKind.NotThing));
-            
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
@@ -528,7 +543,16 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Insert(1, new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
                 this.ContextMenu.Insert(2, new ContextMenuItemViewModel("Copy the Element Definition", "", this.CopyElementDefinitionCommand, MenuItemKind.Copy, ClassKind.ElementDefinition));
                 this.ContextMenu.Insert(3, new ContextMenuItemViewModel("Highlight Element Usages", "", this.HighlightElementUsagesCommand, MenuItemKind.Highlight, ClassKind.ElementUsage));
-                this.ContextMenu.Insert(4, new ContextMenuItemViewModel("Change Ownership", "", this.ChangeOwnershipCommand , MenuItemKind.Edit, ClassKind.NotThing));
+                this.ContextMenu.Insert(4, new ContextMenuItemViewModel("Change Ownership", "", this.ChangeOwnershipCommand, MenuItemKind.Edit, ClassKind.NotThing));
+
+                if (elementDefRow.IsTopElement)
+                {
+                    this.ContextMenu.Insert(5, new ContextMenuItemViewModel("Unset as Top Element", "", this.UnsetAsTopElementDefinitionCommand, MenuItemKind.Edit, ClassKind.NotThing));
+                }
+                else
+                {
+                    this.ContextMenu.Insert(5, new ContextMenuItemViewModel("Set as Top Element", "", this.SetAsTopElementDefinitionCommand, MenuItemKind.Edit, ClassKind.NotThing));
+                }
 
                 return;
             }
@@ -559,7 +583,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
 
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Navigates to Element Definition", "", this.ChangeFocusCommand, MenuItemKind.Navigate, ClassKind.ElementDefinition));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Navigate to Element Definition", "", this.ChangeFocusCommand, MenuItemKind.Navigate, ClassKind.ElementDefinition));
 
                 if (this.SelectedThing.ContainedRows.Count > 0)
                 {
@@ -935,6 +959,52 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Executes the <see cref="SetAsTopElementDefinitionCommand"/>
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns> 
+        private async Task ExecuteSetAsTopElementDefinitionCommandAsync()
+        {
+            var elementDefRow = this.SelectedThing as ElementDefinitionRowViewModel;
+            if (elementDefRow?.Thing != null && (this.Thing.TopElement == null || this.Thing.TopElement != elementDefRow.Thing))
+            {
+                var iterationClone = this.Thing.Clone(false);
+                iterationClone.TopElement = elementDefRow.Thing;
+
+                var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
+                var transaction = new ThingTransaction(transactionContext);
+                transaction.CreateOrUpdate(iterationClone);
+
+                await this.DalWrite(transaction);
+            }
+        }
+
+        /// <summary>
+        /// Executes the <see cref="UnsetAsTopElementDefinitionCommand"/>
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ExecuteUnsetAsTopElementDefinitionCommandAsync()
+        {
+            var iteration = this.Thing;
+            var elementDefRow = this.SelectedThing as ElementDefinitionRowViewModel;
+
+            if (elementDefRow?.Thing != null && iteration.TopElement == elementDefRow.Thing)
+            {
+                var iterationClone = iteration.Clone(false);
+                iterationClone.TopElement = null;
+
+                var transactionContext = TransactionContextResolver.ResolveContext(iteration);
+                var transaction = new ThingTransaction(transactionContext);
+                transaction.CreateOrUpdate(iterationClone);
+
+                await this.DalWrite(transaction);
+            }
+        }
+
+        /// <summary>
         /// Execute the <see cref="ChangeOwnershipCommand"/>
         /// </summary>
         /// <returns>
@@ -962,7 +1032,7 @@ namespace CDP4EngineeringModel.ViewModels
                     this.SelectedThing.Thing,
                     result.DomainOfExpertise,
                     result.IsContainedItemChangeOwnershipSelected,
-                    new List<ClassKind> { ClassKind.ElementDefinition , ClassKind.Parameter});
+                    new List<ClassKind> { ClassKind.ElementDefinition, ClassKind.Parameter });
             }
             catch (Exception exception)
             {
