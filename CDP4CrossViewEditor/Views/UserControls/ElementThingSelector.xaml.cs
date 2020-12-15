@@ -25,6 +25,10 @@
 
 namespace CDP4CrossViewEditor.Views.UserControls
 {
+    using CDP4CrossViewEditor.ViewModels;
+
+    using DevExpress.Xpf.Grid;
+
     /// <summary>
     /// Interaction logic for ElementThingSelector.xaml
     /// </summary>

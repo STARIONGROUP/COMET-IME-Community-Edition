@@ -23,6 +23,10 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Row="0" Grid.Column="0">
                     <dxg:GridControl MaxHeight="150"
+                                     SelectedItems="{Binding Path=SelectedSourceList,
+                                                            Mode=TwoWay,
+                                                            UpdateSourceTrigger=PropertyChanged}"
+                                     SelectionMode="Row"
                                      AutoGenerateColumns="None"
                                      ItemsSource="{Binding ElementDefinitionSourceList}">
                         <dxg:GridControl.View>
@@ -49,7 +53,11 @@
                     <uc:ThingSelectorControl />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="2">
-                    <dxg:GridControl MaxHeight="500"
+                    <dxg:GridControl MaxHeight="150"
+                                     SelectedItems="{Binding Path=SelectedTargetList,
+                                                            Mode=TwoWay,
+                                                            UpdateSourceTrigger=PropertyChanged}"
+                                     SelectionMode="Row"
                                      AutoGenerateColumns="None"
                                      ItemsSource="{Binding ElementDefinitionTargetList}">
                         <dxg:GridControl.View>
@@ -58,7 +66,7 @@
                                            AllowColumnMoving="True"
                                            AllowEditing="False"
                                            AllowGrouping="False"
-                                           AllowDragDrop="False"
+                                           AllowDragDrop="True"
                                            AutoWidth="true"
                                            ShowFilterPanelMode="Never"
                                            IsDetailButtonVisibleBinding="{x:Null}"

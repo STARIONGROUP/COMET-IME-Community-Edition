@@ -82,8 +82,8 @@ namespace CDP4CrossViewEditor.ViewModels
             this.DialogTitle = "Select equipments and parameters";
             this.Iteration = iteration;
 
-            this.ElementSelectorViewModel = new ThingSelectorViewModel(this.Iteration, ClassKind.ElementBase);
-            this.ParameterSelectorViewModel = new ThingSelectorViewModel(this.Iteration, ClassKind.ParameterBase);
+            this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(this.Iteration);
+            this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(this.Iteration);
 
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.ExecuteCancel());

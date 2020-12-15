@@ -45,7 +45,7 @@ namespace CDP4CrossViewEditor.RowModels
         public Thing Thing
         {
             get => this.thing;
-            private set => this.RaiseAndSetIfChanged(ref this.thing, value);
+            set => this.RaiseAndSetIfChanged(ref this.thing, value);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace CDP4CrossViewEditor.RowModels
         public Guid Iid
         {
             get => this.iid;
-            private set => this.RaiseAndSetIfChanged(ref this.iid, value);
+            set => this.RaiseAndSetIfChanged(ref this.iid, value);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace CDP4CrossViewEditor.RowModels
         public string Name
         {
             get => this.name;
-            private set => this.RaiseAndSetIfChanged(ref this.name, value);
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace CDP4CrossViewEditor.RowModels
         public string ShortName
         {
             get => this.shortName;
-            private set => this.RaiseAndSetIfChanged(ref this.shortName, value);
+            set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
         /// <summary>

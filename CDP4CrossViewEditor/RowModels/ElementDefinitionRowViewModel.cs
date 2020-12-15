@@ -27,10 +27,12 @@ namespace CDP4CrossViewEditor.RowModels
 {
     using CDP4Common.EngineeringModelData;
 
+    using CDP4CommonView;
+
     /// <summary>
     /// Row class representing a <see cref="ElementDefinition"/> as a plain object
     /// </summary>
-    public class ElementDefinitionRowViewModel : DefinedThingRowViewModel<ElementDefinition>
+    public class ElementDefinitionRowViewModel : DefinedThingRowViewModel<ElementBase>
     {
         /// <summary>
         /// Gets the current <see cref="DomainOfExpertise"/> represented as <see cref="string"/>
@@ -43,10 +45,10 @@ namespace CDP4CrossViewEditor.RowModels
         /// <param name="elementDefinition">
         /// The <see cref="ElementDefinition"/> associated with this row
         /// </param>
-        public ElementDefinitionRowViewModel(ElementDefinition elementDefinition)
+        public ElementDefinitionRowViewModel(ElementBase elementDefinition)
             : base(elementDefinition)
         {
-            this.DomainOfExpertise = elementDefinition.Owner.ShortName;
+            this.DomainOfExpertise = elementDefinition.Owner.Name;
         }
     }
 }

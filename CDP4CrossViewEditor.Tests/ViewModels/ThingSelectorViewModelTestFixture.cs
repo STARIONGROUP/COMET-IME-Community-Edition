@@ -94,13 +94,16 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ElementBase);
+            var viewModelElements = new ElementDefinitionSelectorViewModel(this.iteration);
+            var viewModelParameters = new ParameterTypeSelectorViewModel(this.iteration);
 
-            Assert.AreEqual(this.iteration, viewModel.Iteration);
-            Assert.AreEqual(0, viewModel.ElementDefinitionSourceList.Count);
-            Assert.AreEqual(0, viewModel.ElementDefinitionTargetList.Count);
-            Assert.AreEqual(0, viewModel.ParameterTypeSourceList.Count);
-            Assert.AreEqual(0, viewModel.ParameterTypeTargetList.Count);
+            Assert.AreEqual(this.iteration, viewModelElements.Iteration);
+            Assert.AreEqual(0, viewModelElements.ElementDefinitionSourceList.Count);
+            Assert.AreEqual(0, viewModelElements.ElementDefinitionTargetList.Count);
+
+            Assert.AreEqual(this.iteration, viewModelParameters.Iteration);
+            Assert.AreEqual(0, viewModelParameters.ParameterTypeSourceList.Count);
+            Assert.AreEqual(0, viewModelParameters.ParameterTypeTargetList.Count);
         }
 
         [Test]
@@ -112,16 +115,27 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
             Assert.DoesNotThrow(() => viewModel.MoveItemsUp.Execute(null));
             Assert.DoesNotThrow(() => viewModel.MoveItemsDown.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));
+
+            viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ParameterType);
+
+            Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.MoveItemsUp.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.MoveItemsDown.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
             Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));
         }
 
         [Test]
         public void VerifyBindings()
         {
-            var viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ElementBase);
-            viewModel.BindData();
-            viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ParameterBase);
-            viewModel.BindData();
+            var viewModelElements = new ElementDefinitionSelectorViewModel(this.iteration);
+            viewModelElements.BindData();
+
+            var viewModelParameters = new ParameterTypeSelectorViewModel(this.iteration);
+            viewModelParameters.BindData();
         }
     }
 }
