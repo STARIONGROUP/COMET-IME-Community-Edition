@@ -97,8 +97,10 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             var viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ElementBase);
 
             Assert.AreEqual(this.iteration, viewModel.Iteration);
-            Assert.AreEqual(0, viewModel.SourceThingList.Count);
-            Assert.AreEqual(0, viewModel.TargetThingList.Count);
+            Assert.AreEqual(0, viewModel.ElementDefinitionSourceList.Count);
+            Assert.AreEqual(0, viewModel.ElementDefinitionTargetList.Count);
+            Assert.AreEqual(0, viewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(0, viewModel.ParameterTypeTargetList.Count);
         }
 
         [Test]

@@ -25,8 +25,8 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <uc:ThingSelector Grid.Row="0" Mode="ElementBase" VerticalAlignment="Stretch" x:Name="ElementThingSelector" />
-            <uc:ThingSelector Grid.Row="1" Mode="ParameterBase" VerticalAlignment="Stretch" x:Name="ParameterThingSelector" />
+            <uc:ElementThingSelector Grid.Row="0" Mode="ElementBase" VerticalAlignment="Stretch" x:Name="ElementThingSelector" />
+            <uc:ParameterThingSelector Grid.Row="1" Mode="ParameterBase" VerticalAlignment="Stretch" x:Name="ParameterThingSelector" />
         </Grid>
         <dxlc:LayoutGroup Orientation="Horizontal">
             <Button MinWidth="75"

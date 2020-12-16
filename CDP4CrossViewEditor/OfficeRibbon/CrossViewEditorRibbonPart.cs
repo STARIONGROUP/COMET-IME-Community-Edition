@@ -207,7 +207,7 @@ namespace CDP4CrossViewEditor
 
             if (ribbonControlId.StartsWith("Editor_"))
             {
-                await Task.Run(() => this.LaunchCrossViewEditorAsync(ribbonControlTag));
+                this.LaunchCrossViewEditorAsync(ribbonControlTag);
             }
             else
             {

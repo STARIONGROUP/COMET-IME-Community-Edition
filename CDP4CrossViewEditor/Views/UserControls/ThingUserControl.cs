@@ -30,6 +30,8 @@ namespace CDP4CrossViewEditor.Views.UserControls
     using System.Windows.Controls;
     using CDP4Common.CommonData;
 
+    using CDP4CrossViewEditor.ViewModels;
+
     /// <summary>
     /// Base class for all things selector user controls
     /// </summary>
@@ -55,13 +57,34 @@ namespace CDP4CrossViewEditor.Views.UserControls
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ThingUserControl"/> class.
+        /// </summary>
+        protected ThingUserControl()
+        {
+            this.DataContextChanged += this.ThingUserControl_DataContextChanged;
+        }
+
+        /// <summary>
+        /// Bind view model when context is available
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The arguments.</param>
+        private void ThingUserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (this.DataContext is ThingSelectorViewModel viewModel)
+            {
+                viewModel.BindData();
+            }
+        }
+
+        /// <summary>
         /// Static callback handler which will handle any changes that occurs globally
         /// </summary>
         /// <param name="d">The dependency object user control <see cref="DependencyObject" /></param>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         private static void OnClassKindChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as ThingSelector)?.ThingSelectionChanged(e);
+            (d as ThingUserControl)?.ThingSelectionChanged(e);
         }
 
         /// <summary>
