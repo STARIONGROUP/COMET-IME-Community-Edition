@@ -26,15 +26,15 @@
 namespace CDP4CrossViewEditor.Tests.ViewModels
 {
     using System;
+    using System.Linq;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CrossViewEditor.ViewModels;
 
     using CDP4Dal;
-
+    using CDP4Dal.DAL;
     using Moq;
 
     using NUnit.Framework;
@@ -46,14 +46,17 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
     public class ThingSelectorViewModelTestFixture
     {
         /// <summary>
+        /// The current set of credentials that will be used
+        /// </summary>
+        private readonly Credentials credentials = new Credentials(
+            "John",
+            "Doe",
+            new Uri("http://www.rheagroup.com/"));
+
+        /// <summary>
         /// The current session associated <see cref="Assembler"></see>
         /// </summary>
         private Assembler assembler;
-
-        /// <summary>
-        /// The current assembler <see cref="Uri"/>
-        /// </summary>
-        private Uri uri;
 
         /// <summary>
         /// Mock <see cref="ISession"/>
@@ -61,29 +64,68 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         private Mock<ISession> session;
 
         /// <summary>
-        /// Current iteration used for test
+        /// Mock <see cref="IDal"/>
+        /// </summary>
+        private Mock<IDal> dal;
+
+        /// <summary>
+        /// Current iteration used for test <see cref="Iteration"/>
         /// </summary>
         private Iteration iteration;
 
         [SetUp]
         public void SetUp()
         {
-            this.uri = new Uri("http://www.rheageoup.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.credentials.Uri);
+
+            this.dal = new Mock<IDal>();
+            this.dal.SetupProperty(d => d.Session);
+            this.assembler = new Assembler(this.credentials.Uri);
+
             this.session = new Mock<ISession>();
+            this.session.Setup(x => x.Dal).Returns(this.dal.Object);
+            this.session.Setup(x => x.Credentials).Returns(this.credentials);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
-                    EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                    EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 },
-                IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
                     IterationNumber = 1
                 }
             };
+
+            var domain = new DomainOfExpertise(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
+            {
+                Name = "domain"
+
+            };
+
+            var elementDefinition = new ElementDefinition
+            {
+                Iid = Guid.NewGuid(),
+                Name = "ElementDefinition_1",
+                ShortName = "ED_1",
+                Container = this.iteration,
+                Owner = domain
+            };
+
+            var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri);
+
+            var parameter = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterType,
+                Scale = parameterType.DefaultScale,
+                Owner = domain
+            };
+
+            this.iteration.Element.Add(elementDefinition);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameter);
         }
 
         [TearDown]
@@ -107,35 +149,46 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatCommandsWorks()
+        public void VerifyThatCommandsWorksOnElements()
         {
-            var viewModel = new ThingSelectorViewModel(this.iteration, this.session.Object, ClassKind.ElementBase);
+            var viewModel = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
 
-            Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.BindData());
+
+            viewModel.SelectedSourceList = viewModel.ElementDefinitionSourceList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
+
+            viewModel.SelectedTargetList = viewModel.ElementDefinitionTargetList;
+            Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
+
             Assert.DoesNotThrow(() => viewModel.MoveItemsUp.Execute(null));
             Assert.DoesNotThrow(() => viewModel.MoveItemsDown.Execute(null));
             Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
-            Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));
 
-            viewModel = new ThingSelectorViewModel(this.iteration, this.session.Object, ClassKind.ParameterType);
-
-            Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
+            viewModel.SelectedSourceList = viewModel.ElementDefinitionSourceList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
-            Assert.DoesNotThrow(() => viewModel.MoveItemsUp.Execute(null));
-            Assert.DoesNotThrow(() => viewModel.MoveItemsDown.Execute(null));
-            Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
             Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));
         }
 
         [Test]
-        public void VerifyBindings()
+        public void VerifyThatCommandsWorksOnParameters()
         {
-            var viewModelElements = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
-            viewModelElements.BindData();
+            var viewModel = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
 
-            var viewModelParameters = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
-            viewModelParameters.BindData();
+            Assert.DoesNotThrow(() => viewModel.BindData());
+
+            viewModel.SelectedSourceList = viewModel.ParameterTypeSourceList;
+            Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
+
+            viewModel.SelectedTargetList = viewModel.ParameterTypeTargetList;
+            Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
+
+            Assert.DoesNotThrow(() => viewModel.MoveItemsUp.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.MoveItemsDown.Execute(null));
+            Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
+
+            viewModel.SelectedSourceList = viewModel.ParameterTypeSourceList;
+            Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));
         }
     }
 }

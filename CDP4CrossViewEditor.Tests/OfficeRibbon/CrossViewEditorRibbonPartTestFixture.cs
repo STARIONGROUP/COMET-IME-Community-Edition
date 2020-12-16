@@ -173,6 +173,9 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(sessionEvent);
             Assert.IsNull(this.ribbonPart.Session);
+
+            var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
+            CDPMessageBus.Current.SendMessage(closeSessionEvent);
         }
 
         [Test]
@@ -232,6 +235,9 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             CDPMessageBus.Current.SendObjectChangeEvent(this.CreateIteration(), EventKind.Added);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled(RibbonButtonId));
+
+            var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
+            CDPMessageBus.Current.SendMessage(closeSessionEvent);
         }
 
         [Test]
@@ -276,6 +282,9 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
 
             CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Removed);
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
+
+            var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
+            CDPMessageBus.Current.SendMessage(closeSessionEvent);
         }
 
         [Test]
@@ -284,10 +293,8 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             var fluentRibbonManager = new FluentRibbonManager { IsActive = true };
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
-            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
-
             var iteration = this.CreateIteration();
+            CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Added);
 
             Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
 
@@ -299,6 +306,9 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         {
             var fluentRibbonManager = new FluentRibbonManager { IsActive = true };
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
 
             var iteration = this.CreateIteration();
 

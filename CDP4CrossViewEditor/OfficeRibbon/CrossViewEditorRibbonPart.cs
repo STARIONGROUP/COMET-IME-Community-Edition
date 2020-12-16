@@ -223,12 +223,6 @@ namespace CDP4CrossViewEditor
         /// </param>
         private void LaunchCrossViewEditorAsync(string iterationId)
         {
-            if (iterationId == string.Empty)
-            {
-                logger.Debug("The cross editor workbook cannot be build: the iteration id is empty");
-                return;
-            }
-
             var uniqueId = Guid.Parse(iterationId);
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
 
