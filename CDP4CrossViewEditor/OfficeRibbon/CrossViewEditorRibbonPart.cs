@@ -251,7 +251,7 @@ namespace CDP4CrossViewEditor
                 return;
             }
 
-            var crossViewDialogViewModel = new CrossViewDialogViewModel(iteration);
+            var crossViewDialogViewModel = new CrossViewDialogViewModel(iteration, this.Session);
             this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
         }
 

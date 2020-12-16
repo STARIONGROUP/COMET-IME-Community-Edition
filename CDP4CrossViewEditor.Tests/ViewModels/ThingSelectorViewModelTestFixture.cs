@@ -94,8 +94,8 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewModelElements = new ElementDefinitionSelectorViewModel(this.iteration);
-            var viewModelParameters = new ParameterTypeSelectorViewModel(this.iteration);
+            var viewModelElements = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
+            var viewModelParameters = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
 
             Assert.AreEqual(this.iteration, viewModelElements.Iteration);
             Assert.AreEqual(0, viewModelElements.ElementDefinitionSourceList.Count);
@@ -109,7 +109,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatCommandsWorks()
         {
-            var viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ElementBase);
+            var viewModel = new ThingSelectorViewModel(this.iteration, this.session.Object, ClassKind.ElementBase);
 
             Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
@@ -118,7 +118,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
             Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));
 
-            viewModel = new ThingSelectorViewModel(this.iteration, ClassKind.ParameterType);
+            viewModel = new ThingSelectorViewModel(this.iteration, this.session.Object, ClassKind.ParameterType);
 
             Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
@@ -131,10 +131,10 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyBindings()
         {
-            var viewModelElements = new ElementDefinitionSelectorViewModel(this.iteration);
+            var viewModelElements = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
             viewModelElements.BindData();
 
-            var viewModelParameters = new ParameterTypeSelectorViewModel(this.iteration);
+            var viewModelParameters = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
             viewModelParameters.BindData();
         }
     }

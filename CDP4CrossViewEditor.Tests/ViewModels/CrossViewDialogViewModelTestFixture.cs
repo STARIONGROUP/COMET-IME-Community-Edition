@@ -90,7 +90,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewModel = new CrossViewDialogViewModel(this.iteration);
+            var viewModel = new CrossViewDialogViewModel(this.iteration, this.session.Object);
 
             Assert.AreEqual("Select equipments and parameters", viewModel.DialogTitle);
             Assert.IsInstanceOf<ThingSelectorViewModel>(viewModel.ElementSelectorViewModel);
@@ -100,7 +100,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatCommandsWorks()
         {
-            var viewModel = new CrossViewDialogViewModel(this.iteration);
+            var viewModel = new CrossViewDialogViewModel(this.iteration, this.session.Object);
 
             Assert.DoesNotThrow(() => viewModel.OkCommand.Execute(null));
             Assert.DoesNotThrow(() => viewModel.CancelCommand.Execute(null));

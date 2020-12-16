@@ -33,6 +33,8 @@ namespace CDP4CrossViewEditor.ViewModels
 
     using CDP4Composition.Navigation;
 
+    using CDP4Dal;
+
     using ReactiveUI;
 
     /// <summary>
@@ -50,6 +52,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private ClassKind ThingClassKind
         {
+            get => this.thingClassKind;
             set => this.RaiseAndSetIfChanged(ref this.thingClassKind, value);
         }
 
@@ -57,6 +60,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Gets the <see cref="Iteration"/>
         /// </summary>
         public Iteration Iteration { get; private set; }
+
+        public ISession Session { get; private set; }
 
         /// <summary>
         /// Gets/sets the move command <see cref="ReactiveCommand"/> from target to source
@@ -92,10 +97,12 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Initializes a new instance of the <see cref="ThingSelectorViewModel"/> class.
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/> </param>
+        /// <param name="session"></param>
         /// <param name="thingClassKind">Current type of thing <see cref="ClassKind"/></param>
-        public ThingSelectorViewModel(Iteration iteration, ClassKind thingClassKind)
+        public ThingSelectorViewModel(Iteration iteration, ISession session, ClassKind thingClassKind)
         {
             this.Iteration = iteration;
+            this.Session = session;
             this.ThingClassKind = thingClassKind;
             this.AddSubscriptions();
         }
@@ -120,6 +127,13 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Things will be selected for Cross View Editor table/report
         /// </summary>
         protected virtual void ExecuteMoveToTarget()
+        {
+        }
+
+        /// <summary>
+        /// Executes clear selected items command <see cref="ClearItems"/>
+        /// </summary>
+        protected virtual void ExecuteClear()
         {
         }
 
@@ -188,14 +202,6 @@ namespace CDP4CrossViewEditor.ViewModels
         private void ExecuteMoveDown()
         {
             // TODO #625: Implement ordering and sorting support for selected elements
-        }
-
-        /// <summary>
-        /// Executes clear selected items command <see cref="ClearItems"/>
-        /// </summary>
-        private void ExecuteClear()
-        {
-            // TODO #623 Implement core functionality
         }
 
         /// <summary>

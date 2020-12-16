@@ -30,9 +30,10 @@ namespace CDP4CrossViewEditor.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4CrossViewEditor.RowModels;
+
+    using CDP4Dal;
 
     using ReactiveUI;
 
@@ -65,7 +66,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Initializes a new instance of the <see cref="ParameterTypeSelectorViewModel"/> class.
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/> </param>
-        public ParameterTypeSelectorViewModel(Iteration iteration) : base(iteration, ClassKind.ParameterBase)
+        /// <param name="session"></param>
+        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session) : base(iteration, session, ClassKind.ParameterBase)
         {
             this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>
             {
@@ -93,8 +95,14 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         public override void BindData()
         {
-            var elements = this.Iteration.Element.ToList<ElementBase>().Union(this.Iteration.Element.SelectMany(e => e.ContainedElement).ToList<ElementBase>());
-            var parameterTypeList = new List<ParameterType>();
+            var iterationElements = this.Iteration.Element.AsEnumerable<ElementBase>();
+
+            if (iterationElements == null)
+            {
+                return;
+            }
+
+            var elements = iterationElements.Union(this.Iteration.Element.SelectMany(e => e.ContainedElement).AsEnumerable<ElementBase>());
 
             foreach (var element in elements)
             {
@@ -102,36 +110,34 @@ namespace CDP4CrossViewEditor.ViewModels
                 {
                     case ElementDefinition definition:
                     {
-                        foreach (var parameter in definition.Parameter)
-                        {
-                            if (parameterTypeList.Contains(parameter.ParameterType))
-                            {
-                                continue;
-                            }
-
-                            parameterTypeList.Add(parameter.ParameterType);
-                            this.ParameterTypeSourceList.Add(new ParameterTypeRowViewModel(parameter.ParameterType));
-                        }
-
+                        this.AddParameterType(definition.Parameter);
                         break;
                     }
 
                     case ElementUsage usage:
                     {
-                        foreach (var parameterOverride in usage.ParameterOverride)
-                        {
-                            if (parameterTypeList.Contains(parameterOverride.ParameterType))
-                            {
-                                continue;
-                            }
-
-                            parameterTypeList.Add(parameterOverride.ParameterType);
-                            this.ParameterTypeSourceList.Add(new ParameterTypeRowViewModel(parameterOverride.ParameterType));
-                        }
-
+                        this.AddParameterType(usage.ParameterOverride);
                         break;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Add parameter type to source parameter type list
+        /// </summary>
+        /// <typeparam name="T">Generic type <see cref="ParameterBase"/></typeparam>
+        /// <param name="containerList">Source for <see cref="Parameter"/>/<see cref="ParameterOverride"/></param>
+        private void AddParameterType<T>(IEnumerable<T> containerList) where T : ParameterBase
+        {
+            foreach (var parameter in containerList)
+            {
+                if (this.ParameterTypeSourceList.Any(parameterType => parameterType.Thing == parameter.ParameterType))
+                {
+                    continue;
+                }
+
+                this.ParameterTypeSourceList.Add(new ParameterTypeRowViewModel(parameter.ParameterType, this.Session, null));
             }
         }
 
@@ -141,6 +147,15 @@ namespace CDP4CrossViewEditor.ViewModels
         protected override void ExecuteMoveToSource()
         {
             ExecuteMove(this.ParameterTypeTargetList, this.ParameterTypeSourceList, this.SelectedTargetList);
+        }
+
+        /// <summary>
+        /// Executes clear selected items command
+        /// </summary>
+        protected override void ExecuteClear()
+        {
+            this.SelectedTargetList = this.ParameterTypeTargetList;
+            this.ExecuteMoveToSource();
         }
 
         /// <summary>

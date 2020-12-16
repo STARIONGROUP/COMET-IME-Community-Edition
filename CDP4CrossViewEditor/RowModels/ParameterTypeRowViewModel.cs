@@ -28,26 +28,29 @@ namespace CDP4CrossViewEditor.RowModels
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Mvvm;
+
+    using CDP4Dal;
+
     /// <summary>
     /// Row class representing a <see cref="ParameterType"/> as a plain object
     /// </summary>
-    public class ParameterTypeRowViewModel : DefinedThingRowViewModel<ParameterType>
+    public class ParameterTypeRowViewModel : CDP4CommonView.ParameterTypeRowViewModel<ParameterType>
     {
         /// <summary>
-        /// Gets the current <see cref="ClassKind"/> represented as <see cref="string"/>
+        /// Gets the <see cref="ClassKind"/> of the <see cref="ParameterType"/>
         /// </summary>
-        public string ParameterClassType { private set; get; }
+        public string Type => this.Thing.ClassKind.ToString();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterTypeRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="ParameterTypeRowViewModel"/> class.
         /// </summary>
-        /// <param name="parameterType">
-        /// The <see cref="ParameterType"/> associated with this row
-        /// </param>
-        public ParameterTypeRowViewModel(ParameterType parameterType)
-            : base(parameterType)
+        /// <param name="parameterType">The <see cref="ParameterType"/></param>
+        /// <param name="session">The session.</param>
+        /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
+        public ParameterTypeRowViewModel(ParameterType parameterType, ISession session, IViewModelBase<Thing> containerViewModel)
+            : base(parameterType, session, containerViewModel)
         {
-            this.ParameterClassType = parameterType.ClassKind.ToString();
         }
     }
 }

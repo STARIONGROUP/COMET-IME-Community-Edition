@@ -27,10 +27,14 @@ namespace CDP4CrossViewEditor.ViewModels
 {
     using System.Linq;
 
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4CommonView;
 
-    using CDP4CrossViewEditor.RowModels;
+    using CDP4Dal;
+
+    //using CDP4CrossViewEditor.RowModels;
 
     using ReactiveUI;
 
@@ -63,7 +67,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Initializes a new instance of the <see cref="ElementDefinitionSelectorViewModel"/> class.
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/> </param>
-        public ElementDefinitionSelectorViewModel(Iteration iteration) : base(iteration, ClassKind.ElementBase)
+        /// <param name="session"></param>
+        public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session) : base(iteration, session, ClassKind.ElementBase)
         {
             this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>
             {
@@ -91,11 +96,11 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         public override void BindData()
         {
-            var elements = this.Iteration.Element.ToList<ElementBase>();
+            var elements = this.Iteration.Element.Where(t => t.ChangeKind != ChangeKind.Delete);
 
             foreach (var elementDefinition in elements)
             {
-                this.ElementDefinitionSourceList.Add(new ElementDefinitionRowViewModel(elementDefinition));
+                this.ElementDefinitionSourceList.Add(new ElementDefinitionRowViewModel(elementDefinition, this.Session, null));
             }
         }
 
@@ -113,6 +118,15 @@ namespace CDP4CrossViewEditor.ViewModels
         protected override void ExecuteMoveToTarget()
         {
             ExecuteMove(this.ElementDefinitionSourceList, this.ElementDefinitionTargetList, this.SelectedSourceList);
+        }
+
+        /// <summary>
+        /// Executes clear selected items command
+        /// </summary>
+        protected override void ExecuteClear()
+        {
+            this.SelectedTargetList = this.ElementDefinitionTargetList;
+            this.ExecuteMoveToSource();
         }
     }
 }
