@@ -305,6 +305,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void BindParameters()
         {
+            // TODO #623 Implement core functionality
             var parameterDictionary = new Dictionary<string, ClassKind>()
             {
                 { "m", ClassKind.SimpleQuantityKind },
