@@ -34,8 +34,6 @@ namespace CDP4CrossViewEditor.ViewModels
 
     using CDP4Dal;
 
-    //using CDP4CrossViewEditor.RowModels;
-
     using ReactiveUI;
 
     /// <summary>

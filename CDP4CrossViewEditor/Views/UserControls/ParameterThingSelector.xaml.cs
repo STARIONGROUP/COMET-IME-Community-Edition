@@ -26,7 +26,7 @@
 namespace CDP4CrossViewEditor.Views.UserControls
 {
     /// <summary>
-    /// Interaction logic for ElementThingSelector.xaml
+    /// Interaction logic for ParameterThingSelector.xaml
     /// </summary>
     public partial class ParameterThingSelector : ThingUserControl
     {
