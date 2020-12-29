@@ -65,8 +65,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeSelectorViewModel"/> class.
         /// </summary>
-        /// <param name="iteration">Current opened iteration <see cref="Iteration"/> </param>
-        /// <param name="session"></param>
+        /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
+        /// <param name="session">Current opened session <see cref="ISession"/></param>
         public ParameterTypeSelectorViewModel(Iteration iteration, ISession session) : base(iteration, session, ClassKind.ParameterBase)
         {
             this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>

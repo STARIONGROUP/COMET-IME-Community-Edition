@@ -83,7 +83,9 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="iteration">
         /// The <see cref="Iteration"/> that is currently opened
         /// </param>
-        /// <param name="session"></param>
+        /// <param name="session">
+        /// Current user session <see cref="ISession"/>
+        /// </param>
         public CrossViewDialogViewModel(Iteration iteration, ISession session)
         {
             this.DialogTitle = "Select equipments and parameters";

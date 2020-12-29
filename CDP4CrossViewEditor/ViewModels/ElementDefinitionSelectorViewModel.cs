@@ -52,7 +52,7 @@ namespace CDP4CrossViewEditor.ViewModels
         public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionTargetList { get; set; }
 
         /// <summary>
-        ///
+        /// Gets or sets user selected elements lists
         /// </summary>
         public ReactiveList<ElementDefinitionRowViewModel> SelectedSourceList { get; set; }
 
@@ -64,8 +64,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionSelectorViewModel"/> class.
         /// </summary>
-        /// <param name="iteration">Current opened iteration <see cref="Iteration"/> </param>
-        /// <param name="session"></param>
+        /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
+        /// <param name="session">Current opened session <see cref="ISession"/></param>
         public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session) : base(iteration, session, ClassKind.ElementBase)
         {
             this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>

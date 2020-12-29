@@ -102,7 +102,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             var domain = new DomainOfExpertise(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
             {
                 Name = "domain"
-
             };
 
             var elementDefinition = new ElementDefinition
@@ -161,8 +160,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             viewModel.SelectedTargetList = viewModel.ElementDefinitionTargetList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
 
-            Assert.DoesNotThrow(() => viewModel.MoveItemsUp.Execute(null));
-            Assert.DoesNotThrow(() => viewModel.MoveItemsDown.Execute(null));
             Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
 
             viewModel.SelectedSourceList = viewModel.ElementDefinitionSourceList;
@@ -183,8 +180,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             viewModel.SelectedTargetList = viewModel.ParameterTypeTargetList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
 
-            Assert.DoesNotThrow(() => viewModel.MoveItemsUp.Execute(null));
-            Assert.DoesNotThrow(() => viewModel.MoveItemsDown.Execute(null));
             Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
 
             viewModel.SelectedSourceList = viewModel.ParameterTypeSourceList;

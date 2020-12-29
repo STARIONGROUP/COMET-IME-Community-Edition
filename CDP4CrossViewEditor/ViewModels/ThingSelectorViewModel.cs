@@ -57,10 +57,13 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="Iteration"/>
+        /// Gets or sets the <see cref="Iteration"/>
         /// </summary>
         public Iteration Iteration { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the user session <see cref="ISession"/>
+        /// </summary>
         public ISession Session { get; private set; }
 
         /// <summary>
@@ -72,16 +75,6 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Gets/sets the move command <see cref="ReactiveCommand"/> from source to target
         /// </summary>
         public ReactiveCommand<object> MoveItemsToTarget { get; private set; }
-
-        /// <summary>
-        /// Gets/sets the moving up element list command <see cref="ReactiveCommand"/>
-        /// </summary>
-        public ReactiveCommand<object> MoveItemsUp { get; private set; }
-
-        /// <summary>
-        /// Gets/sets the moving down element list command <see cref="ReactiveCommand"/>
-        /// </summary>
-        public ReactiveCommand<object> MoveItemsDown { get; private set; }
 
         /// <summary>
         /// Gets/sets the sorting list command <see cref="ReactiveCommand"/>
@@ -97,7 +90,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Initializes a new instance of the <see cref="ThingSelectorViewModel"/> class.
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/> </param>
-        /// <param name="session"></param>
+        /// <param name="session">Current opened session <see cref="ISession"/></param>
         /// <param name="thingClassKind">Current type of thing <see cref="ClassKind"/></param>
         public ThingSelectorViewModel(Iteration iteration, ISession session, ClassKind thingClassKind)
         {
@@ -140,7 +133,6 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Move elements beween two list
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="sourceList">Source list</param>
         /// <param name="targetList">Target list</param>
         /// <param name="selectedElements">Elements that will be moved beween source and target</param>
@@ -173,35 +165,11 @@ namespace CDP4CrossViewEditor.ViewModels
             this.MoveItemsToTarget = ReactiveCommand.Create();
             this.MoveItemsToTarget.Subscribe(_ => this.ExecuteMoveToTarget());
 
-            this.MoveItemsUp = ReactiveCommand.Create();
-            this.MoveItemsUp.Subscribe(_ => this.ExecuteMoveUp());
-
-            this.MoveItemsDown = ReactiveCommand.Create();
-            this.MoveItemsDown.Subscribe(_ => this.ExecuteMoveDown());
-
             this.ClearItems = ReactiveCommand.Create();
             this.ClearItems.Subscribe(_ => this.ExecuteClear());
 
             this.SortItems = ReactiveCommand.Create();
             this.SortItems.Subscribe(_ => this.ExecuteSort());
-        }
-
-        /// <summary>
-        /// Executes move items command <see cref="MoveItemsUp"/>
-        /// ExecuteMove selected <see cref="Thing"/> one position up inside selection list
-        /// </summary>
-        private void ExecuteMoveUp()
-        {
-            // TODO #625: Implement ordering and sorting support for selected elements
-        }
-
-        /// <summary>
-        /// Executes move items command <see cref="MoveItemsDown"/>
-        /// ExecuteMove selected <see cref="Thing"/> one position down inside selection list
-        /// </summary>
-        private void ExecuteMoveDown()
-        {
-            // TODO #625: Implement ordering and sorting support for selected elements
         }
 
         /// <summary>
