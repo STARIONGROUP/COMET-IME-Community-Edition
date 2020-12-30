@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:uc="clr-namespace:CDP4CrossViewEditor.Views.UserControls"
-	xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     mc:Ignorable="d">
@@ -28,26 +28,25 @@
                                      SelectedItems="{Binding Path=SelectedSourceList,
                                                             Mode=TwoWay,
                                                             UpdateSourceTrigger=PropertyChanged}"
-                                     SelectionMode="Row"
-                                     AutoGenerateColumns="None"
                                      ItemsSource="{Binding ParameterTypeSourceList}">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
-                                           AllowColumnMoving="True"
+                                           AllowColumnMoving="False"
+                                           AllowSorting="True"
                                            AllowEditing="False"
                                            AllowGrouping="False"
-                                           AllowDragDrop="False"
+                                           AllowDragDrop="True"
+                                           ShowTargetInfoInDragDropHint="True"
                                            AutoWidth="true"
                                            ShowFilterPanelMode="Never"
-                                           IsDetailButtonVisibleBinding="{x:Null}"
                                            ShowGroupPanel="False"
                                            ShowSearchPanelMode="Default">
                             </dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn FieldName="Name" Header="Name" SortMode="Value" SortIndex="0" />
-                            <dxg:GridColumn FieldName="Type" Header="Type" SortMode="Value" />
+                            <dxg:GridColumn FieldName="Name" Header="Name" ReadOnly="True" SortMode="Value" SortIndex="0" />
+                            <dxg:GridColumn FieldName="Type" Header="Type" ReadOnly="True" SortMode="Value" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </StackPanel>
@@ -66,20 +65,21 @@
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
-                                           AllowColumnMoving="True"
+                                           AllowColumnMoving="False"
+                                           AllowSorting="False"
                                            AllowEditing="False"
                                            AllowGrouping="False"
-                                           AllowDragDrop="False"
+                                           AllowDragDrop="True"
+                                           ShowTargetInfoInDragDropHint="True"
                                            AutoWidth="true"
                                            ShowFilterPanelMode="Never"
-                                           IsDetailButtonVisibleBinding="{x:Null}"
                                            ShowGroupPanel="False"
-                                           ShowSearchPanelMode="Default">
+                                           ShowSearchPanelMode="Never">
                             </dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn FieldName="Name" Header="Name" SortMode="Value" SortIndex="0" />
-                            <dxg:GridColumn FieldName="Type" Header="Type" SortMode="Value" />
+                            <dxg:GridColumn AllowColumnFiltering="False" FieldName="Name" Header="Name" />
+                            <dxg:GridColumn FieldName="Type" Header="Type" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                     <Button Margin="0 5 0 0"

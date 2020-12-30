@@ -30,7 +30,8 @@ namespace CDP4CrossViewEditor.ViewModels
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4CommonView;
+
+    using CDP4CrossViewEditor.RowModels;
 
     using CDP4Dal;
 
@@ -44,12 +45,12 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets or sets source element list
         /// </summary>
-        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionSourceList { get; set; }
+        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionSourceList { get; private set; }
 
         /// <summary>
         /// Gets or sets target element list
         /// </summary>
-        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionTargetList { get; set; }
+        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionTargetList { get; private set; }
 
         /// <summary>
         /// Gets or sets user selected elements lists

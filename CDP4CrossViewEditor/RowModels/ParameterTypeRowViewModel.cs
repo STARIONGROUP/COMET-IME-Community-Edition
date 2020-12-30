@@ -46,11 +46,20 @@ namespace CDP4CrossViewEditor.RowModels
         /// Initializes a new instance of the <see cref="ParameterTypeRowViewModel"/> class.
         /// </summary>
         /// <param name="parameterType">The <see cref="ParameterType"/></param>
-        /// <param name="session">The session.</param>
+        /// <param name="session">The session</param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
         public ParameterTypeRowViewModel(ParameterType parameterType, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(parameterType, session, containerViewModel)
         {
+        }
+
+        /// <summary>
+        /// Override string for custom display
+        /// </summary>
+        /// <returns>Custom string appearance</returns>
+        public override string ToString()
+        {
+            return $"{this.Name}({this.Type})";
         }
     }
 }
