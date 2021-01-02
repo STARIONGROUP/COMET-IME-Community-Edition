@@ -1,21 +1,46 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceExportViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4IME.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using CDP4Common.CommonData;
+    using System.Reactive;
+    using System.Threading.Tasks;
+
     using CDP4Dal.Operations;
+    
     using CDP4Composition.Navigation;
+    
     using CDP4Dal;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
+    
     using Microsoft.Practices.ServiceLocation;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -83,14 +108,13 @@ namespace CDP4IME.ViewModels
         /// <param name="openSaveFileDialogService">
         /// The file Dialog Service.
         /// </param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="openSaveFileDialogService"/> is null</exception>
         public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService)
         {
-            if (openSaveFileDialogService == null)
-            {
-                throw new ArgumentNullException("The openSaveFileDialogService may not be null", "openSaveFileDialogService");
-            }
+            this.openSaveFileDialogService = openSaveFileDialogService ?? 
+                throw new ArgumentNullException(nameof(openSaveFileDialogService), 
+                    $"The {nameof(openSaveFileDialogService)} may not be null");
 
-            this.openSaveFileDialogService = openSaveFileDialogService;
             this.AvailableDals = new List<IDalMetaData>();
             this.OpenSessions = new ReactiveList<ISession>(sessions);
             this.DialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
@@ -106,9 +130,8 @@ namespace CDP4IME.ViewModels
                 vm => vm.Path,
                 (passwordRetype, password, selecteddal, selectedsession, path) => selecteddal != null && selectedsession != null 
                     && !string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(password) && password == passwordRetype);
-            
-            this.OkCommand = ReactiveCommand.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+
+            this.OkCommand = ReactiveCommand.CreateAsyncTask(canOk, async _ => await this.ExecuteOk());
 
             this.BrowseCommand = ReactiveCommand.Create();
             this.BrowseCommand.Subscribe(_ => this.ExecuteBrowse());
@@ -124,15 +147,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public IDalMetaData SelectedDal
         {
-            get
-            {
-                return this.selectedDal;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedDal, value);
-            }
+            get => this.selectedDal;
+            set => this.RaiseAndSetIfChanged(ref this.selectedDal, value);
         }
 
         /// <summary>
@@ -140,15 +156,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public ISession SelectedSession
         {
-            get
-            {
-                return this.selectedSession;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedSession, value);
-            }
+            get => this.selectedSession;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSession, value);
         }
 
         /// <summary>
@@ -156,15 +165,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public string PasswordRetype
         {
-            get
-            {
-                return this.passwordRetype;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.passwordRetype, value);
-            }
+            get => this.passwordRetype;
+            set => this.RaiseAndSetIfChanged(ref this.passwordRetype, value);
         }
 
         /// <summary>
@@ -172,15 +174,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public string Password
         {
-            get
-            {
-                return this.password;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.password, value);
-            }
+            get => this.password;
+            set => this.RaiseAndSetIfChanged(ref this.password, value);
         }
 
         /// <summary>
@@ -188,15 +183,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public string Path
         {
-            get
-            {
-                return this.path;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.path, value);
-            }
+            get => this.path;
+            set => this.RaiseAndSetIfChanged(ref this.path, value);
         }
 
         /// <summary>
@@ -204,15 +192,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public List<IDalMetaData> AvailableDals
         {
-            get
-            {
-                return this.availableDals;
-            }
-
-            private set
-            {
-                this.RaiseAndSetIfChanged(ref this.availableDals, value);
-            }
+            get => this.availableDals;
+            private set => this.RaiseAndSetIfChanged(ref this.availableDals, value);
         }
 
         /// <summary>
@@ -220,21 +201,14 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public ReactiveList<ISession> OpenSessions
         {
-            get
-            {
-                return this.openSessions;
-            }
-
-            private set
-            {
-                this.RaiseAndSetIfChanged(ref this.openSessions, value);
-            }
+            get => this.openSessions;
+            private set => this.RaiseAndSetIfChanged(ref this.openSessions, value);
         }
 
         /// <summary>
         /// Gets the Ok Command
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel Command
@@ -249,7 +223,8 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Executes the Ok Command
         /// </summary>
-        private async void ExecuteOk()
+        /// <returns>A <see cref="Task"/></returns>
+        private async Task ExecuteOk()
         {
             this.IsBusy = true;
             this.LoadingMessage = "Exporting...";
@@ -262,13 +237,14 @@ namespace CDP4IME.ViewModels
                 var dal = this.dals.Single(x => x.Metadata.DalType == DalType.File);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
                 
-                var fileExportSession = new Session(dalInstance, creds);
+                _ = new Session(dalInstance, creds);
 
                 // create write 
                 var operationContainers = new List<OperationContainer>();
 
                 // TODO: allow iteration setup selection by user
                 var openIterations = this.selectedSession.OpenIterations.Select(x => x.Key);
+                
                 foreach (var iteration in openIterations)
                 {
                     var transactionContext = TransactionContextResolver.ResolveContext(iteration);
@@ -279,7 +255,7 @@ namespace CDP4IME.ViewModels
                     operationContainers.Add(operationContainer);
                 }
 
-                var result = await dalInstance.Write(operationContainers);
+                await dalInstance.Write(operationContainers);
                 this.DialogResult = new BaseDialogResult(true);
             }
             catch (Exception ex)

@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PublicationBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -28,7 +28,9 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.CommonData;
@@ -58,7 +60,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// The <see cref="PublicationChildRowComparer"/> used to compare the sort-order of rows
         /// </summary>
-        private static readonly PublicationChildRowComparer rowComparer = new PublicationChildRowComparer();
+        private static readonly PublicationChildRowComparer RowComparer = new PublicationChildRowComparer();
 
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -91,8 +93,8 @@ namespace CDP4EngineeringModel.ViewModels
         public PublicationBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.AddSubscriptions();
             this.UpdatePublications();
@@ -105,7 +107,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the Create Command
         /// </summary>
-        public ReactiveCommand<object> PublishCommand { get; protected set; }
+        public ReactiveCommand<Unit> PublishCommand { get; protected set; }
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -180,8 +182,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeCommands();
 
-            this.PublishCommand = ReactiveCommand.Create();
-            this.PublishCommand.Subscribe(_ => this.ExecutePublishCommand());
+            this.PublishCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecutePublishCommand());
         }
 
         /// <summary>
@@ -319,7 +320,7 @@ namespace CDP4EngineeringModel.ViewModels
             // if the domain row has a checkbox, select this one as well.
             ((PublicationParameterOrOverrideRowViewModel)parameterRow).ToBePublished = domainRow.ToBePublished;
 
-            domainRow.ContainedRows.SortedInsert(parameterRow, rowComparer);
+            domainRow.ContainedRows.SortedInsert(parameterRow, RowComparer);
         }
 
         /// <summary>
@@ -377,7 +378,7 @@ namespace CDP4EngineeringModel.ViewModels
                 // if the domain row has a checkbox, select this one as well.
                 ((PublicationParameterOrOverrideRowViewModel)parameterRow).ToBePublished = domainRow.ToBePublished;
 
-                domainRow.ContainedRows.SortedInsert(parameterRow, rowComparer);
+                domainRow.ContainedRows.SortedInsert(parameterRow, RowComparer);
             }
         }
 
@@ -422,7 +423,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Execute the publication.
         /// </summary>
-        public async void ExecutePublishCommand()
+        public async Task ExecutePublishCommand()
         {
             // get the list of parameters or overrides to publish
             var parametersOrOverrides = this.GetListOfParametersOrOverridesToPublish().ToList();
@@ -430,8 +431,12 @@ namespace CDP4EngineeringModel.ViewModels
             // there must be some parameters selected. An empty publication is not possible.
             if (parametersOrOverrides.Count == 0)
             {
-                MessageBox.Show("Please select at least one Parameter or Parameter Override to be published.",
-                    "Publication", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    "Please select at least one Parameter or Parameter Override to be published.",
+                    "Publication",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
                 return;
             }
 
@@ -450,6 +455,7 @@ namespace CDP4EngineeringModel.ViewModels
             var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
             var containerTransaction = new ThingTransaction(transactionContext, iteration);
             containerTransaction.CreateOrUpdate(publication);
+            
             try
             {
                 var operationContainer = containerTransaction.FinalizeTransaction();
@@ -463,8 +469,11 @@ namespace CDP4EngineeringModel.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format("Publication failed: {0}", ex.Message), "Publication Failed",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"Publication failed: {ex.Message}", 
+                    "Publication Failed",
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Error);
             }
             finally
             {
@@ -507,6 +516,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var publication in oldPublications)
             {
                 var row = this.Publications.SingleOrDefault(x => x.Thing == publication);
+                
                 if (row != null)
                 {
                     this.Publications.RemoveAndDispose(row);
@@ -532,6 +542,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var domain in oldDomains)
             {
                 var row = this.Domains.SingleOrDefault(x => x.Thing == domain);
+                
                 if (row != null)
                 {
                     this.Domains.RemoveAndDispose(row);
@@ -636,9 +647,9 @@ namespace CDP4EngineeringModel.ViewModels
             if (this.SelectedThing != null && this.SelectedThing.ContainedRows.Count > 0)
             {
                 this.ContextMenu.Add(
-                    this.SelectedThing.IsExpanded ?
-                    new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
-                    new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+                    this.SelectedThing.IsExpanded 
+                        ? new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) 
+                        : new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
             }
         }
 

@@ -1,21 +1,46 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SessionViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4IME.ViewModels
 {
     using System;
     using System.Globalization;
+    using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Input;
     using System.Windows.Threading;
+
     using CDP4Composition;
     using CDP4Composition.Events;
     using CDP4Composition.Navigation;
+
     using CDP4Dal;
+
     using Microsoft.Practices.ServiceLocation;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -23,7 +48,6 @@ namespace CDP4IME.ViewModels
     /// </summary>
     public class SessionViewModel : ReactiveObject
     {
-        #region Fields
         /// <summary>
         /// Out property for the <see cref="LastUpdateDateTimeHint"/> property
         /// </summary>
@@ -32,7 +56,7 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// The default auto refresh interval
         /// </summary>
-        private const uint defaultRefreshInterval = 60;
+        private const uint DefaultRefreshInterval = 60;
 
         /// <summary>
         /// Out property for <see cref="HasError"/>
@@ -73,9 +97,7 @@ namespace CDP4IME.ViewModels
         /// Backing field for the <see cref="LastUpdateDateTime"/> property.
         /// </summary>
         private DateTime lastUpdateDateTime;
-        #endregion
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionViewModel"/> class.
         /// </summary>
@@ -85,16 +107,11 @@ namespace CDP4IME.ViewModels
         public SessionViewModel(ISession session)
         {
             this.Session = session;
-            this.AutoRefreshInterval = defaultRefreshInterval;
+            this.AutoRefreshInterval = DefaultRefreshInterval;
 
-            this.Close = ReactiveCommand.Create();
-            this.Close.Subscribe(_ => this.ExecuteClose());
-
-            this.Refresh = ReactiveCommand.Create();
-            this.Refresh.Subscribe(_ => this.ExecuteRefresh());
-
-            this.Reload = ReactiveCommand.Create();
-            this.Reload.Subscribe(_ => this.ExecuteReload());
+            this.Close = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteClose());
+            this.Refresh = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteRefresh());
+            this.Reload = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteReload());
 
             this.HideAll = ReactiveCommand.Create();
             this.HideAll.Subscribe(_ => this.ExecuteHideAll());
@@ -111,9 +128,7 @@ namespace CDP4IME.ViewModels
             this.WhenAnyValue(x => x.AutoRefreshInterval)
                 .Subscribe(_ => this.SetTimer());
         }
-        #endregion
 
-        #region Public properties
         /// <summary>
         /// Gets the <see cref="Session"/> object that is encapsulated by the current <see cref="SessionViewModel"/>.
         /// </summary>
@@ -122,7 +137,7 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Gets the Close <see cref="ICommand"/> that closes the encapsulated <see cref="Session"/>
         /// </summary>
-        public ReactiveCommand<object> Close { get; private set; }
+        public ReactiveCommand<Unit> Close { get; private set; }
 
         /// <summary>
         /// Gets the Hide All <see cref="ICommand"/> that closes all the panels associated to this <see cref="Session"/>
@@ -135,7 +150,7 @@ namespace CDP4IME.ViewModels
         /// <remarks>
         /// a refresh loads the latest new data from the data-source
         /// </remarks>
-        public ReactiveCommand<object> Refresh { get; private set; }
+        public ReactiveCommand<Unit> Refresh { get; private set; }
 
         /// <summary>
         /// Gets the Refresh <see cref="ICommand"/> that reloads the encapsulated <see cref="Session"/>
@@ -143,29 +158,17 @@ namespace CDP4IME.ViewModels
         /// <remarks>
         /// a reload loads all the data from the data-source
         /// </remarks>
-        public ReactiveCommand<object> Reload { get; private set; }
+        public ReactiveCommand<Unit> Reload { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="Uri"/> of the current <see cref="Session"/>
         /// </summary>
-        public string DataSourceUri
-        {
-            get
-            {
-                return this.Session.DataSourceUri;
-            }
-        }
+        public string DataSourceUri => this.Session.DataSourceUri;
 
         /// <summary>
         /// Gets the name of the current <see cref="ISession"/>
         /// </summary>
-        public string SessionName
-        {
-            get
-            {
-                return this.Session.Name;
-            }
-        }
+        public string SessionName => this.Session.Name;
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="Session"/> object has it's
@@ -173,15 +176,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public bool IsAutoRefreshEnabled
         {
-            get
-            {
-                return this.isAutoRefreshEnabled;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isAutoRefreshEnabled, value);
-            }
+            get => this.isAutoRefreshEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isAutoRefreshEnabled, value);
         }
 
         /// <summary>
@@ -189,15 +185,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public uint AutoRefreshInterval
         {
-            get
-            {
-                return this.autoRefreshInterval;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.autoRefreshInterval, value);
-            }
+            get => this.autoRefreshInterval;
+            set => this.RaiseAndSetIfChanged(ref this.autoRefreshInterval, value);
         }
 
         /// <summary>
@@ -205,15 +194,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public uint AutoRefreshSecondsLeft
         {
-            get
-            {
-                return this.autoRefreshSecondsLeft;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.autoRefreshSecondsLeft, value);
-            }
+            get => this.autoRefreshSecondsLeft;
+            set => this.RaiseAndSetIfChanged(ref this.autoRefreshSecondsLeft, value);
         }
 
         /// <summary>
@@ -221,15 +203,9 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public bool IsClosed
         {
-            get
-            {
-                return this.isClosed;
-            }
+            get => this.isClosed;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isClosed, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isClosed, value);
         }
 
         /// <summary>
@@ -237,47 +213,35 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public DateTime LastUpdateDateTime
         {
-            get
-            {
-                return this.lastUpdateDateTime;
-            }
+            get => this.lastUpdateDateTime;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.lastUpdateDateTime, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.lastUpdateDateTime, value);
         }
 
         /// <summary>
         /// Gets the hint displayed on the data-source Refresh button
         /// </summary>
-        public string LastUpdateDateTimeHint
-        {
-            get { return "Last Updated at " + this.lastUpdateDateTimeHint.Value; }
-        }
+        public string LastUpdateDateTimeHint => "Last Updated at " + this.lastUpdateDateTimeHint.Value;
 
         /// <summary>
         /// Gets a value indicating whether an Error was produced
         /// </summary>
-        public bool HasError
-        {
-            get { return this.hasError.Value; }
-        }
+        public bool HasError => this.hasError.Value;
 
         /// <summary>
         /// Gets or sets the error message 
         /// </summary>
         public string ErrorMsg
         {
-            get { return this.errorMsg; }
-            set { this.RaiseAndSetIfChanged(ref this.errorMsg, value); }
+            get => this.errorMsg;
+            set => this.RaiseAndSetIfChanged(ref this.errorMsg, value);
         }
-        #endregion
 
         /// <summary>
         /// Executes the <see cref="Close"/> Command and closes the <see cref="Session"/>
         /// </summary>
-        private async void ExecuteClose()
+        /// <returns>A <see cref="Task"/></returns>
+        private async Task ExecuteClose()
         {
             await this.Session.Close();
             this.IsClosed = true;
@@ -286,7 +250,8 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Executes the <see cref="Refresh"/> Command and refreshes the <see cref="Session"/>
         /// </summary>
-        private async void ExecuteRefresh()
+        /// <returns>A <see cref="Task"/></returns>
+        private async Task ExecuteRefresh()
         {
             try
             {
@@ -303,7 +268,8 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Executes the <see cref="Reload"/> Command and reloads the <see cref="Session"/>
         /// </summary>
-        private async void ExecuteReload()
+        /// <returns>A <see cref="Task"/></returns>
+        private async Task ExecuteReload()
         {
             try
             {
@@ -330,15 +296,11 @@ namespace CDP4IME.ViewModels
             if (this.IsAutoRefreshEnabled)
             {
                 //dispose of previous timer
-                if (this.timer != null)
-                {
-                    this.timer.Stop();
-                }
+                this.timer?.Stop();
 
                 this.AutoRefreshSecondsLeft = this.AutoRefreshInterval;
-                
-                this.timer = new DispatcherTimer();
-                this.timer.Interval = TimeSpan.FromSeconds(1);
+
+                this.timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
                 this.timer.Tick += this.OntTimerElapsed;
                 this.timer.Start();
             }

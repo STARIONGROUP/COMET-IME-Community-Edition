@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -28,6 +28,7 @@ namespace CDP4Requirements.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -70,11 +71,6 @@ namespace CDP4Requirements.ViewModels
     public class RequirementsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget,
         IRequirementBrowserDisplaySettings, IDeprecatableBrowserViewModel
     {
-        /// <summary>
-        /// The logger for the current class
-        /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         ///  The comparer for <see cref="RequirementsSpecification"/>
         /// </summary>
@@ -222,7 +218,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the Verify Requirement command
         /// </summary>
-        public ReactiveCommand<object> VerifyRequirementsCommand { get; private set; }
+        public ReactiveCommand<Unit> VerifyRequirementsCommand { get; private set; }
 
         /// <summary>
         /// Gets the Navigate To <see cref="RequirementsSpecification"/> Editor Command
@@ -356,8 +352,8 @@ namespace CDP4Requirements.ViewModels
             var currentReqSpec = this.ReqSpecificationRows.Select(x => x.Thing).ToList();
             var updatedReqSpec = this.Thing.RequirementsSpecification;
 
-            var added = updatedReqSpec.Except(currentReqSpec).Cast<RequirementsSpecification>().ToList();
-            var removed = currentReqSpec.Except(updatedReqSpec).Cast<RequirementsSpecification>().ToList();
+            var added = updatedReqSpec.Except(currentReqSpec).ToList();
+            var removed = currentReqSpec.Except(updatedReqSpec).ToList();
 
             foreach (var requirementsSpecification in added)
             {
@@ -499,12 +495,11 @@ namespace CDP4Requirements.ViewModels
         private void ExecuteCreateRequirement()
         {
             var req = new Requirement();
-            var reqGroup = this.SelectedThing.Thing as RequirementsGroup;
 
             var reqSpecification = this.SelectedThing.Thing as RequirementsSpecification ??
                                    this.SelectedThing.Thing.GetContainerOfType<RequirementsSpecification>();
 
-            if (reqGroup != null)
+            if (this.SelectedThing.Thing is RequirementsGroup reqGroup)
             {
                 req.Group = reqGroup;
             }
@@ -526,16 +521,19 @@ namespace CDP4Requirements.ViewModels
             this.CreateRelationshipCommand.Subscribe(_ => this.ExecuteCreateCommand<BinaryRelationship>(this.Thing));
 
             this.CreateRequirementGroupCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirementGroup));
+            
             this.CreateRequirementGroupCommand.Subscribe(_ =>
                 this.ExecuteCreateCommand<RequirementsGroup>(this.SelectedThing.Thing));
 
             this.CreateRequirementCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirement));
             this.CreateRequirementCommand.Subscribe(_ => this.ExecuteCreateRequirement());
 
-            this.VerifyRequirementsCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanVerifyRequirements));
-            this.VerifyRequirementsCommand.Subscribe(_ => this.ExecuteVerifyRequirements());
+            this.VerifyRequirementsCommand = ReactiveCommand.CreateAsyncTask(
+                this.WhenAnyValue(x => x.CanVerifyRequirements), 
+                async _ => await this.ExecuteVerifyRequirements());
 
             this.NavigateToRequirementsSpecificationEditorCommand = ReactiveCommand.Create();
+            
             this.NavigateToRequirementsSpecificationEditorCommand.Subscribe(_ =>
                 this.ExecuteNavigateToRequirementsSpecificationEditor());
         }
@@ -714,7 +712,8 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Updates requirement verification for all <see cref="RequirementsSpecification"/>s contained in this RequirementBrowser
         /// </summary>
-        private async void ExecuteVerifyRequirements()
+        /// <returns>A <see cref="Task"/></returns>
+        private async Task ExecuteVerifyRequirements()
         {
             if (this.CanVerifyRequirements)
             {
@@ -759,6 +758,7 @@ namespace CDP4Requirements.ViewModels
                 var vm = new RequirementsSpecificationEditorViewModel(requirementsSpecification, this.Session,
                     this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService,
                     this.PluginSettingsService);
+                
                 this.openRequirementsSpecificationEditorViewModels.Add(vm);
                 this.PanelNavigationService.Open(vm, true);
             }
@@ -791,6 +791,7 @@ namespace CDP4Requirements.ViewModels
 
             var containerClone = model.Clone(false);
             var transaction = new ThingTransaction(transactionContext, containerClone);
+            
             this.ThingDialogNavigationService.Navigate(engineeringModelDataNote, transaction, this.Session, true,
                 ThingDialogKind.Create, this.ThingDialogNavigationService, containerClone);
         }

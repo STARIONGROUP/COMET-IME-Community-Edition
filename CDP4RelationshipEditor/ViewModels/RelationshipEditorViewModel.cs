@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipEditorViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
@@ -29,6 +29,7 @@ namespace CDP4RelationshipEditor.ViewModels
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -100,11 +101,6 @@ namespace CDP4RelationshipEditor.ViewModels
         private int currentIteration;
 
         /// <summary>
-        /// Backing field for <see cref="DomainOfExpertise"/>
-        /// </summary>
-        private string domainOfExpertise;
-
-        /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Relationship Editor";
@@ -124,8 +120,8 @@ namespace CDP4RelationshipEditor.ViewModels
         public RelationshipEditorViewModel(Iteration thing, Participant participant, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
+            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.AddSubscriptions();
             this.UpdateProperties();
@@ -145,8 +141,10 @@ namespace CDP4RelationshipEditor.ViewModels
             this.CreateBinaryRelationshipCommand.Subscribe(_ => this.CreateBinaryRelationshipCommandExecute());
 
             // creation of multi relationship requires selected nodes
-            this.CreateMultiRelationshipCommand = ReactiveCommand.Create(canCreateMultiRelationship);
-            this.CreateMultiRelationshipCommand.Subscribe(_ => this.CreateMultiRelationshipCommandExecute());
+            // creation of multi relationship requires selected nodes
+            this.CreateMultiRelationshipCommand = ReactiveCommand.CreateAsyncTask(canCreateMultiRelationship,
+                async _ => await this.CreateMultiRelationshipCommandExecute());
+
         }
 
         /// <summary>
@@ -287,7 +285,7 @@ namespace CDP4RelationshipEditor.ViewModels
         /// <summary>
         /// Gets or sets the Create Multi Relationship Command
         /// </summary>
-        public ReactiveCommand<object> CreateMultiRelationshipCommand { get; protected set; }
+        public ReactiveCommand<Unit> CreateMultiRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the active <see cref="Participant"/> of this editor.
@@ -299,8 +297,8 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </summary>
         public ReactiveList<object> ThingDiagramItems
         {
-            get { return this.thingDiagramItems; }
-            set { this.RaiseAndSetIfChanged(ref this.thingDiagramItems, value); }
+            get => this.thingDiagramItems;
+            set => this.RaiseAndSetIfChanged(ref this.thingDiagramItems, value);
         }
 
         /// <summary>
@@ -308,8 +306,8 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </summary>
         public DisposableReactiveList<RuleNavBarItemViewModel> RelationshipRules
         {
-            get { return this.relationshipRules; }
-            set { this.RaiseAndSetIfChanged(ref this.relationshipRules, value); }
+            get => this.relationshipRules;
+            set => this.RaiseAndSetIfChanged(ref this.relationshipRules, value);
         }
 
         /// <summary>
@@ -322,8 +320,8 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </summary>
         public DiagramItem SelectedItem
         {
-            get { return this.selectedItem; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedItem, value); }
+            get => this.selectedItem;
+            set => this.RaiseAndSetIfChanged(ref this.selectedItem, value);
         }
 
         /// <summary>
@@ -331,8 +329,8 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </summary>
         public ReactiveList<DiagramItem> SelectedItems
         {
-            get { return this.selectedItems; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedItems, value); }
+            get => this.selectedItems;
+            set => this.RaiseAndSetIfChanged(ref this.selectedItems, value);
         }
 
         /// <summary>
@@ -340,8 +338,8 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -349,26 +347,14 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup
-        {
-            get { return this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>(); }
-        }
-
-        /// <summary>
-        /// Gets the current <see cref="DomainOfExpertise"/> name
-        /// </summary>
-        public string DomainOfExpertise
-        {
-            get { return this.domainOfExpertise; }
-            private set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
-        }
+        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
 
         /// <summary>
         /// The pending rule holds a rule in memory while creating connections, to apply to relationsships in case
@@ -390,10 +376,11 @@ namespace CDP4RelationshipEditor.ViewModels
         /// <param name="rule">
         /// The rule this relationship is based on.
         /// </param>
-        public void CreateMultiRelationshipCommandExecute(MultiRelationshipRule rule = null)
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task CreateMultiRelationshipCommandExecute(MultiRelationshipRule rule = null)
         {
             var relatableThings = this.SelectedItems.Select(i => ((NamedThingDiagramContentItem) i).Thing);
-            this.CreateMultiRelationship(relatableThings, rule);
+            await this.CreateMultiRelationship(relatableThings, rule);
         }
 
         /// <summary>
@@ -401,11 +388,11 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </summary>
         /// <param name="relatableThings">The list of <see cref="Thing"/> that this relationship will apply to.</param>
         /// <param name="rule">The <see cref="MultiRelationshipRule"/> that defines this relationship.</param>
-        private async void CreateMultiRelationship(IEnumerable<Thing> relatableThings, MultiRelationshipRule rule)
+        /// <returns>A <see cref="Task"/></returns>
+        private async Task CreateMultiRelationship(IEnumerable<Thing> relatableThings, MultiRelationshipRule rule)
         {
             // send off the relationship
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
             var multiRelationship = new MultiRelationship(Guid.NewGuid(), null, null) { Owner = tuple.Item1 };
 
             if (rule != null)
@@ -432,18 +419,16 @@ namespace CDP4RelationshipEditor.ViewModels
                 await this.Session.Write(operationContainer);
 
                 // at this point relationship has gone through.
-                var returedRelationship =
-                    this.Thing.Relationship.FirstOrDefault(r => r.Iid == multiRelationship.Iid) as MultiRelationship;
 
-                if (returedRelationship != null)
+                if (this.Thing.Relationship.FirstOrDefault(r => r.Iid == multiRelationship.Iid) is MultiRelationship returedRelationship)
                 {
                     this.CreateMultiRelationshipDiagramConnector(returedRelationship);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format("Creation of Binary Relationship failed: {0}", ex.Message),
-                    "Binary Relationship Failed",
+                MessageBox.Show($"Creation of Multi Relationship failed: {ex.Message}",
+                    "Multi Relationship Failed",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -452,7 +437,7 @@ namespace CDP4RelationshipEditor.ViewModels
         /// Creates a <see cref="BinaryRelationship"/>
         /// </summary>
         /// <param name="connector">The drawn <see cref="DiagramConnector"/> that is used as a template.</param>
-        private async void CreateBinaryRelationship(DiagramConnector connector)
+        private void CreateBinaryRelationship(DiagramConnector connector)
         {
             var beginItemContent = ((DiagramContentItem) connector?.BeginItem)?.Content as NamedThingDiagramContentItem;
             var endItemContent = ((DiagramContentItem)connector?.EndItem)?.Content as NamedThingDiagramContentItem;
@@ -467,8 +452,7 @@ namespace CDP4RelationshipEditor.ViewModels
             }
 
             // send off the relationship
-            Tuple<DomainOfExpertise, Participant> tuple;
-            this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
+            this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
 
             var binaryRelationship = new BinaryRelationship(Guid.NewGuid(), null, null) { Owner = tuple.Item1 };
 
@@ -494,7 +478,7 @@ namespace CDP4RelationshipEditor.ViewModels
             try
             {
                 var operationContainer = containerTransaction.FinalizeTransaction();
-                await this.Session.Write(operationContainer);
+                this.Session.Write(operationContainer).GetAwaiter().GetResult();
 
                 // at this point relationship has gone through.
 
@@ -572,9 +556,7 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            var rowPayload = dropInfo.Payload as Thing;
-
-            if (rowPayload != null)
+            if (dropInfo.Payload is Thing rowPayload)
             {
                 if (!this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.Thing).Contains(rowPayload))
                 {
@@ -654,14 +636,10 @@ namespace CDP4RelationshipEditor.ViewModels
                 return;
             }
 
-            var thingDiagramItem = this.SelectedItem as IThingDiagramItem;
-
-            if (thingDiagramItem == null)
+            if (!(this.SelectedItem is IThingDiagramItem thingDiagramItem))
             {
                 // logic to handle drawing of new connections
-                var newDiagramConnector = this.SelectedItem as DiagramConnector;
-
-                if (newDiagramConnector != null)
+                if (this.SelectedItem is DiagramConnector newDiagramConnector)
                 {
                     // a new connection was drawn
                     this.CreateBinaryRelationship(newDiagramConnector);
@@ -698,7 +676,7 @@ namespace CDP4RelationshipEditor.ViewModels
             {
                 this.DomainOfExpertise = (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null)
                     ? "None"
-                    : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
+                    : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
             }
         }
     }
