@@ -25,8 +25,12 @@
 
 namespace CDP4CrossViewEditor.RowModels
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Mvvm;
 
@@ -38,6 +42,11 @@ namespace CDP4CrossViewEditor.RowModels
     public class ElementDefinitionRowViewModel : CDP4CommonView.ElementDefinitionRowViewModel
     {
         /// <summary>
+        /// Gets or sets current element categories and super categories
+        /// </summary>
+        public List<Category> Categories { private set; get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionRowViewModel"/> class.
         /// </summary>
         /// <param name="elementDefinition">The <see cref="ElementDefinition"/></param>
@@ -46,6 +55,10 @@ namespace CDP4CrossViewEditor.RowModels
         public ElementDefinitionRowViewModel(ElementDefinition elementDefinition, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(elementDefinition, session, containerViewModel)
         {
+            var categories = elementDefinition.Category;
+            var superCategories = categories.Distinct().SelectMany(x => x.AllSuperCategories()).ToList();
+
+            this.Categories = categories.Union(superCategories).ToList();
         }
 
         /// <summary>
