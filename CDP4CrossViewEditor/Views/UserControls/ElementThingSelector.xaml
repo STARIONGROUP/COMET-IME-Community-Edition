@@ -8,7 +8,6 @@
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxfui="http://schemas.devexpress.com/winfx/2008/xaml/core/filteringui"
     mc:Ignorable="d">
     <dxlc:LayoutControl Height="Auto"
                         Background="White"
@@ -31,7 +30,6 @@
                                                              UpdateSourceTrigger=PropertyChanged}"
                                      SelectionMode="Row"
                                      AutoGenerateColumns="None"
-                                     CustomUniqueValues="GridControl_OnCustomUniqueValues"
                                      ItemsSource="{Binding ElementDefinitionSourceList}">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
@@ -39,30 +37,16 @@
                                            AllowColumnMoving="False"
                                            AllowEditing="False"
                                            AllowGrouping="False"
-                                           AutoWidth="True"
+                                           AutoWidth="true"
+                                           ShowFilterPanelMode="Never"
                                            IsDetailButtonVisibleBinding="{x:Null}"
                                            ShowGroupPanel="False"
                                            ShowSearchPanelMode="Default">
-                                <dxg:TableView.FilterEditorTemplate>
-                                    <DataTemplate>
-                                        <dxfui:FilterEditorControl QueryGroupOperations="OnQueryGroupOperations"
-                                                                   QueryOperators="OnQueryOperators" />
-                                    </DataTemplate>
-                                </dxg:TableView.FilterEditorTemplate>
                             </dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
                             <dxg:GridColumn FieldName="Name" Header="Name" SortMode="Value" SortIndex="0" />
                             <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" SortMode="Value" />
-                            <dxg:GridColumn FieldName="Categories"
-                                            AllowAutoFilter="True"
-                                            AutoFilterCondition="Like"
-                                            ColumnFilterMode="Value"
-                                            Visible="False">
-                                <dxg:GridColumn.Binding>
-                                    <Binding Path="RowData.Row.Categories" />
-                                </dxg:GridColumn.Binding>
-                            </dxg:GridColumn>
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </StackPanel>
