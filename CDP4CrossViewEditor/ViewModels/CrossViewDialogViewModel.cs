@@ -26,6 +26,8 @@
 namespace CDP4CrossViewEditor.ViewModels
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Windows.Input;
 
     using CDP4Common.EngineeringModelData;
@@ -35,6 +37,8 @@ namespace CDP4CrossViewEditor.ViewModels
 
     using CDP4Dal;
 
+    using NetOffice.ExcelApi;
+
     using ReactiveUI;
 
     /// <summary>
@@ -42,6 +46,11 @@ namespace CDP4CrossViewEditor.ViewModels
     /// </summary>
     public class CrossViewDialogViewModel : DialogViewModelBase
     {
+        /// <summary>
+        /// Backing field for the <see cref="SelectedWorkbook"/> property.
+        /// </summary>
+        private WorkbookRowViewModel selectedWorkbook;
+
         /// <summary>
         /// Gets the dialog box title
         /// </summary>
@@ -78,19 +87,39 @@ namespace CDP4CrossViewEditor.ViewModels
         public ThingSelectorViewModel ParameterSelectorViewModel { get; private set; }
 
         /// <summary>
+        /// Gets the list of <see cref="WorkbookRowViewModel"/>s that is available in the current Excel application.
+        /// </summary>
+        private List<WorkbookRowViewModel> Workbooks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="WorkbookRowViewModel"/>
+        /// </summary>
+        public WorkbookRowViewModel SelectedWorkbook
+        {
+            get => this.selectedWorkbook;
+            set => this.RaiseAndSetIfChanged(ref this.selectedWorkbook, value);
+        }
+
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CrossViewDialogViewModel"/> class.
         /// </summary>
+        /// <param name="application">
+        /// The Excel <see cref="Application"/> that contains workbooks <see cref="Workbook"/>
+        /// </param>
         /// <param name="iteration">
         /// The <see cref="Iteration"/> that is currently opened
         /// </param>
         /// <param name="session">
         /// Current user session <see cref="ISession"/>
         /// </param>
-        public CrossViewDialogViewModel(Iteration iteration, ISession session)
+        public CrossViewDialogViewModel(Application application, Iteration iteration, ISession session)
         {
+            this.Workbooks = new List<WorkbookRowViewModel>();
             this.DialogTitle = "Select equipments and parameters";
             this.Iteration = iteration;
             this.Session = session;
+            this.PopulateWorkbooks(application);
 
             this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(this.Iteration, this.Session);
             this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(this.Iteration, this.Session);
@@ -100,6 +129,29 @@ namespace CDP4CrossViewEditor.ViewModels
 
             this.OkCommand = ReactiveCommand.Create();
             this.OkCommand.Subscribe(_ => this.ExecuteOk());
+        }
+
+        /// <summary>
+        /// populate the workbook row view-models that represent workbooks that are open in the
+        /// excel application.
+        /// </summary>
+        /// <param name="application">
+        /// The Excel <see cref="Application"/> that contains workbooks
+        /// </param>
+        private void PopulateWorkbooks(Application application)
+        {
+            if (application == null)
+            {
+                return;
+            }
+
+            foreach (var workbook in application.Workbooks)
+            {
+                var row = new WorkbookRowViewModel(workbook);
+                this.Workbooks.Add(row);
+            }
+
+            this.SelectedWorkbook = this.Workbooks[0];
         }
 
         /// <summary>
@@ -115,7 +167,12 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteOk()
         {
-            this.DialogResult = new BaseDialogResult(true);
+            if (this.ElementSelectorViewModel is ElementDefinitionSelectorViewModel elementDefinitionViewModel &&
+                this.ParameterSelectorViewModel is ParameterTypeSelectorViewModel parameterTypeViewModel)
+            {
+                this.DialogResult = new WorkbookSelectionDialogResult(true, this.SelectedWorkbook.Workbook, elementDefinitionViewModel.ElementDefinitionTargetList.Select(e => e.Thing), 
+                    parameterTypeViewModel.ParameterTypeTargetList.Select(p => p.Thing));
+            }
         }
     }
 }

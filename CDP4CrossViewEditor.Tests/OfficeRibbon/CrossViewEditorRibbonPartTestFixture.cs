@@ -73,6 +73,11 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         private Uri uri;
 
         /// <summary>
+        /// The current active person <see cref="Person"/>
+        /// </summary>
+        private Person person;
+
+        /// <summary>
         /// The <see cref="RibbonPart"/> under test
         /// </summary>
         private CrossViewEditorRibbonPart ribbonPart;
@@ -128,9 +133,11 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
             this.uri = new Uri("http://www.rheageoup.com");
+            this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "John", Surname = "Doe" };
             this.assembler = new Assembler(this.uri);
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();

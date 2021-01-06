@@ -180,11 +180,11 @@ namespace CDP4CrossViewEditor
                     break;
 
                 case EventKind.Removed:
-                {
-                    var iteration = iterationEvent.ChangedThing as Iteration;
-                    this.Iterations.RemoveAll(x => x == iteration);
-                    break;
-                }
+                    {
+                        var iteration = iterationEvent.ChangedThing as Iteration;
+                        this.Iterations.RemoveAll(x => x == iteration);
+                        break;
+                    }
             }
         }
 
@@ -207,7 +207,7 @@ namespace CDP4CrossViewEditor
 
             if (ribbonControlId.StartsWith("Editor_"))
             {
-                this.LaunchCrossViewEditorAsync(ribbonControlTag);
+                await this.LaunchCrossViewEditorAsync(ribbonControlTag);
             }
             else
             {
@@ -221,8 +221,14 @@ namespace CDP4CrossViewEditor
         /// <param name="iterationId">
         /// The unique id of the <see cref="Iteration"/>
         /// </param>
-        private void LaunchCrossViewEditorAsync(string iterationId)
+        private async Task LaunchCrossViewEditorAsync(string iterationId)
         {
+            if (iterationId == string.Empty)
+            {
+                logger.Debug("The cross editor workbook cannot be build: the iteration id is empty");
+                return;
+            }
+
             var uniqueId = Guid.Parse(iterationId);
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
 
@@ -232,21 +238,42 @@ namespace CDP4CrossViewEditor
                 return;
             }
 
+            if (!(iteration.Container is EngineeringModel engineeringModel))
+            {
+                logger.Error("The cross editor workbook cannot be build: Iteration container object is null");
+                return;
+            }
+
+            var activeParticipant = engineeringModel.EngineeringModelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
+
             if (this.officeApplicationWrapper.Excel == null)
             {
                 logger.Error("The cross editor workbook cannot be build: The Excel Application object is null");
                 return;
             }
 
-            var workbook = this.QueryIterationWorkbook(this.officeApplicationWrapper.Excel, iteration);
+            var application = this.officeApplicationWrapper.Excel;
 
-            if (workbook != null || !(iteration.Container is EngineeringModel))
+            var crossViewDialogViewModel = new CrossViewDialogViewModel(application, iteration, this.Session);
+            this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
+
+            var dialogResult = crossViewDialogViewModel.DialogResult as WorkbookSelectionDialogResult;
+
+            if (dialogResult?.Result != null && dialogResult.Result.Value)
             {
-                return;
+                var workbook = dialogResult.Workbook;
+
+                try
+                {
+                    var workbookOperator = new WorkbookOperator(application, workbook, this.DialogNavigationService);
+                    await workbookOperator.Rebuild(this.Session, iteration, activeParticipant, dialogResult.WorkbookElements, dialogResult.WorkbookParameterType);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex);
+                }
             }
 
-            var crossViewDialogViewModel = new CrossViewDialogViewModel(iteration, this.Session);
-            this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
         }
 
         /// <summary>
@@ -307,7 +334,7 @@ namespace CDP4CrossViewEditor
 
             foreach (var iteration in this.Iterations)
             {
-                var engineeringModel = (EngineeringModel) iteration.Container;
+                var engineeringModel = (EngineeringModel)iteration.Container;
 
                 var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
 
