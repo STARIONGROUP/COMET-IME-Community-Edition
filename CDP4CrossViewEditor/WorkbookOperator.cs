@@ -129,6 +129,8 @@ namespace CDP4CrossViewEditor
         /// <param name="participant">
         /// The active <see cref="Participant"/> for which the workbook is being rebuilt.
         /// </param>
+        /// <param name="elementDefinitions"></param>
+        /// <param name="parameterTypes"></param>
         public async Task Rebuild(ISession session, Iteration iteration, Participant participant,
             IEnumerable<ElementDefinition> elementDefinitions,
             IEnumerable<ParameterType> parameterTypes)
@@ -211,9 +213,8 @@ namespace CDP4CrossViewEditor
         /// <param name="participant">
         /// The active <see cref="Participant"/> for which the workbook is being rebuilt.
         /// </param>
-        /// <param name="processedValueSets">
-        /// The <see cref="Thing"/>s that have been changed on the Parameter sheet that need to be kept
-        /// </param>
+        /// <param name="elementDefinitions"></param>
+        /// <param name="parameterTypes"></param>
         private void WriteCrossviewSheet(ISession session, Iteration iteration, Participant participant,
             IEnumerable<ElementDefinition> elementDefinitions,
             IEnumerable<ParameterType> parameterTypes)

@@ -92,10 +92,10 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </summary>
         private void InitializeArray()
         {
-            this.ContentArray = new object[,] {};
-            this.LockArray = new object[,]{};
-            this.FormatArray = new object[,] {};
-            this.FormulaArray = new object[,] {};
+            this.ContentArray = new object[,] { };
+            this.LockArray = new object[,] { };
+            this.FormatArray = new object[,] { };
+            this.FormulaArray = new object[,] { };
         }
 
         /// <summary>
