@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4CrossViewEditor.Assemblers.CrossviewSheet
+namespace CDP4CrossViewEditor.Assemblers
 {
     using System;
     using System.Collections.Generic;

@@ -170,7 +170,7 @@ namespace CDP4CrossViewEditor.ViewModels
             if (this.ElementSelectorViewModel is ElementDefinitionSelectorViewModel elementDefinitionViewModel &&
                 this.ParameterSelectorViewModel is ParameterTypeSelectorViewModel parameterTypeViewModel)
             {
-                this.DialogResult = new WorkbookSelectionDialogResult(true, this.SelectedWorkbook.Workbook, elementDefinitionViewModel.ElementDefinitionTargetList.Select(e => e.Thing),
+                this.DialogResult = new WorkbookSelectionDialogResult(true, this.SelectedWorkbook?.Workbook, elementDefinitionViewModel.ElementDefinitionTargetList.Select(e => e.Thing),
                     parameterTypeViewModel.ParameterTypeTargetList.Select(p => p.Thing));
             }
         }

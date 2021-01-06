@@ -32,6 +32,7 @@ namespace CDP4CrossViewEditor.Tests
     using CDP4OfficeInfrastructure;
 
     using Moq;
+
     using NUnit.Framework;
 
     /// <summary>

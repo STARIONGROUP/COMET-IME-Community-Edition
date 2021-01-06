@@ -32,6 +32,9 @@ namespace CDP4CrossViewEditor.Generator
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4CrossViewEditor.Assemblers;
+    using CDP4CrossViewEditor.RowModels.CrossviewSheet;
+
     using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Enums;
 
@@ -41,9 +44,6 @@ namespace CDP4CrossViewEditor.Generator
     using Exception = System.Exception;
 
     using CDP4Dal;
-
-    using CDP4CrossViewEditor.Assemblers.CrossviewSheet;
-    using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
