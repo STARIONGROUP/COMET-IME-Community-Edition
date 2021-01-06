@@ -28,11 +28,12 @@ namespace CDP4CrossViewEditor.ViewModels
     using System;
     using System.Windows.Input;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Navigation;
+
+    using CDP4Dal;
 
     using ReactiveUI;
 
@@ -50,6 +51,11 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Gets the <see cref="IterationSetup"/>
         /// </summary>
         public Iteration Iteration { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ISession"/>
+        /// </summary>
+        public ISession Session { get; private set; }
 
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
@@ -77,13 +83,17 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="iteration">
         /// The <see cref="Iteration"/> that is currently opened
         /// </param>
-        public CrossViewDialogViewModel(Iteration iteration)
+        /// <param name="session">
+        /// Current user session <see cref="ISession"/>
+        /// </param>
+        public CrossViewDialogViewModel(Iteration iteration, ISession session)
         {
             this.DialogTitle = "Select equipments and parameters";
             this.Iteration = iteration;
+            this.Session = session;
 
-            this.ElementSelectorViewModel = new ThingSelectorViewModel(this.Iteration, ClassKind.ElementBase);
-            this.ParameterSelectorViewModel = new ThingSelectorViewModel(this.Iteration, ClassKind.ParameterBase);
+            this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(this.Iteration, this.Session);
+            this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(this.Iteration, this.Session);
 
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.ExecuteCancel());

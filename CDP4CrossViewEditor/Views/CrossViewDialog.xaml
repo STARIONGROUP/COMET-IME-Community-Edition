@@ -9,7 +9,7 @@
              xmlns:uc="clr-namespace:CDP4CrossViewEditor.Views.UserControls"
              Title="{Binding DialogTitle}"
              Width="700"
-             Height="500"
+             Height="525"
              dx:ThemeManager.ThemeName="Seven"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              DataContextChanged="DXWindow_DataContextChanged"

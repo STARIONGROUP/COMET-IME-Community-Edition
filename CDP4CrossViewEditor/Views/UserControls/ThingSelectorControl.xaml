@@ -14,7 +14,7 @@
                 MaxWidth="75"
                 MaxHeight="25"
                 HorizontalAlignment="Right"
-                Command="{Binding Path=MoveToTarget}"
+                Command="{Binding Path=MoveItemsToTarget}"
                 IsDefault="True">
             <StackPanel Orientation="Horizontal">
                 <Image Source="{dx:DXImage Image=Next_16x16.png}" Stretch="Uniform" />
@@ -25,7 +25,7 @@
                 MaxWidth="75"
                 MaxHeight="25"
                 HorizontalAlignment="Right"
-                Command="{Binding Path=MoveToSource}">
+                Command="{Binding Path=MoveItemsToSource}">
             <StackPanel Orientation="Horizontal">
                 <Image Source="{dx:DXImage Image=Prev_16x16.png}" Stretch="Uniform" />
             </StackPanel>

@@ -7,6 +7,7 @@
     xmlns:uc="clr-namespace:CDP4CrossViewEditor.Views.UserControls"
 	xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     mc:Ignorable="d">
     <dxlc:LayoutControl Height="Auto"
                         Background="White"
@@ -22,7 +23,12 @@
                     <ColumnDefinition Width="45*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Row="0" Grid.Column="0">
-                    <dxg:GridControl MaxHeight="150"
+                    <dxg:GridControl MinHeight="125"
+                                     MaxHeight="150"
+                                     SelectedItems="{Binding Path=SelectedSourceList,
+                                                             Mode=TwoWay,
+                                                             UpdateSourceTrigger=PropertyChanged}"
+                                     SelectionMode="Row"
                                      AutoGenerateColumns="None"
                                      ItemsSource="{Binding ElementDefinitionSourceList}">
                         <dxg:GridControl.View>
@@ -41,7 +47,7 @@
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
                             <dxg:GridColumn FieldName="Name" Header="Name" SortMode="Value" SortIndex="0" />
-                            <dxg:GridColumn FieldName="DomainOfExpertise" Header="Domain Of Expertise" SortMode="Value" />
+                            <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" SortMode="Value" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </StackPanel>
@@ -49,7 +55,12 @@
                     <uc:ThingSelectorControl />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="2">
-                    <dxg:GridControl MaxHeight="500"
+                    <dxg:GridControl MinHeight="125"
+                                     MaxHeight="150"
+                                     SelectedItems="{Binding Path=SelectedTargetList,
+                                                             Mode=TwoWay,
+                                                             UpdateSourceTrigger=PropertyChanged}"
+                                     SelectionMode="Row"
                                      AutoGenerateColumns="None"
                                      ItemsSource="{Binding ElementDefinitionTargetList}">
                         <dxg:GridControl.View>
@@ -58,7 +69,7 @@
                                            AllowColumnMoving="True"
                                            AllowEditing="False"
                                            AllowGrouping="False"
-                                           AllowDragDrop="False"
+                                           AllowDragDrop="True"
                                            AutoWidth="true"
                                            ShowFilterPanelMode="Never"
                                            IsDetailButtonVisibleBinding="{x:Null}"
@@ -68,9 +79,20 @@
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
                             <dxg:GridColumn FieldName="Name" Header="Name" SortMode="Value" SortIndex="0" />
-                            <dxg:GridColumn FieldName="DomainOfExpertise" Header="Domain Of Expertise" SortMode="Value" />
+                            <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" SortMode="Value" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
+                    <Button Margin="0 5 0 0"
+                            MinWidth="75"
+                            MinHeight="25"
+                            MaxWidth="75"
+                            MaxHeight="25"
+                            HorizontalAlignment="Center"
+                            Command="{Binding Path=ClearItems}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{dx:DXImage Image=Clear_16x16.png}" Stretch="Uniform" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Grid>
         </GroupBox>
