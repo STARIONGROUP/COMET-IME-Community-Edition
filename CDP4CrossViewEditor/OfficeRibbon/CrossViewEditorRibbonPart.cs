@@ -244,7 +244,7 @@ namespace CDP4CrossViewEditor
                 return;
             }
 
-            var activeParticipant = engineeringModel.EngineeringModelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
+            var activeParticipant = engineeringModel.EngineeringModelSetup.Participant.FirstOrDefault(x => x.Person == this.Session.ActivePerson);
 
             if (this.officeApplicationWrapper.Excel == null)
             {

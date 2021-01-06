@@ -341,11 +341,16 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         /// <returns></returns>
         private Iteration CreateIteration()
         {
+            var participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = this.person };
+
             return new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri)
                 {
                     EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                    {
+                        Participant = { participant }
+                    }
                 },
                 IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
                 {
