@@ -31,6 +31,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4CrossViewEditor.RowModels;
     using CDP4CrossViewEditor.ViewModels;
 
     using CDP4Dal;
@@ -101,7 +102,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             var domain = new DomainOfExpertise(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
             {
-                Name = "domain"
+                Name = "Domain"
             };
 
             var elementDefinition = new ElementDefinition
@@ -113,7 +114,10 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
                 Owner = domain
             };
 
-            var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri);
+            var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "P_SimpleQuantityKind"
+            };
 
             var parameter = new Parameter
             {
@@ -155,6 +159,12 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.DoesNotThrow(() => viewModel.BindData());
 
             viewModel.SelectedSourceList = viewModel.ElementDefinitionSourceList;
+            var elementDefinition = viewModel.SelectedSourceList.FirstOrDefault();
+
+            Assert.NotNull(elementDefinition);
+            Assert.AreEqual(0, elementDefinition.Categories.Count);
+            Assert.AreEqual("ElementDefinition_1(Domain)", elementDefinition.ToString());
+
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
 
             viewModel.SelectedTargetList = viewModel.ElementDefinitionTargetList;
@@ -175,6 +185,12 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.DoesNotThrow(() => viewModel.BindData());
 
             viewModel.SelectedSourceList = viewModel.ParameterTypeSourceList;
+            var parameterType = viewModel.SelectedSourceList.FirstOrDefault();
+
+            Assert.NotNull(parameterType);
+            Assert.AreEqual("SimpleQuantityKind", parameterType.Type);
+            Assert.AreEqual("P_SimpleQuantityKind(SimpleQuantityKind)", parameterType.ToString());
+
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
 
             viewModel.SelectedTargetList = viewModel.ParameterTypeTargetList;

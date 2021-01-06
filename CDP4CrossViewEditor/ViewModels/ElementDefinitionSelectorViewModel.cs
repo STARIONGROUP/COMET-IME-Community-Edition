@@ -25,12 +25,15 @@
 
 namespace CDP4CrossViewEditor.ViewModels
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4CommonView;
+    using CDP4Common.SiteDirectoryData;
+
+    using CDP4CrossViewEditor.RowModels;
 
     using CDP4Dal;
 
@@ -44,12 +47,12 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets or sets source element list
         /// </summary>
-        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionSourceList { get; set; }
+        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionSourceList { get; private set; }
 
         /// <summary>
         /// Gets or sets target element list
         /// </summary>
-        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionTargetList { get; set; }
+        public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionTargetList { get; private set; }
 
         /// <summary>
         /// Gets or sets user selected elements lists
@@ -60,6 +63,8 @@ namespace CDP4CrossViewEditor.ViewModels
         ///
         /// </summary>
         public ReactiveList<ElementDefinitionRowViewModel> SelectedTargetList { get; set; }
+
+        public List<Category> Categories { private set; get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionSelectorViewModel"/> class.
@@ -87,6 +92,8 @@ namespace CDP4CrossViewEditor.ViewModels
             {
                 ChangeTrackingEnabled = true
             };
+
+            this.Categories = new List<Category>();
         }
 
         /// <summary>
@@ -99,6 +106,15 @@ namespace CDP4CrossViewEditor.ViewModels
             foreach (var elementDefinition in elements)
             {
                 this.ElementDefinitionSourceList.Add(new ElementDefinitionRowViewModel(elementDefinition, this.Session, null));
+
+                var categories = elementDefinition.Category;
+                var superCategories = categories
+                    .Distinct()
+                    .SelectMany(x => x.AllSuperCategories())
+                    .ToList();
+
+                this.Categories = this.Categories.Union(categories).Union(superCategories)
+                    .ToList();
             }
         }
 
