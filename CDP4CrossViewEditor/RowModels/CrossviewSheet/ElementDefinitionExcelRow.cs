@@ -39,7 +39,7 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
     /// The purpose of the <see cref="ElementDefinitionExcelRow"/> is to represent an <see cref="ElementDefinition"/>
     /// on the Parameter Sheet in Excel
     /// </summary>
-    public class ElementDefinitionExcelRow : ExcelRowBase<ElementDefinition>
+    public class ElementDefinitionExcelRow : ExcelRow<ElementDefinition>
     {
         /// <summary>
         /// The level offset of the current row.
@@ -78,7 +78,7 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         }
 
         /// <summary>
-        /// Update the properties of the <see cref="ExcelRowBase{T}"/>
+        /// Update the properties of the <see cref="ExcelRow{T}"/>
         /// </summary>
         private void UpdateProperties()
         {

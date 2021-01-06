@@ -1,10 +1,29 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IExcelRow.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4CrossViewEditor.RowModels
+namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
 {
     using System.Collections.Generic;
 
@@ -54,52 +73,7 @@ namespace CDP4CrossViewEditor.RowModels
         /// <summary>
         /// Gets the model code of the <see cref="Thing"/> that is represented by the current row.
         /// </summary>
-        string ModelCode { get; }
-
-        /// <summary>
-        /// Gets the computed value
-        /// </summary>
-        object ComputedValue { get; }
-
-        /// <summary>
-        /// Gets the manual value
-        /// </summary>
-        object ManualValue { get; }
-
-        /// <summary>
-        /// Gets the reference value
-        /// </summary>
-        object ReferenceValue { get; }
-
-        /// <summary>
-        /// Gets the switch
-        /// </summary>
-        string Switch { get; }
-
-        /// <summary>
-        /// Gets the actual value
-        /// </summary>
-        object ActualValue { get; }
-
-        /// <summary>
-        /// Gets the formula
-        /// </summary>
-        string Formula { get; }
-
-        /// <summary>
-        /// Gets short-name of the <see cref="ParameterTypeShortName"/> and the shot-name of the <see cref="MeasurementScale"/> if it is applicable.
-        /// </summary>
-        string ParameterTypeShortName { get; }
-
-        /// <summary>
-        /// Gets the <see cref="ParameterType"/> that the <see cref="Parameter"/> or <see cref="ParameterOverride"/> references.
-        /// </summary>
-        ParameterType ParameterType { get; }
-
-        /// <summary>
-        /// Gets the excel format depending on the parameter type that is represented
-        /// </summary>
-        string Format { get; }
+        string ModelCode { get; set; }
 
         /// <summary>
         /// Gets the short-name of the owning <see cref="DomainOfExpertise"/>

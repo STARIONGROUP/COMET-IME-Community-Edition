@@ -1,17 +1,36 @@
-﻿
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="CrossviewSheetGenerator.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4CrossViewEditor.Generator
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-
-    using CDP4Composition.ViewModels;
-
-    using CDP4CrossViewEditor.RowModels;
 
     using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Enums;
@@ -22,7 +41,9 @@ namespace CDP4CrossViewEditor.Generator
     using Exception = System.Exception;
 
     using CDP4Dal;
-    using CDP4CrossViewEditor.Assemblers;
+
+    using CDP4CrossViewEditor.Assemblers.CrossviewSheet;
+    using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
@@ -32,14 +53,9 @@ namespace CDP4CrossViewEditor.Generator
     public class CrossviewSheetGenerator
     {
         /// <summary>
-        /// the string that is used as the list separator.
-        /// </summary>
-        private string listSeparator;
-
-        /// <summary>
         /// The NLog logger
         /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// The current excel application
@@ -55,11 +71,6 @@ namespace CDP4CrossViewEditor.Generator
         /// The <see cref="Participant"/> for which the Parameter-Sheet needs to be generated.
         /// </summary>
         private readonly Participant participant;
-
-        /// <summary>
-        /// The country code of the application (language version)
-        /// </summary>
-        private int xlCountryCode;
 
         /// <summary>
         /// The <see cref="IExcelRow{T}"/> that make up the content of the parameter sheet
@@ -92,24 +103,19 @@ namespace CDP4CrossViewEditor.Generator
         private object[,] parameterFormat;
 
         /// <summary>
-        /// The array that contains the content of the parameter section of the parameter sheet
+        /// The array that contains the content of the parameter section of the crossview sheet
         /// </summary>
         private object[,] parameterContent;
 
         /// <summary>
-        /// The array that contains the lock settings of the parameter section of the parameter sheet
+        /// The array that contains the lock settings of the parameter section of the crossview sheet
         /// </summary>
         private object[,] parameterLock;
 
         /// <summary>
-        /// A string that contains the switch values used as validation formula
-        /// </summary>
-        private string switchFormula;
-
-        /// <summary>
         /// Gets the <see cref="ISession"/> that is active
         /// </summary>
-        private ISession session;
+        private readonly ISession session;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CrossviewSheetGenerator"/> class.
@@ -139,7 +145,8 @@ namespace CDP4CrossViewEditor.Generator
         /// <param name="workbook">
         /// The current <see cref="Workbook"/> when Crossview sheet will be rebuild.
         /// </param>
-        /// <param name="processedValueSets"></param>
+        /// <param name="elementDefinitions"></param>
+        /// <param name="parameterTypes"></param>
         public void Rebuild(Application application, Workbook workbook, IEnumerable<ElementDefinition> elementDefinitions,
             IEnumerable<ParameterType> parameterTypes)
         {
@@ -149,11 +156,6 @@ namespace CDP4CrossViewEditor.Generator
             this.excelApplication = application;
 
             this.excelApplication.StatusBar = "Rebuilding Crossview Sheet";
-
-            this.listSeparator = (string)application.International(XlApplicationInternational.xlListSeparator);
-            this.xlCountryCode = Convert.ToInt32(application.International(XlApplicationInternational.xlCountryCode));
-            this.SetLanguageSpecificVariables();
-            this.SetSwitchString();
 
             var enabledEvents = application.EnableEvents;
             var displayAlerts = application.DisplayAlerts;
@@ -169,7 +171,7 @@ namespace CDP4CrossViewEditor.Generator
             {
                 application.Cursor = XlMousePointer.xlWait;
 
-                this.crossviewSheet = CrossviewSheetUtilities.RetrieveParameterSheet(workbook, true);
+                this.crossviewSheet = CrossviewSheetUtilities.RetrieveSheet(workbook, true);
 
                 CrossviewSheetUtilities.ApplyLocking(this.crossviewSheet, false);
 
@@ -211,40 +213,27 @@ namespace CDP4CrossViewEditor.Generator
         }
 
         /// <summary>
-        /// Sets the language specific variables used by the parameter sheet generator
-        /// </summary>
-        private void SetLanguageSpecificVariables()
-        {
-        }
-
-        /// <summary>
-        /// Set the <see cref="switchFormula"/> that is used as formula for cell validation
-        /// </summary>
-        private void SetSwitchString()
-        {
-            this.switchFormula = string.Join(this.listSeparator, Enum.GetNames(typeof(ParameterSwitchKind)));
-        }
-
-        /// <summary>
         /// collect the information that is to be written to the Parameter sheet
         /// </summary>
-        /// <param name="processedValueSets">IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets</param>
+        /// <param name="elementDefinitions"></param>
+        /// <param name="parameterTypes"></param>
         private void PopulateSheetArrays(IEnumerable<ElementDefinition> elementDefinitions, IEnumerable<ParameterType> parameterTypes)
         {
             var selectedDomainOfExpertise = this.session.QuerySelectedDomainOfExpertise(this.iteration);
 
             // Instantiate the different rows
-            var assembler = new CrossviewSheetRowAssembler(this.iteration, selectedDomainOfExpertise);
+            var assembler = new CrossviewSheetRowAssembler(selectedDomainOfExpertise);
             assembler.Assemble(elementDefinitions);
             this.excelRows = assembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
-            var parameterArrayAssembler = new CrossviewArrayAssembler(this.excelRows, elementDefinitions, parameterTypes);
+            var parameterArrayAssembler = new CrossviewArrayAssembler(this.excelRows, parameterTypes);
             this.parameterContent = parameterArrayAssembler.ContentArray;
             this.parameterFormat = parameterArrayAssembler.FormatArray;
             this.parameterLock = parameterArrayAssembler.LockArray;
 
-            var headerArrayAssembler = new CrossviewHeaderArrayAssembler(this.session, this.iteration, this.participant);
+            // Instantiate header
+            var headerArrayAssembler = new CrossviewHeaderArrayAssembler(this.session, this.iteration, this.participant, this.parameterContent.GetLength(1));
             this.headerFormat = headerArrayAssembler.FormatArray;
             this.headerContent = headerArrayAssembler.HeaderArray;
             this.headerLock = headerArrayAssembler.LockArray;
@@ -256,8 +245,7 @@ namespace CDP4CrossViewEditor.Generator
         private void WriteParameterSheet()
         {
             this.WriteHeader();
-            this.WriteParameters();
-            this.UpdateParameterCells();
+            this.WriteRows();
         }
 
         /// <summary>
@@ -281,7 +269,7 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Write the content of the <see cref="parameterContent"/> to the parameter sheet
         /// </summary>
-        private void WriteParameters()
+        private void WriteRows()
         {
             var numberOfRows = this.parameterContent.GetLength(0);
             var numberOfColumns = this.parameterContent.GetLength(1);
@@ -291,9 +279,6 @@ namespace CDP4CrossViewEditor.Generator
 
             var parameterRange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow, 1], this.crossviewSheet.Cells[endrow, numberOfColumns]);
             parameterRange.Name = "Crossview";
-
-            Console.WriteLine(parameterRange.Rows.Count);
-            Console.WriteLine(this.parameterContent.GetLength(0));
 
             parameterRange.NumberFormat = this.parameterFormat;
             parameterRange.Value = this.parameterContent;
@@ -313,7 +298,7 @@ namespace CDP4CrossViewEditor.Generator
         }
 
         /// <summary>
-        /// apply cell names to the actual value column
+        /// Apply cell names to the actual value column
         /// </summary>
         /// <param name="beginRow">
         /// The row at which the range begins
@@ -323,101 +308,12 @@ namespace CDP4CrossViewEditor.Generator
         /// </param>
         private void ApplyCellNames(int beginRow, int endRow)
         {
-            try
-            {
-                var range =
-                    this.crossviewSheet.Range(
-                        this.crossviewSheet.Cells[beginRow + 2, CrossviewSheetConstants.ActualValueColumn],
-                        this.crossviewSheet.Cells[endRow, CrossviewSheetConstants.ModelCodeColumn]);
+            var range =
+                this.crossviewSheet.Range(
+                    this.crossviewSheet.Cells[beginRow + 2, CrossviewSheetConstants.ActualValueColumn],
+                    this.crossviewSheet.Cells[endRow, CrossviewSheetConstants.ModelCodeColumn]);
 
-                range.CreateNames(top: false, left: false, bottom: false, right: true);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Could not apply cell names", ex);
-            }
-        }
-
-        /// <summary>
-        /// Apply row validation using the information from the <see cref="IExcelRow{Thing}"/> and
-        /// </summary>
-        /// <param name="excelRow">
-        /// An instance of <see cref="IExcelRow{Thing}"/> that contains the information used to apply the proper validation
-        /// </param>
-        /// <param name="rownumber">
-        /// The number of the row in the parameter sheet
-        /// </param>
-        private void ApplyRowValidation(IExcelRow<Thing> excelRow, int rownumber)
-        {
-        }
-
-        /// <summary>
-        /// Apply grouping to the excel rows to allow expanding and collapsing in excel
-        /// </summary>
-        /// <param name="excelRow">
-        /// The <see cref="IExcelRow{Thing}"/> that contains the level information
-        /// </param>
-        /// <param name="rownumber">
-        /// The row in excel that needs the grouping to be applied
-        /// </param>
-        private void ApplyRowGrouping(IExcelRow<Thing> excelRow, int rownumber)
-        {
-            //var outlineLevel = excelRow.Level + 1;
-
-            //this.crossviewSheet.Cells[rownumber, 14].Value = outlineLevel;
-
-            //if (outlineLevel < 8)
-            //{
-            //    this.crossviewSheet.Rows[rownumber].EntireRow.OutlineLevel = outlineLevel;
-            //}
-            //else
-            //{
-            //    this.crossviewSheet.Rows[rownumber].EntireRow.OutlineLevel = 8;
-            //}
-        }
-
-        /// <summary>
-        /// Apply the formula to the actual value column
-        /// </summary>
-        /// <param name="excelRow">
-        /// The <see cref="IExcelRow{Thing}"/> that contains the level information
-        /// </param>
-        /// <param name="rownumber">
-        /// The row in excel that needs the formula applied
-        /// </param>
-        private void ApplyActualValueFormula(IExcelRow<Thing> excelRow, int rownumber)
-        {
-        }
-
-        /// <summary>
-        /// Apply the formula to the computed-column
-        /// </summary>
-        /// <param name="excelRow">
-        /// The <see cref="IExcelRow{Thing}"/> that contains the formula that is to be applied
-        /// </param>
-        /// <param name="rownumber">
-        /// The row in excel that needs the formula applied
-        /// </param>
-        private void ApplyFormulaValueToComputedValueCell(IExcelRow<Thing> excelRow, int rownumber)
-        {
-        }
-
-        /// <summary>
-        /// Update the content of specific parameter related cells
-        /// </summary>
-        private void UpdateParameterCells()
-        {
-            var row = this.headerContent.GetLength(0) + 4;
-
-            foreach (var excelRow in this.excelRows)
-            {
-                this.ApplyRowValidation(excelRow, row);
-                this.ApplyRowGrouping(excelRow, row);
-                this.ApplyActualValueFormula(excelRow, row);
-                this.ApplyFormulaValueToComputedValueCell(excelRow, row);
-
-                row++;
-            }
+            range.CreateNames(top: false, left: false, bottom: false, right: true);
         }
     }
 }
