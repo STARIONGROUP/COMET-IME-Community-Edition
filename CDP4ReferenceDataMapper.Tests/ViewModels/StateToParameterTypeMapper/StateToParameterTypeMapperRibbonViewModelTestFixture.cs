@@ -72,8 +72,9 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         private IterationSetup iterationSetup;
 
         private EngineeringModel engineeringModel;
-        
         private Iteration iteration;
+        private ModelReferenceDataLibrary modelReferenceDataLibrary;
+        private SiteReferenceDataLibrary siteReferenceDataLibrary;
 
         [SetUp]
         public void SetUp()
@@ -97,6 +98,11 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.engineeringModelSetup };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationSetup };
             this.engineeringModel.Iteration.Add(this.iteration);
+            this.modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
+            this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
+            this.engineeringModelSetup.RequiredRdl.Add(this.modelReferenceDataLibrary);
+            this.modelReferenceDataLibrary.RequiredRdl = this.siteReferenceDataLibrary;
+            this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteReferenceDataLibrary);
 
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
