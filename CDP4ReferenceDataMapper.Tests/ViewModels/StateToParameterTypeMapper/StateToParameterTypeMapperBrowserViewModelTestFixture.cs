@@ -43,6 +43,8 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
     using CDP4ReferenceDataMapper.ViewModels;
 
+    using DevExpress.Mvvm.POCO;
+
     using Moq;
 
     using NUnit.Framework;
@@ -74,8 +76,9 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         private IterationSetup iterationSetup;
 
         private EngineeringModel engineeringModel;
-
         private Iteration iteration;
+        private ModelReferenceDataLibrary modelReferenceDataLibrary;
+        private SiteReferenceDataLibrary siteReferenceDataLibrary;
 
         [SetUp]
         public void SetUp()
@@ -99,6 +102,11 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.engineeringModelSetup };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationSetup };
             this.engineeringModel.Iteration.Add(this.iteration);
+            this.modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
+            this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
+            this.engineeringModelSetup.RequiredRdl.Add(this.modelReferenceDataLibrary);
+            this.modelReferenceDataLibrary.RequiredRdl = this.siteReferenceDataLibrary;
+            this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteReferenceDataLibrary);
 
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -112,6 +120,8 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         [Test]
         public void Verify_that_properties_are_set_on_newed_up()
         {
+            this.PopulateTestData();
+
             this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
                 this.iteration,
                 this.session.Object,
@@ -122,6 +132,65 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.Caption, Is.EqualTo("Actual Finite State to ParameterType mapping, iteration_1"));
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.ToolTip, Is.EqualTo("Test\nhttp://www.rheagroup.com/\nJohn Doe"));
+
+            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleElementDefinitionCategory.Count, Is.EqualTo(2));
+            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleActualFiniteStateList.Count, Is.EqualTo(1));
+            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleSourceParameterTypeCategory.Count, Is.EqualTo(1));
+            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.Count, Is.EqualTo(2));
+            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.Count, Is.EqualTo(4));
+        }
+
+        private void PopulateTestData()
+        {
+            // PossibleElementDefinitionCategory
+            var elementDefinitionCategory_1 = new Category(Guid.NewGuid(), this.cache, this.uri) { Name = "Batteries", ShortName = "BAT" };
+            elementDefinitionCategory_1.PermissibleClass.Add(ClassKind.ElementDefinition);
+            this.siteReferenceDataLibrary.DefinedCategory.Add(elementDefinitionCategory_1);
+            var elementDefinitionCategory_2 = new Category(Guid.NewGuid(), this.cache, this.uri) { Name = "Reaction Wheels", ShortName = "RW" };
+            elementDefinitionCategory_2.PermissibleClass.Add(ClassKind.ElementDefinition);
+            this.siteReferenceDataLibrary.DefinedCategory.Add(elementDefinitionCategory_2);
+
+            // PossibleActualFiniteStateList
+            var possibleFiniteStateList = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri) { Name = "System Modes", ShortName = "SM", Owner = this.domain};
+            var possibleFiniteState_on = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "On", ShortName = "On" };
+            possibleFiniteStateList.PossibleState.Add(possibleFiniteState_on);
+            var possibleFiniteState_off = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "Off", ShortName = "Off" };
+            possibleFiniteStateList.PossibleState.Add(possibleFiniteState_off);
+            var possibleFiniteState_standby = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "stand by", ShortName = "stby" };
+            possibleFiniteStateList.PossibleState.Add(possibleFiniteState_standby);
+            this.iteration.PossibleFiniteStateList.Add(possibleFiniteStateList);
+
+            var actualFinitateSteList = new ActualFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
+            actualFinitateSteList.PossibleFiniteStateList.Add(possibleFiniteStateList);
+            var actualFinitateSte_on = new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri);
+            actualFinitateSteList.ActualState.Add(actualFinitateSte_on);
+            actualFinitateSte_on.PossibleState.Add(possibleFiniteState_on);
+            var actualFinitateSte_off = new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri);
+            actualFinitateSteList.ActualState.Add(actualFinitateSte_off);
+            actualFinitateSte_off.PossibleState.Add(possibleFiniteState_off);
+            var actualFinitateSte_standby = new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri);
+            actualFinitateSteList.ActualState.Add(actualFinitateSte_standby);
+            actualFinitateSte_standby.PossibleState.Add(possibleFiniteState_standby);
+            this.iteration.ActualFiniteStateList.Add(actualFinitateSteList);
+
+            // PossibleSourceParameterTypeCategory
+            var sourceParameterTypeCategory_1 = new Category(Guid.NewGuid(), this.cache, this.uri) { Name = "Power Modes", ShortName = "PM" };
+            sourceParameterTypeCategory_1.PermissibleClass.Add(ClassKind.SimpleQuantityKind);
+            sourceParameterTypeCategory_1.PermissibleClass.Add(ClassKind.DerivedQuantityKind);
+            this.siteReferenceDataLibrary.DefinedCategory.Add(sourceParameterTypeCategory_1);
+
+            // PossibleTargetMappingParameterType
+            var textParameterType_1 = new TextParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "Mapping 1", ShortName = "map1" };
+            this.siteReferenceDataLibrary.ParameterType.Add(textParameterType_1);
+            var textParameterType_2 = new TextParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "Mapping 2", ShortName = "map2" };
+            this.siteReferenceDataLibrary.ParameterType.Add(textParameterType_2);
+
+            // PossibleTargetValueParameterType
+            var simpleQuantityKind_1 = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "Power Consumption", ShortName = "PWC" };
+            this.siteReferenceDataLibrary.ParameterType.Add(simpleQuantityKind_1);
+            var simpleQuantityKind_2 = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "Duty Cycle", ShortName = "DC" };
+            this.siteReferenceDataLibrary.ParameterType.Add(simpleQuantityKind_2);
         }
     }
 }
+
