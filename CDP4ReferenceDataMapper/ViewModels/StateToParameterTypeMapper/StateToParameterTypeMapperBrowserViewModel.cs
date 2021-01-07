@@ -27,16 +27,14 @@ namespace CDP4ReferenceDataMapper.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-
+    
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
-    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -113,6 +111,9 @@ namespace CDP4ReferenceDataMapper.ViewModels
         public StateToParameterTypeMapperBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
+            var sw = new Stopwatch();
+            logger.Debug("Initializing StateToParameterTypeMapperBrowserViewModel");
+
             this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
             this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
@@ -124,6 +125,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
             //this.AddSubscriptions();
             this.UpdateProperties();
+
+            logger.Debug($"Finished Initialization of StateToParameterTypeMapperBrowserViewModel in {sw.ElapsedMilliseconds} [ms]");
         }
 
         /// <summary>
@@ -222,13 +225,36 @@ namespace CDP4ReferenceDataMapper.ViewModels
         public ReactiveList<ScalarParameterType> PossibleTargetValueParameterType { get; private set; }
 
         /// <summary>
-        /// Initializes the <see cref="ICommand"/>s
+        /// Gets the <see cref="ReactiveCommand"/> to start the mapping - populate the row-view-models
+        /// </summary>
+        public ReactiveCommand<object> StartMappingCommand { get; protected set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to clear the mapping settings
+        /// </summary>
+        public ReactiveCommand<object> ClearSettingsCommand { get; protected set; }
+
+        /// <summary>
+        /// Initializes the <see cref="ReactiveCommand"/>s
         /// </summary>
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
+
+            var canExecuteStartMappingCommand = this.WhenAnyValue(
+                    vm => vm.SelectedElementDefinitionCategory, 
+                    vm => vm.SelectedActualFiniteStateList,
+                    vm => vm.SelectedSourceParameterTypeCategory,
+                    vm => vm.SelectedTargetMappingParameterType,
+                    vm => vm.SelectedTargetValueParameterType,
+                    (a,b,c,d,e) => 
+                        a != null && b != null && c != null && d != null && e != null);
             
-            //custom commands go here
+            this.StartMappingCommand = ReactiveCommand.Create(canExecuteStartMappingCommand);
+            this.StartMappingCommand.Subscribe(_ => this.ExecuteStartMappingCommand());
+
+            this.ClearSettingsCommand = ReactiveCommand.Create();
+            this.ClearSettingsCommand.Subscribe(_ => this.ExecuteClearSettingsCommand());
         }
 
         /// <summary>
@@ -264,6 +290,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// </summary>
         private void PopulatePossibleElementDefinitionCategory()
         {
+            logger.Debug("Populate PossibleElementDefinitionCategory");
+
             this.PossibleElementDefinitionCategory.Clear();
             var model = (EngineeringModel)this.Thing.Container;
             var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
@@ -272,6 +300,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
             allowedCategories.AddRange(mrdl.GetRequiredRdls().SelectMany(rdl => rdl.DefinedCategory).Where(c => c.PermissibleClass.Contains(ClassKind.ElementDefinition)));
 
             this.PossibleElementDefinitionCategory.AddRange(allowedCategories.OrderBy(c => c.ShortName));
+
+            logger.Debug($"Populated list with {this.PossibleElementDefinitionCategory.Count} PossibleElementDefinitionCategory");
         }
 
         /// <summary>
@@ -279,9 +309,13 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// </summary>
         private void PopulatePossibleActualFiniteStateList()
         {
+            logger.Debug("Populate PossibleActualFiniteStateList");
+
             this.PossibleActualFiniteStateList.Clear();
-            
+
             this.PossibleActualFiniteStateList.AddRange(this.Thing.ActualFiniteStateList.OrderBy(x => x.ShortName));
+
+            logger.Debug($"Populated list with {this.PossibleActualFiniteStateList.Count} PossibleActualFiniteStateList");
         }
 
         /// <summary>
@@ -292,6 +326,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// </remarks>
         private void PopulatePossibleSourceParameterTypeCategory()
         {
+            logger.Debug("Populate PossibleSourceParameterTypeCategory");
+
             this.PossibleSourceParameterTypeCategory.Clear();
             var model = (EngineeringModel)this.Thing.Container;
             var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
@@ -310,6 +346,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
                     this.PossibleSourceParameterTypeCategory.Add(category);
                 }
             }
+
+            logger.Debug($"Populated list with {this.PossibleSourceParameterTypeCategory.Count} PossibleSourceParameterTypeCategory");
         }
 
         /// <summary>
@@ -317,6 +355,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// </summary>
         private void PopulatePossibleTargetMappingParameterType()
         {
+            logger.Debug("Populate PossibleTargetMappingParameterType");
+
             this.PossibleTargetMappingParameterType.Clear();
             var model = (EngineeringModel)this.Thing.Container;
             var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
@@ -325,6 +365,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
             allowedParameterTypes.AddRange(mrdl.GetRequiredRdls().SelectMany(rdl => rdl.ParameterType).OfType<TextParameterType>());
 
             this.PossibleTargetMappingParameterType.AddRange(allowedParameterTypes.OrderBy(c => c.ShortName));
+
+            logger.Debug($"Populated list with {this.PossibleTargetMappingParameterType.Count} PossibleTargetMappingParameterType");
         }
 
         /// <summary>
@@ -332,6 +374,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// </summary>
         private void PopulatePossibleTargetValueParameterType()
         {
+            logger.Debug("Populate PossibleTargetValueParameterType");
+
             this.PossibleTargetValueParameterType.Clear();
             var model = (EngineeringModel)this.Thing.Container;
             var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
@@ -339,7 +383,37 @@ namespace CDP4ReferenceDataMapper.ViewModels
             var allowedParameterTypes = new List<ScalarParameterType>(mrdl.ParameterType.OfType<ScalarParameterType>());
             allowedParameterTypes.AddRange(mrdl.GetRequiredRdls().SelectMany(rdl => rdl.ParameterType).OfType<ScalarParameterType>());
 
-            this.PossibleTargetValueParameterType.AddRange(allowedParameterTypes.OrderBy(c => c.ShortName));
+            this.PossibleTargetValueParameterType.AddRange(allowedParameterTypes.OrderBy(c => c.Name));
+
+            logger.Debug($"Populated list with {this.PossibleTargetValueParameterType.Count} PossibleTargetValueParameterType");
+        }
+
+        /// <summary>
+        /// Executes the <see cref="ClearSettingsCommand"/>
+        /// </summary>
+        private void ExecuteClearSettingsCommand()
+        {
+            logger.Debug("Clear settings - select items");
+
+            this.SelectedElementDefinitionCategory = null;
+            this.SelectedActualFiniteStateList = null;
+            this.SelectedSourceParameterTypeCategory = null;
+            this.SelectedTargetMappingParameterType = null;
+            this.SelectedTargetValueParameterType = null;
+
+            logger.Debug("Clear settings - rows");
+
+            // TODO: clear row-view-models
+        }
+
+        /// <summary>
+        /// Executes the <see cref="ExecuteStartMappingCommand"/>
+        /// </summary>
+        private void ExecuteStartMappingCommand()
+        {
+            logger.Debug("start mapping");
+
+            // TODO: Create row-view-models
         }
     }
 }
