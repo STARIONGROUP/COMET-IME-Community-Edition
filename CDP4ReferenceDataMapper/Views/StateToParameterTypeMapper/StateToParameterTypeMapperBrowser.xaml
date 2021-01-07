@@ -37,7 +37,15 @@
 
         <views:BrowserHeader Grid.Row="1" />
 
-        <dxlc:LayoutGroup Grid.Row="2" Header="Settings" Orientation="Vertical">
+        <dxlc:LayoutGroup  Grid.Row="2" Header="Settings" 
+                           View="GroupBox"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           IsCollapsible="True"
+                           IsCollapsed="True"
+                           Orientation="Vertical"
+                           ScrollBars="Auto"
+                           GroupBoxDisplayMode="Normal">
             <dxlc:LayoutItem Label="Element Definition Category: ">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -82,7 +90,7 @@
                     </Button>
                 </Grid>
             </dxlc:LayoutItem>
-            <dxlc:LayoutItem Margin="5" Label="Actual Finite State List: ">
+            <dxlc:LayoutItem Label="Actual Finite State List: ">
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -127,7 +135,7 @@
                     </Button>
                 </Grid>
             </dxlc:LayoutItem>
-            <dxlc:LayoutItem Margin="5" Label="Source Parameter Type Category: ">
+            <dxlc:LayoutItem Label="Source Parameter Type Category: ">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -171,7 +179,7 @@
                     </Button>
                 </Grid>
             </dxlc:LayoutItem>
-            <dxlc:LayoutItem Margin="5" Label="Target Mapping Parameter Type: ">
+            <dxlc:LayoutItem Label="Target Mapping Parameter Type: ">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -215,51 +223,73 @@
                     </Button>
                 </Grid>
             </dxlc:LayoutItem>
-            <dxlc:LayoutItem Margin="5" Label="Target Value Parameter Type: ">
+            <dxlc:LayoutItem Label="Target Value Parameter Type: ">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="35" />
-                    </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="35" />
+                </Grid.ColumnDefinitions>
 
-                    <dxe:ComboBoxEdit Name="TargetValueParameterTypeComboBoxEdit"
-                                  DisplayMember="Name"
-                                  EditValue="{Binding Path=SelectedTargetValueParameterType,
-                                                Mode=TwoWay,
-                                                UpdateSourceTrigger=PropertyChanged}"
-                                  IsTextEditable="False"
-                                  ItemsSource="{Binding Path=PossibleTargetValueParameterType}"
-                                  ShowCustomItems="True"
-                                  ToolTip="Select the Parameter Type that where the mapped values are to be stored" >
-                        <dxe:ComboBoxEdit.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource NamedShortNamedThingToStringConverter}}" />
-                            </DataTemplate>
-                        </dxe:ComboBoxEdit.ItemTemplate>
-                    </dxe:ComboBoxEdit>
+                <dxe:ComboBoxEdit Name="TargetValueParameterTypeComboBoxEdit"
+                              DisplayMember="Name"
+                              EditValue="{Binding Path=SelectedTargetValueParameterType,
+                                            Mode=TwoWay,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                              IsTextEditable="False"
+                              ItemsSource="{Binding Path=PossibleTargetValueParameterType}"
+                              ShowCustomItems="True"
+                              ToolTip="Select the Parameter Type that where the mapped values are to be stored" >
+                    <dxe:ComboBoxEdit.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource NamedShortNamedThingToStringConverter}}" />
+                        </DataTemplate>
+                    </dxe:ComboBoxEdit.ItemTemplate>
+                </dxe:ComboBoxEdit>
 
-                    <Button Grid.Column="1"
-                            Width="25"
-                            Height="25"
-                            Margin="3"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Top"
-                            Command="{Binding InspectSelectedTargetValueParameterTypeCommand}"
-                            ToolTip="Inspect the selected Parameter Type">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Padding" Value="1"/>
-                                <Setter Property="Content">
-                                    <Setter.Value>
-                                        <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </Grid>
-            </dxlc:LayoutItem>
+                <Button Grid.Column="1"
+                        Width="25"
+                        Height="25"
+                        Margin="3"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Command="{Binding InspectSelectedTargetValueParameterTypeCommand}"
+                        ToolTip="Inspect the selected Parameter Type">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Padding" Value="1"/>
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+        </dxlc:LayoutItem>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Width="75"
+                        Height="25"
+                        Margin="3"
+                        Name="OkButton"
+                        IsDefault="True"
+                        Command="{Binding Path=StartMappingCommand}"
+                        Content="Map" 
+                        HorizontalAlignment="Left"/>
+                <Button Width="75"
+                        Height="25"
+                        Name="CancelButton"
+                        Margin="3"
+                        IsCancel="true"
+                        Command="{Binding Path=ClearSettingsCommand}"
+                        Content="Clear" 
+                        HorizontalAlignment="Right"/>
+            </StackPanel>
+            
         </dxlc:LayoutGroup>
+
+        <DataGrid Grid.Row="3"></DataGrid>
 
         <views:SelectedThingGroupControl Grid.Row="4"/>
     </Grid>
