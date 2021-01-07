@@ -5,11 +5,6 @@ environment:
   PROJECT_MAIN:   'CDP4-CE'
   TEST_RESULT:    'TestResult.xml'
   TEST_COVERAGE:  'CoverResults.xml'
-  SONARCLOUD_PROJECT_KEY: RHEAGROUP_CDP4-IME-Community-Edition
-  SONARCLOUD_ORGANIZATION: rheagroup
-  SONARCLOUD_URL: 'https://sonarcloud.io'
-  SONARCLOUD_TOKEN:
-    secure: 67KNIhsvMPwHylkTvfGtu39hYkK94X8svR0pxSBeqbm92ffGeViAv7SVDHnC+kbv
 
 skip_branch_with_pr: true
 for:
@@ -76,7 +71,3 @@ after_test:
         if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master") {
           SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
         }
-notifications:
-  - provider: Email
-    to:
-      - cdp_devs@rheagroup.com
