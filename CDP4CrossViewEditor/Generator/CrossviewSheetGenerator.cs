@@ -176,7 +176,7 @@ namespace CDP4CrossViewEditor.Generator
                 CrossviewSheetUtilities.ApplyLocking(this.crossviewSheet, false);
 
                 this.PopulateSheetArrays(elementDefinitions, parameterTypes);
-                this.WriteParameterSheet();
+                this.WriteSheet();
                 this.ApplySheetSettings();
 
                 CrossviewSheetUtilities.ApplyLocking(this.crossviewSheet, true);
@@ -242,7 +242,7 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Write the data to the Parameter sheet
         /// </summary>
-        private void WriteParameterSheet()
+        private void WriteSheet()
         {
             this.WriteHeader();
             this.WriteRows();
@@ -260,10 +260,10 @@ namespace CDP4CrossViewEditor.Generator
             range.HorizontalAlignment = XlHAlign.xlHAlignLeft;
             range.NumberFormat = this.headerFormat;
             range.Locked = this.headerLock;
-
             range.Name = "Header";
             range.Value = this.headerContent;
             range.Interior.ColorIndex = 8;
+            range.EntireColumn.AutoFit();
         }
 
         /// <summary>
@@ -279,10 +279,10 @@ namespace CDP4CrossViewEditor.Generator
 
             var parameterRange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow, 1], this.crossviewSheet.Cells[endrow, numberOfColumns]);
             parameterRange.Name = "Crossview";
-
             parameterRange.NumberFormat = this.parameterFormat;
             parameterRange.Value = this.parameterContent;
             parameterRange.Locked = this.parameterLock;
+            parameterRange.EntireColumn.AutoFit();
 
             var formattedrange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow - 1, 1], this.crossviewSheet.Cells[startrow, numberOfColumns]);
             formattedrange.Interior.ColorIndex = 34;
@@ -290,6 +290,7 @@ namespace CDP4CrossViewEditor.Generator
             formattedrange.Font.Bold = true;
             formattedrange.Font.Underline = true;
             formattedrange.Font.Size = 11;
+            formattedrange.EntireColumn.AutoFit();
 
             this.ApplyCellNames(startrow, endrow);
 

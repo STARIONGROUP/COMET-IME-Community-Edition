@@ -41,7 +41,12 @@ namespace CDP4CrossViewEditor.Assemblers
     public sealed class CrossviewArrayAssembler
     {
         /// <summary>
-        /// Total numer of columns
+        /// Initial fixed columns
+        /// </summary>
+        private const int FixedColumns = 5;
+
+        /// <summary>
+        /// Total number of columns
         /// </summary>
         private readonly int numberOfColumns;
 
@@ -59,7 +64,7 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             this.excelRows = excelRows;
             var parameterTypesList = parameterTypes.ToList();
-            this.numberOfColumns = parameterTypesList.Count + 4;
+            this.numberOfColumns = parameterTypesList.Count + FixedColumns;
 
             this.InitializeArray();
             this.PopulateContentArray(parameterTypesList);
@@ -108,14 +113,15 @@ namespace CDP4CrossViewEditor.Assemblers
 
             contentArray[0] = "Name";
             contentArray[1] = "Short Name";
-            contentArray[2] = "Owner";
-            contentArray[3] = "Category";
+            contentArray[2] = "Type";
+            contentArray[3] = "Owner";
+            contentArray[4] = "Category";
 
             var index = 0;
 
             foreach (var parameterType in parameterTypesList)
             {
-                contentArray[4 + index] = parameterType.ShortName;
+                contentArray[FixedColumns + index] = parameterType.ShortName;
                 index++;
             }
 
@@ -126,14 +132,21 @@ namespace CDP4CrossViewEditor.Assemblers
                 contentArray = new object[this.numberOfColumns];
                 contentArray[0] = excelRow.Name;
                 contentArray[1] = excelRow.ShortName;
-                contentArray[2] = excelRow.Owner;
-                contentArray[3] = excelRow.Categories;
+                contentArray[2] = excelRow.Type;
+                contentArray[3] = excelRow.Owner;
+                contentArray[4] = excelRow.Categories;
 
-                var parameterList = (excelRow.Thing as ElementDefinition)?.Parameter;
+                var parameterList = new List<ParameterBase>();
 
-                if (parameterList == null)
+                switch (excelRow.Thing)
                 {
-                    continue;
+                    case ElementDefinition elementDefinition:
+                        parameterList = elementDefinition.Parameter.ToList<ParameterBase>();
+                        break;
+
+                    case ElementUsage elementUsage:
+                        parameterList = elementUsage.ParameterOverride.ToList<ParameterBase>();
+                        break;
                 }
 
                 index = 0;
@@ -147,8 +160,8 @@ namespace CDP4CrossViewEditor.Assemblers
                             continue;
                         }
 
-                        var valueSet = parameter.ValueSet.FirstOrDefault();
-                        contentArray[4 + index] = valueSet?.Published.FirstOrDefault();
+                        var valueSet = parameter.ValueSets.FirstOrDefault();
+                        contentArray[FixedColumns + index] = valueSet?.ActualValue.FirstOrDefault();
                         index++;
                     }
                 }

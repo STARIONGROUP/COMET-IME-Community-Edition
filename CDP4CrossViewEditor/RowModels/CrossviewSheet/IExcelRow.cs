@@ -28,7 +28,6 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
     using System.Collections.Generic;
 
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
@@ -61,7 +60,7 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         int Level { get; }
 
         /// <summary>
-        /// Gets the human readable Name of the <see cref="Parameter"/>, <see cref="ParameterOverride"/> or <see cref="ParameterSubscription"/> that is represented by the Row
+        /// Gets the human readable Name
         /// </summary>
         string Name { get; }
 
@@ -95,14 +94,6 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         /// Gets or sets the <see cref="Container"/> property.
         /// </summary>
         IExcelRow<Thing> Container { get; set; }
-
-        /// <summary>
-        /// Queries the current row for the contained rows
-        /// </summary>
-        /// <returns>
-        /// the rows that are contained by the current row
-        /// </returns>
-        IEnumerable<IExcelRow<Thing>> GetContainedRows();
 
         /// <summary>
         /// Queries the current row for all the rows in the subtree

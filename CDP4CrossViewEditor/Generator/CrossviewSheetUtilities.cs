@@ -48,26 +48,25 @@ namespace CDP4CrossViewEditor.Generator
         /// </returns>
         public static Worksheet RetrieveSheet(Workbook workbook, bool replace = false)
         {
-            var parameterWorksheet = workbook.RetrieveWorksheet("Crossview", replace);
-            return parameterWorksheet;
+            return workbook.RetrieveWorksheet("Crossview", replace);
         }
 
         /// <summary>
         /// lock or unlock the parameter sheet
         /// </summary>
-        /// <param name="parameterSheet">
+        /// <param name="crossviewSheet">
         /// The <see cref="Worksheet"/> that is to be locked or unlocked.
         /// </param>
         /// <param name="locking">
         /// a value indicating whether locking or unlocking should be applied.
         /// </param>
-        public static void ApplyLocking(Worksheet parameterSheet, bool locking)
+        public static void ApplyLocking(Worksheet crossviewSheet, bool locking)
         {
             if (locking)
             {
-                parameterSheet.EnableOutlining = true;
+                crossviewSheet.EnableOutlining = true;
 
-                parameterSheet.Protect(
+                crossviewSheet.Protect(
                     password: null,
                     drawingObjects: null,
                     contents: true,
@@ -87,7 +86,7 @@ namespace CDP4CrossViewEditor.Generator
             }
             else
             {
-                parameterSheet.Unprotect();
+                crossviewSheet.Unprotect();
             }
         }
     }

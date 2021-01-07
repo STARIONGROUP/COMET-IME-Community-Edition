@@ -40,9 +40,9 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
     public abstract class ExcelRow<T> : IExcelRow<T> where T : Thing
     {
         /// <summary>
-        /// Backing field for the <see cref="containedRows"/> property.
+        /// Gets or set containing rows
         /// </summary>
-        private readonly List<IExcelRow<Thing>> containedRows = new List<IExcelRow<Thing>>();
+        protected List<IExcelRow<Thing>> ContainedRows { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExcelRow{T}"/> class.
@@ -53,6 +53,7 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         protected ExcelRow(T thing)
         {
             this.Thing = thing;
+            this.ContainedRows = new List<IExcelRow<Thing>>();
         }
 
         /// <summary>
@@ -94,17 +95,6 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         public IExcelRow<Thing> Container { get; set; }
 
         /// <summary>
-        /// Queries the current row for the contained rows
-        /// </summary>
-        /// <returns>
-        /// the rows that are contained by the current row
-        /// </returns>
-        public IEnumerable<IExcelRow<Thing>> GetContainedRows()
-        {
-            return this.containedRows;
-        }
-
-        /// <summary>
         /// Queries the current row for all the rows in the subtree
         /// </summary>
         /// <returns>
@@ -113,16 +103,10 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         public IEnumerable<IExcelRow<Thing>> GetContainedRowsDeep()
         {
             var resultList = new List<IExcelRow<Thing>> { this };
-            var elementUsageRows = this.containedRows.OfType<ElementUsageExcelRow>().ToList();
+
+            var elementUsageRows = this.ContainedRows.OfType<ElementDefinitionExcelRow>().ToList();
 
             foreach (var containedRow in elementUsageRows.OrderBy(x => x.Name))
-            {
-                resultList.AddRange(containedRow.GetContainedRowsDeep());
-            }
-
-            var leftOverRows = this.containedRows.Except(elementUsageRows);
-
-            foreach (var containedRow in leftOverRows)
             {
                 resultList.AddRange(containedRow.GetContainedRowsDeep());
             }

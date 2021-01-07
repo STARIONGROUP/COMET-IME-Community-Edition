@@ -71,12 +71,18 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <param name="elementDefinitions"></param>
         public void Assemble(IEnumerable<ElementDefinition> elementDefinitions)
         {
-            var definitionRows = elementDefinitions.Select(elementDefinition => new ElementDefinitionExcelRow(elementDefinition, this.owner, null)).ToList();
+            var definitionRows = elementDefinitions.Select(elementDefinition => new ElementDefinitionExcelRow(elementDefinition)).ToList();
 
             foreach (var elementDefinitionExcelRow in definitionRows)
             {
-                var deepRows = elementDefinitionExcelRow.GetContainedRowsDeep().ToList();
-                this.excelRows.AddRange(deepRows);
+                var elementUsages = elementDefinitionExcelRow.Thing.ContainedElement.OrderBy(elementUsage => elementUsage.Name);
+                this.excelRows.Add(elementDefinitionExcelRow);
+
+                foreach (var elementUsage in elementUsages)
+                {
+                    var elemenUsageExcelRow = new ElementUsageExcelRow(elementUsage);
+                    this.excelRows.Add(elemenUsageExcelRow);
+                }
             }
         }
     }

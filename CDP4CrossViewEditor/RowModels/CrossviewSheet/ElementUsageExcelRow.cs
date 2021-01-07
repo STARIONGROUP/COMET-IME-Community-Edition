@@ -25,19 +25,13 @@
 
 namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition.ViewModels;
-
     /// <summary>
-    /// The purpose of the <see cref="ElementUsageExcelRow"/> is to represent an <see cref="ElementUsage"/>
-    /// on the Parameter Sheet in Excel
+    /// The purpose of the <see cref="ElementUsageExcelRow"/> is to represent an <see cref="ElementUsage"/> in the sheet
     /// </summary>
     public class ElementUsageExcelRow : ExcelRow<ElementUsage>
     {
@@ -49,28 +43,12 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         /// </remarks>
         private const int LevelOffset = 1;
 
-        public string[] ParameterTypes { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ElementUsageExcelRow"/> class.
-        /// </summary>
-        /// <param name="elementUsage">
-        /// The <see cref="ElementUsage"/> that is represented by the current row
-        /// </param>
-        /// <param name="owner">
-        /// The <see cref="DomainOfExpertise"/> that is the owner of any Parameter, ParameterSubscriptions or ParameterOverrides
-        /// in the <see cref="ElementUsage"/> that is represented by the current row.
-        /// </param>
-        /// <param name="processedValueSets">
-        /// The <see cref="Thing"/>s for which the values need to be restored to what the user provided.
-        /// </param>
-        public ElementUsageExcelRow(ElementUsage elementUsage, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
+        /// <summary>Initializes a new instance of the <see cref="ElementUsageExcelRow"/> class</summary>
+        /// <param name="elementUsage">The <see cref="ElementUsage"/> that is represented by the current row</param>
+        public ElementUsageExcelRow(ElementUsage elementUsage)
             : base(elementUsage)
         {
             this.UpdateProperties();
-
-            var sortedOverrides = elementUsage.ParameterOverride.Where(po => po.Owner == owner).OrderBy(po => po.ParameterType.Name);
-            this.ProcessParameterOverrides(sortedOverrides, owner, processedValueSets);
         }
 
         /// <summary>
@@ -79,7 +57,8 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         private void UpdateProperties()
         {
             this.Id = this.Thing.Iid.ToString();
-            this.Name = $"{new string(' ', 3)}{this.Thing.ShortName} : {this.Thing.ElementDefinition.ShortName}";
+            this.Name = $"{new string(' ', 3)}{this.Thing.Name} : {this.Thing.ElementDefinition.Name}";
+            this.ShortName = $"{new string(' ', 3)}{this.Thing.ShortName} : {this.Thing.ElementDefinition.ShortName}";
             this.Type = "EU";
             this.Owner = this.Thing.Owner.ShortName;
             this.Level = LevelOffset;
@@ -88,24 +67,6 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
             var categories = this.Thing.ElementDefinition.GetAllCategories().ToList();
             categories.AddRange(this.Thing.GetAllCategories());
             this.Categories = categories.Distinct().Aggregate(string.Empty, (current, cat) => current + " " + cat.ShortName).Trim();
-        }
-
-        /// <summary>
-        /// Process the <see cref="ParameterOverride"/>s that are contained by the <see cref="ElementUsage"/> that is represented by the current excel row
-        /// </summary>
-        /// <param name="parameterOverrides">The <see cref="ParameterOverride"/>s contained by the <see cref="ElementUsage"/>.</param>
-        /// <param name="owner">
-        /// The <see cref="DomainOfExpertise"/> that is the owner of any ParameterOverrides
-        /// in the <see cref="ElementUsage"/> that is represented by the current row.
-        /// </param>
-        /// <param name="processedValueSets">
-        /// The <see cref="Thing"/>s for which the values need to be restored to what the user provided.
-        /// </param>
-        private void ProcessParameterOverrides(IEnumerable<ParameterOverride> parameterOverrides, DomainOfExpertise owner, IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets)
-        {
-            foreach (var parameterOverride in parameterOverrides)
-            {
-            }
         }
     }
 }

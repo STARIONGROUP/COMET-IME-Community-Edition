@@ -28,15 +28,12 @@ namespace CDP4CrossViewEditor
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using System.Threading.Tasks;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Navigation;
-    using CDP4Composition.ViewModels;
 
     using CDP4CrossViewEditor.Generator;
 
@@ -59,17 +56,6 @@ namespace CDP4CrossViewEditor
         /// The NLog Logger
         /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// A selection of class kinds that are contained by the engineering model.
-        /// </summary>
-        private static readonly ClassKind[] EngineeringModelKinds =
-        {
-            ClassKind.EngineeringModel,
-            ClassKind.Iteration,
-            ClassKind.CommonFileStore,
-            ClassKind.ModelLogEntry
-        };
 
         /// <summary>
         /// The <see cref="Workbook"/> that is being managed by the current <see cref="WorkbookOperator"/>
@@ -115,7 +101,7 @@ namespace CDP4CrossViewEditor
         /// <summary>
         /// Gets the <see cref="IDialogNavigationService"/> used to navigate to dialogs
         /// </summary>
-        public IDialogNavigationService DialogNavigationService { get; private set; }
+        private IDialogNavigationService DialogNavigationService { get; set; }
 
         /// <summary>
         /// Rebuild the Parameter Sheet
@@ -147,6 +133,7 @@ namespace CDP4CrossViewEditor
                 this.WriteCrossviewSheet(session, iteration, participant, elementDefinitions, parameterTypes);
 
                 this.WriteSessionInfoToWorkbook(session, iteration, participant);
+
                 this.WriteWorkbookDataToWorkbook(iteration);
 
                 this.ActivateCrossviewEditorSheet();
@@ -182,23 +169,6 @@ namespace CDP4CrossViewEditor
 
             this.application.StatusBar = $"CDP4: data refreshed in {sw.ElapsedMilliseconds} [ms]";
             this.application.Cursor = XlMousePointer.xlDefault;
-        }
-
-        /// <summary>
-        /// Set the <see cref="Iteration"/> container id for all applicable <see cref="Thing"/>
-        /// </summary>
-        /// <param name="dtos">
-        /// The <see cref="Thing"/> to set
-        /// </param>
-        private static void SetIterationContainer(ref List<CDP4Common.DTO.Thing> dtos)
-        {
-            var iteration = dtos.OfType<CDP4Common.DTO.Iteration>().Single();
-
-            foreach (var thing in dtos.Where(x => !EngineeringModelKinds.Contains(x.ClassKind)))
-            {
-                // all the returned thing are iteration contained
-                thing.IterationContainerId = iteration.Iid;
-            }
         }
 
         /// <summary>
