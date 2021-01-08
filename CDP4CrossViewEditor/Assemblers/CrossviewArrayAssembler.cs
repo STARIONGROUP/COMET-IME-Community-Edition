@@ -32,6 +32,7 @@ namespace CDP4CrossViewEditor.Assemblers
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
     /// <summary>
@@ -40,11 +41,6 @@ namespace CDP4CrossViewEditor.Assemblers
     /// </summary>
     public sealed class CrossviewArrayAssembler
     {
-        /// <summary>
-        /// Initial fixed columns
-        /// </summary>
-        private const int FixedColumns = 5;
-
         /// <summary>
         /// Total number of columns
         /// </summary>
@@ -64,7 +60,7 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             this.excelRows = excelRows;
             var parameterTypesList = parameterTypes.ToList();
-            this.numberOfColumns = parameterTypesList.Count + FixedColumns;
+            this.numberOfColumns = parameterTypesList.Count + CrossviewSheetConstants.FixedColumns;
 
             this.InitializeArray();
             this.PopulateContentArray(parameterTypesList);
@@ -121,7 +117,7 @@ namespace CDP4CrossViewEditor.Assemblers
 
             foreach (var parameterType in parameterTypesList)
             {
-                contentArray[FixedColumns + index] = parameterType.ShortName;
+                contentArray[CrossviewSheetConstants.FixedColumns + index] = parameterType.ShortName;
                 index++;
             }
 
@@ -161,7 +157,7 @@ namespace CDP4CrossViewEditor.Assemblers
                         }
 
                         var valueSet = parameter.ValueSets.FirstOrDefault();
-                        contentArray[FixedColumns + index] = valueSet?.ActualValue.FirstOrDefault();
+                        contentArray[CrossviewSheetConstants.FixedColumns + index] = valueSet?.ActualValue.FirstOrDefault();
                         index++;
                     }
                 }

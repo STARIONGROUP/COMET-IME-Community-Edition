@@ -258,7 +258,7 @@ namespace CDP4CrossViewEditor.Generator
             range.HorizontalAlignment = XlHAlign.xlHAlignLeft;
             range.NumberFormat = this.headerFormat;
             range.Locked = this.headerLock;
-            range.Name = "Header";
+            range.Name = CrossviewSheetConstants.HeaderName;
             range.Value = this.headerContent;
             range.Interior.ColorIndex = 8;
             range.EntireColumn.AutoFit();
@@ -276,7 +276,7 @@ namespace CDP4CrossViewEditor.Generator
             var endrow = startrow + numberOfRows - 1;
 
             var parameterRange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow, 1], this.crossviewSheet.Cells[endrow, numberOfColumns]);
-            parameterRange.Name = "Crossview";
+            parameterRange.Name = CrossviewSheetConstants.RangeName;
             parameterRange.NumberFormat = this.parameterFormat;
             parameterRange.Value = this.parameterContent;
             parameterRange.Locked = this.parameterLock;

@@ -95,26 +95,6 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         public IExcelRow<Thing> Container { get; set; }
 
         /// <summary>
-        /// Queries the current row for all the rows in the subtree
-        /// </summary>
-        /// <returns>
-        /// the rows that are contained by the current row and its subtree
-        /// </returns>
-        public IEnumerable<IExcelRow<Thing>> GetContainedRowsDeep()
-        {
-            var resultList = new List<IExcelRow<Thing>> { this };
-
-            var elementUsageRows = this.ContainedRows.OfType<ElementDefinitionExcelRow>().ToList();
-
-            foreach (var containedRow in elementUsageRows.OrderBy(x => x.Name))
-            {
-                resultList.AddRange(containedRow.GetContainedRowsDeep());
-            }
-
-            return resultList;
-        }
-
-        /// <summary>
         /// Gets or sets the short-name of the owning <see cref="DomainOfExpertise"/>
         /// </summary>
         public string Owner { get; protected set; }

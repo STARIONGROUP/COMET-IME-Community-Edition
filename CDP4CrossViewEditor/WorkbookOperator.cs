@@ -236,7 +236,7 @@ namespace CDP4CrossViewEditor
         {
             try
             {
-                var worksheet = (Worksheet)this.workbook.Worksheets["Crossview"];
+                var worksheet = (Worksheet)this.workbook.Worksheets[CrossviewSheetConstants.CrossviewSheetName];
                 worksheet.Activate();
                 worksheet.Cells[1, 1].Select();
             }

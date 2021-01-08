@@ -32,7 +32,9 @@ namespace CDP4CrossViewEditor
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
+
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -42,10 +44,11 @@ namespace CDP4CrossViewEditor
 
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4OfficeInfrastructure;
-    using CDP4OfficeInfrastructure.OfficeDal;
-    using NetOffice.ExcelApi;
+
     using NLog;
+
     using ReactiveUI;
 
     /// <summary>
@@ -180,11 +183,9 @@ namespace CDP4CrossViewEditor
                     break;
 
                 case EventKind.Removed:
-                    {
-                        var iteration = iterationEvent.ChangedThing as Iteration;
-                        this.Iterations.RemoveAll(x => x == iteration);
-                        break;
-                    }
+                    var iteration = iterationEvent.ChangedThing as Iteration;
+                    this.Iterations.RemoveAll(x => x == iteration);
+                    break;
             }
         }
 
@@ -273,40 +274,6 @@ namespace CDP4CrossViewEditor
                     logger.Error(ex);
                 }
             }
-
-        }
-
-        /// <summary>
-        /// Gets the workbook that corresponds to the specified <see cref="Iteration"/>
-        /// </summary>
-        /// <param name="application">
-        /// The Excel application
-        /// </param>
-        /// <param name="iteration">
-        /// The <see cref="Iteration"/> for which the workbook is queried
-        /// </param>
-        /// <returns>
-        /// The <see cref="Workbook"/> that corresponds to the queried Iteration, null if the workbook cannot be found.
-        /// </returns>
-        private Workbook QueryIterationWorkbook(Application application, Iteration iteration)
-        {
-            foreach (var workbook in application.Workbooks)
-            {
-                var workbookSessionDal = new WorkbookSessionDal(workbook);
-                var workbookSession = workbookSessionDal.Read();
-
-                if (workbookSession == null)
-                {
-                    continue;
-                }
-
-                if (workbookSession.IterationSetup.IterationIid == iteration.Iid)
-                {
-                    return workbook;
-                }
-            }
-
-            return null;
         }
 
         /// <summary>

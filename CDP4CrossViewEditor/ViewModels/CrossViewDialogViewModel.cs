@@ -100,7 +100,6 @@ namespace CDP4CrossViewEditor.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.selectedWorkbook, value);
         }
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CrossViewDialogViewModel"/> class.
         /// </summary>

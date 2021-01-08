@@ -28,6 +28,8 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4CrossViewEditor.Generator;
+
     /// <summary>
     /// The purpose of the <see cref="ElementDefinitionExcelRow"/> is to represent an <see cref="ElementDefinition"/>
     /// on the Parameter Sheet in Excel
@@ -60,7 +62,7 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
             this.Id = this.Thing.Iid.ToString();
             this.Name = this.Thing.Name;
             this.ShortName = this.Thing.ShortName;
-            this.Type = "ED";
+            this.Type = CrossviewSheetConstants.ED;
             this.Owner = this.Thing.Owner.ShortName;
             this.Level = LevelOffset;
             this.ModelCode = this.Thing.ModelCode();

@@ -48,7 +48,7 @@ namespace CDP4CrossViewEditor.Generator
         /// </returns>
         public static Worksheet RetrieveSheet(Workbook workbook, bool replace = false)
         {
-            return workbook.RetrieveWorksheet("Crossview", replace);
+            return workbook.RetrieveWorksheet(CrossviewSheetConstants.CrossviewSheetName, replace);
         }
 
         /// <summary>

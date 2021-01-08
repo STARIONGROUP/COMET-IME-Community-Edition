@@ -30,6 +30,8 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4CrossViewEditor.Generator;
+
     /// <summary>
     /// The purpose of the <see cref="ElementUsageExcelRow"/> is to represent an <see cref="ElementUsage"/> in the sheet
     /// </summary>
@@ -59,7 +61,7 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
             this.Id = this.Thing.Iid.ToString();
             this.Name = $"{new string(' ', 3)}{this.Thing.Name} : {this.Thing.ElementDefinition.Name}";
             this.ShortName = $"{new string(' ', 3)}{this.Thing.ShortName} : {this.Thing.ElementDefinition.ShortName}";
-            this.Type = "EU";
+            this.Type = CrossviewSheetConstants.EU;
             this.Owner = this.Thing.Owner.ShortName;
             this.Level = LevelOffset;
             this.ModelCode = this.Thing.ModelCode();
