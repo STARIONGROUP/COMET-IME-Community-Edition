@@ -27,6 +27,7 @@ namespace CDP4CrossViewEditor
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Reflection;
@@ -222,6 +223,7 @@ namespace CDP4CrossViewEditor
         /// <param name="iterationId">
         /// The unique id of the <see cref="Iteration"/>
         /// </param>
+        [ExcludeFromCodeCoverage]
         private async Task LaunchCrossViewEditorAsync(string iterationId)
         {
             if (iterationId == string.Empty)
@@ -266,7 +268,7 @@ namespace CDP4CrossViewEditor
 
                 try
                 {
-                    var workbookOperator = new WorkbookOperator(application, workbook, this.DialogNavigationService);
+                    var workbookOperator = new WorkbookOperator(application, workbook);
                     await workbookOperator.Rebuild(this.Session, iteration, activeParticipant, dialogResult.WorkbookElements, dialogResult.WorkbookParameterType);
                 }
                 catch (Exception ex)

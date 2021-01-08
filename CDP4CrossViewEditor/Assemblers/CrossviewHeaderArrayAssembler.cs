@@ -30,6 +30,8 @@ namespace CDP4CrossViewEditor.Assemblers
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4CrossViewEditor.Generator;
+
     using CDP4Dal;
 
     using CDP4OfficeInfrastructure.Assemblers;
@@ -86,7 +88,7 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             base.PopulateHeaderFormatArray();
 
-            this.FormatArray[5, 2] = "yyyy-mm-dd hh:mm:ss";
+            this.FormatArray[5, 2] = CrossviewSheetConstants.HeaderDateFormat;
         }
 
         /// <summary>
@@ -94,12 +96,10 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </summary>
         public override void PopulateHeaderArray()
         {
-            this.HeaderArray[0, 0] = "Engineering Model:";
-            this.HeaderArray[1, 0] = "Iteration number:";
-            this.HeaderArray[2, 0] = "Study Phase:";
-            this.HeaderArray[3, 0] = "Domain:";
-            this.HeaderArray[4, 0] = "User:";
-            this.HeaderArray[5, 0] = "Rebuild Date:";
+            for (var i = 0; i < CrossviewSheetConstants.HeaderColumnNames.Length; i++)
+            {
+                this.HeaderArray[i, 0] = CrossviewSheetConstants.HeaderColumnNames[i];
+            }
 
             this.HeaderArray[0, 1] = this.EngineeringModel.EngineeringModelSetup.Name;
             this.HeaderArray[1, 1] = this.Iteration.IterationSetup.IterationNumber;

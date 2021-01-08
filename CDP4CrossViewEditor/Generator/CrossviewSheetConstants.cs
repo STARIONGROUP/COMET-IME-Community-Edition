@@ -71,5 +71,15 @@ namespace CDP4CrossViewEditor.Generator
         /// The name of the <see cref="ElementUsage"/> row type
         /// </summary>
         internal const string EU = "EU";
+
+        /// <summary>
+        /// Header date format
+        /// </summary>
+        internal const string HeaderDateFormat = "yyyy-mm-dd hh:mm:ss";
+
+        /// <summary>
+        /// Header column names info
+        /// </summary>
+        internal static readonly string[] HeaderColumnNames = { "Engineering Model", "Iteration number", "Study Phase", "Domain", "User", "Rebuild Date" };
     }
 }

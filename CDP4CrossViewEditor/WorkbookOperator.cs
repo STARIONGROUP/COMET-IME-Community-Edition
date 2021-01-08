@@ -34,8 +34,6 @@ namespace CDP4CrossViewEditor
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition.Navigation;
-
     using CDP4CrossViewEditor.Generator;
 
     using CDP4Dal;
@@ -78,32 +76,25 @@ namespace CDP4CrossViewEditor
         /// <param name="workbook">
         /// The <see cref="Workbook"/> that is being operated on.
         /// </param>
-        /// <param name="dialogNavigationService">
-        /// The instance of <see cref="IDialogNavigationService"/> that orchestrates navigation to dialogs
-        /// </param>
-        public WorkbookOperator(Application application, Workbook workbook, IDialogNavigationService dialogNavigationService)
+        public WorkbookOperator(Application application, Workbook workbook)
         {
             if (application == null)
             {
-                throw new ArgumentNullException(nameof(application), "the Excel application may not be null");
+                Logger.Error("The Excel application may not be null");
+                return;
             }
 
             if (workbook == null)
             {
-                throw new ArgumentNullException(nameof(workbook), "the workbook may not be null");
+                Logger.Error("The workbook may not be null");
+                return;
             }
 
             workbook.Activate();
 
             this.workbook = workbook;
             this.application = application;
-            this.DialogNavigationService = dialogNavigationService;
         }
-
-        /// <summary>
-        /// Gets the <see cref="IDialogNavigationService"/> used to navigate to dialogs
-        /// </summary>
-        private IDialogNavigationService DialogNavigationService { get; set; }
 
         /// <summary>
         /// Rebuild the Parameter Sheet
