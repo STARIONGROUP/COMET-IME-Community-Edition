@@ -35,9 +35,14 @@ namespace CDP4SiteDirectory.ViewModels
         private FolderRowViewModel iterationSetupFolderRow;
 
         /// <summary>
-        /// The row containing all the <see cref="IterationSetup"/> in this <see cref="EngineeringModelSetup"/> row
+        /// The row containing all the <see cref="DomainOfExpertise"/> in this <see cref="EngineeringModelSetup"/> row
         /// </summary>
         private FolderRowViewModel activeDomainFolderRow;
+
+        /// <summary>
+        /// The row containing all the <see cref="Organization"/> in this <see cref="EngineeringModelSetup"/> row
+        /// </summary>
+        private FolderRowViewModel organizationFolderRow;
 
         /// <summary>
         /// Backing field for the <see cref="Description"/> property
@@ -48,7 +53,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// The underscore capitals to spaced TitleCase converter.
         /// </summary>
         private readonly UnderscoreCapitalsToSpacedTitleCaseConverter titleConverter = new UnderscoreCapitalsToSpacedTitleCaseConverter();
-        
+
         #endregion
 
         #region Constructors
@@ -71,9 +76,12 @@ namespace CDP4SiteDirectory.ViewModels
             this.iterationSetupFolderRow = new FolderRowViewModel("Iterations", "Iterations", this.Session, this);
             this.activeDomainFolderRow = new FolderRowViewModel("Active Domains", "Active Domains", this.Session, this);
 
+            this.organizationFolderRow = new FolderRowViewModel("Organizations", "Organizations", this.Session, this);
+
             this.ContainedRows.Add(this.participantFolderRow);
             this.ContainedRows.Add(this.iterationSetupFolderRow);
             this.ContainedRows.Add(this.activeDomainFolderRow);
+            this.ContainedRows.Add(this.organizationFolderRow);
 
             this.UpdateProperties();
         }
@@ -242,6 +250,33 @@ namespace CDP4SiteDirectory.ViewModels
         {
             var row = new DomainOfExpertiseRowViewModel(domain, this.Session, this);
             this.activeDomainFolderRow.ContainedRows.Add(row);
+        }
+
+        /// <summary>
+        /// Remove the <see cref="Organization"/>
+        /// </summary>
+        /// <param name="organization">
+        /// the <see cref="Organization"/> object to remove
+        /// </param>
+        private void RemoveOrganization(Organization organization)
+        {
+            var row = this.organizationFolderRow.ContainedRows.SingleOrDefault(r => r.Thing == organization);
+            if (row != null)
+            {
+                this.organizationFolderRow.ContainedRows.RemoveAndDispose(row);
+            }
+        }
+
+        /// <summary>
+        /// Add the <see cref="Organization"/>
+        /// </summary>
+        /// <param name="organization">
+        /// the <see cref="Organization"/> object to add
+        /// </param>
+        private void AddOrganization(Organization organization)
+        {
+            var row = new OrganizationRowViewModel(organization, this.Session, this);
+            this.organizationFolderRow.ContainedRows.Add(row);
         }
     }
 }

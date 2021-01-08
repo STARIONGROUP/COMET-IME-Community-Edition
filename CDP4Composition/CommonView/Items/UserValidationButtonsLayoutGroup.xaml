@@ -22,7 +22,7 @@
             Name="OkButton"
             IsDefault="True"
             Command="{Binding Path=OkCommand}"
-            Content="Ok" 
+            Content="OK"
             HorizontalAlignment="Left"
             Visibility="{Binding IsOkVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     <Button Width="75"
@@ -31,6 +31,6 @@
             Margin="3"
             IsCancel="true"
             Command="{Binding Path=CancelCommand}"
-            Content="Cancel" 
+            Content="Cancel"
             HorizontalAlignment="Right"/>
 </dxlc:LayoutGroup>

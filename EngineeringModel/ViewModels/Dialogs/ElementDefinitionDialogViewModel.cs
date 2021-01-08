@@ -37,6 +37,11 @@ namespace CDP4EngineeringModel.ViewModels
         private string modelCode;
 
         /// <summary>
+        /// Backing field for <see cref="SelectedOrganizations"/>
+        /// </summary>
+        private ReactiveList<Organization> selectedOrganizations;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionDialogViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -98,14 +103,32 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets the possible <see cref="Organization"/> that may be selected.
+        /// </summary>
+        public List<Organization> PossibleOrganizations { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="Organization"/>s.
+        /// </summary>
+        public ReactiveList<Organization> SelectedOrganizations
+        {
+            get { return this.selectedOrganizations; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedOrganizations, value); }
+        }
+
+        /// <summary>
         /// Initialize the dialog
         /// </summary>
         protected override void Initialize()
         {
             base.Initialize();
+
+            this.SelectedOrganizations = new ReactiveList<Organization>();
+            this.SelectedOrganizations.ChangeTrackingEnabled = true;
+
             this.PopulatePossibleCategories();
         }
-        
+
         /// <summary>
         /// Update the properties
         /// </summary>
@@ -119,7 +142,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.ModelCode = this.Thing.ModelCode();
-            
+
             if (this.SelectedOwner == null)
             {
                 this.SelectedOwner = this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Container);
@@ -137,7 +160,7 @@ namespace CDP4EngineeringModel.ViewModels
             var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
             this.PossibleOwner.AddRange(domains);
         }
-        
+
         /// <summary>
         /// Update the transaction with the Thing represented by this Dialog
         /// </summary>

@@ -13,17 +13,18 @@
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              xmlns:converters1="clr-namespace:CDP4EngineeringModel.Converters"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
-             Height="350"
-             Width="300"
+             Height="550"
+             Width="400"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
     <dx:DXWindow.Resources>
-        <converters:UnderscoreCapitalsToSpacedTitleCaseConverter x:Key="UnderscoreCapitalsToSpacedTitleCaseConverter" />       
-        <converters:NotConverter x:Key="NotConverter"/>
-        <converters1:ReactiveDomainToObjectListConverter x:Key="DomainToObjectListConverter"/>
+        <converters:UnderscoreCapitalsToSpacedTitleCaseConverter x:Key="UnderscoreCapitalsToSpacedTitleCaseConverter" />
+        <converters:NotConverter x:Key="NotConverter" />
+        <converters1:ReactiveDomainToObjectListConverter x:Key="DomainToObjectListConverter" />
+        <converters:ReactiveOrganizationToObjectListConverter x:Key="ReactiveOrganizationToObjectListConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </dx:DXWindow.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -33,100 +34,127 @@
                           Orientation="Vertical"
                           ScrollBars="None"
                           Grid.Row="0">
-        
-                <lc:LayoutGroup Margin="-10,-7,-10,-5"
+
+            <lc:LayoutGroup Margin="-10,-7,-10,-5"
                             Orientation="Vertical"
                             View="Tabs"
                             lc:LayoutControl.AllowHorizontalSizing="True">
-                    <lc:LayoutGroup Header="Basic" Orientation="Vertical">
-                        <items:ShortNameLayoutItem/>
-                        <items:NameLayoutItem/>
-                        <lc:LayoutItem Label="Source Model: ">
-                            <dxe:ComboBoxEdit Name="PossibleSourceEngineeringModelSetup"
-                                            DisplayMember="Name"
-                                            EditValue="{Binding Path=SourceEngineeringModelSetup,
+                <lc:LayoutGroup Header="Basic" Orientation="Vertical">
+                    <items:ShortNameLayoutItem />
+                    <items:NameLayoutItem />
+                    <lc:LayoutItem Label="Source Model: ">
+                        <dxe:ComboBoxEdit Name="PossibleSourceEngineeringModelSetup"
+                                          DisplayMember="Name"
+                                          EditValue="{Binding Path=SourceEngineeringModelSetup,
                                                                 Mode=TwoWay,
                                                                 UpdateSourceTrigger=PropertyChanged}"
-                                            IsTextEditable="False"
-                                            IsEnabled="{Binding IsNonEditableFieldReadOnly, Converter={StaticResource NotConverter}}"
-                                            ItemsSource="{Binding Path=PossibleSourceEngineeringModelSetup}"
-                                            NullValueButtonPlacement="EditBox"
-                                            ShowCustomItems="True"/>
-                        </lc:LayoutItem>
-                        <lc:LayoutItem Label="Model Kind:">
-                            <dxe:ComboBoxEdit Name="ModelKind"
-                                            ApplyItemTemplateToSelectedItem="True"
-                                            IsEnabled="{Binding IsReadOnly ,Converter={StaticResource NotConverter}}"
-                                            EditValue="{Binding Path=Kind,
+                                          IsTextEditable="False"
+                                          IsEnabled="{Binding IsNonEditableFieldReadOnly, Converter={StaticResource NotConverter}}"
+                                          ItemsSource="{Binding Path=PossibleSourceEngineeringModelSetup}"
+                                          NullValueButtonPlacement="EditBox"
+                                          ShowCustomItems="True" />
+                    </lc:LayoutItem>
+                    <lc:LayoutItem Label="Model Kind:">
+                        <dxe:ComboBoxEdit Name="ModelKind"
+                                          ApplyItemTemplateToSelectedItem="True"
+                                          IsEnabled="{Binding IsReadOnly ,Converter={StaticResource NotConverter}}"
+                                          EditValue="{Binding Path=Kind,
                                                                 UpdateSourceTrigger=PropertyChanged,
                                                                 Mode=TwoWay}"
-                                            IsTextEditable="False">
-                                <dxmvvm:Interaction.Behaviors>
-                                    <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type common:EngineeringModelKind}" />
-                                </dxmvvm:Interaction.Behaviors>
-                                <dxe:ComboBoxEdit.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Name, Converter={StaticResource UnderscoreCapitalsToSpacedTitleCaseConverter}}" />
-                                    </DataTemplate>
-                                </dxe:ComboBoxEdit.ItemTemplate>
-                            </dxe:ComboBoxEdit>
-                        </lc:LayoutItem>
-                        <lc:LayoutItem Label="Study Phase:">
-                            <dxe:ComboBoxEdit Name="StudyPhase"
-                                            ApplyItemTemplateToSelectedItem="True"
-                                            IsEnabled="{Binding IsReadOnly ,Converter={StaticResource NotConverter}}"
-                                            EditValue="{Binding Path=StudyPhase,
+                                          IsTextEditable="False">
+                            <dxmvvm:Interaction.Behaviors>
+                                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type common:EngineeringModelKind}" />
+                            </dxmvvm:Interaction.Behaviors>
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Text="{Binding Name, Converter={StaticResource UnderscoreCapitalsToSpacedTitleCaseConverter}}" />
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+                    <lc:LayoutItem Label="Study Phase:">
+                        <dxe:ComboBoxEdit Name="StudyPhase"
+                                          ApplyItemTemplateToSelectedItem="True"
+                                          IsEnabled="{Binding IsReadOnly ,Converter={StaticResource NotConverter}}"
+                                          EditValue="{Binding Path=StudyPhase,
                                                                 UpdateSourceTrigger=PropertyChanged,
                                                                 Mode=TwoWay}"
-                                            IsTextEditable="False">
-                                <dxmvvm:Interaction.Behaviors>
-                                    <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type common:StudyPhaseKind}" />
-                                </dxmvvm:Interaction.Behaviors>
-                                <dxe:ComboBoxEdit.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Name, Converter={StaticResource UnderscoreCapitalsToSpacedTitleCaseConverter}}" />
-                                    </DataTemplate>
-                                </dxe:ComboBoxEdit.ItemTemplate>
-                            </dxe:ComboBoxEdit>
-                        </lc:LayoutItem>
-                        <lc:LayoutItem Label="Site RDL:">
-                            <dxe:ComboBoxEdit Name="SiteReferenceDataLibrary"
-                                            DisplayMember="Name"
-                                            EditValue="{Binding Path=SelectedSiteReferenceDataLibrary}"
-                                            IsReadOnly="{Binding IsNonEditableFieldReadOnly}"
-                                            IsEnabled="{Binding IsOriginal,
+                                          IsTextEditable="False">
+                            <dxmvvm:Interaction.Behaviors>
+                                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type common:StudyPhaseKind}" />
+                            </dxmvvm:Interaction.Behaviors>
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Text="{Binding Name, Converter={StaticResource UnderscoreCapitalsToSpacedTitleCaseConverter}}" />
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+                    <lc:LayoutItem Label="Site RDL:">
+                        <dxe:ComboBoxEdit Name="SiteReferenceDataLibrary"
+                                          DisplayMember="Name"
+                                          EditValue="{Binding Path=SelectedSiteReferenceDataLibrary}"
+                                          IsReadOnly="{Binding IsNonEditableFieldReadOnly}"
+                                          IsEnabled="{Binding IsOriginal,
                                                                 UpdateSourceTrigger=PropertyChanged}"
-                                            IsTextEditable="False"
-                                            ItemsSource="{Binding Path=PossibleSiteReferenceDataLibraries}" />
-                        </lc:LayoutItem>
-                    </lc:LayoutGroup>
-
-                    <lc:LayoutGroup Header="Active Domain" Orientation="Vertical">
-                        <lc:LayoutItem>
-                            <dxe:ListBoxEdit VerticalAlignment="Stretch"
-                                            HorizontalAlignment="Stretch"
-                                            MaxHeight="250"
-                                            Margin="10"
-                                            IsReadOnly="{Binding IsActiveDomainSelectionReadOnly}"
-                                            DisplayMember="Name"
-                                            EditValue="{Binding ActiveDomain, Converter={StaticResource DomainToObjectListConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                            ItemsSource="{Binding PossibleActiveDomain}">
-                                <dxe:ListBoxEdit.StyleSettings>
-                                    <dxe:CheckedListBoxEditStyleSettings />
-                                </dxe:ListBoxEdit.StyleSettings>
-                            </dxe:ListBoxEdit>
-                        </lc:LayoutItem>
-                    </lc:LayoutGroup>
-
-                    <items:AdvancedLayoutGroup/>
+                                          IsTextEditable="False"
+                                          ItemsSource="{Binding Path=PossibleSiteReferenceDataLibraries}" />
+                    </lc:LayoutItem>
                 </lc:LayoutGroup>
-        
-            
+
+                <lc:LayoutGroup Header="Active Domain" Orientation="Vertical">
+                    <lc:LayoutItem>
+                        <dxe:ListBoxEdit VerticalAlignment="Stretch"
+                                         HorizontalAlignment="Stretch"
+                                         MaxHeight="250"
+                                         Margin="10"
+                                         IsReadOnly="{Binding IsActiveDomainSelectionReadOnly}"
+                                         DisplayMember="Name"
+                                         EditValue="{Binding ActiveDomain, Converter={StaticResource DomainToObjectListConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         ItemsSource="{Binding PossibleActiveDomain}">
+                            <dxe:ListBoxEdit.StyleSettings>
+                                <dxe:CheckedListBoxEditStyleSettings />
+                            </dxe:ListBoxEdit.StyleSettings>
+                        </dxe:ListBoxEdit>
+                    </lc:LayoutItem>
+                </lc:LayoutGroup>
+                <lc:LayoutGroup Header="Organizations" Orientation="Vertical">
+                    <lc:LayoutItem Label="Participating Organizations: " >
+                        <dxe:ComboBoxEdit Name="OrganizationParticipant"
+                                          DisplayMember="Name"
+                                          EditValue="{Binding Path=SelectedOrganizations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ReactiveOrganizationToObjectListConverter}}"
+                                          IsEnabled="{Binding IsReadOnly ,Converter={StaticResource NotConverter}}"
+                                          IsTextEditable="False"
+                                          ItemsSource="{Binding Path=PossibleOrganizations}">
+                            <dxe:ComboBoxEdit.StyleSettings>
+                                <dxe:CheckedTokenComboBoxStyleSettings />
+                            </dxe:ComboBoxEdit.StyleSettings>
+                        </dxe:ComboBoxEdit>
+                    </lc:LayoutItem>
+                    <lc:LayoutItem Label="Model Admin Organization: " >
+                        <dxe:ComboBoxEdit Name="DefaultOrganizationParticipant"
+                                          DisplayMember="Name"
+                                          AutoComplete="True"
+                                          NullValueButtonPlacement="EditBox"
+                                          IncrementalSearch="True"
+                                          ImmediatePopup="True"
+                                          EditValue="{Binding Path=SelectedDefaultOrganization, UpdateSourceTrigger=PropertyChanged}"
+                                          IsEnabled="{Binding IsReadOnly ,Converter={StaticResource NotConverter}}"
+                                          IsTextEditable="True"
+                                          ItemsSource="{Binding Path=SelectedOrganizations}" />
+                    </lc:LayoutItem>
+                </lc:LayoutGroup>
+                <items:AdvancedLayoutGroup />
+            </lc:LayoutGroup>
+
+
         </lc:LayoutControl>
-        <views:LoadingControl Grid.Row="0" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
+        <views:LoadingControl Grid.Row="0" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}" />
         <StackPanel Grid.Row="1" Orientation="Vertical">
-            <items:UserValidationButtonsLayoutGroup/>
-            <items:ErrorMessageLayoutGroup/>
+            <items:UserValidationButtonsLayoutGroup />
+            <items:ErrorMessageLayoutGroup />
         </StackPanel>
     </Grid>
 </dx:DXWindow>
