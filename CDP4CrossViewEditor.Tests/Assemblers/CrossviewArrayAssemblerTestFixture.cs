@@ -90,10 +90,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 }
             };
 
-
-
-
-
             var elementDefinition = new ElementDefinition
             {
                 Iid = Guid.NewGuid(),
@@ -103,6 +99,15 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 Owner = this.domain
             };
 
+            var elementUsage = new ElementUsage(Guid.NewGuid(), null, null)
+            {
+                Name = "ElementUsage_1",
+                ShortName = "EU_1",
+                Owner = this.domain
+            };
+
+            elementDefinition.ContainedElement.Add(elementUsage);
+            elementUsage.ElementDefinition = elementDefinition;
             this.elementDefinitions.Add(elementDefinition);
 
             var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)

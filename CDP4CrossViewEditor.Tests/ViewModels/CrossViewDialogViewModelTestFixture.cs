@@ -73,7 +73,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         public void SetUp()
         {
             this.assembler = new Assembler(this.credentials.Uri);
-            new Uri("http://www.rheageoup.com");
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Credentials).Returns(this.credentials);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);

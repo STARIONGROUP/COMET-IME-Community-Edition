@@ -101,15 +101,15 @@ namespace CDP4CrossViewEditor.Assemblers
             this.HeaderArray[4, 0] = "User:";
             this.HeaderArray[5, 0] = "Rebuild Date:";
 
-            this.HeaderArray[0, 2] = this.EngineeringModel.EngineeringModelSetup.Name;
-            this.HeaderArray[1, 2] = this.Iteration.IterationSetup.IterationNumber;
-            this.HeaderArray[2, 2] = this.EngineeringModel.EngineeringModelSetup.StudyPhase.ToString();
+            this.HeaderArray[0, 1] = this.EngineeringModel.EngineeringModelSetup.Name;
+            this.HeaderArray[1, 1] = this.Iteration.IterationSetup.IterationNumber;
+            this.HeaderArray[2, 1] = this.EngineeringModel.EngineeringModelSetup.StudyPhase.ToString();
 
             var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Iteration);
 
-            this.HeaderArray[3, 2] = selectedDomainOfExpertise == null ? "-" : selectedDomainOfExpertise.Name;
-            this.HeaderArray[4, 2] = $"{this.Participant.Person.GivenName} {this.Participant.Person.Surname}";
-            this.HeaderArray[5, 2] = DateTime.Now;
+            this.HeaderArray[3, 1] = selectedDomainOfExpertise == null ? "-" : selectedDomainOfExpertise.Name;
+            this.HeaderArray[4, 1] = $"{this.Participant.Person.GivenName} {this.Participant.Person.Surname}";
+            this.HeaderArray[5, 1] = DateTime.Now;
         }
     }
 }

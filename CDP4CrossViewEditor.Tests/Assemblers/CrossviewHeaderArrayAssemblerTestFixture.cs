@@ -110,18 +110,18 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         [Test]
         public void VerifyThatAssemblerPopulatesArrays()
         {
-            var headerArrayAssembler = new CrossviewHeaderArrayAssembler(this.session.Object, this.iteration, this.participant, 4);
+            var headerArrayAssembler = new CrossviewHeaderArrayAssembler(this.session.Object, this.iteration, this.participant, 5);
             var headerArray = headerArrayAssembler.HeaderArray;
 
-            Assert.AreEqual(this.engineeringModel.EngineeringModelSetup.Name, headerArray[0, 2]);
-            Assert.AreEqual(this.iteration.IterationSetup.IterationNumber, headerArray[1, 2]);
-            Assert.AreEqual(this.engineeringModel.EngineeringModelSetup.StudyPhase.ToString(), headerArray[2, 2]);
+            Assert.AreEqual(this.engineeringModel.EngineeringModelSetup.Name, headerArray[0, 1]);
+            Assert.AreEqual(this.iteration.IterationSetup.IterationNumber, headerArray[1, 1]);
+            Assert.AreEqual(this.engineeringModel.EngineeringModelSetup.StudyPhase.ToString(), headerArray[2, 1]);
 
             this.session.Object.OpenIterations.TryGetValue(this.iteration, out var tuple);
 
             Assert.IsNotNull(tuple);
-            Assert.AreEqual(tuple.Item1.Name, headerArray[3, 2]);
-            Assert.AreEqual($"{this.participant.Person.GivenName} {this.participant.Person.Surname}", headerArray[4, 2]);
+            Assert.AreEqual(tuple.Item1.Name, headerArray[3, 1]);
+            Assert.AreEqual($"{this.participant.Person.GivenName} {this.participant.Person.Surname}", headerArray[4, 1]);
         }
     }
 }
