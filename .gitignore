@@ -76,3 +76,6 @@ CDP4.v12.suo
 
 *.cdp4ck
 **.orig
+
+.idea
+/CDP4Addin/Properties/launchSettings.json

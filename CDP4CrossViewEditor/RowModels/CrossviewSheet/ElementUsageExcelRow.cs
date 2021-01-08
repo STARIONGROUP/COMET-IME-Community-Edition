@@ -59,8 +59,8 @@ namespace CDP4CrossViewEditor.RowModels.CrossviewSheet
         private void UpdateProperties()
         {
             this.Id = this.Thing.Iid.ToString();
-            this.Name = $"{new string(' ', 3)}{this.Thing.Name} : {this.Thing.ElementDefinition.Name}";
-            this.ShortName = $"{new string(' ', 3)}{this.Thing.ShortName} : {this.Thing.ElementDefinition.ShortName}";
+            this.Name = $"{new string(' ', 3)}{(this.Thing.Container as ElementDefinition)?.Name} : {this.Thing.Name}";
+            this.ShortName = $"{new string(' ', 3)}{(this.Thing.Container as ElementDefinition)?.ShortName} : {this.Thing.ShortName}";
             this.Type = CrossviewSheetConstants.EU;
             this.Owner = this.Thing.Owner.ShortName;
             this.Level = LevelOffset;

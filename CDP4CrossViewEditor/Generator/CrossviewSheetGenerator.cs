@@ -44,8 +44,9 @@ namespace CDP4CrossViewEditor.Generator
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
-    /// the Crossview sheet that contains the ElementDefinitions, Parameters, ParameterOverrides, and Subscriptions
-    /// of the <see cref="DomainOfExpertise"/> of the active <see cref="Participant"/>.
+    /// the crossview sheet that contains the selected <see cref="ElementDefinition"/>s, <see cref="ElementUsage"/>s,
+    /// and for each <see cref="ParameterType"/> display the value of the <see cref="Parameter"/> and/or <see cref="ParameterOverride"/>
+    /// for the active <see cref="Participant"/>.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class CrossviewSheetGenerator
@@ -61,17 +62,17 @@ namespace CDP4CrossViewEditor.Generator
         private Application excelApplication;
 
         /// <summary>
-        /// The <see cref="Iteration"/> for which the Parameter-Sheet needs to be generated.
+        /// The <see cref="Iteration"/> for which the crossview sheet needs to be generated.
         /// </summary>
         private readonly Iteration iteration;
 
         /// <summary>
-        /// The <see cref="Participant"/> for which the Parameter-Sheet needs to be generated.
+        /// The <see cref="Participant"/> for which the crossview sheet needs to be generated.
         /// </summary>
         private readonly Participant participant;
 
         /// <summary>
-        /// The <see cref="Worksheet"/> that the parameters are written to.
+        /// The crossview <see cref="Worksheet"/>.
         /// </summary>
         private Worksheet crossviewSheet;
 
@@ -91,19 +92,19 @@ namespace CDP4CrossViewEditor.Generator
         private object[,] headerFormat;
 
         /// <summary>
-        /// The array that contains the formatting of the parameter section of the crossview sheet
+        /// The array that contains the formatting of the body section of the crossview sheet
         /// </summary>
-        private object[,] parameterFormat;
+        private object[,] bodyFormat;
 
         /// <summary>
-        /// The array that contains the content of the parameter section of the crossview sheet
+        /// The array that contains the content of the body section of the crossview sheet
         /// </summary>
-        private object[,] parameterContent;
+        private object[,] bodyContent;
 
         /// <summary>
-        /// The array that contains the lock settings of the parameter section of the crossview sheet
+        /// The array that contains the lock settings of the body section of the crossview sheet
         /// </summary>
-        private object[,] parameterLock;
+        private object[,] bodyLock;
 
         /// <summary>
         /// Gets the <see cref="ISession"/> that is active
@@ -114,13 +115,13 @@ namespace CDP4CrossViewEditor.Generator
         /// Initializes a new instance of the <see cref="CrossviewSheetGenerator"/> class.
         /// </summary>
         /// <param name="session">
-        /// The <see cref="ISession"/> for which the parameter sheet is generated.
+        /// The <see cref="ISession"/> for which the crossview sheet is generated.
         /// </param>
         /// <param name="iteration">
-        /// The iteration that contains the <see cref="ParameterValueSet"/>s that will be generated on the Parameter sheet
+        /// The <see cref="Iteration"/> for which the crossview sheet is generated.
         /// </param>
         /// <param name="participant">
-        /// The participant for which the sheet is generated.
+        /// The <see cref="Participant"/> for which the crossview sheet is generated.
         /// </param>
         public CrossviewSheetGenerator(ISession session, Iteration iteration, Participant participant)
         {
@@ -136,10 +137,14 @@ namespace CDP4CrossViewEditor.Generator
         /// The excel application object that contains the <see cref="Workbook"/>
         /// </param>
         /// <param name="workbook">
-        /// The current <see cref="Workbook"/> when Crossview sheet will be rebuild.
+        /// The current <see cref="Workbook"/> when crossview sheet will be rebuild.
         /// </param>
-        /// <param name="elementDefinitions"></param>
-        /// <param name="parameterTypes"></param>
+        /// <param name="elementDefinitions">
+        /// Selected element definition list
+        /// </param>
+        /// <param name="parameterTypes">
+        /// Selected parameter types list
+        /// </param>
         public void Rebuild(Application application, Workbook workbook, IEnumerable<ElementDefinition> elementDefinitions,
             IEnumerable<ParameterType> parameterTypes)
         {
@@ -193,7 +198,7 @@ namespace CDP4CrossViewEditor.Generator
         }
 
         /// <summary>
-        /// Apply formatting settings to the Parameter sheet
+        /// Apply formatting settings to the crossview sheet
         /// </summary>
         private void ApplySheetSettings()
         {
@@ -206,10 +211,14 @@ namespace CDP4CrossViewEditor.Generator
         }
 
         /// <summary>
-        /// collect the information that is to be written to the Parameter sheet
+        /// collect the information that is to be written to the crossview sheet
         /// </summary>
-        /// <param name="elementDefinitions"></param>
-        /// <param name="parameterTypes"></param>
+        /// <param name="elementDefinitions">
+        /// Selected element definition list
+        /// </param>
+        /// <param name="parameterTypes">
+        /// Selected parameter types list
+        /// </param>
         private void PopulateSheetArrays(IEnumerable<ElementDefinition> elementDefinitions, IEnumerable<ParameterType> parameterTypes)
         {
             // Instantiate the different rows
@@ -218,20 +227,20 @@ namespace CDP4CrossViewEditor.Generator
             var excelRows = assembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
-            var parameterArrayAssembler = new CrossviewArrayAssembler(excelRows, parameterTypes);
-            this.parameterContent = parameterArrayAssembler.ContentArray;
-            this.parameterFormat = parameterArrayAssembler.FormatArray;
-            this.parameterLock = parameterArrayAssembler.LockArray;
+            var crossviewArrayAssembler = new CrossviewArrayAssembler(excelRows, parameterTypes);
+            this.bodyContent = crossviewArrayAssembler.ContentArray;
+            this.bodyFormat = crossviewArrayAssembler.FormatArray;
+            this.bodyLock = crossviewArrayAssembler.LockArray;
 
             // Instantiate header
-            var headerArrayAssembler = new CrossviewHeaderArrayAssembler(this.session, this.iteration, this.participant, this.parameterContent.GetLength(1));
-            this.headerFormat = headerArrayAssembler.FormatArray;
+            var headerArrayAssembler = new CrossviewHeaderArrayAssembler(this.session, this.iteration, this.participant, this.bodyContent.GetLength(1));
             this.headerContent = headerArrayAssembler.HeaderArray;
+            this.headerFormat = headerArrayAssembler.FormatArray;
             this.headerLock = headerArrayAssembler.LockArray;
         }
 
         /// <summary>
-        /// Write the data to the Parameter sheet
+        /// Write the data to the crossview sheet
         /// </summary>
         private void WriteSheet()
         {
@@ -240,7 +249,7 @@ namespace CDP4CrossViewEditor.Generator
         }
 
         /// <summary>
-        /// Write the header info to the parameter sheet
+        /// Write the header info to the crossview sheet
         /// </summary>
         private void WriteHeader()
         {
@@ -258,21 +267,21 @@ namespace CDP4CrossViewEditor.Generator
         }
 
         /// <summary>
-        /// Write the content of the <see cref="parameterContent"/> to the parameter sheet
+        /// Write the content of the <see cref="bodyContent"/> to the crossview sheet
         /// </summary>
         private void WriteRows()
         {
-            var numberOfRows = this.parameterContent.GetLength(0);
-            var numberOfColumns = this.parameterContent.GetLength(1);
+            var numberOfRows = this.bodyContent.GetLength(0);
+            var numberOfColumns = this.bodyContent.GetLength(1);
 
             var startrow = this.headerContent.GetLength(0) + 2;
             var endrow = startrow + numberOfRows - 1;
 
             var parameterRange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow, 1], this.crossviewSheet.Cells[endrow, numberOfColumns]);
             parameterRange.Name = CrossviewSheetConstants.RangeName;
-            parameterRange.NumberFormat = this.parameterFormat;
-            parameterRange.Value = this.parameterContent;
-            parameterRange.Locked = this.parameterLock;
+            parameterRange.NumberFormat = this.bodyFormat;
+            parameterRange.Value = this.bodyContent;
+            parameterRange.Locked = this.bodyLock;
             parameterRange.EntireColumn.AutoFit();
 
             var formattedrange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow - 1, 1], this.crossviewSheet.Cells[startrow, numberOfColumns]);
