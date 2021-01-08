@@ -27,12 +27,15 @@ namespace CDP4CrossViewEditor
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
+
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -42,10 +45,11 @@ namespace CDP4CrossViewEditor
 
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4OfficeInfrastructure;
-    using CDP4OfficeInfrastructure.OfficeDal;
-    using NetOffice.ExcelApi;
+
     using NLog;
+
     using ReactiveUI;
 
     /// <summary>
@@ -180,11 +184,9 @@ namespace CDP4CrossViewEditor
                     break;
 
                 case EventKind.Removed:
-                {
                     var iteration = iterationEvent.ChangedThing as Iteration;
                     this.Iterations.RemoveAll(x => x == iteration);
                     break;
-                }
             }
         }
 
@@ -207,7 +209,7 @@ namespace CDP4CrossViewEditor
 
             if (ribbonControlId.StartsWith("Editor_"))
             {
-                this.LaunchCrossViewEditorAsync(ribbonControlTag);
+                await this.LaunchCrossViewEditorAsync(ribbonControlTag);
             }
             else
             {
@@ -221,8 +223,15 @@ namespace CDP4CrossViewEditor
         /// <param name="iterationId">
         /// The unique id of the <see cref="Iteration"/>
         /// </param>
-        private void LaunchCrossViewEditorAsync(string iterationId)
+        [ExcludeFromCodeCoverage]
+        private async Task LaunchCrossViewEditorAsync(string iterationId)
         {
+            if (iterationId == string.Empty)
+            {
+                logger.Debug("The cross editor workbook cannot be build: the iteration id is empty");
+                return;
+            }
+
             var uniqueId = Guid.Parse(iterationId);
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
 
@@ -232,54 +241,41 @@ namespace CDP4CrossViewEditor
                 return;
             }
 
+            if (!(iteration.Container is EngineeringModel engineeringModel))
+            {
+                logger.Error("The cross editor workbook cannot be build: Iteration container object is null");
+                return;
+            }
+
+            var activeParticipant = engineeringModel.EngineeringModelSetup.Participant.FirstOrDefault(x => x.Person == this.Session.ActivePerson);
+
             if (this.officeApplicationWrapper.Excel == null)
             {
                 logger.Error("The cross editor workbook cannot be build: The Excel Application object is null");
                 return;
             }
 
-            var workbook = this.QueryIterationWorkbook(this.officeApplicationWrapper.Excel, iteration);
+            var application = this.officeApplicationWrapper.Excel;
 
-            if (workbook != null || !(iteration.Container is EngineeringModel))
-            {
-                return;
-            }
-
-            var crossViewDialogViewModel = new CrossViewDialogViewModel(iteration, this.Session);
+            var crossViewDialogViewModel = new CrossViewDialogViewModel(application, iteration, this.Session);
             this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
-        }
 
-        /// <summary>
-        /// Gets the workbook that corresponds to the specified <see cref="Iteration"/>
-        /// </summary>
-        /// <param name="application">
-        /// The Excel application
-        /// </param>
-        /// <param name="iteration">
-        /// The <see cref="Iteration"/> for which the workbook is queried
-        /// </param>
-        /// <returns>
-        /// The <see cref="Workbook"/> that corresponds to the queried Iteration, null if the workbook cannot be found.
-        /// </returns>
-        private Workbook QueryIterationWorkbook(Application application, Iteration iteration)
-        {
-            foreach (var workbook in application.Workbooks)
+            var dialogResult = crossViewDialogViewModel.DialogResult as WorkbookSelectionDialogResult;
+
+            if (dialogResult?.Result != null && dialogResult.Result.Value)
             {
-                var workbookSessionDal = new WorkbookSessionDal(workbook);
-                var workbookSession = workbookSessionDal.Read();
+                var workbook = dialogResult.Workbook;
 
-                if (workbookSession == null)
+                try
                 {
-                    continue;
+                    var workbookOperator = new WorkbookOperator(application, workbook);
+                    await workbookOperator.Rebuild(this.Session, iteration, activeParticipant, dialogResult.WorkbookElements, dialogResult.WorkbookParameterType);
                 }
-
-                if (workbookSession.IterationSetup.IterationIid == iteration.Iid)
+                catch (Exception ex)
                 {
-                    return workbook;
+                    logger.Error(ex);
                 }
             }
-
-            return null;
         }
 
         /// <summary>
@@ -307,7 +303,7 @@ namespace CDP4CrossViewEditor
 
             foreach (var iteration in this.Iterations)
             {
-                var engineeringModel = (EngineeringModel) iteration.Container;
+                var engineeringModel = (EngineeringModel)iteration.Container;
 
                 var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
 

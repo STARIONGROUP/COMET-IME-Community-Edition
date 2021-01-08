@@ -26,13 +26,18 @@
 namespace CDP4CrossViewEditor.Tests.ViewModels
 {
     using System;
+    using System.Linq;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CrossViewEditor.ViewModels;
+
     using CDP4Dal;
+    using CDP4Dal.DAL;
+
     using Moq;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -42,14 +47,17 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
     public class CrossViewDialogViewModelTestFixture
     {
         /// <summary>
+        /// The current set of credentials that will be used
+        /// </summary>
+        private readonly Credentials credentials = new Credentials(
+            "John",
+            "Doe",
+            new Uri("http://www.rheagroup.com/"));
+
+        /// <summary>
         /// The current session associated <see cref="Assembler"></see>
         /// </summary>
         private Assembler assembler;
-
-        /// <summary>
-        /// The current assembler <see cref="Uri"/>
-        /// </summary>
-        private Uri uri;
 
         /// <summary>
         /// Mock <see cref="ISession"/>
@@ -64,22 +72,52 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [SetUp]
         public void SetUp()
         {
-            this.uri = new Uri("http://www.rheageoup.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.credentials.Uri);
             this.session = new Mock<ISession>();
+            this.session.Setup(x => x.Credentials).Returns(this.credentials);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
-                    EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                    EngineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 },
-                IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
                     IterationNumber = 1
                 }
             };
+
+            var domain = new DomainOfExpertise(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
+            {
+                Name = "Domain"
+            };
+
+            var elementDefinition = new ElementDefinition
+            {
+                Iid = Guid.NewGuid(),
+                Name = "ElementDefinition_1",
+                ShortName = "ED_1",
+                Container = this.iteration,
+                Owner = domain
+            };
+
+            var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "P_SimpleQuantityKind"
+            };
+
+            var parameter = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterType,
+                Scale = parameterType.DefaultScale,
+                Owner = domain
+            };
+
+            this.iteration.Element.Add(elementDefinition);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameter);
         }
 
         [TearDown]
@@ -90,7 +128,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewModel = new CrossViewDialogViewModel(this.iteration, this.session.Object);
+            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
 
             Assert.AreEqual("Select equipments and parameters", viewModel.DialogTitle);
             Assert.IsInstanceOf<ThingSelectorViewModel>(viewModel.ElementSelectorViewModel);
@@ -98,12 +136,28 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatCommandsWorks()
+        public void VerifyThatOkCommandsWorks()
         {
-            var viewModel = new CrossViewDialogViewModel(this.iteration, this.session.Object);
+            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
+            var elementDefinitionSelectorViewModel = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
+            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
+
+            Assert.DoesNotThrow(() => elementDefinitionSelectorViewModel.BindData());
+            Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.BindData());
+
+            parameterTypeSelectorViewModel.SelectedSourceList = parameterTypeSelectorViewModel.ParameterTypeSourceList;
+            elementDefinitionSelectorViewModel.SelectedSourceList = elementDefinitionSelectorViewModel.ElementDefinitionSourceList;
 
             Assert.DoesNotThrow(() => viewModel.OkCommand.Execute(null));
+            Assert.IsTrue(viewModel.DialogResult.Result);
+        }
+
+        [Test]
+        public void VerifyThatCancelCommandsWorks()
+        {
+            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
             Assert.DoesNotThrow(() => viewModel.CancelCommand.Execute(null));
+            Assert.IsFalse(viewModel.DialogResult.Result);
         }
     }
 }
