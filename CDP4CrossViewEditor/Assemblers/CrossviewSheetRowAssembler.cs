@@ -25,13 +25,11 @@
 
 namespace CDP4CrossViewEditor.Assemblers
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
@@ -47,17 +45,10 @@ namespace CDP4CrossViewEditor.Assemblers
         private readonly List<IExcelRow<Thing>> excelRows = new List<IExcelRow<Thing>>();
 
         /// <summary>
-        /// The owner <see cref="DomainOfExpertise"/>
-        /// </summary>
-        private readonly DomainOfExpertise owner;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CrossviewSheetRowAssembler"/> class
         /// </summary>
-        /// <param name="owner">The owner<see cref="DomainOfExpertise"/> </param>
-        public CrossviewSheetRowAssembler(DomainOfExpertise owner)
+        public CrossviewSheetRowAssembler()
         {
-            this.owner = owner ?? throw new ArgumentNullException(nameof(owner), "The owning DomainOfExpertise may not be null");
         }
 
         /// <summary>

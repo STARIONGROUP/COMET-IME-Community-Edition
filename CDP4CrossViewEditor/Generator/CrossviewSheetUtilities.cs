@@ -25,6 +25,8 @@
 
 namespace CDP4CrossViewEditor.Generator
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using CDP4OfficeInfrastructure.Excel;
 
     using NetOffice.ExcelApi;
@@ -32,6 +34,7 @@ namespace CDP4CrossViewEditor.Generator
     /// <summary>
     /// Helper methods to interact with the workbook
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class CrossviewSheetUtilities
     {
         /// <summary>

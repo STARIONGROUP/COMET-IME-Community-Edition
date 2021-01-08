@@ -52,6 +52,11 @@ namespace CDP4CrossViewEditor.Assemblers
         private readonly IEnumerable<IExcelRow<Thing>> excelRows;
 
         /// <summary>
+        /// The selection parameter types <see cref= "IEnumerable{ParameterType}"/>
+        /// </summary>
+        private IEnumerable<ParameterType> parameterTypes;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CrossviewArrayAssembler"/> class.
         /// </summary>
         /// <param name="excelRows">The excel rows</param>
@@ -59,11 +64,11 @@ namespace CDP4CrossViewEditor.Assemblers
         public CrossviewArrayAssembler(IEnumerable<IExcelRow<Thing>> excelRows, IEnumerable<ParameterType> parameterTypes)
         {
             this.excelRows = excelRows;
-            var parameterTypesList = parameterTypes.ToList();
-            this.numberOfColumns = parameterTypesList.Count + CrossviewSheetConstants.FixedColumns;
+            this.parameterTypes = parameterTypes;
+            this.numberOfColumns = this.parameterTypes.Count() + CrossviewSheetConstants.FixedColumns;
 
             this.InitializeArray();
-            this.PopulateContentArray(parameterTypesList);
+            this.PopulateContentArray();
             this.PopulateContentLockArray();
             this.PopulateContentFormatArray();
         }
@@ -102,70 +107,17 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <summary>
         /// Populate the <see cref="ContentArray"/> with data
         /// </summary>
-        private void PopulateContentArray(List<ParameterType> parameterTypesList)
+        private void PopulateContentArray()
         {
-            var contentArray = new object[this.numberOfColumns];
             var contentList = new List<object[]>();
 
-            contentArray[0] = "Name";
-            contentArray[1] = "Short Name";
-            contentArray[2] = "Type";
-            contentArray[3] = "Owner";
-            contentArray[4] = "Category";
+            var contentHeader = this.PopulateContentHeader();
 
-            var index = 0;
+            contentList.Add(contentHeader);
 
-            foreach (var parameterType in parameterTypesList)
-            {
-                contentArray[CrossviewSheetConstants.FixedColumns + index] = parameterType.ShortName;
-                index++;
-            }
+            contentList.AddRange(this.excelRows.Select(this.PopulateContentRow));
 
-            contentList.Add(contentArray);
-
-            foreach (var excelRow in this.excelRows)
-            {
-                contentArray = new object[this.numberOfColumns];
-                contentArray[0] = excelRow.Name;
-                contentArray[1] = excelRow.ShortName;
-                contentArray[2] = excelRow.Type;
-                contentArray[3] = excelRow.Owner;
-                contentArray[4] = excelRow.Categories;
-
-                var parameterList = new List<ParameterBase>();
-
-                switch (excelRow.Thing)
-                {
-                    case ElementDefinition elementDefinition:
-                        parameterList = elementDefinition.Parameter.ToList<ParameterBase>();
-                        break;
-
-                    case ElementUsage elementUsage:
-                        parameterList = elementUsage.ParameterOverride.ToList<ParameterBase>();
-                        break;
-                }
-
-                index = 0;
-
-                foreach (var parameterType in parameterTypesList)
-                {
-                    foreach (var parameter in parameterList)
-                    {
-                        if (parameter.ParameterType != parameterType)
-                        {
-                            continue;
-                        }
-
-                        var valueSet = parameter.ValueSets.FirstOrDefault();
-                        contentArray[CrossviewSheetConstants.FixedColumns + index] = valueSet?.ActualValue.FirstOrDefault();
-                        index++;
-                    }
-                }
-
-                contentList.Add(contentArray);
-            }
-
-            var columnsCount = contentArray.Length;
+            var columnsCount = contentHeader.Length;
             var tempObjects = new object[this.excelRows.Count() + 2, columnsCount];
 
             for (var i = 0; i < contentList.Count; i++)
@@ -182,6 +134,81 @@ namespace CDP4CrossViewEditor.Assemblers
             this.FormulaArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
         }
 
+        /// <summary>Populate excel content header</summary>
+        /// <returns>
+        /// Array that contains header columns names and selected parameter types
+        /// </returns>
+        private object[] PopulateContentHeader()
+        {
+            var contentArray = new object[this.numberOfColumns];
+
+            contentArray[0] = "Name";
+            contentArray[1] = "Short Name";
+            contentArray[2] = "Type";
+            contentArray[3] = "Owner";
+            contentArray[4] = "Category";
+
+            var index = 0;
+
+            foreach (var parameterType in this.parameterTypes)
+            {
+                contentArray[CrossviewSheetConstants.FixedColumns + index] = parameterType.ShortName;
+                index++;
+            }
+
+            return contentArray;
+        }
+
+        /// <summary>
+        /// Populate excel content row
+        /// </summary>
+        /// <param name="excelRow">Current execel row <see cref="IExcelRow{Thing}"/></param>
+        /// <returns>
+        /// Array that contains element definition/usages specific data
+        /// </returns>
+        private object[] PopulateContentRow(IExcelRow<Thing> excelRow)
+        {
+            var contentArray = new object[this.numberOfColumns];
+
+            contentArray[0] = excelRow.Name;
+            contentArray[1] = excelRow.ShortName;
+            contentArray[2] = excelRow.Type;
+            contentArray[3] = excelRow.Owner;
+            contentArray[4] = excelRow.Categories;
+
+            var parameterList = new List<ParameterBase>();
+
+            switch (excelRow.Thing)
+            {
+                case ElementDefinition elementDefinition:
+                    parameterList = elementDefinition.Parameter.ToList<ParameterBase>();
+                    break;
+
+                case ElementUsage elementUsage:
+                    parameterList = elementUsage.ParameterOverride.ToList<ParameterBase>();
+                    break;
+            }
+
+            var index = 0;
+
+            foreach (var parameterType in this.parameterTypes)
+            {
+                foreach (var parameter in parameterList)
+                {
+                    if (parameter.ParameterType != parameterType)
+                    {
+                        continue;
+                    }
+
+                    var valueSet = parameter.ValueSets.FirstOrDefault();
+                    contentArray[CrossviewSheetConstants.FixedColumns + index] = valueSet?.ActualValue.FirstOrDefault();
+                    index++;
+                }
+            }
+
+            return contentArray;
+        }
+
         /// <summary>
         /// Populate the <see cref="FormatArray"/> with formatting data
         /// </summary>
@@ -191,8 +218,6 @@ namespace CDP4CrossViewEditor.Assemblers
             {
                 this.FormatArray[0, i] = "@";
             }
-
-            //TODO Apply specific format exeption
         }
 
         /// <summary>
@@ -204,8 +229,6 @@ namespace CDP4CrossViewEditor.Assemblers
             {
                 this.LockArray[0, i] = true;
             }
-
-            //TODO Apply specific lock exeption
         }
     }
 }

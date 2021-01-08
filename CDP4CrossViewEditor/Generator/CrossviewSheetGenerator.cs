@@ -25,12 +25,10 @@
 
 namespace CDP4CrossViewEditor.Generator
 {
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CrossViewEditor.Assemblers;
-    using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
     using CDP4Dal;
 
@@ -42,12 +40,14 @@ namespace CDP4CrossViewEditor.Generator
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
     /// the Crossview sheet that contains the ElementDefinitions, Parameters, ParameterOverrides, and Subscriptions
     /// of the <see cref="DomainOfExpertise"/> of the active <see cref="Participant"/>.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class CrossviewSheetGenerator
     {
         /// <summary>
@@ -69,11 +69,6 @@ namespace CDP4CrossViewEditor.Generator
         /// The <see cref="Participant"/> for which the Parameter-Sheet needs to be generated.
         /// </summary>
         private readonly Participant participant;
-
-        /// <summary>
-        /// The <see cref="IExcelRow{T}"/> that make up the content of the parameter sheet
-        /// </summary>
-        private IEnumerable<IExcelRow<Thing>> excelRows;
 
         /// <summary>
         /// The <see cref="Worksheet"/> that the parameters are written to.
@@ -217,15 +212,13 @@ namespace CDP4CrossViewEditor.Generator
         /// <param name="parameterTypes"></param>
         private void PopulateSheetArrays(IEnumerable<ElementDefinition> elementDefinitions, IEnumerable<ParameterType> parameterTypes)
         {
-            var selectedDomainOfExpertise = this.session.QuerySelectedDomainOfExpertise(this.iteration);
-
             // Instantiate the different rows
-            var assembler = new CrossviewSheetRowAssembler(selectedDomainOfExpertise);
+            var assembler = new CrossviewSheetRowAssembler();
             assembler.Assemble(elementDefinitions);
-            this.excelRows = assembler.ExcelRows;
+            var excelRows = assembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
-            var parameterArrayAssembler = new CrossviewArrayAssembler(this.excelRows, parameterTypes);
+            var parameterArrayAssembler = new CrossviewArrayAssembler(excelRows, parameterTypes);
             this.parameterContent = parameterArrayAssembler.ContentArray;
             this.parameterFormat = parameterArrayAssembler.FormatArray;
             this.parameterLock = parameterArrayAssembler.LockArray;

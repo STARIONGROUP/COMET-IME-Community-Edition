@@ -176,7 +176,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         [Test]
         public void VerifyThatAssemblerPopulatesArrays()
         {
-            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler(this.domain);
+            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
             crossviewSheetRowAssembler.Assemble(this.elementDefinitions);
             this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
 

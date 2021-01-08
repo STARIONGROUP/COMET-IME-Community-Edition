@@ -28,6 +28,7 @@ namespace CDP4CrossViewEditor
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
@@ -50,6 +51,7 @@ namespace CDP4CrossViewEditor
     /// The purpose of the <see cref="WorkbookOperator"/> is to delegate the operations on a <see cref="Workbook"/>
     /// to the proper classes
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class WorkbookOperator
     {
         /// <summary>
