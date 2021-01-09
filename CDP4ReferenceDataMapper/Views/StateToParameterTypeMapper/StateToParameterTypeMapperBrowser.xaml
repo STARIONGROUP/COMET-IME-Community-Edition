@@ -9,6 +9,7 @@
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -289,7 +290,36 @@
             
         </dxlc:LayoutGroup>
 
-        <DataGrid Grid.Row="3"></DataGrid>
+        <dxg:GridControl Grid.Row="3" Name="MappingDataGrid"
+                         ColumnsSource="{Binding DataSourceManager.Columns}"
+                         ItemsSource="{Binding DataSourceManager.DataTable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         AutoGenerateColumns="KeepOld"
+                         Height="Auto"
+                         Width="Auto">
+            <dxg:GridControl.ColumnGeneratorTemplate>
+                <DataTemplate>
+                    <ContentControl>
+                        <dxg:GridColumn FieldName="{Binding FieldName}">
+
+                        </dxg:GridColumn>
+                    </ContentControl>
+                </DataTemplate>
+            </dxg:GridControl.ColumnGeneratorTemplate>
+            <dxg:GridControl.View>
+                <dxg:TableView Name="MappingDataTableView"
+                               AllowColumnMoving="False"
+                               HorizontalScrollbarVisibility="Visible"
+                               AutoWidth="False"
+                               AllowGrouping="False"
+                               AllowEditing="False"
+                               AllowSorting="False"
+                               ShowGroupPanel="False"
+                               ShowGroupedColumns="False"
+                               ShowSearchPanelMode="Never"
+                               ShowTotalSummary="False">
+                </dxg:TableView>
+            </dxg:GridControl.View>
+        </dxg:GridControl>
 
         <views:SelectedThingGroupControl Grid.Row="4"/>
     </Grid>
