@@ -44,8 +44,6 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
     using CDP4ReferenceDataMapper.ViewModels;
 
-    using DevExpress.Mvvm.POCO;
-
     using Moq;
 
     using NUnit.Framework;
