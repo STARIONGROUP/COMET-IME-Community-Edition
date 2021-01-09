@@ -36,12 +36,15 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
+
+    using CDP4ReferenceDataMapper.StateToParameterTypeMapper;
 
     using NLog;
 
@@ -93,6 +96,11 @@ namespace CDP4ReferenceDataMapper.ViewModels
         private ScalarParameterType selectedTargetValueParameterType;
 
         /// <summary>
+        /// Backing field for the <see cref="DataSourceManager"/>
+        /// </summary>
+        private DataSourceManager dataSourceManager;
+
+        /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Actual Finite State to ParameterType mapping";
@@ -125,6 +133,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
             //this.AddSubscriptions();
             this.UpdateProperties();
+
+            this.DataSourceManager = new DataSourceManager();
 
             logger.Debug($"Finished Initialization of StateToParameterTypeMapperBrowserViewModel in {sw.ElapsedMilliseconds} [ms]");
         }
@@ -223,6 +233,15 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// Gets or sets the <see cref="ReactiveList{ScalarParameterType}"/> from which the <see cref="ScalarParameterType"/>
         /// </summary>
         public ReactiveList<ScalarParameterType> PossibleTargetValueParameterType { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataSourceManager"/>
+        /// </summary>
+        public DataSourceManager DataSourceManager
+        {
+            get => this.dataSourceManager;
+            set => this.RaiseAndSetIfChanged(ref this.dataSourceManager, value);
+        }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to start the mapping - populate the row-view-models
@@ -401,9 +420,9 @@ namespace CDP4ReferenceDataMapper.ViewModels
             this.SelectedTargetMappingParameterType = null;
             this.SelectedTargetValueParameterType = null;
 
-            logger.Debug("Clear settings - rows");
+            logger.Debug("Clear data source");
 
-            // TODO: clear row-view-models
+            this.DataSourceManager = new DataSourceManager();
         }
 
         /// <summary>
@@ -413,7 +432,12 @@ namespace CDP4ReferenceDataMapper.ViewModels
         {
             logger.Debug("start mapping");
 
-            // TODO: Create row-view-models
+            this.DataSourceManager = new DataSourceManager(this.Thing,
+                this.selectedElementDefinitionCategory,
+                this.selectedActualFiniteStateList,
+                this.selectedSourceParameterTypeCategory,
+                this.selectedTargetMappingParameterType,
+                this.selectedTargetValueParameterType);
         }
     }
 }
