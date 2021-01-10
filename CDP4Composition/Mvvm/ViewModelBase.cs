@@ -234,6 +234,7 @@ namespace CDP4Composition.Mvvm
         protected virtual void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             this.RevisionNumber = objectChange.ChangedThing.RevisionNumber;
+            this.ModifiedOn = objectChange.ChangedThing.ModifiedOn;
         }
     }
 }
