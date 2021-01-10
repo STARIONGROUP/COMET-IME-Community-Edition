@@ -1,25 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MappingToReferenceScaleRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    This is an auto-generated class. Any manual changes to this file will be overwritten!
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or (at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
 // </summary>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+    using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,36 +49,35 @@ namespace CDP4CommonView
     /// </summary>
     public partial class MappingToReferenceScaleRowViewModel : RowViewModelBase<MappingToReferenceScale>
     {
-
         /// <summary>
-        /// Backing field for <see cref="ReferenceScaleValue"/>
-        /// </summary>
-        private ScaleValueDefinition referenceScaleValue;
-
-        /// <summary>
-        /// Backing field for <see cref="ReferenceScaleValueShortName"/>
-        /// </summary>
-        private string referenceScaleValueShortName;
-
-        /// <summary>
-        /// Backing field for <see cref="ReferenceScaleValueName"/>
-        /// </summary>
-        private string referenceScaleValueName;
-
-        /// <summary>
-        /// Backing field for <see cref="DependentScaleValue"/>
+        /// Backing field for <see cref="DependentScaleValue"/> property
         /// </summary>
         private ScaleValueDefinition dependentScaleValue;
 
         /// <summary>
-        /// Backing field for <see cref="DependentScaleValueShortName"/>
+        /// Backing field for <see cref="DependentScaleValueName"/> property
+        /// </summary>
+        private string dependentScaleValueName;
+
+        /// <summary>
+        /// Backing field for <see cref="DependentScaleValueShortName"/> property
         /// </summary>
         private string dependentScaleValueShortName;
 
         /// <summary>
-        /// Backing field for <see cref="DependentScaleValueName"/>
+        /// Backing field for <see cref="ReferenceScaleValue"/> property
         /// </summary>
-        private string dependentScaleValueName;
+        private ScaleValueDefinition referenceScaleValue;
+
+        /// <summary>
+        /// Backing field for <see cref="ReferenceScaleValueName"/> property
+        /// </summary>
+        private string referenceScaleValueName;
+
+        /// <summary>
+        /// Backing field for <see cref="ReferenceScaleValueShortName"/> property
+        /// </summary>
+        private string referenceScaleValueShortName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MappingToReferenceScaleRowViewModel"/> class
@@ -69,34 +90,6 @@ namespace CDP4CommonView
             this.UpdateProperties();
         }
 
-
-        /// <summary>
-        /// Gets or sets the ReferenceScaleValue
-        /// </summary>
-        public ScaleValueDefinition ReferenceScaleValue
-        {
-            get { return this.referenceScaleValue; }
-            set { this.RaiseAndSetIfChanged(ref this.referenceScaleValue, value); }
-        }
-
-        /// <summary>
-        /// Gets or set the ShortName of <see cref="ReferenceScaleValue"/>
-        /// </summary>
-        public string ReferenceScaleValueShortName
-        {
-            get { return this.referenceScaleValueShortName; }
-            set { this.RaiseAndSetIfChanged(ref this.referenceScaleValueShortName, value); }
-        }
-
-        /// <summary>
-        /// Gets or set the Name of <see cref="ReferenceScaleValue"/>
-        /// </summary>
-        public string ReferenceScaleValueName
-        {
-            get { return this.referenceScaleValueName; }
-            set { this.RaiseAndSetIfChanged(ref this.referenceScaleValueName, value); }
-        }
-
         /// <summary>
         /// Gets or sets the DependentScaleValue
         /// </summary>
@@ -104,6 +97,15 @@ namespace CDP4CommonView
         {
             get { return this.dependentScaleValue; }
             set { this.RaiseAndSetIfChanged(ref this.dependentScaleValue, value); }
+        }
+
+        /// <summary>
+        /// Gets or set the Name of <see cref="DependentScaleValue"/>
+        /// </summary>
+        public string DependentScaleValueName
+        {
+            get { return this.dependentScaleValueName; }
+            set { this.RaiseAndSetIfChanged(ref this.dependentScaleValueName, value); }
         }
 
         /// <summary>
@@ -116,15 +118,32 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or set the Name of <see cref="DependentScaleValue"/>
+        /// Gets or sets the ReferenceScaleValue
         /// </summary>
-        public string DependentScaleValueName
+        public ScaleValueDefinition ReferenceScaleValue
         {
-            get { return this.dependentScaleValueName; }
-            set { this.RaiseAndSetIfChanged(ref this.dependentScaleValueName, value); }
+            get { return this.referenceScaleValue; }
+            set { this.RaiseAndSetIfChanged(ref this.referenceScaleValue, value); }
         }
 
-	
+        /// <summary>
+        /// Gets or set the Name of <see cref="ReferenceScaleValue"/>
+        /// </summary>
+        public string ReferenceScaleValueName
+        {
+            get { return this.referenceScaleValueName; }
+            set { this.RaiseAndSetIfChanged(ref this.referenceScaleValueName, value); }
+        }
+
+        /// <summary>
+        /// Gets or set the ShortName of <see cref="ReferenceScaleValue"/>
+        /// </summary>
+        public string ReferenceScaleValueShortName
+        {
+            get { return this.referenceScaleValueShortName; }
+            set { this.RaiseAndSetIfChanged(ref this.referenceScaleValueShortName, value); }
+        }
+
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -135,6 +154,7 @@ namespace CDP4CommonView
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+
             this.UpdateProperties();
         }
 
@@ -143,19 +163,28 @@ namespace CDP4CommonView
         /// </summary>
         private void UpdateProperties()
         {
-            this.ModifiedOn = this.Thing.ModifiedOn;
-			if (this.Thing.ReferenceScaleValue != null)
-			{
-				this.ReferenceScaleValueShortName = this.Thing.ReferenceScaleValue.ShortName;
-				this.ReferenceScaleValueName = this.Thing.ReferenceScaleValue.Name;
-			}			
-            this.ReferenceScaleValue = this.Thing.ReferenceScaleValue;
-			if (this.Thing.DependentScaleValue != null)
-			{
-				this.DependentScaleValueShortName = this.Thing.DependentScaleValue.ShortName;
-				this.DependentScaleValueName = this.Thing.DependentScaleValue.Name;
-			}			
             this.DependentScaleValue = this.Thing.DependentScaleValue;
+            if (this.Thing.DependentScaleValue != null)
+            {
+                this.DependentScaleValueName = this.Thing.DependentScaleValue.Name;
+                this.DependentScaleValueShortName = this.Thing.DependentScaleValue.ShortName;
+            }
+            else
+            {
+                this.DependentScaleValueName = string.Empty;
+                this.DependentScaleValueShortName = string.Empty;
+            }
+            this.ReferenceScaleValue = this.Thing.ReferenceScaleValue;
+            if (this.Thing.ReferenceScaleValue != null)
+            {
+                this.ReferenceScaleValueName = this.Thing.ReferenceScaleValue.Name;
+                this.ReferenceScaleValueShortName = this.Thing.ReferenceScaleValue.ShortName;
+            }
+            else
+            {
+                this.ReferenceScaleValueName = string.Empty;
+                this.ReferenceScaleValueShortName = string.Empty;
+            }
         }
     }
 }

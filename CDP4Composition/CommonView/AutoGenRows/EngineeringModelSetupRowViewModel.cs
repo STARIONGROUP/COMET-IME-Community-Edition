@@ -1,25 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelSetupRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    This is an auto-generated class. Any manual changes to this file will be overwritten!
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or (at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
 // </summary>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+    using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,26 +49,25 @@ namespace CDP4CommonView
     /// </summary>
     public partial class EngineeringModelSetupRowViewModel : DefinedThingRowViewModel<EngineeringModelSetup>
     {
-
         /// <summary>
-        /// Backing field for <see cref="Kind"/>
-        /// </summary>
-        private EngineeringModelKind kind;
-
-        /// <summary>
-        /// Backing field for <see cref="StudyPhase"/>
-        /// </summary>
-        private StudyPhaseKind studyPhase;
-
-        /// <summary>
-        /// Backing field for <see cref="EngineeringModelIid"/>
+        /// Backing field for <see cref="EngineeringModelIid"/> property
         /// </summary>
         private Guid engineeringModelIid;
 
         /// <summary>
-        /// Backing field for <see cref="SourceEngineeringModelSetupIid"/>
+        /// Backing field for <see cref="Kind"/> property
+        /// </summary>
+        private EngineeringModelKind kind;
+
+        /// <summary>
+        /// Backing field for <see cref="SourceEngineeringModelSetupIid"/> property
         /// </summary>
         private Guid sourceEngineeringModelSetupIid;
+
+        /// <summary>
+        /// Backing field for <see cref="StudyPhase"/> property
+        /// </summary>
+        private StudyPhaseKind studyPhase;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EngineeringModelSetupRowViewModel"/> class
@@ -59,6 +80,14 @@ namespace CDP4CommonView
             this.UpdateProperties();
         }
 
+        /// <summary>
+        /// Gets or sets the EngineeringModelIid
+        /// </summary>
+        public Guid EngineeringModelIid
+        {
+            get { return this.engineeringModelIid; }
+            set { this.RaiseAndSetIfChanged(ref this.engineeringModelIid, value); }
+        }
 
         /// <summary>
         /// Gets or sets the Kind
@@ -67,6 +96,15 @@ namespace CDP4CommonView
         {
             get { return this.kind; }
             set { this.RaiseAndSetIfChanged(ref this.kind, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the SourceEngineeringModelSetupIid
+        /// </summary>
+        public Guid SourceEngineeringModelSetupIid
+        {
+            get { return this.sourceEngineeringModelSetupIid; }
+            set { this.RaiseAndSetIfChanged(ref this.sourceEngineeringModelSetupIid, value); }
         }
 
         /// <summary>
@@ -79,25 +117,6 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or sets the EngineeringModelIid
-        /// </summary>
-        public Guid EngineeringModelIid
-        {
-            get { return this.engineeringModelIid; }
-            set { this.RaiseAndSetIfChanged(ref this.engineeringModelIid, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the SourceEngineeringModelSetupIid
-        /// </summary>
-        public Guid SourceEngineeringModelSetupIid
-        {
-            get { return this.sourceEngineeringModelSetupIid; }
-            set { this.RaiseAndSetIfChanged(ref this.sourceEngineeringModelSetupIid, value); }
-        }
-
-	
-        /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
         /// </summary>
@@ -107,6 +126,7 @@ namespace CDP4CommonView
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+
             this.UpdateProperties();
         }
 
@@ -115,14 +135,13 @@ namespace CDP4CommonView
         /// </summary>
         private void UpdateProperties()
         {
-            this.ModifiedOn = this.Thing.ModifiedOn;
-            this.Kind = this.Thing.Kind;
-            this.StudyPhase = this.Thing.StudyPhase;
             this.EngineeringModelIid = this.Thing.EngineeringModelIid;
-            if(this.Thing.SourceEngineeringModelSetupIid.HasValue)
+            this.Kind = this.Thing.Kind;
+            if (this.Thing.SourceEngineeringModelSetupIid.HasValue)
             {
                 this.SourceEngineeringModelSetupIid = this.Thing.SourceEngineeringModelSetupIid.Value;
             }
+            this.StudyPhase = this.Thing.StudyPhase;
         }
     }
 }

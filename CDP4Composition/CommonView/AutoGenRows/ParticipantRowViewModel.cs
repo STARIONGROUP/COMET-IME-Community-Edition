@@ -1,25 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParticipantRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    This is an auto-generated class. Any manual changes to this file will be overwritten!
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or (at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
 // </summary>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+    using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,46 +49,55 @@ namespace CDP4CommonView
     /// </summary>
     public partial class ParticipantRowViewModel : RowViewModelBase<Participant>
     {
-
         /// <summary>
-        /// Backing field for <see cref="IsActive"/>
+        /// Backing field for <see cref="IsActive"/> property
         /// </summary>
         private bool isActive;
 
         /// <summary>
-        /// Backing field for <see cref="Person"/>
+        /// Backing field for <see cref="Person"/> property
         /// </summary>
         private Person person;
 
         /// <summary>
-        /// Backing field for <see cref="Role"/>
+        /// Backing field for <see cref="PersonName"/> property
+        /// </summary>
+        private string personName;
+
+        /// <summary>
+        /// Backing field for <see cref="PersonShortName"/> property
+        /// </summary>
+        private string personShortName;
+
+        /// <summary>
+        /// Backing field for <see cref="Role"/> property
         /// </summary>
         private ParticipantRole role;
 
         /// <summary>
-        /// Backing field for <see cref="RoleShortName"/>
-        /// </summary>
-        private string roleShortName;
-
-        /// <summary>
-        /// Backing field for <see cref="RoleName"/>
+        /// Backing field for <see cref="RoleName"/> property
         /// </summary>
         private string roleName;
 
         /// <summary>
-        /// Backing field for <see cref="SelectedDomain"/>
+        /// Backing field for <see cref="RoleShortName"/> property
+        /// </summary>
+        private string roleShortName;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedDomain"/> property
         /// </summary>
         private DomainOfExpertise selectedDomain;
 
         /// <summary>
-        /// Backing field for <see cref="SelectedDomainShortName"/>
-        /// </summary>
-        private string selectedDomainShortName;
-
-        /// <summary>
-        /// Backing field for <see cref="SelectedDomainName"/>
+        /// Backing field for <see cref="SelectedDomainName"/> property
         /// </summary>
         private string selectedDomainName;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedDomainShortName"/> property
+        /// </summary>
+        private string selectedDomainShortName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParticipantRowViewModel"/> class
@@ -78,7 +109,6 @@ namespace CDP4CommonView
         {
             this.UpdateProperties();
         }
-
 
         /// <summary>
         /// Gets or sets the IsActive
@@ -99,21 +129,30 @@ namespace CDP4CommonView
         }
 
         /// <summary>
+        /// Gets or set the Name of <see cref="Person"/>
+        /// </summary>
+        public string PersonName
+        {
+            get { return this.personName; }
+            set { this.RaiseAndSetIfChanged(ref this.personName, value); }
+        }
+
+        /// <summary>
+        /// Gets or set the ShortName of <see cref="Person"/>
+        /// </summary>
+        public string PersonShortName
+        {
+            get { return this.personShortName; }
+            set { this.RaiseAndSetIfChanged(ref this.personShortName, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the Role
         /// </summary>
         public ParticipantRole Role
         {
             get { return this.role; }
             set { this.RaiseAndSetIfChanged(ref this.role, value); }
-        }
-
-        /// <summary>
-        /// Gets or set the ShortName of <see cref="Role"/>
-        /// </summary>
-        public string RoleShortName
-        {
-            get { return this.roleShortName; }
-            set { this.RaiseAndSetIfChanged(ref this.roleShortName, value); }
         }
 
         /// <summary>
@@ -126,12 +165,30 @@ namespace CDP4CommonView
         }
 
         /// <summary>
+        /// Gets or set the ShortName of <see cref="Role"/>
+        /// </summary>
+        public string RoleShortName
+        {
+            get { return this.roleShortName; }
+            set { this.RaiseAndSetIfChanged(ref this.roleShortName, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the SelectedDomain
         /// </summary>
         public DomainOfExpertise SelectedDomain
         {
             get { return this.selectedDomain; }
             set { this.RaiseAndSetIfChanged(ref this.selectedDomain, value); }
+        }
+
+        /// <summary>
+        /// Gets or set the Name of <see cref="SelectedDomain"/>
+        /// </summary>
+        public string SelectedDomainName
+        {
+            get { return this.selectedDomainName; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedDomainName, value); }
         }
 
         /// <summary>
@@ -144,16 +201,6 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or set the Name of <see cref="SelectedDomain"/>
-        /// </summary>
-        public string SelectedDomainName
-        {
-            get { return this.selectedDomainName; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedDomainName, value); }
-        }
-
-	
-        /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
         /// </summary>
@@ -163,6 +210,7 @@ namespace CDP4CommonView
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+
             this.UpdateProperties();
         }
 
@@ -171,21 +219,40 @@ namespace CDP4CommonView
         /// </summary>
         private void UpdateProperties()
         {
-            this.ModifiedOn = this.Thing.ModifiedOn;
             this.IsActive = this.Thing.IsActive;
             this.Person = this.Thing.Person;
-			if (this.Thing.Role != null)
-			{
-				this.RoleShortName = this.Thing.Role.ShortName;
-				this.RoleName = this.Thing.Role.Name;
-			}			
+            if (this.Thing.Person != null)
+            {
+                this.PersonName = this.Thing.Person.Name;
+                this.PersonShortName = this.Thing.Person.ShortName;
+            }
+            else
+            {
+                this.PersonName = string.Empty;
+                this.PersonShortName = string.Empty;
+            }
             this.Role = this.Thing.Role;
-			if (this.Thing.SelectedDomain != null)
-			{
-				this.SelectedDomainShortName = this.Thing.SelectedDomain.ShortName;
-				this.SelectedDomainName = this.Thing.SelectedDomain.Name;
-			}			
+            if (this.Thing.Role != null)
+            {
+                this.RoleName = this.Thing.Role.Name;
+                this.RoleShortName = this.Thing.Role.ShortName;
+            }
+            else
+            {
+                this.RoleName = string.Empty;
+                this.RoleShortName = string.Empty;
+            }
             this.SelectedDomain = this.Thing.SelectedDomain;
+            if (this.Thing.SelectedDomain != null)
+            {
+                this.SelectedDomainName = this.Thing.SelectedDomain.Name;
+                this.SelectedDomainShortName = this.Thing.SelectedDomain.ShortName;
+            }
+            else
+            {
+                this.SelectedDomainName = string.Empty;
+                this.SelectedDomainShortName = string.Empty;
+            }
         }
     }
 }

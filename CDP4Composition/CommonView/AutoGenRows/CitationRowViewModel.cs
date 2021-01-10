@@ -1,25 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CitationRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    This is an auto-generated class. Any manual changes to this file will be overwritten!
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or (at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
 // </summary>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+    using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,41 +49,40 @@ namespace CDP4CommonView
     /// </summary>
     public partial class CitationRowViewModel : RowViewModelBase<Citation>
     {
-
         /// <summary>
-        /// Backing field for <see cref="Location"/>
-        /// </summary>
-        private string location;
-
-        /// <summary>
-        /// Backing field for <see cref="IsAdaptation"/>
+        /// Backing field for <see cref="IsAdaptation"/> property
         /// </summary>
         private bool isAdaptation;
 
         /// <summary>
-        /// Backing field for <see cref="Remark"/>
+        /// Backing field for <see cref="Location"/> property
+        /// </summary>
+        private string location;
+
+        /// <summary>
+        /// Backing field for <see cref="Remark"/> property
         /// </summary>
         private string remark;
 
         /// <summary>
-        /// Backing field for <see cref="ShortName"/>
+        /// Backing field for <see cref="ShortName"/> property
         /// </summary>
         private string shortName;
 
         /// <summary>
-        /// Backing field for <see cref="Source"/>
+        /// Backing field for <see cref="Source"/> property
         /// </summary>
         private ReferenceSource source;
 
         /// <summary>
-        /// Backing field for <see cref="SourceShortName"/>
-        /// </summary>
-        private string sourceShortName;
-
-        /// <summary>
-        /// Backing field for <see cref="SourceName"/>
+        /// Backing field for <see cref="SourceName"/> property
         /// </summary>
         private string sourceName;
+
+        /// <summary>
+        /// Backing field for <see cref="SourceShortName"/> property
+        /// </summary>
+        private string sourceShortName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CitationRowViewModel"/> class
@@ -74,6 +95,14 @@ namespace CDP4CommonView
             this.UpdateProperties();
         }
 
+        /// <summary>
+        /// Gets or sets the IsAdaptation
+        /// </summary>
+        public bool IsAdaptation
+        {
+            get { return this.isAdaptation; }
+            set { this.RaiseAndSetIfChanged(ref this.isAdaptation, value); }
+        }
 
         /// <summary>
         /// Gets or sets the Location
@@ -82,15 +111,6 @@ namespace CDP4CommonView
         {
             get { return this.location; }
             set { this.RaiseAndSetIfChanged(ref this.location, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the IsAdaptation
-        /// </summary>
-        public bool IsAdaptation
-        {
-            get { return this.isAdaptation; }
-            set { this.RaiseAndSetIfChanged(ref this.isAdaptation, value); }
         }
 
         /// <summary>
@@ -121,15 +141,6 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or set the ShortName of <see cref="Source"/>
-        /// </summary>
-        public string SourceShortName
-        {
-            get { return this.sourceShortName; }
-            set { this.RaiseAndSetIfChanged(ref this.sourceShortName, value); }
-        }
-
-        /// <summary>
         /// Gets or set the Name of <see cref="Source"/>
         /// </summary>
         public string SourceName
@@ -138,7 +149,15 @@ namespace CDP4CommonView
             set { this.RaiseAndSetIfChanged(ref this.sourceName, value); }
         }
 
-	
+        /// <summary>
+        /// Gets or set the ShortName of <see cref="Source"/>
+        /// </summary>
+        public string SourceShortName
+        {
+            get { return this.sourceShortName; }
+            set { this.RaiseAndSetIfChanged(ref this.sourceShortName, value); }
+        }
+
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -149,6 +168,7 @@ namespace CDP4CommonView
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+
             this.UpdateProperties();
         }
 
@@ -157,17 +177,21 @@ namespace CDP4CommonView
         /// </summary>
         private void UpdateProperties()
         {
-            this.ModifiedOn = this.Thing.ModifiedOn;
-            this.Location = this.Thing.Location;
             this.IsAdaptation = this.Thing.IsAdaptation;
+            this.Location = this.Thing.Location;
             this.Remark = this.Thing.Remark;
             this.ShortName = this.Thing.ShortName;
-			if (this.Thing.Source != null)
-			{
-				this.SourceShortName = this.Thing.Source.ShortName;
-				this.SourceName = this.Thing.Source.Name;
-			}			
             this.Source = this.Thing.Source;
+            if (this.Thing.Source != null)
+            {
+                this.SourceName = this.Thing.Source.Name;
+                this.SourceShortName = this.Thing.Source.ShortName;
+            }
+            else
+            {
+                this.SourceName = string.Empty;
+                this.SourceShortName = string.Empty;
+            }
         }
     }
 }

@@ -1,25 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeComponentRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    This is an auto-generated class. Any manual changes to this file will be overwritten!
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or (at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
 // </summary>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+    using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,41 +49,40 @@ namespace CDP4CommonView
     /// </summary>
     public partial class ParameterTypeComponentRowViewModel : RowViewModelBase<ParameterTypeComponent>
     {
-
         /// <summary>
-        /// Backing field for <see cref="ShortName"/>
-        /// </summary>
-        private string shortName;
-
-        /// <summary>
-        /// Backing field for <see cref="ParameterType"/>
+        /// Backing field for <see cref="ParameterType"/> property
         /// </summary>
         private ParameterType parameterType;
 
         /// <summary>
-        /// Backing field for <see cref="ParameterTypeShortName"/>
-        /// </summary>
-        private string parameterTypeShortName;
-
-        /// <summary>
-        /// Backing field for <see cref="ParameterTypeName"/>
+        /// Backing field for <see cref="ParameterTypeName"/> property
         /// </summary>
         private string parameterTypeName;
 
         /// <summary>
-        /// Backing field for <see cref="Scale"/>
+        /// Backing field for <see cref="ParameterTypeShortName"/> property
+        /// </summary>
+        private string parameterTypeShortName;
+
+        /// <summary>
+        /// Backing field for <see cref="Scale"/> property
         /// </summary>
         private MeasurementScale scale;
 
         /// <summary>
-        /// Backing field for <see cref="ScaleShortName"/>
+        /// Backing field for <see cref="ScaleName"/> property
+        /// </summary>
+        private string scaleName;
+
+        /// <summary>
+        /// Backing field for <see cref="ScaleShortName"/> property
         /// </summary>
         private string scaleShortName;
 
         /// <summary>
-        /// Backing field for <see cref="ScaleName"/>
+        /// Backing field for <see cref="ShortName"/> property
         /// </summary>
-        private string scaleName;
+        private string shortName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeComponentRowViewModel"/> class
@@ -74,16 +95,6 @@ namespace CDP4CommonView
             this.UpdateProperties();
         }
 
-
-        /// <summary>
-        /// Gets or sets the ShortName
-        /// </summary>
-        public string ShortName
-        {
-            get { return this.shortName; }
-            set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
-        }
-
         /// <summary>
         /// Gets or sets the ParameterType
         /// </summary>
@@ -91,15 +102,6 @@ namespace CDP4CommonView
         {
             get { return this.parameterType; }
             set { this.RaiseAndSetIfChanged(ref this.parameterType, value); }
-        }
-
-        /// <summary>
-        /// Gets or set the ShortName of <see cref="ParameterType"/>
-        /// </summary>
-        public string ParameterTypeShortName
-        {
-            get { return this.parameterTypeShortName; }
-            set { this.RaiseAndSetIfChanged(ref this.parameterTypeShortName, value); }
         }
 
         /// <summary>
@@ -112,12 +114,30 @@ namespace CDP4CommonView
         }
 
         /// <summary>
+        /// Gets or set the ShortName of <see cref="ParameterType"/>
+        /// </summary>
+        public string ParameterTypeShortName
+        {
+            get { return this.parameterTypeShortName; }
+            set { this.RaiseAndSetIfChanged(ref this.parameterTypeShortName, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the Scale
         /// </summary>
         public MeasurementScale Scale
         {
             get { return this.scale; }
             set { this.RaiseAndSetIfChanged(ref this.scale, value); }
+        }
+
+        /// <summary>
+        /// Gets or set the Name of <see cref="Scale"/>
+        /// </summary>
+        public string ScaleName
+        {
+            get { return this.scaleName; }
+            set { this.RaiseAndSetIfChanged(ref this.scaleName, value); }
         }
 
         /// <summary>
@@ -130,15 +150,14 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or set the Name of <see cref="Scale"/>
+        /// Gets or sets the ShortName
         /// </summary>
-        public string ScaleName
+        public string ShortName
         {
-            get { return this.scaleName; }
-            set { this.RaiseAndSetIfChanged(ref this.scaleName, value); }
+            get { return this.shortName; }
+            set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
         }
 
-	
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -149,6 +168,7 @@ namespace CDP4CommonView
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+
             this.UpdateProperties();
         }
 
@@ -157,20 +177,29 @@ namespace CDP4CommonView
         /// </summary>
         private void UpdateProperties()
         {
-            this.ModifiedOn = this.Thing.ModifiedOn;
-            this.ShortName = this.Thing.ShortName;
-			if (this.Thing.ParameterType != null)
-			{
-				this.ParameterTypeShortName = this.Thing.ParameterType.ShortName;
-				this.ParameterTypeName = this.Thing.ParameterType.Name;
-			}			
             this.ParameterType = this.Thing.ParameterType;
-			if (this.Thing.Scale != null)
-			{
-				this.ScaleShortName = this.Thing.Scale.ShortName;
-				this.ScaleName = this.Thing.Scale.Name;
-			}			
+            if (this.Thing.ParameterType != null)
+            {
+                this.ParameterTypeName = this.Thing.ParameterType.Name;
+                this.ParameterTypeShortName = this.Thing.ParameterType.ShortName;
+            }
+            else
+            {
+                this.ParameterTypeName = string.Empty;
+                this.ParameterTypeShortName = string.Empty;
+            }
             this.Scale = this.Thing.Scale;
+            if (this.Thing.Scale != null)
+            {
+                this.ScaleName = this.Thing.Scale.Name;
+                this.ScaleShortName = this.Thing.Scale.ShortName;
+            }
+            else
+            {
+                this.ScaleName = string.Empty;
+                this.ScaleShortName = string.Empty;
+            }
+            this.ShortName = this.Thing.ShortName;
         }
     }
 }

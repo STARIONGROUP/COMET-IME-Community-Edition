@@ -1,25 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ExternalIdentifierMapRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    This is an auto-generated class. Any manual changes to this file will be overwritten!
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or (at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
 // </summary>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+    using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,56 +49,55 @@ namespace CDP4CommonView
     /// </summary>
     public partial class ExternalIdentifierMapRowViewModel : RowViewModelBase<ExternalIdentifierMap>
     {
-
         /// <summary>
-        /// Backing field for <see cref="ExternalModelName"/>
-        /// </summary>
-        private string externalModelName;
-
-        /// <summary>
-        /// Backing field for <see cref="ExternalToolName"/>
-        /// </summary>
-        private string externalToolName;
-
-        /// <summary>
-        /// Backing field for <see cref="ExternalToolVersion"/>
-        /// </summary>
-        private string externalToolVersion;
-
-        /// <summary>
-        /// Backing field for <see cref="Name"/>
-        /// </summary>
-        private string name;
-
-        /// <summary>
-        /// Backing field for <see cref="ExternalFormat"/>
+        /// Backing field for <see cref="ExternalFormat"/> property
         /// </summary>
         private ReferenceSource externalFormat;
 
         /// <summary>
-        /// Backing field for <see cref="ExternalFormatShortName"/>
-        /// </summary>
-        private string externalFormatShortName;
-
-        /// <summary>
-        /// Backing field for <see cref="ExternalFormatName"/>
+        /// Backing field for <see cref="ExternalFormatName"/> property
         /// </summary>
         private string externalFormatName;
 
         /// <summary>
-        /// Backing field for <see cref="Owner"/>
+        /// Backing field for <see cref="ExternalFormatShortName"/> property
+        /// </summary>
+        private string externalFormatShortName;
+
+        /// <summary>
+        /// Backing field for <see cref="ExternalModelName"/> property
+        /// </summary>
+        private string externalModelName;
+
+        /// <summary>
+        /// Backing field for <see cref="ExternalToolName"/> property
+        /// </summary>
+        private string externalToolName;
+
+        /// <summary>
+        /// Backing field for <see cref="ExternalToolVersion"/> property
+        /// </summary>
+        private string externalToolVersion;
+
+        /// <summary>
+        /// Backing field for <see cref="Name"/> property
+        /// </summary>
+        private string name;
+
+        /// <summary>
+        /// Backing field for <see cref="Owner"/> property
         /// </summary>
         private DomainOfExpertise owner;
 
         /// <summary>
-        /// Backing field for <see cref="OwnerShortName"/>
-        /// </summary>
-        private string ownerShortName;
-
-        /// <summary>
-        /// Backing field for <see cref="OwnerName"/>
+        /// Backing field for <see cref="OwnerName"/> property
         /// </summary>
         private string ownerName;
+
+        /// <summary>
+        /// Backing field for <see cref="OwnerShortName"/> property
+        /// </summary>
+        private string ownerShortName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExternalIdentifierMapRowViewModel"/> class
@@ -89,6 +110,32 @@ namespace CDP4CommonView
             this.UpdateProperties();
         }
 
+        /// <summary>
+        /// Gets or sets the ExternalFormat
+        /// </summary>
+        public ReferenceSource ExternalFormat
+        {
+            get { return this.externalFormat; }
+            set { this.RaiseAndSetIfChanged(ref this.externalFormat, value); }
+        }
+
+        /// <summary>
+        /// Gets or set the Name of <see cref="ExternalFormat"/>
+        /// </summary>
+        public string ExternalFormatName
+        {
+            get { return this.externalFormatName; }
+            set { this.RaiseAndSetIfChanged(ref this.externalFormatName, value); }
+        }
+
+        /// <summary>
+        /// Gets or set the ShortName of <see cref="ExternalFormat"/>
+        /// </summary>
+        public string ExternalFormatShortName
+        {
+            get { return this.externalFormatShortName; }
+            set { this.RaiseAndSetIfChanged(ref this.externalFormatShortName, value); }
+        }
 
         /// <summary>
         /// Gets or sets the ExternalModelName
@@ -127,39 +174,21 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or sets the ExternalFormat
-        /// </summary>
-        public ReferenceSource ExternalFormat
-        {
-            get { return this.externalFormat; }
-            set { this.RaiseAndSetIfChanged(ref this.externalFormat, value); }
-        }
-
-        /// <summary>
-        /// Gets or set the ShortName of <see cref="ExternalFormat"/>
-        /// </summary>
-        public string ExternalFormatShortName
-        {
-            get { return this.externalFormatShortName; }
-            set { this.RaiseAndSetIfChanged(ref this.externalFormatShortName, value); }
-        }
-
-        /// <summary>
-        /// Gets or set the Name of <see cref="ExternalFormat"/>
-        /// </summary>
-        public string ExternalFormatName
-        {
-            get { return this.externalFormatName; }
-            set { this.RaiseAndSetIfChanged(ref this.externalFormatName, value); }
-        }
-
-        /// <summary>
         /// Gets or sets the Owner
         /// </summary>
         public DomainOfExpertise Owner
         {
             get { return this.owner; }
             set { this.RaiseAndSetIfChanged(ref this.owner, value); }
+        }
+
+        /// <summary>
+        /// Gets or set the Name of <see cref="Owner"/>
+        /// </summary>
+        public string OwnerName
+        {
+            get { return this.ownerName; }
+            set { this.RaiseAndSetIfChanged(ref this.ownerName, value); }
         }
 
         /// <summary>
@@ -172,16 +201,6 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or set the Name of <see cref="Owner"/>
-        /// </summary>
-        public string OwnerName
-        {
-            get { return this.ownerName; }
-            set { this.RaiseAndSetIfChanged(ref this.ownerName, value); }
-        }
-
-	
-        /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
         /// </summary>
@@ -191,6 +210,7 @@ namespace CDP4CommonView
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+
             this.UpdateProperties();
         }
 
@@ -199,23 +219,32 @@ namespace CDP4CommonView
         /// </summary>
         private void UpdateProperties()
         {
-            this.ModifiedOn = this.Thing.ModifiedOn;
+            this.ExternalFormat = this.Thing.ExternalFormat;
+            if (this.Thing.ExternalFormat != null)
+            {
+                this.ExternalFormatName = this.Thing.ExternalFormat.Name;
+                this.ExternalFormatShortName = this.Thing.ExternalFormat.ShortName;
+            }
+            else
+            {
+                this.ExternalFormatName = string.Empty;
+                this.ExternalFormatShortName = string.Empty;
+            }
             this.ExternalModelName = this.Thing.ExternalModelName;
             this.ExternalToolName = this.Thing.ExternalToolName;
             this.ExternalToolVersion = this.Thing.ExternalToolVersion;
             this.Name = this.Thing.Name;
-			if (this.Thing.ExternalFormat != null)
-			{
-				this.ExternalFormatShortName = this.Thing.ExternalFormat.ShortName;
-				this.ExternalFormatName = this.Thing.ExternalFormat.Name;
-			}			
-            this.ExternalFormat = this.Thing.ExternalFormat;
-			if (this.Thing.Owner != null)
-			{
-				this.OwnerShortName = this.Thing.Owner.ShortName;
-				this.OwnerName = this.Thing.Owner.Name;
-			}			
             this.Owner = this.Thing.Owner;
+            if (this.Thing.Owner != null)
+            {
+                this.OwnerName = this.Thing.Owner.Name;
+                this.OwnerShortName = this.Thing.Owner.ShortName;
+            }
+            else
+            {
+                this.OwnerName = string.Empty;
+                this.OwnerShortName = string.Empty;
+            }
         }
     }
 }

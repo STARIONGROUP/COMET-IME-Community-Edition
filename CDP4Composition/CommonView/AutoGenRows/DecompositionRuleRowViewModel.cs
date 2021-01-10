@@ -1,25 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DecompositionRuleRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    This is an auto-generated class. Any manual changes to this file will be overwritten!
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or (at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
 // </summary>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+    using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,31 +49,30 @@ namespace CDP4CommonView
     /// </summary>
     public partial class DecompositionRuleRowViewModel : RuleRowViewModel<DecompositionRule>
     {
-
         /// <summary>
-        /// Backing field for <see cref="MinContained"/>
-        /// </summary>
-        private int minContained;
-
-        /// <summary>
-        /// Backing field for <see cref="MaxContained"/>
-        /// </summary>
-        private int maxContained;
-
-        /// <summary>
-        /// Backing field for <see cref="ContainingCategory"/>
+        /// Backing field for <see cref="ContainingCategory"/> property
         /// </summary>
         private Category containingCategory;
 
         /// <summary>
-        /// Backing field for <see cref="ContainingCategoryShortName"/>
+        /// Backing field for <see cref="ContainingCategoryName"/> property
+        /// </summary>
+        private string containingCategoryName;
+
+        /// <summary>
+        /// Backing field for <see cref="ContainingCategoryShortName"/> property
         /// </summary>
         private string containingCategoryShortName;
 
         /// <summary>
-        /// Backing field for <see cref="ContainingCategoryName"/>
+        /// Backing field for <see cref="MaxContained"/> property
         /// </summary>
-        private string containingCategoryName;
+        private int maxContained;
+
+        /// <summary>
+        /// Backing field for <see cref="MinContained"/> property
+        /// </summary>
+        private int minContained;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DecompositionRuleRowViewModel"/> class
@@ -64,25 +85,6 @@ namespace CDP4CommonView
             this.UpdateProperties();
         }
 
-
-        /// <summary>
-        /// Gets or sets the MinContained
-        /// </summary>
-        public int MinContained
-        {
-            get { return this.minContained; }
-            set { this.RaiseAndSetIfChanged(ref this.minContained, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the MaxContained
-        /// </summary>
-        public int MaxContained
-        {
-            get { return this.maxContained; }
-            set { this.RaiseAndSetIfChanged(ref this.maxContained, value); }
-        }
-
         /// <summary>
         /// Gets or sets the ContainingCategory
         /// </summary>
@@ -90,6 +92,15 @@ namespace CDP4CommonView
         {
             get { return this.containingCategory; }
             set { this.RaiseAndSetIfChanged(ref this.containingCategory, value); }
+        }
+
+        /// <summary>
+        /// Gets or set the Name of <see cref="ContainingCategory"/>
+        /// </summary>
+        public string ContainingCategoryName
+        {
+            get { return this.containingCategoryName; }
+            set { this.RaiseAndSetIfChanged(ref this.containingCategoryName, value); }
         }
 
         /// <summary>
@@ -102,15 +113,23 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or set the Name of <see cref="ContainingCategory"/>
+        /// Gets or sets the MaxContained
         /// </summary>
-        public string ContainingCategoryName
+        public int MaxContained
         {
-            get { return this.containingCategoryName; }
-            set { this.RaiseAndSetIfChanged(ref this.containingCategoryName, value); }
+            get { return this.maxContained; }
+            set { this.RaiseAndSetIfChanged(ref this.maxContained, value); }
         }
 
-	
+        /// <summary>
+        /// Gets or sets the MinContained
+        /// </summary>
+        public int MinContained
+        {
+            get { return this.minContained; }
+            set { this.RaiseAndSetIfChanged(ref this.minContained, value); }
+        }
+
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -121,6 +140,7 @@ namespace CDP4CommonView
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+
             this.UpdateProperties();
         }
 
@@ -129,18 +149,22 @@ namespace CDP4CommonView
         /// </summary>
         private void UpdateProperties()
         {
-            this.ModifiedOn = this.Thing.ModifiedOn;
-            this.MinContained = this.Thing.MinContained;
-            if(this.Thing.MaxContained.HasValue)
+            this.ContainingCategory = this.Thing.ContainingCategory;
+            if (this.Thing.ContainingCategory != null)
+            {
+                this.ContainingCategoryName = this.Thing.ContainingCategory.Name;
+                this.ContainingCategoryShortName = this.Thing.ContainingCategory.ShortName;
+            }
+            else
+            {
+                this.ContainingCategoryName = string.Empty;
+                this.ContainingCategoryShortName = string.Empty;
+            }
+            if (this.Thing.MaxContained.HasValue)
             {
                 this.MaxContained = this.Thing.MaxContained.Value;
             }
-			if (this.Thing.ContainingCategory != null)
-			{
-				this.ContainingCategoryShortName = this.Thing.ContainingCategory.ShortName;
-				this.ContainingCategoryName = this.Thing.ContainingCategory.Name;
-			}			
-            this.ContainingCategory = this.Thing.ContainingCategory;
+            this.MinContained = this.Thing.MinContained;
         }
     }
 }
