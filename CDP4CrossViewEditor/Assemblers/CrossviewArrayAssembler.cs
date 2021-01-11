@@ -287,7 +287,7 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             this.SetContentColumnIndex(
                 parameterBase.ParameterType.ShortName,
-                parameterBase.Scale.ShortName,
+                parameterBase.Scale?.ShortName ?? "",
                 index);
         }
 
@@ -332,7 +332,7 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             return this.GetContentColumnIndex(
                 parameterBase.ParameterType.ShortName,
-                parameterBase.Scale.ShortName);
+                parameterBase.Scale?.ShortName ?? "");
         }
 
         /// <summary>
