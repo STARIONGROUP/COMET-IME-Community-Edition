@@ -10,8 +10,8 @@
     <Product>CDP4SiteDirectory</Product>
     <Description>CDP4 SiteDirectory Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>7.0.1</AssemblyVersion>
-    <FileVersion>7.0.1</FileVersion>
+    <AssemblyVersion>7.0.2</AssemblyVersion>
+    <FileVersion>7.0.2</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -35,13 +35,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="6.3.0">
+    <PackageReference Include="CDP4Common-CE" Version="7.2.0-508-PR162">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="7.0.0">
+    <PackageReference Include="CDP4Dal-CE" Version="7.2.0-508-PR162">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.3.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.2.0-508-PR162">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">
