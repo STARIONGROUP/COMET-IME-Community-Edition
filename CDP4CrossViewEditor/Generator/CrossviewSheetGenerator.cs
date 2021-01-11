@@ -77,34 +77,14 @@ namespace CDP4CrossViewEditor.Generator
         private Worksheet crossviewSheet;
 
         /// <summary>
-        /// The array that contains the content of the header section of the crossview sheet
+        /// The <see cref="CrossviewArrayAssembler"/>
         /// </summary>
-        private object[,] headerContent;
+        private CrossviewArrayAssembler crossviewArrayAssember;
 
         /// <summary>
-        /// The array that contains the lock settings of the header section of the crossview sheet
+        /// The <see cref="CrossviewHeaderArrayAssembler"/>
         /// </summary>
-        private object[,] headerLock;
-
-        /// <summary>
-        /// The array that contains the formatting settings of the header section of the crossview sheet
-        /// </summary>
-        private object[,] headerFormat;
-
-        /// <summary>
-        /// The array that contains the formatting of the body section of the crossview sheet
-        /// </summary>
-        private object[,] bodyFormat;
-
-        /// <summary>
-        /// The array that contains the content of the body section of the crossview sheet
-        /// </summary>
-        private object[,] bodyContent;
-
-        /// <summary>
-        /// The array that contains the lock settings of the body section of the crossview sheet
-        /// </summary>
-        private object[,] bodyLock;
+        private CrossviewHeaderArrayAssembler headerArrayAssembler;
 
         /// <summary>
         /// Gets the <see cref="ISession"/> that is active
@@ -227,16 +207,14 @@ namespace CDP4CrossViewEditor.Generator
             var excelRows = assembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
-            var crossviewArrayAssembler = new CrossviewArrayAssembler(excelRows, parameterTypes);
-            this.bodyContent = crossviewArrayAssembler.ContentArray;
-            this.bodyFormat = crossviewArrayAssembler.FormatArray;
-            this.bodyLock = crossviewArrayAssembler.LockArray;
+            this.crossviewArrayAssember = new CrossviewArrayAssembler(excelRows, parameterTypes);
 
             // Instantiate header
-            var headerArrayAssembler = new CrossviewHeaderArrayAssembler(this.session, this.iteration, this.participant, this.bodyContent.GetLength(1));
-            this.headerContent = headerArrayAssembler.HeaderArray;
-            this.headerFormat = headerArrayAssembler.FormatArray;
-            this.headerLock = headerArrayAssembler.LockArray;
+            this.headerArrayAssembler = new CrossviewHeaderArrayAssembler(
+                this.session,
+                this.iteration,
+                this.participant,
+                this.crossviewArrayAssember.ContentArray.GetLength(1));
         }
 
         /// <summary>
@@ -253,15 +231,15 @@ namespace CDP4CrossViewEditor.Generator
         /// </summary>
         private void WriteHeader()
         {
-            var numberOfRows = this.headerContent.GetLength(0);
-            var numberOfColumns = this.headerContent.GetLength(1);
+            var numberOfRows = this.headerArrayAssembler.HeaderArray.GetLength(0);
+            var numberOfColumns = this.headerArrayAssembler.HeaderArray.GetLength(1);
 
             var range = this.crossviewSheet.Range(this.crossviewSheet.Cells[1, 1], this.crossviewSheet.Cells[numberOfRows, numberOfColumns]);
             range.HorizontalAlignment = XlHAlign.xlHAlignLeft;
-            range.NumberFormat = this.headerFormat;
-            range.Locked = this.headerLock;
+            range.NumberFormat = this.headerArrayAssembler.FormatArray;
+            range.Locked = this.headerArrayAssembler.LockArray;
             range.Name = CrossviewSheetConstants.HeaderName;
-            range.Value = this.headerContent;
+            range.Value = this.headerArrayAssembler.HeaderArray;
             range.Interior.ColorIndex = 8;
             range.EntireColumn.AutoFit();
         }
@@ -271,12 +249,12 @@ namespace CDP4CrossViewEditor.Generator
         /// </summary>
         private void WriteRows()
         {
-            var numberOfHeaderRows = this.headerContent.GetLength(0);
+            var numberOfHeaderRows = this.headerArrayAssembler.HeaderArray.GetLength(0);
 
-            var numberOfBodyRows = this.bodyContent.GetLength(0);
-            var numberOfColumns = this.bodyContent.GetLength(1);
+            var numberOfBodyRows = this.crossviewArrayAssember.ContentArray.GetLength(0);
+            var numberOfColumns = this.crossviewArrayAssember.ContentArray.GetLength(1);
 
-            var dataStartRow = numberOfHeaderRows + CrossviewSheetConstants.HeaderDepth;
+            var dataStartRow = numberOfHeaderRows + this.crossviewArrayAssember.ActualHeaderDepth;
             var dataEndRow = numberOfHeaderRows + numberOfBodyRows;
 
             var formattedrange = this.crossviewSheet.Range(
@@ -293,9 +271,9 @@ namespace CDP4CrossViewEditor.Generator
                 this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
                 this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
             parameterRange.Name = CrossviewSheetConstants.RangeName;
-            parameterRange.NumberFormat = this.bodyFormat;
-            parameterRange.Value = this.bodyContent;
-            parameterRange.Locked = this.bodyLock;
+            parameterRange.NumberFormat = this.crossviewArrayAssember.FormatArray;
+            parameterRange.Value = this.crossviewArrayAssember.ContentArray;
+            parameterRange.Locked = this.crossviewArrayAssember.LockArray;
             parameterRange.EntireColumn.AutoFit();
 
             this.ApplyCellNames(dataStartRow, dataEndRow);

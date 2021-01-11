@@ -47,6 +47,13 @@ namespace CDP4CrossViewEditor.Assemblers
         private int numberOfColumns = CrossviewSheetConstants.FixedColumns;
 
         /// <summary>
+        /// The actual number of header nested layers.
+        /// This might be lower than <see cref="CrossviewSheetConstants.HeaderDepth"/>
+        /// if all values on a layer are missing.
+        /// </summary>
+        public int ActualHeaderDepth { get; private set; }
+
+        /// <summary>
         /// The <see cref="IExcelRow{T}"/> that are being used to populate the various arrays
         /// </summary>
         private readonly IEnumerable<IExcelRow<Thing>> excelRows;
@@ -117,6 +124,8 @@ namespace CDP4CrossViewEditor.Assemblers
             this.InitializeHeaderStructure();
 
             var contentHeader = this.GenerateContentHeader();
+
+            this.ActualHeaderDepth = CrossviewSheetConstants.HeaderDepth;
 
             this.ContentArray = new object[this.excelRows.Count() + contentHeader.Count, this.numberOfColumns];
             this.LockArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
