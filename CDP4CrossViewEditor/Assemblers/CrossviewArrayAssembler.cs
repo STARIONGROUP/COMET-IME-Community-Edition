@@ -243,34 +243,72 @@ namespace CDP4CrossViewEditor.Assemblers
             contentRow[3] = excelRow.Owner;
             contentRow[4] = excelRow.Categories;
 
-            var parameterList = new List<ParameterBase>();
+            IEnumerable<ParameterBase> parameters;
 
             switch (excelRow.Thing)
             {
-                case ElementDefinition elementDefinition:
-                    parameterList = elementDefinition.Parameter.ToList<ParameterBase>();
+                case ElementUsage elementUsage:
+                    parameters = this.parameterTypes
+                        .Select(pt => GetParameterBase(elementUsage, pt))
+                        .Where(p => p != null);
                     break;
 
-                case ElementUsage elementUsage:
-                    parameterList = elementUsage.ParameterOverride.ToList<ParameterBase>();
+                case ElementDefinition elementDefinition:
+                    parameters = this.parameterTypes
+                        .Select(pt => GetParameterBase(elementDefinition, pt))
+                        .Where(p => p != null);
                     break;
+
+                default:
+                    return contentRow;
             }
 
-            foreach (var parameterType in this.parameterTypes)
+            foreach (var parameterBase in parameters)
             {
-                foreach (var parameter in parameterList)
-                {
-                    if (parameter.ParameterType != parameterType)
-                    {
-                        continue;
-                    }
-
-                    var valueSet = parameter.ValueSets.FirstOrDefault();
-                    contentRow[this.GetContentColumnIndex(parameter)] = valueSet?.ActualValue.FirstOrDefault();
-                }
+                var valueSet = parameterBase.ValueSets.FirstOrDefault();
+                contentRow[this.GetContentColumnIndex(parameterBase)] = valueSet?.ActualValue.FirstOrDefault();
             }
 
             return contentRow;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ParameterOverride"/> corresponding to the given <paramref name="parameterType"/>
+        /// from the given <see cref="ElementUsage"/>, if present; otherwise,
+        /// gets the <see cref="Parameter"/> corresponding to the given <paramref name="parameterType"/>
+        /// from the <see cref="ElementUsage.ElementDefinition"/>.
+        /// </summary>
+        /// <param name="elementUsage">
+        /// The given <see cref="ElementUsage"/>
+        /// </param>
+        /// <param name="parameterType">
+        /// The given <see cref="ParameterType"/>
+        /// </param>
+        /// <returns>
+        /// The <see cref="ParameterBase"/>
+        /// </returns>
+        private static ParameterBase GetParameterBase(ElementUsage elementUsage, ParameterType parameterType)
+        {
+            return elementUsage.ParameterOverride.FirstOrDefault(po => po.ParameterType == parameterType)
+                   ?? GetParameterBase(elementUsage.ElementDefinition, parameterType);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Parameter"/> corresponding to the given <paramref name="parameterType"/>
+        /// from the given <see cref="ElementDefinition"/>.
+        /// </summary>
+        /// <param name="elementDefinition">
+        /// The given <see cref="ElementDefinition"/>
+        /// </param>
+        /// <param name="parameterType">
+        /// The given <see cref="ParameterType"/>
+        /// </param>
+        /// <returns>
+        /// The <see cref="ParameterBase"/>
+        /// </returns>
+        private static ParameterBase GetParameterBase(ElementDefinition elementDefinition, ParameterType parameterType)
+        {
+            return elementDefinition.Parameter.FirstOrDefault(p => p.ParameterType == parameterType);
         }
 
         /// <summary>
