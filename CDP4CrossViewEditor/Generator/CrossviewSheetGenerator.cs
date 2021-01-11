@@ -271,20 +271,17 @@ namespace CDP4CrossViewEditor.Generator
         /// </summary>
         private void WriteRows()
         {
-            var numberOfRows = this.bodyContent.GetLength(0);
+            var numberOfHeaderRows = this.headerContent.GetLength(0);
+
+            var numberOfBodyRows = this.bodyContent.GetLength(0);
             var numberOfColumns = this.bodyContent.GetLength(1);
 
-            var startrow = this.headerContent.GetLength(0) + 2;
-            var endrow = startrow + numberOfRows - 1;
+            var dataStartRow = numberOfHeaderRows + CrossviewSheetConstants.HeaderDepth;
+            var dataEndRow = numberOfHeaderRows + numberOfBodyRows;
 
-            var parameterRange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow, 1], this.crossviewSheet.Cells[endrow, numberOfColumns]);
-            parameterRange.Name = CrossviewSheetConstants.RangeName;
-            parameterRange.NumberFormat = this.bodyFormat;
-            parameterRange.Value = this.bodyContent;
-            parameterRange.Locked = this.bodyLock;
-            parameterRange.EntireColumn.AutoFit();
-
-            var formattedrange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow - 1, 1], this.crossviewSheet.Cells[startrow, numberOfColumns]);
+            var formattedrange = this.crossviewSheet.Range(
+                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
+                this.crossviewSheet.Cells[dataStartRow, numberOfColumns]);
             formattedrange.Interior.ColorIndex = 34;
             formattedrange.HorizontalAlignment = XlHAlign.xlHAlignCenter;
             formattedrange.Font.Bold = true;
@@ -292,9 +289,18 @@ namespace CDP4CrossViewEditor.Generator
             formattedrange.Font.Size = 11;
             formattedrange.EntireColumn.AutoFit();
 
-            this.ApplyCellNames(startrow, endrow);
+            var parameterRange = this.crossviewSheet.Range(
+                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
+                this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
+            parameterRange.Name = CrossviewSheetConstants.RangeName;
+            parameterRange.NumberFormat = this.bodyFormat;
+            parameterRange.Value = this.bodyContent;
+            parameterRange.Locked = this.bodyLock;
+            parameterRange.EntireColumn.AutoFit();
 
-            this.crossviewSheet.Cells[startrow + 1, 1].Select();
+            this.ApplyCellNames(dataStartRow, dataEndRow);
+
+            this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
             this.excelApplication.ActiveWindow.FreezePanes = true;
         }
 
