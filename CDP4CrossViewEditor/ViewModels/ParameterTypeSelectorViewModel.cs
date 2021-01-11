@@ -45,7 +45,7 @@ namespace CDP4CrossViewEditor.ViewModels
     public sealed class ParameterTypeSelectorViewModel : ThingSelectorViewModel
     {
         /// <summary>
-        /// Hard coded power related parameters types list
+        /// Hardcoded power related parameter type short names list
         /// </summary>
         private static readonly string[] PowerParameters = { "redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
 
@@ -59,8 +59,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         public bool PowerParametersEnabled
         {
-            get { return this.powerParametersEnabled; }
-            set { this.RaiseAndSetIfChanged(ref this.powerParametersEnabled, value); }
+            get => this.powerParametersEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.powerParametersEnabled, value);
         }
 
         /// <summary>
@@ -219,12 +219,17 @@ namespace CDP4CrossViewEditor.ViewModels
                 switch (element)
                 {
                     case ElementDefinition definition:
-                        powerParameterType.AddRange(definition.Parameter.Where(p => PowerParameters.Contains(p.ParameterType.ShortName)).Select(p => p.ParameterType));
+                        powerParameterType.AddRange(definition.Parameter
+                            .Where(p => PowerParameters.Contains(p.ParameterType.ShortName))
+                            .Select(p => p.ParameterType));
 
                         break;
 
                     case ElementUsage usage:
-                        powerParameterType.AddRange(usage.ParameterOverride.Where(p => PowerParameters.Contains(p.ParameterType.ShortName)).Select(p => p.ParameterType));
+                        powerParameterType.AddRange(usage.ParameterOverride
+                            .Where(p => PowerParameters.Contains(p.ParameterType.ShortName))
+                            .Select(p => p.ParameterType));
+
                         break;
                 }
             }
