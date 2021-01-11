@@ -41,6 +41,7 @@ namespace CDP4CrossViewEditor.Generator
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
@@ -77,34 +78,14 @@ namespace CDP4CrossViewEditor.Generator
         private Worksheet crossviewSheet;
 
         /// <summary>
-        /// The array that contains the content of the header section of the crossview sheet
+        /// The <see cref="CrossviewArrayAssembler"/>
         /// </summary>
-        private object[,] headerContent;
+        private CrossviewArrayAssembler crossviewArrayAssember;
 
         /// <summary>
-        /// The array that contains the lock settings of the header section of the crossview sheet
+        /// The <see cref="CrossviewHeaderArrayAssembler"/>
         /// </summary>
-        private object[,] headerLock;
-
-        /// <summary>
-        /// The array that contains the formatting settings of the header section of the crossview sheet
-        /// </summary>
-        private object[,] headerFormat;
-
-        /// <summary>
-        /// The array that contains the formatting of the body section of the crossview sheet
-        /// </summary>
-        private object[,] bodyFormat;
-
-        /// <summary>
-        /// The array that contains the content of the body section of the crossview sheet
-        /// </summary>
-        private object[,] bodyContent;
-
-        /// <summary>
-        /// The array that contains the lock settings of the body section of the crossview sheet
-        /// </summary>
-        private object[,] bodyLock;
+        private CrossviewHeaderArrayAssembler headerArrayAssembler;
 
         /// <summary>
         /// Gets the <see cref="ISession"/> that is active
@@ -227,16 +208,14 @@ namespace CDP4CrossViewEditor.Generator
             var excelRows = assembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
-            var crossviewArrayAssembler = new CrossviewArrayAssembler(excelRows, parameterTypes);
-            this.bodyContent = crossviewArrayAssembler.ContentArray;
-            this.bodyFormat = crossviewArrayAssembler.FormatArray;
-            this.bodyLock = crossviewArrayAssembler.LockArray;
+            this.crossviewArrayAssember = new CrossviewArrayAssembler(excelRows, parameterTypes);
 
             // Instantiate header
-            var headerArrayAssembler = new CrossviewHeaderArrayAssembler(this.session, this.iteration, this.participant, this.bodyContent.GetLength(1));
-            this.headerContent = headerArrayAssembler.HeaderArray;
-            this.headerFormat = headerArrayAssembler.FormatArray;
-            this.headerLock = headerArrayAssembler.LockArray;
+            this.headerArrayAssembler = new CrossviewHeaderArrayAssembler(
+                this.session,
+                this.iteration,
+                this.participant,
+                this.crossviewArrayAssember.ContentArray.GetLength(1));
         }
 
         /// <summary>
@@ -253,48 +232,82 @@ namespace CDP4CrossViewEditor.Generator
         /// </summary>
         private void WriteHeader()
         {
-            var numberOfRows = this.headerContent.GetLength(0);
-            var numberOfColumns = this.headerContent.GetLength(1);
+            var numberOfRows = this.headerArrayAssembler.HeaderArray.GetLength(0);
+            var numberOfColumns = this.headerArrayAssembler.HeaderArray.GetLength(1);
 
             var range = this.crossviewSheet.Range(this.crossviewSheet.Cells[1, 1], this.crossviewSheet.Cells[numberOfRows, numberOfColumns]);
             range.HorizontalAlignment = XlHAlign.xlHAlignLeft;
-            range.NumberFormat = this.headerFormat;
-            range.Locked = this.headerLock;
+            range.NumberFormat = this.headerArrayAssembler.FormatArray;
+            range.Locked = this.headerArrayAssembler.LockArray;
             range.Name = CrossviewSheetConstants.HeaderName;
-            range.Value = this.headerContent;
+            range.Value = this.headerArrayAssembler.HeaderArray;
             range.Interior.ColorIndex = 8;
             range.EntireColumn.AutoFit();
         }
 
         /// <summary>
-        /// Write the content of the <see cref="bodyContent"/> to the crossview sheet
+        /// Write the content of the crossview sheet
         /// </summary>
         private void WriteRows()
         {
-            var numberOfRows = this.bodyContent.GetLength(0);
-            var numberOfColumns = this.bodyContent.GetLength(1);
+            var numberOfHeaderRows = this.headerArrayAssembler.HeaderArray.GetLength(0);
 
-            var startrow = this.headerContent.GetLength(0) + 2;
-            var endrow = startrow + numberOfRows - 1;
+            var numberOfBodyRows = this.crossviewArrayAssember.ContentArray.GetLength(0);
+            var numberOfColumns = this.crossviewArrayAssember.ContentArray.GetLength(1);
 
-            var parameterRange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow, 1], this.crossviewSheet.Cells[endrow, numberOfColumns]);
+            var dataStartRow = numberOfHeaderRows + this.crossviewArrayAssember.ActualHeaderDepth;
+            var dataEndRow = numberOfHeaderRows + numberOfBodyRows;
+
+            var parameterRange = this.crossviewSheet.Range(
+                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
+                this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
             parameterRange.Name = CrossviewSheetConstants.RangeName;
-            parameterRange.NumberFormat = this.bodyFormat;
-            parameterRange.Value = this.bodyContent;
-            parameterRange.Locked = this.bodyLock;
+            parameterRange.NumberFormat = this.crossviewArrayAssember.FormatArray;
+            parameterRange.Value = this.crossviewArrayAssember.ContentArray;
+            parameterRange.Locked = this.crossviewArrayAssember.LockArray;
             parameterRange.EntireColumn.AutoFit();
 
-            var formattedrange = this.crossviewSheet.Range(this.crossviewSheet.Cells[startrow - 1, 1], this.crossviewSheet.Cells[startrow, numberOfColumns]);
-            formattedrange.Interior.ColorIndex = 34;
-            formattedrange.HorizontalAlignment = XlHAlign.xlHAlignCenter;
-            formattedrange.Font.Bold = true;
-            formattedrange.Font.Underline = true;
-            formattedrange.Font.Size = 11;
-            formattedrange.EntireColumn.AutoFit();
+            var formattedRange = this.crossviewSheet.Range(
+                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
+                this.crossviewSheet.Cells[dataStartRow, numberOfColumns]);
+            formattedRange.Interior.ColorIndex = 34;
+            formattedRange.HorizontalAlignment = XlHAlign.xlHAlignCenter;
+            formattedRange.VerticalAlignment = XlVAlign.xlVAlignCenter;
+            formattedRange.Font.Bold = true;
+            formattedRange.Font.Underline = true;
+            formattedRange.Font.Size = 11;
+            formattedRange.EntireColumn.AutoFit();
 
-            this.ApplyCellNames(startrow, endrow);
+            // format fixed columns
+            for (var i = 1; i <= CrossviewSheetConstants.FixedColumns; ++i)
+            {
+                this.crossviewSheet.Range(
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, i],
+                        this.crossviewSheet.Cells[dataStartRow, i])
+                    .Merge();
+            }
 
-            this.crossviewSheet.Cells[startrow + 1, 1].Select();
+            // group horizontal parameter columns
+            var bodyHeaderDictionary = this.crossviewArrayAssember.headerDictionary;
+            foreach (var parameterTypeShortName in bodyHeaderDictionary.Keys)
+            {
+                var min = bodyHeaderDictionary[parameterTypeShortName].Values.Min();
+                var max = bodyHeaderDictionary[parameterTypeShortName].Values.Max();
+
+                if (min == max)
+                {
+                    continue;
+                }
+
+                this.crossviewSheet.Range(
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, min + 1],
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, max + 1])
+                    .Merge();
+            }
+
+            this.ApplyCellNames(dataStartRow, CrossviewSheetConstants.FixedColumns + 1, dataEndRow, numberOfColumns);
+
+            this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
             this.excelApplication.ActiveWindow.FreezePanes = true;
         }
 
@@ -304,15 +317,21 @@ namespace CDP4CrossViewEditor.Generator
         /// <param name="beginRow">
         /// The row at which the range begins
         /// </param>
+        /// <param name="beginColumn">
+        /// The column at which the range begins
+        /// </param>
         /// <param name="endRow">
         /// The row at which the range ends
         /// </param>
-        private void ApplyCellNames(int beginRow, int endRow)
+        /// <param name="endColumn">
+        /// The column at which the range ends
+        /// </param>
+        private void ApplyCellNames(int beginRow, int beginColumn, int endRow, int endColumn)
         {
             var range =
                 this.crossviewSheet.Range(
-                    this.crossviewSheet.Cells[beginRow + 2, CrossviewSheetConstants.ActualValueColumn],
-                    this.crossviewSheet.Cells[endRow, CrossviewSheetConstants.ModelCodeColumn]);
+                    this.crossviewSheet.Cells[beginRow, beginColumn],
+                    this.crossviewSheet.Cells[endRow, endColumn]);
 
             range.CreateNames(top: false, left: false, bottom: false, right: true);
         }

@@ -135,7 +135,8 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                Name = "PT1_SimpleQuantityKind"
+                Name = "PT1_SimpleQuantityKind",
+                ShortName = "PT1_SimpleQuantityKind"
             };
 
             this.parameterTypes.Add(parameterType);
@@ -165,12 +166,8 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, new List<ParameterType>());
             var contentArray = arrayAssembler.ContentArray;
 
-            // The array contains 2 more rows to make a nice header and spacing
-            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - 2);
-
-            // The content is empty/null
-            Assert.IsNull(contentArray[1, 0]);
-            Assert.IsNull(contentArray[1, 1]);
+            // The array contains more rows to make a nice header and spacing
+            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - arrayAssembler.ActualHeaderDepth);
         }
 
         [Test]
@@ -183,10 +180,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
             var contentArray = arrayAssembler.ContentArray;
 
-            // The array contains 2 more rows to make a nice header and spacing
-            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - 2);
-            Assert.AreEqual("ElementDefinition_1", contentArray[1, 0]);
-            Assert.AreEqual("ED_1", contentArray[1, 1]);
+            // The array contains more rows to make a nice header and spacing
+            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - arrayAssembler.ActualHeaderDepth);
+            Assert.AreEqual("ElementDefinition_1", contentArray[arrayAssembler.ActualHeaderDepth, 0]);
+            Assert.AreEqual("ED_1", contentArray[arrayAssembler.ActualHeaderDepth, 1]);
         }
     }
 }
