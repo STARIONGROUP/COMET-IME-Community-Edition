@@ -44,16 +44,6 @@ namespace CDP4CrossViewEditor.Generator
         internal const int HeaderDepth = 2;
 
         /// <summary>
-        /// The number of the Actual value column
-        /// </summary>
-        internal const int ActualValueColumn = 7;
-
-        /// <summary>
-        /// The number of the Model code column
-        /// </summary>
-        internal const int ModelCodeColumn = 8;
-
-        /// <summary>
         /// The name of the range on the Parameters sheet that contains the header rows.
         /// </summary>
         internal const string HeaderName = "Header";

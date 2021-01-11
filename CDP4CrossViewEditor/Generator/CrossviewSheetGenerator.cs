@@ -286,7 +286,7 @@ namespace CDP4CrossViewEditor.Generator
             parameterRange.Locked = this.crossviewArrayAssember.LockArray;
             parameterRange.EntireColumn.AutoFit();
 
-            this.ApplyCellNames(dataStartRow, dataEndRow);
+            this.ApplyCellNames(dataStartRow, CrossviewSheetConstants.FixedColumns + 1, dataEndRow, numberOfColumns);
 
             this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
             this.excelApplication.ActiveWindow.FreezePanes = true;
@@ -298,15 +298,21 @@ namespace CDP4CrossViewEditor.Generator
         /// <param name="beginRow">
         /// The row at which the range begins
         /// </param>
+        /// <param name="beginColumn">
+        /// The column at which the range begins
+        /// </param>
         /// <param name="endRow">
         /// The row at which the range ends
         /// </param>
-        private void ApplyCellNames(int beginRow, int endRow)
+        /// <param name="endColumn">
+        /// The column at which the range ends
+        /// </param>
+        private void ApplyCellNames(int beginRow, int beginColumn, int endRow, int endColumn)
         {
             var range =
                 this.crossviewSheet.Range(
-                    this.crossviewSheet.Cells[beginRow + 2, CrossviewSheetConstants.ActualValueColumn],
-                    this.crossviewSheet.Cells[endRow, CrossviewSheetConstants.ModelCodeColumn]);
+                    this.crossviewSheet.Cells[beginRow, beginColumn],
+                    this.crossviewSheet.Cells[endRow, endColumn]);
 
             range.CreateNames(top: false, left: false, bottom: false, right: true);
         }
