@@ -44,7 +44,7 @@ namespace CDP4CrossViewEditor.ViewModels
     public sealed class ParameterTypeSelectorViewModel : ThingSelectorViewModel
     {
         /// <summary>
-        /// Hard coded power related parameters types list
+        /// Hardcoded power related parameter type short names list
         /// </summary>
         private static readonly string[] PowerParameters = { "redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
 
