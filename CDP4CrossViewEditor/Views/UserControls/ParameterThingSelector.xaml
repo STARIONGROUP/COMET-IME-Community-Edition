@@ -8,6 +8,7 @@
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     mc:Ignorable="d">
     <dxlc:LayoutControl Height="Auto"
                         Background="White"
@@ -23,8 +24,8 @@
                     <ColumnDefinition Width="45*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Row="0" Grid.Column="0">
-                    <dxg:GridControl MaxHeight="250"
-                                     MinHeight="125"
+                    <dxg:GridControl MaxHeight="175"
+                                     MinHeight="175"
                                      SelectedItems="{Binding Path=SelectedSourceList,
                                                             Mode=TwoWay,
                                                             UpdateSourceTrigger=PropertyChanged}"
@@ -49,13 +50,21 @@
                             <dxg:GridColumn FieldName="Type" Header="Type" ReadOnly="True" SortMode="Value" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
+                    <StackPanel Margin="0 5 0 0">
+                        <dxlc:LayoutItem Label="Power" HorizontalAlignment="Center">
+                            <dxe:ToggleSwitch IsChecked="{Binding PowerParametersEnabled, Mode=TwoWay}"
+                                              ContentPlacement="Both"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Top" />
+                        </dxlc:LayoutItem>
+                    </StackPanel>
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
                     <uc:ThingSelectorControl />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="2">
-                    <dxg:GridControl MaxHeight="250"
-                                     MinHeight="125"
+                    <dxg:GridControl MaxHeight="150"
+                                     MinHeight="150"
                                      SelectedItems="{Binding Path=SelectedTargetList,
                                                             Mode=TwoWay,
                                                             UpdateSourceTrigger=PropertyChanged}"
@@ -66,7 +75,6 @@
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
                                            AllowColumnMoving="False"
-                                           AllowSorting="False"
                                            AllowEditing="False"
                                            AllowGrouping="False"
                                            AllowDragDrop="True"

@@ -24,8 +24,8 @@
                     <ColumnDefinition Width="45*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Row="0" Grid.Column="0">
-                    <dxg:GridControl MinHeight="125"
-                                     MaxHeight="150"
+                    <dxg:GridControl MaxHeight="175"
+                                     MinHeight="175"
                                      SelectedItems="{Binding Path=SelectedSourceList,
                                                              Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
@@ -70,8 +70,8 @@
                     <uc:ThingSelectorControl />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="2">
-                    <dxg:GridControl MinHeight="125"
-                                     MaxHeight="150"
+                    <dxg:GridControl MaxHeight="150"
+                                     MinHeight="150"
                                      SelectedItems="{Binding Path=SelectedTargetList,
                                                              Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
