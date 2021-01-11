@@ -257,15 +257,25 @@ namespace CDP4CrossViewEditor.Generator
             var dataStartRow = numberOfHeaderRows + this.crossviewArrayAssember.ActualHeaderDepth;
             var dataEndRow = numberOfHeaderRows + numberOfBodyRows;
 
-            var formattedrange = this.crossviewSheet.Range(
+            var formattedRange = this.crossviewSheet.Range(
                 this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
                 this.crossviewSheet.Cells[dataStartRow, numberOfColumns]);
-            formattedrange.Interior.ColorIndex = 34;
-            formattedrange.HorizontalAlignment = XlHAlign.xlHAlignCenter;
-            formattedrange.Font.Bold = true;
-            formattedrange.Font.Underline = true;
-            formattedrange.Font.Size = 11;
-            formattedrange.EntireColumn.AutoFit();
+            formattedRange.Interior.ColorIndex = 34;
+            formattedRange.HorizontalAlignment = XlHAlign.xlHAlignCenter;
+            formattedRange.VerticalAlignment = XlVAlign.xlVAlignCenter;
+            formattedRange.Font.Bold = true;
+            formattedRange.Font.Underline = true;
+            formattedRange.Font.Size = 11;
+            formattedRange.EntireColumn.AutoFit();
+
+            // format fixed columns
+            for (var i = 1; i <= CrossviewSheetConstants.FixedColumns; ++i)
+            {
+                this.crossviewSheet.Range(
+                    this.crossviewSheet.Cells[numberOfHeaderRows + 1, i],
+                    this.crossviewSheet.Cells[dataStartRow, i])
+                    .Merge();
+            }
 
             var parameterRange = this.crossviewSheet.Range(
                 this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
