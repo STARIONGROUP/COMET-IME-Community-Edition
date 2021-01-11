@@ -38,14 +38,10 @@ namespace CDP4CrossViewEditor.Generator
         internal const int FixedColumns = 5;
 
         /// <summary>
-        /// The number of the Actual value column
+        /// The number of header nested "layers": ParamterType, MeasurementUnit.
+        /// NOTE: There might be fewer actual header rows if all values on a layer are missing.
         /// </summary>
-        internal const int ActualValueColumn = 7;
-
-        /// <summary>
-        /// The number of the Model code column
-        /// </summary>
-        internal const int ModelCodeColumn = 8;
+        internal const int HeaderDepth = 2;
 
         /// <summary>
         /// The name of the range on the Parameters sheet that contains the header rows.
