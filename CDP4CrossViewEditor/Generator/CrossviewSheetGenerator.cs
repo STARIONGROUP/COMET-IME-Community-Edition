@@ -41,6 +41,7 @@ namespace CDP4CrossViewEditor.Generator
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
@@ -272,8 +273,26 @@ namespace CDP4CrossViewEditor.Generator
             for (var i = 1; i <= CrossviewSheetConstants.FixedColumns; ++i)
             {
                 this.crossviewSheet.Range(
-                    this.crossviewSheet.Cells[numberOfHeaderRows + 1, i],
-                    this.crossviewSheet.Cells[dataStartRow, i])
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, i],
+                        this.crossviewSheet.Cells[dataStartRow, i])
+                    .Merge();
+            }
+
+            // group horizontal parameter columns
+            var bodyHeaderDictionary = this.crossviewArrayAssember.headerDictionary;
+            foreach (var parameterTypeShortName in bodyHeaderDictionary.Keys)
+            {
+                var min = bodyHeaderDictionary[parameterTypeShortName].Values.Min();
+                var max = bodyHeaderDictionary[parameterTypeShortName].Values.Max();
+
+                if (min == max)
+                {
+                    continue;
+                }
+
+                this.crossviewSheet.Range(
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, min + 1],
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, max + 1])
                     .Merge();
             }
 

@@ -66,7 +66,7 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <summary>
         /// The header structure mapping parameters to indices
         /// </summary>
-        private readonly Dictionary<string, SortedDictionary<string, int>> headerDictionary
+        internal readonly Dictionary<string, SortedDictionary<string, int>> headerDictionary
             = new Dictionary<string, SortedDictionary<string, int>>();
 
         /// <summary>
