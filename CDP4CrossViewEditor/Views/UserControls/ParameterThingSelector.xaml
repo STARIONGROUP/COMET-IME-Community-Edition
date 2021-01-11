@@ -63,8 +63,8 @@
                     <uc:ThingSelectorControl />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="2">
-                    <dxg:GridControl MaxHeight="175"
-                                     MinHeight="175"
+                    <dxg:GridControl MaxHeight="150"
+                                     MinHeight="150"
                                      SelectedItems="{Binding Path=SelectedTargetList,
                                                             Mode=TwoWay,
                                                             UpdateSourceTrigger=PropertyChanged}"
@@ -75,7 +75,6 @@
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
                                            AllowColumnMoving="False"
-                                           AllowSorting="False"
                                            AllowEditing="False"
                                            AllowGrouping="False"
                                            AllowDragDrop="True"

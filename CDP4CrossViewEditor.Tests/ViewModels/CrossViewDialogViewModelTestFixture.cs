@@ -182,9 +182,19 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.Zero(parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
 
             parameterTypeSelectorViewModel.BindData();
+
+            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+
             parameterTypeSelectorViewModel.PowerParametersEnabled = true;
 
-            Assert.NotZero(parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+
+            parameterTypeSelectorViewModel.PowerParametersEnabled = false;
+
+            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
         }
     }
 }

@@ -31,7 +31,6 @@ namespace CDP4CrossViewEditor.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4CrossViewEditor.RowModels;
 
@@ -114,11 +113,11 @@ namespace CDP4CrossViewEditor.ViewModels
             {
                 if (isPowerClicked)
                 {
-                    this.ExecuteMovePower();
+                    this.ExecuteMovePowerToTarget();
                 }
                 else
                 {
-                    this.ExecuteClear();
+                    this.ExecuteMovePowerToSource();
                 }
             });
         }
@@ -188,6 +187,7 @@ namespace CDP4CrossViewEditor.ViewModels
         protected override void ExecuteClear()
         {
             this.SelectedTargetList = this.ParameterTypeTargetList;
+
             this.ExecuteMoveToSource();
         }
 
@@ -202,41 +202,29 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Move power related parameter types to target list
         /// </summary>
-        private void ExecuteMovePower()
+        private void ExecuteMovePowerToTarget()
         {
-            var powerParameterType = new List<ParameterType>();
-            var iterationElements = this.Iteration.Element.AsEnumerable<ElementBase>();
-
-            if (iterationElements == null)
-            {
-                return;
-            }
-
-            var elements = iterationElements.Union(this.Iteration.Element.SelectMany(e => e.ContainedElement).AsEnumerable<ElementBase>());
-
-            foreach (var element in elements)
-            {
-                switch (element)
-                {
-                    case ElementDefinition definition:
-                        powerParameterType.AddRange(definition.Parameter.Where(p => PowerParameters.Contains(p.ParameterType.ShortName)).Select(p => p.ParameterType));
-
-                        break;
-
-                    case ElementUsage usage:
-                        powerParameterType.AddRange(usage.ParameterOverride.Where(p => PowerParameters.Contains(p.ParameterType.ShortName)).Select(p => p.ParameterType));
-                        break;
-                }
-            }
+            var powerParameterTypes = this.ParameterTypeSourceList
+                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
 
             this.SelectedSourceList.Clear();
-
-            foreach (var parameterType in powerParameterType)
-            {
-                this.SelectedSourceList.AddRange(this.ParameterTypeSourceList.Where(pts => pts.Thing == parameterType));
-            }
+            this.SelectedSourceList.AddRange(powerParameterTypes);
 
             this.ExecuteMoveToTarget();
+        }
+
+        /// <summary>
+        /// Move power related parameter types to source list
+        /// </summary>
+        private void ExecuteMovePowerToSource()
+        {
+            var powerParameterTypes = this.ParameterTypeTargetList
+                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
+
+            this.SelectedTargetList.Clear();
+            this.SelectedTargetList.AddRange(powerParameterTypes);
+
+            this.ExecuteMoveToSource();
         }
     }
 }
