@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
+  <Fragment>
+    <ComponentGroup Id="CDP4CROSSVIEWEDITOR_CG" Directory="CROSSVIEWEDITOR">
+      
+      <Component Id="comp_CDP4CrossViewEditor" Guid="{5F252FBB-C2CE-42E7-9BD8-1C51D800E54A}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4CrossViewEditor"  Vital="yes" Source="$(var.CDP4CrossViewEditor.TargetPath)" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Manifest_CDP4CrossViewEditor" Guid="{3F3E93FE-202F-424C-9252-65532BC9E958}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4CrossViewEditor"  Vital="yes" Source="$(var.CDP4CrossViewEditor.TargetDir)CDP4CrossViewEditor.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
+    </ComponentGroup>
+  </Fragment>
+</Wix>

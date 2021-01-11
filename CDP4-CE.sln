@@ -51,6 +51,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDP4Addin.Tests", "CDP4Addin.Tests\CDP4Addin.Tests.csproj", "{7D544F36-1ECF-4201-B4DB-32318471DF76}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "CDP4IMEInstaller", "CDP4IMEInstaller\CDP4IMEInstaller.wixproj", "{2EE90906-5978-4C5A-A9BE-1D8FEB5ADCE9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A9113A52-C31F-4C76-B87F-AB28E079284C} = {A9113A52-C31F-4C76-B87F-AB28E079284C}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDP4ParameterSheetGenerator", "CDP4ParameterSheetGenerator\CDP4ParameterSheetGenerator.csproj", "{05B9FB71-DFFD-40BC-BF35-F05A1F3CF217}"
 EndProject
