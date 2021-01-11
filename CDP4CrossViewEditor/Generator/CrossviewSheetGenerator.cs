@@ -246,7 +246,7 @@ namespace CDP4CrossViewEditor.Generator
         }
 
         /// <summary>
-        /// Write the content of the <see cref="bodyContent"/> to the crossview sheet
+        /// Write the content of the crossview sheet
         /// </summary>
         private void WriteRows()
         {
@@ -257,6 +257,15 @@ namespace CDP4CrossViewEditor.Generator
 
             var dataStartRow = numberOfHeaderRows + this.crossviewArrayAssember.ActualHeaderDepth;
             var dataEndRow = numberOfHeaderRows + numberOfBodyRows;
+
+            var parameterRange = this.crossviewSheet.Range(
+                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
+                this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
+            parameterRange.Name = CrossviewSheetConstants.RangeName;
+            parameterRange.NumberFormat = this.crossviewArrayAssember.FormatArray;
+            parameterRange.Value = this.crossviewArrayAssember.ContentArray;
+            parameterRange.Locked = this.crossviewArrayAssember.LockArray;
+            parameterRange.EntireColumn.AutoFit();
 
             var formattedRange = this.crossviewSheet.Range(
                 this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
@@ -295,15 +304,6 @@ namespace CDP4CrossViewEditor.Generator
                         this.crossviewSheet.Cells[numberOfHeaderRows + 1, max + 1])
                     .Merge();
             }
-
-            var parameterRange = this.crossviewSheet.Range(
-                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
-                this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
-            parameterRange.Name = CrossviewSheetConstants.RangeName;
-            parameterRange.NumberFormat = this.crossviewArrayAssember.FormatArray;
-            parameterRange.Value = this.crossviewArrayAssember.ContentArray;
-            parameterRange.Locked = this.crossviewArrayAssember.LockArray;
-            parameterRange.EntireColumn.AutoFit();
 
             this.ApplyCellNames(dataStartRow, CrossviewSheetConstants.FixedColumns + 1, dataEndRow, numberOfColumns);
 
