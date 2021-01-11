@@ -105,7 +105,12 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                Name = "P_SimpleQuantityKind"
+                ShortName = "P_SimpleQuantityKind"
+            };
+
+            var parameterTypePowerOn = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "P_on"
             };
 
             var parameter = new Parameter
@@ -116,8 +121,17 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
                 Owner = domain
             };
 
+            var parameterPowerOn = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypePowerOn,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
             this.iteration.Element.Add(elementDefinition);
             this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameter);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameterPowerOn);
         }
 
         [TearDown]
@@ -131,8 +145,8 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
 
             Assert.AreEqual("Select equipments and parameters", viewModel.DialogTitle);
-            Assert.IsInstanceOf<ThingSelectorViewModel>(viewModel.ElementSelectorViewModel);
-            Assert.IsInstanceOf<ThingSelectorViewModel>(viewModel.ParameterSelectorViewModel);
+            Assert.IsInstanceOf<ElementDefinitionSelectorViewModel>(viewModel.ElementSelectorViewModel);
+            Assert.IsInstanceOf<ParameterTypeSelectorViewModel>(viewModel.ParameterSelectorViewModel);
         }
 
         [Test]
@@ -158,6 +172,29 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
             Assert.DoesNotThrow(() => viewModel.CancelCommand.Execute(null));
             Assert.IsFalse(viewModel.DialogResult.Result);
+        }
+
+        [Test]
+        public void VerifyThatPowerCommandsWorks()
+        {
+            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
+
+            Assert.Zero(parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+
+            parameterTypeSelectorViewModel.BindData();
+
+            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+
+            parameterTypeSelectorViewModel.PowerParametersEnabled = true;
+
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+
+            parameterTypeSelectorViewModel.PowerParametersEnabled = false;
+
+            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
         }
     }
 }

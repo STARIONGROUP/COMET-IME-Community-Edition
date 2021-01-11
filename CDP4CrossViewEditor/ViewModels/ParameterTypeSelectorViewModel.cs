@@ -25,6 +25,7 @@
 
 namespace CDP4CrossViewEditor.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -40,8 +41,27 @@ namespace CDP4CrossViewEditor.ViewModels
     /// <summary>
     /// The specialized view-model needed to select parameter types for building cross view editor sheet
     /// </summary>
-    public class ParameterTypeSelectorViewModel : ThingSelectorViewModel
+    public sealed class ParameterTypeSelectorViewModel : ThingSelectorViewModel
     {
+        /// <summary>
+        /// Hardcoded power related parameter type short names list
+        /// </summary>
+        private static readonly string[] PowerParameters = { "redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
+
+        /// <summary>
+        /// Backing field for <see cref="PowerParametersEnabled"/>
+        /// </summary>
+        private bool powerParametersEnabled;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the power button is checked
+        /// </summary>
+        public bool PowerParametersEnabled
+        {
+            get { return this.powerParametersEnabled; }
+            set { this.RaiseAndSetIfChanged(ref this.powerParametersEnabled, value); }
+        }
+
         /// <summary>
         /// Gets or sets source parameter list
         /// </summary>
@@ -88,6 +108,18 @@ namespace CDP4CrossViewEditor.ViewModels
             {
                 ChangeTrackingEnabled = true
             };
+
+            this.WhenAnyValue(vm => vm.PowerParametersEnabled).Subscribe(isPowerClicked =>
+            {
+                if (isPowerClicked)
+                {
+                    this.ExecuteMovePowerToTarget();
+                }
+                else
+                {
+                    this.ExecuteMovePowerToSource();
+                }
+            });
         }
 
         /// <summary>
@@ -155,6 +187,7 @@ namespace CDP4CrossViewEditor.ViewModels
         protected override void ExecuteClear()
         {
             this.SelectedTargetList = this.ParameterTypeTargetList;
+
             this.ExecuteMoveToSource();
         }
 
@@ -164,6 +197,34 @@ namespace CDP4CrossViewEditor.ViewModels
         protected override void ExecuteMoveToTarget()
         {
             ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
+        }
+
+        /// <summary>
+        /// Move power related parameter types to target list
+        /// </summary>
+        private void ExecuteMovePowerToTarget()
+        {
+            var powerParameterTypes = this.ParameterTypeSourceList
+                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
+
+            this.SelectedSourceList.Clear();
+            this.SelectedSourceList.AddRange(powerParameterTypes);
+
+            this.ExecuteMoveToTarget();
+        }
+
+        /// <summary>
+        /// Move power related parameter types to source list
+        /// </summary>
+        private void ExecuteMovePowerToSource()
+        {
+            var powerParameterTypes = this.ParameterTypeTargetList
+                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
+
+            this.SelectedTargetList.Clear();
+            this.SelectedTargetList.AddRange(powerParameterTypes);
+
+            this.ExecuteMoveToSource();
         }
     }
 }
