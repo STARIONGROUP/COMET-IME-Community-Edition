@@ -127,7 +127,7 @@ namespace CDP4CrossViewEditor
 
                 this.WriteSessionInfoToWorkbook(session, iteration, participant);
 
-                this.WriteWorkbookDataToWorkbook(iteration);
+                this.WriteWorkbookDataToWorkbook(elementDefinitions, parameterTypes);
 
                 this.ActivateCrossviewEditorSheet();
 
@@ -212,13 +212,16 @@ namespace CDP4CrossViewEditor
         /// <summary>
         /// Write the <see cref="Iteration"/> data to the workbook as a custom XML part
         /// </summary>
-        /// <param name="iteration">
-        /// The <see cref="Iteration"/> that is being stored in the workbook
+        /// <param name="elementDefinitions">
+        /// The <see cref="IEnumerable{ElementDefinition}"/> that is being stored in the workbook
         /// </param>
-        private void WriteWorkbookDataToWorkbook(Iteration iteration)
+        /// <param name="parameterTypes">
+        /// The <see cref="IEnumerable{ParameterType}"/> that is being stored in the workbook
+        /// </param>
+        private void WriteWorkbookDataToWorkbook(IEnumerable<ElementDefinition> elementDefinitions, IEnumerable<ParameterType> parameterTypes)
         {
-            var workbookData = new WorkbookData(iteration);
-            var workbookDataDal = new WorkbookDataDal(this.workbook);
+            var workbookData = new CrossviewWorkbookData(elementDefinitions, parameterTypes);
+            var workbookDataDal = new CrossviewWorkbookDataDal(this.workbook);
             workbookDataDal.Write(workbookData);
         }
 
