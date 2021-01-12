@@ -47,7 +47,7 @@ namespace CDP4CrossViewEditor
     using CDP4Dal.Events;
 
     using CDP4OfficeInfrastructure;
-
+    using CDP4OfficeInfrastructure.OfficeDal;
     using NLog;
 
     using ReactiveUI;
@@ -67,6 +67,11 @@ namespace CDP4CrossViewEditor
         /// The <see cref="IOfficeApplicationWrapper"/> that provides access to the loaded Office application
         /// </summary>
         private readonly IOfficeApplicationWrapper officeApplicationWrapper;
+
+        /// <summary>
+        /// Gets or sets the <see cref="IExcelQuery"/> that is used to query the excel application
+        /// </summary>
+        internal IExcelQuery ExcelQuery { get; set; }
 
         /// <summary>
         /// Gets the <see cref="ISession"/> that is active for the <see cref="RibbonPart"/>
@@ -102,6 +107,7 @@ namespace CDP4CrossViewEditor
         public CrossViewEditorRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
+            this.ExcelQuery = new ExcelQuery();
             this.officeApplicationWrapper = officeApplicationWrapper;
             this.Iterations = new List<Iteration>();
 
@@ -256,6 +262,17 @@ namespace CDP4CrossViewEditor
             }
 
             var application = this.officeApplicationWrapper.Excel;
+            var activeWorkbook = this.ExcelQuery.QueryActiveWorkbook(application);
+
+            if (activeWorkbook != null)
+            {
+                var workbookDataDal = new CrossviewWorkbookDataDal(activeWorkbook);
+                var preservedData = workbookDataDal.Read();
+
+                if (preservedData != null)
+                {
+                }
+            }
 
             var crossViewDialogViewModel = new CrossViewDialogViewModel(application, iteration, this.Session);
             this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
