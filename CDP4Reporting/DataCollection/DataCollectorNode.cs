@@ -375,6 +375,22 @@ namespace CDP4Reporting.DataCollection
         }
 
         /// <summary>
+        /// Returns a list of <see cref="Category"/> objects that the <see cref="NestedElement"/> is member of
+        /// </summary>
+        /// <param name="categories">a <see cref="IEnumerable{T}"/> of type <see cref="Category"/> that need to be checked.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of type <see cref="Category"/></returns>
+        public IEnumerable<Category> FindNestedElementCategories(IEnumerable<Category> categories)
+        {
+            foreach (var category in categories)
+            {
+                if (this.NestedElement.IsMemberOfCategory(category))
+                {
+                    yield return category;
+                }
+            }
+        }
+
+        /// <summary>
         /// Adds to the <paramref name="table"/> the <see cref="DataRow"/> representations
         /// of this node's subtree.
         /// </summary>

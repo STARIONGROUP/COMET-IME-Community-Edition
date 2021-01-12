@@ -10,8 +10,8 @@
     <Product>CDP4RelationshipEditor</Product>
     <Description>CDP4 Relationship Editor Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>7.0.0.6</AssemblyVersion>
-    <FileVersion>7.0.0.6</FileVersion>
+    <AssemblyVersion>7.0.0.7</AssemblyVersion>
+    <FileVersion>7.0.0.7</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
