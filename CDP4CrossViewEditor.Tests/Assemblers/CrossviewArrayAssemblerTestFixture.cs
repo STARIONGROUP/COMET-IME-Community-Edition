@@ -34,6 +34,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CrossViewEditor.Assemblers;
+    using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
     using CDP4Dal;
@@ -167,7 +168,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             var contentArray = arrayAssembler.ContentArray;
 
             // The array contains more rows to make a nice header and spacing
-            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - arrayAssembler.ActualHeaderDepth);
+            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - CrossviewSheetConstants.HeaderDepth);
         }
 
         [Test]
@@ -181,9 +182,9 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             var contentArray = arrayAssembler.ContentArray;
 
             // The array contains more rows to make a nice header and spacing
-            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - arrayAssembler.ActualHeaderDepth);
-            Assert.AreEqual("ElementDefinition_1", contentArray[arrayAssembler.ActualHeaderDepth, 0]);
-            Assert.AreEqual("ED_1", contentArray[arrayAssembler.ActualHeaderDepth, 1]);
+            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - CrossviewSheetConstants.HeaderDepth);
+            Assert.AreEqual("ElementDefinition_1", contentArray[CrossviewSheetConstants.HeaderDepth, 0]);
+            Assert.AreEqual("ED_1", contentArray[CrossviewSheetConstants.HeaderDepth, 1]);
         }
     }
 }
