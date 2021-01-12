@@ -303,6 +303,28 @@ namespace CDP4CrossViewEditor.Generator
                         this.crossviewSheet.Cells[dataStartRow, i])
                     .Merge();
             }
+            
+            // collapse empty header rows
+            for (var i = 0; i < CrossviewSheetConstants.HeaderDepth; ++i)
+            {
+                var collapse = true;
+
+                for (var j = CrossviewSheetConstants.FixedColumns; j < numberOfColumns; ++j)
+                {
+                    if ((string)this.crossviewArrayAssember.ContentArray[i, j] == "")
+                    {
+                        continue;
+                    }
+
+                    collapse = false;
+                    break;
+                }
+
+                if (collapse)
+                {
+                    this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, 1].EntireRow.Hidden = true;
+                }
+            }
 
             // group horizontal parameter columns
             var bodyHeaderDictionary = this.crossviewArrayAssember.headerDictionary;
