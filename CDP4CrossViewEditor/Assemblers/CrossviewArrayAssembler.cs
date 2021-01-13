@@ -25,7 +25,6 @@
 
 namespace CDP4CrossViewEditor.Assemblers
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -36,7 +35,7 @@ namespace CDP4CrossViewEditor.Assemblers
     using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
-    using HeaderColumn = System.ValueTuple<string, string, string, string>;
+    using HeaderColumn = System.ValueTuple<string, string, string, string, string>;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewArrayAssembler"/> is to create the arrays that are
@@ -61,10 +60,21 @@ namespace CDP4CrossViewEditor.Assemblers
 
         /// <summary>
         /// The header structure mapping parameter layer short names to indices:
-        /// ParamterType -> ActualFiniteStateList -> ActualFiniteState -> MeasurementUnit -> index
+        /// ParamterType -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState -> index
         /// </summary>
-        internal readonly Dictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>> headerDictionary
-            = new Dictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>>();
+        internal readonly
+            Dictionary<string,
+                SortedDictionary<string,
+                    SortedDictionary<string,
+                        SortedDictionary<string,
+                            SortedDictionary<string,
+                                int>>>>> headerDictionary
+            = new Dictionary<string,
+                SortedDictionary<string,
+                    SortedDictionary<string,
+                        SortedDictionary<string,
+                            SortedDictionary<string,
+                                int>>>>>();
 
         /// <summary>
         /// Gets the array that contains the parameter sheet information
@@ -156,18 +166,24 @@ namespace CDP4CrossViewEditor.Assemblers
 
                 foreach (var measurementScaleShortName in msDictionary.Keys.ToList())
                 {
-                    var afslDictionary = msDictionary[measurementScaleShortName];
+                    var oDictionary = msDictionary[measurementScaleShortName];
 
-                    foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
+                    foreach (var optionShortName in oDictionary.Keys.ToList())
                     {
-                        var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+                        var afslDictionary = oDictionary[optionShortName];
 
-                        foreach (var actualFiniteStateShortName in afsDictionary.Keys.ToList())
+                        foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
                         {
-                            yield return (parameterTypeShortName,
-                                measurementScaleShortName,
-                                actualFiniteStateListShortName,
-                                actualFiniteStateShortName);
+                            var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+
+                            foreach (var actualFiniteStateShortName in afsDictionary.Keys.ToList())
+                            {
+                                yield return (parameterTypeShortName,
+                                    measurementScaleShortName,
+                                    optionShortName,
+                                    actualFiniteStateListShortName,
+                                    actualFiniteStateShortName);
+                            }
                         }
                     }
                 }
@@ -228,7 +244,8 @@ namespace CDP4CrossViewEditor.Assemblers
                     rows[0, columnIndex],
                     rows[1, columnIndex],
                     rows[2, columnIndex],
-                    rows[3, columnIndex]
+                    rows[3, columnIndex],
+                    rows[4, columnIndex]
                     ) = headerColumn;
 
                 // add square brackets to MeasurementScale short name
@@ -349,6 +366,7 @@ namespace CDP4CrossViewEditor.Assemblers
             this.SetContentColumnIndex((
                     parameter.ParameterType.ShortName,
                     parameter.Scale?.ShortName ?? "",
+                    parameterValueSet.ActualOption?.ShortName ?? "",
                     parameter.StateDependence?.ShortName ?? "",
                     parameterValueSet.ActualState?.ShortName ?? ""),
                 -1);
@@ -368,26 +386,38 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             var (parameterTypeShortName,
                 measurementScaleShortName,
+                optionShortName,
                 actualFiniteStateListShortName,
                 actualFiniteStateShortName) = headerColumn;
 
             if (!this.headerDictionary.ContainsKey(parameterTypeShortName))
             {
-                this.headerDictionary[parameterTypeShortName] = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>();
+                this.headerDictionary[parameterTypeShortName]
+                    = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>>();
             }
 
             var msDictionary = this.headerDictionary[parameterTypeShortName];
 
             if (!msDictionary.ContainsKey(measurementScaleShortName))
             {
-                msDictionary[measurementScaleShortName] = new SortedDictionary<string, SortedDictionary<string, int>>();
+                msDictionary[measurementScaleShortName]
+                    = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>();
             }
 
-            var afslDictionary = msDictionary[measurementScaleShortName];
+            var optionDictionary = msDictionary[measurementScaleShortName];
+
+            if (!optionDictionary.ContainsKey(optionShortName))
+            {
+                optionDictionary[optionShortName]
+                    = new SortedDictionary<string, SortedDictionary<string, int>>();
+            }
+
+            var afslDictionary = optionDictionary[optionShortName];
 
             if (!afslDictionary.ContainsKey(actualFiniteStateListShortName))
             {
-                afslDictionary[actualFiniteStateListShortName] = new SortedDictionary<string, int>();
+                afslDictionary[actualFiniteStateListShortName]
+                    = new SortedDictionary<string, int>();
             }
 
             var afsDictionary = afslDictionary[actualFiniteStateListShortName];
@@ -411,6 +441,7 @@ namespace CDP4CrossViewEditor.Assemblers
             return this.GetContentColumnIndex((
                 parameterOrOverrideBase.ParameterType.ShortName,
                 parameterOrOverrideBase.Scale?.ShortName ?? "",
+                parameterValueSetBase.ActualOption?.ShortName ?? "",
                 parameterOrOverrideBase.StateDependence?.ShortName ?? "",
                 parameterValueSetBase.ActualState?.ShortName ?? ""));
         }
@@ -428,12 +459,14 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             var (parameterTypeShortName,
                 measurementScaleShortName,
+                optionShortName,
                 actualFiniteStateListShortName,
                 actualFiniteStateShortName) = headerColumn;
 
             return this.headerDictionary
                 [parameterTypeShortName]
                 [measurementScaleShortName]
+                [optionShortName]
                 [actualFiniteStateListShortName]
                 [actualFiniteStateShortName];
         }
