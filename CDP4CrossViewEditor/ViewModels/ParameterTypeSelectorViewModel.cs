@@ -87,7 +87,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
         /// <param name="session">Current opened session <see cref="ISession"/></param>
-        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session) : base(iteration, session, ClassKind.ParameterBase)
+        /// <param name="preservedIids">Current user selection <see cref="List{Guid}"/></param>
+        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids) : base(iteration, session, ClassKind.ParameterBase, preservedIids)
         {
             this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>
             {
@@ -153,6 +154,26 @@ namespace CDP4CrossViewEditor.ViewModels
                     }
                 }
             }
+
+            this.PreserveSelection();
+        }
+
+        /// <summary>
+        /// Preserve parameter types objects selection from workbook xml parts
+        /// </summary>
+        private void PreserveSelection()
+        {
+            if (this.PreservedIids == null)
+            {
+                return;
+            }
+
+            this.SelectedSourceList.Clear();
+
+            this.SelectedSourceList.AddRange(this.ParameterTypeSourceList
+                .Where(row => this.PreservedIids.Contains(row.Thing.Iid)));
+
+            this.ExecuteMoveToTarget();
         }
 
         /// <summary>

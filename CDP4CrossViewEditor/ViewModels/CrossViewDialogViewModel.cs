@@ -36,7 +36,7 @@ namespace CDP4CrossViewEditor.ViewModels
     using CDP4Composition.Navigation;
 
     using CDP4Dal;
-
+    using CDP4OfficeInfrastructure.OfficeDal;
     using NetOffice.ExcelApi;
 
     using ReactiveUI;
@@ -59,12 +59,12 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets the <see cref="IterationSetup"/>
         /// </summary>
-        public Iteration Iteration { get; private set; }
+        private Iteration Iteration { get; set; }
 
         /// <summary>
         /// Gets the <see cref="ISession"/>
         /// </summary>
-        public ISession Session { get; private set; }
+        private ISession Session { get; set; }
 
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
@@ -118,10 +118,8 @@ namespace CDP4CrossViewEditor.ViewModels
             this.DialogTitle = "Select equipments and parameters";
             this.Iteration = iteration;
             this.Session = session;
-            this.PopulateWorkbooks(application);
-
-            this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(this.Iteration, this.Session);
-            this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(this.Iteration, this.Session);
+            this.InitWorkbooks(application);
+            this.InitModels();
 
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
@@ -137,7 +135,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="application">
         /// The Excel <see cref="Application"/> that contains workbooks
         /// </param>
-        private void PopulateWorkbooks(Application application)
+        private void InitWorkbooks(Application application)
         {
             if (application == null)
             {
@@ -151,6 +149,27 @@ namespace CDP4CrossViewEditor.ViewModels
             }
 
             this.SelectedWorkbook = this.Workbooks[0];
+        }
+
+        private void InitModels()
+        {
+            CrossviewWorkbookData preservedData = null;
+
+            if (this.SelectedWorkbook != null)
+            {
+                var workbookDataDal = new CrossviewWorkbookDataDal(this.SelectedWorkbook?.Workbook);
+                preservedData = workbookDataDal.Read();
+            }
+
+            this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(
+                this.Iteration,
+                this.Session,
+                preservedData?.ElementDefinitionList?.Select(ed => ed.Iid).ToList());
+
+            this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(
+                this.Iteration,
+                this.Session,
+                preservedData?.ParameterTypeList?.Select(pt => pt.Iid).ToList());
         }
 
         /// <summary>

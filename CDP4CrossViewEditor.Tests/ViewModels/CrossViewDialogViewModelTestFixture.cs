@@ -26,6 +26,7 @@
 namespace CDP4CrossViewEditor.Tests.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -68,6 +69,16 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         /// Current iteration used for test
         /// </summary>
         private Iteration iteration;
+
+        /// <summary>
+        /// Preserved element definitions iids
+        /// </summary>
+        private List<Guid> preservedElementsIids = new List<Guid>();
+
+        /// <summary>
+        /// Preserved parameter types iids
+        /// </summary>
+        private List<Guid> preservedParametersIids = new List<Guid>();
 
         [SetUp]
         public void SetUp()
@@ -153,8 +164,16 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         public void VerifyThatOkCommandsWorks()
         {
             var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
-            var elementDefinitionSelectorViewModel = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
-            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
+
+            var elementDefinitionSelectorViewModel = new ElementDefinitionSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedElementsIids);
+
+            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedParametersIids);
 
             Assert.DoesNotThrow(() => elementDefinitionSelectorViewModel.BindData());
             Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.BindData());
@@ -177,7 +196,10 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatPowerCommandsWorks()
         {
-            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
+            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedParametersIids);
 
             Assert.Zero(parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
 

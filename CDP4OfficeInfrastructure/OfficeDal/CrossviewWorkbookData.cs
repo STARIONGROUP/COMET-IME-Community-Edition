@@ -27,30 +27,30 @@ namespace CDP4OfficeInfrastructure.OfficeDal
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Xml;
     using System.Xml.Serialization;
 
     using CDP4Common.DTO;
+
     using NetOffice.ExcelApi;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewWorkbookData"/> class is to store session data in a <see cref="Workbook"/>
     /// as a custom XML part, and retrieve it from the workbook.
     /// </summary>
-    [XmlRoot("CDP4Session", Namespace = "http://cdp4session.rheagroup.com")]
+    [XmlRoot("CDP4CrossviewData", Namespace = "http://cdp4crossviewdata.rheagroup.com")]
     public class CrossviewWorkbookData : CustomOfficeData
     {
         /// <summary>
         /// Backing field for the <see cref="ElementDefinitionData"/> property.
         /// </summary>
-        [XmlIgnore]
-        private string elementDefinitionData;
+        [XmlIgnore] private string elementDefinitionData;
 
         /// <summary>
         /// Backing field for the <see cref="ParameterTypeData"/> property.
         /// </summary>
-        [XmlIgnore]
-        private string parameterTypeData;
+        [XmlIgnore] private string parameterTypeData;
 
         /// <summary>
         /// Gets or sets the <see cref="IEnumerable{ElementDefinition}"/> data of the current <see cref="Workbook"/>
@@ -64,10 +64,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
                 return doc.CreateCDataSection(this.elementDefinitionData);
             }
 
-            set
-            {
-                this.elementDefinitionData = value.Value;
-            }
+            set => this.elementDefinitionData = value.Value;
         }
 
         /// <summary>
@@ -82,69 +79,44 @@ namespace CDP4OfficeInfrastructure.OfficeDal
                 return doc.CreateCDataSection(this.parameterTypeData);
             }
 
-            set
-            {
-                this.parameterTypeData = value.Value;
-            }
+            set => this.parameterTypeData = value.Value;
         }
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{ElementDefinition}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> ElementDefinitionList
-        {
-            get
-            {
-                return this.Serializer.Deserialize(this.GenerateStreamFromString(this.ElementDefinitionData.Value));
-            }
-        }
+        public IEnumerable<Thing> ElementDefinitionList => this.Serializer.Deserialize(this.GenerateStreamFromString(this.ElementDefinitionData.Value));
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{ParameterType}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> ParameterTypeList
-        {
-            get
-            {
-                return this.Serializer.Deserialize(this.GenerateStreamFromString(this.ParameterTypeData.Value));
-            }
-        }
+        public IEnumerable<Thing> ParameterTypeList => this.Serializer.Deserialize(this.GenerateStreamFromString(this.ParameterTypeData.Value));
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkbookData"/> class.
+        /// Initializes a new instance of the <see cref="CrossviewWorkbookData"/> class.
         /// </summary>
         public CrossviewWorkbookData()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkbookData"/> class.
+        /// Initializes a new instance of the <see cref="CrossviewWorkbookData"/> class.
         /// </summary>
         /// <param name="elementDefinitions">
-        /// The element definitions list that needs to be preserved <see cref="IEnumerable{ElementDefinition}"
+        /// The element definitions list that needs to be preserved <see cref="IEnumerable{ElementDefinition}" />
         /// </param>
         /// <param name="parameterTypes">
-        /// The parameter types list that needs to be preserved <see cref="IEnumerable{ParameterType}"
+        /// The parameter types list that needs to be preserved <see cref="IEnumerable{ParameterType}" />
         /// </param>
         public CrossviewWorkbookData(IEnumerable<CDP4Common.EngineeringModelData.ElementDefinition> elementDefinitions, IEnumerable<CDP4Common.SiteDirectoryData.ParameterType> parameterTypes)
         {
-            var selectedElementDefinitions = new List<ElementDefinition>();
-            var selectedParameterType = new List<ParameterType>();
+            var preservedDefinitions = elementDefinitions.Select(elementDefinition => elementDefinition.ToDto() as ElementDefinition).ToList();
+            var preservedTypes = parameterTypes.Select(parameterType => parameterType.ToDto() as ParameterType).ToList();
 
-            foreach (var elementDefinition in elementDefinitions)
-            {
-                selectedElementDefinitions.Add(elementDefinition.ToDto() as ElementDefinition);
-            }
-
-            foreach (var parameterType in parameterTypes)
-            {
-                selectedParameterType.Add(parameterType.ToDto() as ParameterType);
-            }
-
-            this.GenerateStreamFromThings(selectedElementDefinitions);
-            this.GenerateStreamFromThings(selectedParameterType);
+            this.GenerateStringFromThings(preservedDefinitions);
+            this.GenerateStringFromThings(preservedTypes);
         }
 
         /// <summary>
@@ -152,7 +124,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// </summary>
         /// <typeparam name="T"><see cref="ElementDefinition"/> or <see cref="ParameterType"/></typeparam>
         /// <param name="things">List of <see cref="Thing"/>s that will serialized to stream</param>
-        private void GenerateStreamFromThings<T>(List<T> things)
+        private void GenerateStringFromThings<T>(List<T> things)
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -165,6 +137,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
                     {
                         this.elementDefinitionData = reader.ReadToEnd();
                     }
+
                     if (things[0] is ParameterType)
                     {
                         this.parameterTypeData = reader.ReadToEnd();
@@ -180,15 +153,13 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// <returns>The stream</returns>
         private Stream GenerateStreamFromString(string s)
         {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                StreamWriter writer = new StreamWriter(stream);
-                writer.Write(s);
-                writer.Flush();
-                stream.Position = 0;
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
 
-                return stream;
-            }
+            return stream;
         }
     }
 }

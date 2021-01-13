@@ -26,6 +26,7 @@
 namespace CDP4CrossViewEditor.Tests.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -72,6 +73,16 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         /// Current iteration used for test <see cref="Iteration"/>
         /// </summary>
         private Iteration iteration;
+
+        /// <summary>
+        /// Preserved element definitions iids
+        /// </summary>
+        private List<Guid> preservedElementsIids = new List<Guid>();
+
+        /// <summary>
+        /// Preserved parameter types iids
+        /// </summary>
+        private List<Guid> preservedParametersIids = new List<Guid>();
 
         [SetUp]
         public void SetUp()
@@ -138,22 +149,34 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewModelElements = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
-            var viewModelParameters = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
+            var viewModelElements = new ElementDefinitionSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedElementsIids);
+
+            var viewModelParameters = new ParameterTypeSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedParametersIids);
 
             Assert.AreEqual(this.iteration, viewModelElements.Iteration);
             Assert.AreEqual(0, viewModelElements.ElementDefinitionSourceList.Count);
             Assert.AreEqual(0, viewModelElements.ElementDefinitionTargetList.Count);
+            Assert.IsEmpty(viewModelElements.PreservedIids);
 
             Assert.AreEqual(this.iteration, viewModelParameters.Iteration);
             Assert.AreEqual(0, viewModelParameters.ParameterTypeSourceList.Count);
             Assert.AreEqual(0, viewModelParameters.ParameterTypeTargetList.Count);
+            Assert.IsEmpty(viewModelParameters.PreservedIids);
         }
 
         [Test]
         public void VerifyThatCommandsWorksOnElements()
         {
-            var viewModel = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
+            var viewModel = new ElementDefinitionSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedElementsIids);
 
             Assert.DoesNotThrow(() => viewModel.BindData());
 
@@ -169,8 +192,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             viewModel.SelectedTargetList = viewModel.ElementDefinitionTargetList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
 
-            Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
-
             viewModel.SelectedSourceList = viewModel.ElementDefinitionSourceList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
             Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));
@@ -179,7 +200,10 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatCommandsWorksOnParameters()
         {
-            var viewModel = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
+            var viewModel = new ParameterTypeSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedParametersIids);
 
             Assert.DoesNotThrow(() => viewModel.BindData());
 
@@ -194,8 +218,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             viewModel.SelectedTargetList = viewModel.ParameterTypeTargetList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
-
-            Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
 
             viewModel.SelectedSourceList = viewModel.ParameterTypeSourceList;
             Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));

@@ -26,6 +26,7 @@
 namespace CDP4OfficeInfrastructure.OfficeDal
 {
     using NetOffice.ExcelApi;
+
     using NLog;
 
     /// <summary>
