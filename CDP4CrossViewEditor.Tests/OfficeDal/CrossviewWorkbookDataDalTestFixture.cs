@@ -193,6 +193,8 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
             var application = new Application();
             var workbook = application.Workbooks.Open(this.excelFilePath, false, false);
 
+            Assert.AreEqual(1, this.workbookData.ParameterTypeList.Count());
+            Assert.AreEqual(1, this.workbookData.ElementDefinitionList.Count());
             Assert.NotNull(workbook);
 
             try

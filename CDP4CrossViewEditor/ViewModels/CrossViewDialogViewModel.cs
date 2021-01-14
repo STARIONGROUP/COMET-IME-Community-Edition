@@ -36,7 +36,9 @@ namespace CDP4CrossViewEditor.ViewModels
     using CDP4Composition.Navigation;
 
     using CDP4Dal;
+
     using CDP4OfficeInfrastructure.OfficeDal;
+
     using NetOffice.ExcelApi;
 
     using ReactiveUI;
@@ -129,7 +131,7 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        /// populate the workbook row view-models that represent workbooks that are open in the
+        /// Populate the workbook row view-models that represent workbooks that are open in the
         /// excel application.
         /// </summary>
         /// <param name="application">
@@ -151,6 +153,9 @@ namespace CDP4CrossViewEditor.ViewModels
             this.SelectedWorkbook = this.Workbooks[0];
         }
 
+        /// <summary>
+        /// Init referenced view models
+        /// </summary>
         private void InitModels()
         {
             CrossviewWorkbookData preservedData = null;
