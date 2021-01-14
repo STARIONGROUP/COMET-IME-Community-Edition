@@ -56,12 +56,12 @@ namespace CDP4CrossViewEditor.ViewModels
         public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionTargetList { get; private set; }
 
         /// <summary>
-        /// Gets or sets user selected elements lists
+        /// Gets or sets user selected elements source list
         /// </summary>
         public ReactiveList<ElementDefinitionRowViewModel> SelectedSourceList { get; set; }
 
         /// <summary>
-        ///
+        /// Gets or sets user selected elements target list
         /// </summary>
         public ReactiveList<ElementDefinitionRowViewModel> SelectedTargetList { get; set; }
 

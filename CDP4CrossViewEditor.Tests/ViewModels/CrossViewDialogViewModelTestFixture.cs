@@ -156,8 +156,14 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
 
             Assert.AreEqual("Select equipments and parameters", viewModel.DialogTitle);
+
             Assert.IsInstanceOf<ElementDefinitionSelectorViewModel>(viewModel.ElementSelectorViewModel);
             Assert.IsInstanceOf<ParameterTypeSelectorViewModel>(viewModel.ParameterSelectorViewModel);
+
+            this.iteration.Element.Clear();
+
+            Assert.DoesNotThrow(() => viewModel.ElementSelectorViewModel.BindData());
+            Assert.DoesNotThrow(() => viewModel.ParameterSelectorViewModel.BindData());
         }
 
         [Test]

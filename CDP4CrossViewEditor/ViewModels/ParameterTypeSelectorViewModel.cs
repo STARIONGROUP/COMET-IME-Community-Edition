@@ -128,14 +128,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         public override void BindData()
         {
-            var iterationElements = this.Iteration.Element.AsEnumerable<ElementBase>();
-
-            if (iterationElements == null)
-            {
-                return;
-            }
-
-            var elements = iterationElements.Union(this.Iteration.Element.SelectMany(e => e.ContainedElement).AsEnumerable<ElementBase>());
+            var elements = this.Iteration.Element.Union(this.Iteration.Element.SelectMany(e => e.ContainedElement).AsEnumerable<ElementBase>());
 
             foreach (var element in elements)
             {

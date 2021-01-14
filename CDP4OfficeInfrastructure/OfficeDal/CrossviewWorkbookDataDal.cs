@@ -27,19 +27,12 @@ namespace CDP4OfficeInfrastructure.OfficeDal
 {
     using NetOffice.ExcelApi;
 
-    using NLog;
-
     /// <summary>
     /// The purpose of the <see cref="CrossviewWorkbookDataDal"/> class is to read and write the <see cref="CrossviewWorkbookData"/>
     /// custom XML part to and from a <see cref="Workbook"/>.
     /// </summary>
     public class CrossviewWorkbookDataDal : CustomOfficeDataDal<CrossviewWorkbookData>
     {
-        /// <summary>
-        /// The current logger
-        /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkbookSessionDal"/> class.
         /// </summary>

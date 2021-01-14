@@ -51,9 +51,10 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets or sets thing type
         /// </summary>
-        private ClassKind ThingClassKind
+        public ClassKind ThingClassKind
         {
-            set => this.RaiseAndSetIfChanged(ref this.thingClassKind, value);
+            private set => this.RaiseAndSetIfChanged(ref this.thingClassKind, value);
+            get => this.thingClassKind;
         }
 
         /// <summary>
