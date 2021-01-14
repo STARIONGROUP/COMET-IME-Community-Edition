@@ -205,7 +205,7 @@ namespace CDP4CrossViewEditor.Assemblers
                         measurementUnitShortName);
 
                     rows[0, columnIndex] = parameterTypeShortName;
-                    rows[1, columnIndex] = measurementUnitShortName;
+                    rows[1, columnIndex] = $"[{measurementUnitShortName}]";
                 }
             }
 
