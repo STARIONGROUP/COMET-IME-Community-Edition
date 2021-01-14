@@ -155,9 +155,22 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
         }
 
         [Test]
-        public void VerifyThatArgementNotNullExceptionIsThrown()
+        public void VerifyThatArgumentNotNullExceptionIsThrown()
         {
-            Assert.Throws<ArgumentNullException>(() => new CrossviewWorkbookDataDal(null));
+            Assert.Throws<ArgumentNullException>(() => { new CrossviewWorkbookDataDal(null); });
+        }
+
+        [Test]
+        public void VerifyThatUserSelectionIsPreserved()
+        {
+            Assert.AreEqual(1, this.workbookData.ElementDefinitionList.Count());
+            Assert.AreEqual(1, this.workbookData.ParameterTypeList.Count());
+
+            Assert.IsTrue(this.workbookData.ElementDefinitionList.FirstOrDefault() is CDP4Common.DTO.ElementDefinition);
+            Assert.IsTrue(this.workbookData.ParameterTypeList.FirstOrDefault() is CDP4Common.DTO.ParameterType);
+
+            Assert.AreEqual(this.elementDefinition.Name, (this.workbookData.ElementDefinitionList.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
+            Assert.AreEqual(this.parameterType.Name, (this.workbookData.ParameterTypeList.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
         }
 
         [Test]
@@ -193,8 +206,6 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
             var application = new Application();
             var workbook = application.Workbooks.Open(this.excelFilePath, false, false);
 
-            Assert.AreEqual(1, this.workbookData.ParameterTypeList.Count());
-            Assert.AreEqual(1, this.workbookData.ElementDefinitionList.Count());
             Assert.NotNull(workbook);
 
             try

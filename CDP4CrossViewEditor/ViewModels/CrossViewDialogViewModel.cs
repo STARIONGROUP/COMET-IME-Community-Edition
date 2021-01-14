@@ -27,6 +27,7 @@ namespace CDP4CrossViewEditor.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Windows.Input;
 
@@ -137,6 +138,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="application">
         /// The Excel <see cref="Application"/> that contains workbooks
         /// </param>
+        [ExcludeFromCodeCoverage]
         private void InitWorkbooks(Application application)
         {
             if (application == null)
@@ -156,6 +158,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Init referenced view models
         /// </summary>
+        [ExcludeFromCodeCoverage]
         private void InitModels()
         {
             CrossviewWorkbookData preservedData = null;
