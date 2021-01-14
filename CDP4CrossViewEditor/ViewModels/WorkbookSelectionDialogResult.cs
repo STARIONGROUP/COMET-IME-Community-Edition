@@ -62,10 +62,13 @@ namespace CDP4CrossViewEditor.ViewModels
         public Workbook Workbook { get; private set; }
 
         /// <summary>
-        /// Gets or sets workbook elements
+        /// Gets or sets workbook element definitions
         /// </summary>
         public IEnumerable<ElementDefinition> WorkbookElements { get; private set; }
 
+        /// <summary>
+        /// Gets or sets workbook parameter types
+        /// </summary>
         public IEnumerable<ParameterType> WorkbookParameterType { get; private set; }
     }
 }
