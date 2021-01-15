@@ -115,6 +115,23 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 }
             };
 
+            var option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "Option 1",
+                ShortName = "OPT_1",
+            };
+
+            this.iteration.Option.Add(option1);
+            this.iteration.DefaultOption = option1;
+
+            var option2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "Option 2",
+                ShortName = "OPT_2"
+            };
+
+            this.iteration.Option.Add(option2);
+
             var elementDefinition = new ElementDefinition
             {
                 Iid = Guid.NewGuid(),
@@ -159,12 +176,24 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             var parameterValueset1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                Manual = new ValueArray<string>(new List<string> { "Manual" }),
-                Reference = new ValueArray<string>(new List<string> { "Reference" }),
-                Computed = new ValueArray<string>(new List<string> { "Computed" }),
-                Formula = new ValueArray<string>(new List<string> { "Formula" }),
-                Published = new ValueArray<string>(new List<string> { "Published" }),
-                ValueSwitch = ParameterSwitchKind.MANUAL
+                Manual = new ValueArray<string>(new List<string> { "1" }),
+                Reference = new ValueArray<string>(new List<string> { "1.1" }),
+                Computed = new ValueArray<string>(new List<string> { "1.2" }),
+                Formula = new ValueArray<string>(new List<string> { "1.3" }),
+                Published = new ValueArray<string>(new List<string> { "1.4" }),
+                ValueSwitch = ParameterSwitchKind.MANUAL,
+                ActualOption = option1
+            };
+
+            var parameterValueset2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Manual = new ValueArray<string>(new List<string> { "1" }),
+                Reference = new ValueArray<string>(new List<string> { "1" }),
+                Computed = new ValueArray<string>(new List<string> { "1" }),
+                Formula = new ValueArray<string>(new List<string> { "1" }),
+                Published = new ValueArray<string>(new List<string> { "1" }),
+                ValueSwitch = ParameterSwitchKind.REFERENCE,
+                ActualOption = option2
             };
 
             var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
@@ -177,7 +206,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 },
                 Owner = this.domain,
                 StateDependence = actualList,
-                ValueSet = { parameterValueset1 },
+                ValueSet = { parameterValueset1, parameterValueset2 }
             };
 
             this.iteration.Element.Add(elementDefinition);

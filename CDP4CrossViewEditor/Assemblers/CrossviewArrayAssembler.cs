@@ -87,11 +87,6 @@ namespace CDP4CrossViewEditor.Assemblers
         public object[,] FormatArray { get; private set; }
 
         /// <summary>
-        /// Gets the array that contains the parameter sheet information
-        /// </summary>
-        private object[,] FormulaArray { get; set; }
-
-        /// <summary>
         /// Gets the array that contains locked cells information
         /// </summary>
         public object[,] LockArray { get; private set; }
@@ -120,7 +115,6 @@ namespace CDP4CrossViewEditor.Assemblers
             this.ContentArray = new object[,] { };
             this.LockArray = new object[,] { };
             this.FormatArray = new object[,] { };
-            this.FormulaArray = new object[,] { };
         }
 
         /// <summary>
@@ -135,7 +129,6 @@ namespace CDP4CrossViewEditor.Assemblers
             this.ContentArray = new object[this.excelRows.Count() + contentHeader.Count, this.numberOfColumns];
             this.LockArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
             this.FormatArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
-            this.FormulaArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
 
             var contentList = new List<object[]>();
 
