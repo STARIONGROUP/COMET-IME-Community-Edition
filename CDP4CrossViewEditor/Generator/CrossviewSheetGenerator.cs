@@ -280,7 +280,11 @@ namespace CDP4CrossViewEditor.Generator
 
             this.PrettifyBodyHeader();
 
-            this.ApplyCellNames(dataStartRow, CrossviewSheetConstants.FixedColumns + 1, dataEndRow, numberOfColumns);
+            this.ApplyCellNames(
+                dataStartRow + 1,
+                CrossviewSheetConstants.FixedColumns + 1,
+                dataEndRow,
+                numberOfColumns);
 
             this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
             this.excelApplication.ActiveWindow.FreezePanes = true;
@@ -449,12 +453,10 @@ namespace CDP4CrossViewEditor.Generator
         /// </param>
         private void ApplyCellNames(int beginRow, int beginColumn, int endRow, int endColumn)
         {
-            var range =
-                this.crossviewSheet.Range(
+            this.crossviewSheet.Range(
                     this.crossviewSheet.Cells[beginRow, beginColumn],
-                    this.crossviewSheet.Cells[endRow, endColumn]);
-
-            range.CreateNames(top: false, left: false, bottom: false, right: true);
+                    this.crossviewSheet.Cells[endRow, endColumn])
+                .CreateNames(top: false, left: false, bottom: false, right: true);
         }
     }
 }
