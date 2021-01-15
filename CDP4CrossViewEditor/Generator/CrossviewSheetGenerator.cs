@@ -25,6 +25,12 @@
 
 namespace CDP4CrossViewEditor.Generator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -36,12 +42,6 @@ namespace CDP4CrossViewEditor.Generator
     using NetOffice.ExcelApi.Enums;
 
     using NLog;
-
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
@@ -303,7 +303,7 @@ namespace CDP4CrossViewEditor.Generator
                         this.crossviewSheet.Cells[dataStartRow, i])
                     .Merge();
             }
-            
+
             // collapse empty header rows
             for (var i = 0; i < CrossviewSheetConstants.HeaderDepth; ++i)
             {

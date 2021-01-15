@@ -60,7 +60,7 @@ namespace CDP4CrossViewEditor.Assemblers
 
         /// <summary>
         /// The header structure mapping parameter layer short names to indices:
-        /// ParamterType -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState -> index
+        /// ParameterType -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState -> index
         /// </summary>
         internal readonly
             Dictionary<string,
