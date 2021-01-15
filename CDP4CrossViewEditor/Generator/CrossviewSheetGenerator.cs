@@ -331,71 +331,92 @@ namespace CDP4CrossViewEditor.Generator
 
             foreach (var parameterTypeShortName in bodyHeaderDictionary.Keys.ToList())
             {
-                var msDictionary = bodyHeaderDictionary[parameterTypeShortName];
+                var ptcDictionary = bodyHeaderDictionary[parameterTypeShortName];
 
                 var minPt = numberOfColumns;
                 var maxPt = 0;
 
-                foreach (var measurementScaleShortName in msDictionary.Keys.ToList())
+                foreach (var parameterTypeComponentShortName in ptcDictionary.Keys.ToList())
                 {
-                    var oDictionary = msDictionary[measurementScaleShortName];
+                    var msDictionary = ptcDictionary[parameterTypeComponentShortName];
 
-                    var minMs = numberOfColumns;
-                    var maxMs = 0;
+                    var minPtc = numberOfColumns;
+                    var maxPtc = 0;
 
-                    foreach (var optionShortName in oDictionary.Keys.ToList())
+                    foreach (var measurementScaleShortName in msDictionary.Keys.ToList())
                     {
-                        var afslDictionary = oDictionary[optionShortName];
+                        var oDictionary = msDictionary[measurementScaleShortName];
 
-                        var minO = numberOfColumns;
-                        var maxO = 0;
+                        var minMs = numberOfColumns;
+                        var maxMs = 0;
 
-                        foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
+                        foreach (var optionShortName in oDictionary.Keys.ToList())
                         {
-                            var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+                            var afslDictionary = oDictionary[optionShortName];
 
-                            var minAfsl = afsDictionary.Values.Min();
-                            var maxAfsl = afsDictionary.Values.Max();
+                            var minO = numberOfColumns;
+                            var maxO = 0;
 
-                            minO = Math.Min(minO, minAfsl);
-                            maxO = Math.Max(maxO, maxAfsl);
+                            foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
+                            {
+                                var afsDictionary = afslDictionary[actualFiniteStateListShortName];
 
-                            minMs = Math.Min(minMs, minAfsl);
-                            maxMs = Math.Max(maxMs, maxAfsl);
+                                var minAfsl = afsDictionary.Values.Min();
+                                var maxAfsl = afsDictionary.Values.Max();
 
-                            minPt = Math.Min(minPt, minAfsl);
-                            maxPt = Math.Max(maxPt, maxAfsl);
+                                minO = Math.Min(minO, minAfsl);
+                                maxO = Math.Max(maxO, maxAfsl);
 
-                            if (minAfsl == maxAfsl)
+                                minMs = Math.Min(minMs, minAfsl);
+                                maxMs = Math.Max(maxMs, maxAfsl);
+
+                                minPtc = Math.Min(minPtc, minAfsl);
+                                maxPtc = Math.Max(maxPtc, maxAfsl);
+
+                                minPt = Math.Min(minPt, minAfsl);
+                                maxPt = Math.Max(maxPt, maxAfsl);
+
+                                if (minAfsl == maxAfsl)
+                                {
+                                    continue;
+                                }
+
+                                this.crossviewSheet.Range(
+                                        this.crossviewSheet.Cells[numberOfHeaderRows + 5, minAfsl + 1],
+                                        this.crossviewSheet.Cells[numberOfHeaderRows + 5, maxAfsl + 1])
+                                    .Merge();
+                            }
+
+                            if (minO == maxO)
                             {
                                 continue;
                             }
 
                             this.crossviewSheet.Range(
-                                    this.crossviewSheet.Cells[numberOfHeaderRows + 4, minAfsl + 1],
-                                    this.crossviewSheet.Cells[numberOfHeaderRows + 4, maxAfsl + 1])
+                                    this.crossviewSheet.Cells[numberOfHeaderRows + 4, minO + 1],
+                                    this.crossviewSheet.Cells[numberOfHeaderRows + 4, maxO + 1])
                                 .Merge();
                         }
 
-                        if (minO == maxO)
+                        if (minMs == maxMs)
                         {
                             continue;
                         }
 
                         this.crossviewSheet.Range(
-                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, minO + 1],
-                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, maxO + 1])
+                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, minMs + 1],
+                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, maxMs + 1])
                             .Merge();
                     }
 
-                    if (minMs == maxMs)
+                    if (minPtc == maxPtc)
                     {
                         continue;
                     }
 
                     this.crossviewSheet.Range(
-                            this.crossviewSheet.Cells[numberOfHeaderRows + 2, minMs + 1],
-                            this.crossviewSheet.Cells[numberOfHeaderRows + 2, maxMs + 1])
+                            this.crossviewSheet.Cells[numberOfHeaderRows + 2, minPtc + 1],
+                            this.crossviewSheet.Cells[numberOfHeaderRows + 2, maxPtc + 1])
                         .Merge();
                 }
 

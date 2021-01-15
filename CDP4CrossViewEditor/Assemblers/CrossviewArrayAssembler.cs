@@ -35,7 +35,7 @@ namespace CDP4CrossViewEditor.Assemblers
     using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
-    using HeaderColumn = System.ValueTuple<string, string, string, string, string>;
+    using HeaderColumn = System.ValueTuple<string, string, string, string, string, string>;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewArrayAssembler"/> is to create the arrays that are
@@ -60,21 +60,23 @@ namespace CDP4CrossViewEditor.Assemblers
 
         /// <summary>
         /// The header structure mapping parameter layer short names to indices:
-        /// ParameterType -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState -> index
+        /// ParameterType -> ParameterTypeComponent -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState -> index
         /// </summary>
         internal readonly
             Dictionary<string,
-                SortedDictionary<string,
+                SortedDictionary<string, 
                     SortedDictionary<string,
                         SortedDictionary<string,
                             SortedDictionary<string,
-                                int>>>>> headerDictionary
+                                SortedDictionary<string,
+                                    int>>>>>> headerDictionary
             = new Dictionary<string,
                 SortedDictionary<string,
                     SortedDictionary<string,
                         SortedDictionary<string,
                             SortedDictionary<string,
-                                int>>>>>();
+                                SortedDictionary<string,
+                                int>>>>>>();
 
         /// <summary>
         /// Gets the array that contains the parameter sheet information
@@ -155,27 +157,33 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             foreach (var parameterTypeShortName in this.headerDictionary.Keys.ToList())
             {
-                var msDictionary = this.headerDictionary[parameterTypeShortName];
+                var ptcDictionary = this.headerDictionary[parameterTypeShortName];
 
-                foreach (var measurementScaleShortName in msDictionary.Keys.ToList())
+                foreach (var parameterTypeComponentShortName in ptcDictionary.Keys.ToList())
                 {
-                    var oDictionary = msDictionary[measurementScaleShortName];
+                    var msDictionary = ptcDictionary[parameterTypeComponentShortName];
 
-                    foreach (var optionShortName in oDictionary.Keys.ToList())
+                    foreach (var measurementScaleShortName in msDictionary.Keys.ToList())
                     {
-                        var afslDictionary = oDictionary[optionShortName];
+                        var oDictionary = msDictionary[measurementScaleShortName];
 
-                        foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
+                        foreach (var optionShortName in oDictionary.Keys.ToList())
                         {
-                            var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+                            var afslDictionary = oDictionary[optionShortName];
 
-                            foreach (var actualFiniteStateShortName in afsDictionary.Keys.ToList())
+                            foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
                             {
-                                yield return (parameterTypeShortName,
-                                    measurementScaleShortName,
-                                    optionShortName,
-                                    actualFiniteStateListShortName,
-                                    actualFiniteStateShortName);
+                                var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+
+                                foreach (var actualFiniteStateShortName in afsDictionary.Keys.ToList())
+                                {
+                                    yield return (parameterTypeShortName,
+                                        parameterTypeComponentShortName,
+                                        measurementScaleShortName,
+                                        optionShortName,
+                                        actualFiniteStateListShortName,
+                                        actualFiniteStateShortName);
+                                }
                             }
                         }
                     }
@@ -238,11 +246,12 @@ namespace CDP4CrossViewEditor.Assemblers
                     rows[1, columnIndex],
                     rows[2, columnIndex],
                     rows[3, columnIndex],
-                    rows[4, columnIndex]
+                    rows[4, columnIndex],
+                    rows[5, columnIndex]
                     ) = headerColumn;
 
                 // add square brackets to MeasurementScale short name
-                rows[1, columnIndex] = $"[{rows[1, columnIndex]}]";
+                rows[2, columnIndex] = $"[{rows[2, columnIndex]}]";
             }
 
             for (var i = 0; i < CrossviewSheetConstants.HeaderDepth; ++i)
@@ -297,11 +306,26 @@ namespace CDP4CrossViewEditor.Assemblers
                     return contentRow;
             }
 
-            foreach (var parameterValueSetBase in parameters
-                .Where(p => p != null)
-                .SelectMany(p => p.ValueSets.Cast<ParameterValueSetBase>()))
+            foreach (var parameterOrOverrideBase in parameters.Where(p => p != null))
             {
-                contentRow[this.GetContentColumnIndex(parameterValueSetBase)] = parameterValueSetBase.ActualValue.FirstOrDefault();
+                foreach (var parameterValueSetBase in parameterOrOverrideBase.ValueSets.Cast<ParameterValueSetBase>())
+                {
+                    if (parameterOrOverrideBase.ParameterType is CompoundParameterType compoundParameterType)
+                    {
+                        // TODO account for recursive CompoundParameterTypes
+                        for (var i = 0; i < compoundParameterType.NumberOfValues; ++i)
+                        {
+                            var component = compoundParameterType.Component[i];
+                            var value = parameterValueSetBase.ActualValue[i];
+
+                            contentRow[this.GetContentColumnIndex(parameterValueSetBase, component)] = value;
+                        }
+                    }
+                    else
+                    {
+                        contentRow[this.GetContentColumnIndex(parameterValueSetBase)] = parameterValueSetBase.ActualValue.First();
+                    }
+                }
             }
 
             return contentRow;
@@ -356,13 +380,32 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             var parameter = (Parameter)parameterValueSet.Container;
 
-            this.SetContentColumnIndex((
-                    parameter.ParameterType.ShortName,
-                    parameter.Scale?.ShortName ?? "",
-                    parameterValueSet.ActualOption?.ShortName ?? "",
-                    parameter.StateDependence?.ShortName ?? "",
-                    parameterValueSet.ActualState?.ShortName ?? ""),
-                -1);
+            if (parameter.ParameterType is CompoundParameterType compoundParameterType)
+            {
+                // NOTE: call Select so that 'component' has a proper type, not object
+                foreach (var component in compoundParameterType.Component.Select(x => x))
+                {
+                    this.SetContentColumnIndex((
+                            parameter.ParameterType.ShortName,
+                            component.ParameterType.ShortName,
+                            component.Scale?.ShortName ?? "",
+                            parameterValueSet.ActualOption?.ShortName ?? "",
+                            parameter.StateDependence?.ShortName ?? "",
+                            parameterValueSet.ActualState?.ShortName ?? ""), 
+                        -1);
+                }
+            }
+            else
+            {
+                this.SetContentColumnIndex((
+                        parameter.ParameterType.ShortName,
+                        "",
+                        parameter.Scale?.ShortName ?? "",
+                        parameterValueSet.ActualOption?.ShortName ?? "",
+                        parameter.StateDependence?.ShortName ?? "",
+                        parameterValueSet.ActualState?.ShortName ?? ""),
+                    -1);
+            }
         }
 
         /// <summary>
@@ -378,6 +421,7 @@ namespace CDP4CrossViewEditor.Assemblers
         private void SetContentColumnIndex(HeaderColumn headerColumn, int index)
         {
             var (parameterTypeShortName,
+                parameterTypeComponentShortName,
                 measurementScaleShortName,
                 optionShortName,
                 actualFiniteStateListShortName,
@@ -386,10 +430,18 @@ namespace CDP4CrossViewEditor.Assemblers
             if (!this.headerDictionary.ContainsKey(parameterTypeShortName))
             {
                 this.headerDictionary[parameterTypeShortName]
+                    = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>>>();
+            }
+
+            var ptcDictionary = this.headerDictionary[parameterTypeShortName];
+
+            if (!ptcDictionary.ContainsKey(parameterTypeComponentShortName))
+            {
+                ptcDictionary[parameterTypeComponentShortName]
                     = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>>();
             }
 
-            var msDictionary = this.headerDictionary[parameterTypeShortName];
+            var msDictionary = ptcDictionary[parameterTypeComponentShortName];
 
             if (!msDictionary.ContainsKey(measurementScaleShortName))
             {
@@ -424,15 +476,28 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <param name="parameterValueSetBase">
         /// The given <see cref="ParameterValueSetBase"/>
         /// </param>
+        /// <param name="component"></param>
         /// <returns>
         /// The column index
         /// </returns>
-        private int GetContentColumnIndex(ParameterValueSetBase parameterValueSetBase)
+        private int GetContentColumnIndex(ParameterValueSetBase parameterValueSetBase, ParameterTypeComponent component = null)
         {
             var parameterOrOverrideBase = (ParameterOrOverrideBase)parameterValueSetBase.Container;
 
+            if (component != null)
+            {
+                return this.GetContentColumnIndex((
+                    parameterOrOverrideBase.ParameterType.ShortName,
+                    component.ParameterType.ShortName,
+                    component.Scale?.ShortName ?? "",
+                    parameterValueSetBase.ActualOption?.ShortName ?? "",
+                    parameterOrOverrideBase.StateDependence?.ShortName ?? "",
+                    parameterValueSetBase.ActualState?.ShortName ?? ""));
+            }
+
             return this.GetContentColumnIndex((
                 parameterOrOverrideBase.ParameterType.ShortName,
+                "",
                 parameterOrOverrideBase.Scale?.ShortName ?? "",
                 parameterValueSetBase.ActualOption?.ShortName ?? "",
                 parameterOrOverrideBase.StateDependence?.ShortName ?? "",
@@ -451,6 +516,7 @@ namespace CDP4CrossViewEditor.Assemblers
         private int GetContentColumnIndex(HeaderColumn headerColumn)
         {
             var (parameterTypeShortName,
+                parameterTypeComponentShortName,
                 measurementScaleShortName,
                 optionShortName,
                 actualFiniteStateListShortName,
@@ -458,6 +524,7 @@ namespace CDP4CrossViewEditor.Assemblers
 
             return this.headerDictionary
                 [parameterTypeShortName]
+                [parameterTypeComponentShortName]
                 [measurementScaleShortName]
                 [optionShortName]
                 [actualFiniteStateListShortName]
