@@ -39,9 +39,9 @@ namespace CDP4CrossViewEditor.Generator
 
         /// <summary>
         /// The number of header nested "layers":
-        /// ParameterType -> MeasurementUnit -> ActualFiniteStateList -> ActualFiniteState.
+        /// ParameterType -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState.
         /// </summary>
-        internal const int HeaderDepth = 4;
+        internal const int HeaderDepth = 5;
 
         /// <summary>
         /// The name of the range on the Parameters sheet that contains the header rows.

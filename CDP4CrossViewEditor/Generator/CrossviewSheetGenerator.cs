@@ -25,6 +25,12 @@
 
 namespace CDP4CrossViewEditor.Generator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -36,12 +42,6 @@ namespace CDP4CrossViewEditor.Generator
     using NetOffice.ExcelApi.Enums;
 
     using NLog;
-
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
@@ -303,7 +303,7 @@ namespace CDP4CrossViewEditor.Generator
                         this.crossviewSheet.Cells[dataStartRow, i])
                     .Merge();
             }
-            
+
             // collapse empty header rows
             for (var i = 0; i < CrossviewSheetConstants.HeaderDepth; ++i)
             {
@@ -338,32 +338,53 @@ namespace CDP4CrossViewEditor.Generator
 
                 foreach (var measurementScaleShortName in msDictionary.Keys.ToList())
                 {
-                    var afslDictionary = msDictionary[measurementScaleShortName];
+                    var oDictionary = msDictionary[measurementScaleShortName];
 
                     var minMs = numberOfColumns;
                     var maxMs = 0;
 
-                    foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
+                    foreach (var optionShortName in oDictionary.Keys.ToList())
                     {
-                        var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+                        var afslDictionary = oDictionary[optionShortName];
 
-                        var minAfsl = afsDictionary.Values.Min();
-                        var maxAfsl = afsDictionary.Values.Max();
+                        var minO = numberOfColumns;
+                        var maxO = 0;
 
-                        minMs = Math.Min(minMs, minAfsl);
-                        maxMs = Math.Max(maxMs, maxAfsl);
+                        foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
+                        {
+                            var afsDictionary = afslDictionary[actualFiniteStateListShortName];
 
-                        minPt = Math.Min(minPt, minAfsl);
-                        maxPt = Math.Max(maxPt, maxAfsl);
+                            var minAfsl = afsDictionary.Values.Min();
+                            var maxAfsl = afsDictionary.Values.Max();
 
-                        if (minAfsl == maxAfsl)
+                            minO = Math.Min(minO, minAfsl);
+                            maxO = Math.Max(maxO, maxAfsl);
+
+                            minMs = Math.Min(minMs, minAfsl);
+                            maxMs = Math.Max(maxMs, maxAfsl);
+
+                            minPt = Math.Min(minPt, minAfsl);
+                            maxPt = Math.Max(maxPt, maxAfsl);
+
+                            if (minAfsl == maxAfsl)
+                            {
+                                continue;
+                            }
+
+                            this.crossviewSheet.Range(
+                                    this.crossviewSheet.Cells[numberOfHeaderRows + 4, minAfsl + 1],
+                                    this.crossviewSheet.Cells[numberOfHeaderRows + 4, maxAfsl + 1])
+                                .Merge();
+                        }
+
+                        if (minO == maxO)
                         {
                             continue;
                         }
 
                         this.crossviewSheet.Range(
-                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, minAfsl + 1],
-                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, maxAfsl + 1])
+                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, minO + 1],
+                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, maxO + 1])
                             .Merge();
                     }
 
