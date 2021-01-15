@@ -314,7 +314,6 @@ namespace CDP4CrossViewEditor.Assemblers
                 {
                     if (parameterOrOverrideBase.ParameterType is CompoundParameterType compoundParameterType)
                     {
-                        // TODO #695: account for recursive CompoundParameterTypes
                         for (var i = 0; i < compoundParameterType.NumberOfValues; ++i)
                         {
                             var component = compoundParameterType.Component[i];
