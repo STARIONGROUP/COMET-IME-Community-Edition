@@ -32,6 +32,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     using CDP4CrossViewEditor.Assemblers;
     using CDP4CrossViewEditor.Generator;
@@ -134,6 +135,20 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             elementUsage.ElementDefinition = elementDefinition;
             this.elementDefinitions.Add(elementDefinition);
 
+            var actualList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri);
+
+            var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "PossibleFiniteStateList_1",
+                ShortName = "PFSL_1",
+                PossibleState =
+                {
+                    new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri) { Name = "PossibleState_1", ShortName = "PS_1" }
+                }
+            };
+
+            actualList.PossibleFiniteStateList.Add(possibleList);
+
             var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "PT1_SimpleQuantityKind",
@@ -142,12 +157,27 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.parameterTypes.Add(parameterType);
 
-            var parameter = new Parameter
+            var parameterValueset1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                Iid = Guid.NewGuid(),
+                Manual = new ValueArray<string>(new List<string> { "Manual" }),
+                Reference = new ValueArray<string>(new List<string> { "Reference" }),
+                Computed = new ValueArray<string>(new List<string> { "Computed" }),
+                Formula = new ValueArray<string>(new List<string> { "Formula" }),
+                Published = new ValueArray<string>(new List<string> { "Published" }),
+                ValueSwitch = ParameterSwitchKind.MANUAL
+            };
+
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
                 ParameterType = parameterType,
-                Scale = parameterType.DefaultScale,
-                Owner = this.domain
+                Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                {
+                    Name = "RatioScale_1",
+                    ShortName = "RS_1"
+                },
+                Owner = this.domain,
+                StateDependence = actualList,
+                ValueSet = { parameterValueset1 },
             };
 
             this.iteration.Element.Add(elementDefinition);
