@@ -35,6 +35,8 @@ namespace CDP4CrossViewEditor.Assemblers
     using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
+    using HeaderColumn = System.ValueTuple<string, string, string, string>;
+
     /// <summary>
     /// The purpose of the <see cref="CrossviewArrayAssembler"/> is to create the arrays that are
     /// used to populate the Parameter Sheet
@@ -47,13 +49,6 @@ namespace CDP4CrossViewEditor.Assemblers
         private int numberOfColumns = CrossviewSheetConstants.FixedColumns;
 
         /// <summary>
-        /// The actual number of header nested layers.
-        /// This might be lower than <see cref="CrossviewSheetConstants.HeaderDepth"/>
-        /// if all values on a layer are missing.
-        /// </summary>
-        public int ActualHeaderDepth { get; private set; }
-
-        /// <summary>
         /// The <see cref="IExcelRow{T}"/> that are being used to populate the various arrays
         /// </summary>
         private readonly IEnumerable<IExcelRow<Thing>> excelRows;
@@ -64,10 +59,11 @@ namespace CDP4CrossViewEditor.Assemblers
         private IEnumerable<ParameterType> parameterTypes;
 
         /// <summary>
-        /// The header structure mapping parameters to indices
+        /// The header structure mapping parameter layer short names to indices:
+        /// ParamterType -> ActualFiniteStateList -> ActualFiniteState -> MeasurementUnit -> index
         /// </summary>
-        internal readonly Dictionary<string, SortedDictionary<string, int>> headerDictionary
-            = new Dictionary<string, SortedDictionary<string, int>>();
+        internal readonly Dictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>> headerDictionary
+            = new Dictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>>();
 
         /// <summary>
         /// Gets the array that contains the parameter sheet information
@@ -78,11 +74,6 @@ namespace CDP4CrossViewEditor.Assemblers
         /// Gets the array that contains formatting information
         /// </summary>
         public object[,] FormatArray { get; private set; }
-
-        /// <summary>
-        /// Gets the array that contains the parameter sheet information
-        /// </summary>
-        private object[,] FormulaArray { get; set; }
 
         /// <summary>
         /// Gets the array that contains locked cells information
@@ -113,7 +104,6 @@ namespace CDP4CrossViewEditor.Assemblers
             this.ContentArray = new object[,] { };
             this.LockArray = new object[,] { };
             this.FormatArray = new object[,] { };
-            this.FormulaArray = new object[,] { };
         }
 
         /// <summary>
@@ -125,12 +115,9 @@ namespace CDP4CrossViewEditor.Assemblers
 
             var contentHeader = this.GenerateContentHeader();
 
-            this.ActualHeaderDepth = CrossviewSheetConstants.HeaderDepth;
-
             this.ContentArray = new object[this.excelRows.Count() + contentHeader.Count, this.numberOfColumns];
             this.LockArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
             this.FormatArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
-            this.FormulaArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
 
             var contentList = new List<object[]>();
 
@@ -148,6 +135,38 @@ namespace CDP4CrossViewEditor.Assemblers
         }
 
         /// <summary>
+        /// Gets all header columns
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IEnumerable{HeaderColumn}"/>
+        /// </returns>
+        private IEnumerable<HeaderColumn> GetHeaderColumns()
+        {
+            foreach (var parameterTypeShortName in this.headerDictionary.Keys.ToList())
+            {
+                var msDictionary = this.headerDictionary[parameterTypeShortName];
+
+                foreach (var measurementScaleShortName in msDictionary.Keys.ToList())
+                {
+                    var afslDictionary = msDictionary[measurementScaleShortName];
+
+                    foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
+                    {
+                        var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+
+                        foreach (var actualFiniteStateShortName in afsDictionary.Keys.ToList())
+                        {
+                            yield return (parameterTypeShortName,
+                                measurementScaleShortName,
+                                actualFiniteStateListShortName,
+                                actualFiniteStateShortName);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Initializes the header structure mapping parameters to indices
         /// </summary>
         private void InitializeHeaderStructure()
@@ -159,19 +178,16 @@ namespace CDP4CrossViewEditor.Assemblers
                 foreach (var parameter in elementDefinition.Parameter
                     .Where(parameter => this.parameterTypes.Contains(parameter.ParameterType)))
                 {
-                    this.SetContentColumnIndex(parameter);
+                    foreach (var valueSet in parameter.ValueSet)
+                    {
+                        this.SetContentColumnIndex(valueSet);
+                    }
                 }
             }
 
-            foreach (var parameterTypeShortName in this.headerDictionary.Keys.ToList())
+            foreach (var headerColumn in this.GetHeaderColumns())
             {
-                foreach (var measurementUnitShortName in this.headerDictionary[parameterTypeShortName].Keys.ToList())
-                {
-                    this.SetContentColumnIndex(
-                        parameterTypeShortName,
-                        measurementUnitShortName,
-                        this.numberOfColumns++);
-                }
+                this.SetContentColumnIndex(headerColumn, this.numberOfColumns++);
             }
         }
 
@@ -196,17 +212,19 @@ namespace CDP4CrossViewEditor.Assemblers
                 rows[i, 4] = "Category";
             }
 
-            foreach (var parameterTypeShortName in this.headerDictionary.Keys)
+            foreach (var headerColumn in this.GetHeaderColumns())
             {
-                foreach (var measurementUnitShortName in this.headerDictionary[parameterTypeShortName].Keys)
-                {
-                    var columnIndex = this.GetContentColumnIndex(
-                        parameterTypeShortName,
-                        measurementUnitShortName);
+                var columnIndex = this.GetContentColumnIndex(headerColumn);
 
-                    rows[0, columnIndex] = parameterTypeShortName;
-                    rows[1, columnIndex] = $"[{measurementUnitShortName}]";
-                }
+                (
+                    rows[0, columnIndex],
+                    rows[1, columnIndex],
+                    rows[2, columnIndex],
+                    rows[3, columnIndex]
+                    ) = headerColumn;
+
+                // add square brackets to MeasurementScale short name
+                rows[1, columnIndex] = $"[{rows[1, columnIndex]}]";
             }
 
             for (var i = 0; i < CrossviewSheetConstants.HeaderDepth; ++i)
@@ -243,30 +261,29 @@ namespace CDP4CrossViewEditor.Assemblers
             contentRow[3] = excelRow.Owner;
             contentRow[4] = excelRow.Categories;
 
-            IEnumerable<ParameterBase> parameters;
+            IEnumerable<ParameterOrOverrideBase> parameters;
 
             switch (excelRow.Thing)
             {
                 case ElementUsage elementUsage:
                     parameters = this.parameterTypes
-                        .Select(pt => GetParameterBase(elementUsage, pt))
-                        .Where(p => p != null);
+                        .Select(pt => GetParameterOrOverrideBase(elementUsage, pt));
                     break;
 
                 case ElementDefinition elementDefinition:
                     parameters = this.parameterTypes
-                        .Select(pt => GetParameterBase(elementDefinition, pt))
-                        .Where(p => p != null);
+                        .Select(pt => GetParameterOrOverrideBase(elementDefinition, pt));
                     break;
 
                 default:
                     return contentRow;
             }
 
-            foreach (var parameterBase in parameters)
+            foreach (var parameterValueSetBase in parameters
+                .Where(p => p != null)
+                .SelectMany(p => p.ValueSets.Cast<ParameterValueSetBase>()))
             {
-                var valueSet = parameterBase.ValueSets.FirstOrDefault();
-                contentRow[this.GetContentColumnIndex(parameterBase)] = valueSet?.ActualValue.FirstOrDefault();
+                contentRow[this.GetContentColumnIndex(parameterValueSetBase)] = parameterValueSetBase.ActualValue.FirstOrDefault();
             }
 
             return contentRow;
@@ -285,12 +302,12 @@ namespace CDP4CrossViewEditor.Assemblers
         /// The given <see cref="ParameterType"/>
         /// </param>
         /// <returns>
-        /// The <see cref="ParameterBase"/>
+        /// The <see cref="ParameterOrOverrideBase"/>
         /// </returns>
-        private static ParameterBase GetParameterBase(ElementUsage elementUsage, ParameterType parameterType)
+        private static ParameterOrOverrideBase GetParameterOrOverrideBase(ElementUsage elementUsage, ParameterType parameterType)
         {
             return elementUsage.ParameterOverride.FirstOrDefault(po => po.ParameterType == parameterType)
-                   ?? GetParameterBase(elementUsage.ElementDefinition, parameterType);
+                   ?? GetParameterOrOverrideBase(elementUsage.ElementDefinition, parameterType);
         }
 
         /// <summary>
@@ -304,94 +321,113 @@ namespace CDP4CrossViewEditor.Assemblers
         /// The given <see cref="ParameterType"/>
         /// </param>
         /// <returns>
-        /// The <see cref="ParameterBase"/>
+        /// The <see cref="ParameterOrOverrideBase"/>
         /// </returns>
-        private static ParameterBase GetParameterBase(ElementDefinition elementDefinition, ParameterType parameterType)
+        private static ParameterOrOverrideBase GetParameterOrOverrideBase(ElementDefinition elementDefinition, ParameterType parameterType)
         {
             return elementDefinition.Parameter.FirstOrDefault(p => p.ParameterType == parameterType);
         }
 
         /// <summary>
-        /// Sets the column index associated to the given <paramref name="parameterBase"/>
-        /// to the given column <paramref name="index"/>
+        /// Initializes the column index associated to the given <paramref name="parameterValueSet"/>
         /// </summary>
-        /// <param name="parameterBase">
-        /// The given <see cref="ParameterBase"/>
+        /// <param name="parameterValueSet">
+        /// The given <see cref="ParameterValueSet"/>
         /// </param>
-        /// <param name="index">
-        /// The given column index
-        /// </param>
-        private void SetContentColumnIndex(ParameterBase parameterBase, int index = -1)
+        private void SetContentColumnIndex(ParameterValueSet parameterValueSet)
         {
-            this.SetContentColumnIndex(
-                parameterBase.ParameterType.ShortName,
-                parameterBase.Scale?.ShortName ?? "",
-                index);
+            var parameter = (Parameter)parameterValueSet.Container;
+
+            this.SetContentColumnIndex((
+                    parameter.ParameterType.ShortName,
+                    parameter.Scale?.ShortName ?? "",
+                    parameter.StateDependence?.ShortName ?? "",
+                    parameterValueSet.ActualState?.ShortName ?? ""),
+                -1);
         }
 
         /// <summary>
-        /// Sets the column index associated to the given arguments
+        /// Sets the column index associated to the given <paramref name="headerColumn"/>
         /// to the given column <paramref name="index"/>
         /// </summary>
-        /// <param name="parameterTypeShortName">
-        /// The given <see cref="ParameterType"/> short name
-        /// </param>
-        /// <param name="measurementScaleShortName">
-        /// The given <see cref="MeasurementScale"/> short name
+        /// <param name="headerColumn">
+        /// The given <see cref="HeaderColumn"/>
         /// </param>
         /// <param name="index">
         /// The given column index
         /// </param>
-        private void SetContentColumnIndex(
-            string parameterTypeShortName,
-            string measurementScaleShortName,
-            int index)
+        private void SetContentColumnIndex(HeaderColumn headerColumn, int index)
         {
+            var (parameterTypeShortName,
+                measurementScaleShortName,
+                actualFiniteStateListShortName,
+                actualFiniteStateShortName) = headerColumn;
+
             if (!this.headerDictionary.ContainsKey(parameterTypeShortName))
             {
-                this.headerDictionary[parameterTypeShortName] = new SortedDictionary<string, int>();
+                this.headerDictionary[parameterTypeShortName] = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>();
             }
 
-            var scaleDictionary = this.headerDictionary[parameterTypeShortName];
+            var msDictionary = this.headerDictionary[parameterTypeShortName];
 
-            scaleDictionary[measurementScaleShortName] = index;
+            if (!msDictionary.ContainsKey(measurementScaleShortName))
+            {
+                msDictionary[measurementScaleShortName] = new SortedDictionary<string, SortedDictionary<string, int>>();
+            }
+
+            var afslDictionary = msDictionary[measurementScaleShortName];
+
+            if (!afslDictionary.ContainsKey(actualFiniteStateListShortName))
+            {
+                afslDictionary[actualFiniteStateListShortName] = new SortedDictionary<string, int>();
+            }
+
+            var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+
+            afsDictionary[actualFiniteStateShortName] = index;
         }
 
         /// <summary>
-        /// Gets the column index associated to the given <paramref name="parameterBase"/>
+        /// Gets the column index associated to the given <paramref name="parameterValueSetBase"/>
         /// </summary>
-        /// <param name="parameterBase">
-        /// The given <see cref="ParameterBase"/>
+        /// <param name="parameterValueSetBase">
+        /// The given <see cref="ParameterValueSetBase"/>
         /// </param>
         /// <returns>
         /// The column index
         /// </returns>
-        private int GetContentColumnIndex(ParameterBase parameterBase)
+        private int GetContentColumnIndex(ParameterValueSetBase parameterValueSetBase)
         {
-            return this.GetContentColumnIndex(
-                parameterBase.ParameterType.ShortName,
-                parameterBase.Scale?.ShortName ?? "");
+            var parameterOrOverrideBase = (ParameterOrOverrideBase)parameterValueSetBase.Container;
+
+            return this.GetContentColumnIndex((
+                parameterOrOverrideBase.ParameterType.ShortName,
+                parameterOrOverrideBase.Scale?.ShortName ?? "",
+                parameterOrOverrideBase.StateDependence?.ShortName ?? "",
+                parameterValueSetBase.ActualState?.ShortName ?? ""));
         }
 
         /// <summary>
-        /// Gets the column index associated to the given arguments
+        /// Gets the column index associated to the given <paramref name="headerColumn"/>
         /// </summary>
-        /// <param name="parameterTypeShortName">
-        /// The given <see cref="ParameterType"/> short name
-        /// </param>
-        /// <param name="measurementScaleShortName">
-        /// The given <see cref="MeasurementScale"/> short name
+        /// <param name="headerColumn">
+        /// The given <see cref="HeaderColumn"/>
         /// </param>
         /// <returns>
         /// The column index
         /// </returns>
-        private int GetContentColumnIndex(
-            string parameterTypeShortName,
-            string measurementScaleShortName)
+        private int GetContentColumnIndex(HeaderColumn headerColumn)
         {
+            var (parameterTypeShortName,
+                measurementScaleShortName,
+                actualFiniteStateListShortName,
+                actualFiniteStateShortName) = headerColumn;
+
             return this.headerDictionary
                 [parameterTypeShortName]
-                [measurementScaleShortName];
+                [measurementScaleShortName]
+                [actualFiniteStateListShortName]
+                [actualFiniteStateShortName];
         }
 
         /// <summary>

@@ -32,8 +32,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     using CDP4CrossViewEditor.Assemblers;
+    using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
     using CDP4Dal;
@@ -133,6 +135,20 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             elementUsage.ElementDefinition = elementDefinition;
             this.elementDefinitions.Add(elementDefinition);
 
+            var actualList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri);
+
+            var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "PossibleFiniteStateList_1",
+                ShortName = "PFSL_1",
+                PossibleState =
+                {
+                    new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri) { Name = "PossibleState_1", ShortName = "PS_1" }
+                }
+            };
+
+            actualList.PossibleFiniteStateList.Add(possibleList);
+
             var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "PT1_SimpleQuantityKind",
@@ -141,12 +157,27 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.parameterTypes.Add(parameterType);
 
-            var parameter = new Parameter
+            var parameterValueset1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                Iid = Guid.NewGuid(),
+                Manual = new ValueArray<string>(new List<string> { "Manual" }),
+                Reference = new ValueArray<string>(new List<string> { "Reference" }),
+                Computed = new ValueArray<string>(new List<string> { "Computed" }),
+                Formula = new ValueArray<string>(new List<string> { "Formula" }),
+                Published = new ValueArray<string>(new List<string> { "Published" }),
+                ValueSwitch = ParameterSwitchKind.MANUAL
+            };
+
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
                 ParameterType = parameterType,
-                Scale = parameterType.DefaultScale,
-                Owner = this.domain
+                Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                {
+                    Name = "RatioScale_1",
+                    ShortName = "RS_1"
+                },
+                Owner = this.domain,
+                StateDependence = actualList,
+                ValueSet = { parameterValueset1 },
             };
 
             this.iteration.Element.Add(elementDefinition);
@@ -167,7 +198,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             var contentArray = arrayAssembler.ContentArray;
 
             // The array contains more rows to make a nice header and spacing
-            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - arrayAssembler.ActualHeaderDepth);
+            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - CrossviewSheetConstants.HeaderDepth);
         }
 
         [Test]
@@ -181,9 +212,9 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             var contentArray = arrayAssembler.ContentArray;
 
             // The array contains more rows to make a nice header and spacing
-            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - arrayAssembler.ActualHeaderDepth);
-            Assert.AreEqual("ElementDefinition_1", contentArray[arrayAssembler.ActualHeaderDepth, 0]);
-            Assert.AreEqual("ED_1", contentArray[arrayAssembler.ActualHeaderDepth, 1]);
+            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - CrossviewSheetConstants.HeaderDepth);
+            Assert.AreEqual("ElementDefinition_1", contentArray[CrossviewSheetConstants.HeaderDepth, 0]);
+            Assert.AreEqual("ED_1", contentArray[CrossviewSheetConstants.HeaderDepth, 1]);
         }
     }
 }

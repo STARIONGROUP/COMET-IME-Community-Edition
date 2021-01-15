@@ -255,7 +255,7 @@ namespace CDP4CrossViewEditor.Generator
             var numberOfBodyRows = this.crossviewArrayAssember.ContentArray.GetLength(0);
             var numberOfColumns = this.crossviewArrayAssember.ContentArray.GetLength(1);
 
-            var dataStartRow = numberOfHeaderRows + this.crossviewArrayAssember.ActualHeaderDepth;
+            var dataStartRow = numberOfHeaderRows + CrossviewSheetConstants.HeaderDepth;
             var dataEndRow = numberOfHeaderRows + numberOfBodyRows;
 
             var parameterRange = this.crossviewSheet.Range(
@@ -278,6 +278,23 @@ namespace CDP4CrossViewEditor.Generator
             formattedRange.Font.Size = 11;
             formattedRange.EntireColumn.AutoFit();
 
+            this.PrettifyBodyHeader();
+
+            this.ApplyCellNames(dataStartRow, CrossviewSheetConstants.FixedColumns + 1, dataEndRow, numberOfColumns);
+
+            this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
+            this.excelApplication.ActiveWindow.FreezePanes = true;
+        }
+
+        /// <summary>
+        /// Prettify body header
+        /// </summary>
+        private void PrettifyBodyHeader()
+        {
+            var numberOfHeaderRows = this.headerArrayAssembler.HeaderArray.GetLength(0);
+            var numberOfColumns = this.crossviewArrayAssember.ContentArray.GetLength(1);
+            var dataStartRow = numberOfHeaderRows + CrossviewSheetConstants.HeaderDepth;
+
             // format fixed columns
             for (var i = 1; i <= CrossviewSheetConstants.FixedColumns; ++i)
             {
@@ -286,29 +303,91 @@ namespace CDP4CrossViewEditor.Generator
                         this.crossviewSheet.Cells[dataStartRow, i])
                     .Merge();
             }
+            
+            // collapse empty header rows
+            for (var i = 0; i < CrossviewSheetConstants.HeaderDepth; ++i)
+            {
+                var collapse = true;
+
+                for (var j = CrossviewSheetConstants.FixedColumns; j < numberOfColumns; ++j)
+                {
+                    if ((string)this.crossviewArrayAssember.ContentArray[i, j] == "")
+                    {
+                        continue;
+                    }
+
+                    collapse = false;
+                    break;
+                }
+
+                if (collapse)
+                {
+                    this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, 1].EntireRow.Hidden = true;
+                }
+            }
 
             // group horizontal parameter columns
             var bodyHeaderDictionary = this.crossviewArrayAssember.headerDictionary;
-            foreach (var parameterTypeShortName in bodyHeaderDictionary.Keys)
-            {
-                var min = bodyHeaderDictionary[parameterTypeShortName].Values.Min();
-                var max = bodyHeaderDictionary[parameterTypeShortName].Values.Max();
 
-                if (min == max)
+            foreach (var parameterTypeShortName in bodyHeaderDictionary.Keys.ToList())
+            {
+                var msDictionary = bodyHeaderDictionary[parameterTypeShortName];
+
+                var minPt = numberOfColumns;
+                var maxPt = 0;
+
+                foreach (var measurementScaleShortName in msDictionary.Keys.ToList())
+                {
+                    var afslDictionary = msDictionary[measurementScaleShortName];
+
+                    var minMs = numberOfColumns;
+                    var maxMs = 0;
+
+                    foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
+                    {
+                        var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+
+                        var minAfsl = afsDictionary.Values.Min();
+                        var maxAfsl = afsDictionary.Values.Max();
+
+                        minMs = Math.Min(minMs, minAfsl);
+                        maxMs = Math.Max(maxMs, maxAfsl);
+
+                        minPt = Math.Min(minPt, minAfsl);
+                        maxPt = Math.Max(maxPt, maxAfsl);
+
+                        if (minAfsl == maxAfsl)
+                        {
+                            continue;
+                        }
+
+                        this.crossviewSheet.Range(
+                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, minAfsl + 1],
+                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, maxAfsl + 1])
+                            .Merge();
+                    }
+
+                    if (minMs == maxMs)
+                    {
+                        continue;
+                    }
+
+                    this.crossviewSheet.Range(
+                            this.crossviewSheet.Cells[numberOfHeaderRows + 2, minMs + 1],
+                            this.crossviewSheet.Cells[numberOfHeaderRows + 2, maxMs + 1])
+                        .Merge();
+                }
+
+                if (minPt == maxPt)
                 {
                     continue;
                 }
 
                 this.crossviewSheet.Range(
-                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, min + 1],
-                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, max + 1])
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, minPt + 1],
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, maxPt + 1])
                     .Merge();
             }
-
-            this.ApplyCellNames(dataStartRow, CrossviewSheetConstants.FixedColumns + 1, dataEndRow, numberOfColumns);
-
-            this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
-            this.excelApplication.ActiveWindow.FreezePanes = true;
         }
 
         /// <summary>
