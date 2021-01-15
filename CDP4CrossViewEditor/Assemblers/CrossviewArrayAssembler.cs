@@ -64,7 +64,7 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </summary>
         internal readonly
             Dictionary<string,
-                SortedDictionary<string, 
+                SortedDictionary<string,
                     SortedDictionary<string,
                         SortedDictionary<string,
                             SortedDictionary<string,
@@ -295,11 +295,13 @@ namespace CDP4CrossViewEditor.Assemblers
                 case ElementUsage elementUsage:
                     parameters = this.parameterTypes
                         .Select(pt => GetParameterOrOverrideBase(elementUsage, pt));
+
                     break;
 
                 case ElementDefinition elementDefinition:
                     parameters = this.parameterTypes
                         .Select(pt => GetParameterOrOverrideBase(elementDefinition, pt));
+
                     break;
 
                 default:
@@ -376,7 +378,7 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <param name="parameterValueSet">
         /// The given <see cref="ParameterValueSet"/>
         /// </param>
-        private void SetContentColumnIndex(ParameterValueSet parameterValueSet)
+        private void SetContentColumnIndex(ParameterValueSetBase parameterValueSet)
         {
             var parameter = (Parameter)parameterValueSet.Container;
 
@@ -391,7 +393,7 @@ namespace CDP4CrossViewEditor.Assemblers
                             component.Scale?.ShortName ?? "",
                             parameterValueSet.ActualOption?.ShortName ?? "",
                             parameter.StateDependence?.ShortName ?? "",
-                            parameterValueSet.ActualState?.ShortName ?? ""), 
+                            parameterValueSet.ActualState?.ShortName ?? ""),
                         -1);
                 }
             }
