@@ -105,6 +105,7 @@ namespace CDP4Composition.Tests.ViewModels
             {
                 Name = Name,
                 ElementDefinition = this.elementDefinition,
+                Container = this.elementDefinition,
                 ParameterOverride = { this.parameterOverride }
             };
 
@@ -141,6 +142,11 @@ namespace CDP4Composition.Tests.ViewModels
             var lastParameter = vm.Parameters.LastOrDefault();
             Assert.IsNotNull(lastParameter);
             Assert.AreEqual("-", lastParameter.Value);
+            
+            vm = new ElementParameterRowControlViewModel(this.elementUsage, this.option);
+            var rowParameterOverride = vm.Parameters.LastOrDefault();
+            Assert.IsNotNull(rowParameterOverride);
+            Assert.AreEqual("-", rowParameterOverride.Value);
 
             vm = new ElementParameterRowControlViewModel(this.elementDefinition, null);
             Assert.IsEmpty(vm.Parameters);
