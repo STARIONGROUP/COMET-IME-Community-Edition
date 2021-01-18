@@ -26,6 +26,7 @@
 namespace CDP4Composition.Tests.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -46,6 +47,7 @@ namespace CDP4Composition.Tests.ViewModels
         private ElementUsage elementUsage;
         private Option option;
         private Parameter parameter;
+        private Parameter parameter2;
         private ParameterOverride parameterOverride;
         private DomainOfExpertise owner;
         private Assembler assembler;
@@ -63,9 +65,26 @@ namespace CDP4Composition.Tests.ViewModels
 
             this.parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
             {
-                ValueSet = { new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(), Published = new ValueArray<string>() }},
+                ValueSet = 
+                { 
+                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
+                    {
+                        ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(new List<string>() {"2","3","4"})
+                    },
+                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
+                    {
+                        ValueSwitch = ParameterSwitchKind.COMPUTED, Computed = new ValueArray<string>(new List<string>() {"5","6","7"})
+                    }
+                },
                 ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { Name = Name, ShortName = Name},
                 Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { ShortName = Name },
+                Owner = this.owner
+            };
+
+            this.parameter2 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
+            {
+                ValueSet = { new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(), Published = new ValueArray<string>() } },
+                ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { Name = Name, ShortName = Name },
                 Owner = this.owner
             };
 
@@ -79,7 +98,7 @@ namespace CDP4Composition.Tests.ViewModels
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
             {
                 Name = Name,
-                Parameter = { this.parameter }
+                Parameter = { this.parameter, this.parameter2 }
             };
 
             this.elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
@@ -99,7 +118,7 @@ namespace CDP4Composition.Tests.ViewModels
         public void VerifyProperties()
         {
             var vm = new ElementParameterRowControlViewModel(this.elementDefinition, this.option);
-            Assert.AreEqual(1, vm.Parameters.Count);
+            Assert.AreEqual(2, vm.Parameters.Count);
             Assert.AreSame(vm.Element, this.elementDefinition);
             Assert.AreSame(vm.ActualOption, this.option);
             Assert.AreSame(vm.Element, this.elementDefinition);
@@ -111,14 +130,18 @@ namespace CDP4Composition.Tests.ViewModels
             Assert.AreSame(firstParameter.Name, Name);
             Assert.AreSame(firstParameter.ShortName, Name);
             Assert.AreSame(firstParameter.Parameter, this.parameter);
-            Assert.AreEqual(firstParameter.Value, " [test]");
-            Assert.AreEqual(firstParameter.Description, "-");
+            Assert.AreEqual($"2 [{Name}]", firstParameter.Value);
+            Assert.AreEqual("-", firstParameter.Description);
             Assert.AreSame(firstParameter.OwnerShortName, Name);
             Assert.AreEqual(firstParameter.Switch, ParameterSwitchKind.REFERENCE.ToString());
             Assert.AreEqual(firstParameter.RowType, nameof(Parameter));
             Assert.AreSame(firstParameter.ActualOption, this.option);
             Assert.IsNotNull(firstParameter.ModelCode);
-            
+
+            var lastParameter = vm.Parameters.LastOrDefault();
+            Assert.IsNotNull(lastParameter);
+            Assert.AreEqual("-", lastParameter.Value);
+
             vm = new ElementParameterRowControlViewModel(this.elementDefinition, null);
             Assert.IsEmpty(vm.Parameters);
         }
