@@ -181,7 +181,7 @@ namespace CDP4Composition.ViewModels
 
             this.Name = this.Parameter.ParameterType.Name;
             this.ShortName = this.Parameter.ParameterType.ShortName;
-            var actualvalue = valueSet?.ActualValue.FirstOrDefault() ?? "-";
+            var actualvalue = valueSet?.Published.FirstOrDefault() ?? "-";
 
             var scaleShortName = this.Parameter.Scale is null 
                     ? string.Empty 
