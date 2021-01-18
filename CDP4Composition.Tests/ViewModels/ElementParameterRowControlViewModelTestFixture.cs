@@ -74,11 +74,13 @@ namespace CDP4Composition.Tests.ViewModels
                 {
                     new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
                     {
-                        ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(new List<string>() { "2", "3", "4" })
+                        ValueSwitch = ParameterSwitchKind.REFERENCE,
+                        Published = new ValueArray<string>(new List<string>() { "2", "3", "4" })
                     },
                     new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
                     {
-                        ValueSwitch = ParameterSwitchKind.COMPUTED, Computed = new ValueArray<string>(new List<string>() { "5", "6", "7" })
+                        ValueSwitch = ParameterSwitchKind.COMPUTED, 
+                        Computed = new ValueArray<string>(new List<string>() { "5", "6", "7" })
                     }
                 },
                 ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { Name = Name, ShortName = Name },
