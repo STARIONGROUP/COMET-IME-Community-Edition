@@ -64,6 +64,11 @@ namespace CDP4Reporting.DataCollection
         public Category MainCategory { get; set; }
 
         /// <summary>
+        /// The actual <see cref="Category"/>.
+        /// </summary>
+        public Category ActualCategory { get; set; }
+
+        /// <summary>
         /// Initializes a reported category column based on the corresponding <see cref="ElementBase"/>
         /// within the associated <see cref="DataCollectorNode{T}"/>.
         /// </summary>
@@ -82,6 +87,17 @@ namespace CDP4Reporting.DataCollection
             this.Value = this.IsMemberOfCategory();
 
             this.MainCategory = this.CategoriesInRequiredRdl.FirstOrDefault(x => x.ShortName == this.ShortName);
+
+            if (this.Value)
+            {
+                var childCategories = this.CategoriesInRequiredRdl.Where(x => x.AllSuperCategories().Contains(this.MainCategory));
+        
+                this.ActualCategory = 
+                    this.Node.FindNestedElementCategories(childCategories)
+                        .FirstOrDefault()
+                    ??
+                    this.MainCategory;
+            }
         }
 
         /// <summary>
