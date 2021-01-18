@@ -185,7 +185,7 @@ namespace CDP4Composition.ViewModels
 
             var scaleShortName = this.Parameter.Scale is null 
                     ? string.Empty 
-                    : $" [{this.Parameter.Scale?.ShortName}]";
+                    : $" [{this.Parameter.Scale.ShortName}]";
 
             this.Value = $"{actualvalue}{scaleShortName}";
             this.OwnerShortName = this.Parameter.Owner.ShortName;

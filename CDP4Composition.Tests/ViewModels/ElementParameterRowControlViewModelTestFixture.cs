@@ -63,34 +63,56 @@ namespace CDP4Composition.Tests.ViewModels
 
             this.owner = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { ShortName = Name };
 
+            this.option = new Option(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
+            {
+                Name = Name
+            };
+
             this.parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
             {
-                ValueSet = 
-                { 
+                ValueSet =
+                {
                     new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
                     {
-                        ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(new List<string>() {"2","3","4"})
+                        ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(new List<string>() { "2", "3", "4" })
                     },
                     new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
                     {
-                        ValueSwitch = ParameterSwitchKind.COMPUTED, Computed = new ValueArray<string>(new List<string>() {"5","6","7"})
+                        ValueSwitch = ParameterSwitchKind.COMPUTED, Computed = new ValueArray<string>(new List<string>() { "5", "6", "7" })
                     }
                 },
-                ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { Name = Name, ShortName = Name},
+                ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { Name = Name, ShortName = Name },
                 Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { ShortName = Name },
                 Owner = this.owner
             };
 
             this.parameter2 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
             {
-                ValueSet = { new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(), Published = new ValueArray<string>() } },
+                ValueSet =
+                {
+                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
+                    {
+                        ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(), Published = new ValueArray<string>()
+                    }
+                },
                 ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { Name = Name, ShortName = Name },
                 Owner = this.owner
             };
 
             this.parameterOverride = new ParameterOverride(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
             {
-                ValueSet = { new ParameterOverrideValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri) { ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(), Published = new ValueArray<string>() } },
+                ValueSet =
+                {
+                    new ParameterOverrideValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
+                    {
+                        ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(), Published = new ValueArray<string>()
+                    },
+                    new ParameterOverrideValueSet(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
+                    {
+                        ValueSwitch = ParameterSwitchKind.REFERENCE, Reference = new ValueArray<string>(new List<string>() {"18"}), 
+                        Published = new ValueArray<string>()
+                    }
+                },
                 Parameter = this.parameter,
                 Owner = this.owner
             };
@@ -107,11 +129,6 @@ namespace CDP4Composition.Tests.ViewModels
                 ElementDefinition = this.elementDefinition,
                 Container = this.elementDefinition,
                 ParameterOverride = { this.parameterOverride }
-            };
-
-            this.option = new Option(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
-            {
-                Name = Name
             };
         }
 
@@ -142,7 +159,7 @@ namespace CDP4Composition.Tests.ViewModels
             var lastParameter = vm.Parameters.LastOrDefault();
             Assert.IsNotNull(lastParameter);
             Assert.AreEqual("-", lastParameter.Value);
-            
+
             vm = new ElementParameterRowControlViewModel(this.elementUsage, this.option);
             var rowParameterOverride = vm.Parameters.LastOrDefault();
             Assert.IsNotNull(rowParameterOverride);
@@ -150,6 +167,23 @@ namespace CDP4Composition.Tests.ViewModels
 
             vm = new ElementParameterRowControlViewModel(this.elementDefinition, null);
             Assert.IsEmpty(vm.Parameters);
+        }
+
+        [Test]
+        public void VerifyPropertiesWhenParameterIsOptionDependant()
+        {
+            this.parameter.IsOptionDependent = true;
+            this.parameter.ValueSet.First().ActualOption = this.option;
+            var vm = new ElementParameterRowControlViewModel(this.elementDefinition, this.option);
+            Assert.AreEqual($"2 [{Name}]", vm.Parameters.First().Value);
+
+            this.parameter.ValueSet.First().ActualOption = new Option(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
+            {
+                Name = Name
+            };
+
+            vm = new ElementParameterRowControlViewModel(this.elementDefinition, this.option);
+            Assert.AreEqual($"- [{Name}]", vm.Parameters.First().Value);
         }
     }
 }
