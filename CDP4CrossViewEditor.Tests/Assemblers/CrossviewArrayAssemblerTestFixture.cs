@@ -196,7 +196,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 ActualOption = option2
             };
 
-            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            var parameter1 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 ParameterType = parameterType,
                 Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
@@ -209,8 +209,42 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 ValueSet = { parameterValueset1, parameterValueset2 }
             };
 
+            var compoundParameterType = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri){
+                Name = "CompoundParameterType_1",
+                ShortName = "CPT_1"
+            };
+
+            compoundParameterType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "a",
+                ParameterType = parameterType
+            });
+
+            compoundParameterType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "b",
+                ParameterType = parameterType
+            });
+
+            this.parameterTypes.Add(compoundParameterType);
+
+            var parameter2 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ParameterType = compoundParameterType,
+                Owner = this.domain,
+                ValueSet =
+                {
+                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        Manual = new ValueArray<string>(new List<string> { "a_value", "b_value" }),
+                        ValueSwitch = ParameterSwitchKind.MANUAL
+                    }
+                }
+            };
+
             this.iteration.Element.Add(elementDefinition);
-            this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameter);
+            elementDefinition.Parameter.Add(parameter1);
+            elementDefinition.Parameter.Add(parameter2);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
