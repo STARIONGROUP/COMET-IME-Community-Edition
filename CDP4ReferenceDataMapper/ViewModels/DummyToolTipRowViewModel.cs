@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ActualStateDataGridColumn.cs" company="RHEA System S.A.">
+// <copyright file="DummyToolTipRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -23,40 +23,43 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ReferenceDataMapper.StateToParameterTypeMapper
+namespace CDP4ReferenceDataMapper.ViewModels
 {
-    using System;
+    using CDP4Common.CommonData;
 
-    using CDP4Common.EngineeringModelData;
+    using CDP4Composition.Mvvm;
+
+    using CDP4Dal;
 
     using ReactiveUI;
 
     /// <summary>
-    /// The <see cref="ActualStateDataGridColumn"/> class represents a column in a data-grid
+    /// A dummy <see cref="RowViewModelBase{T}"/> used to follow the method of showing the Tooltip in the Details panel.
     /// </summary>
-    public class ActualStateDataGridColumn : DataGridColumn
+    /// <typeparam name="T">The <see cref="Thing"/> represented by the row</typeparam>
+    public class DummyToolTipRowViewModel<T> : RowViewModelBase<T> where T : Thing
     {
         /// <summary>
-        /// Backing field for the <see cref="ActualFiniteState"/> property
+        /// Holds the value for a custom tooltip text 
         /// </summary>
-        private ActualFiniteState actualFiniteState;
+        private string customTooltip;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActualStateDataGridColumn"/> class
+        /// Gets or sets the tooltip
         /// </summary>
-        /// <param name="actualFiniteState">
-        /// the value for the <see cref="ActualFiniteState"/> property
-        /// </param>
-        public ActualStateDataGridColumn(ActualFiniteState actualFiniteState)
+        public new string Tooltip
         {
-            this.ActualFiniteState = actualFiniteState;
-            this.FieldName = actualFiniteState.ShortName;
+            get { return this.customTooltip ?? base.Tooltip; }
+            set { this.RaiseAndSetIfChanged(ref this.customTooltip, value); }
         }
 
-        public ActualFiniteState ActualFiniteState
+        /// <summary>
+        /// Creates a new instance of the <see cref="DummyToolTipRowViewModel{T}"/> class.
+        /// </summary>
+        /// <param name="thing">The thing of type <typeparamref name="T"/>></param>
+        /// <param name="session">The <see cref="ISession"/></param>
+        public DummyToolTipRowViewModel(T thing, ISession session) : base(thing, session, null)
         {
-            get { return this.actualFiniteState; }
-            set { this.RaiseAndSetIfChanged(ref this.actualFiniteState, value); }
         }
     }
 }

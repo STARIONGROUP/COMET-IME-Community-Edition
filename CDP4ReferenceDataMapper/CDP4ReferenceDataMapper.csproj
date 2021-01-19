@@ -34,9 +34,6 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <None Remove="Views\StateToParameterTypeMapper\StateToParameterTypeMapperBrowser.xaml" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="PresentationCore">
       <Private>false</Private>
     </Reference>
@@ -279,20 +276,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\StateToParameterTypeMapper\StateToParameterTypeMapperBrowser.xaml">
+    <Page Include="Views\StateToParameterTypeMapperBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\StateToParameterTypeMapper\StateToParameterTypeMapperRibbon.xaml">
+    <Page Include="Views\StateToParameterTypeMapperRibbon.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\StateToParameterTypeMapper\StateToParameterTypeMapperBrowser.xaml.cs">
+    <Compile Update="Views\StateToParameterTypeMapperBrowser.xaml.cs">
       <DependentUpon>StateToParameterTypeMapperBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\StateToParameterTypeMapper\StateToParameterTypeMapperRibbon.xaml.cs">
+    <Compile Update="Views\StateToParameterTypeMapperRibbon.xaml.cs">
       <DependentUpon>StateToParameterTypeMapperRibbon.xaml</DependentUpon>
     </Compile>
   </ItemGroup>

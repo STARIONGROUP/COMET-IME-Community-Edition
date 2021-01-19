@@ -1,0 +1,402 @@
+﻿<UserControl x:Class="CDP4ReferenceDataMapper.Views.StateToParameterTypeMapperBrowser"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:behaviors="clr-namespace:CDP4ReferenceDataMapper.Behaviors"
+             xmlns:converters1="clr-namespace:CDP4ReferenceDataMapper.Converters"
+             xmlns:dataTemplateSelectors="clr-namespace:CDP4ReferenceDataMapper.DataTemplateSelectors"
+             d:DesignHeight="650"
+             d:DesignWidth="400"
+             dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/RibbonMenuItemTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:NamedShortNamedThingToStringConverter x:Key="NamedShortNamedThingToStringConverter" />
+            
+            <DataTemplate x:Key="comboBoxEditor">
+                <dxe:ComboBoxEdit 
+                    Name="PART_Editor"
+                    DisplayMember="Name"
+                    ValueMember="Iid"
+                    AllowDefaultButton="False"
+                    Foreground="DarkOrange"
+                    IsTextEditable="False">
+                    <dxe:ComboBoxEdit.ItemsSource>
+                        <MultiBinding>
+                            <Binding Path="RowData.Row" />
+                            <Binding ElementName="MappingDataGrid"  Path="DataContext.DataSourceManager"/>
+                            <MultiBinding.Converter>
+                                <converters1:MappingRowItemsSourceConverter/>
+                            </MultiBinding.Converter>
+                        </MultiBinding>
+                    </dxe:ComboBoxEdit.ItemsSource>
+                    <dxmvvm:Interaction.Behaviors>  
+                        <dxmvvm:EventToCommand EventName="SelectedIndexChanged" 
+                                               Command="{Binding ElementName=MappingDataTableView, Path=DataContext.SelectedMappingParameterChangedCommand, UpdateSourceTrigger=PropertyChanged}" 
+                                               UseDispatcher="True">
+                        </dxmvvm:EventToCommand>
+                    </dxmvvm:Interaction.Behaviors>  
+                    <dxe:ComboBoxEdit.Buttons>  
+                        <dxe:ButtonInfo GlyphKind="Custom" x:Name="buttonClear" >  
+                            <dxe:ButtonInfo.Template>  
+                                <DataTemplate>  
+                                    <dxe:ButtonClose HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0" Command="{Binding (dxe:BaseEdit.OwnerEdit).SetNullValueCommand, RelativeSource={RelativeSource Self}}"/>
+                                </DataTemplate>  
+                            </dxe:ButtonInfo.Template>  
+                        </dxe:ButtonInfo>  
+                        <dxe:ButtonInfo IsDefaultButton="True" GlyphKind="DropDown"/>  
+                    </dxe:ComboBoxEdit.Buttons>  
+                </dxe:ComboBoxEdit>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <views:CommonThingControl Grid.Row="0" GridView="{Binding ElementName=View}" />
+
+        <views:BrowserHeader Grid.Row="1" />
+        <dxlc:LayoutControl Grid.Row="2"  View="GroupBox"
+                            Orientation="Vertical">
+            <dxlc:LayoutGroup  Header="Settings" 
+                               View="GroupBox"
+                               IsCollapsible="True"
+                               IsCollapsed="False"
+                               Orientation="Vertical"
+                               ScrollBars="Auto"
+                               dxlc:LayoutControl.AllowHorizontalSizing="True">
+                <dxlc:LayoutItem Label="Element Definition Category: ">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+
+                        <dxe:ComboBoxEdit Grid.Row="0" Name="ElementDefinitionCategoryComboBoxEdit"
+                                          DisplayMember="Name"
+                                          EditValue="{Binding Path=SelectedElementDefinitionCategory,
+                                                        Mode=TwoWay,
+                                                        UpdateSourceTrigger=PropertyChanged}"
+                                          IsTextEditable="False"
+                                          ItemsSource="{Binding Path=PossibleElementDefinitionCategory}"
+                                          ShowCustomItems="True"
+                                          ToolTip="Select the Category that Element Definitions and Element Usages have to be a member of to create the mapping" >
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource NamedShortNamedThingToStringConverter}}" />
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
+                        </dxe:ComboBoxEdit>
+
+                        <Button Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Command="{Binding InspectSelectedElementDefinitionCategoryCommand}"
+                                ToolTip="Inspect the selected Category">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Actual Finite State List: ">
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+
+                        <dxe:ComboBoxEdit Grid.Row="0" Name="ActualFiniteStateListComboBoxEdit"
+                                          DisplayMember="Name"
+                                          EditValue="{Binding Path=SelectedActualFiniteStateList,
+                                                        Mode=TwoWay,
+                                                        UpdateSourceTrigger=PropertyChanged}"
+                                          IsTextEditable="False"
+                                          ItemsSource="{Binding Path=PossibleActualFiniteStateList}"
+                                          ShowCustomItems="True"
+                                          ToolTip="Select the Actual Finite State List for which the mapping needs to be created" >
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource NamedShortNamedThingToStringConverter}}" />
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
+                        </dxe:ComboBoxEdit>
+
+                        <Button Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Command="{Binding InspectSelectedSelectedActualFiniteStateListCommand}"
+                                ToolTip="Inspect the selected Actual Finite State">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Source Parameter Types: ">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+
+                        <dxe:ListBoxEdit ItemsSource="{ Binding SourceParameterTypes }"
+                                                EditValue="{Binding SelectedSourceParameterType, Mode=TwoWay}"
+                                                MinHeight ="150"
+                                                MaxHeight ="150"
+                                                DisplayMember="Name">
+                            <i:Interaction.Behaviors>
+                                <dragDrop:FrameworkElementDragBehavior />
+                                <dragDrop:FrameworkElementDropBehavior />
+                            </i:Interaction.Behaviors>
+                        </dxe:ListBoxEdit>
+                        <Button Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Command="{Binding RemoveSelectedSourceParameterTypeCommand}"
+                                ToolTip="Remove selected ParameterType">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{dx:DXImage Image=Delete_16x16.png}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Target Mapping Parameter Type: ">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+
+                        <dxe:ComboBoxEdit Grid.Row="0" Name="TargetMappingParameterTypeComboBoxEdit"
+                                      DisplayMember="Name"
+                                      EditValue="{Binding Path=SelectedTargetMappingParameterType,
+                                                    Mode=TwoWay,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                      IsTextEditable="False"
+                                      ItemsSource="{Binding Path=PossibleTargetMappingParameterType}"
+                                      ShowCustomItems="True"
+                                      ToolTip="Select the Text Parameter Type in which the created mapping is stored" >
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource NamedShortNamedThingToStringConverter}}" />
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
+                        </dxe:ComboBoxEdit>
+
+                        <Button Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Command="{Binding InspectSelectedTargetMappingParameterTypeCommand}"
+                                ToolTip="Inspect the selected Parameter Type">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Target Value Parameter Type: ">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+
+                        <dxe:ComboBoxEdit Name="TargetValueParameterTypeComboBoxEdit"
+                                      DisplayMember="Name"
+                                      EditValue="{Binding Path=SelectedTargetValueParameterType,
+                                                    Mode=TwoWay,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                      IsTextEditable="False"
+                                      ItemsSource="{Binding Path=PossibleTargetValueParameterType}"
+                                      ShowCustomItems="True"
+                                      ToolTip="Select the Parameter Type that where the mapped values are to be stored" >
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource NamedShortNamedThingToStringConverter}}" />
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
+                        </dxe:ComboBoxEdit>
+
+                        <Button Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Command="{Binding InspectSelectedTargetValueParameterTypeCommand}"
+                                ToolTip="Inspect the selected Parameter Type">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </dxlc:LayoutItem>
+                <StackPanel Orientation="Horizontal"  HorizontalAlignment="Right">
+                    <Button Width="75"
+                            Height="25"
+                            Margin="3"
+                            Name="OkButton"
+                            IsDefault="True"
+                            Command="{Binding Path=StartMappingCommand}"
+                            Content="Map" 
+                            HorizontalAlignment="Left"/>
+                    <Button Width="75"
+                            Height="25"
+                            Name="CancelButton"
+                            Margin="3"
+                            IsCancel="true"
+                            Command="{Binding Path=ClearSettingsCommand}"
+                            Content="Clear" 
+                            HorizontalAlignment="Right"/>
+                </StackPanel>
+                
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+
+        <dxg:TreeListControl Grid.Row="3" Name="MappingDataGrid"
+                         ColumnsSource="{Binding DataSourceManager.Columns}"
+                         ItemsSource="{Binding DataSourceManager.DataTable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         SelectedItem="{Binding SelectedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         AutoGenerateColumns="KeepOld"
+                         Height="Auto"
+                         Width="Auto">
+            <dxg:TreeListControl.ColumnGeneratorTemplate>
+                <DataTemplate>
+                    <ContentControl>
+                        <dxg:TreeListColumn 
+                            Visible="{Binding Visible}" FieldName="{Binding FieldName}" AllowEditing="{Binding AllowEditing}">
+                            <dxg:TreeListColumn.CellTemplateSelector>
+                                <dataTemplateSelectors:StateToParameterTypeMapperTemplateSelector />
+                            </dxg:TreeListColumn.CellTemplateSelector>
+                        </dxg:TreeListColumn>
+                    </ContentControl>
+                </DataTemplate>
+            </dxg:TreeListControl.ColumnGeneratorTemplate>
+            <dxg:TreeListControl.View>
+                <dxg:TreeListView Name="MappingDataTableView"
+                               EnableImmediatePosting="True"
+                               KeyFieldName="Id" ParentFieldName="ParentId"
+                               AllowColumnMoving="False"
+                               AutoExpandAllNodes="True"
+                               HorizontalScrollbarVisibility="Visible"
+                               AutoWidth="False"
+                               AllowEditing="True"
+                               AllowSorting="False"
+                               AllowFilterEditor="False"
+                               AllowColumnFiltering="False"
+                               ShowSearchPanelMode="Never"
+                               ShowTotalSummary="False"
+                               TreeDerivationMode="Selfreference">
+                    <dxmvvm:Interaction.Behaviors>  
+                        <dxmvvm:EventToCommand EventName="CellValueChanging" 
+                                               Command="{Binding SelectedMappingParameterChangedCommand}" 
+                                               PassEventArgsToCommand="True">
+                        </dxmvvm:EventToCommand>
+                        <behaviors:MappingCellReadOnlyBehavior DataSourceManager = "{Binding DataSourceManager}" />
+                    </dxmvvm:Interaction.Behaviors>  
+                    <dxg:TreeListView.RowStyle>
+                        <Style TargetType="{x:Type dxg:RowControl}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Row.Type, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="ED">
+                                    <Setter Property="Foreground" Value="Black" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Row.Type, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="EU">
+                                    <Setter Property="Foreground" Value="DodgerBlue" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Row.Type, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="PARAM-MAP">
+                                    <Setter Property="Foreground" Value="DarkOrange" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Row.Type, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="PARAM-VAL">
+                                    <Setter Property="Foreground" Value="Black" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </dxg:TreeListView.RowStyle>
+                </dxg:TreeListView>
+            </dxg:TreeListControl.View>
+        </dxg:TreeListControl>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="75"
+                    Height="25"
+                    Margin="3"
+                    Name="SaveButton"
+                    Command="{Binding Path=SaveValuesCommand}"
+                    Content="Save" 
+                    HorizontalAlignment="Left"/>
+        </StackPanel>
+
+
+        <views:SelectedThingGroupControl Grid.Row="5"/>
+    </Grid>
+</UserControl>
