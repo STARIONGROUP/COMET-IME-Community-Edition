@@ -177,9 +177,17 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Move parameter types back to source list
         /// </summary>
-        protected override void ExecuteMoveToSource()
+        protected internal override void ExecuteMoveToSource()
         {
             ExecuteMove(this.ParameterTypeTargetList, this.ParameterTypeSourceList, this.SelectedTargetList);
+        }
+
+        /// <summary>
+        /// Move parameter types back to target list
+        /// </summary>
+        protected internal override void ExecuteMoveToTarget()
+        {
+            ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
         }
 
         /// <summary>
@@ -190,14 +198,6 @@ namespace CDP4CrossViewEditor.ViewModels
             this.SelectedTargetList = this.ParameterTypeTargetList;
 
             this.ExecuteMoveToSource();
-        }
-
-        /// <summary>
-        /// Move parameter types back to target list
-        /// </summary>
-        protected override void ExecuteMoveToTarget()
-        {
-            ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
         }
 
         /// <summary>

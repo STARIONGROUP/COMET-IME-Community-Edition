@@ -122,7 +122,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Move element definition back to source list
         /// </summary>
-        protected override void ExecuteMoveToSource()
+        protected internal override void ExecuteMoveToSource()
         {
             ExecuteMove(this.ElementDefinitionTargetList, this.ElementDefinitionSourceList, this.SelectedTargetList);
         }
@@ -130,7 +130,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Move element definition back to target list
         /// </summary>
-        protected override void ExecuteMoveToTarget()
+        protected internal override void ExecuteMoveToTarget()
         {
             ExecuteMove(this.ElementDefinitionSourceList, this.ElementDefinitionTargetList, this.SelectedSourceList);
         }

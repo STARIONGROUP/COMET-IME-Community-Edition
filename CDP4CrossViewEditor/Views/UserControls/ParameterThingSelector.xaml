@@ -34,7 +34,8 @@
                                                             Mode=TwoWay,
                                                             UpdateSourceTrigger=PropertyChanged}"
                                      ItemsSource="{Binding ParameterTypeSourceList}"
-                                     SelectionMode="Row">
+                                     SelectionMode="Row"
+                                     MouseDoubleClick="GridControl_OnMouseDoubleClickSource">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
@@ -73,9 +74,10 @@
                                      SelectedItems="{Binding Path=SelectedTargetList,
                                                             Mode=TwoWay,
                                                             UpdateSourceTrigger=PropertyChanged}"
+                                     ItemsSource="{Binding ParameterTypeTargetList}"
                                      SelectionMode="Row"
                                      AutoGenerateColumns="None"
-                                     ItemsSource="{Binding ParameterTypeTargetList}">
+                                     MouseDoubleClick="GridControl_OnMouseDoubleClickTarget">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"

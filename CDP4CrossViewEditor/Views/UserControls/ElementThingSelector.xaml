@@ -36,7 +36,8 @@
                                      ItemsSource="{Binding ElementDefinitionSourceList}"
                                      SelectionMode="Row"
                                      AutoGenerateColumns="None"
-                                     CustomUniqueValues="GridControl_OnCustomUniqueValues">
+                                     CustomUniqueValues="GridControl_OnCustomUniqueValues"
+                                     MouseDoubleClick="GridControl_OnMouseDoubleClickSource">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
@@ -79,9 +80,10 @@
                                      SelectedItems="{Binding Path=SelectedTargetList,
                                                              Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
+                                     ItemsSource="{Binding ElementDefinitionTargetList}"
                                      SelectionMode="Row"
                                      AutoGenerateColumns="None"
-                                     ItemsSource="{Binding ElementDefinitionTargetList}">
+                                     MouseDoubleClick="GridControl_OnMouseDoubleClickTarget">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
