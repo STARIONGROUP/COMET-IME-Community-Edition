@@ -42,6 +42,11 @@ namespace CDP4EngineeringModel.ViewModels
         private ReactiveList<Organization> selectedOrganizations;
 
         /// <summary>
+        /// Backing field for see <see cref="AreOrganizationsVisible"/>
+        /// </summary>
+        private bool areOrganizationsVisible;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionDialogViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -94,6 +99,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="ElementDefinition"/> can set <see cref="OrganizationalParticipant"/>
+        /// </summary>
+        public bool AreOrganizationsVisible
+        {
+            get { return this.areOrganizationsVisible; }
+            set { this.RaiseAndSetIfChanged(ref this.areOrganizationsVisible, value); }
+        }
+
+        /// <summary>
         /// Gets or sets a value that represents the ModelCode of the current <see cref="ElementDefinition"/>
         /// </summary>
         public string ModelCode
@@ -123,10 +137,12 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.Initialize();
 
+            this.PossibleOrganizations = new List<Organization>();
             this.SelectedOrganizations = new ReactiveList<Organization>();
             this.SelectedOrganizations.ChangeTrackingEnabled = true;
 
             this.PopulatePossibleCategories();
+            this.PopulatePossibleOrganizations();
         }
 
         /// <summary>
@@ -147,6 +163,9 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.SelectedOwner = this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Container);
             }
+
+            this.SelectedOrganizations.Clear();
+            this.SelectedOrganizations.AddRange(this.Thing.OrganizationalParticipant.Select(op => op.Organization));
         }
 
         /// <summary>
@@ -181,10 +200,27 @@ namespace CDP4EngineeringModel.ViewModels
                     iteration.TopElement = null;
                 }
             }
+
+            var model = (EngineeringModel)this.Container.Container;
+            var organizationalParticipations = model.EngineeringModelSetup.OrganizationalParticipant;
+
+            var selectedOrganizationalParticipants = new List<OrganizationalParticipant>();
+
+            foreach (var selectedOrganization in this.SelectedOrganizations)
+            {
+                var participant = organizationalParticipations.FirstOrDefault(op => op.Organization.Equals(selectedOrganization));
+
+                if (participant != null)
+                {
+                    selectedOrganizationalParticipants.Add(participant);
+                }
+            }
+
+            this.Thing.OrganizationalParticipant = selectedOrganizationalParticipants;
         }
 
         /// <summary>
-        /// Populate the possible <see cref="Category"/> for this <see cref="ElementUsage"/>
+        /// Populate the possible <see cref="Category"/> for this <see cref="ElementDefinition"/>
         /// </summary>
         private void PopulatePossibleCategories()
         {
@@ -197,6 +233,30 @@ namespace CDP4EngineeringModel.ViewModels
                         .Where(c => c.PermissibleClass.Contains(this.Thing.ClassKind)));
 
             this.PossibleCategory.AddRange(allowedCategories.OrderBy(c => c.ShortName));
+        }
+
+        /// <summary>
+        /// Populate the possible <see cref="Organization"/> for this <see cref="ElementDefinition"/>
+        /// </summary>
+        private void PopulatePossibleOrganizations()
+        {
+            this.PossibleOrganizations.Clear();
+
+            var model = (EngineeringModel)this.Container.Container;
+            var organizationalParticipations = model.EngineeringModelSetup.OrganizationalParticipant;
+
+            if (organizationalParticipations == null || !organizationalParticipations.Any())
+            {
+                this.AreOrganizationsVisible = false;
+                return;
+            }
+           
+            this.AreOrganizationsVisible = true;
+            
+
+            var organizations = organizationalParticipations.Select(op => op.Organization).Except(new List<Organization> { model.EngineeringModelSetup.DefaultOrganizationalParticipant?.Organization });
+
+            this.PossibleOrganizations.AddRange(organizations.OrderBy(c => c.Name));
         }
 
         /// <summary>

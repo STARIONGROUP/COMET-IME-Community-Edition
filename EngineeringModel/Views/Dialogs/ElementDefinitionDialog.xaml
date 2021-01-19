@@ -48,7 +48,7 @@
                 </lc:LayoutItem>
             </lc:LayoutGroup>
             <items:CategoryLayoutGroup/>
-            <lc:LayoutGroup Header="Organizations" Orientation="Vertical">
+            <lc:LayoutGroup Header="Organizations" Orientation="Vertical" IsEnabled="{Binding AreOrganizationsVisible}">
                 <lc:LayoutItem Label="Visible To: " >
                     <dxe:ComboBoxEdit Name="OrganizationParticipant"
                                       DisplayMember="Name"

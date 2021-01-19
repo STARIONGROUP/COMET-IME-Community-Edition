@@ -267,6 +267,18 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.SelectedSiteReferenceDataLibrary = modelRdl.RequiredRdl;
             }
+
+            // get organizational participation data
+            var organizationalParticipationOrganizations = this.Thing.OrganizationalParticipant?.Select(op => op.Organization);
+            this.SelectedOrganizations.Clear();
+            this.SelectedOrganizations.AddRange(organizationalParticipationOrganizations);
+
+            var thingDefaultOrganizationalParticipant = this.Thing.DefaultOrganizationalParticipant;
+
+            if (thingDefaultOrganizationalParticipant != null)
+            {
+                this.SelectedDefaultOrganization = this.SelectedOrganizations.Contains(thingDefaultOrganizationalParticipant.Organization) ? thingDefaultOrganizationalParticipant.Organization : null;
+            }
         }
 
         /// <summary>
@@ -275,6 +287,39 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void UpdateTransaction()
         {
             base.UpdateTransaction();
+
+            // organizational prticipation
+            if (this.SelectedOrganizations.Any() || this.Thing.OrganizationalParticipant.Any())
+            {
+                var existingOrganizations = this.Thing.OrganizationalParticipant.Select(op => op.Organization).ToList();
+
+                var newOrgs = this.SelectedOrganizations.Except(existingOrganizations);
+                var deletedOrgs = existingOrganizations.Except(this.SelectedOrganizations);
+
+                foreach (var organization in newOrgs)
+                {
+                    var orgParticipation = new OrganizationalParticipant
+                    {
+                        Organization = organization
+                    };
+
+                    this.Thing.OrganizationalParticipant.Add(orgParticipation);
+                    this.transaction.Create(orgParticipation);
+                }
+
+                foreach (var organization in deletedOrgs)
+                {
+                    var participantion = this.Thing.OrganizationalParticipant.FirstOrDefault(p => p.Organization.Equals(organization));
+
+                    if (participantion != null)
+                    {
+                        this.transaction.Delete(participantion, this.Thing);
+                    }
+                }
+            }
+
+            this.Thing.DefaultOrganizationalParticipant = this.Thing.OrganizationalParticipant.FirstOrDefault(p => p.Organization.Equals(this.SelectedDefaultOrganization));
+
             if (this.dialogKind.Equals(ThingDialogKind.Update))
             {
                 return;

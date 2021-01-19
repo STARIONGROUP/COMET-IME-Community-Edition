@@ -131,10 +131,12 @@ namespace CDP4SiteDirectory.ViewModels
             var newparticipant = this.Thing.Participant.Except(this.participantFolderRow.ContainedRows.Select(x => (Participant)x.Thing)).ToList();
             var newiteration = currentIterationSetup.Except(this.iterationSetupFolderRow.ContainedRows.Select(x => (IterationSetup)x.Thing)).ToList();
             var newDomain = this.Thing.ActiveDomain.Except(this.activeDomainFolderRow.ContainedRows.Select(x => (DomainOfExpertise)x.Thing)).ToList();
+            var newOrganizations = this.Thing.OrganizationalParticipant.Except(this.organizationFolderRow.ContainedRows.Select(x => ((OrganizationalParticipationRowViewModel)x).OrganizationalParticipation)).ToList();
 
             var oldparticipant = this.participantFolderRow.ContainedRows.Select(x => (Participant)x.Thing).Except(this.Thing.Participant).ToList();
             var olditeration = this.iterationSetupFolderRow.ContainedRows.Select(x => (IterationSetup)x.Thing).Except(currentIterationSetup).ToList();
             var oldDomain = this.activeDomainFolderRow.ContainedRows.Select(x => (DomainOfExpertise)x.Thing).Except(this.Thing.ActiveDomain).ToList();
+            var oldOrganization = this.organizationFolderRow.ContainedRows.Select(x => ((OrganizationalParticipationRowViewModel)x).OrganizationalParticipation).Except(this.Thing.OrganizationalParticipant).ToList();
 
             foreach (var participant in oldparticipant)
             {
@@ -149,6 +151,11 @@ namespace CDP4SiteDirectory.ViewModels
             foreach (var domain in oldDomain)
             {
                 this.RemoveDomain(domain);
+            }
+
+            foreach (var organizationalParticipant in oldOrganization)
+            {
+                this.RemoveOrganization(organizationalParticipant);
             }
 
             foreach (var participant in newparticipant)
@@ -166,9 +173,18 @@ namespace CDP4SiteDirectory.ViewModels
                 this.AddDomain(domain);
             }
 
+            foreach (var organization in newOrganizations)
+            {
+                this.AddOrganization(organization);
+            }
+
             var orderedCollection = this.activeDomainFolderRow.ContainedRows.OfType<DomainOfExpertiseRowViewModel>().OrderBy(x => x.Name).ToArray();
             this.activeDomainFolderRow.ContainedRows.ClearWithoutDispose();
             this.activeDomainFolderRow.ContainedRows.AddRange(orderedCollection);
+
+            var orderedCollectionOrganizations = this.organizationFolderRow.ContainedRows.OfType<OrganizationRowViewModel>().OrderBy(x => x.Name).ToArray();
+            this.organizationFolderRow.ContainedRows.ClearWithoutDispose();
+            this.organizationFolderRow.ContainedRows.AddRange(orderedCollectionOrganizations);
         }
 
         /// <summary>
@@ -255,12 +271,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Remove the <see cref="Organization"/>
         /// </summary>
-        /// <param name="organization">
-        /// the <see cref="Organization"/> object to remove
+        /// <param name="organizationalParticipant">
+        /// the <see cref="OrganizationalParticipant"/> object to remove
         /// </param>
-        private void RemoveOrganization(Organization organization)
+        private void RemoveOrganization(OrganizationalParticipant organizationalParticipant)
         {
-            var row = this.organizationFolderRow.ContainedRows.SingleOrDefault(r => r.Thing == organization);
+            var row = this.organizationFolderRow.ContainedRows.SingleOrDefault(r => ((OrganizationalParticipationRowViewModel)r).OrganizationalParticipation.Equals(organizationalParticipant));
             if (row != null)
             {
                 this.organizationFolderRow.ContainedRows.RemoveAndDispose(row);
@@ -270,12 +286,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Add the <see cref="Organization"/>
         /// </summary>
-        /// <param name="organization">
-        /// the <see cref="Organization"/> object to add
+        /// <param name="organizationalParticipation">
+        /// the <see cref="OrganizationalParticipant"/> object to add
         /// </param>
-        private void AddOrganization(Organization organization)
+        private void AddOrganization(OrganizationalParticipant organizationalParticipation)
         {
-            var row = new OrganizationRowViewModel(organization, this.Session, this);
+            var row = new OrganizationalParticipationRowViewModel(organizationalParticipation, this.Session, this);
             this.organizationFolderRow.ContainedRows.Add(row);
         }
     }

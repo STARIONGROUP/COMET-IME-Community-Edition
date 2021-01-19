@@ -26,9 +26,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="7.2.0-508-PR162" />
-    <PackageReference Include="CDP4Dal-CE" Version="7.2.0-508-PR162" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.2.0-508-PR162" />
+    <PackageReference Include="CDP4Common-CE" Version="7.2.0-511-PR163" />
+    <PackageReference Include="CDP4Dal-CE" Version="7.2.0-511-PR163" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.2.0-511-PR163" />
     <PackageReference Include="CommonServiceLocator" Version="1.3" />
     <PackageReference Include="DevExpress.CodeParser" Version="20.1.8" />
     <PackageReference Include="DevExpress.Data" Version="20.1.8" />
