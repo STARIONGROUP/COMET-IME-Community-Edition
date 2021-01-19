@@ -71,7 +71,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
         /// <param name="session">Current opened session <see cref="ISession"/></param>
-        public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session) : base(iteration, session, ClassKind.ElementBase)
+        public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session)
+            : base(iteration, session, ClassKind.ElementDefinition)
         {
             this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>
             {

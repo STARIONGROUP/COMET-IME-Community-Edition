@@ -13,7 +13,11 @@
     <dxlc:LayoutControl Height="Auto"
                         Background="White"
                         Orientation="Vertical">
-        <GroupBox Header="Parameter" Padding="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <GroupBox
+            Header="{Binding ThingClassKind}"
+            Padding="5"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
