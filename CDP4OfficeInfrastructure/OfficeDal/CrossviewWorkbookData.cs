@@ -53,6 +53,16 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         [XmlIgnore] private string parameterTypeData;
 
         /// <summary>
+        /// Backing field for the <see cref="CellNamesData"/> property.
+        /// </summary>
+        [XmlIgnore] private string cellNamesData;
+
+        /// <summary>
+        /// Backing field for the <see cref="CellValuesData"/> property.
+        /// </summary>
+        [XmlIgnore] private string cellValuesData;
+
+        /// <summary>
         /// Gets or sets the <see cref="IEnumerable{ElementDefinition}"/> data of the current <see cref="Workbook"/>
         /// </summary>
         [XmlElement(typeof(XmlCDataSection))]
@@ -83,6 +93,36 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         }
 
         /// <summary>
+        /// Gets or set the modefied cell names of the current <see cref="Workbook"/>
+        /// </summary>
+        [XmlElement(typeof(XmlCDataSection))]
+        public XmlCDataSection CellNamesData
+        {
+            get
+            {
+                var doc = new XmlDocument();
+                return doc.CreateCDataSection(this.cellNamesData);
+            }
+
+            set => this.cellNamesData = value.Value;
+        }
+
+        /// <summary>
+        /// Gets or set the modefied cell values of the current <see cref="Workbook"/>
+        /// </summary>
+        [XmlElement(typeof(XmlCDataSection))]
+        public XmlCDataSection CellValuesData
+        {
+            get
+            {
+                var doc = new XmlDocument();
+                return doc.CreateCDataSection(this.cellValuesData);
+            }
+
+            set => this.cellValuesData = value.Value;
+        }
+
+        /// <summary>
         /// Gets the <see cref="IEnumerable{ElementDefinition}"/> instances.
         /// </summary>
         [XmlIgnore]
@@ -93,6 +133,25 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// </summary>
         [XmlIgnore]
         public IEnumerable<Thing> ParameterTypeList => this.Serializer.Deserialize(this.GenerateStreamFromString(this.ParameterTypeData.Value));
+
+        /// <summary>
+        /// Gets or sets a dictionary that contains cell names and cell values that has been modified
+        /// </summary>
+        [XmlIgnore]
+        public Dictionary<string, string> ManuallySavedValues
+        {
+            get
+            {
+                var result = new Dictionary<string, string>();
+
+                for(var i = 0; i < this.CellNamesData.Value.Split('|').Length; i++)
+                {
+                    result[this.CellNamesData.Value.Split('|')[i]] = this.CellValuesData.Value.Split('|')[i];
+                }
+
+                return result;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CrossviewWorkbookData"/> class.
@@ -110,21 +169,30 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// <param name="parameterTypes">
         /// The parameter types list that needs to be preserved <see cref="IEnumerable{ParameterType}" />
         /// </param>
-        public CrossviewWorkbookData(IEnumerable<CDP4Common.EngineeringModelData.ElementDefinition> elementDefinitions, IEnumerable<CDP4Common.SiteDirectoryData.ParameterType> parameterTypes)
+        /// <param name="manuallySavedValues">
+        /// The cell name/value key/value pai that needs to be preserved <see cref="Dictionary{TKey,TValue}"/>
+        /// </param>
+        public CrossviewWorkbookData(IEnumerable<CDP4Common.EngineeringModelData.ElementDefinition> elementDefinitions, IEnumerable<CDP4Common.SiteDirectoryData.ParameterType> parameterTypes,
+            Dictionary<string, string> manuallySavedValues)
         {
             var preservedDefinitions = elementDefinitions.Select(elementDefinition => elementDefinition.ToDto() as ElementDefinition).ToList();
-            var preservedTypes = parameterTypes.Select(parameterType => parameterType.ToDto() as ParameterType).ToList();
+            this.elementDefinitionData =  this.GenerateStringFromList(preservedDefinitions);
 
-            this.GenerateStringFromThings(preservedDefinitions);
-            this.GenerateStringFromThings(preservedTypes);
+            var preservedTypes = parameterTypes.Select(parameterType => parameterType.ToDto() as ParameterType).ToList();
+            this.parameterTypeData = this.GenerateStringFromList(preservedTypes);
+
+            this.cellNamesData = string.Join("|", manuallySavedValues.Keys.ToArray());
+
+            this.cellValuesData = string.Join("|", manuallySavedValues.Values.ToArray());
         }
 
         /// <summary>
-        /// Generate a stream from a list
+        /// Generate a string from a list
         /// </summary>
         /// <typeparam name="T"><see cref="ElementDefinition"/> or <see cref="ParameterType"/></typeparam>
         /// <param name="things">List of <see cref="Thing"/>s that will serialized to stream</param>
-        private void GenerateStringFromThings<T>(List<T> things)
+        /// <returns>String generated from generic list</returns>
+        private string GenerateStringFromList<T>(List<T> things)
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -133,15 +201,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
 
                 using (var reader = new StreamReader(memoryStream))
                 {
-                    if (things[0] is ElementDefinition)
-                    {
-                        this.elementDefinitionData = reader.ReadToEnd();
-                    }
-
-                    if (things[0] is ParameterType)
-                    {
-                        this.parameterTypeData = reader.ReadToEnd();
-                    }
+                    return reader.ReadToEnd();
                 }
             }
         }
@@ -150,7 +210,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// Generate a stream from a string
         /// </summary>
         /// <param name="s">The string input</param>
-        /// <returns>The stream</returns>
+        /// <returns>The stream generated from the string</returns>
         private Stream GenerateStreamFromString(string s)
         {
             var stream = new MemoryStream();

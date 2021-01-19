@@ -104,6 +104,11 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
+        ///
+        /// </summary>
+        private Dictionary<string, string> ManuallyFilledValues = new Dictionary<string, string>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CrossViewDialogViewModel"/> class.
         /// </summary>
         /// <param name="application">
@@ -115,13 +120,16 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="session">
         /// Current user session <see cref="ISession"/>
         /// </param>
-        public CrossViewDialogViewModel(Application application, Iteration iteration, ISession session)
+        /// <param name="activeWorkbook">
+        /// The Excel active workbook <see cref="Workbook"/> that might contain Crossview worksheet
+        /// </param>
+        public CrossViewDialogViewModel(Application application, Iteration iteration, ISession session, Workbook activeWorkbook)
         {
             this.Workbooks = new List<WorkbookRowViewModel>();
             this.DialogTitle = "Select equipments and parameters";
             this.Iteration = iteration;
             this.Session = session;
-            this.InitWorkbooks(application);
+            this.InitWorkbooks(application, activeWorkbook);
             this.InitModels();
 
             this.CancelCommand = ReactiveCommand.Create();
@@ -138,8 +146,11 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="application">
         /// The Excel <see cref="Application"/> that contains workbooks
         /// </param>
+        /// <param name="activeWorkbook">
+        /// The Excel active workbook <see cref="Workbook"/> that might contain Crossview worksheet
+        /// </param>
         [ExcludeFromCodeCoverage]
-        private void InitWorkbooks(Application application)
+        private void InitWorkbooks(Application application, Workbook activeWorkbook)
         {
             if (application == null)
             {
@@ -150,9 +161,17 @@ namespace CDP4CrossViewEditor.ViewModels
             {
                 var row = new WorkbookRowViewModel(workbook);
                 this.Workbooks.Add(row);
+
+                if (activeWorkbook == workbook)
+                {
+                    this.SelectedWorkbook = row;
+                }
             }
 
-            this.SelectedWorkbook = this.Workbooks[0];
+            if (this.SelectedWorkbook == null)
+            {
+                this.SelectedWorkbook = this.Workbooks[0];
+            }
         }
 
         /// <summary>
@@ -167,6 +186,7 @@ namespace CDP4CrossViewEditor.ViewModels
             {
                 var workbookDataDal = new CrossviewWorkbookDataDal(this.SelectedWorkbook?.Workbook);
                 preservedData = workbookDataDal.Read();
+                this.ManuallyFilledValues = preservedData?.ManuallySavedValues ?? new Dictionary<string, string>();
             }
 
             this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(
@@ -197,7 +217,8 @@ namespace CDP4CrossViewEditor.ViewModels
                 this.ParameterSelectorViewModel is ParameterTypeSelectorViewModel parameterTypeViewModel)
             {
                 this.DialogResult = new WorkbookSelectionDialogResult(true, this.SelectedWorkbook?.Workbook, elementDefinitionViewModel.ElementDefinitionTargetList.Select(e => e.Thing),
-                    parameterTypeViewModel.ParameterTypeTargetList.Select(p => p.Thing));
+                    parameterTypeViewModel.ParameterTypeTargetList.Select(p => p.Thing),
+                    this.ManuallyFilledValues);
             }
         }
     }

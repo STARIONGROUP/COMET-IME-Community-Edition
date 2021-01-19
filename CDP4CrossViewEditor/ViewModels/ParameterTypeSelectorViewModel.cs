@@ -46,7 +46,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Hardcoded power related parameter type short names list
         /// </summary>
-        private static readonly string[] PowerParameters = { "redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
+        private static readonly string[] PowerParameters = { "Redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
 
         /// <summary>
         /// Backing field for <see cref="PowerParametersEnabled"/>

@@ -81,7 +81,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
                 this.parameterType
             };
 
-            this.workbookData = new CrossviewWorkbookData(elements, parameterTypes);
+            this.workbookData = new CrossviewWorkbookData(elements, parameterTypes, new Dictionary<string, string>());
         }
 
         private void InstantiateThings()

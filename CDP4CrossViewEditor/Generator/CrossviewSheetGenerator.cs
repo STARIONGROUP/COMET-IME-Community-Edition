@@ -120,14 +120,8 @@ namespace CDP4CrossViewEditor.Generator
         /// <param name="workbook">
         /// The current <see cref="Workbook"/> when crossview sheet will be rebuild.
         /// </param>
-        /// <param name="elementDefinitions">
-        /// Selected element definition list
-        /// </param>
-        /// <param name="parameterTypes">
-        /// Selected parameter types list
-        /// </param>
-        public void Rebuild(Application application, Workbook workbook, IEnumerable<ElementDefinition> elementDefinitions,
-            IEnumerable<ParameterType> parameterTypes)
+        /// <param name="workbookMetadata"></param>
+        public void Rebuild(Application application, Workbook workbook, WorkbookMetadata workbookMetadata)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -154,8 +148,8 @@ namespace CDP4CrossViewEditor.Generator
 
                 CrossviewSheetUtilities.ApplyLocking(this.crossviewSheet, false);
 
-                this.PopulateSheetArrays(elementDefinitions, parameterTypes);
-                this.WriteSheet();
+                this.PopulateSheetArrays(workbookMetadata.ElementDefinitions, workbookMetadata.ParameterTypes);
+                this.WriteSheet(workbookMetadata.ParameterValues);
                 this.ApplySheetSettings();
 
                 CrossviewSheetUtilities.ApplyLocking(this.crossviewSheet, true);
@@ -221,10 +215,10 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Write the data to the crossview sheet
         /// </summary>
-        private void WriteSheet()
+        private void WriteSheet(Dictionary<string, string> changedValues)
         {
             this.WriteHeader();
-            this.WriteRows();
+            this.WriteRows(changedValues);
         }
 
         /// <summary>
@@ -248,7 +242,7 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Write the content of the crossview sheet
         /// </summary>
-        private void WriteRows()
+        private void WriteRows(Dictionary<string, string> changedValues)
         {
             var numberOfHeaderRows = this.headerArrayAssembler.HeaderArray.GetLength(0);
 
@@ -290,8 +284,15 @@ namespace CDP4CrossViewEditor.Generator
                         continue;
                     }
 
+                    var cellName = this.crossviewArrayAssember.NamesArray[i, j].ToString();
+
                     this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1]
-                        .Name = this.crossviewArrayAssember.NamesArray[i, j];
+                        .Name = cellName;
+
+                    if (changedValues.ContainsKey(cellName))
+                    {
+                        this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1].Value = changedValues[cellName];
+                    }
                 }
             }
 

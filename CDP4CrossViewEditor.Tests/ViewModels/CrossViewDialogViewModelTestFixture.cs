@@ -153,7 +153,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
+            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object, null);
 
             Assert.AreEqual("Select equipments and parameters", viewModel.DialogTitle);
 
@@ -169,7 +169,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatOkCommandsWorks()
         {
-            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
+            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object, null);
 
             var elementDefinitionSelectorViewModel = new ElementDefinitionSelectorViewModel(
                 this.iteration,
@@ -194,7 +194,8 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatCancelCommandsWorks()
         {
-            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object);
+            var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object, null);
+
             Assert.DoesNotThrow(() => viewModel.CancelCommand.Execute(null));
             Assert.IsFalse(viewModel.DialogResult.Result);
         }

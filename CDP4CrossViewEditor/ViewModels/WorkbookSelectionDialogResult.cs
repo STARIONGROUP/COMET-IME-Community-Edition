@@ -46,14 +46,17 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="workbook">The <see cref="Workbook"/> that is the result of a selection.</param>
         /// <param name="workbookElements">Elements that has been selected <see cref="ElementDefinition"/></param>
         /// <param name="workbookParameterTypes">Parameter types that has been selected <see cref="ParameterType"/></param>
+        /// <param name="workbookChangedValues"></param>
         public WorkbookSelectionDialogResult(bool? res, Workbook workbook,
             IEnumerable<ElementDefinition> workbookElements,
-            IEnumerable<ParameterType> workbookParameterTypes)
+            IEnumerable<ParameterType> workbookParameterTypes,
+            Dictionary<string, string> workbookChangedValues)
             : base(res)
         {
             this.Workbook = workbook;
             this.WorkbookElements = workbookElements;
             this.WorkbookParameterType = workbookParameterTypes;
+            this.WorkbookChangedValues = workbookChangedValues;
         }
 
         /// <summary>
@@ -70,5 +73,10 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Gets or sets workbook parameter types
         /// </summary>
         public IEnumerable<ParameterType> WorkbookParameterType { get; private set; }
+
+        /// <summary>
+        /// Get or sets workbook manually edited data values
+        /// </summary>
+        public Dictionary<string, string> WorkbookChangedValues { get; private set; }
     }
 }
