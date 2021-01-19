@@ -25,6 +25,12 @@
 
 namespace CDP4CrossViewEditor.Generator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -36,12 +42,6 @@ namespace CDP4CrossViewEditor.Generator
     using NetOffice.ExcelApi.Enums;
 
     using NLog;
-
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
@@ -255,7 +255,7 @@ namespace CDP4CrossViewEditor.Generator
             var numberOfBodyRows = this.crossviewArrayAssember.ContentArray.GetLength(0);
             var numberOfColumns = this.crossviewArrayAssember.ContentArray.GetLength(1);
 
-            var dataStartRow = numberOfHeaderRows + this.crossviewArrayAssember.ActualHeaderDepth;
+            var dataStartRow = numberOfHeaderRows + CrossviewSheetConstants.HeaderDepth;
             var dataEndRow = numberOfHeaderRows + numberOfBodyRows;
 
             var parameterRange = this.crossviewSheet.Range(
@@ -278,6 +278,36 @@ namespace CDP4CrossViewEditor.Generator
             formattedRange.Font.Size = 11;
             formattedRange.EntireColumn.AutoFit();
 
+            this.PrettifyBodyHeader();
+
+            // add names to parameter value cells
+            for (var i = 0; i < numberOfBodyRows; ++i)
+            {
+                for (var j = 0; j < numberOfColumns; ++j)
+                {
+                    if (this.crossviewArrayAssember.NamesArray[i, j] == null)
+                    {
+                        continue;
+                    }
+
+                    this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1]
+                        .Name = this.crossviewArrayAssember.NamesArray[i, j];
+                }
+            }
+
+            this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
+            this.excelApplication.ActiveWindow.FreezePanes = true;
+        }
+
+        /// <summary>
+        /// Prettify body header
+        /// </summary>
+        private void PrettifyBodyHeader()
+        {
+            var numberOfHeaderRows = this.headerArrayAssembler.HeaderArray.GetLength(0);
+            var numberOfColumns = this.crossviewArrayAssember.ContentArray.GetLength(1);
+            var dataStartRow = numberOfHeaderRows + CrossviewSheetConstants.HeaderDepth;
+
             // format fixed columns
             for (var i = 1; i <= CrossviewSheetConstants.FixedColumns; ++i)
             {
@@ -287,53 +317,132 @@ namespace CDP4CrossViewEditor.Generator
                     .Merge();
             }
 
+            // collapse empty header rows
+            for (var i = 0; i < CrossviewSheetConstants.HeaderDepth; ++i)
+            {
+                var collapse = true;
+
+                for (var j = CrossviewSheetConstants.FixedColumns; j < numberOfColumns; ++j)
+                {
+                    if ((string)this.crossviewArrayAssember.ContentArray[i, j] == "")
+                    {
+                        continue;
+                    }
+
+                    collapse = false;
+                    break;
+                }
+
+                if (collapse)
+                {
+                    this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, 1].EntireRow.Hidden = true;
+                }
+            }
+
             // group horizontal parameter columns
             var bodyHeaderDictionary = this.crossviewArrayAssember.headerDictionary;
-            foreach (var parameterTypeShortName in bodyHeaderDictionary.Keys)
-            {
-                var min = bodyHeaderDictionary[parameterTypeShortName].Values.Min();
-                var max = bodyHeaderDictionary[parameterTypeShortName].Values.Max();
 
-                if (min == max)
+            foreach (var parameterTypeShortName in bodyHeaderDictionary.Keys.ToList())
+            {
+                var ptcDictionary = bodyHeaderDictionary[parameterTypeShortName];
+
+                var minPt = numberOfColumns;
+                var maxPt = 0;
+
+                foreach (var parameterTypeComponentShortName in ptcDictionary.Keys.ToList())
+                {
+                    var msDictionary = ptcDictionary[parameterTypeComponentShortName];
+
+                    var minPtc = numberOfColumns;
+                    var maxPtc = 0;
+
+                    foreach (var measurementScaleShortName in msDictionary.Keys.ToList())
+                    {
+                        var oDictionary = msDictionary[measurementScaleShortName];
+
+                        var minMs = numberOfColumns;
+                        var maxMs = 0;
+
+                        foreach (var optionShortName in oDictionary.Keys.ToList())
+                        {
+                            var afslDictionary = oDictionary[optionShortName];
+
+                            var minO = numberOfColumns;
+                            var maxO = 0;
+
+                            foreach (var actualFiniteStateListShortName in afslDictionary.Keys.ToList())
+                            {
+                                var afsDictionary = afslDictionary[actualFiniteStateListShortName];
+
+                                var minAfsl = afsDictionary.Values.Min();
+                                var maxAfsl = afsDictionary.Values.Max();
+
+                                minO = Math.Min(minO, minAfsl);
+                                maxO = Math.Max(maxO, maxAfsl);
+
+                                minMs = Math.Min(minMs, minAfsl);
+                                maxMs = Math.Max(maxMs, maxAfsl);
+
+                                minPtc = Math.Min(minPtc, minAfsl);
+                                maxPtc = Math.Max(maxPtc, maxAfsl);
+
+                                minPt = Math.Min(minPt, minAfsl);
+                                maxPt = Math.Max(maxPt, maxAfsl);
+
+                                if (minAfsl == maxAfsl)
+                                {
+                                    continue;
+                                }
+
+                                this.crossviewSheet.Range(
+                                        this.crossviewSheet.Cells[numberOfHeaderRows + 5, minAfsl + 1],
+                                        this.crossviewSheet.Cells[numberOfHeaderRows + 5, maxAfsl + 1])
+                                    .Merge();
+                            }
+
+                            if (minO == maxO)
+                            {
+                                continue;
+                            }
+
+                            this.crossviewSheet.Range(
+                                    this.crossviewSheet.Cells[numberOfHeaderRows + 4, minO + 1],
+                                    this.crossviewSheet.Cells[numberOfHeaderRows + 4, maxO + 1])
+                                .Merge();
+                        }
+
+                        if (minMs == maxMs)
+                        {
+                            continue;
+                        }
+
+                        this.crossviewSheet.Range(
+                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, minMs + 1],
+                                this.crossviewSheet.Cells[numberOfHeaderRows + 3, maxMs + 1])
+                            .Merge();
+                    }
+
+                    if (minPtc == maxPtc)
+                    {
+                        continue;
+                    }
+
+                    this.crossviewSheet.Range(
+                            this.crossviewSheet.Cells[numberOfHeaderRows + 2, minPtc + 1],
+                            this.crossviewSheet.Cells[numberOfHeaderRows + 2, maxPtc + 1])
+                        .Merge();
+                }
+
+                if (minPt == maxPt)
                 {
                     continue;
                 }
 
                 this.crossviewSheet.Range(
-                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, min + 1],
-                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, max + 1])
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, minPt + 1],
+                        this.crossviewSheet.Cells[numberOfHeaderRows + 1, maxPt + 1])
                     .Merge();
             }
-
-            this.ApplyCellNames(dataStartRow, CrossviewSheetConstants.FixedColumns + 1, dataEndRow, numberOfColumns);
-
-            this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
-            this.excelApplication.ActiveWindow.FreezePanes = true;
-        }
-
-        /// <summary>
-        /// Apply cell names to the actual value column
-        /// </summary>
-        /// <param name="beginRow">
-        /// The row at which the range begins
-        /// </param>
-        /// <param name="beginColumn">
-        /// The column at which the range begins
-        /// </param>
-        /// <param name="endRow">
-        /// The row at which the range ends
-        /// </param>
-        /// <param name="endColumn">
-        /// The column at which the range ends
-        /// </param>
-        private void ApplyCellNames(int beginRow, int beginColumn, int endRow, int endColumn)
-        {
-            var range =
-                this.crossviewSheet.Range(
-                    this.crossviewSheet.Cells[beginRow, beginColumn],
-                    this.crossviewSheet.Cells[endRow, endColumn]);
-
-            range.CreateNames(top: false, left: false, bottom: false, right: true);
         }
     }
 }
