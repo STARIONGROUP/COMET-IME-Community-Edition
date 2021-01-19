@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataGridColumn.cs" company="RHEA System S.A.">
+// <copyright file="SourceParameter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -23,31 +23,42 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ReferenceDataMapper.StateToParameterTypeMapper
+namespace CDP4ReferenceDataMapper.Data
 {
-    using System;
-    
-    using ReactiveUI;
+    using CDP4Common.SiteDirectoryData;
 
-    public class DataGridColumn : ReactiveObject, IDisposable
+    /// <summary>
+    /// Specific UI class used as a wrapper for a <see cref="ParameterType"/>
+    /// </summary>
+    public class SourceParameter
     {
         /// <summary>
-        /// Backing field for the <see cref="FieldName"/> property
+        /// The <see cref="ParameterType"/>
         /// </summary>
-        private string fieldName;
+        private readonly ParameterType parameterType;
 
         /// <summary>
-        /// Gets or sets the field name of the column
+        /// Gets the name of the <see cref="SourceParameter"/>
         /// </summary>
-        public string FieldName
-        {
-            get { return this.fieldName; }
-            set { this.RaiseAndSetIfChanged(ref this.fieldName, value); }
-        }
+        public string Name => this.parameterType?.Name;
 
-        public virtual void Dispose()
+        /// <summary>
+        /// Gets the ShortName of the <see cref="SourceParameter"/>
+        /// </summary>
+        public string ShortName => this.parameterType?.ShortName;
+
+        /// <summary>
+        /// Gets the Iid of the <see cref="SourceParameter"/> as a string
+        /// </summary>
+        public string Iid => this.parameterType?.Iid.ToString();
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="SourceParameter"/> class
+        /// </summary>
+        /// <param name="parameterType"></param>
+        public SourceParameter(ParameterType parameterType)
         {
-            //
+            this.parameterType = parameterType;
         }
     }
 }

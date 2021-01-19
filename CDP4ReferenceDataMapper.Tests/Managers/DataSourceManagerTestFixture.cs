@@ -27,6 +27,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -37,7 +38,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
     using CDP4Dal;
     using CDP4Dal.Permission;
 
-    using CDP4ReferenceDataMapper.StateToParameterTypeMapper;
+    using CDP4ReferenceDataMapper.Managers;
     using CDP4ReferenceDataMapper.ViewModels;
 
     using Moq;
@@ -71,7 +72,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
         private Category elementDefinitionCategory_2;
         private ActualFiniteStateList actualFiniteStateList;
-        private Category sourceParameterTypeCategory_1;
+        private ICollection<ParameterType> sourceParameterTypes_1;
         private TextParameterType textParameterType_1;
         private ScalarParameterType simpleQuantityKind_1;
 
@@ -114,13 +115,12 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.dataSourceManager = new DataSourceManager(this.iteration,
                 this.elementDefinitionCategory_2, 
                 this.actualFiniteStateList, 
-                this.sourceParameterTypeCategory_1, 
-                this.textParameterType_1, this.simpleQuantityKind_1);
+                this.sourceParameterTypes_1, 
+                this.textParameterType_1, 
+                this.simpleQuantityKind_1);
 
-            Assert.That(this.dataSourceManager.Columns.Count, Is.EqualTo(4));
-            Assert.That(this.dataSourceManager.DataTable.Rows.Count, Is.EqualTo(5)); // TODO: this should be 4 once IsM
-
-
+            Assert.That(this.dataSourceManager.Columns.Count, Is.EqualTo(8));
+            Assert.That(this.dataSourceManager.DataTable.Rows.Count, Is.EqualTo(4)); // TODO: this should be 4 once IsM
         }
 
         private void PopulateTestData()
@@ -156,11 +156,15 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             actualFinitateSte_standby.PossibleState.Add(possibleFiniteState_standby);
             this.iteration.ActualFiniteStateList.Add(this.actualFiniteStateList);
 
-            // PossibleSourceParameterTypeCategory
-            this.sourceParameterTypeCategory_1 = new Category(Guid.NewGuid(), this.cache, this.uri) { Name = "Power Modes", ShortName = "PM" };
-            this.sourceParameterTypeCategory_1.PermissibleClass.Add(ClassKind.SimpleQuantityKind);
-            this.sourceParameterTypeCategory_1.PermissibleClass.Add(ClassKind.DerivedQuantityKind);
-            this.siteReferenceDataLibrary.DefinedCategory.Add(this.sourceParameterTypeCategory_1);
+            this.sourceParameterTypes_1 = 
+                new List<ParameterType> 
+                {
+                    new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri)
+                    {
+                        Name = "QuantityKind",
+                        ShortName = "QK"
+                    }
+                };
 
             // PossibleTargetMappingParameterType
             this.textParameterType_1 = new TextParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "Mapping 1", ShortName = "map1" };
