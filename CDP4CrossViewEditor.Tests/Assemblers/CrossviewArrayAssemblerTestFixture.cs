@@ -32,8 +32,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     using CDP4CrossViewEditor.Assemblers;
+    using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels.CrossviewSheet;
 
     using CDP4Dal;
@@ -113,6 +115,23 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 }
             };
 
+            var option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "Option 1",
+                ShortName = "OPT_1",
+            };
+
+            this.iteration.Option.Add(option1);
+            this.iteration.DefaultOption = option1;
+
+            var option2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "Option 2",
+                ShortName = "OPT_2"
+            };
+
+            this.iteration.Option.Add(option2);
+
             var elementDefinition = new ElementDefinition
             {
                 Iid = Guid.NewGuid(),
@@ -133,6 +152,20 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             elementUsage.ElementDefinition = elementDefinition;
             this.elementDefinitions.Add(elementDefinition);
 
+            var actualList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri);
+
+            var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "PossibleFiniteStateList_1",
+                ShortName = "PFSL_1",
+                PossibleState =
+                {
+                    new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri) { Name = "PossibleState_1", ShortName = "PS_1" }
+                }
+            };
+
+            actualList.PossibleFiniteStateList.Add(possibleList);
+
             var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "PT1_SimpleQuantityKind",
@@ -141,16 +174,77 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.parameterTypes.Add(parameterType);
 
-            var parameter = new Parameter
+            var parameterValueset1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                Iid = Guid.NewGuid(),
+                Manual = new ValueArray<string>(new List<string> { "1" }),
+                Reference = new ValueArray<string>(new List<string> { "1.1" }),
+                Computed = new ValueArray<string>(new List<string> { "1.2" }),
+                Formula = new ValueArray<string>(new List<string> { "1.3" }),
+                Published = new ValueArray<string>(new List<string> { "1.4" }),
+                ValueSwitch = ParameterSwitchKind.MANUAL,
+                ActualOption = option1
+            };
+
+            var parameterValueset2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Manual = new ValueArray<string>(new List<string> { "1" }),
+                Reference = new ValueArray<string>(new List<string> { "1" }),
+                Computed = new ValueArray<string>(new List<string> { "1" }),
+                Formula = new ValueArray<string>(new List<string> { "1" }),
+                Published = new ValueArray<string>(new List<string> { "1" }),
+                ValueSwitch = ParameterSwitchKind.REFERENCE,
+                ActualOption = option2
+            };
+
+            var parameter1 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
                 ParameterType = parameterType,
-                Scale = parameterType.DefaultScale,
-                Owner = this.domain
+                Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                {
+                    Name = "RatioScale_1",
+                    ShortName = "RS_1"
+                },
+                Owner = this.domain,
+                StateDependence = actualList,
+                ValueSet = { parameterValueset1, parameterValueset2 }
+            };
+
+            var compoundParameterType = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri){
+                Name = "CompoundParameterType_1",
+                ShortName = "CPT_1"
+            };
+
+            compoundParameterType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "a",
+                ParameterType = parameterType
+            });
+
+            compoundParameterType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "b",
+                ParameterType = parameterType
+            });
+
+            this.parameterTypes.Add(compoundParameterType);
+
+            var parameter2 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ParameterType = compoundParameterType,
+                Owner = this.domain,
+                ValueSet =
+                {
+                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        Manual = new ValueArray<string>(new List<string> { "a_value", "b_value" }),
+                        ValueSwitch = ParameterSwitchKind.MANUAL
+                    }
+                }
             };
 
             this.iteration.Element.Add(elementDefinition);
-            this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameter);
+            elementDefinition.Parameter.Add(parameter1);
+            elementDefinition.Parameter.Add(parameter2);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
@@ -167,7 +261,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             var contentArray = arrayAssembler.ContentArray;
 
             // The array contains more rows to make a nice header and spacing
-            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - arrayAssembler.ActualHeaderDepth);
+            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - CrossviewSheetConstants.HeaderDepth);
         }
 
         [Test]
@@ -181,9 +275,9 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             var contentArray = arrayAssembler.ContentArray;
 
             // The array contains more rows to make a nice header and spacing
-            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - arrayAssembler.ActualHeaderDepth);
-            Assert.AreEqual("ElementDefinition_1", contentArray[arrayAssembler.ActualHeaderDepth, 0]);
-            Assert.AreEqual("ED_1", contentArray[arrayAssembler.ActualHeaderDepth, 1]);
+            Assert.AreEqual(this.excelRows.Count, contentArray.GetLength(0) - CrossviewSheetConstants.HeaderDepth);
+            Assert.AreEqual("ElementDefinition_1", contentArray[CrossviewSheetConstants.HeaderDepth, 0]);
+            Assert.AreEqual("ED_1", contentArray[CrossviewSheetConstants.HeaderDepth, 1]);
         }
     }
 }
