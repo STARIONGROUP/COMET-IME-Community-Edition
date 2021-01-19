@@ -33,7 +33,8 @@
                                      SelectedItems="{Binding Path=SelectedSourceList,
                                                             Mode=TwoWay,
                                                             UpdateSourceTrigger=PropertyChanged}"
-                                     ItemsSource="{Binding ParameterTypeSourceList}">
+                                     ItemsSource="{Binding ParameterTypeSourceList}"
+                                     SelectionMode="Row">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"

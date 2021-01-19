@@ -33,10 +33,10 @@
                                      SelectedItems="{Binding Path=SelectedSourceList,
                                                              Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
+                                     ItemsSource="{Binding ElementDefinitionSourceList}"
                                      SelectionMode="Row"
                                      AutoGenerateColumns="None"
-                                     CustomUniqueValues="GridControl_OnCustomUniqueValues"
-                                     ItemsSource="{Binding ElementDefinitionSourceList}">
+                                     CustomUniqueValues="GridControl_OnCustomUniqueValues">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
