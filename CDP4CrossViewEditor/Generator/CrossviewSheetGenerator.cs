@@ -280,10 +280,20 @@ namespace CDP4CrossViewEditor.Generator
 
             this.PrettifyBodyHeader();
 
-            this.crossviewSheet.Range(
-                    this.crossviewSheet.Cells[dataStartRow + 1, CrossviewSheetConstants.FixedColumns + 1],
-                    this.crossviewSheet.Cells[dataEndRow, numberOfColumns])
-                .CreateNames(top: false, left: false, bottom: false, right: true);
+            // add names to parameter value cells
+            for (var i = 0; i < numberOfBodyRows; ++i)
+            {
+                for (var j = 0; j < numberOfColumns; ++j)
+                {
+                    if (this.crossviewArrayAssember.NamesArray[i, j] == null)
+                    {
+                        continue;
+                    }
+
+                    this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1]
+                        .Name = this.crossviewArrayAssember.NamesArray[i, j];
+                }
+            }
 
             this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
             this.excelApplication.ActiveWindow.FreezePanes = true;
