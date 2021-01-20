@@ -42,6 +42,7 @@ namespace CDP4CrossViewEditor
 
     using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Enums;
+    using NetOffice.Exceptions;
 
     using NLog;
 
@@ -268,7 +269,17 @@ namespace CDP4CrossViewEditor
         [ExcludeFromCodeCoverage]
         private void Worksheet_ChangeEvent(Range target)
         {
-            var cellName = (target.Name as Name)?.Name;
+            string cellName = null;
+
+            try
+            {
+                cellName = (target.Name as Name)?.Name;
+            }
+            catch (PropertyGetCOMException ex)
+            {
+                Logger.Error(ex);
+                return;
+            }
 
             if (string.IsNullOrEmpty(cellName))
             {
