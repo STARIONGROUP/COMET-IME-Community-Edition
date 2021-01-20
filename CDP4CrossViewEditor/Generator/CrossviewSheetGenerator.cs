@@ -46,7 +46,7 @@ namespace CDP4CrossViewEditor.Generator
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
     /// the crossview sheet that contains the selected <see cref="ElementDefinition"/>s, <see cref="ElementUsage"/>s,
-    /// and for each <see cref="ParameterType"/> display the value of the <see cref="Parameter"/> and/or <see cref="ParameterOverride"/>
+    /// and for each <see cref="ParameterType"/> display the value of the <see cref="CDP4Common.EngineeringModelData.Parameter"/> and/or <see cref="ParameterOverride"/>
     /// for the active <see cref="Participant"/>.
     /// </summary>
     [ExcludeFromCodeCoverage]
@@ -261,6 +261,7 @@ namespace CDP4CrossViewEditor.Generator
             var parameterRange = this.crossviewSheet.Range(
                 this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
                 this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
+
             parameterRange.Name = CrossviewSheetConstants.RangeName;
             parameterRange.NumberFormat = this.crossviewArrayAssember.FormatArray;
             parameterRange.Value = this.crossviewArrayAssember.ContentArray;
@@ -292,6 +293,19 @@ namespace CDP4CrossViewEditor.Generator
 
                     this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1]
                         .Name = this.crossviewArrayAssember.NamesArray[i, j];
+
+                    if (!CrossviewSheetPMeanUtility.IsCalculationPossible(this.crossviewArrayAssember.NamesArray, i) || !this.crossviewArrayAssember.NamesArray[i, j].ToString().EndsWith("P_mean"))
+                    {
+                        continue;
+                    }
+
+                    var pMeanValue = CrossviewSheetPMeanUtility.ComputeCalculation(this.crossviewArrayAssember.NamesArray,
+                        this.crossviewArrayAssember.ContentArray, i);
+
+                    if (pMeanValue.HasValue)
+                    {
+                        this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1].Value = pMeanValue.Value;
+                    }
                 }
             }
 
