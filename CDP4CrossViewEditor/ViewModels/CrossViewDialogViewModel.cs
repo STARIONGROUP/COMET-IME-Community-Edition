@@ -115,13 +115,14 @@ namespace CDP4CrossViewEditor.ViewModels
         public CrossViewDialogViewModel(Application application, Iteration iteration, ISession session)
         {
             this.Workbooks = new List<WorkbookRowViewModel>();
-            this.DialogTitle = "Select equipments and parameters";
             this.Iteration = iteration;
             this.Session = session;
             this.PopulateWorkbooks(application);
 
             this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(this.Iteration, this.Session);
             this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(this.Iteration, this.Session);
+
+            this.DialogTitle = $"Select {this.ElementSelectorViewModel.ThingClassKind}s and {this.ParameterSelectorViewModel.ThingClassKind}s";
 
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
