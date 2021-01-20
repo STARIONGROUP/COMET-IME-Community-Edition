@@ -46,7 +46,7 @@ namespace CDP4CrossViewEditor.Generator
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
     /// the crossview sheet that contains the selected <see cref="ElementDefinition"/>s, <see cref="ElementUsage"/>s,
-    /// and for each <see cref="ParameterType"/> display the value of the <see cref="Parameter"/> and/or <see cref="ParameterOverride"/>
+    /// and for each <see cref="ParameterType"/> display the value of the <see cref="CDP4Common.EngineeringModelData.Parameter"/> and/or <see cref="ParameterOverride"/>
     /// for the active <see cref="Participant"/>.
     /// </summary>
     [ExcludeFromCodeCoverage]
@@ -86,6 +86,11 @@ namespace CDP4CrossViewEditor.Generator
         /// The <see cref="CrossviewHeaderArrayAssembler"/>
         /// </summary>
         private CrossviewHeaderArrayAssembler headerArrayAssembler;
+
+        /// <summary>
+        /// The <see cref="CrossviewSheetRowAssembler"/>
+        /// </summary>
+        private CrossviewSheetRowAssembler sheetRowAssembler;
 
         /// <summary>
         /// Gets the <see cref="ISession"/> that is active
@@ -197,9 +202,9 @@ namespace CDP4CrossViewEditor.Generator
         private void PopulateSheetArrays(IEnumerable<ElementDefinition> elementDefinitions, IEnumerable<ParameterType> parameterTypes)
         {
             // Instantiate the different rows
-            var assembler = new CrossviewSheetRowAssembler();
-            assembler.Assemble(elementDefinitions);
-            var excelRows = assembler.ExcelRows;
+            this.sheetRowAssembler = new CrossviewSheetRowAssembler();
+            this.sheetRowAssembler.Assemble(elementDefinitions);
+            var excelRows = this.sheetRowAssembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
             this.crossviewArrayAssember = new CrossviewArrayAssembler(excelRows, parameterTypes);
@@ -285,13 +290,14 @@ namespace CDP4CrossViewEditor.Generator
                     }
 
                     var cellName = this.crossviewArrayAssember.NamesArray[i, j].ToString();
-
-                    this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1]
-                        .Name = cellName;
+                    var cellObject = this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1];
+                    cellObject.Name = cellName;
 
                     if (changedValues.ContainsKey(cellName))
                     {
-                        this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1].Value = changedValues[cellName];
+                        cellObject.Value = changedValues[cellName];
+                        var range = this.crossviewSheet.Range(cellObject, cellObject);
+                        range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue);
                     }
                 }
             }

@@ -177,7 +177,6 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Init referenced view models
         /// </summary>
-        [ExcludeFromCodeCoverage]
         private void InitModels()
         {
             CrossviewWorkbookData preservedData = null;
