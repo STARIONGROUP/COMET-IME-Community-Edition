@@ -35,7 +35,9 @@ namespace CDP4ReferenceDataMapper.Behaviors
     using DevExpress.Xpf.Grid.TreeList;
 
     /// <summary>
-    /// Add custom readonly behavior to cells of a <see cref="TreeListView"/>
+    /// Adds behavior to a <see cref="TreeListView"/> that handles setting the readonly property of an Editor control.
+    /// When a column is edittable and allowing to edit of cells is conditional for individual rows, we should set the
+    /// editor control's readonly property to true for the cells we don't want to allow editting for.
     /// </summary>
     public class MappingCellReadOnlyBehavior : Behavior<TreeListView>
     {
@@ -70,7 +72,7 @@ namespace CDP4ReferenceDataMapper.Behaviors
         }
 
         /// <summary>
-        /// Executes when an editor control is show.
+        /// Checks if the Editor in the <see cref="TreeListView"/> should be shown or not, using the Editor's readonly property.
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The <see cref="TreeListEditorEventArgs"/></param>
