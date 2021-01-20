@@ -94,6 +94,11 @@ namespace CDP4CrossViewEditor.Assemblers
         public object[,] LockArray { get; private set; }
 
         /// <summary>
+        /// Gets the array that contains name information
+        /// </summary>
+        public object[,] NamesArray { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CrossviewArrayAssembler"/> class.
         /// </summary>
         /// <param name="excelRows">The excel rows</param>
@@ -117,6 +122,7 @@ namespace CDP4CrossViewEditor.Assemblers
             this.ContentArray = new object[,] { };
             this.LockArray = new object[,] { };
             this.FormatArray = new object[,] { };
+            this.NamesArray = new object[,] { };
         }
 
         /// <summary>
@@ -131,18 +137,29 @@ namespace CDP4CrossViewEditor.Assemblers
             this.ContentArray = new object[this.excelRows.Count() + contentHeader.Count, this.numberOfColumns];
             this.LockArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
             this.FormatArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
+            this.NamesArray = new object[this.ContentArray.GetLength(0), this.ContentArray.GetLength(1)];
 
             var contentList = new List<object[]>();
+            var namesList = new List<object[]>();
 
-            contentList.AddRange(contentHeader);
+            foreach (var content in contentHeader)
+            {
+                contentList.Add(content);
+                namesList.Add(new object[this.numberOfColumns]);
+            }
 
-            contentList.AddRange(this.excelRows.Select(this.ContentRowSelector));
+            foreach (var (content, names) in this.excelRows.Select(this.ContentRowSelector))
+            {
+                contentList.Add(content);
+                namesList.Add(names);
+            }
 
             for (var i = 0; i < contentList.Count; i++)
             {
                 for (var j = 0; j < contentList[i].Length; j++)
                 {
                     this.ContentArray[i, j] = contentList[i][j];
+                    this.NamesArray[i, j] = namesList[i][j];
                 }
             }
         }
@@ -270,17 +287,18 @@ namespace CDP4CrossViewEditor.Assemblers
         }
 
         /// <summary>
-        /// Generate content row
+        /// Generate content row and names
         /// </summary>
         /// <param name="excelRow">
         /// Current <see cref="IExcelRow{T}"/>
         /// </param>
         /// <returns>
-        /// Array that contains element specific data
+        /// A <see cref="System.ValueTuple"/> that contains element specific data
         /// </returns>
-        private object[] ContentRowSelector(IExcelRow<Thing> excelRow)
+        private (object[] content, object[] names) ContentRowSelector(IExcelRow<Thing> excelRow)
         {
             var contentRow = new object[this.numberOfColumns];
+            var namesRow = new object[this.numberOfColumns];
 
             contentRow[0] = excelRow.Name;
             contentRow[1] = excelRow.ShortName;
@@ -305,7 +323,7 @@ namespace CDP4CrossViewEditor.Assemblers
                     break;
 
                 default:
-                    return contentRow;
+                    return (contentRow, namesRow);
             }
 
             foreach (var parameterOrOverrideBase in parameters.Where(p => p != null))
@@ -319,17 +337,21 @@ namespace CDP4CrossViewEditor.Assemblers
                             var component = compoundParameterType.Component[i];
                             var value = parameterValueSetBase.ActualValue[i];
 
-                            contentRow[this.GetContentColumnIndex(parameterValueSetBase, component)] = value;
+                            var index = this.GetContentColumnIndex(parameterValueSetBase, component);
+                            contentRow[index] = value;
+                            namesRow[index] = parameterValueSetBase.ModelCode(i);
                         }
                     }
                     else
                     {
-                        contentRow[this.GetContentColumnIndex(parameterValueSetBase)] = parameterValueSetBase.ActualValue.First();
+                        var index = this.GetContentColumnIndex(parameterValueSetBase);
+                        contentRow[index] = parameterValueSetBase.ActualValue.First();
+                        namesRow[index] = parameterValueSetBase.ModelCode();
                     }
                 }
             }
 
-            return contentRow;
+            return (contentRow, namesRow);
         }
 
         /// <summary>

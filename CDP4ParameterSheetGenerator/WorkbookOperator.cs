@@ -677,7 +677,6 @@ namespace CDP4ParameterSheetGenerator
             {
                 var worksheet = (Worksheet)this.workbook.Worksheets[ParameterSheetConstants.ParameterSheetName];
                 worksheet.Activate();
-                worksheet.Cells[1, 1].Select();
             }
             catch (Exception ex)
             {
