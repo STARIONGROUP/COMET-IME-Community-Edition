@@ -27,6 +27,7 @@ namespace CDP4CrossViewEditor.Views.UserControls
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Windows.Input;
 
     using CDP4Common.SiteDirectoryData;
 
@@ -61,6 +62,33 @@ namespace CDP4CrossViewEditor.Views.UserControls
         {
             this.InitializeComponent();
             CreateAndRegisterCustomFunctionOperators();
+        }
+
+        /// <summary>
+        /// Creates and registers the custom functions used to filter the category column
+        /// </summary>
+        private static void CreateAndRegisterCustomFunctionOperators()
+        {
+            var isMemberOfCategoryFunction = CustomFunctionFactory.Create(
+                IsMemberOfCategoryName,
+                (IEnumerable<Category> categories, string categoryName) =>
+                {
+                    return categories?.Any(x => x.Name.ToString().Equals(categoryName) ||
+                                                x.AllSuperCategories().Any(y => y.Name.ToString().Equals(categoryName)))
+                           ?? false;
+                });
+
+            CriteriaOperator.RegisterCustomFunction(isMemberOfCategoryFunction);
+
+            var hasCategoryAppliedFunction = CustomFunctionFactory.Create(
+                HasCategoryApplied,
+                (IEnumerable<Category> categories, string categoryName) =>
+                {
+                    return categories?.Any(x => x.Name.ToString().Equals(categoryName))
+                           ?? false;
+                });
+
+            CriteriaOperator.RegisterCustomFunction(hasCategoryAppliedFunction);
         }
 
         /// <summary>
@@ -122,27 +150,25 @@ namespace CDP4CrossViewEditor.Views.UserControls
         }
 
         /// <summary>
-        /// Creates and registers the custom functions used to filter the category column
+        /// Move elements on double click
         /// </summary>
-        private static void CreateAndRegisterCustomFunctionOperators()
+        /// <param name="sender">Associated control <see cref="GridControl"/></param>
+        /// <param name="e">Associated event <see cref="MouseButtonEventArgs"/></param>
+        private void GridControl_OnMouseDoubleClickSource(object sender, MouseButtonEventArgs e)
         {
-            var isMemberOfCategoryFunction = CustomFunctionFactory.Create(
-                IsMemberOfCategoryName,
-                (IEnumerable<Category> categories, string categoryName) =>
-                {
-                    return categories?.Any(x => x.Name.ToString().Equals(categoryName) || x.AllSuperCategories().Any(y => y.Name.ToString().Equals(categoryName))) ?? false;
-                });
+            (this.DataContext as ElementDefinitionSelectorViewModel)
+                ?.ExecuteMoveToTarget();
+        }
 
-            CriteriaOperator.RegisterCustomFunction(isMemberOfCategoryFunction);
-
-            var hasCategoryAppliedFunction = CustomFunctionFactory.Create(
-                HasCategoryApplied,
-                (IEnumerable<Category> categories, string categoryName) =>
-                {
-                    return categories?.Any(x => x.Name.ToString().Equals(categoryName)) ?? false;
-                });
-
-            CriteriaOperator.RegisterCustomFunction(hasCategoryAppliedFunction);
+        /// <summary>
+        /// Move elements on double click
+        /// </summary>
+        /// <param name="sender">Associated control <see cref="GridControl"/></param>
+        /// <param name="e">Associated event <see cref="MouseButtonEventArgs"/></param>
+        private void GridControl_OnMouseDoubleClickTarget(object sender, MouseButtonEventArgs e)
+        {
+            (this.DataContext as ElementDefinitionSelectorViewModel)
+                ?.ExecuteMoveToSource();
         }
     }
 }
