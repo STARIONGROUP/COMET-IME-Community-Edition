@@ -36,7 +36,6 @@ namespace CDP4ReferenceDataMapper.Converters
 
     using CDP4ReferenceDataMapper.Data;
     using CDP4ReferenceDataMapper.Managers;
-    using CDP4ReferenceDataMapper.ViewModels;
     using CDP4ReferenceDataMapper.Views;
 
     /// <summary>
@@ -79,7 +78,7 @@ namespace CDP4ReferenceDataMapper.Converters
         /// <returns>a <see cref="NotSupportedException"/> is thrown</returns>
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }
