@@ -50,10 +50,10 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets or sets thing type
         /// </summary>
-        private ClassKind ThingClassKind
+        public ClassKind ThingClassKind
         {
             get => this.thingClassKind;
-            set => this.RaiseAndSetIfChanged(ref this.thingClassKind, value);
+            private set => this.RaiseAndSetIfChanged(ref this.thingClassKind, value);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Executes move to source command <see cref="MoveItemsToSource"/>
         /// Things will be moved back to selection source
         /// </summary>
-        protected virtual void ExecuteMoveToSource()
+        protected internal virtual void ExecuteMoveToSource()
         {
         }
 
@@ -119,7 +119,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Executes move to target command <see cref="MoveItemsToTarget"/>
         /// Things will be selected for Cross View Editor table/report
         /// </summary>
-        protected virtual void ExecuteMoveToTarget()
+        protected internal virtual void ExecuteMoveToTarget()
         {
         }
 
@@ -137,6 +137,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="targetList">Target list</param>
         /// <param name="selectedElements">Elements that will be moved beween source and target</param>
         protected static void ExecuteMove<T>(ReactiveList<T> sourceList, ReactiveList<T> targetList, ReactiveList<T> selectedElements)
+            where T : ReactiveObject
         {
             if (selectedElements.Count == 0)
             {
@@ -144,9 +145,8 @@ namespace CDP4CrossViewEditor.ViewModels
             }
 
             targetList.AddRange(selectedElements);
-            var reverseList = selectedElements.Reverse();
 
-            foreach (var element in reverseList)
+            foreach (var element in selectedElements.Reverse())
             {
                 sourceList.Remove(element);
             }
