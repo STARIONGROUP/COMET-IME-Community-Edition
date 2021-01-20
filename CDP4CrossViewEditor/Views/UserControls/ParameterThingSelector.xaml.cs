@@ -25,6 +25,12 @@
 
 namespace CDP4CrossViewEditor.Views.UserControls
 {
+    using System.Windows.Input;
+
+    using CDP4CrossViewEditor.ViewModels;
+
+    using DevExpress.Xpf.Grid;
+
     /// <summary>
     /// Interaction logic for ParameterThingSelector.xaml
     /// </summary>
@@ -36,6 +42,28 @@ namespace CDP4CrossViewEditor.Views.UserControls
         public ParameterThingSelector()
         {
             this.InitializeComponent();
+        }
+
+        /// <summary>
+        /// Move elements on double click
+        /// </summary>
+        /// <param name="sender">Associated control <see cref="GridControl"/></param>
+        /// <param name="e">Associated event <see cref="MouseButtonEventArgs"/></param>
+        private void GridControl_OnMouseDoubleClickSource(object sender, MouseButtonEventArgs e)
+        {
+            (this.DataContext as ParameterTypeSelectorViewModel)
+                ?.ExecuteMoveToTarget();
+        }
+
+        /// <summary>
+        /// Move elements on double click
+        /// </summary>
+        /// <param name="sender">Associated control <see cref="GridControl"/></param>
+        /// <param name="e">Associated event <see cref="MouseButtonEventArgs"/></param>
+        private void GridControl_OnMouseDoubleClickTarget(object sender, MouseButtonEventArgs e)
+        {
+            (this.DataContext as ParameterTypeSelectorViewModel)
+                ?.ExecuteMoveToSource();
         }
     }
 }

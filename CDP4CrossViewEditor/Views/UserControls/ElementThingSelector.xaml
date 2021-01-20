@@ -13,7 +13,11 @@
     <dxlc:LayoutControl Height="Auto"
                         Background="White"
                         Orientation="Vertical">
-        <GroupBox Header="Element" Padding="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <GroupBox
+            Header="{Binding ThingClassKind}"
+            Padding="5"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -29,10 +33,11 @@
                                      SelectedItems="{Binding Path=SelectedSourceList,
                                                              Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
+                                     ItemsSource="{Binding ElementDefinitionSourceList}"
                                      SelectionMode="Row"
                                      AutoGenerateColumns="None"
                                      CustomUniqueValues="GridControl_OnCustomUniqueValues"
-                                     ItemsSource="{Binding ElementDefinitionSourceList}">
+                                     MouseDoubleClick="GridControl_OnMouseDoubleClickSource">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
@@ -75,9 +80,10 @@
                                      SelectedItems="{Binding Path=SelectedTargetList,
                                                              Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
+                                     ItemsSource="{Binding ElementDefinitionTargetList}"
                                      SelectionMode="Row"
                                      AutoGenerateColumns="None"
-                                     ItemsSource="{Binding ElementDefinitionTargetList}">
+                                     MouseDoubleClick="GridControl_OnMouseDoubleClickTarget">
                         <dxg:GridControl.View>
                             <dxg:TableView HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"

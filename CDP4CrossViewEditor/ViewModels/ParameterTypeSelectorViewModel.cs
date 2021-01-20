@@ -88,7 +88,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
         /// <param name="session">Current opened session <see cref="ISession"/></param>
         /// <param name="preservedIids">Current user selection <see cref="List{Guid}"/></param>
-        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids) : base(iteration, session, ClassKind.ParameterBase, preservedIids)
+        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids) : base(iteration, session, ClassKind.ParameterType, preservedIids)
         {
             this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>
             {
@@ -190,9 +190,17 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Move parameter types back to source list
         /// </summary>
-        protected override void ExecuteMoveToSource()
+        protected internal override void ExecuteMoveToSource()
         {
             ExecuteMove(this.ParameterTypeTargetList, this.ParameterTypeSourceList, this.SelectedTargetList);
+        }
+
+        /// <summary>
+        /// Move parameter types back to target list
+        /// </summary>
+        protected internal override void ExecuteMoveToTarget()
+        {
+            ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
         }
 
         /// <summary>
@@ -203,14 +211,6 @@ namespace CDP4CrossViewEditor.ViewModels
             this.SelectedTargetList = this.ParameterTypeTargetList;
 
             this.ExecuteMoveToSource();
-        }
-
-        /// <summary>
-        /// Move parameter types back to target list
-        /// </summary>
-        protected override void ExecuteMoveToTarget()
-        {
-            ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
         }
 
         /// <summary>
