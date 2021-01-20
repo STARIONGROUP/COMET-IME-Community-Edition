@@ -84,5 +84,6 @@
   <ItemGroup>
     <Folder Include="Converters\" />
     <Folder Include="RowModels\" />
+    <Folder Include="TestData\" />
   </ItemGroup>
 </Project>
