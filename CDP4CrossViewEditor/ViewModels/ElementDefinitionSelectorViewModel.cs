@@ -73,7 +73,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
         /// <param name="session">Current opened session <see cref="ISession"/></param>
         /// <param name="preservedIids">Current user selection <see cref="List{Guid}"/></param>
-        public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids) : base(iteration, session, ClassKind.ElementBase, preservedIids)
+        public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids) : base(iteration, session, ClassKind.ElementDefinition, preservedIids)
         {
             this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>
             {
@@ -145,7 +145,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Move element definition back to source list
         /// </summary>
-        protected override void ExecuteMoveToSource()
+        protected internal override void ExecuteMoveToSource()
         {
             ExecuteMove(this.ElementDefinitionTargetList, this.ElementDefinitionSourceList, this.SelectedTargetList);
         }
@@ -153,7 +153,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Move element definition back to target list
         /// </summary>
-        protected override void ExecuteMoveToTarget()
+        protected internal override void ExecuteMoveToTarget()
         {
             ExecuteMove(this.ElementDefinitionSourceList, this.ElementDefinitionTargetList, this.SelectedSourceList);
         }
