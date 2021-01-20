@@ -181,7 +181,13 @@ namespace CDP4Composition.ViewModels
 
             this.Name = this.Parameter.ParameterType.Name;
             this.ShortName = this.Parameter.ParameterType.ShortName;
-            this.Value = $"{valueSet?.Published.FirstOrDefault() ?? "-"} [{this.Parameter.Scale?.ShortName ?? "-"}]";
+            var actualvalue = valueSet?.Published.FirstOrDefault() ?? "-";
+
+            var scaleShortName = this.Parameter.Scale is null 
+                    ? string.Empty 
+                    : $" [{this.Parameter.Scale.ShortName}]";
+
+            this.Value = $"{actualvalue}{scaleShortName}";
             this.OwnerShortName = this.Parameter.Owner.ShortName;
             this.Switch = valueSet?.ValueSwitch.ToString();
             this.Description = "-";
