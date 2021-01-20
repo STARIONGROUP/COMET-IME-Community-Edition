@@ -152,19 +152,30 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             elementUsage.ElementDefinition = elementDefinition;
             this.elementDefinitions.Add(elementDefinition);
 
-            var actualList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri);
+            var possibleFiniteState = new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "PossibleState_1",
+                ShortName = "PS_1"
+            };
 
             var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "PossibleFiniteStateList_1",
                 ShortName = "PFSL_1",
-                PossibleState =
-                {
-                    new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri) { Name = "PossibleState_1", ShortName = "PS_1" }
-                }
+                PossibleState = { possibleFiniteState }
             };
 
-            actualList.PossibleFiniteStateList.Add(possibleList);
+            var actualFiniteState = new ActualFiniteState(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                PossibleState = { possibleFiniteState },
+                Kind = ActualFiniteStateKind.MANDATORY
+            };
+
+            var actualList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                PossibleFiniteStateList = { possibleList },
+                ActualState = { actualFiniteState }
+            };
 
             var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
@@ -173,28 +184,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             };
 
             this.parameterTypes.Add(parameterType);
-
-            var parameterValueset1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
-            {
-                Manual = new ValueArray<string>(new List<string> { "1" }),
-                Reference = new ValueArray<string>(new List<string> { "1.1" }),
-                Computed = new ValueArray<string>(new List<string> { "1.2" }),
-                Formula = new ValueArray<string>(new List<string> { "1.3" }),
-                Published = new ValueArray<string>(new List<string> { "1.4" }),
-                ValueSwitch = ParameterSwitchKind.MANUAL,
-                ActualOption = option1
-            };
-
-            var parameterValueset2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
-            {
-                Manual = new ValueArray<string>(new List<string> { "1" }),
-                Reference = new ValueArray<string>(new List<string> { "1" }),
-                Computed = new ValueArray<string>(new List<string> { "1" }),
-                Formula = new ValueArray<string>(new List<string> { "1" }),
-                Published = new ValueArray<string>(new List<string> { "1" }),
-                ValueSwitch = ParameterSwitchKind.REFERENCE,
-                ActualOption = option2
-            };
 
             var parameter1 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
@@ -206,7 +195,31 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 },
                 Owner = this.domain,
                 StateDependence = actualList,
-                ValueSet = { parameterValueset1, parameterValueset2 }
+                ValueSet =
+                {
+                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        Manual = new ValueArray<string>(new List<string> { "1" }),
+                        Reference = new ValueArray<string>(new List<string> { "1.1" }),
+                        Computed = new ValueArray<string>(new List<string> { "1.2" }),
+                        Formula = new ValueArray<string>(new List<string> { "1.3" }),
+                        Published = new ValueArray<string>(new List<string> { "1.4" }),
+                        ValueSwitch = ParameterSwitchKind.MANUAL,
+                        ActualOption = option1,
+                        ActualState = actualFiniteState
+                    },
+                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        Manual = new ValueArray<string>(new List<string> { "1" }),
+                        Reference = new ValueArray<string>(new List<string> { "1" }),
+                        Computed = new ValueArray<string>(new List<string> { "1" }),
+                        Formula = new ValueArray<string>(new List<string> { "1" }),
+                        Published = new ValueArray<string>(new List<string> { "1" }),
+                        ValueSwitch = ParameterSwitchKind.REFERENCE,
+                        ActualOption = option2,
+                        ActualState = actualFiniteState
+                    }
+                }
             };
 
             var compoundParameterType = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri){
