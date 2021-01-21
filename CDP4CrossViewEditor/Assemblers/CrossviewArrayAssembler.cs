@@ -326,6 +326,9 @@ namespace CDP4CrossViewEditor.Assemblers
                     return (contentRow, namesRow);
             }
 
+            var isCalculationPossible = CrossviewSheetPMeanUtility.IsCalculationPossible(parameters.Where(p => p != null).ToList());
+            var calculationParameters = new List<(ParameterValueSetBase, ParameterTypeComponent)>();
+
             foreach (var parameterOrOverrideBase in parameters.Where(p => p != null))
             {
                 foreach (var parameterValueSetBase in parameterOrOverrideBase.ValueSets.Cast<ParameterValueSetBase>())
@@ -340,6 +343,12 @@ namespace CDP4CrossViewEditor.Assemblers
                             var index = this.GetContentColumnIndex(parameterValueSetBase, component);
                             contentRow[index] = value;
                             namesRow[index] = parameterValueSetBase.ModelCode(i);
+
+                            if (isCalculationPossible &&
+                                CrossviewSheetPMeanUtility.IsRequiredParameter(parameterOrOverrideBase.ParameterType.ShortName))
+                            {
+                                calculationParameters.Add((parameterValueSetBase, component));
+                            }
                         }
                     }
                     else
@@ -347,8 +356,25 @@ namespace CDP4CrossViewEditor.Assemblers
                         var index = this.GetContentColumnIndex(parameterValueSetBase);
                         contentRow[index] = parameterValueSetBase.ActualValue.First();
                         namesRow[index] = parameterValueSetBase.ModelCode();
+
+                        if (isCalculationPossible &&
+                            CrossviewSheetPMeanUtility.IsRequiredParameter(parameterOrOverrideBase.ParameterType.ShortName))
+                        {
+                            calculationParameters.Add((parameterValueSetBase, null));
+                        }
                     }
                 }
+            }
+
+            if (!isCalculationPossible)
+            {
+                return (contentRow, namesRow);
+            }
+
+            foreach (var requiredParameter in CrossviewSheetPMeanUtility.RequiredParameters)
+            {
+                var touple = calculationParameters.FirstOrDefault(t => t.Item1.QueryParameterType().ShortName == requiredParameter);
+                var value = this.GetContentColumnValue(touple.Item1, touple.Item2);
             }
 
             return (contentRow, namesRow);
