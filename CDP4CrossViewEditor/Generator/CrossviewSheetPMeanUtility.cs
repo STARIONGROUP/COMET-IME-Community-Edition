@@ -25,8 +25,11 @@
 
 namespace CDP4CrossViewEditor.Generator
 {
+    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+
+    using CDP4Common.EngineeringModelData;
 
     /// <summary>
     /// Helper class that is required for computing value of P_mean parameter
@@ -36,7 +39,7 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Hardcoded P_mean related parameter types
         /// </summary>
-        private static readonly string[] RequiredParameters = { "P_stby", "P_on", "P_duty_cyc", "redundancy.scheme", "redundancy.type", "redundancy.k", "redundancy.n", "P_mean" };
+        public static readonly string[] RequiredParameters = { "redundancy", "P_stby", "P_on", "P_duty_cyc", "P_mean" };
 
         private const string RedundancySchemeHot = "Hot";
 
@@ -46,64 +49,57 @@ namespace CDP4CrossViewEditor.Generator
 
         private const string RedundancyTypeExternal = "External";
 
+        public static bool IsRequiredParameter(string parameterName)
+        {
+            return RequiredParameters.Contains(parameterName);
+        }
+
+        public static bool IsPMean(string parameterName)
+        {
+            return parameterName.Equals("P_mean");
+        }
+
         /// <summary>
         /// Check if P_mean parameter calculation is possible
         /// </summary>
-        /// <param name="namesObjects">Parameter type names</param>
-        /// <param name="rowIndex">Current row index</param>
+        /// <param name="parameters"></param>
         /// <returns>True if all power related parameters are present, False otherwise</returns>
-        public static bool IsCalculationPossible(object[,] namesObjects, int rowIndex)
+        public static bool IsCalculationPossible(List<ParameterOrOverrideBase> parameters)
         {
-            var rowNamesObjects = Enumerable.Range(CrossviewSheetConstants.FixedColumns, namesObjects.GetLength(1) - CrossviewSheetConstants.FixedColumns)
-                .Select(x => namesObjects[rowIndex, x])
-                .ToArray();
+            // Check if all power required parameters are present
+            if (RequiredParameters.Except(parameters.Select(p => p.ParameterType.ShortName)).Any())
+            {
+                return false;
+            }
 
-            var countPowerParameters = (from name in rowNamesObjects from parameter in RequiredParameters where name != null && name.ToString().EndsWith(parameter) select name).Count();
+            // Check if P_duty_cyc && P_mean have the same state dependency
+            var pDutyCycle = parameters.Where(p => p != null).FirstOrDefault(p => p.ParameterType.ShortName.Equals("P_duty_cyc"));
+            var pMean = parameters.Where(p => p != null).FirstOrDefault(p => p.ParameterType.ShortName.Equals("P_mean"));
 
-            return RequiredParameters.Length == countPowerParameters;
+            if (pDutyCycle == null || pMean == null)
+            {
+                return false;
+            }
+
+            if (pDutyCycle.StateDependence.ActualState.Count == 0 || pMean.StateDependence.ActualState.Count == 0)
+            {
+                return false;
+            }
+
+            return !pDutyCycle.StateDependence.ActualState.Except(pMean.StateDependence.ActualState).Any();
         }
 
         /// <summary>
         /// Calculate P_mean parameter value based on multiple parameter values:
         /// "P_stby", "P_on", "P_duty_cyc", "redundancy.scheme", "redundancy.type", "redundancy.k", "redundancy.n"
         /// </summary>
-        /// <param name="namesObjects">Parameter type names</param>
-        /// <param name="valuesObjects">Parameter actual values</param>
-        /// <param name="rowIndex">Current row index</param>
-        /// <returns>P_mean value <see cref="double"/></returns>
-        public static double? ComputeCalculation(object[,] namesObjects, object[,] valuesObjects, int rowIndex)
+        public static double? ComputeCalculation(string standByValue, string onValue, string dutyCycleValue, string redundancyScheme, string redundancyType, string redundancyK, string redundancyN)
         {
-            var rowNamesObjects = Enumerable.Range(CrossviewSheetConstants.FixedColumns, namesObjects.GetLength(1) - CrossviewSheetConstants.FixedColumns)
-                .Select(x => namesObjects[rowIndex, x])
-                .ToArray();
-
-            var rowValuesObjects = Enumerable.Range(CrossviewSheetConstants.FixedColumns, valuesObjects.GetLength(1) - CrossviewSheetConstants.FixedColumns)
-                .Select(x => valuesObjects[rowIndex, x])
-                .ToArray();
-
-            var calculationDictionary = rowNamesObjects.Zip(rowValuesObjects, (k, v) => new { k, v })
-                .ToDictionary(key => key.k.ToString(), value => value.v.ToString());
-
-            var keyPowerStandBy = calculationDictionary.Keys.FirstOrDefault(key => key.EndsWith("P_stby"));
-            var keyPowerOn = calculationDictionary.Keys.FirstOrDefault(key => key.EndsWith("P_on"));
-            var keyPowerDutyCycle = calculationDictionary.Keys.FirstOrDefault(key => key.EndsWith("P_duty_cyc"));
-            var keyRedundancyType = calculationDictionary.Keys.FirstOrDefault(key => key.EndsWith("redundancy.type"));
-            var keyRedundancyScheme = calculationDictionary.Keys.FirstOrDefault(key => key.EndsWith("redundancy.scheme"));
-            var keyRedundancyK = calculationDictionary.Keys.FirstOrDefault(key => key.EndsWith("redundancy.k"));
-            var keyRedundancyN = calculationDictionary.Keys.FirstOrDefault(key => key.EndsWith("redundancy.n"));
-
-            if (keyPowerStandBy == null || keyPowerOn == null || keyPowerDutyCycle == null ||
-                keyRedundancyType == null || keyRedundancyScheme == null ||
-                keyRedundancyK == null || keyRedundancyN == null)
-            {
-                return null;
-            }
-
-            double.TryParse(calculationDictionary[keyPowerStandBy], NumberStyles.Any, CultureInfo.InvariantCulture, out var pStandByValue);
-            double.TryParse(calculationDictionary[keyPowerOn], NumberStyles.Any, CultureInfo.InvariantCulture, out var pOnValue);
-            double.TryParse(calculationDictionary[keyPowerDutyCycle], NumberStyles.Any, CultureInfo.InvariantCulture, out var pDutyCycleValue);
-            double.TryParse(calculationDictionary[keyRedundancyK], NumberStyles.Any, CultureInfo.InvariantCulture, out var pRedundancyKValue);
-            double.TryParse(calculationDictionary[keyRedundancyN], NumberStyles.Any, CultureInfo.InvariantCulture, out var pRedundancyNValue);
+            double.TryParse(standByValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var pStandByValue);
+            double.TryParse(onValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var pOnValue);
+            double.TryParse(dutyCycleValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var pDutyCycleValue);
+            int.TryParse(redundancyK, NumberStyles.Any, CultureInfo.InvariantCulture, out var pRedundancyKValue);
+            int.TryParse(redundancyN, NumberStyles.Any, CultureInfo.InvariantCulture, out var pRedundancyNValue);
 
             if (pDutyCycleValue == -1)
             {
@@ -115,16 +111,16 @@ namespace CDP4CrossViewEditor.Generator
                 return null;
             }
 
-            switch (calculationDictionary[keyRedundancyType])
+            switch (redundancyType)
             {
                 case RedundancyTypeInternal:
                     return pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue;
 
                 case RedundancyTypeExternal:
-                    switch (calculationDictionary[keyRedundancyScheme])
+                    switch (redundancyScheme)
                     {
                         case RedundancySchemeCold:
-                            return(pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue) * pRedundancyKValue / pRedundancyNValue;
+                            return (pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue) * pRedundancyKValue / pRedundancyNValue;
 
                         case RedundancySchemeHot:
                             return pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue;
