@@ -133,7 +133,7 @@ namespace CDP4OfficeInfrastructure.Tests.OfficeDal
                 this.parameterType
             };
 
-            var workbookDataPass1 = new CrossviewWorkbookData(elements, parameterTypes);
+            var workbookDataPass1 = new CrossviewWorkbookData(elements, parameterTypes, new Dictionary<string, string>());
             CrossviewWorkbookData workbookDataPass2;
 
             using (var writer = new StringWriter())
