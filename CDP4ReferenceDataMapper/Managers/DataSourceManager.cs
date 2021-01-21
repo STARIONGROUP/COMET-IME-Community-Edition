@@ -341,9 +341,9 @@ namespace CDP4ReferenceDataMapper.Managers
                                     .Where(x => !exceptParameterTypes.Contains(x.ParameterType)))
                             .Where(x => x.ParameterType == this.targetValueParameterType);
 
-                    foreach (var parameterOrOverride in valueParameters)
+                    foreach (var valueParameter in valueParameters)
                     {
-                        if (parameterOrOverride.StateDependence == this.actualFiniteStateList)
+                        if (valueParameter.StateDependence == this.actualFiniteStateList)
                         {
                             var mappingParameter = elementUsage.ParameterOverride.FirstOrDefault(x => x.ParameterType == this.targetMappingParameterType);
 
@@ -357,7 +357,7 @@ namespace CDP4ReferenceDataMapper.Managers
                                         rowNumber,
                                         usageRowNumber,
                                         ParameterMappingType,
-                                        $"{parameterOrOverride.ParameterType?.Name} [{parameterOrOverride.ParameterType?.ShortName}]",
+                                        $"{valueParameter.ParameterType?.Name} [{valueParameter.ParameterType?.ShortName}]",
                                         mappingParameter);
 
                                 rowNumber++;
@@ -367,26 +367,39 @@ namespace CDP4ReferenceDataMapper.Managers
                                         rowNumber,
                                         usageRowNumber,
                                         ParameterValueType,
-                                        $"{parameterOrOverride.ParameterType?.Name} [{parameterOrOverride.ParameterType?.ShortName}]",
-                                        parameterOrOverride);
+                                        $"{valueParameter.ParameterType?.Name} [{valueParameter.ParameterType?.ShortName}]",
+                                        valueParameter);
 
-                                foreach (var currentValueSet in parameterOrOverride.ValueSets)
+                                foreach (var currentValueSet in valueParameter.ValueSets)
                                 {
                                     var columnName = currentValueSet.ActualState.ShortName;
                                     var mappingParameterValue = mappingParameter.ValueSets.FirstOrDefault()?.Computed[0];
+                                    var currentValueSetValue = currentValueSet.Computed[0];
+
+                                    parameterOverrideValueRow[columnName] = currentValueSetValue;
 
                                     if (mappingParameterValue != null)
                                     {
-                                        var parameterToStateMapping = JsonConvert.DeserializeObject<List<ParameterToStateMapping>>(mappingParameterValue);
+                                        try
+                                        {
+                                            var parameterToStateMapping = JsonConvert.DeserializeObject<List<ParameterToStateMapping>>(mappingParameterValue);
 
-                                        var originallySavedMapping =
-                                            parameterToStateMapping
-                                                .SingleOrDefault(
-                                                    x =>
-                                                        x.ActualFiniteStateIid == currentValueSet.ActualState.Iid);
+                                            var originallySavedMapping =
+                                                parameterToStateMapping
+                                                    .SingleOrDefault(
+                                                        x =>
+                                                            x.ActualFiniteStateIid == currentValueSet.ActualState.Iid);
 
-                                        parameterOverrideValueRow[columnName] = originallySavedMapping?.Value;
-                                        parameterOverrideMappingRow[columnName] = originallySavedMapping?.ParameterTypeIid;
+                                            if (currentValueSetValue == originallySavedMapping?.Value)
+                                            {
+                                                parameterOverrideValueRow[columnName] = originallySavedMapping?.Value;
+                                                parameterOverrideMappingRow[columnName] = originallySavedMapping?.ParameterTypeIid;
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            // ignored
+                                        }
                                     }
                                 }
 
@@ -587,7 +600,7 @@ namespace CDP4ReferenceDataMapper.Managers
                 elementDefinitionParameter?
                     .ValueSets
                     .FirstOrDefault()?
-                    .ActualValue[0];
+                    .Computed[0];
 
             return value;
         }
@@ -623,24 +636,33 @@ namespace CDP4ReferenceDataMapper.Managers
         /// The <see cref="ISession"/> used to write data to the data store.
         /// </param>
         /// <returns>
-        /// An awaitable <see cref="Task"/>
+        /// An awaitable <see cref="Task{T}"/> of type <see cref="SaveMappingResult"/>/>
         /// </returns>
-        public async Task SaveValues(ISession session)
+        public async Task<SaveMappingResult> TrySaveValues(ISession session)
         {
             var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
             var transaction = new ThingTransaction(transactionContext);
 
-            this.AddValueParameterValueSetsToTransaction(transaction);
-            this.AddMappingParameterValueSetsToTransaction(transaction);
+            var hasValueChanges = this.AddValueParameterValueSetsToTransaction(transaction);
+            var hasMappingChanges = this.AddMappingParameterValueSetsToTransaction(transaction);
+
+            if (!hasValueChanges && !hasMappingChanges)
+            {
+                return SaveMappingResult.CreateUnChangedResult();
+            }
 
             try
             {
                 var operationContainer = transaction.FinalizeTransaction();
                 await session.Write(operationContainer);
+                return SaveMappingResult.CreateSuccesResult();
             }
             catch (Exception ex)
             {
-                logger.Error("The update operation failed: {0}", ex.Message);
+                var errorText = $"The update operation failed: {ex.Message}";
+                logger.Error(errorText);
+
+                return SaveMappingResult.CreateErrorResult(errorText);
             }
         }
 
@@ -669,29 +691,41 @@ namespace CDP4ReferenceDataMapper.Managers
         /// <see cref="ParameterOverrideValueSet"/> to a <see cref="ThingTransaction"/>.
         /// </summary>
         /// <param name="transaction">The <see cref="ThingTransaction"/></param>
-        private void AddValueParameterValueSetsToTransaction(ThingTransaction transaction)
+        /// <returns>true if <see cref="ParameterOverrideValueSet"/>s were added to the transaction, otherwise false </returns>
+        private bool AddValueParameterValueSetsToTransaction(ThingTransaction transaction)
         {
+            var result = false;
+
             foreach (DataRow dataRow in this.DataTable.Rows)
             {
-                if (dataRow[TypeColumnName].ToString() == ParameterValueType)
+                if (dataRow[TypeColumnName].ToString() != ParameterValueType)
                 {
-                    foreach (var actualState in this.actualFiniteStateList.ActualState)
+                    continue;
+                }
+
+                foreach (var actualState in this.actualFiniteStateList.ActualState)
+                {
+                    if (dataRow[actualState.ShortName].ToString() == dataRow[this.GetOrgValueColumnName(actualState.ShortName)].ToString())
                     {
-                        if (dataRow[actualState.ShortName].ToString() != dataRow[this.GetOrgValueColumnName(actualState.ShortName)].ToString())
-                        {
-                            var thing = this.GetThingByDataRow<ParameterOrOverrideBase>(dataRow);
-
-                            if (thing.ValueSets.FirstOrDefault(x => x.ActualState == actualState) is ParameterOverrideValueSet valueSet)
-                            {
-                                var clonedValueSet = valueSet.Clone(false);
-
-                                clonedValueSet.Computed[0] = dataRow[actualState.ShortName].ToString();
-                                transaction.CreateOrUpdate(clonedValueSet);
-                            }
-                        }
+                        continue;
                     }
+
+                    var thing = this.GetThingByDataRow<ParameterOrOverrideBase>(dataRow);
+
+                    if (!(thing.ValueSets.FirstOrDefault(x => x.ActualState == actualState) is ParameterOverrideValueSet valueSet))
+                    {
+                        continue;
+                    }
+
+                    var clonedValueSet = valueSet.Clone(false);
+
+                    clonedValueSet.Computed[0] = dataRow[actualState.ShortName].ToString();
+                    transaction.CreateOrUpdate(clonedValueSet);
+                    result = true;
                 }
             }
+
+            return result;
         }
 
         /// <summary>
@@ -699,52 +733,72 @@ namespace CDP4ReferenceDataMapper.Managers
         /// <see cref="ParameterOverrideValueSet"/> to a <see cref="ThingTransaction"/>.
         /// </summary>
         /// <param name="transaction">The <see cref="ThingTransaction"/></param>
-        private void AddMappingParameterValueSetsToTransaction(ThingTransaction transaction)
+        /// <returns>true if <see cref="ParameterOverrideValueSet"/>s were added to the transaction, otherwise false </returns>
+        private bool AddMappingParameterValueSetsToTransaction(ThingTransaction transaction)
         {
+            var result = false;
+
             foreach (DataRow mappingRow in this.DataTable.Rows)
             {
-                if (mappingRow[TypeColumnName].ToString() == ParameterMappingType)
+                if (mappingRow[TypeColumnName].ToString() != ParameterMappingType)
                 {
-                    var valueRow = this.GetValueRowByMappingRow(mappingRow);
-                    var parameterToMappingList = new List<ParameterToStateMapping>();
-                    var mappingThing = this.GetThingByDataRow<ParameterOrOverrideBase>(mappingRow);
-                    var hasChanges = false;
+                    continue;
+                }
 
-                    if (this.RowHasChanges(mappingRow) || this.RowHasChanges(valueRow))
+                var valueRow = this.GetValueRowByMappingRow(mappingRow);
+                var parameterToMappingList = new List<ParameterToStateMapping>();
+                var mappingThing = this.GetThingByDataRow<ParameterOrOverrideBase>(mappingRow);
+                var hasChanges = false;
+
+                if (this.RowHasChanges(mappingRow) || this.RowHasChanges(valueRow))
+                {
+                    hasChanges = true;
+
+                    foreach (var actualState in this.actualFiniteStateList.ActualState)
                     {
-                        hasChanges = true;
-
-                        foreach (var actualState in this.actualFiniteStateList.ActualState)
+                        if (mappingRow[actualState.ShortName] == DBNull.Value || string.IsNullOrEmpty(mappingRow[actualState.ShortName].ToString()))
                         {
-                            if (mappingRow[actualState.ShortName] != DBNull.Value)
-                            {
-                                var mappedParameterType = this.SourceParameterTypes.SingleOrDefault(x => x.Iid.ToString() == mappingRow[actualState.ShortName].ToString());
-                                var mappingParameterValue = new ParameterToStateMapping(valueRow[actualState.ShortName].ToString(), mappedParameterType, actualState);
-                                parameterToMappingList.Add(mappingParameterValue);
-                            }
+                            continue;
                         }
-                    }
 
-                    if (hasChanges)
-                    {
-                        if (mappingThing.ValueSets.FirstOrDefault() is ParameterValueSetBase valueSet)
+                        var mappedParameterType = this.SourceParameterTypes.SingleOrDefault(x => x.Iid.ToString() == mappingRow[actualState.ShortName].ToString());
+
+                        if (mappedParameterType == null)
                         {
-                            var clonedValueSet = valueSet.Clone(false);
-
-                            if (parameterToMappingList.Any())
-                            {
-                                clonedValueSet.Computed[0] = JsonConvert.SerializeObject(parameterToMappingList);
-                            }
-                            else
-                            {
-                                clonedValueSet.Computed[0] = string.Empty;
-                            }
-
-                            transaction.CreateOrUpdate(clonedValueSet);
+                            continue;
                         }
+
+                        var mappingParameterValue = new ParameterToStateMapping(valueRow[actualState.ShortName].ToString(), mappedParameterType, actualState);
+                        parameterToMappingList.Add(mappingParameterValue);
                     }
                 }
+
+                if (!hasChanges)
+                {
+                    continue;
+                }
+
+                if (!(mappingThing.ValueSets.FirstOrDefault() is ParameterOverrideValueSet valueSet))
+                {
+                    continue;
+                }
+
+                var clonedValueSet = valueSet.Clone(false);
+
+                if (parameterToMappingList.Any())
+                {
+                    clonedValueSet.Computed[0] = JsonConvert.SerializeObject(parameterToMappingList);
+                }
+                else
+                {
+                    clonedValueSet.Computed[0] = string.Empty;
+                }
+
+                transaction.CreateOrUpdate(clonedValueSet);
+                result = true;
             }
+
+            return result;
         }
     }
 }

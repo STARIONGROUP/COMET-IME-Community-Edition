@@ -28,6 +28,7 @@ namespace CDP4ReferenceDataMapper.Converters
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Windows.Data;
@@ -41,6 +42,7 @@ namespace CDP4ReferenceDataMapper.Converters
     /// <summary>
     /// The <see cref="IMultiValueConverter"/> that gets an ItemsSource for a dropdown editor in the <see cref="StateToParameterTypeMapperBrowser"/>
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class MappingRowItemsSourceConverter : IMultiValueConverter
     {
         /// <summary>

@@ -26,7 +26,6 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/RibbonMenuItemTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:NamedShortNamedThingToStringConverter x:Key="NamedShortNamedThingToStringConverter" />
-            
             <DataTemplate x:Key="comboBoxEditor">
                 <dxe:ComboBoxEdit 
                     Name="PART_Editor"
@@ -44,12 +43,6 @@
                             </MultiBinding.Converter>
                         </MultiBinding>
                     </dxe:ComboBoxEdit.ItemsSource>
-                    <dxmvvm:Interaction.Behaviors>  
-                        <dxmvvm:EventToCommand EventName="SelectedIndexChanged" 
-                                               Command="{Binding ElementName=MappingDataTableView, Path=DataContext.SelectedMappingParameterChangedCommand, UpdateSourceTrigger=PropertyChanged}" 
-                                               UseDispatcher="True">
-                        </dxmvvm:EventToCommand>
-                    </dxmvvm:Interaction.Behaviors>  
                     <dxe:ComboBoxEdit.Buttons>  
                         <dxe:ButtonInfo GlyphKind="Custom" x:Name="buttonClear" >  
                             <dxe:ButtonInfo.Template>  
@@ -360,8 +353,10 @@
                                TreeDerivationMode="Selfreference">
                     <dxmvvm:Interaction.Behaviors>  
                         <dxmvvm:EventToCommand EventName="CellValueChanging" 
-                                               Command="{Binding SelectedMappingParameterChangedCommand}" 
-                                               PassEventArgsToCommand="True">
+                                               Command="{Binding SelectedMappingParameterChangedCommand}" >
+                            <dxmvvm:EventToCommand.EventArgsConverter>  
+                                <converters1:TreeListCellValueChangedEventArgsConverter/>  
+                            </dxmvvm:EventToCommand.EventArgsConverter>  
                         </dxmvvm:EventToCommand>
                         <behaviors:MappingCellReadOnlyBehavior DataSourceManager = "{Binding DataSourceManager}" />
                     </dxmvvm:Interaction.Behaviors>  
