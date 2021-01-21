@@ -208,7 +208,7 @@ namespace CDP4Composition.ViewModels
             this.FilterEditorSavedUserPreferences.Clear();
 
             this.unfilteredFilterEditorSavedUserPreferences =
-                this.savedUserPreferenceService.GetFilterEditorCollection<IEnumerable<FilterEditorSavedUserPreference>>(this.session, this.GetUserPreferenceKey())
+                this.savedUserPreferenceService.GetUserPreference<IEnumerable<FilterEditorSavedUserPreference>>(this.session, this.GetUserPreferenceKey())
                     ?.ToList() ?? new List<FilterEditorSavedUserPreference>();
 
             this.FilterEditorSavedUserPreferences.AddRange(
