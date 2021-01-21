@@ -294,18 +294,18 @@ namespace CDP4CrossViewEditor.Generator
                     this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1]
                         .Name = this.crossviewArrayAssember.NamesArray[i, j];
 
-                    if (!CrossviewSheetPMeanUtility.IsCalculationPossible(this.crossviewArrayAssember.NamesArray, i) || !this.crossviewArrayAssember.NamesArray[i, j].ToString().EndsWith("P_mean"))
-                    {
-                        continue;
-                    }
+                    //if (!CrossviewSheetPMeanUtility.IsCalculationPossible(this.crossviewArrayAssember.NamesArray, i) || !this.crossviewArrayAssember.NamesArray[i, j].ToString().EndsWith("P_mean"))
+                    //{
+                    //    continue;
+                    //}
 
-                    var pMeanValue = CrossviewSheetPMeanUtility.ComputeCalculation(this.crossviewArrayAssember.NamesArray,
-                        this.crossviewArrayAssember.ContentArray, i);
+                    //var pMeanValue = CrossviewSheetPMeanUtility.ComputeCalculation(this.crossviewArrayAssember.NamesArray,
+                    //    this.crossviewArrayAssember.ContentArray, i);
 
-                    if (pMeanValue.HasValue)
-                    {
-                        this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1].Value = pMeanValue.Value;
-                    }
+                    //if (pMeanValue.HasValue)
+                    //{
+                    //    this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1].Value = pMeanValue.Value;
+                    //}
                 }
             }
 
@@ -388,8 +388,8 @@ namespace CDP4CrossViewEditor.Generator
                             {
                                 var afsDictionary = afslDictionary[actualFiniteStateListShortName];
 
-                                var minAfsl = afsDictionary.Values.Min();
-                                var maxAfsl = afsDictionary.Values.Max();
+                                var minAfsl = afsDictionary.Values.Select(it => it.Item1).Min();
+                                var maxAfsl = afsDictionary.Values.Select(it => it.Item1).Max();
 
                                 minO = Math.Min(minO, minAfsl);
                                 maxO = Math.Max(maxO, maxAfsl);
