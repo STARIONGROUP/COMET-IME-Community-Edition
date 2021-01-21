@@ -43,7 +43,7 @@ namespace CDP4Composition.Services.FilterEditorService
         /// <param name="session">The session this is attached to.</param>
         /// <param name="userPreferenceKey">The key of the <see cref="UserPreference"/></param>
         /// <returns>A <see cref="T"/> for a specific <see cref="UserPreference.ShortName"/>.</returns>
-        T GetFilterEditorCollection<T>(ISession session, string userPreferenceKey) where T : class;
+        T GetUserPreference<T>(ISession session, string userPreferenceKey) where T : class;
 
         /// <summary>
         /// Creates a subscription to a <see cref="UserPreference"/> change and returns a disposable to keep in the VM collection.
