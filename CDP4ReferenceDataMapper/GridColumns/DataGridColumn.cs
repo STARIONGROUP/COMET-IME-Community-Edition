@@ -32,11 +32,6 @@ namespace CDP4ReferenceDataMapper.GridColumns
     public class DataGridColumn : ReactiveObject
     {
         /// <summary>
-        /// The <see cref="Managers.DataSourceManager"/> where this column belongs to.
-        /// </summary>
-        public DataSourceManager DataSourceManager { get; }
-
-        /// <summary>
         /// Backing field for the <see cref="Visible"/> property
         /// </summary>
         private bool visible = true;
@@ -77,6 +72,11 @@ namespace CDP4ReferenceDataMapper.GridColumns
             get => this.allowEditing;
             set => this.RaiseAndSetIfChanged(ref this.allowEditing, value);
         }
+
+        /// <summary>
+        /// The <see cref="Managers.DataSourceManager"/> where this column belongs to.
+        /// </summary>
+        public DataSourceManager DataSourceManager { get; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="DataGridColumn"/> class.

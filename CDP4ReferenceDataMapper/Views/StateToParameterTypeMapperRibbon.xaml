@@ -20,11 +20,11 @@
 
     <dxb:BarSplitButtonItem Name="OpenStateToParameterTypeMapperRibbonButton"
                             ActAsDropDown="True"
-                            Content="AFS to Parameter Mapper"
+                            Content="Parameter to State Mapper"
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
-                            LargeGlyph="{dx:DXImage Image=Properties_32x32.png}"
-                            Hint="Actual Finite State to Parameter Mapper">
+                            LargeGlyph="{dx:DXImage Image=Stepline_32x32.png}"
+                            Hint="Parameter to ActualFiniteState Parameter Mapper">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>

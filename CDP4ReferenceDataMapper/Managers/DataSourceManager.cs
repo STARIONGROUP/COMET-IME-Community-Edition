@@ -600,7 +600,7 @@ namespace CDP4ReferenceDataMapper.Managers
                 elementDefinitionParameter?
                     .ValueSets
                     .FirstOrDefault()?
-                    .Computed[0];
+                    .ActualValue[0];
 
             return value;
         }

@@ -242,9 +242,9 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             var sourceParameterValueset1 = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
-                Manual = new ValueArray<string>(new List<string> { "-" }),
+                Manual = new ValueArray<string>(new List<string> { "100" }),
                 Reference = new ValueArray<string>(new List<string> { "-" }),
-                Computed = new ValueArray<string>(new List<string> { "100" }),
+                Computed = new ValueArray<string>(new List<string> { "-" }),
                 Formula = new ValueArray<string>(new List<string> { "-" }),
                 Published = new ValueArray<string>(new List<string> { "-" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
@@ -252,9 +252,9 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             var sourceParameterValueset2 = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
-                Manual = new ValueArray<string>(new List<string> { "-" }),
+                Manual = new ValueArray<string>(new List<string> { "200" }),
                 Reference = new ValueArray<string>(new List<string> { "-" }),
-                Computed = new ValueArray<string>(new List<string> { "200" }),
+                Computed = new ValueArray<string>(new List<string> { "-" }),
                 Formula = new ValueArray<string>(new List<string> { "-" }),
                 Published = new ValueArray<string>(new List<string> { "-" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
@@ -685,7 +685,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
 
-            this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.ExecuteAsyncTask();
 
             var dataView = this.stateToParameterTypeMapperBrowserViewModel.DataSourceManager.DataTable.DefaultView;
 
@@ -733,7 +733,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
 
-            this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.ExecuteAsyncTask(null);
 
             //No Changes
             Assert.DoesNotThrowAsync(() => this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.ExecuteAsyncTask());
@@ -808,7 +808,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 newMapping
                     .ValueSet
                     .First()
-                    .Computed[0];
+                    .ActualValue[0];
 
             Assert.AreEqual(newValueValue, dataView[0][columnName].ToString());
         }
