@@ -76,6 +76,11 @@ namespace CDP4ReferenceDataMapper.Managers
             return new SaveMappingResult(false, true, errorText);
         }
 
+        /// <summary>
+        /// Create a <see cref="SaveMappingResult"/> that indicates that a save action did not take place at all,
+        /// because of the lack of changes.
+        /// </summary>
+        /// <returns>The <see cref="SaveMappingResult"/></returns>
         public static SaveMappingResult CreateUnChangedResult()
         {
             return new SaveMappingResult(true, false, string.Empty);

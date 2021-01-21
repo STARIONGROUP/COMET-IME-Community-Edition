@@ -62,11 +62,6 @@ namespace CDP4ReferenceDataMapper.ViewModels
     public class StateToParameterTypeMapperBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget
     {
         /// <summary>
-        /// The logger for the current class
-        /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
         /// </summary>
         private string currentModel;
@@ -310,7 +305,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to execute when the selected item from <see cref="SourceParameterTypes"/> was changed
         /// </summary>
-        public ReactiveCommand<Unit> SelectedMappingParameterChangedCommand { get; protected set; }
+        public ReactiveCommand<object> SelectedMappingParameterChangedCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to execute when changed values need to be saved
@@ -346,7 +341,9 @@ namespace CDP4ReferenceDataMapper.ViewModels
             this.RemoveSelectedSourceParameterTypeCommand = ReactiveCommand.Create(canExecuteRemoveSelectedSourceParameterTypeCommand);
             this.RemoveSelectedSourceParameterTypeCommand.Subscribe(_ => this.ExecuteRemoveSelectedSourceParameterCommand());
 
-            this.SelectedMappingParameterChangedCommand = ReactiveCommand.CreateAsyncTask(this.ExecuteSelectedMappingParameterChangedCommand, RxApp.MainThreadScheduler);
+            this.SelectedMappingParameterChangedCommand = ReactiveCommand.Create();
+            this.SelectedMappingParameterChangedCommand.Subscribe(this.ExecuteSelectedMappingParameterChangedCommand);
+
             this.SaveValuesCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteSaveValuesCommand(), RxApp.MainThreadScheduler);
         }
         
@@ -412,20 +409,16 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// Executes when the <see cref="SelectedMappingParameterChangedCommand"/> was fired.
         /// </summary>
         /// <param name="obj"></param>
-        /// <returns></returns>
-        private async Task ExecuteSelectedMappingParameterChangedCommand(object obj)
+        private void ExecuteSelectedMappingParameterChangedCommand(object obj)
         {
             if (obj == null)
             {
                 return;
             }
 
-            var data = ((DataRowView DataRow, string Property, string Value))obj;
-            
-            var row = data.DataRow;
-            var parameterTypeIid = data.Value;
-            var property = data.Property;
-            this.DataSourceManager.SetValue(property, row.Row, data.Value?.ToString());
+            var (row, property, parameterTypeIid) = ((DataRowView DataRow, string Property, string Value))obj;
+
+            this.DataSourceManager.SetValue(property, row.Row, parameterTypeIid);
 
             var valueRow = this.DataSourceManager.GetValueRowByMappingRow(row.Row);
 
@@ -654,7 +647,9 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// <param name="dropInfo">
         /// Information about the drop operation.
         /// </param>
+#pragma warning disable 1998
         public async Task Drop(IDropInfo dropInfo)
+#pragma warning restore 1998
         {
             if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
             {

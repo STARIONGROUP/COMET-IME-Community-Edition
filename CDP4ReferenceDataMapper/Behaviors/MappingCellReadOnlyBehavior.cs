@@ -80,23 +80,12 @@ namespace CDP4ReferenceDataMapper.Behaviors
         /// <param name="e">The <see cref="TreeListEditorEventArgs"/></param>
         private void AssociatedObject_ShownEditor(object sender, TreeListEditorEventArgs e)
         {
-            var isReadOnly = true;
+            var writeAllowed = sender is TreeListView dataViewBase 
+                                && dataViewBase.DataControl.CurrentItem is DataRowView dataRowView 
+                                && this.DataSourceManager.IsActualStateColumn(e.Column.FieldName) 
+                                && dataRowView[DataSourceManager.TypeColumnName].ToString() == DataSourceManager.ParameterMappingType;
 
-            if (sender is TreeListView dataViewBase)
-            {
-                if (dataViewBase.DataControl.CurrentItem is DataRowView dataRowView)
-                {
-                    if (this.DataSourceManager.IsActualStateColumn(e.Column.FieldName))
-                    {
-                        if (dataRowView[DataSourceManager.TypeColumnName].ToString() == DataSourceManager.ParameterMappingType)
-                        {
-                            isReadOnly = false;
-                        }
-                    }
-                }
-            }
-
-            e.Editor.IsReadOnly = isReadOnly;
+            e.Editor.IsReadOnly = !writeAllowed;
         }
     }
 }
