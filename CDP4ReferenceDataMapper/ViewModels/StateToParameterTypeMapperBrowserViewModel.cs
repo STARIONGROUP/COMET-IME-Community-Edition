@@ -278,7 +278,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
         public ReactiveList<ActualFiniteStateList> PossibleActualFiniteStateList { get; private set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ReactiveList{ScalarParameterType}"/> from which the <see cref="TextParameterType"/>
+        /// Gets or sets the <see cref="ReactiveList{TextParameterType}"/> from which the <see cref="TextParameterType"/>
         /// </summary>
         public ReactiveList<TextParameterType> PossibleTargetMappingParameterType { get; private set; }
 
@@ -619,6 +619,12 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
                     var parameterType = tuple.Item1;
 
+                    if (!this.AllowAddAsSourceParameterType(parameterType))
+                    {
+                        dropInfo.Effects = DragDropEffects.None;
+                        return;
+                    }
+
                     // A parameter that references the drag-over ParameterType already exists
                     if (this.SourceParameterTypes.Any(x => x == parameterType))
                     {
@@ -639,6 +645,25 @@ namespace CDP4ReferenceDataMapper.ViewModels
                 logger.Error(ex, "drag-over caused an error");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Checks if adding a <see cref="ParameterType"/> can be used as source parameter type
+        /// </summary>
+        /// <param name="parameterType">The <see cref="ParameterType"/></param>
+        /// <returns>true if allowed, otherwise false.</returns>
+        private bool AllowAddAsSourceParameterType(ParameterType parameterType)
+        {
+            var allowAdd = parameterType is ScalarParameterType;
+
+            if (parameterType is CompoundParameterType compoundParameterType)
+            {
+                allowAdd = compoundParameterType.Component.Count > 1
+                           && compoundParameterType.Component[0].ParameterType is TextParameterType
+                           && compoundParameterType.Component[1].ParameterType is ScalarParameterType;
+            }
+
+            return allowAdd;
         }
 
         /// <summary>
@@ -668,6 +693,12 @@ namespace CDP4ReferenceDataMapper.ViewModels
                 var parameterType = parameterTypeAndScale.Item1;
 
                 if (this.SourceParameterTypes.Any(x => x == parameterType))
+                {
+                    dropInfo.Effects = DragDropEffects.None;
+                    return;
+                }
+
+                if (!this.AllowAddAsSourceParameterType(parameterType))
                 {
                     dropInfo.Effects = DragDropEffects.None;
                     return;
