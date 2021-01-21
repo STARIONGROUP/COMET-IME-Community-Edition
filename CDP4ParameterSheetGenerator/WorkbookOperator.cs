@@ -34,7 +34,8 @@ namespace CDP4ParameterSheetGenerator
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    
+
+    using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Utilities;
     using CDP4Composition.ViewModels;
@@ -553,7 +554,7 @@ namespace CDP4ParameterSheetGenerator
             var workbookDataDal = new WorkbookDataDal(this.workbook);
             var workbookData = workbookDataDal.Read();
 
-            var workbookSession = new Session(dal, credentials);
+            var workbookSession = dal.CreateSession(credentials);
 
             if (workbookData != null)
             {
