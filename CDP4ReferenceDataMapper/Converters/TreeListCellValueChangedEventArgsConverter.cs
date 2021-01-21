@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StateToParameterTypeMapperTemplateSelector.cs" company="RHEA System S.A.">
+// <copyright file="TreeListCellValueChangedEventArgsConverter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -23,49 +23,35 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ReferenceDataMapper.DataTemplateSelectors
+namespace CDP4ReferenceDataMapper.Converters
 {
     using System.Data;
     using System.Diagnostics.CodeAnalysis;
-    using System.Windows;
-    using System.Windows.Controls;
+    using System.Windows.Data;
 
-    using CDP4ReferenceDataMapper.Managers;
-
-    using DevExpress.Xpf.Grid;
-
-    using DataGridColumn = GridColumns.DataGridColumn;
+    using DevExpress.Mvvm.UI;
+    using DevExpress.Xpf.Grid.TreeList;
 
     /// <summary>
-    /// Custom <see cref="DataTemplateSelector"/> used to dynamically select a editor emplate for a specific cell
+    /// The <see cref="IValueConverter"/> that gets a tuple that holds specific data from a <see cref="TreeListCellValueChangedEventArgs"/>
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class StateToParameterTypeMapperTemplateSelector : DataTemplateSelector
+    public class TreeListCellValueChangedEventArgsConverter : EventArgsConverterBase<TreeListCellValueChangedEventArgs>
     {
         /// <summary>
-        /// Select a specific <see cref="DataTemplate"/> for an item
+        /// Creates a tuple that holds specific data from a <see cref="TreeListCellValueChangedEventArgs"/>
         /// </summary>
-        /// <param name="item">The item (<see cref="EditGridCellData"/>)</param>
-        /// <param name="container">The <see cref="DependencyObject"/></param>
-        /// <returns>A <see cref="DataTemplate"/>, or null if no <see cref="DataTemplate"/> is necessary</returns>
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        /// <param name="sender">The sender <see cref="object"/></param>
+        /// <param name="args">The <see cref="TreeListCellValueChangedEventArgs"/></param>
+        /// <returns></returns>
+        protected override object Convert(object sender, TreeListCellValueChangedEventArgs args)
         {
-            var data = (EditGridCellData)item;
-
-            if (!(data?.RowData.Row is DataRowView dataRowView))
+            if (args == null)
             {
                 return null;
             }
 
-            if (!(data.Column.DataContext is DataGridColumn column))
-            {
-                return null;
-            }
-
-            return dataRowView[DataSourceManager.TypeColumnName].ToString() == DataSourceManager.ParameterMappingType
-                   && column.DataSourceManager.IsActualStateColumn(data.Column.FieldName)
-                ? (DataTemplate)((FrameworkElement)container).FindResource("comboBoxEditor")
-                : null;
+            return (args.Cell.Row as DataRowView, args.Cell.Property, args.Cell.Value as string);
         }
     }
 }
