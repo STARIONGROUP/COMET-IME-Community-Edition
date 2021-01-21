@@ -26,6 +26,7 @@
 namespace CDP4ReferenceDataMapper.Behaviors
 {
     using System.Data;
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows;
 
     using CDP4ReferenceDataMapper.Managers;
@@ -39,6 +40,7 @@ namespace CDP4ReferenceDataMapper.Behaviors
     /// When a column is edittable and allowing to edit of cells is conditional for individual rows, we should set the
     /// editor control's readonly property to true for the cells we don't want to allow editting for.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class MappingCellReadOnlyBehavior : Behavior<TreeListView>
     {
         public static readonly DependencyProperty DataSourceManagerProperty =

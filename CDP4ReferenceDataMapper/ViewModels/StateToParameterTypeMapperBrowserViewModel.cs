@@ -52,8 +52,6 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
     using CDP4ReferenceDataMapper.Managers;
 
-    using DevExpress.Xpf.Grid.TreeList;
-
     using NLog;
 
     using ReactiveUI;
@@ -402,7 +400,12 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// <returns>An awaitable <see cref="Task"/></returns>
         private async Task ExecuteSaveValuesCommand()
         {
-            await this.DataSourceManager.SaveValues(this.Session);
+            var result = await this.DataSourceManager.TrySaveValues(this.Session);
+
+            if (result.HasChanges && result.Result)
+            {
+                await this.StartMappingCommand.ExecuteAsync();
+            }
         }
 
         /// <summary>
@@ -412,30 +415,28 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// <returns></returns>
         private async Task ExecuteSelectedMappingParameterChangedCommand(object obj)
         {
-            if (obj is TreeListCellValueChangedEventArgs treeListCellValueChangedEventArgs)
+            if (obj == null)
             {
-                var data = treeListCellValueChangedEventArgs.Cell;
+                return;
+            }
 
-                if (!(data.Row is DataRowView row))
-                {
-                    return;
-                }
+            var data = ((DataRowView DataRow, string Property, string Value))obj;
+            
+            var row = data.DataRow;
+            var parameterTypeIid = data.Value;
+            var property = data.Property;
+            this.DataSourceManager.SetValue(property, row.Row, data.Value?.ToString());
 
-                var parameterTypeIid = data.Value as string;
-                var property = data.Property;
-                this.DataSourceManager.SetValue(property, row.Row, data.Value?.ToString());
+            var valueRow = this.DataSourceManager.GetValueRowByMappingRow(row.Row);
 
-                var valueRow = this.DataSourceManager.GetValueRowByMappingRow(row.Row);
+            if (valueRow != null)
+            {
+                var newPropertyValue =
+                    string.IsNullOrWhiteSpace(parameterTypeIid)
+                        ? null
+                        : this.DataSourceManager.GetElementDefinitionParameterValueForDataRow(row.Row, new Guid(parameterTypeIid));
 
-                if (valueRow != null)
-                {
-                    var newPropertyValue =
-                        string.IsNullOrWhiteSpace(parameterTypeIid)
-                            ? null
-                            : this.DataSourceManager.GetElementDefinitionParameterValueForDataRow(row.Row, new Guid(parameterTypeIid));
-
-                    this.DataSourceManager.SetValue(property, valueRow, newPropertyValue);
-                }
+                this.DataSourceManager.SetValue(property, valueRow, newPropertyValue);
             }
         }
 
@@ -444,14 +445,18 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// </summary>
         private void ExecuteRemoveSelectedSourceParameterCommand()
         {
-            if (this.SelectedSourceParameterType != null)
+            if (this.SelectedSourceParameterType == null)
             {
-                if (this.SourceParameterTypes.Contains(this.SelectedSourceParameterType))
-                {
-                    this.SourceParameterTypes.Remove(this.SelectedSourceParameterType);
-                    this.SelectedSourceParameterType = this.SourceParameterTypes.FirstOrDefault();
-                }
+                return;
             }
+
+            if (!this.SourceParameterTypes.Contains(this.SelectedSourceParameterType))
+            {
+                return;
+            }
+
+            this.SourceParameterTypes.Remove(this.SelectedSourceParameterType);
+            this.SelectedSourceParameterType = this.SourceParameterTypes.FirstOrDefault();
         }
 
         /// <summary>
@@ -604,12 +609,6 @@ namespace CDP4ReferenceDataMapper.ViewModels
             {
                 logger.Trace("drag over {0}", dropInfo.TargetItem);
 
-                if (dropInfo.TargetItem is IDropTarget droptarget)
-                {
-                    droptarget.DragOver(dropInfo);
-                    return;
-                }
-
                 if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuple)
                 {
                     // check if parameter type is in the chain of rdls
@@ -657,28 +656,20 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.TargetItem is IDropTarget droptarget)
-            {
-                try
-                {
-                    this.IsBusy = true;
-
-                    await droptarget.Drop(dropInfo);
-                }
-                catch (Exception ex)
-                {
-                    this.Feedback = ex.Message;
-                }
-                finally
-                {
-                    this.IsBusy = false;
-                }
-
-                return;
-            }
-
             if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
             {
+                // check if parameter type is in the chain of rdls
+                var model = (EngineeringModel)this.Thing.TopContainer;
+                var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
+                var rdlChains = new List<ReferenceDataLibrary> { mrdl };
+                rdlChains.AddRange(mrdl.RequiredRdls);
+
+                if (!rdlChains.Contains(parameterTypeAndScale.Item1.Container))
+                {
+                    dropInfo.Effects = DragDropEffects.None;
+                    return;
+                }
+
                 var parameterType = parameterTypeAndScale.Item1;
 
                 if (this.SourceParameterTypes.Any(x => x == parameterType))
