@@ -49,7 +49,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
     /// Suite of tests for the <see cref="CrossviewArrayAssembler"/> class
     /// </summary>
     [TestFixture]
-    [Ignore("Debug AppVeyor build failing")]
     public class CrossviewArrayAssemblerTestFixture
     {
         private List<IExcelRow<Thing>> excelRows;

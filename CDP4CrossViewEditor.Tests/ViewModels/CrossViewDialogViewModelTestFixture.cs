@@ -45,7 +45,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
     /// Suite of tests for the <see cref="CrossViewDialogViewModel"/> class
     /// </summary>
     [TestFixture]
-    [Ignore("Debug AppVeyor build failing")]
     public class CrossViewDialogViewModelTestFixture
     {
         /// <summary>

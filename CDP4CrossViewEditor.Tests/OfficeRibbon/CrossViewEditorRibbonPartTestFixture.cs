@@ -55,7 +55,6 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
     /// Suite of tests for the <see cref="CrossViewEditorRibbonPart"/>
     /// </summary>
     [TestFixture, Apartment(ApartmentState.STA)]
-    [Ignore("Debug AppVeyor build failing")]
     public class CrossViewEditorRibbonPartTestFixture
     {
         /// <summary>
