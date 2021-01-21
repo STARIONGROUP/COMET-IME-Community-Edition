@@ -352,7 +352,7 @@ namespace CDP4ReferenceDataMapper.Managers
                             {
                                 rowNumber++;
 
-                                var parameterOverrideMappingRow =
+                                var mappingRow =
                                     this.AddRow(
                                         rowNumber,
                                         usageRowNumber,
@@ -362,7 +362,7 @@ namespace CDP4ReferenceDataMapper.Managers
 
                                 rowNumber++;
 
-                                var parameterOverrideValueRow =
+                                var valueRow =
                                     this.AddRow(
                                         rowNumber,
                                         usageRowNumber,
@@ -376,7 +376,7 @@ namespace CDP4ReferenceDataMapper.Managers
                                     var mappingParameterValue = mappingParameter.ValueSets.FirstOrDefault()?.Computed[0];
                                     var currentValueSetValue = currentValueSet.Computed[0];
 
-                                    parameterOverrideValueRow[columnName] = currentValueSetValue;
+                                    valueRow[columnName] = currentValueSetValue;
 
                                     if (mappingParameterValue != null)
                                     {
@@ -392,8 +392,8 @@ namespace CDP4ReferenceDataMapper.Managers
 
                                             if (currentValueSetValue == originallySavedMapping?.Value)
                                             {
-                                                parameterOverrideValueRow[columnName] = originallySavedMapping?.Value;
-                                                parameterOverrideMappingRow[columnName] = originallySavedMapping?.ParameterTypeIid;
+                                                valueRow[columnName] = originallySavedMapping?.Value;
+                                                mappingRow[columnName] = originallySavedMapping?.ParameterTypeIid;
                                             }
                                         }
                                         catch
@@ -403,8 +403,8 @@ namespace CDP4ReferenceDataMapper.Managers
                                     }
                                 }
 
-                                this.CopyCurrentValuesToOrgValueColumns(parameterOverrideValueRow);
-                                this.CopyCurrentValuesToOrgValueColumns(parameterOverrideMappingRow);
+                                this.CopyCurrentValuesToOrgValueColumns(valueRow);
+                                this.CopyCurrentValuesToOrgValueColumns(mappingRow);
                             }
                         }
                     }
@@ -596,13 +596,23 @@ namespace CDP4ReferenceDataMapper.Managers
                     .Parameter
                     .SingleOrDefault(x => x.ParameterType.Iid == parameterTypeIid);
 
-            var value =
-                elementDefinitionParameter?
+            if (elementDefinitionParameter == null)
+            {
+                return string.Empty;
+            }
+
+            if (elementDefinitionParameter.ParameterType is CompoundParameterType)
+            {
+                return elementDefinitionParameter
                     .ValueSets
                     .FirstOrDefault()?
-                    .ActualValue[0];
+                    .ActualValue[1];
+            }
 
-            return value;
+            return elementDefinitionParameter?
+                .ValueSets
+                .FirstOrDefault()?
+                .ActualValue[0];
         }
 
         /// <summary>

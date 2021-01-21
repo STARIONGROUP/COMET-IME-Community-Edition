@@ -103,7 +103,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         private SimpleQuantityKind valueParameterType_1;
         private SimpleQuantityKind valueParameterType_2;
         private SimpleQuantityKind sourceParameterType_1;
-        private SimpleQuantityKind sourceParameterType_2;
+        private CompoundParameterType sourceParameterType_2;
         private Category elementDefinitionCategory_1;
         private Category elementDefinitionCategory_2;
 
@@ -234,10 +234,34 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.iteration.ActualFiniteStateList.Add(this.actualFinitateStateList);
 
             //SourceParameterTypes
-            this.sourceParameterType_1 = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "Source 1", ShortName = "source1" };
+            this.sourceParameterType_1 = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Name = "Source 1", 
+                ShortName = "source1"
+            };
+
             this.siteReferenceDataLibrary.ParameterType.Add(this.sourceParameterType_1);
 
-            this.sourceParameterType_2 = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "Source 2", ShortName = "source2" };
+            this.sourceParameterType_2 = new CompoundParameterType(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Name = "Source 2", 
+                ShortName = "source2"
+            };
+
+            this.sourceParameterType_2.Component.Add(
+                new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri)
+                {
+                    ShortName = "Name",
+                    ParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri)
+                });
+
+            this.sourceParameterType_2.Component.Add(
+                new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) 
+                {
+                    ShortName = "Name",
+                    ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri)
+                });
+
             this.siteReferenceDataLibrary.ParameterType.Add(this.sourceParameterType_2);
 
             var sourceParameterValueset1 = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
@@ -252,11 +276,11 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             var sourceParameterValueset2 = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
-                Manual = new ValueArray<string>(new List<string> { "200" }),
-                Reference = new ValueArray<string>(new List<string> { "-" }),
-                Computed = new ValueArray<string>(new List<string> { "-" }),
-                Formula = new ValueArray<string>(new List<string> { "-" }),
-                Published = new ValueArray<string>(new List<string> { "-" }),
+                Manual = new ValueArray<string>(new List<string> { "CustomStateName", "200" }),
+                Reference = new ValueArray<string>(new List<string> { "-", "-" }),
+                Computed = new ValueArray<string>(new List<string> { "-", "-" }),
+                Formula = new ValueArray<string>(new List<string> { "-", "-" }),
+                Published = new ValueArray<string>(new List<string> { "-", "-" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
 
@@ -549,7 +573,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleActualFiniteStateList.Count, Is.EqualTo(1));
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Count, Is.EqualTo(0));
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.Count, Is.EqualTo(2));
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.Count, Is.EqualTo(6));
+            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.Count, Is.EqualTo(5));
         }
 
         [Test]
@@ -768,7 +792,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         }
 
         [Test]
-        public async Task Verify_that_SelectedMappingParameterChangedCommand_works()
+        public async Task Verify_that_SelectedScalarMappingParameterChangedCommand_works()
         {
             this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
                 this.iteration,
@@ -809,6 +833,52 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                     .ValueSet
                     .First()
                     .ActualValue[0];
+
+            Assert.AreEqual(newValueValue, dataView[0][columnName].ToString());
+        }
+
+                [Test]
+        public async Task Verify_that_SelectedCompoundMappingParameterChangedCommand_works()
+        {
+            this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
+                this.iteration,
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.panelNavigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object);
+
+            this.stateToParameterTypeMapperBrowserViewModel.SelectedElementDefinitionCategory = this.stateToParameterTypeMapperBrowserViewModel.PossibleElementDefinitionCategory.First();
+            this.stateToParameterTypeMapperBrowserViewModel.SelectedActualFiniteStateList = this.stateToParameterTypeMapperBrowserViewModel.PossibleActualFiniteStateList.First();
+            this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes = new ReactiveList<ParameterType> { this.sourceParameterType_1, this.sourceParameterType_2 };
+            this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
+            this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
+
+            this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute(null);
+
+            var newMapping =
+                this.elementDefinition.Parameter
+                    .First(
+                        x => x.ParameterType == this.sourceParameterType_2);
+
+            var dataView = this.stateToParameterTypeMapperBrowserViewModel.DataSourceManager.DataTable.DefaultView;
+            dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterMappingType}'";
+
+            var newMappingValue = newMapping.ParameterType.Iid.ToString();
+            var columnName = this.actualFinitateSte_on.ShortName;
+            var tuple = (dataView[0], columnName, newValue: newMappingValue);
+
+            await this.stateToParameterTypeMapperBrowserViewModel.SelectedMappingParameterChangedCommand.ExecuteAsyncTask(tuple);
+
+            Assert.AreEqual(newMappingValue, dataView[0][columnName].ToString());
+
+            dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterValueType}'";
+
+            var newValueValue = 
+                newMapping
+                    .ValueSet
+                    .First()
+                    .ActualValue[1];
 
             Assert.AreEqual(newValueValue, dataView[0][columnName].ToString());
         }
@@ -898,7 +968,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         }
         
         [Test]
-        public async Task VerifyThatParameterTypeCanBeDroppedOnce()
+        public async Task VerifyThatScalarParameterTypeCanBeDroppedOnce()
         {
             this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
                 this.iteration,
@@ -916,6 +986,37 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.siteReferenceDataLibrary.ParameterType.Add(simpleQuantityKind);
 
             var payload = new Tuple<ParameterType, MeasurementScale>(simpleQuantityKind, ratioScale);
+            var dropInfo = new Mock<IDropInfo>();
+            dropInfo.Setup(x => x.Payload).Returns(payload);
+            dropInfo.SetupProperty(x => x.Effects);
+
+            this.stateToParameterTypeMapperBrowserViewModel.DragOver(dropInfo.Object);
+            Assert.AreEqual(DragDropEffects.Copy, dropInfo.Object.Effects);
+
+            await this.stateToParameterTypeMapperBrowserViewModel.Drop(dropInfo.Object);
+            Assert.AreEqual(DragDropEffects.Copy, dropInfo.Object.Effects);
+            Assert.AreEqual(1, this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Count);
+
+            await this.stateToParameterTypeMapperBrowserViewModel.Drop(dropInfo.Object);
+            Assert.AreEqual(DragDropEffects.None, dropInfo.Object.Effects);
+            Assert.AreEqual(1, this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Count);
+        }
+
+        [Test]
+        public async Task VerifyThatCompoundParameterTypeCanBeDroppedOnce()
+        {
+            this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
+                this.iteration,
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.panelNavigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object);       
+
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
+            var ratioScale = new RatioScale(Guid.NewGuid(), null, null);
+            var payload = new Tuple<ParameterType, MeasurementScale>(this.sourceParameterType_2, ratioScale);
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(payload);
             dropInfo.SetupProperty(x => x.Effects);
