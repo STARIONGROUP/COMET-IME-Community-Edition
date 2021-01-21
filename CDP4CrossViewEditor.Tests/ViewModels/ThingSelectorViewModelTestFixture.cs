@@ -172,13 +172,13 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.AreEqual(this.iteration, viewModelElements.Iteration);
             Assert.AreEqual(0, viewModelElements.ElementDefinitionSourceList.Count);
             Assert.AreEqual(0, viewModelElements.ElementDefinitionTargetList.Count);
-            Assert.AreEqual(ClassKind.ElementBase, viewModelElements.ThingClassKind);
+            Assert.AreEqual(ClassKind.ElementDefinition, viewModelElements.ThingClassKind);
             Assert.IsNull(viewModelElements.PreservedIids);
 
             Assert.AreEqual(this.iteration, viewModelParameters.Iteration);
             Assert.AreEqual(0, viewModelParameters.ParameterTypeSourceList.Count);
             Assert.AreEqual(0, viewModelParameters.ParameterTypeTargetList.Count);
-            Assert.AreEqual(ClassKind.ParameterBase, viewModelParameters.ThingClassKind);
+            Assert.AreEqual(ClassKind.ParameterType, viewModelParameters.ThingClassKind);
             Assert.IsNull(viewModelParameters.PreservedIids);
         }
 
