@@ -25,12 +25,15 @@
 
 namespace CDP4OfficeInfrastructure.OfficeDal
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using NetOffice.ExcelApi;
 
     /// <summary>
     /// The purpose of the <see cref="CrossviewWorkbookDataDal"/> class is to read and write the <see cref="CrossviewWorkbookData"/>
     /// custom XML part to and from a <see cref="Workbook"/>.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class CrossviewWorkbookDataDal : CustomOfficeDataDal<CrossviewWorkbookData>
     {
         /// <summary>

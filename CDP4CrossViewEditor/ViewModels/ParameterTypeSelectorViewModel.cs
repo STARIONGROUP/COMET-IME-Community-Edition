@@ -46,7 +46,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Hardcoded power related parameter type short names list
         /// </summary>
-        private static readonly string[] PowerParameters = { "Redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
+        private static readonly string[] PowerParameters = { "redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
 
         /// <summary>
         /// Backing field for <see cref="PowerParametersEnabled"/>
@@ -88,7 +88,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
         /// <param name="session">Current opened session <see cref="ISession"/></param>
         /// <param name="preservedIids">Current user selection <see cref="List{Guid}"/></param>
-        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids) : base(iteration, session, ClassKind.ParameterType, preservedIids)
+        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids) :
+            base(iteration, session, ClassKind.ParameterType, preservedIids)
         {
             this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>
             {

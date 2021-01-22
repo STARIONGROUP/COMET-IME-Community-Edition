@@ -43,96 +43,101 @@ namespace CDP4OfficeInfrastructure.OfficeDal
     public class CrossviewWorkbookData : CustomOfficeData
     {
         /// <summary>
-        /// Backing field for the <see cref="ElementDefinitionData"/> property.
+        /// Cell names/values separator
         /// </summary>
-        [XmlIgnore] private string elementDefinitionData;
+        private const string CellSeparator = "|";
 
         /// <summary>
-        /// Backing field for the <see cref="ParameterTypeData"/> property.
+        /// Backing field for the <see cref="SelectedElementDefinitions"/> property.
         /// </summary>
-        [XmlIgnore] private string parameterTypeData;
+        [XmlIgnore] private string selectedElementDefinitions;
 
         /// <summary>
-        /// Backing field for the <see cref="CellNamesData"/> property.
+        /// Backing field for the <see cref="SelectedParameterTypes"/> property.
         /// </summary>
-        [XmlIgnore] private string cellNamesData;
+        [XmlIgnore] private string selectedParameterTypes;
 
         /// <summary>
-        /// Backing field for the <see cref="CellValuesData"/> property.
+        /// Backing field for the <see cref="CellNames"/> property.
         /// </summary>
-        [XmlIgnore] private string cellValuesData;
+        [XmlIgnore] private string cellNames;
+
+        /// <summary>
+        /// Backing field for the <see cref="CellValues"/> property.
+        /// </summary>
+        [XmlIgnore] private string cellValues;
 
         /// <summary>
         /// Gets or sets the <see cref="IEnumerable{ElementDefinition}"/> data of the current <see cref="Workbook"/>
         /// </summary>
         [XmlElement(typeof(XmlCDataSection))]
-        public XmlCDataSection ElementDefinitionData
+        public XmlCDataSection SelectedElementDefinitions
         {
             get
             {
                 var doc = new XmlDocument();
-                return doc.CreateCDataSection(this.elementDefinitionData);
+                return doc.CreateCDataSection(this.selectedElementDefinitions);
             }
 
-            set => this.elementDefinitionData = value.Value;
+            set => this.selectedElementDefinitions = value.Value;
         }
 
         /// <summary>
         /// Gets or sets the <see cref="IEnumerable{ParameterType}"/> data of the current <see cref="Workbook"/>
         /// </summary>
         [XmlElement(typeof(XmlCDataSection))]
-        public XmlCDataSection ParameterTypeData
+        public XmlCDataSection SelectedParameterTypes
         {
             get
             {
                 var doc = new XmlDocument();
-                return doc.CreateCDataSection(this.parameterTypeData);
+                return doc.CreateCDataSection(this.selectedParameterTypes);
             }
 
-            set => this.parameterTypeData = value.Value;
+            set => this.selectedParameterTypes = value.Value;
         }
 
         /// <summary>
         /// Gets or set the modefied cell names of the current <see cref="Workbook"/>
         /// </summary>
         [XmlElement(typeof(XmlCDataSection))]
-        public XmlCDataSection CellNamesData
+        public XmlCDataSection CellNames
         {
             get
             {
                 var doc = new XmlDocument();
-                return doc.CreateCDataSection(this.cellNamesData);
+                return doc.CreateCDataSection(this.cellNames);
             }
 
-            set => this.cellNamesData = value.Value;
+            set => this.cellNames = value.Value;
         }
 
         /// <summary>
         /// Gets or set the modefied cell values of the current <see cref="Workbook"/>
         /// </summary>
         [XmlElement(typeof(XmlCDataSection))]
-        public XmlCDataSection CellValuesData
+        public XmlCDataSection CellValues
         {
             get
             {
                 var doc = new XmlDocument();
-                return doc.CreateCDataSection(this.cellValuesData);
+                return doc.CreateCDataSection(this.cellValues);
             }
 
-            set => this.cellValuesData = value.Value;
+            set => this.cellValues = value.Value;
         }
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{ElementDefinition}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> ElementDefinitionList => this.Serializer.Deserialize(this.GenerateStreamFromString(this.ElementDefinitionData.Value));
+        public IEnumerable<Thing> ManuallySavedElementDefinitionValues => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedElementDefinitions.Value));
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{ParameterType}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> ParameterTypeList => this.Serializer.Deserialize(this.GenerateStreamFromString(this.ParameterTypeData.Value));
+        public IEnumerable<Thing> ManuallySavedParameterValues => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedParameterTypes.Value));
 
         /// <summary>
         /// Gets or sets a dictionary that contains cell names and cell values that has been modified
@@ -143,10 +148,12 @@ namespace CDP4OfficeInfrastructure.OfficeDal
             get
             {
                 var result = new Dictionary<string, string>();
+                var names = this.CellNames.Value.Split('|');
+                var values = this.CellValues.Value.Split('|');
 
-                for(var i = 0; i < this.CellNamesData.Value.Split('|').Length; i++)
+                for (var i = 0; i < names.Length; i++)
                 {
-                    result[this.CellNamesData.Value.Split('|')[i]] = this.CellValuesData.Value.Split('|')[i];
+                    result[names[i]] = values[i];
                 }
 
                 return result;
@@ -170,20 +177,22 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// The parameter types list that needs to be preserved <see cref="IEnumerable{ParameterType}" />
         /// </param>
         /// <param name="manuallySavedValues">
-        /// The cell name/value key/value pai that needs to be preserved <see cref="Dictionary{TKey,TValue}"/>
+        /// The cell name/value key/value pair that needs to be preserved <see cref="Dictionary{TKey,TValue}"/>
         /// </param>
-        public CrossviewWorkbookData(IEnumerable<CDP4Common.EngineeringModelData.ElementDefinition> elementDefinitions, IEnumerable<CDP4Common.SiteDirectoryData.ParameterType> parameterTypes,
+        public CrossviewWorkbookData(
+            IEnumerable<CDP4Common.EngineeringModelData.ElementDefinition> elementDefinitions,
+            IEnumerable<CDP4Common.SiteDirectoryData.ParameterType> parameterTypes,
             Dictionary<string, string> manuallySavedValues)
         {
             var preservedDefinitions = elementDefinitions.Select(elementDefinition => elementDefinition.ToDto() as ElementDefinition).ToList();
-            this.elementDefinitionData =  this.GenerateStringFromList(preservedDefinitions);
+            this.selectedElementDefinitions =  this.GenerateStringFromList(preservedDefinitions);
 
             var preservedTypes = parameterTypes.Select(parameterType => parameterType.ToDto() as ParameterType).ToList();
-            this.parameterTypeData = this.GenerateStringFromList(preservedTypes);
+            this.selectedParameterTypes = this.GenerateStringFromList(preservedTypes);
 
-            this.cellNamesData = string.Join("|", manuallySavedValues.Keys.ToArray());
+            this.cellNames = string.Join(CellSeparator, manuallySavedValues.Keys.ToArray());
 
-            this.cellValuesData = string.Join("|", manuallySavedValues.Values.ToArray());
+            this.cellValues = string.Join(CellSeparator, manuallySavedValues.Values.ToArray());
         }
 
         /// <summary>

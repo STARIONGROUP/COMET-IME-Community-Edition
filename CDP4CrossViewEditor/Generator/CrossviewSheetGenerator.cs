@@ -125,7 +125,9 @@ namespace CDP4CrossViewEditor.Generator
         /// <param name="workbook">
         /// The current <see cref="Workbook"/> when crossview sheet will be rebuild.
         /// </param>
-        /// <param name="workbookMetadata"></param>
+        /// <param name="workbookMetadata">
+        /// The current <see cref="WorkbookMetadata"/> associated.
+        /// </param>
         public void Rebuild(Application application, Workbook workbook, WorkbookMetadata workbookMetadata)
         {
             var sw = new Stopwatch();

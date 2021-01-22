@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossviewWorkbookDataDalTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2020 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -163,14 +182,14 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
         [Test]
         public void VerifyThatUserSelectionIsPreserved()
         {
-            Assert.AreEqual(1, this.workbookData.ElementDefinitionList.Count());
-            Assert.AreEqual(1, this.workbookData.ParameterTypeList.Count());
+            Assert.AreEqual(1, this.workbookData.ManuallySavedElementDefinitionValues.Count());
+            Assert.AreEqual(1, this.workbookData.ManuallySavedParameterValues.Count());
 
-            Assert.IsTrue(this.workbookData.ElementDefinitionList.FirstOrDefault() is CDP4Common.DTO.ElementDefinition);
-            Assert.IsTrue(this.workbookData.ParameterTypeList.FirstOrDefault() is CDP4Common.DTO.ParameterType);
+            Assert.IsTrue(this.workbookData.ManuallySavedElementDefinitionValues.FirstOrDefault() is CDP4Common.DTO.ElementDefinition);
+            Assert.IsTrue(this.workbookData.ManuallySavedParameterValues.FirstOrDefault() is CDP4Common.DTO.ParameterType);
 
-            Assert.AreEqual(this.elementDefinition.Name, (this.workbookData.ElementDefinitionList.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
-            Assert.AreEqual(this.parameterType.Name, (this.workbookData.ParameterTypeList.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
+            Assert.AreEqual(this.elementDefinition.Name, (this.workbookData.ManuallySavedElementDefinitionValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
+            Assert.AreEqual(this.parameterType.Name, (this.workbookData.ManuallySavedParameterValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
         }
 
         [Test]
@@ -218,8 +237,8 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
 
                 Assert.NotNull(retrievedSession);
 
-                Assert.IsNotEmpty(retrievedSession.ElementDefinitionList);
-                Assert.IsNotEmpty(retrievedSession.ParameterTypeList);
+                Assert.IsNotEmpty(retrievedSession.ManuallySavedElementDefinitionValues);
+                Assert.IsNotEmpty(retrievedSession.ManuallySavedParameterValues);
             }
             finally
             {

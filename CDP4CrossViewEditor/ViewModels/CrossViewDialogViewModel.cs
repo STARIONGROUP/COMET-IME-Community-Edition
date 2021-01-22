@@ -104,7 +104,7 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        ///
+        /// Dictionary that contains manuallys aved values
         /// </summary>
         private Dictionary<string, string> ManuallyFilledValues = new Dictionary<string, string>();
 
@@ -192,12 +192,12 @@ namespace CDP4CrossViewEditor.ViewModels
             this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(
                 this.Iteration,
                 this.Session,
-                preservedData?.ElementDefinitionList?.Select(ed => ed.Iid).ToList());
+                preservedData?.ManuallySavedElementDefinitionValues?.Select(ed => ed.Iid).ToList());
 
             this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(
                 this.Iteration,
                 this.Session,
-                preservedData?.ParameterTypeList?.Select(pt => pt.Iid).ToList());
+                preservedData?.ManuallySavedParameterValues?.Select(pt => pt.Iid).ToList());
         }
 
         /// <summary>
@@ -216,7 +216,10 @@ namespace CDP4CrossViewEditor.ViewModels
             if (this.ElementSelectorViewModel is ElementDefinitionSelectorViewModel elementDefinitionViewModel &&
                 this.ParameterSelectorViewModel is ParameterTypeSelectorViewModel parameterTypeViewModel)
             {
-                this.DialogResult = new WorkbookSelectionDialogResult(true, this.SelectedWorkbook?.Workbook, elementDefinitionViewModel.ElementDefinitionTargetList.Select(e => e.Thing),
+                this.DialogResult = new WorkbookSelectionDialogResult(
+                    true,
+                    this.SelectedWorkbook?.Workbook,
+                    elementDefinitionViewModel.ElementDefinitionTargetList.Select(e => e.Thing),
                     parameterTypeViewModel.ParameterTypeTargetList.Select(p => p.Thing),
                     this.ManuallyFilledValues);
             }

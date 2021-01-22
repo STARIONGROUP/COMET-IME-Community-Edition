@@ -94,8 +94,10 @@ namespace CDP4CrossViewEditor
         /// </summary>
         private readonly Application application;
 
+        /// <summary>
+        /// The <see cref="CrossviewSheetGenerator"/> that is being used by the current <see cref="WorkbookOperator"/>
+        /// </summary>
         private CrossviewSheetGenerator crossviewSheetGenerator;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkbookOperator"/> class.
