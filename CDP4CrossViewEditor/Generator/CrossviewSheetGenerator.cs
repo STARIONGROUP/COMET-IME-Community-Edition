@@ -259,8 +259,8 @@ namespace CDP4CrossViewEditor.Generator
             var dataEndRow = numberOfHeaderRows + numberOfBodyRows;
 
             var parameterRange = this.crossviewSheet.Range(
-                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
-                this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
+            this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
+            this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
 
             parameterRange.Name = CrossviewSheetConstants.RangeName;
             parameterRange.NumberFormat = this.crossviewArrayAssember.FormatArray;
@@ -269,8 +269,9 @@ namespace CDP4CrossViewEditor.Generator
             parameterRange.EntireColumn.AutoFit();
 
             var formattedRange = this.crossviewSheet.Range(
-                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
-                this.crossviewSheet.Cells[dataStartRow, numberOfColumns]);
+            this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
+            this.crossviewSheet.Cells[dataStartRow, numberOfColumns]);
+
             formattedRange.Interior.ColorIndex = 34;
             formattedRange.HorizontalAlignment = XlHAlign.xlHAlignCenter;
             formattedRange.VerticalAlignment = XlVAlign.xlVAlignCenter;
@@ -293,19 +294,6 @@ namespace CDP4CrossViewEditor.Generator
 
                     this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1]
                         .Name = this.crossviewArrayAssember.NamesArray[i, j];
-
-                    //if (!CrossviewSheetPMeanUtility.IsCalculationPossible(this.crossviewArrayAssember.NamesArray, i) || !this.crossviewArrayAssember.NamesArray[i, j].ToString().EndsWith("P_mean"))
-                    //{
-                    //    continue;
-                    //}
-
-                    //var pMeanValue = CrossviewSheetPMeanUtility.ComputeCalculation(this.crossviewArrayAssember.NamesArray,
-                    //    this.crossviewArrayAssember.ContentArray, i);
-
-                    //if (pMeanValue.HasValue)
-                    //{
-                    //    this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1].Value = pMeanValue.Value;
-                    //}
                 }
             }
 

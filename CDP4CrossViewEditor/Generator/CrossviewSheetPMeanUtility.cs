@@ -39,9 +39,7 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Hardcoded P_mean related parameter types
         /// </summary>
-        public static readonly string[] RequiredParameters = { "redundancy", "P_stby", "P_on", "P_duty_cyc", "P_mean" };
-
-        public static readonly string[] RequiredParametersWithCompound = { "redundancy.scheme", "redundancy.type", "redundancy.k", "redundancy.n", "P_stby", "P_on", "P_duty_cyc", "P_mean" };
+        private static readonly string[] RequiredParameters = { "redundancy", "P_stby", "P_on", "P_duty_cyc", "P_mean" };
 
         private const string RedundancySchemeHot = "Hot";
 
@@ -89,12 +87,11 @@ namespace CDP4CrossViewEditor.Generator
                 return false;
             }
 
-            if (pDutyCycle.IsOptionDependent && pMean.IsOptionDependent)
+            if (pDutyCycle.IsOptionDependent &&
+                pMean.IsOptionDependent &&
+                pDutyCycle.ValueSets.Select(vs => vs.ActualOption).Except(pMean.ValueSets.Select(vs => vs.ActualOption)).Any())
             {
-                if (pDutyCycle.ValueSets.Select(vs => vs.ActualOption).Except(pMean.ValueSets.Select(vs => vs.ActualOption)).Any())
-                {
-                    return true;
-                }
+                return true;
             }
 
             // Check if P_duty_cyc && P_mean have the same state dependency, both should be

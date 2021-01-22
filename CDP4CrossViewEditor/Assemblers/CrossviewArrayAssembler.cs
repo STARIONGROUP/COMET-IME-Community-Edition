@@ -592,7 +592,7 @@ namespace CDP4CrossViewEditor.Assemblers
                 actualFiniteStateShortName) = headerColumn;
 
             return this.headerDictionary
-                    [parameterTypeShortName]
+                [parameterTypeShortName]
                 [parameterTypeComponentShortName]
                 [measurementScaleShortName]
                 [optionShortName]
