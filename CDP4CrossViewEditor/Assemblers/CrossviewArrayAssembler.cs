@@ -60,7 +60,7 @@ namespace CDP4CrossViewEditor.Assemblers
 
         /// <summary>
         /// The header structure mapping parameter layer short names to indices:
-        /// ParameterType -> ParameterTypeComponent -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState -> (index, value)
+        /// ParameterType -> ParameterTypeComponent -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState -> index
         /// </summary>
         internal readonly
             Dictionary<string,
@@ -69,14 +69,14 @@ namespace CDP4CrossViewEditor.Assemblers
                         SortedDictionary<string,
                             SortedDictionary<string,
                                 SortedDictionary<string,
-                                    (int, string)>>>>>> headerDictionary
+                                    int>>>>>> headerDictionary
             = new Dictionary<string,
                 SortedDictionary<string,
                     SortedDictionary<string,
                         SortedDictionary<string,
                             SortedDictionary<string,
                                 SortedDictionary<string,
-                                    (int, string)>>>>>>();
+                                    int>>>>>>();
 
         /// <summary>
         /// Gets the array that contains the parameter sheet information
@@ -227,10 +227,10 @@ namespace CDP4CrossViewEditor.Assemblers
                 }
             }
 
-            //foreach (var headerColumn in this.GetHeaderColumns())
-            //{
-            //    this.SetContentColumnIndex(headerColumn, (this.numberOfColumns++, null));
-            //}
+            foreach (var headerColumn in this.GetHeaderColumns())
+            {
+                this.SetContentColumnIndex(headerColumn, this.numberOfColumns++);
+            }
         }
 
         /// <summary>
@@ -357,8 +357,12 @@ namespace CDP4CrossViewEditor.Assemblers
                         contentRow[index] = parameterValueSetBase.ActualValue.First();
                         namesRow[index] = parameterValueSetBase.ModelCode();
 
-                        if (isCalculationPossible &&
-                            CrossviewSheetPMeanUtility.IsRequiredParameter(parameterOrOverrideBase.ParameterType.ShortName))
+                        if (!isCalculationPossible)
+                        {
+                            continue;
+                        }
+
+                        if (CrossviewSheetPMeanUtility.IsRequiredParameter(parameterOrOverrideBase.ParameterType.ShortName))
                         {
                             calculationParameters.Add((parameterValueSetBase, null));
                         }
@@ -371,10 +375,24 @@ namespace CDP4CrossViewEditor.Assemblers
                 return (contentRow, namesRow);
             }
 
-            foreach (var requiredParameter in CrossviewSheetPMeanUtility.RequiredParameters)
+            var pMeanIndexes = this.GetContentColumnIndex(calculationParameters, "P_mean").ToArray();
+            var pDutyCycleIndexes = this.GetContentColumnIndex(calculationParameters, "P_duty_cyc").ToArray();
+            var pRedundancyIndexes = this.GetContentColumnIndex(calculationParameters, "redundancy").ToArray();
+            var pStandbyIndex = this.GetContentColumnIndex(calculationParameters, "P_stby").FirstOrDefault();
+            var pOnIndex = this.GetContentColumnIndex(calculationParameters, "P_on").FirstOrDefault();
+
+            for (var i = 0; i < pDutyCycleIndexes.Count(); i++)
             {
-                var touple = calculationParameters.FirstOrDefault(t => t.Item1.QueryParameterType().ShortName == requiredParameter);
-                var value = this.GetContentColumnValue(touple.Item1, touple.Item2);
+                // P_duty_cyc & P_mean have the same state dependancies and the same options
+                contentRow[pMeanIndexes[i]] = CrossviewSheetPMeanUtility.ComputeCalculation(
+                    contentRow[pStandbyIndex].ToString(),
+                    contentRow[pOnIndex].ToString(),
+                    contentRow[pDutyCycleIndexes[i]].ToString(),
+                    contentRow[pRedundancyIndexes[0]].ToString(),
+                    contentRow[pRedundancyIndexes[1]].ToString(),
+                    contentRow[pRedundancyIndexes[2]].ToString(),
+                    contentRow[pRedundancyIndexes[3]].ToString()
+                );
             }
 
             return (contentRow, namesRow);
@@ -441,7 +459,7 @@ namespace CDP4CrossViewEditor.Assemblers
                             parameterValueSet.ActualOption?.ShortName ?? "",
                             parameter.StateDependence?.ShortName ?? "",
                             parameterValueSet.ActualState?.ShortName ?? ""),
-                            (this.numberOfColumns++, parameterValueSet.ActualValue.FirstOrDefault()));
+                            -1);
                 }
             }
             else
@@ -453,19 +471,21 @@ namespace CDP4CrossViewEditor.Assemblers
                         parameterValueSet.ActualOption?.ShortName ?? "",
                         parameter.StateDependence?.ShortName ?? "",
                         parameterValueSet.ActualState?.ShortName ?? ""),
-                        (this.numberOfColumns++, parameterValueSet.ActualValue.FirstOrDefault()));
+                        -1);
             }
         }
 
         /// <summary>
         /// Sets the column index associated to the given <paramref name="headerColumn"/>
-        /// to the given column <paramref name="headerValueTuple"/>
+        /// to the given column <paramref name="index"/>
         /// </summary>
         /// <param name="headerColumn">
         /// The given <see cref="HeaderColumn"/>
         /// </param>
-        /// <param name="headerValueTuple">The given column index and value</param>
-        private void SetContentColumnIndex(HeaderColumn headerColumn, (int, string) headerValueTuple)
+        /// <param name="index">
+        /// The given column index
+        /// </param>
+        private void SetContentColumnIndex(HeaderColumn headerColumn, int index)
         {
             var (parameterTypeShortName,
                 parameterTypeComponentShortName,
@@ -477,7 +497,7 @@ namespace CDP4CrossViewEditor.Assemblers
             if (!this.headerDictionary.ContainsKey(parameterTypeShortName))
             {
                 this.headerDictionary[parameterTypeShortName]
-                    = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, (int, string)>>>>>();
+                    = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>>>();
             }
 
             var ptcDictionary = this.headerDictionary[parameterTypeShortName];
@@ -485,7 +505,7 @@ namespace CDP4CrossViewEditor.Assemblers
             if (!ptcDictionary.ContainsKey(parameterTypeComponentShortName))
             {
                 ptcDictionary[parameterTypeComponentShortName]
-                    = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, (int, string)>>>>();
+                    = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>>();
             }
 
             var msDictionary = ptcDictionary[parameterTypeComponentShortName];
@@ -493,7 +513,7 @@ namespace CDP4CrossViewEditor.Assemblers
             if (!msDictionary.ContainsKey(measurementScaleShortName))
             {
                 msDictionary[measurementScaleShortName]
-                    = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, (int, string)>>>();
+                    = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>();
             }
 
             var optionDictionary = msDictionary[measurementScaleShortName];
@@ -501,7 +521,7 @@ namespace CDP4CrossViewEditor.Assemblers
             if (!optionDictionary.ContainsKey(optionShortName))
             {
                 optionDictionary[optionShortName]
-                    = new SortedDictionary<string, SortedDictionary<string, (int, string)>>();
+                    = new SortedDictionary<string, SortedDictionary<string, int>>();
             }
 
             var afslDictionary = optionDictionary[optionShortName];
@@ -509,12 +529,12 @@ namespace CDP4CrossViewEditor.Assemblers
             if (!afslDictionary.ContainsKey(actualFiniteStateListShortName))
             {
                 afslDictionary[actualFiniteStateListShortName]
-                    = new SortedDictionary<string, (int, string)>();
+                    = new SortedDictionary<string, int>();
             }
 
             var afsDictionary = afslDictionary[actualFiniteStateListShortName];
 
-            afsDictionary[actualFiniteStateShortName] = headerValueTuple;
+            afsDictionary[actualFiniteStateShortName] = index;
         }
 
         /// <summary>
@@ -535,57 +555,22 @@ namespace CDP4CrossViewEditor.Assemblers
 
             if (component != null)
             {
-                return this.GetContentColumn((
+                return this.GetContentColumnIndex((
                     parameterOrOverrideBase.ParameterType.ShortName,
                     component.ParameterType.ShortName,
                     component.Scale?.ShortName ?? "",
                     parameterValueSetBase.ActualOption?.ShortName ?? "",
                     parameterOrOverrideBase.StateDependence?.ShortName ?? "",
-                    parameterValueSetBase.ActualState?.ShortName ?? "")).Item1;
+                    parameterValueSetBase.ActualState?.ShortName ?? ""));
             }
 
-            return this.GetContentColumn((
+            return this.GetContentColumnIndex((
                 parameterOrOverrideBase.ParameterType.ShortName,
                 "",
                 parameterOrOverrideBase.Scale?.ShortName ?? "",
                 parameterValueSetBase.ActualOption?.ShortName ?? "",
                 parameterOrOverrideBase.StateDependence?.ShortName ?? "",
-                parameterValueSetBase.ActualState?.ShortName ?? "")).Item1;
-        }
-
-        /// <summary>
-        /// Gets the column value associated to the given <paramref name="parameterValueSetBase"/>
-        /// </summary>
-        /// <param name="parameterValueSetBase"></param>
-        /// The given <see cref="ParameterValueSetBase"/>
-        /// <param name="component">
-        /// The given <see cref="ParameterTypeComponent"/>
-        /// </param>
-        /// <returns>
-        /// The column value
-        /// </returns>
-        private string GetContentColumnValue(ParameterValueSetBase parameterValueSetBase, ParameterTypeComponent component = null)
-        {
-            var parameterOrOverrideBase = (ParameterOrOverrideBase)parameterValueSetBase.Container;
-
-            if (component != null)
-            {
-                return this.GetContentColumn((
-                    parameterOrOverrideBase.ParameterType.ShortName,
-                    component.ParameterType.ShortName,
-                    component.Scale?.ShortName ?? "",
-                    parameterValueSetBase.ActualOption?.ShortName ?? "",
-                    parameterOrOverrideBase.StateDependence?.ShortName ?? "",
-                    parameterValueSetBase.ActualState?.ShortName ?? "")).Item2;
-            }
-
-            return this.GetContentColumn((
-                parameterOrOverrideBase.ParameterType.ShortName,
-                "",
-                parameterOrOverrideBase.Scale?.ShortName ?? "",
-                parameterValueSetBase.ActualOption?.ShortName ?? "",
-                parameterOrOverrideBase.StateDependence?.ShortName ?? "",
-                parameterValueSetBase.ActualState?.ShortName ?? "")).Item2;
+                parameterValueSetBase.ActualState?.ShortName ?? ""));
         }
 
         /// <summary>
@@ -598,25 +583,6 @@ namespace CDP4CrossViewEditor.Assemblers
         /// The column index
         /// </returns>
         private int GetContentColumnIndex(HeaderColumn headerColumn)
-        {
-            return this.GetContentColumn(headerColumn).Item1;
-        }
-
-        /// <summary>
-        /// Gets the column value associated to the given <paramref name="headerColumn"/>
-        /// </summary>
-        /// <param name="headerColumn">
-        /// The given <see cref="HeaderColumn"/>
-        /// </param>
-        /// <returns>
-        /// The column value
-        /// </returns>
-        private string GetContentColumnValue(HeaderColumn headerColumn)
-        {
-            return this.GetContentColumn(headerColumn).Item2;
-        }
-
-        private (int, string) GetContentColumn(HeaderColumn headerColumn)
         {
             var (parameterTypeShortName,
                 parameterTypeComponentShortName,
@@ -632,6 +598,35 @@ namespace CDP4CrossViewEditor.Assemblers
                 [optionShortName]
                 [actualFiniteStateListShortName]
                 [actualFiniteStateShortName];
+        }
+
+        /// <summary>
+        /// Gets the column index associated to the given <paramref name="parameterName"/>
+        /// </summary>
+        /// <param name="parameterTuples">
+        /// The given parameter tuples to search into it
+        /// </param>
+        /// <param name="parameterName">
+        /// The given parameterName
+        /// </param>
+        /// <returns>
+        /// The excel column index for specific
+        /// ParameterType -> ParameterTypeComponent -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState
+        /// </returns>
+        private IEnumerable<int> GetContentColumnIndex(
+            IEnumerable<(ParameterValueSetBase, ParameterTypeComponent)> parameterTuples,
+            string parameterName)
+        {
+            var indexList = new List<int>();
+
+            var contentList = parameterTuples.Where(t => t.Item1.QueryParameterType().ShortName == parameterName).ToList();
+
+            foreach (var (pvs, ptc) in contentList)
+            {
+                indexList.Add(this.GetContentColumnIndex(pvs, ptc));
+            }
+
+            return indexList;
         }
 
         /// <summary>

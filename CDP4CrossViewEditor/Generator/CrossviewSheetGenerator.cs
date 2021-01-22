@@ -388,8 +388,8 @@ namespace CDP4CrossViewEditor.Generator
                             {
                                 var afsDictionary = afslDictionary[actualFiniteStateListShortName];
 
-                                var minAfsl = afsDictionary.Values.Select(it => it.Item1).Min();
-                                var maxAfsl = afsDictionary.Values.Select(it => it.Item1).Max();
+                                var minAfsl = afsDictionary.Values.Select(it => it).Min();
+                                var maxAfsl = afsDictionary.Values.Select(it => it).Max();
 
                                 minO = Math.Min(minO, minAfsl);
                                 maxO = Math.Max(maxO, maxAfsl);
