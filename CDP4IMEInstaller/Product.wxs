@@ -69,6 +69,10 @@
       <ComponentGroupRef Id="CDP4CROSSVIEWEDITOR_CG" />
     </Feature>
 
+    <Feature Id="CDP4REFERENCEDATAMAPPER" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Reference Data Mapper Plugin" Level="1" >
+      <ComponentGroupRef Id="CDP4REFERENCEDATAMAPPER_CG" />
+    </Feature>
+
     <Feature Id="PARAMETERSHEETGENERATOR" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Parameter Sheet Generator Plugin" Level="1" >
       <ComponentGroupRef Id="PARAMETERSHEETGENERATOR_CG" />
     </Feature>
