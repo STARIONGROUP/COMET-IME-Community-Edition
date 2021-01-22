@@ -10,8 +10,8 @@
     <Product>CDP4CrossViewEditor</Product>
     <Description>CDP4 Excel Addin CrossView Editor</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>7.0.0.7</AssemblyVersion>
-    <FileVersion>7.0.0.7</FileVersion>
+    <AssemblyVersion>7.0.0.8</AssemblyVersion>
+    <FileVersion>7.0.0.8</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
