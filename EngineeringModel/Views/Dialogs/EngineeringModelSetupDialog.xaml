@@ -120,7 +120,7 @@
                         </dxe:ListBoxEdit>
                     </lc:LayoutItem>
                 </lc:LayoutGroup>
-                <lc:LayoutGroup Header="Organizations" Orientation="Vertical">
+                <lc:LayoutGroup Header="Organizations" Orientation="Vertical" IsEnabled="{Binding IsActiveDomainSelectionReadOnly, Converter={StaticResource NotConverter}}">
                     <lc:LayoutItem Label="Participating Organizations: " >
                         <dxe:ComboBoxEdit Name="OrganizationParticipant"
                                           DisplayMember="Name"

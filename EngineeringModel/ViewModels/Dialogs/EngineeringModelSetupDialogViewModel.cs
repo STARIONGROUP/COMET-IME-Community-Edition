@@ -309,7 +309,7 @@ namespace CDP4EngineeringModel.ViewModels
 
                 foreach (var organization in deletedOrgs)
                 {
-                    var participantion = this.Thing.OrganizationalParticipant.FirstOrDefault(p => p.Organization.Equals(organization));
+                    var participantion = this.Thing.OrganizationalParticipant.FirstOrDefault(p => p.Organization.Equals(organization))?.Clone(false);
 
                     if (participantion != null)
                     {

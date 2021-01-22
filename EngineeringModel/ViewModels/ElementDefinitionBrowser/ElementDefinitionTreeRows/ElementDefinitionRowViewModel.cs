@@ -48,8 +48,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="currentDomain">The active <see cref="DomainOfExpertise"/></param>
         /// <param name="session">The associated <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container view-model</param>
-        public ElementDefinitionRowViewModel(ElementDefinition elementDefinition, DomainOfExpertise currentDomain, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(elementDefinition, currentDomain, session, containerViewModel)
+        /// <param name="obfuscationService">The obfuscation service</param>
+        public ElementDefinitionRowViewModel(ElementDefinition elementDefinition, DomainOfExpertise currentDomain, ISession session, IViewModelBase<Thing> containerViewModel,
+            IObfuscationService obfuscationService)
+            : base(elementDefinition, currentDomain, session, containerViewModel, obfuscationService)
         {
             this.UpdateProperties();
         }
@@ -269,7 +271,7 @@ namespace CDP4EngineeringModel.ViewModels
             var addedUsages = this.Thing.ContainedElement.Except(currentUsages).ToList();
             foreach (var elementUsage in addedUsages)
             {
-                var row = new ElementUsageRowViewModel(elementUsage, this.currentDomain, this.Session, this);
+                var row = new ElementUsageRowViewModel(elementUsage, this.currentDomain, this.Session, this, this.ObfuscationService);
                 this.ContainedRows.SortedInsert(row, ChildRowComparer);
             }
         }
