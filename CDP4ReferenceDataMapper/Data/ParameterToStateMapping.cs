@@ -1,0 +1,103 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ParameterToStateMapping.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace CDP4ReferenceDataMapper.Data
+{
+    using System;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
+    using Newtonsoft.Json;
+
+    /// <summary>
+    /// Class that is used for (de)serialization of <see cref="Parameter"/> to <see cref="ActualFiniteState"/> mapping.
+    /// </summary>
+    public class ParameterToStateMapping
+    {
+        /// <summary>
+        /// Gets or sets the <see cref="ParameterType.Iid"/> 
+        /// </summary>
+        public Guid ParameterTypeIid { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ParameterType.Name"/> 
+        /// </summary>
+        public string ParameterTypeName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ParameterType.ShortName"/> 
+        /// </summary>
+        public string ParameterTypeShortName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ActualFiniteState.Iid"/> 
+        /// </summary>
+        public Guid ActualFiniteStateIid { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ActualFiniteState.Name"/> 
+        /// </summary>
+        public string ActualFiniteStateName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ActualFiniteState.ShortName"/> 
+        /// </summary>
+        public string ActualFiniteStateShortName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Parameter"/> value that was mapped
+        /// </summary>
+        public string Value { get; set; }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="ParameterToStateMapping"/> class
+        /// </summary>
+        [JsonConstructor]
+        public ParameterToStateMapping()
+        {
+            // Intentionally empty, because of JSON deserialization
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="ParameterToStateMapping"/> class
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="parameterType">The <see cref="ParameterType"/> that was mapped</param>
+        /// <param name="actualFiniteState">The <see cref="ActualFiniteState"/></param>
+        public ParameterToStateMapping(string value, ParameterType parameterType, ActualFiniteState actualFiniteState)
+        {
+            this.ParameterTypeIid = parameterType.Iid;
+            this.ParameterTypeName = parameterType.Name;
+            this.ParameterTypeShortName = parameterType.ShortName;
+
+            this.ActualFiniteStateIid = actualFiniteState.Iid;
+            this.ActualFiniteStateShortName = actualFiniteState.ShortName;
+            this.ActualFiniteStateName = actualFiniteState.Name;
+
+            this.Value = value;
+        }
+    }
+}

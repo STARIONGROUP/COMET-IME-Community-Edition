@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
+  <Fragment>
+    <ComponentGroup Id="CDP4REFERENCEDATAMAPPER_CG" Directory="REFERENCEDATAMAPPER">
+      
+      <Component Id="comp_CDP4ReferenceDataMapper" Guid="{918076FA-9B77-4679-B91E-0BD442E2F111}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4ReferenceDataMapper"  Vital="yes" Source="$(var.CDP4ReferenceDataMapper.TargetPath)" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Manifest_CDP4ReferenceDataMapper" Guid="{2902597A-9535-4D57-B47F-8669E4607760}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4ReferenceDataMapper"  Vital="yes" Source="$(var.CDP4ReferenceDataMapper.TargetDir)CDP4ReferenceDataMapper.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
+    </ComponentGroup>
+  </Fragment>
+</Wix>

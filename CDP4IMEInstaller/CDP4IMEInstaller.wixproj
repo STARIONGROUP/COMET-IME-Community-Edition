@@ -57,6 +57,7 @@
     <Compile Include="CDP4Reporting.wxs" />
     <Compile Include="CDP4Grapher.wxs" />
     <Compile Include="CDP4CrossViewEditor.wxs" />
+    <Compile Include="CDP4ReferenceDataMapper.wxs" />
     <Compile Include="Dependencies.wxs" />
     <Compile Include="DevExpress.wxs" />
     <Compile Include="EngineeringModelPlugin.wxs" />
@@ -228,6 +229,14 @@
     <ProjectReference Include="..\CDP4PropertyGrid\CDP4PropertyGrid.csproj">
       <Name>CDP4PropertyGrid</Name>
       <Project>{4b9058f7-6acc-4c1e-b1cd-969b04a9cd9c}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4ReferenceDataMapper\CDP4ReferenceDataMapper.csproj">
+      <Name>CDP4ReferenceDataMapper</Name>
+      <Project>{fc0997a4-f981-4002-9bdc-bc2ffa6df552}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
