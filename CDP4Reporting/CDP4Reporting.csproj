@@ -45,13 +45,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.0.1" />
-    <PackageReference Include="CDP4Common-CE" Version="6.3.0">
+    <PackageReference Include="CDP4Common-CE" Version="7.2.0-513-PR162">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="7.0.0">
+    <PackageReference Include="CDP4Dal-CE" Version="7.2.0-513-PR162">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.3.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.2.0-513-PR162">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">
