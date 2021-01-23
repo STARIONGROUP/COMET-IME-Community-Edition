@@ -35,6 +35,9 @@ namespace CDP4OfficeInfrastructure.OfficeDal
 
     using NetOffice.ExcelApi;
 
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// The purpose of the <see cref="CrossviewWorkbookData"/> class is to store session data in a <see cref="Workbook"/>
     /// as a custom XML part, and retrieve it from the workbook.
@@ -42,11 +45,6 @@ namespace CDP4OfficeInfrastructure.OfficeDal
     [XmlRoot("CDP4CrossviewData", Namespace = "http://cdp4crossviewdata.rheagroup.com")]
     public class CrossviewWorkbookData : CustomOfficeData
     {
-        /// <summary>
-        /// Cell names/values separator
-        /// </summary>
-        private const string CellSeparator = "|";
-
         /// <summary>
         /// Backing field for the <see cref="SelectedElementDefinitions"/> property.
         /// </summary>
@@ -148,8 +146,9 @@ namespace CDP4OfficeInfrastructure.OfficeDal
             get
             {
                 var result = new Dictionary<string, string>();
-                var names = this.CellNames.Value.Split('|');
-                var values = this.CellValues.Value.Split('|');
+
+                var names = ((JArray) JsonConvert.DeserializeObject(this.CellNames.Value)).Select(jt => (string) jt).ToArray();
+                var values = ((JArray) JsonConvert.DeserializeObject(this.CellValues.Value)).Select(jt => (string) jt).ToArray();
 
                 for (var i = 0; i < names.Length; i++)
                 {
@@ -190,9 +189,9 @@ namespace CDP4OfficeInfrastructure.OfficeDal
             var preservedTypes = parameterTypes.Select(parameterType => parameterType.ToDto() as ParameterType).ToList();
             this.selectedParameterTypes = this.GenerateStringFromList(preservedTypes);
 
-            this.cellNames = string.Join(CellSeparator, manuallySavedValues.Keys.ToArray());
+            this.cellNames = this.GenerateStringFromList(manuallySavedValues.Keys.ToList());
 
-            this.cellValues = string.Join(CellSeparator, manuallySavedValues.Values.ToArray());
+            this.cellValues = this.GenerateStringFromList(manuallySavedValues.Values.ToList());
         }
 
         /// <summary>
