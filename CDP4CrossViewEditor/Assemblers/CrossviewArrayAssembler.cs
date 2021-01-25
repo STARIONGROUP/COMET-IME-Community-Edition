@@ -339,14 +339,14 @@ namespace CDP4CrossViewEditor.Assemblers
 
                             var index = this.GetContentColumnIndex(parameterValueSetBase, component);
                             contentRow[index] = value;
-                            namesRow[index] = parameterValueSetBase.ModelCode(i);
+                            namesRow[index] = $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode(i)}";
                         }
                     }
                     else
                     {
                         var index = this.GetContentColumnIndex(parameterValueSetBase);
                         contentRow[index] = parameterValueSetBase.ActualValue.First();
-                        namesRow[index] = parameterValueSetBase.ModelCode();
+                        namesRow[index] = $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode()}";
                     }
                 }
             }
