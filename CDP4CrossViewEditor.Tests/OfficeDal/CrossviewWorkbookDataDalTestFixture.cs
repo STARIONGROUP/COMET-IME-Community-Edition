@@ -100,7 +100,9 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
                 this.parameterType
             };
 
-            this.workbookData = new CrossviewWorkbookData(elements, parameterTypes, new Dictionary<string, string>());
+            var manualyValues = new Dictionary<string, string> { { parameterTypes[0].Iid.ToString(), "1" } };
+
+            this.workbookData = new CrossviewWorkbookData(elements, parameterTypes, manualyValues);
         }
 
         private void InstantiateThings()
@@ -184,12 +186,16 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
         {
             Assert.AreEqual(1, this.workbookData.ManuallySavedElementDefinitionValues.Count());
             Assert.AreEqual(1, this.workbookData.ManuallySavedParameterValues.Count());
+            Assert.AreEqual(1, this.workbookData.ManuallySavedValues.Keys.Count);
 
             Assert.IsTrue(this.workbookData.ManuallySavedElementDefinitionValues.FirstOrDefault() is CDP4Common.DTO.ElementDefinition);
             Assert.IsTrue(this.workbookData.ManuallySavedParameterValues.FirstOrDefault() is CDP4Common.DTO.ParameterType);
 
             Assert.AreEqual(this.elementDefinition.Name, (this.workbookData.ManuallySavedElementDefinitionValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
             Assert.AreEqual(this.parameterType.Name, (this.workbookData.ManuallySavedParameterValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
+
+            Assert.NotNull(this.workbookData.ManuallySavedValues.Keys.FirstOrDefault());
+            Assert.AreEqual(this.workbookData.ManuallySavedValues.Keys.FirstOrDefault(), this.parameterType.Iid.ToString());
         }
 
         [Test]

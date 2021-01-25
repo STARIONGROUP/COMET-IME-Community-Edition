@@ -88,11 +88,6 @@ namespace CDP4CrossViewEditor.Generator
         private CrossviewHeaderArrayAssembler headerArrayAssembler;
 
         /// <summary>
-        /// The <see cref="CrossviewSheetRowAssembler"/>
-        /// </summary>
-        private CrossviewSheetRowAssembler sheetRowAssembler;
-
-        /// <summary>
         /// Gets the <see cref="ISession"/> that is active
         /// </summary>
         private readonly ISession session;
@@ -204,9 +199,9 @@ namespace CDP4CrossViewEditor.Generator
         private void PopulateSheetArrays(IEnumerable<ElementDefinition> elementDefinitions, IEnumerable<ParameterType> parameterTypes)
         {
             // Instantiate the different rows
-            this.sheetRowAssembler = new CrossviewSheetRowAssembler();
-            this.sheetRowAssembler.Assemble(elementDefinitions);
-            var excelRows = this.sheetRowAssembler.ExcelRows;
+            var sheetRowAssembler = new CrossviewSheetRowAssembler();
+            sheetRowAssembler.Assemble(elementDefinitions);
+            var excelRows = sheetRowAssembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
             this.crossviewArrayAssember = new CrossviewArrayAssembler(excelRows, parameterTypes);

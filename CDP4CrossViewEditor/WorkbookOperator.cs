@@ -95,11 +95,6 @@ namespace CDP4CrossViewEditor
         private readonly Application application;
 
         /// <summary>
-        /// The <see cref="CrossviewSheetGenerator"/> that is being used by the current <see cref="WorkbookOperator"/>
-        /// </summary>
-        private CrossviewSheetGenerator crossviewSheetGenerator;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="WorkbookOperator"/> class.
         /// </summary>
         /// <param name="application">
@@ -210,8 +205,8 @@ namespace CDP4CrossViewEditor
         /// </param>
         private void WriteCrossviewSheet(ISession session, Iteration iteration, Participant participant)
         {
-            this.crossviewSheetGenerator = new CrossviewSheetGenerator(session, iteration, participant);
-            this.crossviewSheetGenerator.Rebuild(this.application, this.workbook, this.workbookMetadata);
+            var crossviewSheetGenerator = new CrossviewSheetGenerator(session, iteration, participant);
+            crossviewSheetGenerator.Rebuild(this.application, this.workbook, this.workbookMetadata);
         }
 
         /// <summary>
