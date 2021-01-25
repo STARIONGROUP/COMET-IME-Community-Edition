@@ -345,7 +345,7 @@ namespace CDP4CrossViewEditor.Assemblers
                             namesRow[index] = $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode(i)}";
 
                             if (isCalculationPossible &&
-                                CrossviewSheetPMeanUtility.IsRequiredParameter(parameterOrOverrideBase.ParameterType.ShortName))
+                                CrossviewSheetPMeanUtility.RequiredParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
                             {
                                 calculationParameters.Add((parameterValueSetBase, component));
                             }
@@ -362,7 +362,7 @@ namespace CDP4CrossViewEditor.Assemblers
                             continue;
                         }
 
-                        if (CrossviewSheetPMeanUtility.IsRequiredParameter(parameterOrOverrideBase.ParameterType.ShortName))
+                        if (CrossviewSheetPMeanUtility.RequiredParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
                         {
                             calculationParameters.Add((parameterValueSetBase, null));
                         }
@@ -375,11 +375,18 @@ namespace CDP4CrossViewEditor.Assemblers
                 return (contentRow, namesRow);
             }
 
-            var pMeanIndexes = this.GetContentColumnIndex(calculationParameters, "P_mean").ToArray();
-            var pDutyCycleIndexes = this.GetContentColumnIndex(calculationParameters, "P_duty_cyc").ToArray();
-            var pRedundancyIndexes = this.GetContentColumnIndex(calculationParameters, "redundancy").ToArray();
-            var pStandbyIndex = this.GetContentColumnIndex(calculationParameters, "P_stby").FirstOrDefault();
-            var pOnIndex = this.GetContentColumnIndex(calculationParameters, "P_on").FirstOrDefault();
+            var indexes = CrossviewSheetPMeanUtility.RequiredParameters.Select(p => this.GetContentColumnsIndexes(calculationParameters, p)).SelectMany(x => x).ToList();
+
+            var rSchemeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.scheme")).Item2;
+            var rTypeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.type")).Item2;
+            var rKIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.k")).Item2;
+            var rNIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.n")).Item2;
+
+            var pOnIndex = indexes.FirstOrDefault(p => p.Item1.Equals("P_on")).Item2;
+            var pStandbyIndex = indexes.FirstOrDefault(p => p.Item1.Equals("P_stby")).Item2;
+
+            var pDutyCycleIndexes = indexes.Where(p => p.Item1.Equals("P_duty_cyc")).ToArray();
+            var pMeanIndexes = indexes.Where(p => p.Item1.Equals("P_mean")).ToArray();
 
             if (pMeanIndexes.Length != pDutyCycleIndexes.Length)
             {
@@ -389,14 +396,14 @@ namespace CDP4CrossViewEditor.Assemblers
 
             for (var i = 0; i < pDutyCycleIndexes.Count(); i++)
             {
-                contentRow[pMeanIndexes[i]] = CrossviewSheetPMeanUtility.ComputeCalculation(
+                contentRow[pMeanIndexes[i].Item2] = CrossviewSheetPMeanUtility.ComputeCalculation(
                     contentRow[pStandbyIndex].ToString(),
                     contentRow[pOnIndex].ToString(),
-                    contentRow[pDutyCycleIndexes[i]].ToString(),
-                    contentRow[pRedundancyIndexes[0]].ToString(),
-                    contentRow[pRedundancyIndexes[1]].ToString(),
-                    contentRow[pRedundancyIndexes[2]].ToString(),
-                    contentRow[pRedundancyIndexes[3]].ToString()
+                    contentRow[pDutyCycleIndexes[i].Item2].ToString(),
+                    contentRow[rSchemeIndex].ToString(),
+                    contentRow[rTypeIndex].ToString(),
+                    contentRow[rKIndex].ToString(),
+                    contentRow[rNIndex].ToString()
                 );
             }
 
@@ -464,7 +471,7 @@ namespace CDP4CrossViewEditor.Assemblers
                             parameterValueSet.ActualOption?.ShortName ?? "",
                             parameter.StateDependence?.ShortName ?? "",
                             parameterValueSet.ActualState?.ShortName ?? ""),
-                            -1);
+                        -1);
                 }
             }
             else
@@ -609,26 +616,27 @@ namespace CDP4CrossViewEditor.Assemblers
         /// Gets the column index associated to the given <paramref name="parameterName"/>
         /// </summary>
         /// <param name="parameterTuples">
-        /// The given parameter tuples to search into it
+        /// The given parameter tuples(<see cref="ParameterValueSetBase"/>, <see cref="ParameterTypeComponent"/>) to search into it
         /// </param>
         /// <param name="parameterName">
         /// The given parameterName
         /// </param>
         /// <returns>
-        /// The excel column index for specific
-        /// ParameterType -> ParameterTypeComponent -> MeasurementScale -> Option -> ActualFiniteStateList -> ActualFiniteState
+        /// The excel column name and index list for specific parameter type
         /// </returns>
-        private IEnumerable<int> GetContentColumnIndex(
+        private IEnumerable<(string, int)> GetContentColumnsIndexes(
             IEnumerable<(ParameterValueSetBase, ParameterTypeComponent)> parameterTuples,
             string parameterName)
         {
-            var indexList = new List<int>();
+            var indexList = new List<(string, int)>();
 
             var contentList = parameterTuples.Where(t => t.Item1.QueryParameterType().ShortName == parameterName).ToList();
 
             foreach (var (pvs, ptc) in contentList)
             {
-                indexList.Add(this.GetContentColumnIndex(pvs, ptc));
+                var key = ptc == null ? pvs.QueryParameterType().ShortName : $"{pvs.QueryParameterType().ShortName}.{ptc.ShortName}";
+                var index = this.GetContentColumnIndex(pvs, ptc);
+                indexList.Add((key, index));
             }
 
             return indexList;

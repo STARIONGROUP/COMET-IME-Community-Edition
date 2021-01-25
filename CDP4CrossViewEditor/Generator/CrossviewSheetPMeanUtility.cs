@@ -39,25 +39,29 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Hardcoded P_mean related parameter types
         /// </summary>
-        private static readonly string[] RequiredParameters = { "redundancy", "P_stby", "P_on", "P_duty_cyc", "P_mean" };
+        public static readonly string[] RequiredParameters = { "redundancy", "P_stby", "P_on", "P_duty_cyc", "P_mean" };
 
-        private const string RedundancySchemeHot = "Hot";
+        /// <summary>
+        /// Hardcoded redundancy.scheme
+        /// NOTE: not sure about this value
+        /// </summary>
+        private const string RedundancySchemeHot = "Active";
 
-        private const string RedundancySchemeCold = "Cold";
+        /// <summary>
+        /// Hardcoded redundancy.scheme
+        /// NOTE: not sure about this value
+        /// </summary>
+        private const string RedundancySchemeCold = "Passive";
 
+        /// <summary>
+        /// Hardcoded redundancy.type
+        /// </summary>
         private const string RedundancyTypeInternal = "Internal";
 
+        /// <summary>
+        /// Hardcoded redundancy.type
+        /// </summary>
         private const string RedundancyTypeExternal = "External";
-
-        public static bool IsRequiredParameter(string parameterName)
-        {
-            return RequiredParameters.Contains(parameterName);
-        }
-
-        public static bool IsPMean(string parameterName)
-        {
-            return parameterName.Equals("P_mean");
-        }
 
         /// <summary>
         /// Check if P_mean parameter calculation is possible
@@ -95,6 +99,11 @@ namespace CDP4CrossViewEditor.Generator
             }
 
             // Check if P_duty_cyc && P_mean have the same state dependency, both should be
+
+            if (pDutyCycle.StateDependence == null || pMean.StateDependence == null)
+            {
+                return false;
+            }
 
             if (pDutyCycle.StateDependence.ActualState.Count == 0 || pMean.StateDependence.ActualState.Count == 0)
             {
