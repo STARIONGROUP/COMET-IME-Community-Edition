@@ -326,7 +326,7 @@ namespace CDP4CrossViewEditor.Assemblers
                     return (contentRow, namesRow);
             }
 
-            var isCalculationPossible = CrossviewSheetPMeanUtility.IsCalculationPossible(parameters.Where(p => p != null).ToList());
+            var isCalculationPossible = CrossviewSheetPMeanUtilities.IsCalculationPossible(parameters.Where(p => p != null).ToList());
             var calculationParameters = new List<(ParameterValueSetBase, ParameterTypeComponent)>();
 
             foreach (var parameterOrOverrideBase in parameters.Where(p => p != null))
@@ -345,7 +345,7 @@ namespace CDP4CrossViewEditor.Assemblers
                             namesRow[index] = $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode(i)}";
 
                             if (isCalculationPossible &&
-                                CrossviewSheetPMeanUtility.RequiredParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
+                                CrossviewSheetConstants.PowerParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
                             {
                                 calculationParameters.Add((parameterValueSetBase, component));
                             }
@@ -362,7 +362,7 @@ namespace CDP4CrossViewEditor.Assemblers
                             continue;
                         }
 
-                        if (CrossviewSheetPMeanUtility.RequiredParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
+                        if (CrossviewSheetConstants.PowerParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
                         {
                             calculationParameters.Add((parameterValueSetBase, null));
                         }
@@ -375,7 +375,7 @@ namespace CDP4CrossViewEditor.Assemblers
                 return (contentRow, namesRow);
             }
 
-            var indexes = CrossviewSheetPMeanUtility.RequiredParameters.Select(p => this.GetContentColumnsIndexes(calculationParameters, p)).SelectMany(x => x).ToList();
+            var indexes = CrossviewSheetConstants.PowerParameters.Select(p => this.GetContentColumnsIndexes(calculationParameters, p)).SelectMany(x => x).ToList();
 
             var rSchemeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.scheme")).Item2;
             var rTypeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.type")).Item2;
@@ -396,7 +396,7 @@ namespace CDP4CrossViewEditor.Assemblers
 
             for (var i = 0; i < pDutyCycleIndexes.Count(); i++)
             {
-                contentRow[pMeanIndexes[i].Item2] = CrossviewSheetPMeanUtility.ComputeCalculation(
+                contentRow[pMeanIndexes[i].Item2] = CrossviewSheetPMeanUtilities.ComputeCalculation(
                     contentRow[pStandbyIndex].ToString(),
                     contentRow[pOnIndex].ToString(),
                     contentRow[pDutyCycleIndexes[i].Item2].ToString(),

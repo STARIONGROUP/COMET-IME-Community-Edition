@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CrossviewSheetPMeanUtility.cs" company="RHEA System S.A.">
+// <copyright file="CrossviewSheetPMeanUtilities.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -34,13 +34,8 @@ namespace CDP4CrossViewEditor.Generator
     /// <summary>
     /// Helper class that is required for computing value of P_mean parameter
     /// </summary>
-    internal static class CrossviewSheetPMeanUtility
+    internal static class CrossviewSheetPMeanUtilities
     {
-        /// <summary>
-        /// Hardcoded P_mean related parameter types
-        /// </summary>
-        public static readonly string[] RequiredParameters = { "redundancy", "P_stby", "P_on", "P_duty_cyc", "P_mean" };
-
         /// <summary>
         /// Hardcoded redundancy.scheme
         /// NOTE: not sure about this value
@@ -71,7 +66,7 @@ namespace CDP4CrossViewEditor.Generator
         public static bool IsCalculationPossible(List<ParameterOrOverrideBase> parameters)
         {
             // Check if all power required parameters are present
-            if (RequiredParameters.Except(parameters.Select(p => p.ParameterType.ShortName)).Any())
+            if (CrossviewSheetConstants.PowerParameters.Except(new[] { "P_peak" }).Except(parameters.Select(p => p.ParameterType.ShortName)).Any())
             {
                 return false;
             }

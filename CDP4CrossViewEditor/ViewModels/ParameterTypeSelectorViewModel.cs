@@ -32,6 +32,7 @@ namespace CDP4CrossViewEditor.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels;
 
     using CDP4Dal;
@@ -43,11 +44,6 @@ namespace CDP4CrossViewEditor.ViewModels
     /// </summary>
     public sealed class ParameterTypeSelectorViewModel : ThingSelectorViewModel
     {
-        /// <summary>
-        /// Hardcoded power related parameter type short names list
-        /// </summary>
-        private static readonly string[] PowerParameters = { "redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
-
         /// <summary>
         /// Backing field for <see cref="PowerParametersEnabled"/>
         /// </summary>
@@ -205,8 +201,9 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToTarget()
         {
-            var powerParameterTypes = this.ParameterTypeSourceList
-                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
+            var powerParameterTypes = CrossviewSheetConstants.PowerParameters
+                .Select(p => this.ParameterTypeSourceList.FirstOrDefault(row => row.Thing.ShortName == p))
+                .Where(powerParameterTypeRowViewModels => powerParameterTypeRowViewModels != null).ToList();
 
             this.SelectedSourceList.Clear();
             this.SelectedSourceList.AddRange(powerParameterTypes);
@@ -220,7 +217,7 @@ namespace CDP4CrossViewEditor.ViewModels
         private void ExecuteMovePowerToSource()
         {
             var powerParameterTypes = this.ParameterTypeTargetList
-                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
+                .Where(row => CrossviewSheetConstants.PowerParameters.Contains(row.Thing.ShortName));
 
             this.SelectedTargetList.Clear();
             this.SelectedTargetList.AddRange(powerParameterTypes);
