@@ -62,13 +62,15 @@ namespace CDP4CrossViewEditor.ViewModels
             Workbook workbook,
             IEnumerable<ElementDefinition> manuallySavedElementsDefinitionValues,
             IEnumerable<ParameterType> manuallySavedParameterTypesValues,
-            Dictionary<string, string> manuallySavedChangedValues)
+            Dictionary<string, string> manuallySavedChangedValues,
+            bool persistValues)
             : base(res)
         {
             this.Workbook = workbook;
             this.WorkbookElements = manuallySavedElementsDefinitionValues;
             this.WorkbookParameterType = manuallySavedParameterTypesValues;
             this.WorkbookChangedValues = manuallySavedChangedValues;
+            this.PersistValues = persistValues;
         }
 
         /// <summary>
@@ -90,5 +92,10 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Get or sets workbook manually edited data values
         /// </summary>
         public Dictionary<string, string> WorkbookChangedValues { get; private set; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public bool PersistValues { get; private set; }
     }
 }

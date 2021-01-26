@@ -9,7 +9,7 @@
              xmlns:uc="clr-namespace:CDP4CrossViewEditor.Views.UserControls"
              Title="{Binding DialogTitle}"
              Width="700"
-             Height="600"
+             Height="620"
              dx:ThemeManager.ThemeName="Seven"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              DataContextChanged="DXWindow_DataContextChanged"
@@ -21,12 +21,19 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <uc:ElementThingSelector Grid.Row="0" Mode="ElementBase" VerticalAlignment="Stretch" x:Name="ElementThingSelector" />
-            <uc:ParameterThingSelector Grid.Row="1" Mode="ParameterBase" VerticalAlignment="Stretch" x:Name="ParameterThingSelector" />
+            <dxlc:LayoutControl View="Group"
+                        Orientation="Horizontal">
+                <CheckBox Grid.Row="0" Content="Persist manually entered values in the sheet"
+                      HorizontalAlignment="Left"
+                      IsChecked="{Binding Path=PersistValues, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </dxlc:LayoutControl>
+            <uc:ElementThingSelector Grid.Row="1" Mode="ElementBase" VerticalAlignment="Stretch" x:Name="ElementThingSelector" />
+            <uc:ParameterThingSelector Grid.Row="2" Mode="ParameterBase" VerticalAlignment="Stretch" x:Name="ParameterThingSelector" />
         </Grid>
         <dxlc:LayoutGroup Orientation="Horizontal">
             <Button MinWidth="75"
