@@ -196,8 +196,13 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void InitModels()
         {
-            var workbookDataDal = new CrossviewWorkbookDataDal(this.SelectedWorkbook?.Workbook);
-            var preservedData = workbookDataDal.Read();
+            CrossviewWorkbookData preservedData = null;
+
+            if (this.SelectedWorkbook?.Workbook != null)
+            {
+                var workbookDataDal = new CrossviewWorkbookDataDal(this.SelectedWorkbook?.Workbook);
+                preservedData = workbookDataDal.Read();
+            }
 
             this.ManuallyFilledValues = preservedData?.ManuallySavedValues ?? new Dictionary<string, string>();
 
