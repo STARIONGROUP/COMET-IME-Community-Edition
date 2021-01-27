@@ -43,33 +43,36 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Initializes a new instance of the <see cref="WorkbookSelectionDialogResult"/> class.
         /// </summary>
         /// <param name="res">
-        /// The result of the dialog
+        /// The result of the dialog.
         /// </param>
         /// <param name="workbook">
         /// The <see cref="Workbook"/> that is the result of a selection.
         /// </param>
-        /// <param name="manuallySavedElementsDefinitionValues">
-        /// Elements that has been selected <see cref="ElementDefinition"/>
+        /// <param name="savedElementsDefinitions">
+        /// Elements that has been selected <see cref="ElementDefinition"/>.
         /// </param>
-        /// <param name="manuallySavedParameterTypesValues">
-        /// Parameter types that has been selected <see cref="ParameterType"/>
+        /// <param name="savedParameterTypes">
+        /// Parameter types that has been selected <see cref="ParameterType"/>.
         /// </param>
-        /// <param name="manuallySavedChangedValues">
-        /// Manually saved parameter sheet values
+        /// <param name="savedChangedValues">
+        /// Manually saved parameter sheet values.
+        /// </param>
+        /// <param name="persistValues">
+        /// Flag that indicate if values should be saved as workbook metadata.
         /// </param>
         public WorkbookSelectionDialogResult(
             bool? res,
             Workbook workbook,
-            IEnumerable<ElementDefinition> manuallySavedElementsDefinitionValues,
-            IEnumerable<ParameterType> manuallySavedParameterTypesValues,
-            Dictionary<string, string> manuallySavedChangedValues,
+            IEnumerable<ElementDefinition> savedElementsDefinitions,
+            IEnumerable<ParameterType> savedParameterTypes,
+            Dictionary<string, string> savedChangedValues,
             bool persistValues)
             : base(res)
         {
             this.Workbook = workbook;
-            this.WorkbookElements = manuallySavedElementsDefinitionValues;
-            this.WorkbookParameterType = manuallySavedParameterTypesValues;
-            this.WorkbookChangedValues = manuallySavedChangedValues;
+            this.WorkbookElements = savedElementsDefinitions;
+            this.WorkbookParameterType = savedParameterTypes;
+            this.WorkbookChangedValues = savedChangedValues;
             this.PersistValues = persistValues;
         }
 

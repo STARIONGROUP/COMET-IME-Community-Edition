@@ -211,18 +211,28 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             parameterTypeSelectorViewModel.BindData();
 
-            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
-
-            parameterTypeSelectorViewModel.PowerParametersEnabled = true;
-
-            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
-            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
-
-            parameterTypeSelectorViewModel.PowerParametersEnabled = false;
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
 
             Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
             Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+
+            parameterTypeSelectorViewModel.SelectedSourceList.Add(parameterTypeSelectorViewModel.ParameterTypeSourceList.FirstOrDefault());
+            parameterTypeSelectorViewModel.ExecuteMoveToTarget();
+
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
+
+            parameterTypeSelectorViewModel.SelectedTargetList.Add(parameterTypeSelectorViewModel.ParameterTypeTargetList.FirstOrDefault());
+            parameterTypeSelectorViewModel.ExecuteMoveToSource();
+
+            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
         }
     }
 }

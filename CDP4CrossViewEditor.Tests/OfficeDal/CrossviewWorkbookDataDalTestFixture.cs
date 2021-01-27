@@ -178,21 +178,21 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
         [Test]
         public void VerifyThatArgumentNotNullExceptionIsThrown()
         {
-            Assert.Throws<ArgumentNullException>(() => { new CrossviewWorkbookDataDal(null); });
+            Assert.Throws<ArgumentNullException>(() => { _ = new CrossviewWorkbookDataDal(null); });
         }
 
         [Test]
         public void VerifyThatUserSelectionIsPreserved()
         {
-            Assert.AreEqual(1, this.workbookData.ManuallySavedElementDefinitionValues.Count());
-            Assert.AreEqual(1, this.workbookData.ManuallySavedParameterValues.Count());
+            Assert.AreEqual(1, this.workbookData.SavedElementDefinitions.Count());
+            Assert.AreEqual(1, this.workbookData.SavedParameterTypes.Count());
             Assert.AreEqual(1, this.workbookData.ManuallySavedValues.Keys.Count);
 
-            Assert.IsTrue(this.workbookData.ManuallySavedElementDefinitionValues.FirstOrDefault() is CDP4Common.DTO.ElementDefinition);
-            Assert.IsTrue(this.workbookData.ManuallySavedParameterValues.FirstOrDefault() is CDP4Common.DTO.ParameterType);
+            Assert.IsTrue(this.workbookData.SavedElementDefinitions.FirstOrDefault() is CDP4Common.DTO.ElementDefinition);
+            Assert.IsTrue(this.workbookData.SavedParameterTypes.FirstOrDefault() is CDP4Common.DTO.ParameterType);
 
-            Assert.AreEqual(this.elementDefinition.Name, (this.workbookData.ManuallySavedElementDefinitionValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
-            Assert.AreEqual(this.parameterType.Name, (this.workbookData.ManuallySavedParameterValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
+            Assert.AreEqual(this.elementDefinition.Name, (this.workbookData.SavedElementDefinitions.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
+            Assert.AreEqual(this.parameterType.Name, (this.workbookData.SavedParameterTypes.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
 
             Assert.NotNull(this.workbookData.ManuallySavedValues.Keys.FirstOrDefault());
             Assert.AreEqual(this.workbookData.ManuallySavedValues.Keys.FirstOrDefault(), this.parameterType.Iid.ToString());
@@ -243,8 +243,8 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
 
                 Assert.NotNull(retrievedSession);
 
-                Assert.IsNotEmpty(retrievedSession.ManuallySavedElementDefinitionValues);
-                Assert.IsNotEmpty(retrievedSession.ManuallySavedParameterValues);
+                Assert.IsNotEmpty(retrievedSession.SavedElementDefinitions);
+                Assert.IsNotEmpty(retrievedSession.SavedParameterTypes);
             }
             finally
             {
