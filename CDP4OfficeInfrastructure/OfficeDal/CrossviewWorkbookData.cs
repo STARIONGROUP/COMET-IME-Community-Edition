@@ -129,13 +129,13 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// Gets the <see cref="IEnumerable{ElementDefinition}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> ManuallySavedElementDefinitionValues => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedElementDefinitions.Value));
+        public IEnumerable<Thing> SavedElementDefinitionValues => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedElementDefinitions.Value));
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{ParameterType}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> ManuallySavedParameterValues => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedParameterTypes.Value));
+        public IEnumerable<Thing> SavedParameterTypeValues => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedParameterTypes.Value));
 
         /// <summary>
         /// Gets or sets a dictionary that contains cell names and cell values that has been modified
@@ -184,7 +184,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
             Dictionary<string, string> manuallySavedValues)
         {
             var preservedDefinitions = elementDefinitions.Select(elementDefinition => elementDefinition.ToDto() as ElementDefinition).ToList();
-            this.selectedElementDefinitions =  this.GenerateStringFromList(preservedDefinitions);
+            this.selectedElementDefinitions = this.GenerateStringFromList(preservedDefinitions);
 
             var preservedTypes = parameterTypes.Select(parameterType => parameterType.ToDto() as ParameterType).ToList();
             this.selectedParameterTypes = this.GenerateStringFromList(preservedTypes);

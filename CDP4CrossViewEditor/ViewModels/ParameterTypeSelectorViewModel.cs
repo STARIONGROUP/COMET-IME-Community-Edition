@@ -88,8 +88,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
         /// <param name="session">Current opened session <see cref="ISession"/></param>
         /// <param name="preservedIids">Current user selection <see cref="List{Guid}"/></param>
-        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids) :
-            base(iteration, session, ClassKind.ParameterType, preservedIids)
+        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids)
+            : base(iteration, session, ClassKind.ParameterType, preservedIids)
         {
             this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>
             {
@@ -219,8 +219,9 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToTarget()
         {
-            var powerParameterTypes = this.ParameterTypeSourceList
-                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
+            var powerParameterTypes = PowerParameters
+                .Select(shortName => this.ParameterTypeSourceList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+                .Where(row => row != null);
 
             this.SelectedSourceList.Clear();
             this.SelectedSourceList.AddRange(powerParameterTypes);
@@ -233,8 +234,9 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToSource()
         {
-            var powerParameterTypes = this.ParameterTypeTargetList
-                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
+            var powerParameterTypes = PowerParameters
+                .Select(shortName => this.ParameterTypeSourceList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+                .Where(row => row != null);
 
             this.SelectedTargetList.Clear();
             this.SelectedTargetList.AddRange(powerParameterTypes);
