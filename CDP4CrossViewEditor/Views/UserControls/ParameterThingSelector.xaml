@@ -59,6 +59,7 @@
                     <StackPanel Margin="0 5 0 0">
                         <dxlc:LayoutItem Label="Power" HorizontalAlignment="Center">
                             <dxe:ToggleSwitch IsChecked="{Binding PowerParametersEnabled, Mode=TwoWay}"
+                                              Command="{Binding Path=PowerParametersCommand}"
                                               ContentPlacement="Both"
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Top" />
