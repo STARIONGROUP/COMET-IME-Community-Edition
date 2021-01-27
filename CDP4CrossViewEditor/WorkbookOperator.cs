@@ -42,8 +42,30 @@ namespace CDP4CrossViewEditor
 
     using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Enums;
+    using NetOffice.Exceptions;
 
     using NLog;
+
+    /// <summary>
+    /// Workbook metadata that will be preserved between two running sessions
+    /// </summary>
+    public struct WorkbookMetadata
+    {
+        /// <summary>
+        /// Element definitions user selection
+        /// </summary>
+        public IEnumerable<ElementDefinition> ElementDefinitions;
+
+        /// <summary>
+        /// Parameter types user selection
+        /// </summary>
+        public IEnumerable<ParameterType> ParameterTypes;
+
+        /// <summary>
+        /// Parameter sheet values changed by the user
+        /// </summary>
+        public Dictionary<string, string> ParameterValues;
+    }
 
     /// <summary>
     /// The purpose of the <see cref="WorkbookOperator"/> is to delegate the operations on a <see cref="Workbook"/>
@@ -63,6 +85,11 @@ namespace CDP4CrossViewEditor
         private readonly Workbook workbook;
 
         /// <summary>
+        /// The <see cref="WorkbookMetadata"/> that is being managed by the current <see cref="WorkbookOperator"/>
+        /// </summary>
+        private readonly WorkbookMetadata workbookMetadata;
+
+        /// <summary>
         /// The excel <see cref="Application"/> that is being managed by the current <see cref="WorkbookOperator"/>
         /// </summary>
         private readonly Application application;
@@ -76,7 +103,10 @@ namespace CDP4CrossViewEditor
         /// <param name="workbook">
         /// The <see cref="Workbook"/> that is being operated on.
         /// </param>
-        public WorkbookOperator(Application application, Workbook workbook)
+        /// <param name="workbookMetadata">
+        /// The <see cref="WorkbookMetadata"/> that was saved.
+        /// </param>
+        public WorkbookOperator(Application application, Workbook workbook, WorkbookMetadata workbookMetadata)
         {
             if (application == null)
             {
@@ -92,12 +122,13 @@ namespace CDP4CrossViewEditor
 
             workbook.Activate();
 
-            this.workbook = workbook;
             this.application = application;
+            this.workbook = workbook;
+            this.workbookMetadata = workbookMetadata;
         }
 
         /// <summary>
-        /// Rebuild the Parameter Sheet
+        /// Rebuild the Crossview Sheet
         /// </summary>
         /// <param name="session">
         /// The current <see cref="ISession"/> that is rebuilding the parameter sheet
@@ -108,11 +139,7 @@ namespace CDP4CrossViewEditor
         /// <param name="participant">
         /// The active <see cref="Participant"/> for which the workbook is being rebuilt.
         /// </param>
-        /// <param name="elementDefinitions"></param>
-        /// <param name="parameterTypes"></param>
-        public async Task Rebuild(ISession session, Iteration iteration, Participant participant,
-            IEnumerable<ElementDefinition> elementDefinitions,
-            IEnumerable<ParameterType> parameterTypes)
+        public async Task Rebuild(ISession session, Iteration iteration, Participant participant)
         {
             this.application.StatusBar = string.Empty;
 
@@ -123,11 +150,11 @@ namespace CDP4CrossViewEditor
 
                 await this.RefreshSessionData(session);
 
-                this.WriteCrossviewSheet(session, iteration, participant, elementDefinitions, parameterTypes);
+                this.WriteCrossviewSheet(session, iteration, participant);
 
                 this.WriteSessionInfoToWorkbook(session, iteration, participant);
 
-                this.WriteWorkbookDataToWorkbook(iteration);
+                this.WriteWorkbookDataToWorkbook();
 
                 this.ActivateCrossviewEditorSheet();
 
@@ -176,14 +203,10 @@ namespace CDP4CrossViewEditor
         /// <param name="participant">
         /// The active <see cref="Participant"/> for which the workbook is being rebuilt.
         /// </param>
-        /// <param name="elementDefinitions"></param>
-        /// <param name="parameterTypes"></param>
-        private void WriteCrossviewSheet(ISession session, Iteration iteration, Participant participant,
-            IEnumerable<ElementDefinition> elementDefinitions,
-            IEnumerable<ParameterType> parameterTypes)
+        private void WriteCrossviewSheet(ISession session, Iteration iteration, Participant participant)
         {
             var crossviewSheetGenerator = new CrossviewSheetGenerator(session, iteration, participant);
-            crossviewSheetGenerator.Rebuild(this.application, this.workbook, elementDefinitions, parameterTypes);
+            crossviewSheetGenerator.Rebuild(this.application, this.workbook, this.workbookMetadata);
         }
 
         /// <summary>
@@ -212,13 +235,10 @@ namespace CDP4CrossViewEditor
         /// <summary>
         /// Write the <see cref="Iteration"/> data to the workbook as a custom XML part
         /// </summary>
-        /// <param name="iteration">
-        /// The <see cref="Iteration"/> that is being stored in the workbook
-        /// </param>
-        private void WriteWorkbookDataToWorkbook(Iteration iteration)
+        private void WriteWorkbookDataToWorkbook()
         {
-            var workbookData = new WorkbookData(iteration);
-            var workbookDataDal = new WorkbookDataDal(this.workbook);
+            var workbookData = new CrossviewWorkbookData(this.workbookMetadata.ElementDefinitions, this.workbookMetadata.ParameterTypes, this.workbookMetadata.ParameterValues);
+            var workbookDataDal = new CrossviewWorkbookDataDal(this.workbook);
             workbookDataDal.Write(workbookData);
         }
 
@@ -231,11 +251,48 @@ namespace CDP4CrossViewEditor
             {
                 var worksheet = (Worksheet)this.workbook.Worksheets[CrossviewSheetConstants.CrossviewSheetName];
                 worksheet.Activate();
+                worksheet.ChangeEvent += this.Worksheet_ChangeEvent;
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
             }
+        }
+
+        /// <summary>
+        /// Store manually filled values on each cell content change
+        /// </summary>
+        /// <param name="target"> Excel target <see cref="Range"/></param>
+        [ExcludeFromCodeCoverage]
+        private void Worksheet_ChangeEvent(Range target)
+        {
+            string cellName = null;
+
+            try
+            {
+                cellName = (target.Name as Name)?.Name;
+            }
+            catch (PropertyGetCOMException ex)
+            {
+                Logger.Error(ex);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(cellName))
+            {
+                return;
+            }
+
+            if (this.workbookMetadata.ParameterValues.ContainsKey(cellName))
+            {
+                this.workbookMetadata.ParameterValues[cellName] = target.Value.ToString();
+            }
+            else
+            {
+                this.workbookMetadata.ParameterValues.Add(cellName, target.Value.ToString());
+            }
+
+            this.WriteWorkbookDataToWorkbook();
         }
     }
 }

@@ -46,7 +46,7 @@ namespace CDP4CrossViewEditor.Generator
     /// <summary>
     /// The purpose of the <see cref="CrossviewSheetGenerator"/> is to generate in Excel
     /// the crossview sheet that contains the selected <see cref="ElementDefinition"/>s, <see cref="ElementUsage"/>s,
-    /// and for each <see cref="ParameterType"/> display the value of the <see cref="Parameter"/> and/or <see cref="ParameterOverride"/>
+    /// and for each <see cref="ParameterType"/> display the value of the <see cref="CDP4Common.EngineeringModelData.Parameter"/> and/or <see cref="ParameterOverride"/>
     /// for the active <see cref="Participant"/>.
     /// </summary>
     [ExcludeFromCodeCoverage]
@@ -120,14 +120,10 @@ namespace CDP4CrossViewEditor.Generator
         /// <param name="workbook">
         /// The current <see cref="Workbook"/> when crossview sheet will be rebuild.
         /// </param>
-        /// <param name="elementDefinitions">
-        /// Selected element definition list
+        /// <param name="workbookMetadata">
+        /// The current <see cref="WorkbookMetadata"/> associated.
         /// </param>
-        /// <param name="parameterTypes">
-        /// Selected parameter types list
-        /// </param>
-        public void Rebuild(Application application, Workbook workbook, IEnumerable<ElementDefinition> elementDefinitions,
-            IEnumerable<ParameterType> parameterTypes)
+        public void Rebuild(Application application, Workbook workbook, WorkbookMetadata workbookMetadata)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -154,8 +150,8 @@ namespace CDP4CrossViewEditor.Generator
 
                 CrossviewSheetUtilities.ApplyLocking(this.crossviewSheet, false);
 
-                this.PopulateSheetArrays(elementDefinitions, parameterTypes);
-                this.WriteSheet();
+                this.PopulateSheetArrays(workbookMetadata.ElementDefinitions, workbookMetadata.ParameterTypes);
+                this.WriteSheet(workbookMetadata.ParameterValues);
                 this.ApplySheetSettings();
 
                 CrossviewSheetUtilities.ApplyLocking(this.crossviewSheet, true);
@@ -203,9 +199,9 @@ namespace CDP4CrossViewEditor.Generator
         private void PopulateSheetArrays(IEnumerable<ElementDefinition> elementDefinitions, IEnumerable<ParameterType> parameterTypes)
         {
             // Instantiate the different rows
-            var assembler = new CrossviewSheetRowAssembler();
-            assembler.Assemble(elementDefinitions);
-            var excelRows = assembler.ExcelRows;
+            var sheetRowAssembler = new CrossviewSheetRowAssembler();
+            sheetRowAssembler.Assemble(elementDefinitions);
+            var excelRows = sheetRowAssembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
             this.crossviewArrayAssember = new CrossviewArrayAssembler(excelRows, parameterTypes);
@@ -221,10 +217,10 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Write the data to the crossview sheet
         /// </summary>
-        private void WriteSheet()
+        private void WriteSheet(Dictionary<string, string> changedValues)
         {
             this.WriteHeader();
-            this.WriteRows();
+            this.WriteRows(changedValues);
         }
 
         /// <summary>
@@ -248,7 +244,7 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Write the content of the crossview sheet
         /// </summary>
-        private void WriteRows()
+        private void WriteRows(Dictionary<string, string> changedValues)
         {
             var numberOfHeaderRows = this.headerArrayAssembler.HeaderArray.GetLength(0);
 
@@ -290,8 +286,16 @@ namespace CDP4CrossViewEditor.Generator
                         continue;
                     }
 
-                    this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1]
-                        .Name = this.crossviewArrayAssember.NamesArray[i, j];
+                    var cellName = this.crossviewArrayAssember.NamesArray[i, j].ToString();
+                    var cellObject = this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1];
+                    cellObject.Name = cellName;
+
+                    if (changedValues.ContainsKey(cellName))
+                    {
+                        cellObject.Value = changedValues[cellName];
+                        var range = this.crossviewSheet.Range(cellObject, cellObject);
+                        range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue);
+                    }
                 }
             }
 
