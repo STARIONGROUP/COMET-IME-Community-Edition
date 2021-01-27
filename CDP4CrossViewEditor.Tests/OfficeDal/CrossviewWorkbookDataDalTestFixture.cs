@@ -184,15 +184,15 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
         [Test]
         public void VerifyThatUserSelectionIsPreserved()
         {
-            Assert.AreEqual(1, this.workbookData.ManuallySavedElementDefinitionValues.Count());
-            Assert.AreEqual(1, this.workbookData.ManuallySavedParameterValues.Count());
+            Assert.AreEqual(1, this.workbookData.SavedElementDefinitionValues.Count());
+            Assert.AreEqual(1, this.workbookData.SavedParameterTypeValues.Count());
             Assert.AreEqual(1, this.workbookData.ManuallySavedValues.Keys.Count);
 
-            Assert.IsTrue(this.workbookData.ManuallySavedElementDefinitionValues.FirstOrDefault() is CDP4Common.DTO.ElementDefinition);
-            Assert.IsTrue(this.workbookData.ManuallySavedParameterValues.FirstOrDefault() is CDP4Common.DTO.ParameterType);
+            Assert.IsTrue(this.workbookData.SavedElementDefinitionValues.FirstOrDefault() is CDP4Common.DTO.ElementDefinition);
+            Assert.IsTrue(this.workbookData.SavedParameterTypeValues.FirstOrDefault() is CDP4Common.DTO.ParameterType);
 
-            Assert.AreEqual(this.elementDefinition.Name, (this.workbookData.ManuallySavedElementDefinitionValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
-            Assert.AreEqual(this.parameterType.Name, (this.workbookData.ManuallySavedParameterValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
+            Assert.AreEqual(this.elementDefinition.Name, (this.workbookData.SavedElementDefinitionValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
+            Assert.AreEqual(this.parameterType.Name, (this.workbookData.SavedParameterTypeValues.FirstOrDefault() as CDP4Common.DTO.DefinedThing)?.Name);
 
             Assert.NotNull(this.workbookData.ManuallySavedValues.Keys.FirstOrDefault());
             Assert.AreEqual(this.workbookData.ManuallySavedValues.Keys.FirstOrDefault(), this.parameterType.Iid.ToString());
@@ -243,8 +243,8 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
 
                 Assert.NotNull(retrievedSession);
 
-                Assert.IsNotEmpty(retrievedSession.ManuallySavedElementDefinitionValues);
-                Assert.IsNotEmpty(retrievedSession.ManuallySavedParameterValues);
+                Assert.IsNotEmpty(retrievedSession.SavedElementDefinitionValues);
+                Assert.IsNotEmpty(retrievedSession.SavedParameterTypeValues);
             }
             finally
             {

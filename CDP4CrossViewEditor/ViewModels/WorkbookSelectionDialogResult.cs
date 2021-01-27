@@ -43,19 +43,19 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Initializes a new instance of the <see cref="WorkbookSelectionDialogResult"/> class.
         /// </summary>
         /// <param name="res">
-        /// The result of the dialog
+        /// The result of the dialog.
         /// </param>
         /// <param name="workbook">
         /// The <see cref="Workbook"/> that is the result of a selection.
         /// </param>
         /// <param name="manuallySavedElementsDefinitionValues">
-        /// Elements that has been selected <see cref="ElementDefinition"/>
+        /// Elements that has been selected <see cref="ElementDefinition"/>.
         /// </param>
         /// <param name="manuallySavedParameterTypesValues">
-        /// Parameter types that has been selected <see cref="ParameterType"/>
+        /// Parameter types that has been selected <see cref="ParameterType"/>.
         /// </param>
         /// <param name="manuallySavedChangedValues">
-        /// Manually saved parameter sheet values
+        /// Manually saved parameter sheet values.
         /// </param>
         public WorkbookSelectionDialogResult(
             bool? res,
