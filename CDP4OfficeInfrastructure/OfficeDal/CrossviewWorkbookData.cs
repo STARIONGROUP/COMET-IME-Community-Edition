@@ -129,13 +129,13 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// Gets the <see cref="IEnumerable{ElementDefinition}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> SavedElementDefinitionValues => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedElementDefinitions.Value));
+        public IEnumerable<Thing> SavedElementDefinitions => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedElementDefinitions.Value));
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{ParameterType}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> SavedParameterTypeValues => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedParameterTypes.Value));
+        public IEnumerable<Thing> SavedParameterTypes => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedParameterTypes.Value));
 
         /// <summary>
         /// Gets or sets a dictionary that contains cell names and cell values that has been modified
@@ -147,8 +147,8 @@ namespace CDP4OfficeInfrastructure.OfficeDal
             {
                 var result = new Dictionary<string, string>();
 
-                var names = ((JArray) JsonConvert.DeserializeObject(this.CellNames.Value)).Select(jt => (string) jt).ToArray();
-                var values = ((JArray) JsonConvert.DeserializeObject(this.CellValues.Value)).Select(jt => (string) jt).ToArray();
+                var names = ((JArray)JsonConvert.DeserializeObject(this.CellNames.Value)).Select(jt => (string)jt).ToArray();
+                var values = ((JArray)JsonConvert.DeserializeObject(this.CellValues.Value)).Select(jt => (string)jt).ToArray();
 
                 for (var i = 0; i < names.Length; i++)
                 {
