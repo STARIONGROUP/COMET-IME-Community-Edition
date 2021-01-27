@@ -26,8 +26,10 @@
 namespace CDP4CrossViewEditor.Tests.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -73,6 +75,16 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         /// </summary>
         private Iteration iteration;
 
+        /// <summary>
+        /// Preserved element definitions iids
+        /// </summary>
+        private List<Guid> preservedElementsIids = new List<Guid>();
+
+        /// <summary>
+        /// Preserved parameter types iids
+        /// </summary>
+        private readonly List<Guid> preservedParametersIids = new List<Guid>();
+
         [SetUp]
         public void SetUp()
         {
@@ -104,14 +116,23 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
                 Name = "Domain"
             };
 
-            var elementDefinition = new ElementDefinition
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
             {
-                Iid = Guid.NewGuid(),
-                Name = "ElementDefinition_1",
-                ShortName = "ED_1",
+                Name = "ElementDefinition",
+                ShortName = "ED",
                 Container = this.iteration,
                 Owner = domain
             };
+
+            var elementUsage = new ElementUsage(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
+            {
+                Name = "ElementUsage",
+                ShortName = "EU",
+                Owner = domain
+            };
+
+            elementDefinition.ContainedElement.Add(elementUsage);
+            elementUsage.ElementDefinition = elementDefinition;
 
             var parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
@@ -138,22 +159,36 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var viewModelElements = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
-            var viewModelParameters = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
+            var viewModelElements = new ElementDefinitionSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                null);
+
+            var viewModelParameters = new ParameterTypeSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                null);
 
             Assert.AreEqual(this.iteration, viewModelElements.Iteration);
             Assert.AreEqual(0, viewModelElements.ElementDefinitionSourceList.Count);
             Assert.AreEqual(0, viewModelElements.ElementDefinitionTargetList.Count);
+            Assert.AreEqual(ClassKind.ElementDefinition, viewModelElements.ThingClassKind);
+            Assert.IsNull(viewModelElements.PreservedIids);
 
             Assert.AreEqual(this.iteration, viewModelParameters.Iteration);
             Assert.AreEqual(0, viewModelParameters.ParameterTypeSourceList.Count);
             Assert.AreEqual(0, viewModelParameters.ParameterTypeTargetList.Count);
+            Assert.AreEqual(ClassKind.ParameterType, viewModelParameters.ThingClassKind);
+            Assert.IsNull(viewModelParameters.PreservedIids);
         }
 
         [Test]
         public void VerifyThatCommandsWorksOnElements()
         {
-            var viewModel = new ElementDefinitionSelectorViewModel(this.iteration, this.session.Object);
+            var viewModel = new ElementDefinitionSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedElementsIids);
 
             Assert.DoesNotThrow(() => viewModel.BindData());
 
@@ -162,14 +197,12 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             Assert.NotNull(elementDefinition);
             Assert.AreEqual(0, elementDefinition.Categories.Count);
-            Assert.AreEqual("ElementDefinition_1(Domain)", elementDefinition.ToString());
+            Assert.AreEqual("ElementDefinition(Domain)", elementDefinition.ToString());
 
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
 
             viewModel.SelectedTargetList = viewModel.ElementDefinitionTargetList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
-
-            Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
 
             viewModel.SelectedSourceList = viewModel.ElementDefinitionSourceList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToTarget.Execute(null));
@@ -179,7 +212,10 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         [Test]
         public void VerifyThatCommandsWorksOnParameters()
         {
-            var viewModel = new ParameterTypeSelectorViewModel(this.iteration, this.session.Object);
+            var viewModel = new ParameterTypeSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedParametersIids);
 
             Assert.DoesNotThrow(() => viewModel.BindData());
 
@@ -194,8 +230,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             viewModel.SelectedTargetList = viewModel.ParameterTypeTargetList;
             Assert.DoesNotThrow(() => viewModel.MoveItemsToSource.Execute(null));
-
-            Assert.DoesNotThrow(() => viewModel.SortItems.Execute(null));
 
             viewModel.SelectedSourceList = viewModel.ParameterTypeSourceList;
             Assert.DoesNotThrow(() => viewModel.ClearItems.Execute(null));

@@ -87,8 +87,9 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
         /// <param name="session">Current opened session <see cref="ISession"/></param>
-        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session)
-            : base(iteration, session, ClassKind.ParameterType)
+        /// <param name="preservedIids">Current user selection <see cref="List{Guid}"/></param>
+        public ParameterTypeSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids)
+            : base(iteration, session, ClassKind.ParameterType, preservedIids)
         {
             this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>
             {
@@ -128,14 +129,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         public override void BindData()
         {
-            var iterationElements = this.Iteration.Element.AsEnumerable<ElementBase>();
-
-            if (iterationElements == null)
-            {
-                return;
-            }
-
-            var elements = iterationElements.Union(this.Iteration.Element.SelectMany(e => e.ContainedElement).AsEnumerable<ElementBase>());
+            var elements = this.Iteration.Element.Union(this.Iteration.Element.SelectMany(e => e.ContainedElement).AsEnumerable<ElementBase>());
 
             foreach (var element in elements)
             {
@@ -154,6 +148,26 @@ namespace CDP4CrossViewEditor.ViewModels
                     }
                 }
             }
+
+            this.PreserveSelection();
+        }
+
+        /// <summary>
+        /// Preserve parameter types objects selection from workbook xml parts
+        /// </summary>
+        private void PreserveSelection()
+        {
+            if (this.PreservedIids == null)
+            {
+                return;
+            }
+
+            this.SelectedSourceList.Clear();
+
+            this.SelectedSourceList.AddRange(this.ParameterTypeSourceList
+                .Where(row => this.PreservedIids.Contains(row.Thing.Iid)));
+
+            this.ExecuteMoveToTarget();
         }
 
         /// <summary>
@@ -205,8 +219,9 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToTarget()
         {
-            var powerParameterTypes = this.ParameterTypeSourceList
-                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
+            var powerParameterTypes = PowerParameters
+                .Select(shortName => this.ParameterTypeSourceList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+                .Where(row => row != null);
 
             this.SelectedSourceList.Clear();
             this.SelectedSourceList.AddRange(powerParameterTypes);
@@ -219,8 +234,9 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToSource()
         {
-            var powerParameterTypes = this.ParameterTypeTargetList
-                .Where(row => PowerParameters.Contains(row.Thing.ShortName));
+            var powerParameterTypes = PowerParameters
+                .Select(shortName => this.ParameterTypeSourceList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+                .Where(row => row != null);
 
             this.SelectedTargetList.Clear();
             this.SelectedTargetList.AddRange(powerParameterTypes);

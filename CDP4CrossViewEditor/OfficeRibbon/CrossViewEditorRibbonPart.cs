@@ -69,6 +69,11 @@ namespace CDP4CrossViewEditor
         private readonly IOfficeApplicationWrapper officeApplicationWrapper;
 
         /// <summary>
+        /// Gets or sets the <see cref="IExcelQuery"/> that is used to query the excel application
+        /// </summary>
+        private IExcelQuery ExcelQuery { get; set; }
+
+        /// <summary>
         /// Gets the <see cref="ISession"/> that is active for the <see cref="RibbonPart"/>
         /// </summary>
         public ISession Session { get; private set; }
@@ -103,6 +108,7 @@ namespace CDP4CrossViewEditor
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.officeApplicationWrapper = officeApplicationWrapper;
+            this.ExcelQuery = new ExcelQuery();
             this.Iterations = new List<Iteration>();
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
@@ -255,9 +261,9 @@ namespace CDP4CrossViewEditor
                 return;
             }
 
-            var application = this.officeApplicationWrapper.Excel;
+            var activeWorkbook = this.ExcelQuery.QueryActiveWorkbook(this.officeApplicationWrapper.Excel);
 
-            var crossViewDialogViewModel = new CrossViewDialogViewModel(application, iteration, this.Session);
+            var crossViewDialogViewModel = new CrossViewDialogViewModel(this.officeApplicationWrapper.Excel, iteration, this.Session, activeWorkbook);
             this.DialogNavigationService.NavigateModal(crossViewDialogViewModel);
 
             var dialogResult = crossViewDialogViewModel.DialogResult as WorkbookSelectionDialogResult;
@@ -268,8 +274,16 @@ namespace CDP4CrossViewEditor
 
                 try
                 {
-                    var workbookOperator = new WorkbookOperator(application, workbook);
-                    await workbookOperator.Rebuild(this.Session, iteration, activeParticipant, dialogResult.WorkbookElements, dialogResult.WorkbookParameterType);
+                    var workbookMetadata = new WorkbookMetadata
+                    {
+                        ElementDefinitions = dialogResult.WorkbookElements,
+                        ParameterTypes = dialogResult.WorkbookParameterType,
+                        ParameterValues = dialogResult.WorkbookChangedValues
+                    };
+
+                    var workbookOperator = new WorkbookOperator(this.officeApplicationWrapper.Excel, workbook, workbookMetadata);
+
+                    await workbookOperator.Rebuild(this.Session, iteration, activeParticipant);
                 }
                 catch (Exception ex)
                 {

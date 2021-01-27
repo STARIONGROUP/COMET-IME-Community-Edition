@@ -26,6 +26,7 @@
 namespace CDP4CrossViewEditor.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -52,8 +53,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         public ClassKind ThingClassKind
         {
-            get => this.thingClassKind;
             private set => this.RaiseAndSetIfChanged(ref this.thingClassKind, value);
+            get => this.thingClassKind;
         }
 
         /// <summary>
@@ -64,7 +65,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets or sets the user session <see cref="ISession"/>
         /// </summary>
-        public ISession Session { get; private set; }
+        protected ISession Session { get; private set; }
 
         /// <summary>
         /// Gets/sets the move command <see cref="ReactiveCommand"/> from target to source
@@ -77,14 +78,14 @@ namespace CDP4CrossViewEditor.ViewModels
         public ReactiveCommand<object> MoveItemsToTarget { get; private set; }
 
         /// <summary>
-        /// Gets/sets the sorting list command <see cref="ReactiveCommand"/>
-        /// </summary>
-        public ReactiveCommand<object> SortItems { get; private set; }
-
-        /// <summary>
         /// Gets/sets the clearing list command <see cref="ReactiveCommand"/>
         /// </summary>
         public ReactiveCommand<object> ClearItems { get; private set; }
+
+        /// <summary>
+        /// Gets/sets current user selection thing ids
+        /// </summary>
+        public List<Guid> PreservedIids { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ThingSelectorViewModel"/> class.
@@ -92,11 +93,14 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/> </param>
         /// <param name="session">Current opened session <see cref="ISession"/></param>
         /// <param name="thingClassKind">Current type of thing <see cref="ClassKind"/></param>
-        public ThingSelectorViewModel(Iteration iteration, ISession session, ClassKind thingClassKind)
+        /// <param name="preservedIids">Current thing selection<see cref="List{Guid}"/></param>
+        protected ThingSelectorViewModel(Iteration iteration, ISession session, ClassKind thingClassKind, List<Guid> preservedIids)
         {
             this.Iteration = iteration;
             this.Session = session;
             this.ThingClassKind = thingClassKind;
+            this.PreservedIids = preservedIids;
+
             this.AddSubscriptions();
         }
 
@@ -167,17 +171,6 @@ namespace CDP4CrossViewEditor.ViewModels
 
             this.ClearItems = ReactiveCommand.Create();
             this.ClearItems.Subscribe(_ => this.ExecuteClear());
-
-            this.SortItems = ReactiveCommand.Create();
-            this.SortItems.Subscribe(_ => this.ExecuteSort());
-        }
-
-        /// <summary>
-        /// Executes alphabetical sort items command <see cref="SortItems"/>
-        /// </summary>
-        private void ExecuteSort()
-        {
-            // TODO #624 Implement filtering for initially displayed elements
         }
     }
 }
