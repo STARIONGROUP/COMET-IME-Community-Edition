@@ -65,6 +65,11 @@ namespace CDP4CrossViewEditor
         /// Parameter sheet values changed by the user
         /// </summary>
         public Dictionary<string, string> ParameterValues;
+
+        /// <summary>
+        /// Flag that indicates value persistence
+        /// </summary>
+        public bool PersistValues;
     }
 
     /// <summary>
@@ -237,7 +242,11 @@ namespace CDP4CrossViewEditor
         /// </summary>
         private void WriteWorkbookDataToWorkbook()
         {
-            var workbookData = new CrossviewWorkbookData(this.workbookMetadata.ElementDefinitions, this.workbookMetadata.ParameterTypes, this.workbookMetadata.ParameterValues);
+            var workbookData = new CrossviewWorkbookData(
+                this.workbookMetadata.PersistValues ? this.workbookMetadata.ElementDefinitions : new List<ElementDefinition>(),
+                this.workbookMetadata.PersistValues ? this.workbookMetadata.ParameterTypes : new List<ParameterType>(),
+                this.workbookMetadata.PersistValues ? this.workbookMetadata.ParameterValues : new Dictionary<string, string>());
+
             var workbookDataDal = new CrossviewWorkbookDataDal(this.workbook);
             workbookDataDal.Write(workbookData);
         }
@@ -266,7 +275,7 @@ namespace CDP4CrossViewEditor
         [ExcludeFromCodeCoverage]
         private void Worksheet_ChangeEvent(Range target)
         {
-            string cellName = null;
+            string cellName;
 
             try
             {

@@ -278,7 +278,8 @@ namespace CDP4CrossViewEditor
                     {
                         ElementDefinitions = dialogResult.WorkbookElements,
                         ParameterTypes = dialogResult.WorkbookParameterType,
-                        ParameterValues = dialogResult.WorkbookChangedValues
+                        ParameterValues = dialogResult.WorkbookChangedValues,
+                        PersistValues = dialogResult.PersistValues
                     };
 
                     var workbookOperator = new WorkbookOperator(this.officeApplicationWrapper.Excel, workbook, workbookMetadata);

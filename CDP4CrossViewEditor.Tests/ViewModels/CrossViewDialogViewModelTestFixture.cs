@@ -27,6 +27,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -39,7 +40,11 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
     using Moq;
 
+    using NetOffice.ExcelApi;
+
     using NUnit.Framework;
+
+    using Parameter = CDP4Common.EngineeringModelData.Parameter;
 
     /// <summary>
     /// Suite of tests for the <see cref="CrossViewDialogViewModel"/> class
@@ -47,6 +52,11 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
     [TestFixture]
     public class CrossViewDialogViewModelTestFixture
     {
+        /// <summary>
+        /// The current excel file path used by the test
+        /// </summary>
+        private string excelFilePath;
+
         /// <summary>
         /// The current set of credentials that will be used
         /// </summary>
@@ -251,11 +261,23 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             this.iteration.Element.Add(elementDefinition);
             this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameter);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameterPowerOn);
+
+            var sourcePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\TestData\test.xlsx");
+            var fileinfo = new FileInfo(sourcePath);
+
+            var targetPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\TestData\temporarytestfile.xlsx");
+            var tempfile = fileinfo.CopyTo(targetPath, true);
+            this.excelFilePath = tempfile.FullName;
         }
 
         [TearDown]
         public void TearDown()
         {
+            if (System.IO.File.Exists(this.excelFilePath))
+            {
+                System.IO.File.Delete(this.excelFilePath);
+            }
         }
 
         [Test]
@@ -267,53 +289,73 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.IsInstanceOf<ElementDefinitionSelectorViewModel>(viewModel.ElementSelectorViewModel);
             Assert.IsInstanceOf<ParameterTypeSelectorViewModel>(viewModel.ParameterSelectorViewModel);
 
-            this.iteration.Element.Clear();
+            Assert.AreEqual(true, viewModel.PersistValues);
 
             Assert.DoesNotThrow(() => viewModel.ElementSelectorViewModel.BindData());
             Assert.DoesNotThrow(() => viewModel.ParameterSelectorViewModel.BindData());
         }
 
         [Test]
-        public void VerifyThatOkCommandsWorks()
+        public void VerifyThatOkCommandWorksWithNullWorkbook()
         {
             var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object, null);
 
-            var elementDefinitionSelectorViewModel = new ElementDefinitionSelectorViewModel(
-                this.iteration,
-                this.session.Object,
-                this.preservedElementsIids);
+            Assert.IsInstanceOf<ElementDefinitionSelectorViewModel>(viewModel.ElementSelectorViewModel);
+            Assert.IsInstanceOf<ParameterTypeSelectorViewModel>(viewModel.ParameterSelectorViewModel);
 
-            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(
-                this.iteration,
-                this.session.Object,
-                this.preservedParametersIids);
-
-            Assert.DoesNotThrow(() => elementDefinitionSelectorViewModel.BindData());
-            Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.BindData());
-
-            parameterTypeSelectorViewModel.SelectedSourceList = parameterTypeSelectorViewModel.ParameterTypeSourceList;
-            elementDefinitionSelectorViewModel.SelectedSourceList = elementDefinitionSelectorViewModel.ElementDefinitionSourceList;
+            Assert.DoesNotThrow(() => viewModel.ElementSelectorViewModel.BindData());
+            Assert.DoesNotThrow(() => viewModel.ParameterSelectorViewModel.BindData());
 
             Assert.DoesNotThrow(() => viewModel.OkCommand.Execute(null));
+
             Assert.IsTrue(viewModel.DialogResult.Result);
         }
 
         [Test]
-        public void VerifyThatCancelCommandsWorks()
+        [Category("OfficeDependent")]
+        public void VerifyThatOkCommandWorks()
+        {
+            var application = new Application();
+            var workbook = application.Workbooks.Open(this.excelFilePath, false, false);
+
+            Assert.NotNull(workbook);
+
+            var viewModel = new CrossViewDialogViewModel(application, this.iteration, this.session.Object, workbook);
+
+            Assert.IsInstanceOf<ElementDefinitionSelectorViewModel>(viewModel.ElementSelectorViewModel);
+            Assert.IsInstanceOf<ParameterTypeSelectorViewModel>(viewModel.ParameterSelectorViewModel);
+
+            Assert.DoesNotThrow(() => viewModel.ElementSelectorViewModel.BindData());
+            Assert.DoesNotThrow(() => viewModel.ParameterSelectorViewModel.BindData());
+
+            Assert.DoesNotThrow(() => viewModel.OkCommand.Execute(null));
+
+            Assert.IsTrue(viewModel.DialogResult.Result);
+
+            workbook.Close();
+            workbook.Dispose();
+
+            application.Quit();
+            application.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatCancelCommandWorks()
         {
             var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object, null);
 
             Assert.DoesNotThrow(() => viewModel.CancelCommand.Execute(null));
+
             Assert.IsFalse(viewModel.DialogResult.Result);
         }
 
         [Test]
-        public void VerifyThatPowerCommandsWorks()
+        public void VerifyThatPowerCommandWorks()
         {
             var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(
                 this.iteration,
                 this.session.Object,
-                this.preservedParametersIids);
+                new List<Guid>());
 
             Assert.Zero(parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
 

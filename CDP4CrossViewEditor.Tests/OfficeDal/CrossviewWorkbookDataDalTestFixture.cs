@@ -178,7 +178,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
         [Test]
         public void VerifyThatArgumentNotNullExceptionIsThrown()
         {
-            Assert.Throws<ArgumentNullException>(() => { new CrossviewWorkbookDataDal(null); });
+            Assert.Throws<ArgumentNullException>(() => { _ = new CrossviewWorkbookDataDal(null); });
         }
 
         [Test]
