@@ -97,7 +97,7 @@ namespace CDP4CrossViewEditor.ViewModels
         public Dictionary<string, string> WorkbookChangedValues { get; private set; }
 
         /// <summary>
-        ///
+        /// Gets or sets workbook metadata persistence between sessions.
         /// </summary>
         public bool PersistValues { get; private set; }
     }
