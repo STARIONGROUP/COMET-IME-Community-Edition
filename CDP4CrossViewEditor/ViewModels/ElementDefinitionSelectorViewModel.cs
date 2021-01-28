@@ -25,6 +25,7 @@
 
 namespace CDP4CrossViewEditor.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -55,12 +56,12 @@ namespace CDP4CrossViewEditor.ViewModels
         public ReactiveList<ElementDefinitionRowViewModel> ElementDefinitionTargetList { get; private set; }
 
         /// <summary>
-        /// Gets or sets user selected elements lists
+        /// Gets or sets user selected elements source list
         /// </summary>
         public ReactiveList<ElementDefinitionRowViewModel> SelectedSourceList { get; set; }
 
         /// <summary>
-        ///
+        /// Gets or sets user selected elements target list
         /// </summary>
         public ReactiveList<ElementDefinitionRowViewModel> SelectedTargetList { get; set; }
 
@@ -71,8 +72,9 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
         /// <param name="session">Current opened session <see cref="ISession"/></param>
-        public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session)
-            : base(iteration, session, ClassKind.ElementDefinition)
+        /// <param name="preservedIids">Current user selection <see cref="List{Guid}"/></param>
+        public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids)
+            : base(iteration, session, ClassKind.ElementDefinition, preservedIids)
         {
             this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>
             {
@@ -109,6 +111,7 @@ namespace CDP4CrossViewEditor.ViewModels
                 this.ElementDefinitionSourceList.Add(new ElementDefinitionRowViewModel(elementDefinition, this.Session, null));
 
                 var categories = elementDefinition.Category;
+
                 var superCategories = categories
                     .Distinct()
                     .SelectMany(x => x.AllSuperCategories())
@@ -117,6 +120,27 @@ namespace CDP4CrossViewEditor.ViewModels
                 this.Categories = this.Categories.Union(categories).Union(superCategories)
                     .ToList();
             }
+
+            this.PreserveSelection();
+        }
+
+        /// <summary>
+        /// /Preserve element definitions objects selection from workbook xml parts
+        /// </summary>
+        private void PreserveSelection()
+        {
+            if (this.PreservedIids == null)
+            {
+                return;
+            }
+
+            var preservedThings = this.ElementDefinitionSourceList
+                .Where(row => this.PreservedIids.Contains(row.Thing.Iid));
+
+            this.SelectedSourceList.Clear();
+            this.SelectedSourceList.AddRange(preservedThings);
+
+            this.ExecuteMoveToTarget();
         }
 
         /// <summary>

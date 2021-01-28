@@ -27,6 +27,7 @@ namespace CDP4CrossViewEditor.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Windows.Input;
 
@@ -36,6 +37,8 @@ namespace CDP4CrossViewEditor.ViewModels
     using CDP4Composition.Navigation;
 
     using CDP4Dal;
+
+    using CDP4OfficeInfrastructure.OfficeDal;
 
     using NetOffice.ExcelApi;
 
@@ -59,12 +62,12 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets the <see cref="IterationSetup"/>
         /// </summary>
-        public Iteration Iteration { get; private set; }
+        private Iteration Iteration { get; set; }
 
         /// <summary>
         /// Gets the <see cref="ISession"/>
         /// </summary>
-        public ISession Session { get; private set; }
+        private ISession Session { get; set; }
 
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
@@ -101,6 +104,11 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
+        /// Dictionary that contains manuallys aved values
+        /// </summary>
+        private Dictionary<string, string> ManuallyFilledValues = new Dictionary<string, string>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CrossViewDialogViewModel"/> class.
         /// </summary>
         /// <param name="application">
@@ -112,15 +120,16 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="session">
         /// Current user session <see cref="ISession"/>
         /// </param>
-        public CrossViewDialogViewModel(Application application, Iteration iteration, ISession session)
+        /// <param name="activeWorkbook">
+        /// The Excel active workbook <see cref="Workbook"/> that might contain Crossview worksheet
+        /// </param>
+        public CrossViewDialogViewModel(Application application, Iteration iteration, ISession session, Workbook activeWorkbook)
         {
             this.Workbooks = new List<WorkbookRowViewModel>();
             this.Iteration = iteration;
             this.Session = session;
-            this.PopulateWorkbooks(application);
-
-            this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(this.Iteration, this.Session);
-            this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(this.Iteration, this.Session);
+            this.InitWorkbooks(application, activeWorkbook);
+            this.InitModels();
 
             this.DialogTitle = $"Select {this.ElementSelectorViewModel.ThingClassKind}s and {this.ParameterSelectorViewModel.ThingClassKind}s";
 
@@ -132,13 +141,17 @@ namespace CDP4CrossViewEditor.ViewModels
         }
 
         /// <summary>
-        /// populate the workbook row view-models that represent workbooks that are open in the
+        /// Populate the workbook row view-models that represent workbooks that are open in the
         /// excel application.
         /// </summary>
         /// <param name="application">
         /// The Excel <see cref="Application"/> that contains workbooks
         /// </param>
-        private void PopulateWorkbooks(Application application)
+        /// <param name="activeWorkbook">
+        /// The Excel active workbook <see cref="Workbook"/> that might contain Crossview worksheet
+        /// </param>
+        [ExcludeFromCodeCoverage]
+        private void InitWorkbooks(Application application, Workbook activeWorkbook)
         {
             if (application == null)
             {
@@ -149,9 +162,42 @@ namespace CDP4CrossViewEditor.ViewModels
             {
                 var row = new WorkbookRowViewModel(workbook);
                 this.Workbooks.Add(row);
+
+                if (activeWorkbook == workbook)
+                {
+                    this.SelectedWorkbook = row;
+                }
             }
 
-            this.SelectedWorkbook = this.Workbooks[0];
+            if (this.SelectedWorkbook == null)
+            {
+                this.SelectedWorkbook = this.Workbooks[0];
+            }
+        }
+
+        /// <summary>
+        /// Init referenced view models
+        /// </summary>
+        private void InitModels()
+        {
+            CrossviewWorkbookData preservedData = null;
+
+            if (this.SelectedWorkbook != null)
+            {
+                var workbookDataDal = new CrossviewWorkbookDataDal(this.SelectedWorkbook?.Workbook);
+                preservedData = workbookDataDal.Read();
+                this.ManuallyFilledValues = preservedData?.ManuallySavedValues ?? new Dictionary<string, string>();
+            }
+
+            this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(
+                this.Iteration,
+                this.Session,
+                preservedData?.SavedElementDefinitions?.Select(ed => ed.Iid).ToList());
+
+            this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(
+                this.Iteration,
+                this.Session,
+                preservedData?.SavedParameterTypes?.Select(pt => pt.Iid).ToList());
         }
 
         /// <summary>
@@ -170,8 +216,12 @@ namespace CDP4CrossViewEditor.ViewModels
             if (this.ElementSelectorViewModel is ElementDefinitionSelectorViewModel elementDefinitionViewModel &&
                 this.ParameterSelectorViewModel is ParameterTypeSelectorViewModel parameterTypeViewModel)
             {
-                this.DialogResult = new WorkbookSelectionDialogResult(true, this.SelectedWorkbook?.Workbook, elementDefinitionViewModel.ElementDefinitionTargetList.Select(e => e.Thing),
-                    parameterTypeViewModel.ParameterTypeTargetList.Select(p => p.Thing));
+                this.DialogResult = new WorkbookSelectionDialogResult(
+                    true,
+                    this.SelectedWorkbook?.Workbook,
+                    elementDefinitionViewModel.ElementDefinitionTargetList.Select(e => e.Thing),
+                    parameterTypeViewModel.ParameterTypeTargetList.Select(p => p.Thing),
+                    this.ManuallyFilledValues);
             }
         }
     }
