@@ -215,7 +215,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToTarget()
         {
-            var powerParameterTypes = PowerParameters
+            var powerParameterTypes = CrossviewSheetConstants.PowerParameters
                 .Select(shortName => this.ParameterTypeSourceList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
                 .Where(row => row != null);
 
@@ -230,7 +230,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToSource()
         {
-            var powerParameterTypes = PowerParameters
+            var powerParameterTypes = CrossviewSheetConstants.PowerParameters
                 .Select(shortName => this.ParameterTypeSourceList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
                 .Where(row => row != null);
 

@@ -25,6 +25,7 @@
 
 namespace CDP4CrossViewEditor.Generator
 {
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -71,8 +72,10 @@ namespace CDP4CrossViewEditor.Generator
                 return false;
             }
 
-            var pDutyCycle = parameters.Where(p => p != null).FirstOrDefault(p => p.ParameterType.ShortName.Equals("P_duty_cyc"));
-            var pMean = parameters.Where(p => p != null).FirstOrDefault(p => p.ParameterType.ShortName.Equals("P_mean"));
+            var pDutyCycle = parameters.Where(p => p != null)
+                .FirstOrDefault(p => p.ParameterType.ShortName.Equals("P_duty_cyc", StringComparison.InvariantCultureIgnoreCase));
+            var pMean = parameters.Where(p => p != null)
+                .FirstOrDefault(p => p.ParameterType.ShortName.Equals("P_mean", StringComparison.InvariantCultureIgnoreCase));
 
             if (pDutyCycle == null || pMean == null)
             {

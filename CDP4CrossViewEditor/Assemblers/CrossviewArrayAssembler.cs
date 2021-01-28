@@ -25,6 +25,7 @@
 
 namespace CDP4CrossViewEditor.Assemblers
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -377,16 +378,16 @@ namespace CDP4CrossViewEditor.Assemblers
 
             var indexes = CrossviewSheetConstants.PowerParameters.Select(p => this.GetContentColumnsIndexes(calculationParameters, p)).SelectMany(x => x).ToList();
 
-            var rSchemeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.scheme")).Item2;
-            var rTypeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.type")).Item2;
-            var rKIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.k")).Item2;
-            var rNIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.n")).Item2;
+            var rSchemeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.scheme", StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var rTypeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.type", StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var rKIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.k", StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var rNIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.n", StringComparison.InvariantCultureIgnoreCase)).Item2;
 
-            var pOnIndex = indexes.FirstOrDefault(p => p.Item1.Equals("P_on")).Item2;
-            var pStandbyIndex = indexes.FirstOrDefault(p => p.Item1.Equals("P_stby")).Item2;
+            var pOnIndex = indexes.FirstOrDefault(p => p.Item1.Equals("P_on", StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var pStandbyIndex = indexes.FirstOrDefault(p => p.Item1.Equals("P_stby", StringComparison.InvariantCultureIgnoreCase)).Item2;
 
-            var pDutyCycleIndexes = indexes.Where(p => p.Item1.Equals("P_duty_cyc")).ToArray();
-            var pMeanIndexes = indexes.Where(p => p.Item1.Equals("P_mean")).ToArray();
+            var pDutyCycleIndexes = indexes.Where(p => p.Item1.Equals("P_duty_cyc", StringComparison.InvariantCultureIgnoreCase)).ToArray();
+            var pMeanIndexes = indexes.Where(p => p.Item1.Equals("P_mean", StringComparison.InvariantCultureIgnoreCase)).ToArray();
 
             if (pMeanIndexes.Length != pDutyCycleIndexes.Length)
             {
