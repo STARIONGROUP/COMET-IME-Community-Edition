@@ -48,27 +48,32 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <param name="workbook">
         /// The <see cref="Workbook"/> that is the result of a selection.
         /// </param>
-        /// <param name="manuallySavedElementsDefinitionValues">
+        /// <param name="savedElementsDefinitions">
         /// Elements that has been selected <see cref="ElementDefinition"/>.
         /// </param>
-        /// <param name="manuallySavedParameterTypesValues">
+        /// <param name="savedParameterTypes">
         /// Parameter types that has been selected <see cref="ParameterType"/>.
         /// </param>
-        /// <param name="manuallySavedChangedValues">
+        /// <param name="savedChangedValues">
         /// Manually saved parameter sheet values.
+        /// </param>
+        /// <param name="persistValues">
+        /// Flag that indicate if values should be saved as workbook metadata.
         /// </param>
         public WorkbookSelectionDialogResult(
             bool? res,
             Workbook workbook,
-            IEnumerable<ElementDefinition> manuallySavedElementsDefinitionValues,
-            IEnumerable<ParameterType> manuallySavedParameterTypesValues,
-            Dictionary<string, string> manuallySavedChangedValues)
+            IEnumerable<ElementDefinition> savedElementsDefinitions,
+            IEnumerable<ParameterType> savedParameterTypes,
+            Dictionary<string, string> savedChangedValues,
+            bool persistValues)
             : base(res)
         {
             this.Workbook = workbook;
-            this.WorkbookElements = manuallySavedElementsDefinitionValues;
-            this.WorkbookParameterType = manuallySavedParameterTypesValues;
-            this.WorkbookChangedValues = manuallySavedChangedValues;
+            this.WorkbookElements = savedElementsDefinitions;
+            this.WorkbookParameterType = savedParameterTypes;
+            this.WorkbookChangedValues = savedChangedValues;
+            this.PersistValues = persistValues;
         }
 
         /// <summary>
@@ -90,5 +95,10 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Get or sets workbook manually edited data values
         /// </summary>
         public Dictionary<string, string> WorkbookChangedValues { get; private set; }
+
+        /// <summary>
+        /// Gets or sets workbook metadata persistence between sessions.
+        /// </summary>
+        public bool PersistValues { get; private set; }
     }
 }

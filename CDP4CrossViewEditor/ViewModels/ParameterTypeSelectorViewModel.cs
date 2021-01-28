@@ -235,7 +235,7 @@ namespace CDP4CrossViewEditor.ViewModels
         private void ExecuteMovePowerToSource()
         {
             var powerParameterTypes = PowerParameters
-                .Select(shortName => this.ParameterTypeSourceList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+                .Select(shortName => this.ParameterTypeTargetList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
                 .Where(row => row != null);
 
             this.SelectedTargetList.Clear();
