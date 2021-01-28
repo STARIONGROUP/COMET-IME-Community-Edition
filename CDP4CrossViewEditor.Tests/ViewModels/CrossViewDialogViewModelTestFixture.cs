@@ -80,6 +80,23 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         /// </summary>
         private Iteration iteration;
 
+        /// <summary>
+        /// Preserved element definitions iids
+        /// </summary>
+        private List<Guid> preservedElementsIids = new List<Guid>();
+
+        /// <summary>
+        /// Preserved parameter types iids
+        /// </summary>
+        private List<Guid> preservedParametersIids = new List<Guid>();
+
+        private Parameter parameterRedundancy;
+        private Parameter parameterPowerOn;
+        private Parameter parameterPowerStandBy;
+        private Parameter parameterPowerPeak;
+        private Parameter parameterPowerPowerDutyCycle;
+        private Parameter parameterPowerMean;
+
         [SetUp]
         public void SetUp()
         {
@@ -119,9 +136,71 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
                 ShortName = "P_SimpleQuantityKind"
             };
 
+            var parameterTypeRedundancy = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "redundancy",
+                ShortName = "redundancy",
+                Component =
+                {
+                    new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        ShortName = "scheme",
+                        ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                        {
+                            ShortName = "scheme_pt"
+                        }
+                    },
+                    new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        ShortName = "type",
+                        ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                        {
+                            ShortName = "type_pt"
+                        }
+                    },
+                    new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        ShortName = "k",
+                        ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                        {
+                            ShortName = "k_pt"
+                        }
+                    },
+                    new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        ShortName = "n",
+                        ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                        {
+                            ShortName = "n_pt"
+                        }
+                    }
+                }
+            };
+
             var parameterTypePowerOn = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 ShortName = "P_on"
+            };
+
+            var parameterTypePowerStandby = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "P_stby"
+            };
+
+            var parameterTypePowerPeak = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "P_peak"
+            };
+
+            var parameterTypePowerDutyCycle = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "P_duty_cyc"
+            };
+
+            var parameterTypePowerMean = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "P_mean",
+                ShortName = "P_mean"
             };
 
             var parameter = new Parameter
@@ -132,7 +211,15 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
                 Owner = domain
             };
 
-            var parameterPowerOn = new Parameter
+            this.parameterRedundancy = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypeRedundancy,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
+            this.parameterPowerOn = new Parameter
             {
                 Iid = Guid.NewGuid(),
                 ParameterType = parameterTypePowerOn,
@@ -140,9 +227,40 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
                 Owner = domain
             };
 
+            this.parameterPowerStandBy = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypePowerStandby,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
+            this.parameterPowerPeak = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypePowerPeak,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
+            this.parameterPowerPowerDutyCycle = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypePowerDutyCycle,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
+            this.parameterPowerMean = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypePowerMean,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
             this.iteration.Element.Add(elementDefinition);
             this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameter);
-            this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameterPowerOn);
 
             var sourcePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\TestData\test.xlsx");
             var fileinfo = new FileInfo(sourcePath);
@@ -245,25 +363,52 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
             Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
 
-            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
             Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
 
             parameterTypeSelectorViewModel.SelectedSourceList.Add(parameterTypeSelectorViewModel.ParameterTypeSourceList.FirstOrDefault());
             parameterTypeSelectorViewModel.ExecuteMoveToTarget();
 
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
             Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
-            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
 
             parameterTypeSelectorViewModel.SelectedTargetList.Add(parameterTypeSelectorViewModel.ParameterTypeTargetList.FirstOrDefault());
             parameterTypeSelectorViewModel.ExecuteMoveToSource();
 
-            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
             Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
 
             Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
             Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
+        }
+
+        [Test]
+        public void VerifyThatTogglePowerCommandWorks()
+        {
+            // Add 6 power related parameters
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterRedundancy);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerOn);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerStandBy);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerPeak);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerPowerDutyCycle);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerMean);
+
+            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                this.preservedParametersIids);
+
+            Assert.Zero(parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+
+            parameterTypeSelectorViewModel.BindData();
+
+            parameterTypeSelectorViewModel.PowerParametersEnabled = true;
+            Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.PowerParametersCommand.Execute(null));
+            Assert.IsTrue(parameterTypeSelectorViewModel.PowerParametersEnabled);
+
+            parameterTypeSelectorViewModel.PowerParametersEnabled = false;
+            Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.PowerParametersCommand.Execute(null));
+            Assert.IsFalse(parameterTypeSelectorViewModel.PowerParametersEnabled);
         }
     }
 }
