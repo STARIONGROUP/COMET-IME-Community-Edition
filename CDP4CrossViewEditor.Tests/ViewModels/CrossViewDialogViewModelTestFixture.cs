@@ -27,6 +27,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -39,7 +40,11 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
     using Moq;
 
+    using NetOffice.ExcelApi;
+
     using NUnit.Framework;
+
+    using Parameter = CDP4Common.EngineeringModelData.Parameter;
 
     /// <summary>
     /// Suite of tests for the <see cref="CrossViewDialogViewModel"/> class
@@ -47,6 +52,11 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
     [TestFixture]
     public class CrossViewDialogViewModelTestFixture
     {
+        /// <summary>
+        /// The current excel file path used by the test
+        /// </summary>
+        private string excelFilePath;
+
         /// <summary>
         /// The current set of credentials that will be used
         /// </summary>
@@ -79,6 +89,13 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         /// Preserved parameter types iids
         /// </summary>
         private List<Guid> preservedParametersIids = new List<Guid>();
+
+        private Parameter parameterRedundancy;
+        private Parameter parameterPowerOn;
+        private Parameter parameterPowerStandBy;
+        private Parameter parameterPowerPeak;
+        private Parameter parameterPowerPowerDutyCycle;
+        private Parameter parameterPowerMean;
 
         [SetUp]
         public void SetUp()
@@ -119,9 +136,71 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
                 ShortName = "P_SimpleQuantityKind"
             };
 
+            var parameterTypeRedundancy = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "redundancy",
+                ShortName = "redundancy",
+                Component =
+                {
+                    new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        ShortName = "scheme",
+                        ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                        {
+                            ShortName = "scheme_pt"
+                        }
+                    },
+                    new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        ShortName = "type",
+                        ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                        {
+                            ShortName = "type_pt"
+                        }
+                    },
+                    new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        ShortName = "k",
+                        ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                        {
+                            ShortName = "k_pt"
+                        }
+                    },
+                    new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                    {
+                        ShortName = "n",
+                        ParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                        {
+                            ShortName = "n_pt"
+                        }
+                    }
+                }
+            };
+
             var parameterTypePowerOn = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 ShortName = "P_on"
+            };
+
+            var parameterTypePowerStandby = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "P_stby"
+            };
+
+            var parameterTypePowerPeak = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "P_peak"
+            };
+
+            var parameterTypePowerDutyCycle = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                ShortName = "P_duty_cyc"
+            };
+
+            var parameterTypePowerMean = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "P_mean",
+                ShortName = "P_mean"
             };
 
             var parameter = new Parameter
@@ -132,7 +211,15 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
                 Owner = domain
             };
 
-            var parameterPowerOn = new Parameter
+            this.parameterRedundancy = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypeRedundancy,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
+            this.parameterPowerOn = new Parameter
             {
                 Iid = Guid.NewGuid(),
                 ParameterType = parameterTypePowerOn,
@@ -140,14 +227,56 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
                 Owner = domain
             };
 
+            this.parameterPowerStandBy = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypePowerStandby,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
+            this.parameterPowerPeak = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypePowerPeak,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
+            this.parameterPowerPowerDutyCycle = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypePowerDutyCycle,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
+            this.parameterPowerMean = new Parameter
+            {
+                Iid = Guid.NewGuid(),
+                ParameterType = parameterTypePowerMean,
+                Scale = parameterTypePowerOn.DefaultScale,
+                Owner = domain
+            };
+
             this.iteration.Element.Add(elementDefinition);
             this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameter);
-            this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameterPowerOn);
+
+            var sourcePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\TestData\test.xlsx");
+            var fileinfo = new FileInfo(sourcePath);
+
+            var targetPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\TestData\temporarytestfile.xlsx");
+            var tempfile = fileinfo.CopyTo(targetPath, true);
+            this.excelFilePath = tempfile.FullName;
         }
 
         [TearDown]
         public void TearDown()
         {
+            if (System.IO.File.Exists(this.excelFilePath))
+            {
+                System.IO.File.Delete(this.excelFilePath);
+            }
         }
 
         [Test]
@@ -159,49 +288,111 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.IsInstanceOf<ElementDefinitionSelectorViewModel>(viewModel.ElementSelectorViewModel);
             Assert.IsInstanceOf<ParameterTypeSelectorViewModel>(viewModel.ParameterSelectorViewModel);
 
-            this.iteration.Element.Clear();
+            Assert.AreEqual(true, viewModel.PersistValues);
 
             Assert.DoesNotThrow(() => viewModel.ElementSelectorViewModel.BindData());
             Assert.DoesNotThrow(() => viewModel.ParameterSelectorViewModel.BindData());
         }
 
         [Test]
-        public void VerifyThatOkCommandsWorks()
+        public void VerifyThatOkCommandWorksWithNullWorkbook()
         {
             var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object, null);
 
-            var elementDefinitionSelectorViewModel = new ElementDefinitionSelectorViewModel(
-                this.iteration,
-                this.session.Object,
-                this.preservedElementsIids);
+            Assert.IsInstanceOf<ElementDefinitionSelectorViewModel>(viewModel.ElementSelectorViewModel);
+            Assert.IsInstanceOf<ParameterTypeSelectorViewModel>(viewModel.ParameterSelectorViewModel);
 
-            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(
-                this.iteration,
-                this.session.Object,
-                this.preservedParametersIids);
-
-            Assert.DoesNotThrow(() => elementDefinitionSelectorViewModel.BindData());
-            Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.BindData());
-
-            parameterTypeSelectorViewModel.SelectedSourceList = parameterTypeSelectorViewModel.ParameterTypeSourceList;
-            elementDefinitionSelectorViewModel.SelectedSourceList = elementDefinitionSelectorViewModel.ElementDefinitionSourceList;
+            Assert.DoesNotThrow(() => viewModel.ElementSelectorViewModel.BindData());
+            Assert.DoesNotThrow(() => viewModel.ParameterSelectorViewModel.BindData());
 
             Assert.DoesNotThrow(() => viewModel.OkCommand.Execute(null));
+
             Assert.IsTrue(viewModel.DialogResult.Result);
         }
 
         [Test]
-        public void VerifyThatCancelCommandsWorks()
+        [Category("OfficeDependent")]
+        public void VerifyThatOkCommandWorks()
+        {
+            var application = new Application();
+            var workbook = application.Workbooks.Open(this.excelFilePath, false, false);
+
+            Assert.NotNull(workbook);
+
+            var viewModel = new CrossViewDialogViewModel(application, this.iteration, this.session.Object, workbook);
+
+            Assert.IsInstanceOf<ElementDefinitionSelectorViewModel>(viewModel.ElementSelectorViewModel);
+            Assert.IsInstanceOf<ParameterTypeSelectorViewModel>(viewModel.ParameterSelectorViewModel);
+
+            Assert.DoesNotThrow(() => viewModel.ElementSelectorViewModel.BindData());
+            Assert.DoesNotThrow(() => viewModel.ParameterSelectorViewModel.BindData());
+
+            Assert.DoesNotThrow(() => viewModel.OkCommand.Execute(null));
+
+            Assert.IsTrue(viewModel.DialogResult.Result);
+
+            workbook.Close();
+            workbook.Dispose();
+
+            application.Quit();
+            application.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatCancelCommandWorks()
         {
             var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object, null);
 
             Assert.DoesNotThrow(() => viewModel.CancelCommand.Execute(null));
+
             Assert.IsFalse(viewModel.DialogResult.Result);
         }
 
         [Test]
-        public void VerifyThatPowerCommandsWorks()
+        public void VerifyThatPowerCommandWorks()
         {
+            var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(
+                this.iteration,
+                this.session.Object,
+                new List<Guid>());
+
+            Assert.Zero(parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+
+            parameterTypeSelectorViewModel.BindData();
+
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
+
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+
+            parameterTypeSelectorViewModel.SelectedSourceList.Add(parameterTypeSelectorViewModel.ParameterTypeSourceList.FirstOrDefault());
+            parameterTypeSelectorViewModel.ExecuteMoveToTarget();
+
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+
+            parameterTypeSelectorViewModel.SelectedTargetList.Add(parameterTypeSelectorViewModel.ParameterTypeTargetList.FirstOrDefault());
+            parameterTypeSelectorViewModel.ExecuteMoveToSource();
+
+            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
+
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
+            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
+        }
+
+        [Test]
+        public void VerifyThatTogglePowerCommandWorks()
+        {
+            // Add 6 power related parameters
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterRedundancy);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerOn);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerStandBy);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerPeak);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerPowerDutyCycle);
+            this.iteration.Element.FirstOrDefault()?.Parameter.Add(this.parameterPowerMean);
+
             var parameterTypeSelectorViewModel = new ParameterTypeSelectorViewModel(
                 this.iteration,
                 this.session.Object,
@@ -211,28 +402,13 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             parameterTypeSelectorViewModel.BindData();
 
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
+            parameterTypeSelectorViewModel.PowerParametersEnabled = true;
+            Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.PowerParametersCommand.Execute(null));
+            Assert.IsTrue(parameterTypeSelectorViewModel.PowerParametersEnabled);
 
-            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
-
-            parameterTypeSelectorViewModel.SelectedSourceList.Add(parameterTypeSelectorViewModel.ParameterTypeSourceList.FirstOrDefault());
-            parameterTypeSelectorViewModel.ExecuteMoveToTarget();
-
-            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
-            Assert.AreEqual(1, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
-
-            parameterTypeSelectorViewModel.SelectedTargetList.Add(parameterTypeSelectorViewModel.ParameterTypeTargetList.FirstOrDefault());
-            parameterTypeSelectorViewModel.ExecuteMoveToSource();
-
-            Assert.AreEqual(2, parameterTypeSelectorViewModel.ParameterTypeSourceList.Count);
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.ParameterTypeTargetList.Count);
-
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedSourceList.Count);
-            Assert.AreEqual(0, parameterTypeSelectorViewModel.SelectedTargetList.Count);
+            parameterTypeSelectorViewModel.PowerParametersEnabled = false;
+            Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.PowerParametersCommand.Execute(null));
+            Assert.IsFalse(parameterTypeSelectorViewModel.PowerParametersEnabled);
         }
     }
 }

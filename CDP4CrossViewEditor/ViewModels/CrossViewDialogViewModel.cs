@@ -82,17 +82,22 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// ViewModel that corresponds to the element selector area
         /// </summary>
-        public ThingSelectorViewModel ElementSelectorViewModel { get; private set; }
+        public ElementDefinitionSelectorViewModel ElementSelectorViewModel { get; private set; }
 
         /// <summary>
         /// ViewModel that corresponds to the element selector area
         /// </summary>
-        public ThingSelectorViewModel ParameterSelectorViewModel { get; private set; }
+        public ParameterTypeSelectorViewModel ParameterSelectorViewModel { get; private set; }
 
         /// <summary>
         /// Gets the list of <see cref="WorkbookRowViewModel"/>s that is available in the current Excel application.
         /// </summary>
         private List<WorkbookRowViewModel> Workbooks { get; set; }
+
+        /// <summary>
+        /// Backing field for <see cref="PersistValues"/>
+        /// </summary>
+        private bool persistValues;
 
         /// <summary>
         /// Gets or sets the selected <see cref="WorkbookRowViewModel"/>
@@ -107,6 +112,15 @@ namespace CDP4CrossViewEditor.ViewModels
         /// Dictionary that contains manuallys aved values
         /// </summary>
         private Dictionary<string, string> ManuallyFilledValues = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Gets or sets a value indicating metadata sheet persistence
+        /// </summary>
+        public bool PersistValues
+        {
+            get => this.persistValues;
+            set => this.RaiseAndSetIfChanged(ref this.persistValues, value);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CrossViewDialogViewModel"/> class.
@@ -128,6 +142,8 @@ namespace CDP4CrossViewEditor.ViewModels
             this.Workbooks = new List<WorkbookRowViewModel>();
             this.Iteration = iteration;
             this.Session = session;
+            this.PersistValues = true;
+
             this.InitWorkbooks(application, activeWorkbook);
             this.InitModels();
 
@@ -182,12 +198,13 @@ namespace CDP4CrossViewEditor.ViewModels
         {
             CrossviewWorkbookData preservedData = null;
 
-            if (this.SelectedWorkbook != null)
+            if (this.SelectedWorkbook?.Workbook != null)
             {
                 var workbookDataDal = new CrossviewWorkbookDataDal(this.SelectedWorkbook?.Workbook);
                 preservedData = workbookDataDal.Read();
-                this.ManuallyFilledValues = preservedData?.ManuallySavedValues ?? new Dictionary<string, string>();
             }
+
+            this.ManuallyFilledValues = preservedData?.ManuallySavedValues ?? new Dictionary<string, string>();
 
             this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(
                 this.Iteration,
@@ -213,16 +230,13 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteOk()
         {
-            if (this.ElementSelectorViewModel is ElementDefinitionSelectorViewModel elementDefinitionViewModel &&
-                this.ParameterSelectorViewModel is ParameterTypeSelectorViewModel parameterTypeViewModel)
-            {
-                this.DialogResult = new WorkbookSelectionDialogResult(
-                    true,
-                    this.SelectedWorkbook?.Workbook,
-                    elementDefinitionViewModel.ElementDefinitionTargetList.Select(e => e.Thing),
-                    parameterTypeViewModel.ParameterTypeTargetList.Select(p => p.Thing),
-                    this.ManuallyFilledValues);
-            }
+            this.DialogResult = new WorkbookSelectionDialogResult(
+                true,
+                this.SelectedWorkbook?.Workbook,
+                this.ElementSelectorViewModel?.ElementDefinitionTargetList.Select(e => e.Thing),
+                this.ParameterSelectorViewModel?.ParameterTypeTargetList.Select(p => p.Thing),
+                this.ManuallyFilledValues,
+                this.PersistValues);
         }
     }
 }
