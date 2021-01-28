@@ -224,7 +224,7 @@ namespace CDP4CrossViewEditor.ViewModels
             this.PowerParametersEnabled = 
                 PowerParameters
                     .Select(shortName =>
-                        this.ParameterTypeSourceList.FirstOrDefault(row =>
+                        this.ParameterTypeTargetList.FirstOrDefault(row =>
                             string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
                     .Count(row => row != null) == PowerParameters.Length;
         }
