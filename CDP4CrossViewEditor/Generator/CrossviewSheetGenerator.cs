@@ -257,7 +257,6 @@ namespace CDP4CrossViewEditor.Generator
             var parameterRange = this.crossviewSheet.Range(
                 this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
                 this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
-
             parameterRange.Name = CrossviewSheetConstants.RangeName;
             parameterRange.NumberFormat = this.crossviewArrayAssember.FormatArray;
             parameterRange.Value = this.crossviewArrayAssember.ContentArray;
@@ -267,7 +266,6 @@ namespace CDP4CrossViewEditor.Generator
             var formattedRange = this.crossviewSheet.Range(
                 this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
                 this.crossviewSheet.Cells[dataStartRow, numberOfColumns]);
-
             formattedRange.Interior.ColorIndex = 34;
             formattedRange.HorizontalAlignment = XlHAlign.xlHAlignCenter;
             formattedRange.VerticalAlignment = XlVAlign.xlVAlignCenter;
@@ -277,16 +275,6 @@ namespace CDP4CrossViewEditor.Generator
             formattedRange.EntireColumn.AutoFit();
 
             this.PrettifyBodyHeader();
-
-            // lock fixed columns
-            for (var i = dataStartRow + 1; i <= dataEndRow; i++)
-            {
-                var fixedRange = this.crossviewSheet.Range(
-                    this.crossviewSheet.Cells[i, 1],
-                    this.crossviewSheet.Cells[i, CrossviewSheetConstants.FixedColumns]);
-
-                fixedRange.Locked = Enumerable.Repeat(true, CrossviewSheetConstants.FixedColumns).ToArray();
-            }
 
             // add names to parameter value cells
             for (var i = 0; i < numberOfBodyRows; ++i)
