@@ -206,8 +206,12 @@ namespace CDP4CrossViewEditor.ViewModels
         {
             ExecuteMove(this.ParameterTypeTargetList, this.ParameterTypeSourceList, this.SelectedTargetList);
 
-            this.PowerParametersEnabled = PowerParameters
-                                              .Select(shortName => this.ParameterTypeTargetList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase))).Count(row => row != null) == PowerParameters.Length;
+            this.PowerParametersEnabled = 
+                PowerParameters
+                    .Select(shortName =>
+                        this.ParameterTypeTargetList.FirstOrDefault(row =>
+                            string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+                    .Count(row => row != null) == PowerParameters.Length;
         }
 
         /// <summary>
@@ -217,8 +221,12 @@ namespace CDP4CrossViewEditor.ViewModels
         {
             ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
 
-            this.PowerParametersEnabled = PowerParameters
-                                              .Select(shortName => this.ParameterTypeTargetList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase))).Count(row => row != null) == PowerParameters.Length;
+            this.PowerParametersEnabled = 
+                PowerParameters
+                    .Select(shortName =>
+                        this.ParameterTypeSourceList.FirstOrDefault(row =>
+                            string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+                    .Count(row => row != null) == PowerParameters.Length;
         }
 
         /// <summary>

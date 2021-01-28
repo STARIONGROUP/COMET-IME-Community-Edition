@@ -261,7 +261,6 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
             this.iteration.Element.Add(elementDefinition);
             this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameter);
-            this.iteration.Element.FirstOrDefault()?.Parameter.Add(parameterPowerOn);
 
             var sourcePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\TestData\test.xlsx");
             var fileinfo = new FileInfo(sourcePath);
