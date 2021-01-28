@@ -206,7 +206,7 @@ namespace CDP4CrossViewEditor.ViewModels
         {
             ExecuteMove(this.ParameterTypeTargetList, this.ParameterTypeSourceList, this.SelectedTargetList);
 
-            this.PowerParametersEnabled = 
+            this.PowerParametersEnabled =
                 PowerParameters
                     .Select(shortName =>
                         this.ParameterTypeTargetList.FirstOrDefault(row =>
@@ -221,7 +221,7 @@ namespace CDP4CrossViewEditor.ViewModels
         {
             ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
 
-            this.PowerParametersEnabled = 
+            this.PowerParametersEnabled =
                 PowerParameters
                     .Select(shortName =>
                         this.ParameterTypeTargetList.FirstOrDefault(row =>
@@ -234,7 +234,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         protected override void ExecuteClear()
         {
-            this.SelectedTargetList = this.ParameterTypeTargetList;
+            this.SelectedTargetList.Clear();
+            this.SelectedTargetList.AddRange(this.ParameterTypeTargetList);
 
             this.ExecuteMoveToSource();
         }
