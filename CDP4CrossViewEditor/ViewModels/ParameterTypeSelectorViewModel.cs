@@ -203,11 +203,11 @@ namespace CDP4CrossViewEditor.ViewModels
             ExecuteMove(this.ParameterTypeTargetList, this.ParameterTypeSourceList, this.SelectedTargetList);
 
             this.PowerParametersEnabled =
-                PowerParameters
+                CrossviewSheetPMeanUtilities.PowerParameters
                     .Select(shortName =>
                         this.ParameterTypeTargetList.FirstOrDefault(row =>
                             string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
-                    .Count(row => row != null) == PowerParameters.Length;
+                    .Count(row => row != null) == CrossviewSheetPMeanUtilities.PowerParameters.Length;
         }
 
         /// <summary>
@@ -218,11 +218,11 @@ namespace CDP4CrossViewEditor.ViewModels
             ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
 
             this.PowerParametersEnabled =
-                PowerParameters
+                CrossviewSheetPMeanUtilities.PowerParameters
                     .Select(shortName =>
                         this.ParameterTypeTargetList.FirstOrDefault(row =>
                             string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
-                    .Count(row => row != null) == PowerParameters.Length;
+                    .Count(row => row != null) == CrossviewSheetPMeanUtilities.PowerParameters.Length;
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToSource()
         {
-            var powerParameterTypes = PowerParameters
+            var powerParameterTypes = CrossviewSheetPMeanUtilities.PowerParameters
                 .Select(shortName => this.ParameterTypeTargetList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
                 .Where(row => row != null);
 
