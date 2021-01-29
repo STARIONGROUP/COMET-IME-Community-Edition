@@ -90,10 +90,9 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
             this.ContentArray[0, 11] = "TYPE";
             this.ContentArray[0, 12] = "ValueSet Id";
 
-            int i = 2;
+            var i = 2;
             foreach (var excelRow in this.excelRows)
             {
-                
                 this.ContentArray[i, 0] = excelRow.Name;
                 this.ContentArray[i, 1] = excelRow.ShortName;
                 this.ContentArray[i, 2] = excelRow.ComputedValue;
@@ -117,12 +116,12 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// </summary>
         private void PopulateFormatArray()
         {
-            for (int j = this.FormatArray.GetLowerBound(1); j < this.FormatArray.GetUpperBound(1); j++)
+            for (var j = this.FormatArray.GetLowerBound(1); j <= this.FormatArray.GetUpperBound(1); j++)
             {
                 this.FormatArray[0, j] = "@";
             }
 
-            int i = 2;
+            var i = 2;
             foreach (var excelRow in this.excelRows)
             {
                 this.FormatArray[i, 0] = "@";              // Name
@@ -148,12 +147,12 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// </summary>
         private void PopulateLockArray()
         {
-            for (int j = this.LockArray.GetLowerBound(1); j < this.LockArray.GetUpperBound(1); j++)
+            for (var j = this.LockArray.GetLowerBound(1); j <= this.LockArray.GetUpperBound(1); j++)
             {
                 this.LockArray[0, j] = true;
             }
 
-            int i = 2;
+            var i = 2;
             foreach (var excelRow in this.excelRows)
             {
                 this.LockArray[i, 0] = true;  // Name
@@ -222,7 +221,6 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                 default:
                     return true;
             }
-
         }
     }
 }
