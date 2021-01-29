@@ -138,31 +138,35 @@ namespace CDP4CrossViewEditor.Generator
             var pMean = parameters.Where(p => p != null)
                 .FirstOrDefault(p => p.ParameterType.ShortName.Equals("P_mean", StringComparison.InvariantCultureIgnoreCase));
 
-            // Check if P_duty_cyc && P_mean have the same option dependency
-            if (pDutyCycle?.IsOptionDependent != pMean?.IsOptionDependent)
+            if (pDutyCycle == null || pMean == null)
             {
                 return false;
             }
 
-            if (!pDutyCycle.IsOptionDependent ||
-                !pMean.IsOptionDependent ||
-                !pDutyCycle.ValueSets.Select(vs => vs.ActualOption).Except(pMean.ValueSets.Select(vs => vs.ActualOption)).Any())
+            // Check if P_duty_cyc && P_mean have the same option dependency
+            if (pDutyCycle.IsOptionDependent != pMean.IsOptionDependent)
             {
-                // Check if P_duty_cyc && P_mean have the same state dependency, both should be the same
-                if (pDutyCycle.StateDependence == null || pMean.StateDependence == null)
-                {
-                    return false;
-                }
-
-                if (pDutyCycle.StateDependence.ActualState.Count == 0 || pMean.StateDependence.ActualState.Count == 0)
-                {
-                    return false;
-                }
-
-                return !pDutyCycle.StateDependence.ActualState.Except(pMean.StateDependence.ActualState).Any();
+                return false;
             }
 
-            return true;
+            if (pDutyCycle.IsOptionDependent && pMean.IsOptionDependent && pDutyCycle.ValueSets.Select(vs => vs.ActualOption).Except(pMean.ValueSets.Select(vs => vs.ActualOption)).Any())
+            {
+                return true;
+            }
+
+            // Check if P_duty_cyc && P_mean have the same state dependency, both should be the same
+            if (pDutyCycle.StateDependence == null || pMean.StateDependence == null)
+            {
+                return false;
+            }
+
+            if (pDutyCycle.StateDependence.ActualState.Count == 0 || pMean.StateDependence.ActualState.Count == 0)
+            {
+                return false;
+            }
+
+            return !pDutyCycle.StateDependence.ActualState.Except(pMean.StateDependence.ActualState).Any();
+
         }
 
         /// <summary>
