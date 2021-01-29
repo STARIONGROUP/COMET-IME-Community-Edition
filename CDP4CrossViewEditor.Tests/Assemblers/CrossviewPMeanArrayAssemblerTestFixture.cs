@@ -468,7 +468,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
 
-            // The that power related parameters are present into the header
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("redundancy"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_on"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
@@ -490,7 +489,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
 
-            // The that power related parameters are present into the header
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("redundancy"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_on"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
@@ -523,7 +521,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
 
-            // The that power related parameters are present into the header
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("redundancy"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_on"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
@@ -556,7 +553,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
 
-            // The that power related parameters are present into the header
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("redundancy"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_on"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
@@ -581,7 +577,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
 
-            // The that power related parameters are present into the header
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("redundancy"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_on"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
@@ -608,7 +603,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
 
-            // The that power related parameters are present into the header
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("redundancy"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_on"));
@@ -634,7 +628,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
 
-            // The that power related parameters are present into the header
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("redundancy"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_on"));

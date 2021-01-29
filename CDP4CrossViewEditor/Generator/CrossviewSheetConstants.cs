@@ -33,11 +33,6 @@ namespace CDP4CrossViewEditor.Generator
     internal static class CrossviewSheetConstants
     {
         /// <summary>
-        /// Hardcoded power related parameter type short names list
-        /// </summary>
-        public static readonly string[] PowerParameters = { "redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
-
-        /// <summary>
         /// Initial fixed columns
         /// </summary>
         internal const int FixedColumns = 5;

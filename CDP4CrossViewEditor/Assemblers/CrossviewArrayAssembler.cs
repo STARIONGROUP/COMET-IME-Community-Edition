@@ -328,6 +328,7 @@ namespace CDP4CrossViewEditor.Assemblers
             }
 
             var isCalculationPossible = CrossviewSheetPMeanUtilities.IsCalculationPossible(parameters.Where(p => p != null).ToList());
+
             var calculationParameters = new List<(ParameterValueSetBase, ParameterTypeComponent)>();
 
             foreach (var parameterOrOverrideBase in parameters.Where(p => p != null))
@@ -345,8 +346,12 @@ namespace CDP4CrossViewEditor.Assemblers
                             contentRow[index] = value;
                             namesRow[index] = $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode(i)}";
 
-                            if (isCalculationPossible &&
-                                CrossviewSheetConstants.PowerParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
+                            if (!isCalculationPossible)
+                            {
+                                continue;
+                            }
+
+                            if (CrossviewSheetPMeanUtilities.PowerParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
                             {
                                 calculationParameters.Add((parameterValueSetBase, component));
                             }
@@ -363,7 +368,7 @@ namespace CDP4CrossViewEditor.Assemblers
                             continue;
                         }
 
-                        if (CrossviewSheetConstants.PowerParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
+                        if (CrossviewSheetPMeanUtilities.PowerParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
                         {
                             calculationParameters.Add((parameterValueSetBase, null));
                         }
@@ -376,18 +381,21 @@ namespace CDP4CrossViewEditor.Assemblers
                 return (contentRow, namesRow);
             }
 
-            var indexes = CrossviewSheetConstants.PowerParameters.Select(p => this.GetContentColumnsIndexes(calculationParameters, p)).SelectMany(x => x).ToList();
+            var indexes = CrossviewSheetPMeanUtilities.PowerParameters
+                .Select(p => this.GetContentColumnsIndexes(calculationParameters, p)).SelectMany(x => x).ToList();
 
-            var rSchemeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.scheme", StringComparison.InvariantCultureIgnoreCase)).Item2;
-            var rTypeIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.type", StringComparison.InvariantCultureIgnoreCase)).Item2;
-            var rKIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.k", StringComparison.InvariantCultureIgnoreCase)).Item2;
-            var rNIndex = indexes.FirstOrDefault(p => p.Item1.Equals("redundancy.n", StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var rSchemeIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyScheme, StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var rTypeIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyType, StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var rKIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyK, StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var rNIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyN, StringComparison.InvariantCultureIgnoreCase)).Item2;
 
-            var pOnIndex = indexes.FirstOrDefault(p => p.Item1.Equals("P_on", StringComparison.InvariantCultureIgnoreCase)).Item2;
-            var pStandbyIndex = indexes.FirstOrDefault(p => p.Item1.Equals("P_stby", StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var pOnIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.POn, StringComparison.InvariantCultureIgnoreCase)).Item2;
+            var pStandbyIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PStandBy, StringComparison.InvariantCultureIgnoreCase)).Item2;
 
-            var pDutyCycleIndexes = indexes.Where(p => p.Item1.Equals("P_duty_cyc", StringComparison.InvariantCultureIgnoreCase)).ToArray();
-            var pMeanIndexes = indexes.Where(p => p.Item1.Equals("P_mean", StringComparison.InvariantCultureIgnoreCase)).ToArray();
+            var pDutyCycleIndexes = indexes.Where(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PDutyCycle, StringComparison.InvariantCultureIgnoreCase)).ToArray();
+
+            var pMeanIndexes = indexes.Where(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PMean,
+                StringComparison.InvariantCultureIgnoreCase)).ToArray();
 
             if (pMeanIndexes.Length != pDutyCycleIndexes.Length)
             {
@@ -397,7 +405,7 @@ namespace CDP4CrossViewEditor.Assemblers
 
             for (var i = 0; i < pDutyCycleIndexes.Count(); i++)
             {
-                contentRow[pMeanIndexes[i].Item2] = CrossviewSheetPMeanUtilities.ComputeCalculation(
+                contentRow[pMeanIndexes[i].Item2] = CrossviewSheetPMeanUtilities.ComputePMean(
                     contentRow[pStandbyIndex].ToString(),
                     contentRow[pOnIndex].ToString(),
                     contentRow[pDutyCycleIndexes[i].Item2].ToString(),
@@ -458,7 +466,7 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </param>
         private void SetContentColumnIndex(ParameterValueSetBase parameterValueSet)
         {
-            var parameter = (Parameter)parameterValueSet.Container;
+            var parameter = (Parameter) parameterValueSet.Container;
 
             if (parameter.ParameterType is CompoundParameterType compoundParameterType)
             {
@@ -484,7 +492,7 @@ namespace CDP4CrossViewEditor.Assemblers
                         parameterValueSet.ActualOption?.ShortName ?? "",
                         parameter.StateDependence?.ShortName ?? "",
                         parameterValueSet.ActualState?.ShortName ?? ""),
-                        -1);
+                    -1);
             }
         }
 
