@@ -79,6 +79,11 @@ namespace CDP4CrossViewEditor.ViewModels
         public ReactiveList<ParameterTypeRowViewModel> SelectedTargetList { get; set; }
 
         /// <summary>
+        /// Gets/sets the move power parameter types command <see cref="ReactiveCommand"/>
+        /// </summary>
+        public ReactiveCommand<object> PowerParametersCommand { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeSelectorViewModel"/> class.
         /// </summary>
         /// <param name="iteration">Current opened iteration <see cref="Iteration"/></param>
@@ -107,17 +112,23 @@ namespace CDP4CrossViewEditor.ViewModels
                 ChangeTrackingEnabled = true
             };
 
-            this.WhenAnyValue(vm => vm.PowerParametersEnabled).Subscribe(isPowerClicked =>
+            this.PowerParametersCommand = ReactiveCommand.Create();
+            this.PowerParametersCommand.Subscribe(_ => this.ExecutePowerParametersCommand());
+        }
+
+        /// <summary>
+        /// Executes the <see cref="PowerParametersCommand"/>
+        /// </summary>
+        private void ExecutePowerParametersCommand()
+        {
+            if (this.PowerParametersEnabled)
             {
-                if (isPowerClicked)
-                {
-                    this.ExecuteMovePowerToTarget();
-                }
-                else
-                {
-                    this.ExecuteMovePowerToSource();
-                }
-            });
+                this.ExecuteMovePowerToTarget();
+            }
+            else
+            {
+                this.ExecuteMovePowerToSource();
+            }
         }
 
         /// <summary>
@@ -190,6 +201,13 @@ namespace CDP4CrossViewEditor.ViewModels
         protected internal override void ExecuteMoveToSource()
         {
             ExecuteMove(this.ParameterTypeTargetList, this.ParameterTypeSourceList, this.SelectedTargetList);
+
+            this.PowerParametersEnabled =
+                PowerParameters
+                    .Select(shortName =>
+                        this.ParameterTypeTargetList.FirstOrDefault(row =>
+                            string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+                    .Count(row => row != null) == PowerParameters.Length;
         }
 
         /// <summary>
@@ -198,6 +216,13 @@ namespace CDP4CrossViewEditor.ViewModels
         protected internal override void ExecuteMoveToTarget()
         {
             ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
+
+            this.PowerParametersEnabled =
+                PowerParameters
+                    .Select(shortName =>
+                        this.ParameterTypeTargetList.FirstOrDefault(row =>
+                            string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+                    .Count(row => row != null) == PowerParameters.Length;
         }
 
         /// <summary>
@@ -205,7 +230,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         protected override void ExecuteClear()
         {
-            this.SelectedTargetList = this.ParameterTypeTargetList;
+            this.SelectedTargetList.Clear();
+            this.SelectedTargetList.AddRange(this.ParameterTypeTargetList);
 
             this.ExecuteMoveToSource();
         }
@@ -230,8 +256,8 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToSource()
         {
-            var powerParameterTypes = CrossviewSheetPMeanUtilities.PowerParameters
-                .Select(shortName => this.ParameterTypeSourceList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
+            var powerParameterTypes = PowerParameters
+                .Select(shortName => this.ParameterTypeTargetList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
                 .Where(row => row != null);
 
             this.SelectedTargetList.Clear();
