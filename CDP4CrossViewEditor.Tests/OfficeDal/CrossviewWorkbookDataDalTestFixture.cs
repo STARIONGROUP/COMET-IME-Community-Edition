@@ -242,7 +242,6 @@ namespace CDP4CrossViewEditor.Tests.OfficeDal
                 var retrievedSession = workbookDataDal.Read();
 
                 Assert.NotNull(retrievedSession);
-
                 Assert.IsNotEmpty(retrievedSession.SavedElementDefinitions);
                 Assert.IsNotEmpty(retrievedSession.SavedParameterTypes);
             }

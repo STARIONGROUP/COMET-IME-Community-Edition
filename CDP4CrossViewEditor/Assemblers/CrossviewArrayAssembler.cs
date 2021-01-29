@@ -559,9 +559,12 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </summary>
         private void PopulateContentFormatArray()
         {
-            for (var i = this.FormatArray.GetLowerBound(1); i < this.FormatArray.GetUpperBound(1); i++)
+            for (var i = this.FormatArray.GetLowerBound(0); i <= this.FormatArray.GetUpperBound(0); i++)
             {
-                this.FormatArray[0, i] = "@";
+                for (var j = this.FormatArray.GetLowerBound(1); j <= this.FormatArray.GetUpperBound(1); j++)
+                {
+                    this.FormatArray[i, j] = "@";
+                }
             }
         }
 
@@ -570,9 +573,12 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </summary>
         private void PopulateContentLockArray()
         {
-            for (var i = this.LockArray.GetLowerBound(1); i < this.LockArray.GetUpperBound(1); i++)
+            for (var i = this.LockArray.GetLowerBound(0); i <= this.LockArray.GetUpperBound(0); i++)
             {
-                this.LockArray[0, i] = true;
+                for (var j = this.LockArray.GetLowerBound(1); j <= this.LockArray.GetUpperBound(1); j++)
+                {
+                    this.LockArray[i, j] = i < CrossviewSheetConstants.HeaderDepth || j < CrossviewSheetConstants.FixedColumns;
+                }
             }
         }
     }
