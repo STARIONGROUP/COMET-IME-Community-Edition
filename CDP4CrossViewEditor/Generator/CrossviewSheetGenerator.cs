@@ -255,8 +255,8 @@ namespace CDP4CrossViewEditor.Generator
             var dataEndRow = numberOfHeaderRows + numberOfBodyRows;
 
             var parameterRange = this.crossviewSheet.Range(
-            this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
-            this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
+                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
+                this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
 
             parameterRange.Name = CrossviewSheetConstants.RangeName;
             parameterRange.NumberFormat = this.crossviewArrayAssember.FormatArray;
@@ -265,8 +265,8 @@ namespace CDP4CrossViewEditor.Generator
             parameterRange.EntireColumn.AutoFit();
 
             var formattedRange = this.crossviewSheet.Range(
-            this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
-            this.crossviewSheet.Cells[dataStartRow, numberOfColumns]);
+                this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
+                this.crossviewSheet.Cells[dataStartRow, numberOfColumns]);
 
             formattedRange.Interior.ColorIndex = 34;
             formattedRange.HorizontalAlignment = XlHAlign.xlHAlignCenter;
@@ -380,8 +380,8 @@ namespace CDP4CrossViewEditor.Generator
                             {
                                 var afsDictionary = afslDictionary[actualFiniteStateListShortName];
 
-                                var minAfsl = afsDictionary.Values.Select(it => it).Min();
-                                var maxAfsl = afsDictionary.Values.Select(it => it).Max();
+                                var minAfsl = afsDictionary.Values.Min();
+                                var maxAfsl = afsDictionary.Values.Max();
 
                                 minO = Math.Min(minO, minAfsl);
                                 maxO = Math.Max(maxO, maxAfsl);
