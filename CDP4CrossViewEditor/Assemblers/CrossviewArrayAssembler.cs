@@ -619,7 +619,7 @@ namespace CDP4CrossViewEditor.Assemblers
                     }
                     
                     // lock cells with no corresponding parameter
-                    if (this.ContentArray[i, j] == null)
+                    if (this.NamesArray[i, j] == null)
                     {
                         locked = true;
                     }
