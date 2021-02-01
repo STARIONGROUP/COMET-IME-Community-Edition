@@ -604,27 +604,9 @@ namespace CDP4CrossViewEditor.Assemblers
             {
                 for (var j = this.LockArray.GetLowerBound(1); j <= this.LockArray.GetUpperBound(1); j++)
                 {
-                    var locked = false;
-
-                    // lock header
-                    if (i < CrossviewSheetConstants.HeaderDepth)
-                    {
-                        locked = true;
-                    }
-                    
-                    // lock fixed columns
-                    if (j < CrossviewSheetConstants.FixedColumns)
-                    {
-                        locked = true;
-                    }
-                    
-                    // lock cells with no corresponding parameter
-                    if (this.NamesArray[i, j] == null)
-                    {
-                        locked = true;
-                    }
-
-                    this.LockArray[i, j] = locked;
+                    // only named cells can be edited
+                    // this excludes: header, fixed columns, cells with no corresponding parameter
+                    this.LockArray[i, j] = this.NamesArray[i, j] == null;
                 }
             }
         }
