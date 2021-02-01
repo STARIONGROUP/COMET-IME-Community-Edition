@@ -8,12 +8,14 @@ namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using System.Reactive.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     using CDP4CommonView;
 
@@ -55,6 +57,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for the <see cref="ModelCode"/> property.
         /// </summary>
         private string modelCode;
+
+        /// <summary>
+        /// Backing field for the <see cref="ValueColumns"/>
+        /// </summary>
+        private ReactiveList<ParameterTypeAllocationColumn> valueColumns;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterDialogViewModel"/> class.
@@ -153,7 +160,7 @@ namespace CDP4EngineeringModel.ViewModels
             get { return this.selectedValueSet; }
             set { this.RaiseAndSetIfChanged(ref this.selectedValueSet, value); }
         }
-        
+
         /// <summary>
         /// Gets or sets the list of <see cref="ParameterValueSet"/>
         /// </summary>
@@ -185,7 +192,29 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return true; }
         }
-        
+
+        /// <summary>
+        /// Gets or sets the value table for SampledFunctionParameterType
+        /// </summary>
+        public virtual DataTable ValueTable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value data grid columns
+        /// </summary>
+        public virtual ReactiveList<ParameterTypeAllocationColumn> ValueColumns
+        {
+            get { return this.valueColumns; }
+            set { this.RaiseAndSetIfChanged(ref this.valueColumns, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the ParameterType is SampledFunctionParameter.
+        /// </summary>
+        public bool IsSampledFunctionParameter
+        {
+            get { return this.Thing.ParameterType is SampledFunctionParameterType; }
+        }
+
         /// <summary>
         /// Gets or sets a value that represents the ModelCode of the current <see cref="ElementDefinition"/>
         /// </summary>
@@ -203,6 +232,11 @@ namespace CDP4EngineeringModel.ViewModels
             base.Initialize();
             this.ValueSet = new DisposableReactiveList<Dialogs.ParameterRowViewModel>();
             this.PossibleGroups = new ReactiveList<GroupSelectionViewModel>();
+
+            this.ValueColumns = new ReactiveList<ParameterTypeAllocationColumn>()
+            {
+                ChangeTrackingEnabled = true
+            };
         }
 
         /// <summary>
@@ -228,7 +262,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.IsOptionDependent = this.Thing.IsOptionDependent;
             this.IsStateDependent = this.Thing.StateDependence != null;
             this.SelectedParameterType = this.Thing.ParameterType;
-            this.PopulatePossibleParameterType();            
+            this.PopulatePossibleParameterType();
             this.SelectedScale = this.Thing.Scale;
             this.PopulatePossibleScale();
             this.SelectedStateDependence = this.Thing.StateDependence;
@@ -243,7 +277,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
-            
+
             this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null && this.IsSelectedScaleValid();
         }
 
@@ -415,14 +449,21 @@ namespace CDP4EngineeringModel.ViewModels
                 this.Thing.ValueSet[i] = this.Thing.ValueSet[i].Clone(false);
             }
 
-            this.ValueSet.First().UpdateParameterValueSet(this.Thing);
-
-            foreach (var parameterValueSet in this.Thing.ValueSet)
+            if (this.Thing.ParameterType is SampledFunctionParameterType)
             {
-                 this.transaction.CreateOrUpdate(parameterValueSet);
+                ...
+            }
+            else
+            {
+                this.ValueSet.First().UpdateParameterValueSet(this.Thing);
+
+                foreach (var parameterValueSet in this.Thing.ValueSet)
+                {
+                    this.transaction.CreateOrUpdate(parameterValueSet);
+                }
             }
         }
-        
+
         /// <summary>
         /// Populates the <see cref="ValueSet"/> property with the content of the actual thing and the content of the transaction
         /// </summary>
@@ -430,9 +471,128 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.ValueSet.ClearAndDispose();
 
+            if (this.IsSampledFunctionParameter)
+            {
+                this.PopulateSampledFunctionParameterTypeValueGrid();
+                return;
+            }
+
             var row = new Dialogs.ParameterRowViewModel(this.Thing, this.Session, this, this.IsReadOnly);
 
             this.ValueSet.Add(row);
+        }
+
+        /// <summary>
+        /// Populates the value array grid for <see cref="SampledFunctionParameterType"/>
+        /// </summary>
+        private void PopulateSampledFunctionParameterTypeValueGrid()
+        {
+            this.ValueTable = new DataTable();
+            this.ValueTable.Rows.Clear();
+            this.ValueTable.Columns.Clear();
+
+            this.ValueColumns.Clear();
+
+            var columns = this.Thing.ParameterType.NumberOfValues;
+
+            var type = this.Thing.ParameterType as SampledFunctionParameterType;
+
+            if (type == null)
+            {
+                return;
+            }
+
+            foreach (var parameterTypeAssignment in type.IndependentParameterType.ToList())
+            {
+                if (parameterTypeAssignment.ParameterType is CompoundParameterType compoundParameterType)
+                {
+                    // add a column for each component
+                    foreach (ParameterTypeComponent parameterTypeComponent in compoundParameterType.Component)
+                    {
+                        var columnName = parameterTypeComponent.ShortName;
+                        this.ValueTable.Columns.Add(columnName, typeof(object));
+
+                        this.ValueColumns.Add(new ParameterTypeAllocationColumn
+                        {
+                            FieldName = columnName,
+                            DisplayName = parameterTypeComponent.Scale != null ? $"{columnName} [{parameterTypeComponent.Scale.ShortName}]" : columnName,
+                            Assignment = parameterTypeAssignment
+                        });
+                    }
+                }
+                else
+                {
+                    var columnName = parameterTypeAssignment.ParameterType.ShortName;
+                    this.ValueTable.Columns.Add(columnName, typeof(object));
+
+                    this.ValueColumns.Add(new ParameterTypeAllocationColumn
+                    {
+                        FieldName = columnName,
+                        DisplayName = parameterTypeAssignment.MeasurementScale != null ? $"{columnName} [{parameterTypeAssignment.MeasurementScale.ShortName}]" : columnName,
+                        Assignment = parameterTypeAssignment
+                    });
+                }
+            }
+
+            foreach (var parameterTypeAssignment in type.DependentParameterType.ToList())
+            {
+                if (parameterTypeAssignment.ParameterType is CompoundParameterType compoundParameterType)
+                {
+                    // add a column for each component
+                    foreach (ParameterTypeComponent parameterTypeComponent in compoundParameterType.Component)
+                    {
+                        var columnName = parameterTypeComponent.ShortName;
+                        this.ValueTable.Columns.Add(columnName, typeof(object));
+
+                        this.ValueColumns.Add(new ParameterTypeAllocationColumn
+                        {
+                            FieldName = columnName,
+                            DisplayName = parameterTypeComponent.Scale != null ? $"{columnName} [{parameterTypeComponent.Scale.ShortName}]" : columnName,
+                            Assignment = parameterTypeAssignment
+                        });
+                    }
+                }
+                else
+                {
+                    var columnName = parameterTypeAssignment.ParameterType.ShortName;
+                    this.ValueTable.Columns.Add(columnName, typeof(object));
+
+                    this.ValueColumns.Add(new ParameterTypeAllocationColumn
+                    {
+                        FieldName = columnName,
+                        DisplayName = parameterTypeAssignment.MeasurementScale != null ? $"{columnName} [{parameterTypeAssignment.MeasurementScale.ShortName}]" : columnName,
+                        Assignment = parameterTypeAssignment
+                    });
+                }
+            }
+
+            foreach (var valueChunk in this.SplitValues(this.Thing.ValueSet.First().Manual, columns))
+            {
+                var rowValue = this.ValueTable.NewRow();
+                var valueCounter = 0;
+
+                foreach (var value in valueChunk)
+                {
+                    rowValue[valueCounter] = value;
+                    valueCounter++;
+                }
+
+                this.ValueTable.Rows.Add(rowValue);
+            }
+        }
+
+        /// <summary>
+        /// Splits the valueset into chunks based on number of independent and dependent parametertype allocations
+        /// </summary>
+        /// <param name="values">The entire value array</param>
+        /// <param name="nSize">The size of chunks to split into</param>
+        /// <returns>An IEnumerable of the lists of chunks.</returns>
+        private IEnumerable<List<string>> SplitValues(ValueArray<string> values, int nSize = 30)
+        {
+            for (var i = 0; i < values.Count; i += nSize)
+            {
+                yield return values.ToList().GetRange(i, Math.Min(nSize, values.Count - i));
+            }
         }
 
         /// <summary>

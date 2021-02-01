@@ -90,6 +90,14 @@ namespace CDP4EngineeringModel.ViewModels
         public bool IsNameVisible { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether the ParameterType is SampledFunctionParameter.
+        /// </summary>
+        public bool IsSampledFunctionParameter
+        {
+            get { return this.Thing.ParameterType is SampledFunctionParameterType; }
+        }
+
+        /// <summary>
         /// Gets or sets the list of <see cref="ParameterSubscriptionValueSet"/>
         /// </summary>
         public DisposableReactiveList<Dialogs.ParameterSubscriptionRowViewModel> ValueSet { get; protected set; }
@@ -170,8 +178,8 @@ namespace CDP4EngineeringModel.ViewModels
              this.SelectedParameterType = ((ParameterOrOverrideBase)this.Thing.Container).ParameterType;
              this.PossibleOwner.Add(this.SelectedOwner);
              this.PopulateValueSet();
-            
-             this.ModelCode = this.Thing.ModelCode();         
+
+             this.ModelCode = this.Thing.ModelCode();
          }
 
         /// <summary>
@@ -196,14 +204,21 @@ namespace CDP4EngineeringModel.ViewModels
                 this.Thing.ValueSet[i] = this.Thing.ValueSet[i].Clone(false);
             }
 
-            this.ValueSet.First().UpdateValueSets(this.Thing);
-
-            foreach (var parameterSubscriptionValueSet in this.Thing.ValueSet)
+            if (this.Thing.ParameterType is SampledFunctionParameterType)
             {
-                this.transaction.CreateOrUpdate(parameterSubscriptionValueSet);
+
+            }
+            else
+            {
+                this.ValueSet.First().UpdateValueSets(this.Thing);
+
+                foreach (var parameterSubscriptionValueSet in this.Thing.ValueSet)
+                {
+                    this.transaction.CreateOrUpdate(parameterSubscriptionValueSet);
+                }
             }
         }
-        
+
         /// <summary>
         /// Check the validation status of the value rows
         /// </summary>

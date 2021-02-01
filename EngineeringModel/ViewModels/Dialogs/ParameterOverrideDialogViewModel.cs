@@ -145,7 +145,15 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return this.SelectedParameter.IsOptionDependent; }
         }
-        
+
+        /// <summary>
+        /// Gets a value indicating whether the ParameterType is SampledFunctionParameter.
+        /// </summary>
+        public bool IsSampledFunctionParameter
+        {
+            get { return this.Thing.ParameterType is SampledFunctionParameterType; }
+        }
+
         /// <summary>
         /// Gets or sets a value that represents the ModelCode of the current <see cref="ElementDefinition"/>
         /// </summary>
@@ -235,14 +243,21 @@ namespace CDP4EngineeringModel.ViewModels
                 this.Thing.ValueSet[i] = this.Thing.ValueSet[i].Clone(false);
             }
 
-            this.ValueSet.First().UpdateParameterOverrideValueSet(this.Thing);
-
-            foreach (var parameterOverrideValueSet in this.Thing.ValueSet)
+            if (this.Thing.ParameterType is SampledFunctionParameterType)
             {
-                this.transaction.CreateOrUpdate(parameterOverrideValueSet);
+
+            }
+            else
+            {
+                this.ValueSet.First().UpdateParameterOverrideValueSet(this.Thing);
+
+                foreach (var parameterOverrideValueSet in this.Thing.ValueSet)
+                {
+                    this.transaction.CreateOrUpdate(parameterOverrideValueSet);
+                }
             }
         }
-        
+
         /// <summary>
         /// Check the validation status of the value rows
         /// </summary>

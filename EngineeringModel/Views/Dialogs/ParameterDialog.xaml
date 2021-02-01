@@ -13,6 +13,10 @@
              d:DesignWidth="750"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
+    <dx:DXWindow.Resources>
+        <dx:BoolToVisibilityInverseConverter x:Key="InverseBooleanToVisibilityConverter"></dx:BoolToVisibilityInverseConverter>
+        <dx:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter"></dx:BoolToVisibilityConverter>
+    </dx:DXWindow.Resources>
     <lc:LayoutControl Margin="5"
                       Orientation="Vertical"
                       ScrollBars="None">
@@ -78,7 +82,10 @@
                                   Text="{Binding Path=ModelCode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                   IsReadOnly="True"/>
                 </lc:LayoutItem>
-                <views:ParameterValueSetLayoutItem />
+                <views:ParameterValueSetLayoutItem Visibility="{Binding IsSampledFunctionParameter, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+            </lc:LayoutGroup>
+            <lc:LayoutGroup Header="Values" Visibility="{Binding IsSampledFunctionParameter, Converter={StaticResource BooleanToVisibilityConverter}}" Orientation="Vertical">
+                <views:SampledFunctionValueGridLayoutItem></views:SampledFunctionValueGridLayoutItem>
             </lc:LayoutGroup>
             <items:ParameterSubscriptionLayoutGroup />
             <items:AdvancedLayoutGroup />

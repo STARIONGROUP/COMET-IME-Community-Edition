@@ -275,6 +275,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// </returns>
         public override bool IsEditable(string propertyName = "")
         {
+            // turn off inline editing for SampledFunctionParameter
+            if (this.Thing.ParameterType is SampledFunctionParameterType)
+            {
+                return false;
+            }
+
             if (this.isParameterBaseReadOnlyInDataContext)
             {
                 return false;
@@ -388,15 +394,32 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.AddValueSetListener(valueSet);
-            this.Computed = valueSet.Computed.Count() > this.ValueIndex ? valueSet.Computed[this.ValueIndex] : "-";
-            this.Manual = valueSet.Manual.Count() > this.ValueIndex ? valueSet.Manual[this.ValueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
-            this.Reference = valueSet.Reference.Count() > this.ValueIndex ? valueSet.Reference[this.ValueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
-            this.Value = valueSet.ActualValue.Count() > this.ValueIndex ? valueSet.ActualValue[this.ValueIndex] : "-";
-            this.Formula = valueSet.Formula.Count() > this.ValueIndex ? valueSet.Formula[this.ValueIndex] : "-";
+
+            if (this.Thing.ParameterType is SampledFunctionParameterType samplesFunctionParameterType)
+            {
+                var cols = samplesFunctionParameterType.NumberOfValues;
+
+                this.Computed = $"[{valueSet.Computed.Count / cols}x{cols}]";
+                this.Manual = $"[{valueSet.Manual.Count / cols}x{cols}]";
+                this.Reference = $"[{valueSet.Reference.Count / cols}x{cols}]";
+                this.Value = $"[{valueSet.ActualValue.Count / cols}x{cols}]";
+                this.Formula = $"[{valueSet.Formula.Count / cols}x{cols}]";
+                this.Published = $"[{valueSet.Published.Count / cols}x{cols}]";
+            }
+            else
+            {
+                this.Computed = valueSet.Computed.Count() > this.ValueIndex ? valueSet.Computed[this.ValueIndex] : "-";
+                this.Manual = valueSet.Manual.Count() > this.ValueIndex ? valueSet.Manual[this.ValueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
+                this.Reference = valueSet.Reference.Count() > this.ValueIndex ? valueSet.Reference[this.ValueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
+                this.Value = valueSet.ActualValue.Count() > this.ValueIndex ? valueSet.ActualValue[this.ValueIndex] : "-";
+                this.Formula = valueSet.Formula.Count() > this.ValueIndex ? valueSet.Formula[this.ValueIndex] : "-";
+                this.Published = valueSet.Published.Count() > this.ValueIndex ? valueSet.Published[this.ValueIndex] : "-";
+            }
+
             this.State = valueSet.ActualState != null ? valueSet.ActualState.Name : "-";
             this.Option = valueSet.ActualOption;
             this.Switch = valueSet.ValueSwitch;
-            this.Published = valueSet.Published.Count() > this.ValueIndex ? valueSet.Published[this.ValueIndex] : "-";
+
             if (valueSet.Published.Count() <= this.ValueIndex)
             {
                 this.Error = "No ValueSet found for this component";

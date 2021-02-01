@@ -235,9 +235,14 @@ namespace CDP4EngineeringModel.ViewModels
         /// </returns>
         public override bool IsEditable(string propertyName = "")
         {
+            if (this.Thing.ParameterType is SampledFunctionParameterType)
+            {
+                return false;
+            }
+
             return !this.isParameterBaseReadOnlyInDataContext && base.IsEditable(propertyName);
         }
-        
+
         /// <summary>
         /// Initializes the subscription of this row
         /// </summary>
