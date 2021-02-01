@@ -339,14 +339,14 @@ namespace CDP4CrossViewEditor.Assemblers
 
                             var index = this.GetContentColumnIndex(parameterValueSetBase, component);
                             contentRow[index] = value;
-                            namesRow[index] = $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode(i)}";
+                            namesRow[index] = GetCellName(excelRow.Thing, parameterValueSetBase, i);
                         }
                     }
                     else
                     {
                         var index = this.GetContentColumnIndex(parameterValueSetBase);
                         contentRow[index] = parameterValueSetBase.ActualValue.First();
-                        namesRow[index] = $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode()}";
+                        namesRow[index] = GetCellName(excelRow.Thing, parameterValueSetBase);
                     }
                 }
             }
@@ -391,6 +391,33 @@ namespace CDP4CrossViewEditor.Assemblers
         private static ParameterOrOverrideBase GetParameterOrOverrideBase(ElementDefinition elementDefinition, ParameterType parameterType)
         {
             return elementDefinition.Parameter.FirstOrDefault(p => p.ParameterType == parameterType);
+        }
+
+        /// <summary>
+        /// Generate a cell name for the given <paramref name="parameterValueSetBase"/>. Note that non-<see cref="ParameterOverrideValueSet"/>s
+        /// displayed on <see cref="ElementUsage"/> <paramref name="rowThing"/>s will not have a name, as they are not interactible.
+        /// </summary>
+        /// <param name="rowThing">
+        /// The <see cref="Thing"/> of the associated row.
+        /// </param>
+        /// <param name="parameterValueSetBase">
+        ///  The <see cref="ParameterValueSetBase"/> for which to generate the cell name.
+        /// </param>
+        /// <param name="componentIndex">
+        /// Optional, the <see cref="ParameterTypeComponent"/> index.
+        /// </param>
+        /// <returns>
+        /// The cell name.
+        /// </returns>
+        private static string GetCellName(Thing rowThing, ParameterValueSetBase parameterValueSetBase, int? componentIndex = null)
+        {
+            // non-overrides displayed on EUs are not interactible
+            if (rowThing is ElementUsage && parameterValueSetBase is ParameterValueSet)
+            {
+                return null;
+            }
+
+            return $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode(componentIndex)}";
         }
 
         /// <summary>
