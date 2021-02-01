@@ -299,7 +299,7 @@ namespace CDP4CrossViewEditor.Generator
                 }
             }
 
-            this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
+            this.crossviewSheet.Cells[dataStartRow + 1, CrossviewSheetConstants.FixedColumns + 1].Select();
             this.excelApplication.ActiveWindow.FreezePanes = true;
         }
 
