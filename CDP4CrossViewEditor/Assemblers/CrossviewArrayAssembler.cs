@@ -577,7 +577,27 @@ namespace CDP4CrossViewEditor.Assemblers
             {
                 for (var j = this.LockArray.GetLowerBound(1); j <= this.LockArray.GetUpperBound(1); j++)
                 {
-                    this.LockArray[i, j] = i < CrossviewSheetConstants.HeaderDepth || j < CrossviewSheetConstants.FixedColumns;
+                    var locked = false;
+
+                    // lock header
+                    if (i < CrossviewSheetConstants.HeaderDepth)
+                    {
+                        locked = true;
+                    }
+                    
+                    // lock fixed columns
+                    if (j < CrossviewSheetConstants.FixedColumns)
+                    {
+                        locked = true;
+                    }
+                    
+                    // lock cells with no corresponding parameter
+                    if (this.ContentArray[i, j] == null)
+                    {
+                        locked = true;
+                    }
+
+                    this.LockArray[i, j] = locked;
                 }
             }
         }
