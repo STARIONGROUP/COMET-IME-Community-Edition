@@ -29,6 +29,7 @@ namespace CDP4CrossViewEditor.Generator
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Drawing;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -294,12 +295,12 @@ namespace CDP4CrossViewEditor.Generator
                     {
                         cellObject.Value = changedValues[cellName];
                         var range = this.crossviewSheet.Range(cellObject, cellObject);
-                        range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue);
+                        range.Font.Color = ColorTranslator.ToOle(Color.Blue);
                     }
                 }
             }
 
-            this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
+            this.crossviewSheet.Cells[dataStartRow + 1, CrossviewSheetConstants.FixedColumns + 1].Select();
             this.excelApplication.ActiveWindow.FreezePanes = true;
         }
 
