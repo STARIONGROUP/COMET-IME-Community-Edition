@@ -258,7 +258,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.sourceParameterType_2.Component.Add(
                 new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) 
                 {
-                    ShortName = "Name",
+                    ShortName = "Value",
                     ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri)
                 });
 
@@ -566,7 +566,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 this.dialogNavigationService.Object,
                 this.pluginSettingsService.Object);
 
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.Caption, Is.EqualTo("Actual Finite State to ParameterType mapping, iteration_1"));
+            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.Caption, Is.EqualTo("Parameter to Actual Finite State Mapping, iteration_1"));
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.ToolTip, Is.EqualTo("Test\nhttp://www.rheagroup.com/\nJohn Doe"));
 
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleElementDefinitionCategory.Count, Is.EqualTo(2));
@@ -881,6 +881,14 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                     .ActualValue[1];
 
             Assert.AreEqual(newValueValue, dataView[0][columnName].ToString());
+
+            var newShortName = 
+                newMapping
+                    .ValueSet
+                    .First()
+                    .ActualValue[0];
+
+            Assert.AreEqual(newShortName, dataView[0][this.stateToParameterTypeMapperBrowserViewModel.DataSourceManager.GetShortNameColumnName(columnName)].ToString());
         }
 
         [Test]
