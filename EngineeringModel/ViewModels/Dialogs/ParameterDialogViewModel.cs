@@ -25,6 +25,9 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
+
+    using CDP4EngineeringModel.ViewModels.Dialogs;
+
     using ReactiveUI;
     
     /// <summary>
@@ -59,9 +62,19 @@ namespace CDP4EngineeringModel.ViewModels
         private string modelCode;
 
         /// <summary>
-        /// Backing field for the <see cref="ValueColumns"/>
+        /// Backing field for <see cref="DisplayedValueSet"/>
         /// </summary>
-        private ReactiveList<ParameterTypeAllocationColumn> valueColumns;
+        private ValueSetRowViewModel displayedValueSet;
+
+        /// <summary>
+        /// Backing field for <see cref="selectedValueSetGridViewModel"/>
+        /// </summary>
+        private SampledFunctionParameterTypeValueSetGridViewModel selectedValueSetGridViewModel;
+
+        /// <summary>
+        /// Backing field for <see cref="AvailableValueSets"/>
+        /// </summary>
+        private ReactiveList<ValueSetRowViewModel> availableValueSets;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterDialogViewModel"/> class.
@@ -109,8 +122,22 @@ namespace CDP4EngineeringModel.ViewModels
             this.WhenAnyValue(vm => vm.SelectedStateDependence).Subscribe(_ => this.IsValueSetEditable = this.IsOptionDependent == this.Thing.IsOptionDependent && this.SelectedStateDependence == this.Thing.StateDependence);
             this.WhenAnyValue(vm => vm.SelectedScale).Where(x => x != null).Subscribe(_ => this.CheckValueValidation());
             this.WhenAnyValue(vm => vm.SelectedGroupSelection).Subscribe(x => this.SelectedGroup = x != null ? x.Thing : null);
+            this.WhenAnyValue(vm => vm.DisplayedValueSet).Where(x => x != null).Subscribe(_ => this.LoadValueSetGrid());
 
             this.IsNameVisible = this.Thing.ParameterType is CompoundParameterType || this.Thing.IsOptionDependent || this.Thing.StateDependence != null;
+        }
+
+        /// <summary>
+        /// Selects the correct value set grid viewmodel to be the data context for display
+        /// </summary>
+        private void LoadValueSetGrid()
+        {
+            var vm = this.ValueSetGridViewModels.FirstOrDefault(v => v.ValueSet == this.DisplayedValueSet.ValueSet);
+
+            if (vm != null)
+            {
+                this.SelectedValueSetGridViewModel = vm;
+            }
         }
 
         /// <summary>
@@ -162,6 +189,24 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets the available value sets
+        /// </summary>
+        public ReactiveList<ValueSetRowViewModel> AvailableValueSets
+        {
+            get { return this.availableValueSets; }
+            set { this.RaiseAndSetIfChanged(ref this.availableValueSets, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="ParameterValueSetRowViewModel"/>
+        /// </summary>
+        public ValueSetRowViewModel DisplayedValueSet
+        {
+            get { return this.displayedValueSet; }
+            set { this.RaiseAndSetIfChanged(ref this.displayedValueSet, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the list of <see cref="ParameterValueSet"/>
         /// </summary>
         public DisposableReactiveList<Dialogs.ParameterRowViewModel> ValueSet { get; protected set; }
@@ -170,6 +215,20 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the possible groups
         /// </summary>
         public ReactiveList<GroupSelectionViewModel> PossibleGroups { get; private set; }
+
+        /// <summary>
+        /// Gets the list of value set grid view models
+        /// </summary>
+        public ReactiveList<SampledFunctionParameterTypeValueSetGridViewModel> ValueSetGridViewModels { get; private set; }
+
+        /// <summary>
+        /// Gets the selected value set grid view model
+        /// </summary>
+        public SampledFunctionParameterTypeValueSetGridViewModel SelectedValueSetGridViewModel
+        {
+            get { return this.selectedValueSetGridViewModel; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedValueSetGridViewModel, value); }
+        }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ParameterValueSet
@@ -191,20 +250,6 @@ namespace CDP4EngineeringModel.ViewModels
         public bool IsParameterTypeReadOnly
         {
             get { return true; }
-        }
-
-        /// <summary>
-        /// Gets or sets the value table for SampledFunctionParameterType
-        /// </summary>
-        public virtual DataTable ValueTable { get; set; }
-
-        /// <summary>
-        /// Gets or sets the value data grid columns
-        /// </summary>
-        public virtual ReactiveList<ParameterTypeAllocationColumn> ValueColumns
-        {
-            get { return this.valueColumns; }
-            set { this.RaiseAndSetIfChanged(ref this.valueColumns, value); }
         }
 
         /// <summary>
@@ -233,7 +278,12 @@ namespace CDP4EngineeringModel.ViewModels
             this.ValueSet = new DisposableReactiveList<Dialogs.ParameterRowViewModel>();
             this.PossibleGroups = new ReactiveList<GroupSelectionViewModel>();
 
-            this.ValueColumns = new ReactiveList<ParameterTypeAllocationColumn>()
+            this.AvailableValueSets = new ReactiveList<ValueSetRowViewModel>()
+            {
+                ChangeTrackingEnabled = true
+            };
+
+            this.ValueSetGridViewModels = new ReactiveList<SampledFunctionParameterTypeValueSetGridViewModel>()
             {
                 ChangeTrackingEnabled = true
             };
@@ -371,7 +421,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.PossibleScale.AddRange(quantityKind.AllPossibleScale.OrderBy(p => p.ShortName));
         }
-        
+
         /// <summary>
         /// Populates the <see cref="PossibleStateDependence"/> property
         /// </summary>
@@ -444,14 +494,19 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            for (int i = 0; i < this.Thing.ValueSet.Count; i++)
+            for (var i = 0; i < this.Thing.ValueSet.Count; i++)
             {
                 this.Thing.ValueSet[i] = this.Thing.ValueSet[i].Clone(false);
             }
 
             if (this.Thing.ParameterType is SampledFunctionParameterType)
             {
-                ...
+                foreach (var parameterValueSet in this.Thing.ValueSet.ToList())
+                {
+                    var gridVm = this.ValueSetGridViewModels.SingleOrDefault(vm => ((Thing)vm.ValueSet).Iid.Equals(parameterValueSet.Iid));
+
+                    gridVm?.UpdateSampledFunctionParameterValueSet(parameterValueSet);
+                }
             }
             else
             {
@@ -470,129 +525,29 @@ namespace CDP4EngineeringModel.ViewModels
         private void PopulateValueSet()
         {
             this.ValueSet.ClearAndDispose();
+            this.AvailableValueSets.Clear();
 
             if (this.IsSampledFunctionParameter)
             {
-                this.PopulateSampledFunctionParameterTypeValueGrid();
+                this.ValueSetGridViewModels.Clear();
+
+                foreach (var parameterValueSet in this.Thing.ValueSet)
+                {
+                    var newGridVm = new SampledFunctionParameterTypeValueSetGridViewModel(parameterValueSet, (SampledFunctionParameterType)this.Thing.ParameterType);
+                    newGridVm.PopulateSampledFunctionParameterTypeValueGrid();
+
+                    this.ValueSetGridViewModels.Add(newGridVm);
+                    this.AvailableValueSets.Add(new ValueSetRowViewModel(parameterValueSet));
+                }
+
+                this.DisplayedValueSet = this.AvailableValueSets.FirstOrDefault();
+
                 return;
             }
 
             var row = new Dialogs.ParameterRowViewModel(this.Thing, this.Session, this, this.IsReadOnly);
 
             this.ValueSet.Add(row);
-        }
-
-        /// <summary>
-        /// Populates the value array grid for <see cref="SampledFunctionParameterType"/>
-        /// </summary>
-        private void PopulateSampledFunctionParameterTypeValueGrid()
-        {
-            this.ValueTable = new DataTable();
-            this.ValueTable.Rows.Clear();
-            this.ValueTable.Columns.Clear();
-
-            this.ValueColumns.Clear();
-
-            var columns = this.Thing.ParameterType.NumberOfValues;
-
-            var type = this.Thing.ParameterType as SampledFunctionParameterType;
-
-            if (type == null)
-            {
-                return;
-            }
-
-            foreach (var parameterTypeAssignment in type.IndependentParameterType.ToList())
-            {
-                if (parameterTypeAssignment.ParameterType is CompoundParameterType compoundParameterType)
-                {
-                    // add a column for each component
-                    foreach (ParameterTypeComponent parameterTypeComponent in compoundParameterType.Component)
-                    {
-                        var columnName = parameterTypeComponent.ShortName;
-                        this.ValueTable.Columns.Add(columnName, typeof(object));
-
-                        this.ValueColumns.Add(new ParameterTypeAllocationColumn
-                        {
-                            FieldName = columnName,
-                            DisplayName = parameterTypeComponent.Scale != null ? $"{columnName} [{parameterTypeComponent.Scale.ShortName}]" : columnName,
-                            Assignment = parameterTypeAssignment
-                        });
-                    }
-                }
-                else
-                {
-                    var columnName = parameterTypeAssignment.ParameterType.ShortName;
-                    this.ValueTable.Columns.Add(columnName, typeof(object));
-
-                    this.ValueColumns.Add(new ParameterTypeAllocationColumn
-                    {
-                        FieldName = columnName,
-                        DisplayName = parameterTypeAssignment.MeasurementScale != null ? $"{columnName} [{parameterTypeAssignment.MeasurementScale.ShortName}]" : columnName,
-                        Assignment = parameterTypeAssignment
-                    });
-                }
-            }
-
-            foreach (var parameterTypeAssignment in type.DependentParameterType.ToList())
-            {
-                if (parameterTypeAssignment.ParameterType is CompoundParameterType compoundParameterType)
-                {
-                    // add a column for each component
-                    foreach (ParameterTypeComponent parameterTypeComponent in compoundParameterType.Component)
-                    {
-                        var columnName = parameterTypeComponent.ShortName;
-                        this.ValueTable.Columns.Add(columnName, typeof(object));
-
-                        this.ValueColumns.Add(new ParameterTypeAllocationColumn
-                        {
-                            FieldName = columnName,
-                            DisplayName = parameterTypeComponent.Scale != null ? $"{columnName} [{parameterTypeComponent.Scale.ShortName}]" : columnName,
-                            Assignment = parameterTypeAssignment
-                        });
-                    }
-                }
-                else
-                {
-                    var columnName = parameterTypeAssignment.ParameterType.ShortName;
-                    this.ValueTable.Columns.Add(columnName, typeof(object));
-
-                    this.ValueColumns.Add(new ParameterTypeAllocationColumn
-                    {
-                        FieldName = columnName,
-                        DisplayName = parameterTypeAssignment.MeasurementScale != null ? $"{columnName} [{parameterTypeAssignment.MeasurementScale.ShortName}]" : columnName,
-                        Assignment = parameterTypeAssignment
-                    });
-                }
-            }
-
-            foreach (var valueChunk in this.SplitValues(this.Thing.ValueSet.First().Manual, columns))
-            {
-                var rowValue = this.ValueTable.NewRow();
-                var valueCounter = 0;
-
-                foreach (var value in valueChunk)
-                {
-                    rowValue[valueCounter] = value;
-                    valueCounter++;
-                }
-
-                this.ValueTable.Rows.Add(rowValue);
-            }
-        }
-
-        /// <summary>
-        /// Splits the valueset into chunks based on number of independent and dependent parametertype allocations
-        /// </summary>
-        /// <param name="values">The entire value array</param>
-        /// <param name="nSize">The size of chunks to split into</param>
-        /// <returns>An IEnumerable of the lists of chunks.</returns>
-        private IEnumerable<List<string>> SplitValues(ValueArray<string> values, int nSize = 30)
-        {
-            for (var i = 0; i < values.Count; i += nSize)
-            {
-                yield return values.ToList().GetRange(i, Math.Min(nSize, values.Count - i));
-            }
         }
 
         /// <summary>

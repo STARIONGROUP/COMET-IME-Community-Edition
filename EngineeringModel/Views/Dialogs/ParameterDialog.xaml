@@ -9,6 +9,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:views="clr-namespace:CDP4EngineeringModel.Views"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:local="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
              Height="500"
              d:DesignWidth="750"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -85,7 +87,17 @@
                 <views:ParameterValueSetLayoutItem Visibility="{Binding IsSampledFunctionParameter, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
             </lc:LayoutGroup>
             <lc:LayoutGroup Header="Values" Visibility="{Binding IsSampledFunctionParameter, Converter={StaticResource BooleanToVisibilityConverter}}" Orientation="Vertical">
-                <views:SampledFunctionValueGridLayoutItem></views:SampledFunctionValueGridLayoutItem>
+                <lc:LayoutItem Label="Displayed ValueSet: ">
+                    <dxe:ComboBoxEdit IsTextEditable="False"
+                                      EditValue="{Binding DisplayedValueSet, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ShowBorder="True"
+                                      ItemsSource="{Binding AvailableValueSets, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMember="DisplayName"
+                                      ShowCustomItems="False">
+                        
+                    </dxe:ComboBoxEdit>
+                </lc:LayoutItem>
+                <views:SampledFunctionValueGridLayoutItem DataContext="{Binding SelectedValueSetGridViewModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></views:SampledFunctionValueGridLayoutItem>
             </lc:LayoutGroup>
             <items:ParameterSubscriptionLayoutGroup />
             <items:AdvancedLayoutGroup />
