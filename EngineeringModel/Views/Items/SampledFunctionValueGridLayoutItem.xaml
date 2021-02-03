@@ -13,6 +13,7 @@
                  d:DesignHeight="300" d:DesignWidth="300">
     <dxlc:LayoutItem Label="Selected Switch:">
         <dxe:ComboBoxEdit IsTextEditable="False"
+                          IsEnabled="{Binding IsValueSetEditable}"
                           EditValue="{Binding Switch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           ShowBorder="True"
                           ShowCustomItems="False">
@@ -59,13 +60,15 @@
                              ColumnsSource="{Binding ValueColumns}"
                              AutoGenerateColumns="AddNew"
                              SelectionMode="Cell"
+                             IsEnabled="{Binding IsValueSetEditable}"
+                             x:Name="ManualValueTable"
                              MaxHeight="1080"
                              Height="Auto"
                              Width="Auto">
                 <dxg:GridControl.ColumnGeneratorTemplate>
                     <DataTemplate>
                         <ContentControl>
-                            <dxg:GridColumn FieldName="{Binding FieldName}" Header="{Binding DisplayName}">
+                            <dxg:GridColumn FieldName="{Binding FieldName}" Header="{Binding DisplayName}" AllowEditing="True">
 
                             </dxg:GridColumn>
                         </ContentControl>
@@ -79,24 +82,29 @@
                                    AllowColumnFiltering="False"
                                    AllowSorting="False"
                                    ShowGroupPanel="False"
+                                   ShowDataNavigator="True"
+                                   InitNewRow="ManualValueTable_OnInitNewRow"
+                                   NewItemRowPosition="Bottom"
                                    AutoWidth="False"
-                                   AllowEditing="False">
+                                   AllowEditing="{Binding IsValueSetEditable}">
                     </dxg:TableView>
                 </dxg:GridControl.View>
             </dxg:GridControl>
         </dxlc:LayoutGroup>
         <dxlc:LayoutGroup Header="Reference">
             <dxg:GridControl ItemsSource="{Binding ReferenceValueTable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                             IsEnabled="{Binding IsValueSetEditable}"
                              ColumnsSource="{Binding ValueColumns}"
                              AutoGenerateColumns="AddNew"
                              SelectionMode="Cell"
+                             x:Name="ReferenceValueTable"
                              MaxHeight="1080"
                              Height="Auto"
                              Width="Auto">
                 <dxg:GridControl.ColumnGeneratorTemplate>
                     <DataTemplate>
                         <ContentControl>
-                            <dxg:GridColumn FieldName="{Binding FieldName}" Header="{Binding DisplayName}">
+                            <dxg:GridColumn FieldName="{Binding FieldName}" Header="{Binding DisplayName}" AllowEditing="True">
 
                             </dxg:GridColumn>
                         </ContentControl>
@@ -110,8 +118,11 @@
                                    AllowColumnFiltering="False"
                                    AllowSorting="False"
                                    ShowGroupPanel="False"
+                                   ShowDataNavigator="True"
+                                   InitNewRow="ReferenceValueTable_OnInitNewRow"
+                                   NewItemRowPosition="Bottom"
                                    AutoWidth="False"
-                                   AllowEditing="False">
+                                   AllowEditing="True">
                     </dxg:TableView>
                 </dxg:GridControl.View>
             </dxg:GridControl>

@@ -25,14 +25,45 @@
 
 namespace CDP4EngineeringModel.Views
 {
+    using DevExpress.Xpf.Grid;
+
     /// <summary>
     /// Interaction logic for SampledFunctionValueGridLayoutItem.xaml
     /// </summary>
     public partial class SampledFunctionValueGridLayoutItem
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SampledFunctionValueGridLayoutItem"/> class
+        /// </summary>
         public SampledFunctionValueGridLayoutItem()
         {
             this.InitializeComponent();
+        }
+
+        /// <summary>
+        /// Initializes the new row with default values
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The event handler arguments</param>
+        private void ManualValueTable_OnInitNewRow(object sender, InitNewRowEventArgs e)
+        {
+            foreach (var column in this.ManualValueTable.Columns)
+            {
+                this.ManualValueTable.SetCellValue(GridControl.NewItemRowHandle, column, "-");
+            }
+        }
+
+        /// <summary>
+        /// Initializes the new row with default values
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The event handler arguments</param>
+        private void ReferenceValueTable_OnInitNewRow(object sender, InitNewRowEventArgs e)
+        {
+            foreach (var column in this.ReferenceValueTable.Columns)
+            {
+                this.ReferenceValueTable.SetCellValue(GridControl.NewItemRowHandle, column, "-");
+            }
         }
     }
 }

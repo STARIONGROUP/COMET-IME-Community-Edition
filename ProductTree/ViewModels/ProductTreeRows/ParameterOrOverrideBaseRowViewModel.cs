@@ -429,6 +429,13 @@ namespace CDP4ProductTree.ViewModels
                     this.SetScalarValue(valueSet);
                 }
             }
+            else if (this.Thing.ParameterType is SampledFunctionParameterType)
+            {
+                if (valueSet != null)
+                {
+                    this.SetSampledFunctionValue(valueSet);
+                }
+            }
             else
             {
                 // Compound -> set value to the component row
@@ -499,7 +506,15 @@ namespace CDP4ProductTree.ViewModels
 
             if (compoundType == null)
             {
-                stateRow.SetScalarValue(valueSet);
+                if (this.Thing.ParameterType is SampledFunctionParameterType)
+                {
+                    stateRow.SetSampledFunctionValue(valueSet);
+                }
+                else
+                {
+                    stateRow.SetScalarValue(valueSet);
+                }
+
                 stateRow.IsPublishable = isStatePublishable;
             }
             else
@@ -579,6 +594,35 @@ namespace CDP4ProductTree.ViewModels
             }
 
             this.Switch = valueSet.ValueSwitch;
+        }
+
+        /// <summary>
+        /// Set the value of this row in case of the <see cref="ParameterType"/> is a <see cref="SampledFunctionParameterType"/>
+        /// </summary>
+        /// <param name="valueSet">The <see cref="ParameterValueSetBase"/> containing the value</param>
+        private void SetSampledFunctionValue(ParameterValueSetBase valueSet)
+        {
+            // perform checks to see if this is indeed a scalar value
+            if (valueSet.Published.Count() < 2)
+            {
+                logger.Warn("The value set of Parameter or override {0} is marked as SampledFunction, yet has less than 2 values.", this.Thing.Iid);
+            }
+
+            this.Switch = valueSet.ValueSwitch;
+
+            var samplesFunctionParameterType = this.Thing.ParameterType as SampledFunctionParameterType;
+
+            if (samplesFunctionParameterType == null)
+            {
+                logger.Warn("ParameterType mismatch, in {0} is marked as SampledFunction, yet cannot be converted.", this.Thing.Iid);
+                this.Value = "-";
+
+                return;
+            }
+
+            var cols = samplesFunctionParameterType.NumberOfValues;
+
+            this.Value = $"[{valueSet.Published.Count / cols}x{cols}]";
         }
 
         /// <summary>

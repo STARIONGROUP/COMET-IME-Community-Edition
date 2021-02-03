@@ -18,6 +18,7 @@
     <dx:DXWindow.Resources>
         <dx:BoolToVisibilityInverseConverter x:Key="InverseBooleanToVisibilityConverter"></dx:BoolToVisibilityInverseConverter>
         <dx:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter"></dx:BoolToVisibilityConverter>
+        <dx:BoolInverseConverter x:Key="BoolInverseConverter"></dx:BoolInverseConverter>
     </dx:DXWindow.Resources>
     <lc:LayoutControl Margin="5"
                       Orientation="Vertical"
@@ -89,6 +90,7 @@
             <lc:LayoutGroup Header="Values" Visibility="{Binding IsSampledFunctionParameter, Converter={StaticResource BooleanToVisibilityConverter}}" Orientation="Vertical">
                 <lc:LayoutItem Label="Displayed ValueSet: ">
                     <dxe:ComboBoxEdit IsTextEditable="False"
+                                      
                                       EditValue="{Binding DisplayedValueSet, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                       ShowBorder="True"
                                       ItemsSource="{Binding AvailableValueSets, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"

@@ -181,7 +181,7 @@ namespace CDP4Composition.ViewModels
 
             this.Name = this.Parameter.ParameterType.Name;
             this.ShortName = this.Parameter.ParameterType.ShortName;
-            this.Value = $"{valueSet?.Published.FirstOrDefault()} [{this.Parameter.Scale.ShortName}]";
+            this.Value = $"{valueSet?.Published.FirstOrDefault() ?? "-"} [{this.Parameter.Scale?.ShortName ?? "-"}]";
             this.OwnerShortName = this.Parameter.Owner.ShortName;
             this.Switch = valueSet?.ValueSwitch.ToString();
             this.Description = "-";
@@ -199,11 +199,11 @@ namespace CDP4Composition.ViewModels
 
             if (this.Parameter is ParameterOverride parameterOverride)
             {
-                valueSet = parameterOverride.ValueSet.SingleOrDefault(x => (!this.Parameter.IsOptionDependent || (x.ActualOption == this.ActualOption)));
+                valueSet = parameterOverride.ValueSet.FirstOrDefault(x => (!this.Parameter.IsOptionDependent || (x.ActualOption == this.ActualOption)));
             }
             else if (this.Parameter is Parameter parameter)
             {
-                valueSet = parameter.ValueSet.SingleOrDefault(x => (!this.Parameter.IsOptionDependent || (x.ActualOption == this.ActualOption)));
+                valueSet = parameter.ValueSet.FirstOrDefault(x => (!this.Parameter.IsOptionDependent || (x.ActualOption == this.ActualOption)));
             }
 
             return valueSet;

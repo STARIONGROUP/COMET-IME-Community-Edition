@@ -30,6 +30,7 @@ namespace CDP4ProductTree.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services.NestedElementTreeService;
@@ -166,6 +167,35 @@ namespace CDP4ProductTree.ViewModels
 
             this.Switch = valueSet.ValueSwitch;
             this.ModelCode = valueSet.ModelCode();
+        }
+
+        /// <summary>
+        /// Set the value of this row in case of the <see cref="ParameterType"/> is a <see cref="SampledFunctionParameterType"/>
+        /// </summary>
+        /// <param name="valueSet">The <see cref="ParameterValueSetBase"/> containing the value</param>
+        public void SetSampledFunctionValue(ParameterValueSetBase valueSet)
+        {
+            // perform checks to see if this is indeed a scalar value
+            if (valueSet.Published.Count() < 2)
+            {
+                logger.Warn("The value set of Parameter or override {0} is marked as SampledFunction, yet has less than 2 values.", this.Thing.Iid);
+            }
+
+            this.Switch = valueSet.ValueSwitch;
+
+            var samplesFunctionParameterType = this.Thing.ParameterType as SampledFunctionParameterType;
+
+            if (samplesFunctionParameterType == null)
+            {
+                logger.Warn("ParameterType mismatch, in {0} is marked as SampledFunction, yet cannot be converted.", this.Thing.Iid);
+                this.Value = "-";
+
+                return;
+            }
+
+            var cols = samplesFunctionParameterType.NumberOfValues;
+
+            this.Value = $"[{valueSet.Published.Count / cols}x{cols}]";
         }
     }
 }

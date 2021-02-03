@@ -58,13 +58,19 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         private ReactiveList<ParameterTypeAllocationColumn> valueColumns;
 
         /// <summary>
+        /// Backing field for <see cref="IsValueSetEditable"/>
+        /// </summary>
+        private bool isValueSetEditable;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SampledFunctionParameterTypeValueSetGridViewModel" /> class.
         /// </summary>
         /// <param name="thing">The <see cref="IValueSet" /></param>
-        public SampledFunctionParameterTypeValueSetGridViewModel(IValueSet thing, SampledFunctionParameterType parameterType)
+        public SampledFunctionParameterTypeValueSetGridViewModel(IValueSet thing, SampledFunctionParameterType parameterType, bool isValueSetEditable)
         {
             this.ValueSet = thing;
             this.ParameterType = parameterType;
+            this.IsValueSetEditable = isValueSetEditable;
 
             this.IsParameterOrOverride = false;
 
@@ -125,6 +131,15 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         {
             get { return this.isParameterOrOverride; }
             set { this.RaiseAndSetIfChanged(ref this.isParameterOrOverride, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value indicating whether value set is editable
+        /// </summary>
+        public bool IsValueSetEditable
+        {
+            get { return this.isValueSetEditable; }
+            set { this.RaiseAndSetIfChanged(ref this.isValueSetEditable, value); }
         }
 
         /// <summary>
@@ -315,10 +330,24 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                 parameterValueSetBase.Manual = this.CompileTableIntoValueArray(this.ManualValueTable);
                 parameterValueSetBase.Computed = this.CompileTableIntoValueArray(this.ComputedValueTable);
                 parameterValueSetBase.Reference = this.CompileTableIntoValueArray(this.ReferenceValueTable);
+
+                var parameterSwitchKind = this.Switch;
+
+                if (parameterSwitchKind != null)
+                {
+                    parameterValueSetBase.ValueSwitch = parameterSwitchKind.Value;
+                }
             }
             else if (valueset is ParameterSubscriptionValueSet subscriptionValueSet)
             {
                 subscriptionValueSet.Manual = this.CompileTableIntoValueArray(this.ManualValueTable);
+
+                var parameterSwitchKind = this.Switch;
+
+                if (parameterSwitchKind != null)
+                {
+                    subscriptionValueSet.ValueSwitch = parameterSwitchKind.Value;
+                }
             }
         }
 
