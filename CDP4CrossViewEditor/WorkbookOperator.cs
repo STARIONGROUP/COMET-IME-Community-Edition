@@ -54,12 +54,12 @@ namespace CDP4CrossViewEditor
         /// <summary>
         /// Element definitions user selection
         /// </summary>
-        public IEnumerable<ElementDefinition> ElementDefinitions;
+        public IEnumerable<Guid> ElementDefinitions;
 
         /// <summary>
         /// Parameter types user selection
         /// </summary>
-        public IEnumerable<ParameterType> ParameterTypes;
+        public IEnumerable<Guid> ParameterTypes;
 
         /// <summary>
         /// Parameter sheet values changed by the user
