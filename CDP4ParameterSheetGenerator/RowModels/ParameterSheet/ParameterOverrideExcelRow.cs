@@ -92,6 +92,10 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
             {
                 this.Type = ParameterSheetConstants.POVSCD;
             }
+            else if (this.ParameterType is SampledFunctionParameterType)
+            {
+                this.Type = ParameterSheetConstants.SFPOVS;
+            }
             else
             {
                 this.Type = ParameterSheetConstants.POVS;
@@ -123,7 +127,7 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                         {
                             parameterOverrideValueSet = (ParameterOverrideValueSet)processedValueSet.ClonedThing;
                         }
-                        
+
                         this.Switch = parameterOverrideValueSet.ValueSwitch.ToString();
                         this.ActualValue = ParameterValueConverter.ConvertToObject(scalarParameterType, parameterOverrideValueSet.ActualValue[0]);
                         this.ComputedValue = ParameterValueConverter.ConvertToObject(scalarParameterType, parameterOverrideValueSet.Computed[0]);
@@ -136,7 +140,36 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                         this.Format = NumberFormat.Format(this.Thing.ParameterType, this.Thing.Scale);
                     }
 
-                    // do not create sub rows, the parameter row represents the only valueset that exists                    
+                    // do not create sub rows, the parameter row represents the only valueset that exists
+                    return;
+                }
+
+                var sampledFunctionParameterType = this.Thing.ParameterType as SampledFunctionParameterType;
+                if (sampledFunctionParameterType != null)
+                {
+                    var parameterValueSet = this.Thing.ValueSet.FirstOrDefault();
+                    if (parameterValueSet != null)
+                    {
+                        ProcessedValueSet processedValueSet;
+                        if (processedValueSets.TryGetValue(parameterValueSet.Iid, out processedValueSet))
+                        {
+                            parameterValueSet = (ParameterOverrideValueSet)processedValueSet.ClonedThing;
+                        }
+
+                        this.Id = parameterValueSet.Iid.ToString();
+                        this.Switch = parameterValueSet.ValueSwitch.ToString();
+                        this.ActualValue = "N/A";
+                        this.ComputedValue = "N/A";
+                        this.ManualValue = "N/A";
+                        this.ReferenceValue = "N/A";
+                        this.Formula = string.Empty;
+
+                        this.Format = NumberFormat.Format(this.Thing.ParameterType, this.Thing.Scale);
+
+                        this.ModelCode = parameterValueSet.ModelCode();
+                    }
+
+                    // do not create sub rows, the parameter row represents the only valueset that exists
                     return;
                 }
 
