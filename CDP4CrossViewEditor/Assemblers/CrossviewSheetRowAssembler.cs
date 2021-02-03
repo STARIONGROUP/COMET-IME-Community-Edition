@@ -61,26 +61,15 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </param>
         public void Assemble(Iteration iteration, IEnumerable<Guid> elementDefinitions)
         {
-            foreach (var elementDefinitionIid in elementDefinitions)
+            foreach (var elementDefinition in elementDefinitions
+                .Select(iid => iteration.Element.FirstOrDefault(ed => ed.Iid == iid))
+                .Where(x => x != null))
             {
-                var elementDefinition = iteration.Element.FirstOrDefault(x => x.Iid == elementDefinitionIid);
-
-                if (elementDefinition == null)
-                {
-                    continue;
-                }
-
                 this.excelRows.Add(new ElementDefinitionExcelRow(elementDefinition));
 
-                foreach (var iterationElement in iteration.Element)
+                foreach (var elementUsage in iteration.Element
+                    .SelectMany(ed => ed.ContainedElement.Where(eu => eu.ElementDefinition == elementDefinition)))
                 {
-                    var elementUsage = iterationElement.ContainedElement.FirstOrDefault(eu => eu.ElementDefinition == elementDefinition);
-
-                    if (elementUsage == null)
-                    {
-                        continue;
-                    }
-
                     this.excelRows.Add(new ElementUsageExcelRow(elementUsage));
                 }
             }
