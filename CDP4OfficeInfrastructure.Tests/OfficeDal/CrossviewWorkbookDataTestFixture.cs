@@ -154,7 +154,10 @@ namespace CDP4OfficeInfrastructure.Tests.OfficeDal
 
             var manualyValues = new Dictionary<string, string> { { parameterTypes[0].Iid.ToString(), "1" } };
 
-            var workbookDataPass1 = new CrossviewWorkbookData(elements, parameterTypes, manualyValues);
+            var workbookDataPass1 = new CrossviewWorkbookData(
+                elements.Select(ed => ed.Iid),
+                parameterTypes.Select(pt => pt.Iid),
+                manualyValues);
             CrossviewWorkbookData workbookDataPass2;
 
             using (var writer = new StringWriter())
