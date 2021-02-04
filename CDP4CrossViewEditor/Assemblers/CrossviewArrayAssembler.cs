@@ -218,13 +218,19 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </summary>
         private void InitializeHeaderStructure()
         {
-            foreach (var elementDefinition in this.excelRows
-                .Where(row => row.Thing is ElementDefinition)
-                .Select(row => row.Thing as ElementDefinition))
+            foreach (var parameterTypeIid in this.parameterTypes)
             {
-                foreach (var parameter in elementDefinition.Parameter
-                    .Where(parameter => this.parameterTypes.Contains(parameter.ParameterType.Iid)))
+                foreach (var elementDefinition in this.excelRows
+                    .Where(row => row.Thing is ElementDefinition)
+                    .Select(row => row.Thing as ElementDefinition))
                 {
+                    var parameter = elementDefinition.Parameter.FirstOrDefault(p => p.ParameterType.Iid == parameterTypeIid);
+
+                    if (parameter == null)
+                    {
+                        continue;
+                    }
+
                     foreach (var valueSet in parameter.ValueSet)
                     {
                         this.SetContentColumnIndex(valueSet);

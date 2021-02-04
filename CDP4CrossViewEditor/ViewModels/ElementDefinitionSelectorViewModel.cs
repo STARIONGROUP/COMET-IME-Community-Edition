@@ -104,9 +104,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         public override void BindData()
         {
-            var elements = this.Iteration.Element.Where(t => t.ChangeKind != ChangeKind.Delete);
-
-            foreach (var elementDefinition in elements)
+            foreach (var elementDefinition in this.Iteration.Element.Where(t => t.ChangeKind != ChangeKind.Delete))
             {
                 this.ElementDefinitionSourceList.Add(new ElementDefinitionRowViewModel(elementDefinition, this.Session, null));
 
@@ -134,11 +132,11 @@ namespace CDP4CrossViewEditor.ViewModels
                 return;
             }
 
-            var preservedThings = this.ElementDefinitionSourceList
-                .Where(row => this.PreservedIids.Contains(row.Thing.Iid));
-
             this.SelectedSourceList.Clear();
-            this.SelectedSourceList.AddRange(preservedThings);
+
+            this.SelectedSourceList.AddRange(this.PreservedIids
+                .Select(iid => this.ElementDefinitionSourceList.FirstOrDefault(row => row.Thing.Iid == iid))
+                .Where(row => row != null));
 
             this.ExecuteMoveToTarget();
         }
