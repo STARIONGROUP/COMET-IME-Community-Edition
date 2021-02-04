@@ -25,7 +25,13 @@
 
 namespace CDP4Reporting.Utilities
 {
+    using System.Data;
+    using System.Windows;
+    using System.Windows.Controls;
+
     using CDP4Common.EngineeringModelData;
+
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Static class that contains individual utility methods that can be used in reports
@@ -54,6 +60,27 @@ namespace CDP4Reporting.Utilities
             }
 
             return path;
+        }
+
+        /// <summary>
+        /// Shows the data in a <see cref="DataTable"/> in a model <see cref="DXDialog"/>
+        /// </summary>
+        /// <param name="table">
+        /// The <see cref="DataTable"/>
+        /// </param>
+        /// <param name="allowEdit">
+        /// Indicates if editting data in the table is allowed
+        /// </param>
+        public static void ShowDataTable(DataTable table, bool allowEdit = false)
+        {
+            var dialog = new DXDialog(table.TableName);
+            var dataGrid = new DataGrid();
+            dataGrid.HorizontalAlignment = HorizontalAlignment.Stretch;
+            dataGrid.VerticalAlignment = VerticalAlignment.Stretch;
+            dataGrid.ItemsSource = table.DefaultView;
+            dataGrid.IsReadOnly = !allowEdit;
+            dialog.Content = dataGrid;
+            dialog.ShowDialog();
         }
     }
 }
