@@ -27,7 +27,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// <summary>
         /// The current logger
         /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// The <see cref="Workbook"/> that is to be read from or written to.
@@ -44,7 +44,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         {
             if (workbook == null)
             {
-                throw new ArgumentNullException("workbook", "The workbook may not be null");
+                throw new ArgumentNullException(nameof(workbook), "The workbook may not be null");
             }
 
             this.workbook = workbook;
@@ -58,7 +58,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// </returns>
         public T Read()
         {
-            var xmlnamespace = this.GetXmlNameSpace();
+            var xmlnamespace = GetXmlNameSpace();
 
             CustomXMLParts xmlParts;
 
@@ -68,19 +68,14 @@ namespace CDP4OfficeInfrastructure.OfficeDal
             }
             catch (Exception ex)
             {
-                logger.Error(ex);
+                Logger.Error(ex);
                 return null;
             }
 
-            this.RemoveSuperfluousXmlParts(xmlParts, xmlnamespace);
+            RemoveSuperfluousXmlParts(xmlParts, xmlnamespace);
 
             var part = xmlParts.SingleOrDefault();
-            if (part == null)
-            {
-                return null;
-            }
-
-            return this.Deserialize(part.XML);
+            return part == null ? null : Deserialize(part.XML);
         }
 
         /// <summary>
@@ -92,18 +87,21 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// <param name="xmlnamespace">
         /// The XML namespace of the current <see cref="CustomXMLPart"/>
         /// </param>
-        private void RemoveSuperfluousXmlParts(CustomXMLParts xmlParts, string xmlnamespace)
+        private static void RemoveSuperfluousXmlParts(CustomXMLParts xmlParts, string xmlnamespace)
         {
             var amountOfXmlParts = xmlParts.Count;
-            if (amountOfXmlParts > 1)
-            {
-                logger.Debug("The XML part with namespace {0} is present more than once, all but the last one have been removed to recover from the error", xmlnamespace);
 
-                for (int i = 1; i < amountOfXmlParts; i++)
-                {
-                    var xmlPart = xmlParts[i];
-                    xmlPart.Delete();
-                }
+            if (amountOfXmlParts <= 1)
+            {
+                return;
+            }
+
+            Logger.Debug("The XML part with namespace {0} is present more than once, all but the last one have been removed to recover from the error", xmlnamespace);
+
+            for (var i = 1; i < amountOfXmlParts; i++)
+            {
+                var xmlPart = xmlParts[i];
+                xmlPart.Delete();
             }
         }
 
@@ -115,7 +113,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// </param>
         public void Write(T customOfficeData)
         {
-            var xmlstring = this.Serialize(customOfficeData);
+            var xmlstring = Serialize(customOfficeData);
             this.workbook.CustomXMLParts.Add(xmlstring);
         }
 
@@ -125,7 +123,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// <returns>
         /// a string that contains the XML namespace
         /// </returns>
-        private string GetXmlNameSpace()
+        private static string GetXmlNameSpace()
         {
             var type = typeof(T);
             var attribute = (XmlRootAttribute)Attribute.GetCustomAttribute(type, typeof(XmlRootAttribute));
@@ -141,7 +139,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// <returns>
         /// an XML string
         /// </returns>
-        private string Serialize(T t)
+        private static string Serialize(T t)
         {
             string xmlstring;
 
@@ -164,7 +162,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// <returns>
         /// an instance of <see cref="WorkbookSession"/>
         /// </returns>
-        private T Deserialize(string xml)
+        private static T Deserialize(string xml)
         {
             T t = null;
 
