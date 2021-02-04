@@ -6,14 +6,15 @@
 
 namespace CDP4OfficeInfrastructure.OfficeDal
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Xml.Serialization;
     using NetOffice.ExcelApi;
     using NetOffice.OfficeApi;
 
     using NLog;
+
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Xml.Serialization;
 
     /// <summary>
     /// Abstract super class that is used to derive specific data access layer classes to read and write 
@@ -58,13 +59,11 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// </returns>
         public T Read()
         {
-            var xmlnamespace = GetXmlNameSpace();
-
             CustomXMLParts xmlParts;
 
             try
             {
-                xmlParts = this.workbook.CustomXMLParts.SelectByNamespace(xmlnamespace);
+                xmlParts = this.workbook.CustomXMLParts.SelectByNamespace(GetXmlNameSpace());
             }
             catch (Exception ex)
             {
@@ -72,7 +71,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
                 return null;
             }
 
-            RemoveSuperfluousXmlParts(xmlParts, xmlnamespace);
+            RemoveSuperfluousXmlParts(xmlParts);
 
             var part = xmlParts.SingleOrDefault();
             return part == null ? null : Deserialize(part.XML);
@@ -84,24 +83,12 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// <param name="xmlParts">
         /// the <see cref="CustomXMLParts"/> in the workbook.
         /// </param>
-        /// <param name="xmlnamespace">
-        /// The XML namespace of the current <see cref="CustomXMLPart"/>
-        /// </param>
-        private static void RemoveSuperfluousXmlParts(CustomXMLParts xmlParts, string xmlnamespace)
+        private static void RemoveSuperfluousXmlParts(CustomXMLParts xmlParts)
         {
-            var amountOfXmlParts = xmlParts.Count;
-
-            if (amountOfXmlParts <= 1)
+            while (xmlParts.Count > 1)
             {
-                return;
-            }
-
-            Logger.Debug("The XML part with namespace {0} is present more than once, all but the last one have been removed to recover from the error", xmlnamespace);
-
-            for (var i = 1; i < amountOfXmlParts; i++)
-            {
-                var xmlPart = xmlParts[i];
-                xmlPart.Delete();
+                // NOTE indices are 1-based here
+                xmlParts[1].Delete();
             }
         }
 
