@@ -102,6 +102,8 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         {
             var xmlstring = Serialize(customOfficeData);
             this.workbook.CustomXMLParts.Add(xmlstring);
+
+            RemoveSuperfluousXmlParts(this.workbook.CustomXMLParts.SelectByNamespace(GetXmlNameSpace()));
         }
 
         /// <summary>
