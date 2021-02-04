@@ -132,6 +132,7 @@ namespace CDP4Composition.Tests.Extensions
                 nameof(FileRevision.ExcludedPerson),
                 nameof(FileRevision.Iid),
                 nameof(FileRevision.ModifiedOn),
+                nameof(FileRevision.ThingPreference),
                 nameof(FileRevision.RevisionNumber)
             };
 

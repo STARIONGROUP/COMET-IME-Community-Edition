@@ -34,10 +34,10 @@
     <None Remove="Views\GrapherRibbon.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="7.2.0-516-PR162">
+    <PackageReference Include="CDP4Common-CE" Version="7.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="7.2.0-516-PR162">
+    <PackageReference Include="CDP4Dal-CE" Version="7.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DynamicLanguageRuntime" Version="1.2.3" />
