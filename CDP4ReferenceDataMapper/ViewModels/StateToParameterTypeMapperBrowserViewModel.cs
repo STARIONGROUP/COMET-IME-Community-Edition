@@ -119,7 +119,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// <summary>
         /// The Panel Caption
         /// </summary>
-        private const string PanelCaption = "Actual Finite State to ParameterType mapping";
+        private const string PanelCaption = "Parameter to Actual Finite State Mapping";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StateToParameterTypeMapperBrowserViewModel"/> class
@@ -430,6 +430,13 @@ namespace CDP4ReferenceDataMapper.ViewModels
                         : this.DataSourceManager.GetElementDefinitionParameterValueForDataRow(row.Row, new Guid(parameterTypeIid));
 
                 this.DataSourceManager.SetValue(property, valueRow, newPropertyValue);
+
+                var newPropertyCustomName =
+                    string.IsNullOrWhiteSpace(parameterTypeIid)
+                        ? null
+                        : this.DataSourceManager.GetElementDefinitionParameterCustomNameForDataRow(row.Row, new Guid(parameterTypeIid));
+
+                this.DataSourceManager.SetValue(this.DataSourceManager.GetShortNameColumnName(property), valueRow, newPropertyCustomName);
             }
         }
 
