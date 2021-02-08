@@ -358,8 +358,8 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 ValueSet = { sourceParameterOverrideValueset1 }
             };
 
-            this.parameterToStateMapping_1 = new ParameterToStateMapping("100", this.sourceParameterType_1, this.actualFinitateSte_on);
-            this.parameterToStateMapping_2 = new ParameterToStateMapping("100", this.sourceParameterType_1, this.actualFinitateSte_off);
+            this.parameterToStateMapping_1 = new ParameterToStateMapping("100", this.sourceParameterType_1, this.actualFinitateSte_on, "");
+            this.parameterToStateMapping_2 = new ParameterToStateMapping("100", this.sourceParameterType_1, this.actualFinitateSte_off, "");
 
             this.parameterToStateMappingList = new[] { this.parameterToStateMapping_1, this.parameterToStateMapping_2 };
 
