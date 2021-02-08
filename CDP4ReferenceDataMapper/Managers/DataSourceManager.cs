@@ -199,6 +199,16 @@ namespace CDP4ReferenceDataMapper.Managers
             this.DataTable = new DataTable();
             this.Things = new HashSet<Thing>();
         }
+        
+        /// <summary>
+        /// Returns the ShortName column name for a column holding the current value
+        /// </summary>
+        /// <param name="currentValueColumnName">The current value column</param>
+        /// <returns>Name of the column holding the original value</returns>
+        public string GetShortNameColumnName(string currentValueColumnName)
+        {
+            return $"{currentValueColumnName}_shortname";
+        }
 
         /// <summary>
         /// Returns the original value's column name for a column holding the current value
@@ -269,6 +279,8 @@ namespace CDP4ReferenceDataMapper.Managers
                 this.Columns.Add(actualStateDataGridColumn);
                 this.DataTable.Columns.Add(actualStateDataGridColumn.FieldName, typeof(string));
                 this.DataTable.Columns.Add(this.GetOrgValueColumnName(actualStateDataGridColumn.FieldName), typeof(string));
+                this.DataTable.Columns.Add(this.GetShortNameColumnName(actualStateDataGridColumn.FieldName), typeof(string));
+                this.DataTable.Columns.Add(this.GetOrgValueColumnName(this.GetShortNameColumnName(actualStateDataGridColumn.FieldName)), typeof(string));
             }
 
             foreach (var actualFiniteState in oldActualFiniteStates)
@@ -280,6 +292,7 @@ namespace CDP4ReferenceDataMapper.Managers
                     this.Columns.Remove(actualStateDataGridColumn);
                     this.DataTable.Columns.Remove(actualStateDataGridColumn.FieldName);
                     this.DataTable.Columns.Remove(this.GetOrgValueColumnName(actualStateDataGridColumn.FieldName));
+                    this.DataTable.Columns.Remove(this.GetOrgValueColumnName(this.GetShortNameColumnName(actualStateDataGridColumn.FieldName)));
                 }
             }
         }
@@ -393,6 +406,7 @@ namespace CDP4ReferenceDataMapper.Managers
                                             if (currentValueSetValue == originallySavedMapping?.Value)
                                             {
                                                 valueRow[columnName] = originallySavedMapping?.Value;
+                                                valueRow[this.GetShortNameColumnName(columnName)] = originallySavedMapping?.ShortName;
                                                 mappingRow[columnName] = originallySavedMapping?.ParameterTypeIid;
                                             }
                                         }
@@ -616,6 +630,41 @@ namespace CDP4ReferenceDataMapper.Managers
         }
 
         /// <summary>
+        /// Gets the Name of a specific Parameter of the <see cref="ElementDefinition"/> that belongs to a <see cref="DataRow"/>
+        /// or belongs to its root/<see cref="ElementDefinition"/> <see cref="DataRow"/>.
+        /// </summary>
+        /// <param name="dataRow">
+        /// The <see cref="DataRow"/>
+        /// </param>
+        /// <param name="parameterTypeIid">
+        /// The <see cref="ParameterType.Iid"/> of the <see cref="ParameterType"/> we want to to get its computed value from.
+        /// </param>
+        /// <returns>
+        /// The computed value as a <see cref="string"/>
+        /// </returns>
+        public string GetElementDefinitionParameterCustomNameForDataRow(DataRow dataRow, Guid parameterTypeIid)
+        {
+            var elementDefinitionRow = this.GetElementDefinitionRow(dataRow);
+            var elementDefinition = this.GetThingByDataRow<ElementDefinition>(elementDefinitionRow);
+
+            var elementDefinitionParameter =
+                elementDefinition?
+                    .Parameter
+                    .SingleOrDefault(x => x.ParameterType.Iid == parameterTypeIid);
+
+            if (elementDefinitionParameter?.ParameterType is CompoundParameterType)
+            {
+                return elementDefinitionParameter
+                    .ValueSets
+                    .FirstOrDefault()?
+                    .ActualValue[0];
+            }
+
+            return elementDefinitionParameter?
+                .ParameterType.ShortName;
+        }
+
+        /// <summary>
         /// Sets the value of a <see cref="DataColumn"/> for a specific <see cref="DataRow"/> in the <see cref="DataTable"/>.
         /// </summary>
         /// <param name="columnName">The column name</param>
@@ -636,6 +685,7 @@ namespace CDP4ReferenceDataMapper.Managers
             foreach (var actualState in this.actualFiniteStateList.ActualState)
             {
                 dataRow[this.GetOrgValueColumnName(actualState.ShortName)] = dataRow[actualState.ShortName];
+                dataRow[this.GetOrgValueColumnName(this.GetShortNameColumnName(actualState.ShortName))] = dataRow[this.GetShortNameColumnName(actualState.ShortName)];
             }
         }
 
@@ -688,6 +738,11 @@ namespace CDP4ReferenceDataMapper.Managers
                 var columnName = actualState.ShortName;
 
                 if (dataRow[columnName].ToString() != dataRow[this.GetOrgValueColumnName(columnName)].ToString())
+                {
+                    return true;
+                }
+
+                if (dataRow[this.GetShortNameColumnName(columnName)].ToString() != dataRow[this.GetOrgValueColumnName(this.GetShortNameColumnName(columnName))].ToString())
                 {
                     return true;
                 }
@@ -778,7 +833,8 @@ namespace CDP4ReferenceDataMapper.Managers
                             continue;
                         }
 
-                        var mappingParameterValue = new ParameterToStateMapping(valueRow[actualState.ShortName].ToString(), mappedParameterType, actualState);
+                        var shortName = valueRow[this.GetShortNameColumnName(actualState.ShortName)].ToString();
+                        var mappingParameterValue = new ParameterToStateMapping(valueRow[actualState.ShortName].ToString(), mappedParameterType, actualState, shortName);
                         parameterToMappingList.Add(mappingParameterValue);
                     }
                 }
