@@ -56,6 +56,11 @@ namespace CDP4EngineeringModel.ViewModels
         private ModelReferenceDataLibrary requiredRdl;
 
         /// <summary>
+        /// Backing field fot <see cref="Name"/>
+        /// </summary>
+        private string name;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MultiRelationshipCreatorViewModel"/> class
         /// </summary>
         /// <param name="iteration">The current <see cref="Iteration"/></param>
@@ -97,6 +102,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the Name for the <see cref="BinaryRelationship"/> to create
+        /// </summary>
+        public string Name
+        {
+            get { return this.name; }
+            set { this.RaiseAndSetIfChanged(ref this.name, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the <see cref="Category"/>s for the <see cref="BinaryRelationship"/> to create
         /// </summary>
         public List<Category> AppliedCategories
@@ -123,6 +137,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public void ReInitializeControl()
         {
+            this.Name = string.Empty;
             this.RelatedThings.ClearAndDispose();
         }
 
@@ -170,7 +185,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>A new instance of <see cref="Relationship"/></returns>
         public Relationship CreateRelationshipObject()
         {
-            var relationship = new MultiRelationship();
+            var relationship = new MultiRelationship()
+            {
+                Name = this.Name
+            };
+
             relationship.RelatedThing.AddRange(this.RelatedThings.Select(x => x.Thing));
             relationship.Category.AddRange(this.AppliedCategories);
 

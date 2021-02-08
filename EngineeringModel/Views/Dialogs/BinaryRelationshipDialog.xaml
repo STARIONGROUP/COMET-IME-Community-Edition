@@ -27,6 +27,7 @@
                         View="Tabs"
                         lc:LayoutControl.AllowHorizontalSizing="True">
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
+                <items:NameLayoutItem/>
                 <lc:LayoutItem Label="Source ClassKind:">
                     <Grid>
                         <dxe:ComboBoxEdit Name="SourceClassKind"
