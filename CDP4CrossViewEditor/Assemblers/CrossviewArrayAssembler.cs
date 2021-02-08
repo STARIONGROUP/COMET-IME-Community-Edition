@@ -307,19 +307,23 @@ namespace CDP4CrossViewEditor.Assemblers
             contentRow[3] = excelRow.Owner;
             contentRow[4] = excelRow.Categories;
 
-            IEnumerable<ParameterOrOverrideBase> parameters;
+            List<ParameterOrOverrideBase> parameters;
 
             switch (excelRow.Thing)
             {
                 case ElementUsage elementUsage:
                     parameters = this.parameterTypes
-                        .Select(pt => GetParameterOrOverrideBase(elementUsage, pt));
+                        .Select(pt => GetParameterOrOverrideBase(elementUsage, pt))
+                        .Where(p => p != null)
+                        .ToList();
 
                     break;
 
                 case ElementDefinition elementDefinition:
                     parameters = this.parameterTypes
-                        .Select(pt => GetParameterOrOverrideBase(elementDefinition, pt));
+                        .Select(pt => GetParameterOrOverrideBase(elementDefinition, pt))
+                        .Where(p => p != null)
+                        .ToList();
 
                     break;
 
@@ -327,11 +331,11 @@ namespace CDP4CrossViewEditor.Assemblers
                     return (contentRow, namesRow);
             }
 
-            var isCalculationPossible = CrossviewSheetPMeanUtilities.IsCalculationPossible(parameters.Where(p => p != null).ToList());
+            var isCalculationPossible = CrossviewSheetPMeanUtilities.IsCalculationPossible(parameters);
 
             var calculationParameters = new List<(ParameterValueSetBase, ParameterTypeComponent)>();
 
-            foreach (var parameterOrOverrideBase in parameters.Where(p => p != null))
+            foreach (var parameterOrOverrideBase in parameters)
             {
                 foreach (var parameterValueSetBase in parameterOrOverrideBase.ValueSets.Cast<ParameterValueSetBase>())
                 {
