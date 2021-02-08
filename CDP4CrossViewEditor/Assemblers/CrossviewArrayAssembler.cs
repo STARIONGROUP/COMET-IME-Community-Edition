@@ -393,9 +393,7 @@ namespace CDP4CrossViewEditor.Assemblers
             var pStandbyIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PStandBy, StringComparison.InvariantCultureIgnoreCase)).Item2;
 
             var pDutyCycleIndexes = indexes.Where(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PDutyCycle, StringComparison.InvariantCultureIgnoreCase)).ToArray();
-
-            var pMeanIndexes = indexes.Where(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PMean,
-                StringComparison.InvariantCultureIgnoreCase)).ToArray();
+            var pMeanIndexes = indexes.Where(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PMean, StringComparison.InvariantCultureIgnoreCase)).ToArray();
 
             if (pMeanIndexes.Length != pDutyCycleIndexes.Length)
             {

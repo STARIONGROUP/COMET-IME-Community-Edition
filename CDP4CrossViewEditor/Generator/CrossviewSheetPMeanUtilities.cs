@@ -166,7 +166,6 @@ namespace CDP4CrossViewEditor.Generator
             }
 
             return !pDutyCycle.StateDependence.ActualState.Except(pMean.StateDependence.ActualState).Any();
-
         }
 
         /// <summary>
@@ -187,14 +186,28 @@ namespace CDP4CrossViewEditor.Generator
         /// Calculate P_mean parameter value based on multiple parameter values:
         /// "P_stby", "P_on", "P_duty_cyc", "redundancy.scheme", "redundancy.type", "redundancy.k", "redundancy.n"
         /// </summary>
-        /// <param name="standByValue">Power standBy value</param>
-        /// <param name="onValue">Power on value</param>
-        /// <param name="dutyCycleValue">Power duty cycle</param>
-        /// <param name="redundancyScheme">Redundancy scheme</param>
-        /// <param name="redundancyType">Redundancy type</param>
-        /// <param name="redundancyK">Redundancy k</param>
-        /// <param name="redundancyN">Redundancy n</param>
-        /// <returns>Computed value for the Power mean</returns>
+        /// <param name="standByValue">
+        /// Power standBy value
+        /// </param>
+        /// <param name="onValue">
+        /// Power on value
+        /// </param>
+        /// <param name="dutyCycleValue">
+        /// Power duty cycle
+        /// </param>
+        /// <param name="redundancyScheme">
+        /// Redundancy scheme
+        /// </param>
+        /// <param name="redundancyType"
+        /// >Redundancy type</param>
+        /// <param name="redundancyK">Redundancy k
+        /// </param>
+        /// <param name="redundancyN">
+        /// Redundancy n
+        /// </param>
+        /// <returns>
+        /// Computed value for the Power mean
+        /// </returns>
         public static double? ComputePMean(
             string standByValue,
             string onValue,
