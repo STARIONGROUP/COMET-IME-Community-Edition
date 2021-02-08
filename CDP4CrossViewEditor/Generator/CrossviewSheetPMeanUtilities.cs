@@ -149,23 +149,13 @@ namespace CDP4CrossViewEditor.Generator
                 return false;
             }
 
-            if (pDutyCycle.IsOptionDependent && pMean.IsOptionDependent && pDutyCycle.ValueSets.Select(vs => vs.ActualOption).Except(pMean.ValueSets.Select(vs => vs.ActualOption)).Any())
-            {
-                return true;
-            }
-
-            // Check if P_duty_cyc && P_mean have the same state dependency, both should be the same
+            // Check if P_duty_cyc && P_mean have the same state dependency
             if (pDutyCycle.StateDependence == null || pMean.StateDependence == null)
             {
                 return false;
             }
 
-            if (pDutyCycle.StateDependence.ActualState.Count == 0 || pMean.StateDependence.ActualState.Count == 0)
-            {
-                return false;
-            }
-
-            return !pDutyCycle.StateDependence.ActualState.Except(pMean.StateDependence.ActualState).Any();
+            return pDutyCycle.StateDependence == pMean.StateDependence;
         }
 
         /// <summary>
