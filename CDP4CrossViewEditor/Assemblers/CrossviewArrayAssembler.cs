@@ -404,7 +404,7 @@ namespace CDP4CrossViewEditor.Assemblers
                 return (contentRow, namesRow);
             }
 
-            for (var i = 0; i < pDutyCycleIndexes.Count(); i++)
+            for (var i = 0; i < pDutyCycleIndexes.Length; i++)
             {
                 contentRow[pMeanIndexes[i].Item2] = CrossviewSheetPMeanUtilities.ComputePMean(
                     contentRow[pStandbyIndex].ToString(),
