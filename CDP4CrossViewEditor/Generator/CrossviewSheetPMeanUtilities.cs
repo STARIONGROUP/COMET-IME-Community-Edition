@@ -126,17 +126,17 @@ namespace CDP4CrossViewEditor.Generator
         public static bool IsCalculationPossible(List<ParameterOrOverrideBase> parameters)
         {
             // Check if all power required parameters are present
-            if (PowerParameters.Select(p => p.ToLowerInvariant()).Except(new[] { "P_peak".ToLowerInvariant() })
+            if (PowerParameters.Select(p => p.ToLowerInvariant()).Except(new[] { PPeak.ToLowerInvariant() })
                 .Except(parameters.Select(p => p.ParameterType.ShortName.ToLowerInvariant())).Any())
             {
                 return false;
             }
 
             var pDutyCycle = parameters.Where(p => p != null)
-                .FirstOrDefault(p => p.ParameterType.ShortName.Equals("P_duty_cyc", StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(p => p.ParameterType.ShortName.Equals(PDutyCycle, StringComparison.InvariantCultureIgnoreCase));
 
             var pMean = parameters.Where(p => p != null)
-                .FirstOrDefault(p => p.ParameterType.ShortName.Equals("P_mean", StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(p => p.ParameterType.ShortName.Equals(PMean, StringComparison.InvariantCultureIgnoreCase));
 
             if (pDutyCycle == null || pMean == null)
             {
