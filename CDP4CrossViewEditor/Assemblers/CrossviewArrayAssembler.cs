@@ -351,7 +351,7 @@ namespace CDP4CrossViewEditor.Assemblers
                                 continue;
                             }
 
-                            if (CrossviewSheetPMeanUtilities.PowerParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
+                            if (CrossviewSheetPMeanUtilities.IsParameterNeededForComputation(parameterOrOverrideBase))
                             {
                                 calculationParameters.Add((parameterValueSetBase, component));
                             }
@@ -368,7 +368,7 @@ namespace CDP4CrossViewEditor.Assemblers
                             continue;
                         }
 
-                        if (CrossviewSheetPMeanUtilities.PowerParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName))
+                        if (CrossviewSheetPMeanUtilities.IsParameterNeededForComputation(parameterOrOverrideBase))
                         {
                             calculationParameters.Add((parameterValueSetBase, null));
                         }

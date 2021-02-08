@@ -170,6 +170,20 @@ namespace CDP4CrossViewEditor.Generator
         }
 
         /// <summary>
+        /// Checks if the given <paramref name="parameterOrOverrideBase"/> is needed for the computation.
+        /// </summary>
+        /// <param name="parameterOrOverrideBase">
+        /// A <see cref="ParameterOrOverrideBase"/>.
+        /// </param>
+        /// <returns>
+        /// True if the given <paramref name="parameterOrOverrideBase"/> is needed for the computation.
+        /// </returns>
+        internal static bool IsParameterNeededForComputation(ParameterOrOverrideBase parameterOrOverrideBase)
+        {
+            return PowerParameters.Contains(parameterOrOverrideBase.ParameterType.ShortName);
+        }
+
+        /// <summary>
         /// Calculate P_mean parameter value based on multiple parameter values:
         /// "P_stby", "P_on", "P_duty_cyc", "redundancy.scheme", "redundancy.type", "redundancy.k", "redundancy.n"
         /// </summary>
