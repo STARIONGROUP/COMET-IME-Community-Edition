@@ -385,8 +385,7 @@ namespace CDP4CrossViewEditor.Assemblers
                 return (contentRow, namesRow);
             }
 
-            var indexes = CrossviewSheetPMeanUtilities.PowerParameters
-                .Select(p => this.GetContentColumnsIndexes(calculationParameters, p)).SelectMany(x => x).ToList();
+            var indexes = CrossviewSheetPMeanUtilities.PowerParameters.Select(p => this.GetContentColumnsIndexes(calculationParameters, p)).SelectMany(x => x).ToList();
 
             var rSchemeIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyScheme, StringComparison.InvariantCultureIgnoreCase)).Item2;
             var rTypeIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyType, StringComparison.InvariantCultureIgnoreCase)).Item2;
@@ -641,7 +640,7 @@ namespace CDP4CrossViewEditor.Assemblers
         {
             var indexList = new List<(string, int)>();
 
-            var contentList = parameterTuples.Where(t => t.Item1.QueryParameterType().ShortName == parameterName).ToList();
+            var contentList = parameterTuples.Where(t => t.Item1.QueryParameterType().ShortName.Equals(parameterName, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             foreach (var (pvs, ptc) in contentList)
             {
