@@ -18,6 +18,11 @@ namespace CDP4EngineeringModel.ViewModels
     public interface IRelationshipCreatorViewModel : IDisposable
     {
         /// <summary>
+        /// Gets the name of the <see cref="Relationship"/> to create
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// Gets the type of the <see cref="Relationship"/> to create
         /// </summary>
         string CreatorKind { get; }

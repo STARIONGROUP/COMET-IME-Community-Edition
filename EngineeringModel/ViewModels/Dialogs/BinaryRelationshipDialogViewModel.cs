@@ -229,6 +229,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.UpdateProperties();
 
             this.PopulatePossibleClasskind();
+            this.Name = this.Thing.Name;
             this.SelectedSource = this.Thing.Source;
             this.SelectedTarget = this.Thing.Target;
             this.SelectedOwner = this.Thing.Owner;

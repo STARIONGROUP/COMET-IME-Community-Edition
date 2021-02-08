@@ -34,6 +34,12 @@ namespace CDP4CommonView
     public abstract partial class RelationshipDialogViewModel<T> : DialogViewModelBase<T> where T : Relationship
     {
         /// <summary>
+        /// Temporary hand coded change
+        /// Backing field for <see cref="Name"/>
+        /// </summary>
+        private string name;
+
+        /// <summary>
         /// Backing field for <see cref="SelectedOwner"/>
         /// </summary>
         private DomainOfExpertise selectedOwner;
@@ -43,7 +49,7 @@ namespace CDP4CommonView
         /// </summary>
         private RelationshipParameterValueRowViewModel selectedParameterValue;
 
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipDialogViewModel{T}"/> class.
         /// </summary>
@@ -96,6 +102,16 @@ namespace CDP4CommonView
                     throw new ArgumentException(errorMessage);
                 }
             }
+        }
+
+        /// <summary>
+        /// Temporary hand coded change
+        /// Gets or sets the Name
+        /// </summary>
+        public virtual string Name
+        {
+            get { return this.name; }
+            set { this.RaiseAndSetIfChanged(ref this.name, value); }
         }
 
         /// <summary>
@@ -205,6 +221,8 @@ namespace CDP4CommonView
             base.UpdateTransaction();
             var clone = this.Thing;
 
+            //Temporary hand coded
+            clone.Name = this.Name;
             clone.Owner = this.SelectedOwner;
             clone.Category.Clear();
             clone.Category.AddRange(this.Category);
@@ -217,6 +235,8 @@ namespace CDP4CommonView
         protected override void Initialize()
         {
             base.Initialize();
+            //Temporary hand coded
+            this.Name = "";
             this.PossibleOwner = new ReactiveList<DomainOfExpertise>();
             this.ParameterValue = new ReactiveList<RelationshipParameterValueRowViewModel>();
             this.Category = new ReactiveList<Category>();
@@ -229,6 +249,8 @@ namespace CDP4CommonView
         protected override void UpdateProperties()
         {
             base.UpdateProperties();
+            //Temporary hand coded
+            this.Name = this.Thing.Name;
             this.SelectedOwner = this.Thing.Owner;
             this.PopulatePossibleOwner();
             this.PopulateParameterValue();
