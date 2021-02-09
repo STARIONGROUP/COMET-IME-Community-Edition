@@ -90,6 +90,11 @@ namespace CDP4EngineeringModel.ViewModels
         private readonly IChangeOwnershipBatchService changeOwnershipBatchService;
 
         /// <summary>
+        /// The <see cref="IObfuscationService"/> used to determine if rows should be hidden based on obfuscation
+        /// </summary>
+        private readonly IObfuscationService obfuscationService;
+
+        /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
         /// </summary>
         private string currentModel;
@@ -157,6 +162,10 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
             this.changeOwnershipBatchService = changeOwnershipBatchService;
+
+            this.obfuscationService = new ObfuscationService();
+            this.obfuscationService.Initialize(this.Thing, this.Session);
+            this.Disposables.Add(this.obfuscationService);
 
             this.ElementDefinitionRowViewModels = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.UpdateElementDefinition();
@@ -774,7 +783,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (tuple != null)
             {
-                var row = new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this);
+                var row = new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this, this.obfuscationService);
                 this.ElementDefinitionRowViewModels.SortedInsert(row, rowComparer);
             }
         }

@@ -1,0 +1,193 @@
+﻿<dxlc:LayoutGroup x:Class="CDP4EngineeringModel.Views.SampledFunctionValueGridLayoutItem"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                 xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                 xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                 xmlns:local="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
+                 mc:Ignorable="d"
+                 Orientation="Vertical"
+                 d:DesignHeight="300" d:DesignWidth="300">
+    <dxlc:LayoutItem Label="Selected Switch:">
+        <dxe:ComboBoxEdit IsTextEditable="False"
+                          IsEnabled="{Binding IsValueSetEditable}"
+                          EditValue="{Binding Switch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          ShowBorder="True"
+                          ShowCustomItems="False">
+            <dxmvvm:Interaction.Behaviors>
+                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type local:ParameterSwitchKind}" />
+            </dxmvvm:Interaction.Behaviors>
+        </dxe:ComboBoxEdit>
+    </dxlc:LayoutItem>
+    <dxlc:LayoutGroup View="Tabs">
+        <dxlc:LayoutGroup Header="Actual">
+            <dxg:GridControl
+                             ItemsSource="{Binding ActualValueTable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                             ColumnsSource="{Binding ValueColumns}"
+                             AutoGenerateColumns="AddNew"
+                             SelectionMode="Cell"
+                             MaxHeight="1080"
+                             Height="Auto"
+                             Width="Auto">
+                <dxg:GridControl.ColumnGeneratorTemplate>
+                    <DataTemplate>
+                        <ContentControl>
+                            <dxg:GridColumn FieldName="{Binding FieldName}" Header="{Binding DisplayName}">
+
+                            </dxg:GridColumn>
+                        </ContentControl>
+                    </DataTemplate>
+                </dxg:GridControl.ColumnGeneratorTemplate>
+
+                <dxg:GridControl.View>
+                    <dxg:TableView HorizontalScrollbarVisibility="Visible"
+                                   VerticalScrollbarVisibility="Visible"
+                                   AllowGrouping="False"
+                                   AllowColumnFiltering="False"
+                                   AllowSorting="False"
+                                   ShowGroupPanel="False"
+                                   AutoWidth="False"
+                                   AllowEditing="False">
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+            </dxg:GridControl>
+        </dxlc:LayoutGroup>
+        <dxlc:LayoutGroup Header="Manual">
+            <dxg:GridControl ItemsSource="{Binding ManualValueTable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                             ColumnsSource="{Binding ValueColumns}"
+                             AutoGenerateColumns="AddNew"
+                             SelectionMode="Cell"
+                             IsEnabled="{Binding IsValueSetEditable}"
+                             x:Name="ManualValueTable"
+                             MaxHeight="1080"
+                             Height="Auto"
+                             Width="Auto">
+                <dxg:GridControl.ColumnGeneratorTemplate>
+                    <DataTemplate>
+                        <ContentControl>
+                            <dxg:GridColumn FieldName="{Binding FieldName}" Header="{Binding DisplayName}" AllowEditing="True">
+
+                            </dxg:GridColumn>
+                        </ContentControl>
+                    </DataTemplate>
+                </dxg:GridControl.ColumnGeneratorTemplate>
+
+                <dxg:GridControl.View>
+                    <dxg:TableView HorizontalScrollbarVisibility="Visible"
+                                   VerticalScrollbarVisibility="Visible"
+                                   AllowGrouping="False"
+                                   AllowColumnFiltering="False"
+                                   AllowSorting="False"
+                                   ShowGroupPanel="False"
+                                   ShowDataNavigator="True"
+                                   InitNewRow="ManualValueTable_OnInitNewRow"
+                                   NewItemRowPosition="Bottom"
+                                   AutoWidth="False"
+                                   AllowEditing="{Binding IsValueSetEditable}">
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+            </dxg:GridControl>
+        </dxlc:LayoutGroup>
+        <dxlc:LayoutGroup Header="Reference">
+            <dxg:GridControl ItemsSource="{Binding ReferenceValueTable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                             IsEnabled="{Binding IsValueSetEditable}"
+                             ColumnsSource="{Binding ValueColumns}"
+                             AutoGenerateColumns="AddNew"
+                             SelectionMode="Cell"
+                             x:Name="ReferenceValueTable"
+                             MaxHeight="1080"
+                             Height="Auto"
+                             Width="Auto">
+                <dxg:GridControl.ColumnGeneratorTemplate>
+                    <DataTemplate>
+                        <ContentControl>
+                            <dxg:GridColumn FieldName="{Binding FieldName}" Header="{Binding DisplayName}" AllowEditing="True">
+
+                            </dxg:GridColumn>
+                        </ContentControl>
+                    </DataTemplate>
+                </dxg:GridControl.ColumnGeneratorTemplate>
+
+                <dxg:GridControl.View>
+                    <dxg:TableView HorizontalScrollbarVisibility="Visible"
+                                   VerticalScrollbarVisibility="Visible"
+                                   AllowGrouping="False"
+                                   AllowColumnFiltering="False"
+                                   AllowSorting="False"
+                                   ShowGroupPanel="False"
+                                   ShowDataNavigator="True"
+                                   InitNewRow="ReferenceValueTable_OnInitNewRow"
+                                   NewItemRowPosition="Bottom"
+                                   AutoWidth="False"
+                                   AllowEditing="True">
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+            </dxg:GridControl>
+        </dxlc:LayoutGroup>
+        <dxlc:LayoutGroup Header="Computed">
+            <dxg:GridControl ItemsSource="{Binding ComputedValueTable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                             ColumnsSource="{Binding ValueColumns}"
+                             AutoGenerateColumns="AddNew"
+                             SelectionMode="Cell"
+                             MaxHeight="1080"
+                             Height="Auto"
+                             Width="Auto">
+                <dxg:GridControl.ColumnGeneratorTemplate>
+                    <DataTemplate>
+                        <ContentControl>
+                            <dxg:GridColumn FieldName="{Binding FieldName}" Header="{Binding DisplayName}">
+
+                            </dxg:GridColumn>
+                        </ContentControl>
+                    </DataTemplate>
+                </dxg:GridControl.ColumnGeneratorTemplate>
+
+                <dxg:GridControl.View>
+                    <dxg:TableView HorizontalScrollbarVisibility="Visible"
+                                   VerticalScrollbarVisibility="Visible"
+                                   AllowGrouping="False"
+                                   AllowColumnFiltering="False"
+                                   AllowSorting="False"
+                                   ShowGroupPanel="False"
+                                   AutoWidth="False"
+                                   AllowEditing="False">
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+            </dxg:GridControl>
+        </dxlc:LayoutGroup>
+        <dxlc:LayoutGroup Header="Published" IsEnabled="{Binding IsParameterOrOverride}">
+            <dxg:GridControl ItemsSource="{Binding PublishedValueTable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                             ColumnsSource="{Binding ValueColumns}"
+                             AutoGenerateColumns="AddNew"
+                             SelectionMode="Cell"
+                             MaxHeight="1080"
+                             Height="Auto"
+                             Width="Auto">
+                <dxg:GridControl.ColumnGeneratorTemplate>
+                    <DataTemplate>
+                        <ContentControl>
+                            <dxg:GridColumn FieldName="{Binding FieldName}" Header="{Binding DisplayName}">
+
+                            </dxg:GridColumn>
+                        </ContentControl>
+                    </DataTemplate>
+                </dxg:GridControl.ColumnGeneratorTemplate>
+
+                <dxg:GridControl.View>
+                    <dxg:TableView HorizontalScrollbarVisibility="Visible"
+                                   VerticalScrollbarVisibility="Visible"
+                                   AllowGrouping="False"
+                                   AllowColumnFiltering="False"
+                                   AllowSorting="False"
+                                   ShowGroupPanel="False"
+                                   AutoWidth="False"
+                                   AllowEditing="False">
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+            </dxg:GridControl>
+        </dxlc:LayoutGroup>
+    </dxlc:LayoutGroup>
+</dxlc:LayoutGroup>

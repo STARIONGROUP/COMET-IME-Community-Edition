@@ -87,11 +87,15 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
             {
                 this.Type = ParameterSheetConstants.PVSCD;
             }
+            else if (this.ParameterType is SampledFunctionParameterType)
+            {
+                this.Type = ParameterSheetConstants.SFPVS;
+            }
             else
             {
                 this.Type = ParameterSheetConstants.PVS;
             }
-            
+
             this.ParameterTypeShortName = this.Thing.Scale == null ? this.Thing.ParameterType.ShortName : string.Format("{0} [{1}]", this.Thing.ParameterType.ShortName, this.Thing.Scale.ShortName);
         }
 
@@ -116,7 +120,7 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                         {
                             parameterValueSet = (ParameterValueSet)processedValueSet.ClonedThing;
                         }
-                        
+
                         this.Id = parameterValueSet.Iid.ToString();
                         this.Switch = parameterValueSet.ValueSwitch.ToString();
                         this.ActualValue = ParameterValueConverter.ConvertToObject(this.Thing.ParameterType, parameterValueSet.ActualValue[0]);
@@ -130,7 +134,36 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                         this.ModelCode = parameterValueSet.ModelCode();
                     }
 
-                    // do not create sub rows, the parameter row represents the only valueset that exists                    
+                    // do not create sub rows, the parameter row represents the only valueset that exists
+                    return;
+                }
+
+                var sampledFunctionParameterType = this.Thing.ParameterType as SampledFunctionParameterType;
+                if (sampledFunctionParameterType != null)
+                {
+                    var parameterValueSet = this.Thing.ValueSet.FirstOrDefault();
+                    if (parameterValueSet != null)
+                    {
+                        ProcessedValueSet processedValueSet;
+                        if (processedValueSets.TryGetValue(parameterValueSet.Iid, out processedValueSet))
+                        {
+                            parameterValueSet = (ParameterValueSet)processedValueSet.ClonedThing;
+                        }
+
+                        this.Id = parameterValueSet.Iid.ToString();
+                        this.Switch = parameterValueSet.ValueSwitch.ToString();
+                        this.ActualValue = "N/A";
+                        this.ComputedValue = "N/A";
+                        this.ManualValue = "N/A";
+                        this.ReferenceValue = "N/A";
+                        this.Formula = string.Empty;
+
+                        this.Format = NumberFormat.Format(this.Thing.ParameterType, this.Thing.Scale);
+
+                        this.ModelCode = parameterValueSet.ModelCode();
+                    }
+
+                    // do not create sub rows, the parameter row represents the only valueset that exists
                     return;
                 }
 

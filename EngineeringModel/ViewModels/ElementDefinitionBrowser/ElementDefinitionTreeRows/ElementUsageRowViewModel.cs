@@ -44,6 +44,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
+    using CDP4EngineeringModel.Services;
+
     using ReactiveUI;
 
     /// <summary>
@@ -83,8 +85,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="currentExpertise">The active <see cref="DomainOfExpertise"/></param>
         /// <param name="session">The associated <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container view-model</param>
-        public ElementUsageRowViewModel(ElementUsage elementUsage, DomainOfExpertise currentExpertise, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(elementUsage, currentExpertise, session, containerViewModel)
+        /// <param name="obfuscationService">The obfuscation service</param>
+        public ElementUsageRowViewModel(ElementUsage elementUsage, DomainOfExpertise currentExpertise, ISession session, IViewModelBase<Thing> containerViewModel,
+            IObfuscationService obfuscationService)
+            : base(elementUsage, currentExpertise, session, containerViewModel, obfuscationService)
         {
             this.AllOptions = new ReactiveList<Option>();
             this.ExcludedOptions = new ReactiveList<Option>();

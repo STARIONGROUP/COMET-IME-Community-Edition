@@ -36,6 +36,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
+    using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
     using Moq;
     using NUnit.Framework;
@@ -45,6 +47,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     {
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialognavigationService;
+        private Mock<IObfuscationService> obfuscationService;
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://test.com");
         private ElementDefinition elementDefinition;
@@ -87,6 +90,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
+            this.obfuscationService = new Mock<IObfuscationService>();
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri){ Name = "option1"};
@@ -635,7 +639,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.elementDefinitionForUsage1.Parameter.Add(this.parameter1);
 
-            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null);
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
 
             Assert.AreEqual(1, row.Category.Count());
@@ -653,7 +657,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.elementDefinitionForUsage2.Parameter.Add(this.parameter1);
 
-            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage2, this.activeDomain, this.session.Object, null);
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage2, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
 
             Assert.AreEqual(2, row.Category.Count());
@@ -670,7 +674,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatCategoryIsCollectedCorrectlyForElementDefinition()
         {
-            var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementDefinitionRow, false);
 
             Assert.AreEqual(1, row.Category.Count());

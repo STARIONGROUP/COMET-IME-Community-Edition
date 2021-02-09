@@ -35,9 +35,14 @@ namespace CDP4SiteDirectory.ViewModels
         private FolderRowViewModel iterationSetupFolderRow;
 
         /// <summary>
-        /// The row containing all the <see cref="IterationSetup"/> in this <see cref="EngineeringModelSetup"/> row
+        /// The row containing all the <see cref="DomainOfExpertise"/> in this <see cref="EngineeringModelSetup"/> row
         /// </summary>
         private FolderRowViewModel activeDomainFolderRow;
+
+        /// <summary>
+        /// The row containing all the <see cref="Organization"/> in this <see cref="EngineeringModelSetup"/> row
+        /// </summary>
+        private FolderRowViewModel organizationFolderRow;
 
         /// <summary>
         /// Backing field for the <see cref="Description"/> property
@@ -48,7 +53,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// The underscore capitals to spaced TitleCase converter.
         /// </summary>
         private readonly UnderscoreCapitalsToSpacedTitleCaseConverter titleConverter = new UnderscoreCapitalsToSpacedTitleCaseConverter();
-        
+
         #endregion
 
         #region Constructors
@@ -71,9 +76,12 @@ namespace CDP4SiteDirectory.ViewModels
             this.iterationSetupFolderRow = new FolderRowViewModel("Iterations", "Iterations", this.Session, this);
             this.activeDomainFolderRow = new FolderRowViewModel("Active Domains", "Active Domains", this.Session, this);
 
+            this.organizationFolderRow = new FolderRowViewModel("Organizations", "Organizations", this.Session, this);
+
             this.ContainedRows.Add(this.participantFolderRow);
             this.ContainedRows.Add(this.iterationSetupFolderRow);
             this.ContainedRows.Add(this.activeDomainFolderRow);
+            this.ContainedRows.Add(this.organizationFolderRow);
 
             this.UpdateProperties();
         }
@@ -123,10 +131,12 @@ namespace CDP4SiteDirectory.ViewModels
             var newparticipant = this.Thing.Participant.Except(this.participantFolderRow.ContainedRows.Select(x => (Participant)x.Thing)).ToList();
             var newiteration = currentIterationSetup.Except(this.iterationSetupFolderRow.ContainedRows.Select(x => (IterationSetup)x.Thing)).ToList();
             var newDomain = this.Thing.ActiveDomain.Except(this.activeDomainFolderRow.ContainedRows.Select(x => (DomainOfExpertise)x.Thing)).ToList();
+            var newOrganizations = this.Thing.OrganizationalParticipant.Except(this.organizationFolderRow.ContainedRows.Select(x => ((OrganizationalParticipationRowViewModel)x).OrganizationalParticipation)).ToList();
 
             var oldparticipant = this.participantFolderRow.ContainedRows.Select(x => (Participant)x.Thing).Except(this.Thing.Participant).ToList();
             var olditeration = this.iterationSetupFolderRow.ContainedRows.Select(x => (IterationSetup)x.Thing).Except(currentIterationSetup).ToList();
             var oldDomain = this.activeDomainFolderRow.ContainedRows.Select(x => (DomainOfExpertise)x.Thing).Except(this.Thing.ActiveDomain).ToList();
+            var oldOrganization = this.organizationFolderRow.ContainedRows.Select(x => ((OrganizationalParticipationRowViewModel)x).OrganizationalParticipation).Except(this.Thing.OrganizationalParticipant).ToList();
 
             foreach (var participant in oldparticipant)
             {
@@ -141,6 +151,11 @@ namespace CDP4SiteDirectory.ViewModels
             foreach (var domain in oldDomain)
             {
                 this.RemoveDomain(domain);
+            }
+
+            foreach (var organizationalParticipant in oldOrganization)
+            {
+                this.RemoveOrganization(organizationalParticipant);
             }
 
             foreach (var participant in newparticipant)
@@ -158,9 +173,18 @@ namespace CDP4SiteDirectory.ViewModels
                 this.AddDomain(domain);
             }
 
+            foreach (var organization in newOrganizations)
+            {
+                this.AddOrganization(organization);
+            }
+
             var orderedCollection = this.activeDomainFolderRow.ContainedRows.OfType<DomainOfExpertiseRowViewModel>().OrderBy(x => x.Name).ToArray();
             this.activeDomainFolderRow.ContainedRows.ClearWithoutDispose();
             this.activeDomainFolderRow.ContainedRows.AddRange(orderedCollection);
+
+            var orderedCollectionOrganizations = this.organizationFolderRow.ContainedRows.OfType<OrganizationRowViewModel>().OrderBy(x => x.Name).ToArray();
+            this.organizationFolderRow.ContainedRows.ClearWithoutDispose();
+            this.organizationFolderRow.ContainedRows.AddRange(orderedCollectionOrganizations);
         }
 
         /// <summary>
@@ -242,6 +266,33 @@ namespace CDP4SiteDirectory.ViewModels
         {
             var row = new DomainOfExpertiseRowViewModel(domain, this.Session, this);
             this.activeDomainFolderRow.ContainedRows.Add(row);
+        }
+
+        /// <summary>
+        /// Remove the <see cref="Organization"/>
+        /// </summary>
+        /// <param name="organizationalParticipant">
+        /// the <see cref="OrganizationalParticipant"/> object to remove
+        /// </param>
+        private void RemoveOrganization(OrganizationalParticipant organizationalParticipant)
+        {
+            var row = this.organizationFolderRow.ContainedRows.SingleOrDefault(r => ((OrganizationalParticipationRowViewModel)r).OrganizationalParticipation.Equals(organizationalParticipant));
+            if (row != null)
+            {
+                this.organizationFolderRow.ContainedRows.RemoveAndDispose(row);
+            }
+        }
+
+        /// <summary>
+        /// Add the <see cref="Organization"/>
+        /// </summary>
+        /// <param name="organizationalParticipation">
+        /// the <see cref="OrganizationalParticipant"/> object to add
+        /// </param>
+        private void AddOrganization(OrganizationalParticipant organizationalParticipation)
+        {
+            var row = new OrganizationalParticipationRowViewModel(organizationalParticipation, this.Session, this);
+            this.organizationFolderRow.ContainedRows.Add(row);
         }
     }
 }

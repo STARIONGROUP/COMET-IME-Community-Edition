@@ -384,6 +384,7 @@
                         <dxg:TreeListColumn FieldName="Formula" />
                         <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
                         <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
+                        <dxg:TreeListColumn FieldName="IsObfuscated" Header="IsObfuscated" Visible ="False"/>
                         <dxg:TreeListColumn FieldName="Category" Header="Category" Visible ="False" ShowInColumnChooser="False">
                             <dxmvvm:Interaction.Behaviors>
                                 <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Category" ItemsSource="{Binding ElementDefinitionRowViewModels}"/>

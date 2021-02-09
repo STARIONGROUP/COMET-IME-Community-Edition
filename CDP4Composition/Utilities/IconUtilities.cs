@@ -541,6 +541,7 @@ namespace CDP4Common.Helpers
                 case ClassKind.TextParameterType:
                 case ClassKind.TimeOfDayParameterType:
                 case ClassKind.ParameterTypeComponent:
+                case ClassKind.SampledFunctionParameterType:
                 case ClassKind.ParameterType:
                     imagename = "NameManager";
                     imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
