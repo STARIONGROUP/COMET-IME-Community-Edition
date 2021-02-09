@@ -435,7 +435,7 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </param>
         private void SetContentColumnIndex(ParameterValueSetBase parameterValueSet)
         {
-            var parameter = (Parameter) parameterValueSet.Container;
+            var parameter = (Parameter)parameterValueSet.Container;
 
             if (parameter.ParameterType is CompoundParameterType compoundParameterType)
             {
