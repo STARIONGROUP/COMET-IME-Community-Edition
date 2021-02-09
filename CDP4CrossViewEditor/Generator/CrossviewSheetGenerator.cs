@@ -189,19 +189,19 @@ namespace CDP4CrossViewEditor.Generator
         }
 
         /// <summary>
-        /// collect the information that is to be written to the crossview sheet
+        /// Collect the information that is to be written to the crossview sheet.
         /// </summary>
         /// <param name="elementDefinitions">
-        /// Selected element definition list
+        /// Selected <see cref="ElementDefinition"/>s list.
         /// </param>
         /// <param name="parameterTypes">
-        /// Selected parameter types list
+        /// Selected <see cref="ParameterType"/>s list.
         /// </param>
-        private void PopulateSheetArrays(IEnumerable<ElementDefinition> elementDefinitions, IEnumerable<ParameterType> parameterTypes)
+        private void PopulateSheetArrays(IEnumerable<Guid> elementDefinitions, IEnumerable<Guid> parameterTypes)
         {
             // Instantiate the different rows
             var sheetRowAssembler = new CrossviewSheetRowAssembler();
-            sheetRowAssembler.Assemble(elementDefinitions);
+            sheetRowAssembler.Assemble(this.iteration, elementDefinitions);
             var excelRows = sheetRowAssembler.ExcelRows;
 
             // Use the instantiated rows to populate the excel array
@@ -360,7 +360,7 @@ namespace CDP4CrossViewEditor.Generator
             }
 
             // group horizontal parameter columns
-            var bodyHeaderDictionary = this.crossviewArrayAssember.headerDictionary;
+            var bodyHeaderDictionary = this.crossviewArrayAssember.HeaderDictionary;
 
             foreach (var parameterTypeShortName in bodyHeaderDictionary.Keys.ToList())
             {

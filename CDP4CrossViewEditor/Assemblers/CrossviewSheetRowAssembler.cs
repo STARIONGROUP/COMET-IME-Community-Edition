@@ -25,6 +25,7 @@
 
 namespace CDP4CrossViewEditor.Assemblers
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -50,46 +51,26 @@ namespace CDP4CrossViewEditor.Assemblers
         public IEnumerable<IExcelRow<Thing>> ExcelRows => this.excelRows;
 
         /// <summary>
-        /// Assemble the <see cref="IExcelRow{Thing}"/>s
+        /// Assemble the <see cref="IExcelRow{Thing}"/>s.
         /// </summary>
-        /// <param name="elementDefinitions">Selected element definition</param>
-        public void Assemble(IEnumerable<ElementDefinition> elementDefinitions)
+        /// <param name="iteration">
+        /// The <see cref="Iteration"/>.
+        /// </param>
+        /// <param name="elementDefinitions">
+        /// Selected <see cref="ElementDefinition"/>s.
+        /// </param>
+        public void Assemble(Iteration iteration, IEnumerable<Guid> elementDefinitions)
         {
-            if (elementDefinitions == null)
+            foreach (var elementDefinition in elementDefinitions
+                .Select(iid => iteration.Element.FirstOrDefault(ed => ed.Iid == iid))
+                .Where(x => x != null))
             {
-                return;
-            }
+                this.excelRows.Add(new ElementDefinitionExcelRow(elementDefinition));
 
-            var definitions = elementDefinitions.ToList();
-
-            if (!definitions.Any())
-            {
-                return;
-            }
-
-            var definitionRows = definitions.Select(elementDefinition => new ElementDefinitionExcelRow(elementDefinition)).ToList();
-            var allElementDefinitions = (definitions.FirstOrDefault()?.Container as Iteration)?.Element;
-
-            if (allElementDefinitions == null)
-            {
-                return;
-            }
-
-            foreach (var elementDefinitionExcelRow in definitionRows)
-            {
-                this.excelRows.Add(elementDefinitionExcelRow);
-
-                foreach (var element in allElementDefinitions)
+                foreach (var elementUsage in iteration.Element
+                    .SelectMany(ed => ed.ContainedElement.Where(eu => eu.ElementDefinition == elementDefinition)))
                 {
-                    var elementUsage = element.ContainedElement.FirstOrDefault(eu => eu.ElementDefinition == elementDefinitionExcelRow.Thing);
-
-                    if (elementUsage == null)
-                    {
-                        continue;
-                    }
-
-                    var elemenUsageExcelRow = new ElementUsageExcelRow(elementUsage);
-                    this.excelRows.Add(elemenUsageExcelRow);
+                    this.excelRows.Add(new ElementUsageExcelRow(elementUsage));
                 }
             }
         }
