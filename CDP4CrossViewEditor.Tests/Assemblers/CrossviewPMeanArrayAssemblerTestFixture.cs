@@ -447,8 +447,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 11]);
             Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
 
-            Assert.IsNotNull(arrayAssembler.NamesArray[6, 12]);
-
             Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 12].ToString(), out _));
         }
 
@@ -522,6 +520,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_duty_cyc"));
             Assert.IsFalse(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
+
             Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
         }
 
@@ -604,7 +603,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_duty_cyc"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
             Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.IsNotNull(arrayAssembler.NamesArray[6, 12]);
             Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
 
             Assert.AreEqual(0, arrayAssembler.ContentArray[6, 11]);
@@ -628,7 +626,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_duty_cyc"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
             Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.IsNotNull(arrayAssembler.NamesArray[6, 12]);
             Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
 
             Assert.IsNull(arrayAssembler.ContentArray[6, 11]);
