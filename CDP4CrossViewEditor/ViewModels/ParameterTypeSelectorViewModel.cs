@@ -32,6 +32,7 @@ namespace CDP4CrossViewEditor.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels;
 
     using CDP4Dal;
@@ -43,11 +44,6 @@ namespace CDP4CrossViewEditor.ViewModels
     /// </summary>
     public sealed class ParameterTypeSelectorViewModel : ThingSelectorViewModel
     {
-        /// <summary>
-        /// Hardcoded power related parameter type short names list
-        /// </summary>
-        private static readonly string[] PowerParameters = { "redundancy", "P_on", "P_stby", "P_peak", "P_duty_cyc", "P_mean" };
-
         /// <summary>
         /// Backing field for <see cref="PowerParametersEnabled"/>
         /// </summary>
@@ -206,11 +202,11 @@ namespace CDP4CrossViewEditor.ViewModels
             ExecuteMove(this.ParameterTypeTargetList, this.ParameterTypeSourceList, this.SelectedTargetList);
 
             this.PowerParametersEnabled =
-                PowerParameters
+                CrossviewSheetPMeanUtilities.PowerParameters
                     .Select(shortName =>
                         this.ParameterTypeTargetList.FirstOrDefault(row =>
                             string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
-                    .Count(row => row != null) == PowerParameters.Length;
+                    .Count(row => row != null) == CrossviewSheetPMeanUtilities.PowerParameters.Length;
         }
 
         /// <summary>
@@ -221,11 +217,11 @@ namespace CDP4CrossViewEditor.ViewModels
             ExecuteMove(this.ParameterTypeSourceList, this.ParameterTypeTargetList, this.SelectedSourceList);
 
             this.PowerParametersEnabled =
-                PowerParameters
+                CrossviewSheetPMeanUtilities.PowerParameters
                     .Select(shortName =>
                         this.ParameterTypeTargetList.FirstOrDefault(row =>
                             string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
-                    .Count(row => row != null) == PowerParameters.Length;
+                    .Count(row => row != null) == CrossviewSheetPMeanUtilities.PowerParameters.Length;
         }
 
         /// <summary>
@@ -244,7 +240,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToTarget()
         {
-            var powerParameterTypes = PowerParameters
+            var powerParameterTypes = CrossviewSheetPMeanUtilities.PowerParameters
                 .Select(shortName => this.ParameterTypeSourceList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
                 .Where(row => row != null);
 
@@ -259,7 +255,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void ExecuteMovePowerToSource()
         {
-            var powerParameterTypes = PowerParameters
+            var powerParameterTypes = CrossviewSheetPMeanUtilities.PowerParameters
                 .Select(shortName => this.ParameterTypeTargetList.FirstOrDefault(row => string.Equals(row.Thing.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase)))
                 .Where(row => row != null);
 
