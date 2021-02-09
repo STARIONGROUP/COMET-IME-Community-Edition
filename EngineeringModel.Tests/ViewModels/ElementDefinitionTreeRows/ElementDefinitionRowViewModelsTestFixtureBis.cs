@@ -23,6 +23,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
+    using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels;
 
@@ -41,6 +43,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private readonly Uri uri = new Uri("http://test.com");
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<IServiceLocator> serviceLocator;
+        private Mock<IObfuscationService> obfuscationService;
 
         private ElementDefinition elementDefinition;
         private ElementDefinition elementDefinitionForUsage1;
@@ -105,6 +108,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.thingCreator = new Mock<IThingCreator>();
+            this.obfuscationService = new Mock<IObfuscationService>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.serviceLocator = new Mock<IServiceLocator>();
@@ -354,7 +358,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             var revision = typeof (ElementDefinition).GetProperty("RevisionNumber");
 
-            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var groups = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().ToList();
             var group1Row = groups.Single(x => x.Thing == this.parameterGroup1);
@@ -415,7 +419,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinition.Parameter.Add(this.parameter1);
             // **********
 
-            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var group1Row = vm.ContainedRows.Single(x => x.Thing == this.parameterGroup1);
             var group3Row = group1Row.ContainedRows.Single();
 
@@ -449,7 +453,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void VerifyThatElementUsagesCanBeAddedOrRemoved()
         {
             var revision = typeof(ElementDefinition).GetProperty("RevisionNumber");
-            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             // add new usage
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
@@ -496,7 +500,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             // **********
 
             // init the tested class
-            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             // the subscription should replace the parameter
             var subscriptionRow = vm.ContainedRows.Single();
@@ -522,7 +526,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var parameterGroup = new ParameterGroup(Guid.NewGuid(), null, null);
             elementDefinition.ParameterGroup.Add(parameterGroup);
 
-            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null);
             var ratioScale = new RatioScale(Guid.NewGuid(), null, null);
@@ -550,7 +554,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var parameterGroup = new ParameterGroup(Guid.NewGuid(), null, null);
             elementDefinition.ParameterGroup.Add(parameterGroup);
 
-            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null);
             var ratioScale = new RatioScale(Guid.NewGuid(), null, null);
@@ -588,7 +592,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var parameterGroup = new ParameterGroup(Guid.NewGuid(), null, null);
             elementDefinition.ParameterGroup.Add(parameterGroup);
 
-            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null);
             var ratioScale = new RatioScale(Guid.NewGuid(), null, null);
@@ -609,7 +613,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public async Task VerifyThatParameterGetsCreatedWhenParameterTypeIsDropped()
         {
-            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             row.ThingCreator = this.thingCreator.Object;
 
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null);
@@ -629,7 +633,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatStartDragWorks()
         {
-            var row1 = new ElementDefinitionRowViewModel(this.elementDefinitionForUsage1, this.activeDomain, this.session.Object, null);
+            var row1 = new ElementDefinitionRowViewModel(this.elementDefinitionForUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var draginfo = new Mock<IDragInfo>();
             row1.StartDrag(draginfo.Object);
@@ -641,7 +645,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void VerifyThatDragOverWorksWithElementDefinition()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
-            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(this.elementDefinitionForUsage1);
@@ -655,7 +659,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void Verify_that_dragover_sets_move_for_template_ElementDefenition()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
-            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var payloadElementDefenition = new ElementDefinition(Guid.Empty, null, null);
             
@@ -670,7 +674,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatDragOverWorksWithElementDefinition2()
         {
-            var row = new ElementDefinitionRowViewModel(this.elementDefinitionForUsage1, this.activeDomain, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinitionForUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(this.elementDefinitionForUsage1);
@@ -683,7 +687,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public async Task VerifyThatDropsWorks()
         {
-            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(this.elementDefinitionForUsage1);
@@ -704,7 +708,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var parameterGroup = new ParameterGroup(Guid.NewGuid(), null, null);
             elementDefinition.ParameterGroup.Add(parameterGroup);
 
-            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null);
             var ratioScale = new RatioScale(Guid.NewGuid(), null, null);

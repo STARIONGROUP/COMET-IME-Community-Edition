@@ -20,6 +20,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
+    using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
     using Moq;
     using NUnit.Framework;
@@ -33,6 +35,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
+        private Mock<IObfuscationService> obfuscationService;
 
         private ElementDefinition elementDefinition;
         private ElementDefinition elementDefinitionForUsage1;
@@ -80,6 +83,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
+            this.obfuscationService = new Mock<IObfuscationService>();
             this.session = new Mock<ISession>();
             this.assembler = new Assembler(this.uri);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
@@ -346,7 +350,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
             // ***************************************
 
-            var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null);
+            var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             // Verify That Override is displayed instead of parameter
             Assert.AreEqual(2, row.ContainedRows.Count);
@@ -410,7 +414,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
             // ***************************************
 
-            var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null);
+            var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             Assert.AreEqual(2, row.AllOptions.Count);
             Assert.AreEqual(0, row.ExcludedOptions.Count);
             Assert.IsTrue(row.HasExcludes.HasValue);
@@ -457,7 +461,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinitionForUsage1.ParameterGroup.Add(this.parameterGroup1ForUsage1);
             // ***************************************
 
-            var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null);
+            var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null);
             var ratioScale = new RatioScale(Guid.NewGuid(), null, null);

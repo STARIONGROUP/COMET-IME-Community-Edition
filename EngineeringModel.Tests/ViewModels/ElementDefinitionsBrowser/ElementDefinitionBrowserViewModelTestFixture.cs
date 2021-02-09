@@ -72,6 +72,7 @@ namespace CDP4EngineeringModel.Tests
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IParameterSubscriptionBatchService> parameterSubscriptionBatchService;
         private Mock<IChangeOwnershipBatchService> changeOwnershipBatchService;
+        private Mock<IObfuscationService> obfuscationService;
 
         private SiteDirectory sitedir;
         private EngineeringModel model;
@@ -101,6 +102,7 @@ namespace CDP4EngineeringModel.Tests
             this.uri = new Uri("http://test.com");
             this.assembler = new Assembler(this.uri);
             this.panelNavigationService = new Mock<IPanelNavigationService>();
+            this.obfuscationService = new Mock<IObfuscationService>();
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.pt = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -315,7 +317,7 @@ namespace CDP4EngineeringModel.Tests
         {
             var browser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, this.panelNavigationService.Object, null, null, null, null);
             var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.elementDef.Owner, ElementDefinition = this.elementDef, Container = this.elementDef };
-            var usageRow = new ElementUsageRowViewModel(elementUsage, this.elementDef.Owner, this.session.Object, null);
+            var usageRow = new ElementUsageRowViewModel(elementUsage, this.elementDef.Owner, this.session.Object, null, this.obfuscationService.Object);
             var qk = new SimpleQuantityKind();
             var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
@@ -341,7 +343,7 @@ namespace CDP4EngineeringModel.Tests
             paramtType.Component.Add(new ParameterTypeComponent(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri), Scale = null });
             parameter.ParameterType = paramtType;
 
-            var elementDefRow = new ElementDefinitionRowViewModel(this.elementDef, this.elementDef.Owner, this.session.Object, null);
+            var elementDefRow = new ElementDefinitionRowViewModel(this.elementDef, this.elementDef.Owner, this.session.Object, null, this.obfuscationService.Object);
             var parameterValueBaseRow = new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, elementDefRow, false);
             browser.SelectedThing = parameterValueBaseRow;
             browser.ComputePermission();
@@ -809,7 +811,7 @@ namespace CDP4EngineeringModel.Tests
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, this.changeOwnershipBatchService.Object);
-            vm.SelectedThing = new ElementDefinitionRowViewModel(this.elementDef, this.domain, this.session.Object, null);
+            vm.SelectedThing = new ElementDefinitionRowViewModel(this.elementDef, this.domain, this.session.Object, null, this.obfuscationService.Object);
 
             vm.PopulateContextMenu();
 
