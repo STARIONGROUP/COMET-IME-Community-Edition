@@ -25,8 +25,8 @@
 
 namespace CDP4CrossViewEditor.Assemblers
 {
-    using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -82,22 +82,27 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <summary>
         /// Gets the array that contains the parameter sheet information
         /// </summary>
-        public object[,] ContentArray { get; private set; }
+        internal object[,] ContentArray { get; private set; }
 
         /// <summary>
         /// Gets the array that contains formatting information
         /// </summary>
-        public object[,] FormatArray { get; private set; }
+        internal object[,] FormatArray { get; private set; }
 
         /// <summary>
         /// Gets the array that contains locked cells information
         /// </summary>
-        public object[,] LockArray { get; private set; }
+        internal object[,] LockArray { get; private set; }
 
         /// <summary>
         /// Gets the array that contains name information
         /// </summary>
-        public object[,] NamesArray { get; private set; }
+        internal object[,] NamesArray { get; private set; }
+
+        /// <summary>
+        /// Special Excel cell highlighting based on <see cref="ParameterValueSetBase.ModelCode"/>
+        /// </summary>
+        internal Dictionary<string, Color> SpecialHighlighting = new Dictionary<string, Color>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CrossviewArrayAssembler"/> class.
@@ -356,7 +361,7 @@ namespace CDP4CrossViewEditor.Assemblers
                 }
             }
 
-            CrossviewSheetPMeanUtilities.ComputePMean(this, contentRow, parameters);
+            CrossviewSheetPMeanUtilities.ComputePMean(this, contentRow, namesRow, parameters);
 
             return (contentRow, namesRow);
         }

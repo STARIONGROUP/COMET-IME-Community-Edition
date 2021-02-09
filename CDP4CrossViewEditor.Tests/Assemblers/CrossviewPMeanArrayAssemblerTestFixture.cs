@@ -628,7 +628,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
             Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
 
-            Assert.IsNull(arrayAssembler.ContentArray[6, 11]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 11]);
         }
     }
 }

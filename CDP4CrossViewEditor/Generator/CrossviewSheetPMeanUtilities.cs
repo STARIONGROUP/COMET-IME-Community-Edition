@@ -27,6 +27,7 @@ namespace CDP4CrossViewEditor.Generator
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Globalization;
     using System.Linq;
 
@@ -124,12 +125,19 @@ namespace CDP4CrossViewEditor.Generator
         /// The <see cref="CrossviewArrayAssembler"/>
         /// </param>
         /// <param name="contentRow">
-        /// The current Excel row
+        /// The current Excel row values
+        /// </param>
+        /// <param name="namesRow">
+        /// The current Excel row names
         /// </param>
         /// <param name="parameters">
         /// The <see cref="ParameterOrOverrideBase"/>s present on the <see cref="contentRow"/>
         /// </param>
-        internal static void ComputePMean(CrossviewArrayAssembler crossviewArrayAssembler, object[] contentRow, List<ParameterOrOverrideBase> parameters)
+        internal static void ComputePMean(
+            CrossviewArrayAssembler crossviewArrayAssembler,
+            object[] contentRow,
+            object[] namesRow,
+            List<ParameterOrOverrideBase> parameters)
         {
             ParameterOrOverrideBase redundancy = null, pOn = null, pStandBy = null, pDutyCycle = null, pMean = null;
 
@@ -242,7 +250,7 @@ namespace CDP4CrossViewEditor.Generator
                     var pDutyCycleValueSet = pDutyCycleValueSets.First(x => x.ActualState == state) as ParameterValueSetBase;
                     var pMeanValueSet = pMeanValueSets.First(x => x.ActualState == state) as ParameterValueSetBase;
 
-                    contentRow[crossviewArrayAssembler.GetContentColumnIndex(pMeanValueSet)] = ComputePMean(
+                    var value = ComputePMean(
                         contentRow[crossviewArrayAssembler.GetContentColumnIndex(redundancyValueSet, redundancySchemeComponent)] as string,
                         contentRow[crossviewArrayAssembler.GetContentColumnIndex(redundancyValueSet, redundancyTypeComponent)] as string,
                         contentRow[crossviewArrayAssembler.GetContentColumnIndex(redundancyValueSet, redundancyKComponent)] as string,
@@ -250,6 +258,17 @@ namespace CDP4CrossViewEditor.Generator
                         contentRow[crossviewArrayAssembler.GetContentColumnIndex(pOnValueSet)] as string,
                         contentRow[crossviewArrayAssembler.GetContentColumnIndex(pStandByValueSet)] as string,
                         contentRow[crossviewArrayAssembler.GetContentColumnIndex(pDutyCycleValueSet)] as string);
+
+                    if (value == null)
+                    {
+                        continue;
+                    }
+
+                    var index = crossviewArrayAssembler.GetContentColumnIndex(pMeanValueSet);
+
+                    contentRow[index] = value;
+
+                    crossviewArrayAssembler.SpecialHighlighting[namesRow[index] as string] = Color.Green;
                 }
             }
         }

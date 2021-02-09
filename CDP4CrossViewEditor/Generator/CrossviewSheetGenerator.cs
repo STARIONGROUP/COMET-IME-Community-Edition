@@ -300,6 +300,12 @@ namespace CDP4CrossViewEditor.Generator
 
                     cell.Name = name.ToString();
 
+                    // apply special highlighting
+                    if (this.crossviewArrayAssember.SpecialHighlighting.ContainsKey(name.ToString()))
+                    {
+                        cell.Font.Color = this.crossviewArrayAssember.SpecialHighlighting[name.ToString()];
+                    }
+
                     // highlight manually saved values
                     if (changedValues.ContainsKey(name.ToString()))
                     {
