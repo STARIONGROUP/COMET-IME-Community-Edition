@@ -25,6 +25,7 @@
 
 namespace CDP4OfficeInfrastructure.OfficeDal
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -129,13 +130,13 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// Gets the <see cref="IEnumerable{ElementDefinition}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> SavedElementDefinitions => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedElementDefinitions.Value));
+        public IEnumerable<Guid> SavedElementDefinitions => GenerateJArrayFromString(this.SelectedElementDefinitions.Value).Select(jt => Guid.Parse((string)jt));
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{ParameterType}"/> instances.
         /// </summary>
         [XmlIgnore]
-        public IEnumerable<Thing> SavedParameterTypes => this.Serializer.Deserialize(this.GenerateStreamFromString(this.SelectedParameterTypes.Value));
+        public IEnumerable<Guid> SavedParameterTypes => GenerateJArrayFromString(this.SelectedParameterTypes.Value).Select(jt => Guid.Parse((string)jt));
 
         /// <summary>
         /// Gets or sets a dictionary that contains cell names and cell values that has been modified
@@ -147,8 +148,8 @@ namespace CDP4OfficeInfrastructure.OfficeDal
             {
                 var result = new Dictionary<string, string>();
 
-                var names = ((JArray)JsonConvert.DeserializeObject(this.CellNames.Value)).Select(jt => (string)jt).ToArray();
-                var values = ((JArray)JsonConvert.DeserializeObject(this.CellValues.Value)).Select(jt => (string)jt).ToArray();
+                var names = GenerateJArrayFromString(this.CellNames.Value).Select(jt => (string)jt).ToArray();
+                var values = GenerateJArrayFromString(this.CellValues.Value).Select(jt => (string)jt).ToArray();
 
                 for (var i = 0; i < names.Length; i++)
                 {
@@ -160,7 +161,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CrossviewWorkbookData"/> class.
+        /// Parameterless constructor needed for serialization by <see cref="XmlSerializer"/>.
         /// </summary>
         public CrossviewWorkbookData()
         {
@@ -170,41 +171,42 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         /// Initializes a new instance of the <see cref="CrossviewWorkbookData"/> class.
         /// </summary>
         /// <param name="elementDefinitions">
-        /// The element definitions list that needs to be preserved <see cref="IEnumerable{ElementDefinition}" />
+        /// The <see cref="IEnumerable{T}"/> of <see cref="ElementDefinition"/>s that needs to be preserved.
         /// </param>
         /// <param name="parameterTypes">
-        /// The parameter types list that needs to be preserved <see cref="IEnumerable{ParameterType}" />
+        /// The <see cref="IEnumerable{T}"/> of <see cref="ParameterType"/>s that needs to be preserved.
         /// </param>
         /// <param name="manuallySavedValues">
-        /// The cell name/value key/value pair that needs to be preserved <see cref="Dictionary{TKey,TValue}"/>
+        /// The <see cref="Dictionary{TKey,TValue}"/> of cell name/value key/value pairs that needs to be preserved.
         /// </param>
         public CrossviewWorkbookData(
-            IEnumerable<CDP4Common.EngineeringModelData.ElementDefinition> elementDefinitions,
-            IEnumerable<CDP4Common.SiteDirectoryData.ParameterType> parameterTypes,
+            IEnumerable<Guid> elementDefinitions,
+            IEnumerable<Guid> parameterTypes,
             Dictionary<string, string> manuallySavedValues)
         {
-            var preservedDefinitions = elementDefinitions.Select(elementDefinition => elementDefinition.ToDto() as ElementDefinition).ToList();
-            this.selectedElementDefinitions = this.GenerateStringFromList(preservedDefinitions);
-
-            var preservedTypes = parameterTypes.Select(parameterType => parameterType.ToDto() as ParameterType).ToList();
-            this.selectedParameterTypes = this.GenerateStringFromList(preservedTypes);
-
-            this.cellNames = this.GenerateStringFromList(manuallySavedValues.Keys.ToList());
-
-            this.cellValues = this.GenerateStringFromList(manuallySavedValues.Values.ToList());
+            this.selectedElementDefinitions = this.GenerateStringFromList(elementDefinitions);
+            this.selectedParameterTypes = this.GenerateStringFromList(parameterTypes);
+            this.cellNames = this.GenerateStringFromList(manuallySavedValues.Keys);
+            this.cellValues = this.GenerateStringFromList(manuallySavedValues.Values);
         }
 
         /// <summary>
-        /// Generate a string from a list
+        /// Generate a string from an <see cref="IEnumerable{T}"/>.
         /// </summary>
-        /// <typeparam name="T"><see cref="ElementDefinition"/> or <see cref="ParameterType"/></typeparam>
-        /// <param name="things">List of <see cref="Thing"/>s that will serialized to stream</param>
-        /// <returns>String generated from generic list</returns>
-        private string GenerateStringFromList<T>(List<T> things)
+        /// <typeparam name="T">
+        /// The type of the <see cref="IEnumerable{T}"/>
+        /// </typeparam>
+        /// <param name="enumerable">
+        /// <see cref="IEnumerable{T}"/> of <typeparamref name="T"/>/>s that will be serialized to the stream.
+        /// </param>
+        /// <returns>
+        /// String generated from generic list.
+        /// </returns>
+        private string GenerateStringFromList<T>(IEnumerable<T> enumerable)
         {
             using (var memoryStream = new MemoryStream())
             {
-                this.Serializer.SerializeToStream(things, memoryStream);
+                this.Serializer.SerializeToStream(enumerable, memoryStream);
                 memoryStream.Position = 0;
 
                 using (var reader = new StreamReader(memoryStream))
@@ -215,19 +217,17 @@ namespace CDP4OfficeInfrastructure.OfficeDal
         }
 
         /// <summary>
-        /// Generate a stream from a string
+        /// Generate a <see cref="JArray"/> from a <see cref="String"/>.
         /// </summary>
-        /// <param name="s">The string input</param>
-        /// <returns>The stream generated from the string</returns>
-        private Stream GenerateStreamFromString(string s)
+        /// <param name="s">
+        /// The <see cref="String"/> input.
+        /// </param>
+        /// <returns>
+        /// The <see cref="JArray"/> generated from the string.
+        /// </returns>
+        private static JArray GenerateJArrayFromString(string s)
         {
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-            writer.Write(s);
-            writer.Flush();
-            stream.Position = 0;
-
-            return stream;
+            return (JArray)JsonConvert.DeserializeObject(s);
         }
     }
 }

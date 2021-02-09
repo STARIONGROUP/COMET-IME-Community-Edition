@@ -54,12 +54,12 @@ namespace CDP4CrossViewEditor
         /// <summary>
         /// Element definitions user selection
         /// </summary>
-        public IEnumerable<ElementDefinition> ElementDefinitions;
+        public IEnumerable<Guid> ElementDefinitions;
 
         /// <summary>
         /// Parameter types user selection
         /// </summary>
-        public IEnumerable<ParameterType> ParameterTypes;
+        public IEnumerable<Guid> ParameterTypes;
 
         /// <summary>
         /// Parameter sheet values changed by the user
@@ -243,8 +243,8 @@ namespace CDP4CrossViewEditor
         private void WriteWorkbookDataToWorkbook()
         {
             var workbookData = new CrossviewWorkbookData(
-                this.workbookMetadata.PersistValues ? this.workbookMetadata.ElementDefinitions : new List<ElementDefinition>(),
-                this.workbookMetadata.PersistValues ? this.workbookMetadata.ParameterTypes : new List<ParameterType>(),
+                this.workbookMetadata.ElementDefinitions,
+                this.workbookMetadata.ParameterTypes,
                 this.workbookMetadata.PersistValues ? this.workbookMetadata.ParameterValues : new Dictionary<string, string>());
 
             var workbookDataDal = new CrossviewWorkbookDataDal(this.workbook);

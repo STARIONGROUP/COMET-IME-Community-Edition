@@ -25,6 +25,7 @@
 
 namespace CDP4CrossViewEditor.Assemblers
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -56,7 +57,7 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <summary>
         /// The selection parameter types <see cref= "IEnumerable{ParameterType}"/>
         /// </summary>
-        private IEnumerable<ParameterType> parameterTypes;
+        private readonly IEnumerable<Guid> parameterTypes;
 
         /// <summary>
         /// The header structure mapping parameter layer short names to indices:
@@ -69,7 +70,7 @@ namespace CDP4CrossViewEditor.Assemblers
                         SortedDictionary<string,
                             SortedDictionary<string,
                                 SortedDictionary<string,
-                                    int>>>>>> headerDictionary
+                                    int>>>>>> HeaderDictionary
             = new Dictionary<string,
                 SortedDictionary<string,
                     SortedDictionary<string,
@@ -101,9 +102,13 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <summary>
         /// Initializes a new instance of the <see cref="CrossviewArrayAssembler"/> class.
         /// </summary>
-        /// <param name="excelRows">The excel rows</param>
-        /// <param name="parameterTypes">The selection parameter types</param>
-        public CrossviewArrayAssembler(IEnumerable<IExcelRow<Thing>> excelRows, IEnumerable<ParameterType> parameterTypes)
+        /// <param name="excelRows">
+        /// The <see cref="IExcelRow{T}"/>s.
+        /// </param>
+        /// <param name="parameterTypes">
+        /// The selected <see cref="ParameterType"/> <see cref="Thing.Iid"/>s.
+        /// </param>
+        public CrossviewArrayAssembler(IEnumerable<IExcelRow<Thing>> excelRows, IEnumerable<Guid> parameterTypes)
         {
             this.excelRows = excelRows;
             this.parameterTypes = parameterTypes;
@@ -172,9 +177,9 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </returns>
         private IEnumerable<HeaderColumn> GetHeaderColumns()
         {
-            foreach (var parameterTypeShortName in this.headerDictionary.Keys.ToList())
+            foreach (var parameterTypeShortName in this.HeaderDictionary.Keys.ToList())
             {
-                var ptcDictionary = this.headerDictionary[parameterTypeShortName];
+                var ptcDictionary = this.HeaderDictionary[parameterTypeShortName];
 
                 foreach (var parameterTypeComponentShortName in ptcDictionary.Keys.ToList())
                 {
@@ -213,13 +218,19 @@ namespace CDP4CrossViewEditor.Assemblers
         /// </summary>
         private void InitializeHeaderStructure()
         {
-            foreach (var elementDefinition in this.excelRows
-                .Where(row => row.Thing is ElementDefinition)
-                .Select(row => row.Thing as ElementDefinition))
+            foreach (var parameterTypeIid in this.parameterTypes)
             {
-                foreach (var parameter in elementDefinition.Parameter
-                    .Where(parameter => this.parameterTypes.Contains(parameter.ParameterType)))
+                foreach (var elementDefinition in this.excelRows
+                    .Where(row => row.Thing is ElementDefinition)
+                    .Select(row => row.Thing as ElementDefinition))
                 {
+                    var parameter = elementDefinition.Parameter.FirstOrDefault(p => p.ParameterType.Iid == parameterTypeIid);
+
+                    if (parameter == null)
+                    {
+                        continue;
+                    }
+
                     foreach (var valueSet in parameter.ValueSet)
                     {
                         this.SetContentColumnIndex(valueSet);
@@ -361,17 +372,17 @@ namespace CDP4CrossViewEditor.Assemblers
         /// from the <see cref="ElementUsage.ElementDefinition"/>.
         /// </summary>
         /// <param name="elementUsage">
-        /// The given <see cref="ElementUsage"/>
+        /// The given <see cref="ElementUsage"/>.
         /// </param>
         /// <param name="parameterType">
-        /// The given <see cref="ParameterType"/>
+        /// The given <see cref="ParameterType"/> <see cref="Thing.Iid"/>.
         /// </param>
         /// <returns>
-        /// The <see cref="ParameterOrOverrideBase"/>
+        /// The <see cref="ParameterOrOverrideBase"/>.
         /// </returns>
-        private static ParameterOrOverrideBase GetParameterOrOverrideBase(ElementUsage elementUsage, ParameterType parameterType)
+        private static ParameterOrOverrideBase GetParameterOrOverrideBase(ElementUsage elementUsage, Guid parameterType)
         {
-            return elementUsage.ParameterOverride.FirstOrDefault(po => po.ParameterType == parameterType)
+            return elementUsage.ParameterOverride.FirstOrDefault(po => po.ParameterType.Iid == parameterType)
                    ?? GetParameterOrOverrideBase(elementUsage.ElementDefinition, parameterType);
         }
 
@@ -380,17 +391,17 @@ namespace CDP4CrossViewEditor.Assemblers
         /// from the given <see cref="ElementDefinition"/>.
         /// </summary>
         /// <param name="elementDefinition">
-        /// The given <see cref="ElementDefinition"/>
+        /// The given <see cref="ElementDefinition"/>.
         /// </param>
         /// <param name="parameterType">
-        /// The given <see cref="ParameterType"/>
+        /// The given <see cref="ParameterType"/> <see cref="Thing.Iid"/>.
         /// </param>
         /// <returns>
-        /// The <see cref="ParameterOrOverrideBase"/>
+        /// The <see cref="ParameterOrOverrideBase"/>.
         /// </returns>
-        private static ParameterOrOverrideBase GetParameterOrOverrideBase(ElementDefinition elementDefinition, ParameterType parameterType)
+        private static ParameterOrOverrideBase GetParameterOrOverrideBase(ElementDefinition elementDefinition, Guid parameterType)
         {
-            return elementDefinition.Parameter.FirstOrDefault(p => p.ParameterType == parameterType);
+            return elementDefinition.Parameter.FirstOrDefault(p => p.ParameterType.Iid == parameterType);
         }
 
         /// <summary>
@@ -477,13 +488,13 @@ namespace CDP4CrossViewEditor.Assemblers
                 actualFiniteStateListShortName,
                 actualFiniteStateShortName) = headerColumn;
 
-            if (!this.headerDictionary.ContainsKey(parameterTypeShortName))
+            if (!this.HeaderDictionary.ContainsKey(parameterTypeShortName))
             {
-                this.headerDictionary[parameterTypeShortName]
+                this.HeaderDictionary[parameterTypeShortName]
                     = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, int>>>>>();
             }
 
-            var ptcDictionary = this.headerDictionary[parameterTypeShortName];
+            var ptcDictionary = this.HeaderDictionary[parameterTypeShortName];
 
             if (!ptcDictionary.ContainsKey(parameterTypeComponentShortName))
             {
@@ -572,7 +583,7 @@ namespace CDP4CrossViewEditor.Assemblers
                 actualFiniteStateListShortName,
                 actualFiniteStateShortName) = headerColumn;
 
-            return this.headerDictionary
+            return this.HeaderDictionary
                 [parameterTypeShortName]
                 [parameterTypeComponentShortName]
                 [measurementScaleShortName]

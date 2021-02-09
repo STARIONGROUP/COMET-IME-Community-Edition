@@ -209,12 +209,12 @@ namespace CDP4CrossViewEditor.ViewModels
             this.ElementSelectorViewModel = new ElementDefinitionSelectorViewModel(
                 this.Iteration,
                 this.Session,
-                preservedData?.SavedElementDefinitions?.Select(ed => ed.Iid).ToList());
+                preservedData?.SavedElementDefinitions.ToList());
 
             this.ParameterSelectorViewModel = new ParameterTypeSelectorViewModel(
                 this.Iteration,
                 this.Session,
-                preservedData?.SavedParameterTypes?.Select(pt => pt.Iid).ToList());
+                preservedData?.SavedParameterTypes.ToList());
         }
 
         /// <summary>
