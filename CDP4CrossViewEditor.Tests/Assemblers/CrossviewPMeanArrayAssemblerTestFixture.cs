@@ -129,23 +129,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 }
             };
 
-            var option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
-            {
-                Name = "Option 1",
-                ShortName = "OPT_1",
-            };
-
-            this.iteration.Option.Add(option1);
-            this.iteration.DefaultOption = option1;
-
-            var option2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
-            {
-                Name = "Option 2",
-                ShortName = "OPT_2"
-            };
-
-            this.iteration.Option.Add(option2);
-
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "ElementDefinition_1",
@@ -325,14 +308,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                     {
                         Manual = new ValueArray<string>(new List<string> { "0.1" }),
                         ValueSwitch = ParameterSwitchKind.MANUAL,
-                        ActualOption = option1,
-                        ActualState = actualFiniteState
-                    },
-                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
-                    {
-                        Manual = new ValueArray<string>(new List<string> { "0.2" }),
-                        ValueSwitch = ParameterSwitchKind.MANUAL,
-                        ActualOption = option2,
                         ActualState = actualFiniteState
                     }
                 }
@@ -354,14 +329,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                     {
                         Manual = new ValueArray<string>(new List<string> { "-1" }),
                         ValueSwitch = ParameterSwitchKind.MANUAL,
-                        ActualOption = option1,
-                        ActualState = actualFiniteState
-                    },
-                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
-                    {
-                        Manual = new ValueArray<string>(new List<string> { "-1" }),
-                        ValueSwitch = ParameterSwitchKind.MANUAL,
-                        ActualOption = option2,
                         ActualState = actualFiniteState
                     }
                 }
@@ -383,14 +350,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                     {
                         Manual = new ValueArray<string>(new List<string> { "-0.5" }),
                         ValueSwitch = ParameterSwitchKind.MANUAL,
-                        ActualOption = option1,
-                        ActualState = actualFiniteState
-                    },
-                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
-                    {
-                        Manual = new ValueArray<string>(new List<string> { "1.5" }),
-                        ValueSwitch = ParameterSwitchKind.MANUAL,
-                        ActualOption = option2,
                         ActualState = actualFiniteState
                     }
                 }
@@ -418,14 +377,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                     {
                         Manual = new ValueArray<string>(new List<string> { "-" }),
                         ValueSwitch = ParameterSwitchKind.MANUAL,
-                        ActualOption = option1,
-                        ActualState = actualFiniteState
-                    },
-                    new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
-                    {
-                        Manual = new ValueArray<string>(new List<string> { "-" }),
-                        ValueSwitch = ParameterSwitchKind.MANUAL,
-                        ActualOption = option2,
                         ActualState = actualFiniteState
                     }
                 }
@@ -475,9 +426,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
 
             Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 13]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 14]);
+            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
         }
 
         [Test]
@@ -496,16 +445,11 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
 
             Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 13]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 14]);
+            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
 
-            Assert.IsNotNull(arrayAssembler.NamesArray[6, 13]);
-            Assert.IsNotNull(arrayAssembler.NamesArray[6, 14]);
+            Assert.IsNotNull(arrayAssembler.NamesArray[6, 12]);
 
-            Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 13].ToString(), out _));
-            Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 14].ToString(), out _));
-
+            Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 12].ToString(), out _));
         }
 
         [Test]
@@ -528,15 +472,11 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
 
             Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 13]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 14]);
+            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
 
-            Assert.IsNotNull(arrayAssembler.ContentArray[6, 13]);
-            Assert.IsNotNull(arrayAssembler.ContentArray[6, 14]);
+            Assert.IsNotNull(arrayAssembler.ContentArray[6, 12]);
 
-            Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 13].ToString(), out _));
-            Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 14].ToString(), out _));
+            Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 12].ToString(), out _));
         }
 
         [Test]
@@ -558,9 +498,9 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
             Assert.IsFalse(arrayAssembler.headerDictionary.ContainsKey("P_duty_cyc"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
+
             Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
-            Assert.AreEqual(13, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
         }
 
         [Test]
@@ -582,7 +522,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_stby"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_duty_cyc"));
             Assert.IsFalse(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
-            Assert.AreEqual(13, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
         }
 
         [Test]
@@ -624,6 +564,17 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             if (P_duty_cyc != null)
             {
                 P_duty_cyc.IsOptionDependent = true;
+
+                var option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                {
+                    Name = "Option 1",
+                    ShortName = "OPT_1",
+                };
+
+                foreach (var parameterValueSet in P_duty_cyc.ValueSet)
+                {
+                    parameterValueSet.ActualOption = option1;
+                }
             }
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
@@ -653,14 +604,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_duty_cyc"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
             Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
-            Assert.IsNotNull(arrayAssembler.NamesArray[6, 13]);
-            Assert.IsNotNull(arrayAssembler.NamesArray[6, 14]);
-            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 13]);
-            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 14]);
+            Assert.IsNotNull(arrayAssembler.NamesArray[6, 12]);
+            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
 
             Assert.AreEqual(0, arrayAssembler.ContentArray[6, 11]);
-            Assert.AreEqual(0, arrayAssembler.ContentArray[6, 12]);
         }
 
         [Test]
@@ -681,14 +628,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_duty_cyc"));
             Assert.IsTrue(arrayAssembler.headerDictionary.ContainsKey("P_mean"));
             Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
-            Assert.IsNotNull(arrayAssembler.NamesArray[6, 13]);
-            Assert.IsNotNull(arrayAssembler.NamesArray[6, 14]);
-            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 13]);
-            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 14]);
+            Assert.IsNotNull(arrayAssembler.NamesArray[6, 12]);
+            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
 
             Assert.IsNull(arrayAssembler.ContentArray[6, 11]);
-            Assert.IsNull(arrayAssembler.ContentArray[6, 12]);
         }
     }
 }

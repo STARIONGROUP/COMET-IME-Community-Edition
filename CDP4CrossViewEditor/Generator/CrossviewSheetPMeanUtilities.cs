@@ -48,22 +48,22 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Redundancy Scheme parameter type short name
         /// </summary>
-        private const string RedundancyScheme = "red_scheme";
+        public const string RedundancyScheme = "scheme";
 
         /// <summary>
         /// Redundancy Type parameter type short name
         /// </summary>
-        private const string RedundancyType = "red_type";
+        public const string RedundancyType = "type";
 
         /// <summary>
         /// Redundancy K parameter type short name
         /// </summary>
-        private const string RedundancyK = "k_out_of_n_items";
+        public const string RedundancyK = "k";
 
         /// <summary>
         /// Redundancy N parameter type short name
         /// </summary>
-        private const string RedundancyN = "n_items";
+        public const string RedundancyN = "n";
 
         /// <summary>
         /// Power on parameter type short name
@@ -189,28 +189,28 @@ namespace CDP4CrossViewEditor.Generator
             var compoundRedundancy = (CompoundParameterType)redundancy.ParameterType;
 
             var redundancySchemeComponent = compoundRedundancy.Component
-                .FirstOrDefault(x => x.ParameterType.ShortName.Equals(RedundancyScheme, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(x => x.ShortName.Equals(RedundancyScheme, StringComparison.InvariantCultureIgnoreCase));
             if (redundancySchemeComponent == null)
             {
                 return;
             }
             
             var redundancyTypeComponent = compoundRedundancy.Component
-                .FirstOrDefault(x => x.ParameterType.ShortName.Equals(RedundancyType, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(x => x.ShortName.Equals(RedundancyType, StringComparison.InvariantCultureIgnoreCase));
             if (redundancyTypeComponent == null)
             {
                 return;
             }
 
             var redundancyKComponent = compoundRedundancy.Component
-                .FirstOrDefault(x => x.ParameterType.ShortName.Equals(RedundancyK, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(x => x.ShortName.Equals(RedundancyK, StringComparison.InvariantCultureIgnoreCase));
             if (redundancyKComponent == null)
             {
                 return;
             }
 
             var redundancyNComponent = compoundRedundancy.Component
-                .FirstOrDefault(x => x.ParameterType.ShortName.Equals(RedundancyN, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(x => x.ShortName.Equals(RedundancyN, StringComparison.InvariantCultureIgnoreCase));
             if (redundancyNComponent == null)
             {
                 return;
