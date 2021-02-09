@@ -1,23 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfExportDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    
     using CDP4Composition.Navigation;
+    
     using CDP4Dal;
+    
     using CDP4Requirements.ReqIFDal;
-    using NLog;
+    
     using ReactiveUI;
+    
     using ReqIFSharp;
 
     /// <summary>
@@ -38,7 +62,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// The <see cref="IOpenSaveFileDialogService"/>
         /// </summary>
-        private IOpenSaveFileDialogService fileDialogService;
+        private readonly IOpenSaveFileDialogService fileDialogService;
 
         /// <summary>
         /// The <see cref="IReqIFSerializer"/>
@@ -66,28 +90,18 @@ namespace CDP4Requirements.ViewModels
         {
             if (sessions == null)
             {
-                throw new ArgumentNullException("sessions");
+                throw new ArgumentNullException(nameof(sessions));
             }
 
             if (iterations == null)
             {
-                throw new ArgumentNullException("iterations");
-            }
-
-            if (fileDialogService == null)
-            {
-                throw new ArgumentNullException("fileDialogService");
-            }
-
-            if (serializer == null)
-            {
-                throw new ArgumentNullException("serializer");
+                throw new ArgumentNullException(nameof(iterations));
             }
 
             this.Sessions = sessions.ToList();
             this.Iterations = new ReactiveList<ReqIfExportIterationRowViewModel>();
-            this.fileDialogService = fileDialogService;
-            this.serializer = serializer;
+            this.fileDialogService = fileDialogService ?? throw new ArgumentNullException(nameof(fileDialogService));
+            this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
 
             foreach (var iteration in iterations)
             {
@@ -114,8 +128,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public bool IsDetailExpanded
         {
-            get { return this.isDetailExpanded; }
-            set { this.RaiseAndSetIfChanged(ref this.isDetailExpanded, value); }
+            get => this.isDetailExpanded;
+            set => this.RaiseAndSetIfChanged(ref this.isDetailExpanded, value);
         }
 
         /// <summary>
@@ -123,8 +137,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string ErrorDetailMessage
         {
-            get { return this.errorDetailMessage; }
-            private set { this.RaiseAndSetIfChanged(ref this.errorDetailMessage, value); }
+            get => this.errorDetailMessage;
+            private set => this.RaiseAndSetIfChanged(ref this.errorDetailMessage, value);
         }
 
         /// <summary>
@@ -142,8 +156,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public ReqIfExportIterationRowViewModel SelectedIteration
         {
-            get { return this.selectedIteration; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedIteration, value); }
+            get => this.selectedIteration;
+            set => this.RaiseAndSetIfChanged(ref this.selectedIteration, value);
         }
 
         /// <summary>
@@ -151,8 +165,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string Path
         {
-            get { return this.path; }
-            set { this.RaiseAndSetIfChanged(ref this.path, value); }
+            get => this.path;
+            set => this.RaiseAndSetIfChanged(ref this.path, value);
         }
 
         /// <summary>
@@ -173,7 +187,8 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Executes the Ok Command
         /// </summary>
-        private async void ExecuteOk()
+        /// <returns>A <see cref="Task"/></returns>
+        private void ExecuteOk()
         {
             this.IsBusy = true;
             this.LoadingMessage = "Exporting...";
@@ -215,8 +230,7 @@ namespace CDP4Requirements.ViewModels
         /// <returns>True if no violations related to the exported data were found</returns>
         private bool CheckModelValidity(Iteration iteration)
         {
-            var model = iteration.Container as EngineeringModel;
-            if (model == null)
+            if (!(iteration.Container is EngineeringModel model))
             {
                 this.ErrorMessage = "The container of the selected Iteration is not set.";
                 return false;

@@ -1,22 +1,43 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Services
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
-    using CDP4Common;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Exceptions;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
+
     using NLog;
 
     /// <summary>
@@ -117,26 +138,24 @@ namespace CDP4Composition.Services
         {
             if (session == null)
             {
-                throw new ArgumentNullException("session", "The session may not be null");
+                throw new ArgumentNullException(nameof(session), "The session may not be null");
             }
 
             if (verificationList == null)
             {
-                throw new ArgumentNullException("verificationList", "The verificationList may not be null");
+                throw new ArgumentNullException(nameof(verificationList), "The verificationList may not be null");
             }
             
             foreach (var ruleVerification in verificationList.RuleVerification)
             {
-                var builtInRuleVerification = ruleVerification as BuiltInRuleVerification;
-                if (builtInRuleVerification != null && builtInRuleVerification.IsActive)
+                switch (ruleVerification)
                 {
-                    this.Execute(session, builtInRuleVerification, verificationList);
-                }
-
-                var userRuleVerification = ruleVerification as UserRuleVerification;
-                if (userRuleVerification != null && userRuleVerification.IsActive)
-                {
-                    this.Execute(session, userRuleVerification, verificationList);
+                    case BuiltInRuleVerification builtInRuleVerification when builtInRuleVerification.IsActive:
+                        this.Execute(session, builtInRuleVerification, verificationList);
+                        break;
+                    case UserRuleVerification userRuleVerification when userRuleVerification.IsActive:
+                        this.Execute(session, userRuleVerification, verificationList);
+                        break;
                 }
             }
         }
@@ -159,7 +178,7 @@ namespace CDP4Composition.Services
 
             if (iteration == null)
             {
-                throw new ContainmentException(string.Format("The container Iteration of the RuleVerificationList {0} has not been set", container.Iid));
+                throw new ContainmentException($"The container Iteration of the RuleVerificationList {container.Iid} has not been set");
             }
 
             foreach (var violation in builtInRuleVerification.Violation)
@@ -171,13 +190,14 @@ namespace CDP4Composition.Services
             CDPMessageBus.Current.SendObjectChangeEvent(builtInRuleVerification, EventKind.Updated);
 
             var builtInRule = this.QueryBuiltInRule(builtInRuleVerification);
+            
             if (builtInRule == null)
             {
                 logger.Debug("The BuiltInRule with name {0} is not registered with the Service. The BuiltInRuleVerification cannot be executed", builtInRuleVerification.Name);
                 return;
             }
 
-            IEnumerable<RuleViolation> violations = builtInRule.Verify(iteration);
+            var violations = builtInRule.Verify(iteration);
 
             this.UpdateExecutedOn(session, builtInRuleVerification);
 
@@ -209,7 +229,7 @@ namespace CDP4Composition.Services
 
             if (iteration == null)
             {
-                throw new ContainmentException(string.Format("The container Iteration of the RuleVerificationList {0} has not been set", container.Iid));
+                throw new ContainmentException($"The container Iteration of the RuleVerificationList {container.Iid} has not been set");
             }
 
             foreach (var violation in userRuleVerification.Violation)
@@ -270,7 +290,7 @@ namespace CDP4Composition.Services
         /// <param name="ruleVerification">
         /// The <see cref="RuleVerification"/> that is to be updated.
         /// </param>
-        private async void UpdateExecutedOn(ISession session, RuleVerification ruleVerification)
+        private void UpdateExecutedOn(ISession session, RuleVerification ruleVerification)
         {
             try
             {
@@ -281,7 +301,7 @@ namespace CDP4Composition.Services
                 clone.ExecutedOn = DateTime.UtcNow;
 
                 var operationContainer = transaction.FinalizeTransaction();
-                await session.Write(operationContainer);
+                session.Write(operationContainer).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -301,8 +321,7 @@ namespace CDP4Composition.Services
         /// </returns>
         private IBuiltInRule QueryBuiltInRule(BuiltInRuleVerification builtInRuleVerification)
         {
-            Lazy<IBuiltInRule, IBuiltInRuleMetaData> lazyBuiltInRule;
-            this.builtInRules.TryGetValue(builtInRuleVerification.Name, out lazyBuiltInRule);
+            this.builtInRules.TryGetValue(builtInRuleVerification.Name, out var lazyBuiltInRule);
 
             if (lazyBuiltInRule == null)
             {
