@@ -258,6 +258,7 @@ namespace CDP4CrossViewEditor.Generator
             var parameterRange = this.crossviewSheet.Range(
                 this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
                 this.crossviewSheet.Cells[dataEndRow, numberOfColumns]);
+
             parameterRange.Name = CrossviewSheetConstants.RangeName;
             parameterRange.NumberFormat = this.crossviewArrayAssember.FormatArray;
             parameterRange.Value = this.crossviewArrayAssember.ContentArray;
@@ -267,6 +268,7 @@ namespace CDP4CrossViewEditor.Generator
             var formattedRange = this.crossviewSheet.Range(
                 this.crossviewSheet.Cells[numberOfHeaderRows + 1, 1],
                 this.crossviewSheet.Cells[dataStartRow, numberOfColumns]);
+
             formattedRange.Interior.ColorIndex = 34;
             formattedRange.HorizontalAlignment = XlHAlign.xlHAlignCenter;
             formattedRange.VerticalAlignment = XlVAlign.xlVAlignCenter;
@@ -297,6 +299,12 @@ namespace CDP4CrossViewEditor.Generator
                     }
 
                     cell.Name = name.ToString();
+
+                    // apply special highlighting
+                    if (this.crossviewArrayAssember.SpecialHighlighting.ContainsKey(name.ToString()))
+                    {
+                        cell.Font.Color = this.crossviewArrayAssember.SpecialHighlighting[name.ToString()];
+                    }
 
                     // highlight manually saved values
                     if (changedValues.ContainsKey(name.ToString()))

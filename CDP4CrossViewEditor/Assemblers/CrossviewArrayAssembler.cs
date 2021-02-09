@@ -27,6 +27,7 @@ namespace CDP4CrossViewEditor.Assemblers
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -77,27 +78,32 @@ namespace CDP4CrossViewEditor.Assemblers
                         SortedDictionary<string,
                             SortedDictionary<string,
                                 SortedDictionary<string,
-                                int>>>>>>();
+                                    int>>>>>>();
 
         /// <summary>
         /// Gets the array that contains the parameter sheet information
         /// </summary>
-        public object[,] ContentArray { get; private set; }
+        internal object[,] ContentArray { get; private set; }
 
         /// <summary>
         /// Gets the array that contains formatting information
         /// </summary>
-        public object[,] FormatArray { get; private set; }
+        internal object[,] FormatArray { get; private set; }
 
         /// <summary>
         /// Gets the array that contains locked cells information
         /// </summary>
-        public object[,] LockArray { get; private set; }
+        internal object[,] LockArray { get; private set; }
 
         /// <summary>
         /// Gets the array that contains name information
         /// </summary>
-        public object[,] NamesArray { get; private set; }
+        internal object[,] NamesArray { get; private set; }
+
+        /// <summary>
+        /// Special Excel cell highlighting based on <see cref="ParameterValueSetBase.ModelCode"/>
+        /// </summary>
+        internal Dictionary<string, Color> SpecialHighlighting = new Dictionary<string, Color>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CrossviewArrayAssembler"/> class.
@@ -317,19 +323,23 @@ namespace CDP4CrossViewEditor.Assemblers
             contentRow[3] = excelRow.Owner;
             contentRow[4] = excelRow.Categories;
 
-            IEnumerable<ParameterOrOverrideBase> parameters;
+            List<ParameterOrOverrideBase> parameters;
 
             switch (excelRow.Thing)
             {
                 case ElementUsage elementUsage:
                     parameters = this.parameterTypes
-                        .Select(pt => GetParameterOrOverrideBase(elementUsage, pt));
+                        .Select(pt => GetParameterOrOverrideBase(elementUsage, pt))
+                        .Where(p => p != null)
+                        .ToList();
 
                     break;
 
                 case ElementDefinition elementDefinition:
                     parameters = this.parameterTypes
-                        .Select(pt => GetParameterOrOverrideBase(elementDefinition, pt));
+                        .Select(pt => GetParameterOrOverrideBase(elementDefinition, pt))
+                        .Where(p => p != null)
+                        .ToList();
 
                     break;
 
@@ -337,7 +347,7 @@ namespace CDP4CrossViewEditor.Assemblers
                     return (contentRow, namesRow);
             }
 
-            foreach (var parameterOrOverrideBase in parameters.Where(p => p != null))
+            foreach (var parameterOrOverrideBase in parameters)
             {
                 foreach (var parameterValueSetBase in parameterOrOverrideBase.ValueSets.Cast<ParameterValueSetBase>())
                 {
@@ -361,6 +371,8 @@ namespace CDP4CrossViewEditor.Assemblers
                     }
                 }
             }
+
+            CrossviewSheetPMeanUtilities.ComputePMean(this, contentRow, namesRow, parameters);
 
             return (contentRow, namesRow);
         }
@@ -537,11 +549,13 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <param name="parameterValueSetBase">
         /// The given <see cref="ParameterValueSetBase"/>
         /// </param>
-        /// <param name="component"></param>
+        /// <param name="component">
+        /// The given <see cref="ParameterTypeComponent"/>
+        /// </param>
         /// <returns>
         /// The column index
         /// </returns>
-        private int GetContentColumnIndex(ParameterValueSetBase parameterValueSetBase, ParameterTypeComponent component = null)
+        internal int GetContentColumnIndex(ParameterValueSetBase parameterValueSetBase, ParameterTypeComponent component = null)
         {
             var parameterOrOverrideBase = (ParameterOrOverrideBase)parameterValueSetBase.Container;
 
