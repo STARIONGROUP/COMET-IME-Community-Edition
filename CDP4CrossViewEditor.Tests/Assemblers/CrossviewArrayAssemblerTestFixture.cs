@@ -270,7 +270,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         [Test]
         public void VerifyThatAssemblerPopulatesEmptyArrays()
         {
-            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, new List<ParameterType>());
+            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, new List<Guid>());
             var contentArray = arrayAssembler.ContentArray;
 
             // The array contains more rows to make a nice header and spacing
@@ -281,10 +281,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         public void VerifyThatAssemblerPopulatesArrays()
         {
             var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
-            crossviewSheetRowAssembler.Assemble(this.elementDefinitions);
+            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
             this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
 
-            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes);
+            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
             var contentArray = arrayAssembler.ContentArray;
 
             // The array contains more rows to make a nice header and spacing

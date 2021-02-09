@@ -61,7 +61,7 @@ namespace CDP4CrossViewEditor
         /// <summary>
         /// The NLog logger
         /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// The <see cref="IOfficeApplicationWrapper"/> that provides access to the loaded Office application
@@ -209,7 +209,7 @@ namespace CDP4CrossViewEditor
         {
             if (this.Session == null)
             {
-                logger.Error("The current session is null");
+                Logger.Error("The current session is null");
                 return;
             }
 
@@ -219,7 +219,7 @@ namespace CDP4CrossViewEditor
             }
             else
             {
-                logger.Debug($"The ribbon control with Id {ribbonControlId} and Tag {ribbonControlTag} is not handled by the current RibbonPart");
+                Logger.Debug($"The ribbon control with Id {ribbonControlId} and Tag {ribbonControlTag} is not handled by the current RibbonPart");
             }
         }
 
@@ -234,7 +234,7 @@ namespace CDP4CrossViewEditor
         {
             if (iterationId == string.Empty)
             {
-                logger.Debug("The cross editor workbook cannot be build: the iteration id is empty");
+                Logger.Debug("The cross editor workbook cannot be build: the iteration id is empty");
                 return;
             }
 
@@ -243,13 +243,13 @@ namespace CDP4CrossViewEditor
 
             if (iteration == null)
             {
-                logger.Debug($"The cross editor workbook cannot be build: iteration {uniqueId} cannot be found");
+                Logger.Debug($"The cross editor workbook cannot be build: iteration {uniqueId} cannot be found");
                 return;
             }
 
             if (!(iteration.Container is EngineeringModel engineeringModel))
             {
-                logger.Error("The cross editor workbook cannot be build: Iteration container object is null");
+                Logger.Error("The cross editor workbook cannot be build: Iteration container object is null");
                 return;
             }
 
@@ -257,7 +257,7 @@ namespace CDP4CrossViewEditor
 
             if (this.officeApplicationWrapper.Excel == null)
             {
-                logger.Error("The cross editor workbook cannot be build: The Excel Application object is null");
+                Logger.Error("The cross editor workbook cannot be build: The Excel Application object is null");
                 return;
             }
 
@@ -276,8 +276,8 @@ namespace CDP4CrossViewEditor
                 {
                     var workbookMetadata = new WorkbookMetadata
                     {
-                        ElementDefinitions = dialogResult.WorkbookElements,
-                        ParameterTypes = dialogResult.WorkbookParameterType,
+                        ElementDefinitions = dialogResult.WorkbookElements.Select(x => x.Iid),
+                        ParameterTypes = dialogResult.WorkbookParameterType.Select(x => x.Iid),
                         ParameterValues = dialogResult.WorkbookChangedValues,
                         PersistValues = dialogResult.PersistValues
                     };
@@ -288,7 +288,7 @@ namespace CDP4CrossViewEditor
                 }
                 catch (Exception ex)
                 {
-                    logger.Error(ex);
+                    Logger.Error(ex);
                 }
             }
         }
