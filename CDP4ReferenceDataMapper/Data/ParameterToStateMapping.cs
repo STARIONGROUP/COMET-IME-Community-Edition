@@ -73,6 +73,11 @@ namespace CDP4ReferenceDataMapper.Data
         public string Value { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="Parameter"/>'s shortname that was mapped in case the source was a <see cref="CompoundParameterType"/>.
+        /// </summary>
+        public string ShortName { get; set; }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="ParameterToStateMapping"/> class
         /// </summary>
         [JsonConstructor]
@@ -87,7 +92,8 @@ namespace CDP4ReferenceDataMapper.Data
         /// <param name="value">The value</param>
         /// <param name="parameterType">The <see cref="ParameterType"/> that was mapped</param>
         /// <param name="actualFiniteState">The <see cref="ActualFiniteState"/></param>
-        public ParameterToStateMapping(string value, ParameterType parameterType, ActualFiniteState actualFiniteState)
+        /// <param name="shortName">ShortName to add to the mapping</param>
+        public ParameterToStateMapping(string value, ParameterType parameterType, ActualFiniteState actualFiniteState, string shortName)
         {
             this.ParameterTypeIid = parameterType.Iid;
             this.ParameterTypeName = parameterType.Name;
@@ -98,6 +104,7 @@ namespace CDP4ReferenceDataMapper.Data
             this.ActualFiniteStateName = actualFiniteState.Name;
 
             this.Value = value;
+            this.ShortName = shortName;
         }
     }
 }

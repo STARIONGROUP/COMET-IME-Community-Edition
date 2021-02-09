@@ -248,6 +248,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.PopulateParameterGroups();
             this.PopulateParameters();
+            this.UpdateTooltip();
         }
 
         /// <summary>
