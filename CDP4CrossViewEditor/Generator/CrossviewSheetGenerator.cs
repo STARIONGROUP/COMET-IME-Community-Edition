@@ -29,6 +29,7 @@ namespace CDP4CrossViewEditor.Generator
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Drawing;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -279,29 +280,36 @@ namespace CDP4CrossViewEditor.Generator
             this.PrettifyBodyHeader();
 
             // add names to parameter value cells
-            for (var i = 0; i < numberOfBodyRows; ++i)
+            for (var i = CrossviewSheetConstants.HeaderDepth; i < numberOfBodyRows; ++i)
             {
-                for (var j = 0; j < numberOfColumns; ++j)
+                for (var j = CrossviewSheetConstants.FixedColumns; j < numberOfColumns; ++j)
                 {
-                    if (this.crossviewArrayAssember.NamesArray[i, j] == null)
+                    var cell = this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1];
+                    var name = this.crossviewArrayAssember.NamesArray[i, j];
+
+                    if (name == null)
                     {
+                        // non-overrides displayed on EUs are not interactible
+                        if (cell.Value != null)
+                        {
+                            cell.Font.Color = ColorTranslator.ToOle(Color.Gray);
+                        }
+
                         continue;
                     }
 
-                    var cellName = this.crossviewArrayAssember.NamesArray[i, j].ToString();
-                    var cellObject = this.crossviewSheet.Cells[numberOfHeaderRows + i + 1, j + 1];
-                    cellObject.Name = cellName;
+                    cell.Name = name.ToString();
 
-                    if (changedValues.ContainsKey(cellName))
+                    // highlight manually saved values
+                    if (changedValues.ContainsKey(name.ToString()))
                     {
-                        cellObject.Value = changedValues[cellName];
-                        var range = this.crossviewSheet.Range(cellObject, cellObject);
-                        range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Blue);
+                        cell.Value = changedValues[name.ToString()];
+                        cell.Font.Color = ColorTranslator.ToOle(Color.Blue);
                     }
                 }
             }
 
-            this.crossviewSheet.Cells[dataStartRow + 1, 1].Select();
+            this.crossviewSheet.Cells[dataStartRow + 1, CrossviewSheetConstants.FixedColumns + 1].Select();
             this.excelApplication.ActiveWindow.FreezePanes = true;
         }
 

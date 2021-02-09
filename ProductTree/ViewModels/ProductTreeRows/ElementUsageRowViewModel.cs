@@ -303,7 +303,7 @@ namespace CDP4ProductTree.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
 
-            this.Disposables.Add(highlightSubscription);
+            this.Disposables.Add(highlightUsageSubscription);
         }
 
         /// <summary>
@@ -334,6 +334,10 @@ namespace CDP4ProductTree.ViewModels
 
             var categories = this.Thing.Category.Any() ? string.Join(" ", this.Thing.Category.OrderBy(x => x.ShortName).Select(x => x.ShortName)) : "-";
             sb.AppendLine($"Category: {categories}");
+
+            var elementDefCategories = this.Thing.ElementDefinition.Category.OrderBy(x => x.ShortName).Select(x => x.ShortName);
+            var elementDefCategoriesText = this.Thing.ElementDefinition.Category.Any() ? string.Join(" ", elementDefCategories) : "-";
+            sb.AppendLine($"ED Category: {elementDefCategoriesText }");
 
             sb.AppendLine($"Model Code: {this.Path()}");
 
@@ -440,6 +444,7 @@ namespace CDP4ProductTree.ViewModels
             this.PopulateElementUsages();
             this.PopulateParameterGroups();
             this.PopulateParameterOrOverride();
+            this.UpdateTooltip();
         }
 
         /// <summary>

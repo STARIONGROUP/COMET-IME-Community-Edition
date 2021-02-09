@@ -68,9 +68,9 @@ namespace CDP4OfficeInfrastructure.Assemblers
         /// </summary>
         public virtual void PopulateHeaderLockArray()
         {
-            for (int i = this.LockArray.GetLowerBound(0); i < this.LockArray.GetUpperBound(0); i++)
+            for (var i = this.LockArray.GetLowerBound(0); i <= this.LockArray.GetUpperBound(0); i++)
             {
-                for (int j = this.LockArray.GetLowerBound(1); j < this.LockArray.GetUpperBound(1); j++)
+                for (var j = this.LockArray.GetLowerBound(1); j <= this.LockArray.GetUpperBound(1); j++)
                 {
                     this.LockArray[i, j] = true;
                 }
@@ -82,9 +82,9 @@ namespace CDP4OfficeInfrastructure.Assemblers
         /// </summary>
         public virtual void PopulateHeaderFormatArray()
         {
-            for (int i = this.FormatArray.GetLowerBound(0); i < this.FormatArray.GetUpperBound(0); i++)
+            for (var i = this.FormatArray.GetLowerBound(0); i <= this.FormatArray.GetUpperBound(0); i++)
             {
-                for (int j = this.FormatArray.GetLowerBound(1); j < this.FormatArray.GetUpperBound(1); j++)
+                for (var j = this.FormatArray.GetLowerBound(1); j <= this.FormatArray.GetUpperBound(1); j++)
                 {
                     this.FormatArray[i, j] = "@";
                 }

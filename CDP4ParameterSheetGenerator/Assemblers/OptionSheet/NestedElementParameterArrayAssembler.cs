@@ -87,7 +87,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             this.ContentArray[0, 7] = "TYPE";
             this.ContentArray[0, 8] = "ValueSet Id";
 
-            int i = 2;
+            var i = 2;
             foreach (var excelRow in this.excelRows)
             {
                 this.ContentArray[i, 0] = excelRow.Name;
@@ -109,12 +109,12 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         /// </summary>
         private void PopulateFormatArray()
         {
-            for (int j = this.FormatArray.GetLowerBound(1); j < this.FormatArray.GetUpperBound(1); j++)
+            for (var j = this.FormatArray.GetLowerBound(1); j <= this.FormatArray.GetUpperBound(1); j++)
             {
                 this.FormatArray[0, j] = "@";
             }
 
-            int i = 2;
+            var i = 2;
             foreach (var excelRow in this.excelRows)
             {
                 this.FormatArray[i, 0] = "@";              // Name
@@ -136,12 +136,12 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         /// </summary>
         private void PopulateLockArray()
         {
-            for (int j = this.LockArray.GetLowerBound(1); j < this.LockArray.GetUpperBound(1); j++)
+            for (var j = this.LockArray.GetLowerBound(1); j <= this.LockArray.GetUpperBound(1); j++)
             {
                 this.LockArray[0, j] = true;
             }
 
-            int i = 2;
+            var i = 2;
             foreach (var excelRow in this.excelRows)
             {
                 this.LockArray[i, 0] = true;  // Name
