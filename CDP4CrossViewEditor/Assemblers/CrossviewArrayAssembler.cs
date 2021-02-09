@@ -331,10 +331,6 @@ namespace CDP4CrossViewEditor.Assemblers
                     return (contentRow, namesRow);
             }
 
-            var isCalculationPossible = CrossviewSheetPMeanUtilities.IsCalculationPossible(parameters);
-
-            var calculationParameters = new List<(ParameterValueSetBase, ParameterTypeComponent)>();
-
             foreach (var parameterOrOverrideBase in parameters)
             {
                 foreach (var parameterValueSetBase in parameterOrOverrideBase.ValueSets.Cast<ParameterValueSetBase>())
@@ -349,16 +345,6 @@ namespace CDP4CrossViewEditor.Assemblers
                             var index = this.GetContentColumnIndex(parameterValueSetBase, component);
                             contentRow[index] = value;
                             namesRow[index] = $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode(i)}";
-
-                            if (!isCalculationPossible)
-                            {
-                                continue;
-                            }
-
-                            if (CrossviewSheetPMeanUtilities.IsParameterNeededForComputation(parameterOrOverrideBase))
-                            {
-                                calculationParameters.Add((parameterValueSetBase, component));
-                            }
                         }
                     }
                     else
@@ -366,50 +352,11 @@ namespace CDP4CrossViewEditor.Assemblers
                         var index = this.GetContentColumnIndex(parameterValueSetBase);
                         contentRow[index] = parameterValueSetBase.ActualValue.First();
                         namesRow[index] = $"{CrossviewSheetConstants.CrossviewSheetName}_{parameterValueSetBase.ModelCode()}";
-
-                        if (!isCalculationPossible)
-                        {
-                            continue;
-                        }
-
-                        if (CrossviewSheetPMeanUtilities.IsParameterNeededForComputation(parameterOrOverrideBase))
-                        {
-                            calculationParameters.Add((parameterValueSetBase, null));
-                        }
                     }
                 }
             }
 
-            if (!isCalculationPossible)
-            {
-                return (contentRow, namesRow);
-            }
-
-            var indexes = CrossviewSheetPMeanUtilities.PowerParameters.Select(p => this.GetContentColumnsIndexes(calculationParameters, p)).SelectMany(x => x).ToList();
-
-            var rSchemeIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyScheme, StringComparison.InvariantCultureIgnoreCase)).Item2;
-            var rTypeIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyType, StringComparison.InvariantCultureIgnoreCase)).Item2;
-            var rKIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyK, StringComparison.InvariantCultureIgnoreCase)).Item2;
-            var rNIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PRedundancyN, StringComparison.InvariantCultureIgnoreCase)).Item2;
-
-            var pOnIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.POn, StringComparison.InvariantCultureIgnoreCase)).Item2;
-            var pStandbyIndex = indexes.FirstOrDefault(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PStandBy, StringComparison.InvariantCultureIgnoreCase)).Item2;
-
-            var pDutyCycleIndexes = indexes.Where(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PDutyCycle, StringComparison.InvariantCultureIgnoreCase)).ToArray();
-            var pMeanIndexes = indexes.Where(p => p.Item1.Equals(CrossviewSheetPMeanUtilities.PMean, StringComparison.InvariantCultureIgnoreCase)).ToArray();
-
-            for (var i = 0; i < pDutyCycleIndexes.Length; i++)
-            {
-                contentRow[pMeanIndexes[i].Item2] = CrossviewSheetPMeanUtilities.ComputePMean(
-                    contentRow[pStandbyIndex].ToString(),
-                    contentRow[pOnIndex].ToString(),
-                    contentRow[pDutyCycleIndexes[i].Item2].ToString(),
-                    contentRow[rSchemeIndex].ToString(),
-                    contentRow[rTypeIndex].ToString(),
-                    contentRow[rKIndex].ToString(),
-                    contentRow[rNIndex].ToString()
-                );
-            }
+            CrossviewSheetPMeanUtilities.ComputePMean(this, contentRow, parameters);
 
             return (contentRow, namesRow);
         }
@@ -565,7 +512,7 @@ namespace CDP4CrossViewEditor.Assemblers
         /// <returns>
         /// The column index
         /// </returns>
-        private int GetContentColumnIndex(ParameterValueSetBase parameterValueSetBase, ParameterTypeComponent component = null)
+        internal int GetContentColumnIndex(ParameterValueSetBase parameterValueSetBase, ParameterTypeComponent component = null)
         {
             var parameterOrOverrideBase = (ParameterOrOverrideBase)parameterValueSetBase.Container;
 
@@ -614,36 +561,6 @@ namespace CDP4CrossViewEditor.Assemblers
                 [optionShortName]
                 [actualFiniteStateListShortName]
                 [actualFiniteStateShortName];
-        }
-
-        /// <summary>
-        /// Gets the column index associated to the given <paramref name="parameterName"/>
-        /// </summary>
-        /// <param name="parameterTuples">
-        /// The given parameter tuples(<see cref="ParameterValueSetBase"/>, <see cref="ParameterTypeComponent"/>) to search into it
-        /// </param>
-        /// <param name="parameterName">
-        /// The given parameterName
-        /// </param>
-        /// <returns>
-        /// The excel column name and index list for specific parameter type
-        /// </returns>
-        private IEnumerable<(string, int)> GetContentColumnsIndexes(
-            IEnumerable<(ParameterValueSetBase, ParameterTypeComponent)> parameterTuples,
-            string parameterName)
-        {
-            var indexList = new List<(string, int)>();
-
-            var contentList = parameterTuples.Where(t => t.Item1.QueryParameterType().ShortName.Equals(parameterName, StringComparison.InvariantCultureIgnoreCase)).ToList();
-
-            foreach (var (pvs, ptc) in contentList)
-            {
-                var key = ptc == null ? pvs.QueryParameterType().ShortName : $"{pvs.QueryParameterType().ShortName}.{ptc.ShortName}";
-                var index = this.GetContentColumnIndex(pvs, ptc);
-                indexList.Add((key, index));
-            }
-
-            return indexList;
         }
 
         /// <summary>
