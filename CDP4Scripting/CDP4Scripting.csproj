@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{DA9183AB-D060-488F-89E9-DEC1F0177B1E}</ProjectGuid>
-    <MinIMEVersion>7.0.0</MinIMEVersion>
+    <MinIMEVersion>7.0.1</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
    
     <AssemblyTitle>CDP4Scripting</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4Scripting</Product>
     <Description>CDP4 Scripting Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>7.0.0.8</AssemblyVersion>
-    <FileVersion>7.0.0.8</FileVersion>
+    <AssemblyVersion>7.0.1.1</AssemblyVersion>
+    <FileVersion>7.0.1.1</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
