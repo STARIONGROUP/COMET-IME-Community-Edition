@@ -53,12 +53,23 @@ namespace CDP4ReferenceDataMapper.Data
         public string Iid => this.parameterType?.Iid.ToString();
 
         /// <summary>
+        /// Gets the display name of the <see cref="SourceParameter"/>
+        /// </summary>
+        public string DisplayName { get; }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="SourceParameter"/> class
         /// </summary>
-        /// <param name="parameterType"></param>
-        public SourceParameter(ParameterType parameterType)
+        /// <param name="parameterType">
+        /// The <see cref="ParameterType"/>
+        /// </param>
+        /// <param name="displayName">
+        /// The display name in the UI
+        /// </param>
+        public SourceParameter(ParameterType parameterType, string displayName)
         {
             this.parameterType = parameterType;
+            this.DisplayName = displayName;
         }
     }
 }

@@ -180,9 +180,17 @@ namespace CDP4ReferenceDataMapper.Managers
             this.iteration = iteration ?? throw new ArgumentNullException(nameof(iteration), $"The {nameof(iteration)} may not be null");
             this.elementDefinitionCategory = elementDefinitionCategory ?? throw new ArgumentNullException(nameof(elementDefinitionCategory), $"The {nameof(elementDefinitionCategory)} may not be null");
             this.actualFiniteStateList = actualFiniteStateList ?? throw new ArgumentNullException(nameof(actualFiniteStateList), $"The {nameof(actualFiniteStateList)} may not be null");
-            this.sourceParameterTypes = sourceParameterTypes?.Any() ?? false ? new ReactiveList<ParameterType>(sourceParameterTypes) : throw new ArgumentException(nameof(sourceParameterTypes), $"The {nameof(sourceParameterTypes)} may not be empty");
             this.targetMappingParameterType = targetMappingParameterType ?? throw new ArgumentNullException(nameof(targetMappingParameterType), $"The {nameof(targetMappingParameterType)} may not be null");
             this.targetValueParameterType = targetValueParameterType ?? throw new ArgumentNullException(nameof(targetValueParameterType), $"The {nameof(targetValueParameterType)} may not be null");
+
+            this.sourceParameterTypes = new ReactiveList<ParameterType>(sourceParameterTypes);
+
+            this.EnrichSourceParameterTypes();
+
+            if (!this.sourceParameterTypes.Any())
+            {
+                throw new ArgumentException(nameof(sourceParameterTypes), $"The {nameof(sourceParameterTypes)} may not be empty");
+            }
 
             this.Initialize();
 
@@ -397,17 +405,20 @@ namespace CDP4ReferenceDataMapper.Managers
                                         {
                                             var parameterToStateMapping = JsonConvert.DeserializeObject<List<ParameterToStateMapping>>(mappingParameterValue);
 
-                                            var originallySavedMapping =
-                                                parameterToStateMapping
-                                                    .SingleOrDefault(
-                                                        x =>
-                                                            x.ActualFiniteStateIid == currentValueSet.ActualState.Iid);
-
-                                            if (currentValueSetValue == originallySavedMapping?.Value)
+                                            if (parameterToStateMapping?.Any() ?? false)
                                             {
-                                                valueRow[columnName] = originallySavedMapping?.Value;
-                                                valueRow[this.GetShortNameColumnName(columnName)] = originallySavedMapping?.ShortName;
-                                                mappingRow[columnName] = originallySavedMapping?.ParameterTypeIid;
+                                                var originallySavedMapping =
+                                                    parameterToStateMapping
+                                                        .SingleOrDefault(
+                                                            x =>
+                                                                x.ActualFiniteStateIid == currentValueSet.ActualState.Iid);
+
+                                                if (currentValueSetValue == originallySavedMapping?.Value)
+                                                {
+                                                    valueRow[columnName] = originallySavedMapping?.Value;
+                                                    valueRow[this.GetShortNameColumnName(columnName)] = originallySavedMapping?.ShortName;
+                                                    mappingRow[columnName] = originallySavedMapping?.ParameterTypeIid;
+                                                }
                                             }
                                         }
                                         catch
@@ -420,6 +431,94 @@ namespace CDP4ReferenceDataMapper.Managers
                                 this.CopyCurrentValuesToOrgValueColumns(valueRow);
                                 this.CopyCurrentValuesToOrgValueColumns(mappingRow);
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Enriches the <see cref="SourceParameterTypes"/> property with previously mapped <see cref="ParameterType"/>s
+        /// </summary>
+        private void EnrichSourceParameterTypes()
+        {
+            if (!(this.iteration.Container is EngineeringModel model))
+            {
+                return;
+            }
+
+            var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
+
+            var allowedParameterTypes = new List<ParameterType>();
+            var allParameterTypes = mrdl.ParameterType.Union(mrdl.GetRequiredRdls().SelectMany(rdl => rdl.ParameterType)).ToList();
+
+            allowedParameterTypes.AddRange(allParameterTypes.OfType<ScalarParameterType>());
+
+            allowedParameterTypes.AddRange(
+                allParameterTypes
+                    .OfType<CompoundParameterType>()
+                    .Where(x => 
+                        x.Component.Count > 1
+                        && x.Component[0].ParameterType is TextParameterType
+                        && x.Component[1].ParameterType is ScalarParameterType));
+            
+            foreach (var elementDefinition in this.iteration.Element)
+            {
+                if (!elementDefinition.IsMemberOfCategory(this.elementDefinitionCategory))
+                {
+                    continue;
+                }
+
+                var elementUsages = this.QueryElementUsages(elementDefinition);
+
+                foreach (var elementUsage in elementUsages)
+                {
+                    var exceptParameterTypes = elementUsage.ParameterOverride
+                        .Select(y => y.ParameterType);
+
+                    var valueParameters =
+                        elementUsage.ParameterOverride.Cast<ParameterOrOverrideBase>()
+                            .Union(
+                                elementDefinition.Parameter
+                                    .Where(x => !exceptParameterTypes.Contains(x.ParameterType)))
+                            .Where(x => x.ParameterType == this.targetValueParameterType);
+
+                    foreach (var valueParameter in valueParameters)
+                    {
+                        if (valueParameter.StateDependence != this.actualFiniteStateList)
+                        {
+                            continue;
+                        }
+
+                        var mappingParameter = elementUsage.ParameterOverride.FirstOrDefault(x => x.ParameterType == this.targetMappingParameterType);
+
+                        var mappingParameterValue = mappingParameter?.ValueSets.FirstOrDefault()?.Computed[0];
+
+                        if (mappingParameterValue == null)
+                        {
+                            continue;
+                        }
+
+                        try
+                        {
+                            var parameterToStateMappings = JsonConvert.DeserializeObject<List<ParameterToStateMapping>>(mappingParameterValue);
+
+                            if (parameterToStateMappings?.Any() ?? false)
+                            {
+                                foreach (var parameterToStateMapping in parameterToStateMappings)
+                                {
+                                    var parameterType = allowedParameterTypes.FirstOrDefault(x => x.Iid == parameterToStateMapping.ParameterTypeIid);
+
+                                    if (parameterType != null && !this.SourceParameterTypes.Contains(parameterType))
+                                    {
+                                        this.SourceParameterTypes.Add(parameterType);
+                                    }
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            // ignored
                         }
                     }
                 }
@@ -630,7 +729,7 @@ namespace CDP4ReferenceDataMapper.Managers
         }
 
         /// <summary>
-        /// Gets the Name of a specific Parameter of the <see cref="ElementDefinition"/> that belongs to a <see cref="DataRow"/>
+        /// Gets the display Name of a specific Parameter of the <see cref="ElementDefinition"/> that belongs to a <see cref="DataRow"/>
         /// or belongs to its root/<see cref="ElementDefinition"/> <see cref="DataRow"/>.
         /// </summary>
         /// <param name="dataRow">
@@ -642,7 +741,42 @@ namespace CDP4ReferenceDataMapper.Managers
         /// <returns>
         /// The computed value as a <see cref="string"/>
         /// </returns>
-        public string GetElementDefinitionParameterCustomNameForDataRow(DataRow dataRow, Guid parameterTypeIid)
+        public string GetElementDefinitionParameterDisplayNameForDataRow(DataRow dataRow, Guid parameterTypeIid)
+        {
+            var elementDefinitionRow = this.GetElementDefinitionRow(dataRow);
+            var elementDefinition = this.GetThingByDataRow<ElementDefinition>(elementDefinitionRow);
+
+            var elementDefinitionParameter =
+                elementDefinition?
+                    .Parameter
+                    .SingleOrDefault(x => x.ParameterType.Iid == parameterTypeIid);
+
+            if (elementDefinitionParameter?.ParameterType is CompoundParameterType)
+            {
+                return elementDefinitionParameter
+                    .ValueSets
+                    .FirstOrDefault()?
+                    .ActualValue[0];
+            }
+
+            return elementDefinitionParameter?
+                .ParameterType.Name;
+        }
+
+        /// <summary>
+        /// Gets the ShortName of a specific Parameter of the <see cref="ElementDefinition"/> that belongs to a <see cref="DataRow"/>
+        /// or belongs to its root/<see cref="ElementDefinition"/> <see cref="DataRow"/>.
+        /// </summary>
+        /// <param name="dataRow">
+        /// The <see cref="DataRow"/>
+        /// </param>
+        /// <param name="parameterTypeIid">
+        /// The <see cref="ParameterType.Iid"/> of the <see cref="ParameterType"/> we want to to get its computed value from.
+        /// </param>
+        /// <returns>
+        /// The computed value as a <see cref="string"/>
+        /// </returns>
+        public string GetElementDefinitionParameterCustomShortNameForDataRow(DataRow dataRow, Guid parameterTypeIid)
         {
             var elementDefinitionRow = this.GetElementDefinitionRow(dataRow);
             var elementDefinition = this.GetThingByDataRow<ElementDefinition>(elementDefinitionRow);

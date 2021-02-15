@@ -62,6 +62,11 @@ namespace CDP4ReferenceDataMapper.ViewModels
     public class StateToParameterTypeMapperBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget
     {
         /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
         /// </summary>
         private string currentModel;
@@ -160,7 +165,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
             logger.Debug($"Finished Initialization of StateToParameterTypeMapperBrowserViewModel in {sw.ElapsedMilliseconds} [ms]");
         }
-        
+
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
@@ -322,11 +327,10 @@ namespace CDP4ReferenceDataMapper.ViewModels
             var canExecuteStartMappingCommand = this.WhenAnyValue(
                 vm => vm.SelectedElementDefinitionCategory,
                 vm => vm.SelectedActualFiniteStateList,
-                vm => vm.ParameterTypesSelected,
                 vm => vm.SelectedTargetMappingParameterType,
                 vm => vm.SelectedTargetValueParameterType,
-                (a, b, c, d, e) =>
-                    a != null && b != null && c && d != null && e != null);
+                (a, b, c, d) =>
+                    a != null && b != null && c != null && d != null);
 
             this.StartMappingCommand = ReactiveCommand.Create(canExecuteStartMappingCommand);
             this.StartMappingCommand.Subscribe(_ => this.ExecuteStartMappingCommand());
@@ -346,7 +350,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
             this.SaveValuesCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteSaveValuesCommand(), RxApp.MainThreadScheduler);
         }
-        
+
         /// <summary>
         /// Executes when the selected row changes
         /// </summary>
@@ -434,7 +438,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
                 var newPropertyCustomName =
                     string.IsNullOrWhiteSpace(parameterTypeIid)
                         ? null
-                        : this.DataSourceManager.GetElementDefinitionParameterCustomNameForDataRow(row.Row, new Guid(parameterTypeIid));
+                        : this.DataSourceManager.GetElementDefinitionParameterCustomShortNameForDataRow(row.Row, new Guid(parameterTypeIid));
 
                 this.DataSourceManager.SetValue(this.DataSourceManager.GetShortNameColumnName(property), valueRow, newPropertyCustomName);
             }
@@ -590,6 +594,21 @@ namespace CDP4ReferenceDataMapper.ViewModels
                 this.sourceParameterTypes,
                 this.selectedTargetMappingParameterType,
                 this.selectedTargetValueParameterType);
+
+            try
+            {
+                var autoAddedSourceParameterTypes = this.DataSourceManager.SourceParameterTypes.Except(this.sourceParameterTypes).ToList();
+
+                if (autoAddedSourceParameterTypes.Any())
+                {
+                    this.sourceParameterTypes.AddRange(autoAddedSourceParameterTypes);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Execute start mapping caused an error:");
+                throw;
+            }
         }
 
         /// <summary>

@@ -29,7 +29,7 @@
             <DataTemplate x:Key="comboBoxEditor">
                 <dxe:ComboBoxEdit 
                     Name="PART_Editor"
-                    DisplayMember="Name"
+                    DisplayMember="DisplayName"
                     ValueMember="Iid"
                     AllowDefaultButton="False"
                     Foreground="DarkOrange"
@@ -169,44 +169,6 @@
                         </Button>
                     </Grid>
                 </dxlc:LayoutItem>
-                <dxlc:LayoutItem Label="Source Parameter Types: ">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="35" />
-                        </Grid.ColumnDefinitions>
-
-                        <dxe:ListBoxEdit ItemsSource="{ Binding SourceParameterTypes }"
-                                                EditValue="{Binding SelectedSourceParameterType, Mode=TwoWay}"
-                                                MinHeight ="150"
-                                                MaxHeight ="150"
-                                                DisplayMember="Name">
-                            <i:Interaction.Behaviors>
-                                <dragDrop:FrameworkElementDragBehavior />
-                                <dragDrop:FrameworkElementDropBehavior />
-                            </i:Interaction.Behaviors>
-                        </dxe:ListBoxEdit>
-                        <Button Grid.Column="1"
-                                Width="25"
-                                Height="25"
-                                Margin="3"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Top"
-                                Command="{Binding RemoveSelectedSourceParameterTypeCommand}"
-                                ToolTip="Remove selected ParameterType">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Padding" Value="1"/>
-                                    <Setter Property="Content">
-                                        <Setter.Value>
-                                            <Image Source="{dx:DXImage Image=Delete_16x16.png}"/>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                    </Grid>
-                </dxlc:LayoutItem>
                 <dxlc:LayoutItem Label="Target Mapping Parameter Type: ">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -288,6 +250,44 @@
                                     <Setter Property="Content">
                                         <Setter.Value>
                                             <Image Source="{dx:DXImage Image=Find_16x16.png}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Source Parameter Types: ">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+
+                        <dxe:ListBoxEdit ItemsSource="{ Binding SourceParameterTypes }"
+                                                EditValue="{Binding SelectedSourceParameterType, Mode=TwoWay}"
+                                                MinHeight ="150"
+                                                MaxHeight ="150"
+                                                DisplayMember="Name">
+                            <i:Interaction.Behaviors>
+                                <dragDrop:FrameworkElementDragBehavior />
+                                <dragDrop:FrameworkElementDropBehavior />
+                            </i:Interaction.Behaviors>
+                        </dxe:ListBoxEdit>
+                        <Button Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Command="{Binding RemoveSelectedSourceParameterTypeCommand}"
+                                ToolTip="Remove selected ParameterType">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{dx:DXImage Image=Delete_16x16.png}"/>
                                         </Setter.Value>
                                     </Setter>
                                 </Style>

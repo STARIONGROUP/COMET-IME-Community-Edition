@@ -64,7 +64,7 @@ namespace CDP4ReferenceDataMapper.Converters
             {
                 newSourceParameters = 
                     dataSourceManager.GetSourceParameterTypesForDataRow(dataViewRow.Row)?
-                        .Select(x => new SourceParameter(x));
+                        .Select(x => new SourceParameter(x, dataSourceManager.GetElementDefinitionParameterDisplayNameForDataRow(dataViewRow.Row, x.Iid)));
             }
 
             return newSourceParameters;
