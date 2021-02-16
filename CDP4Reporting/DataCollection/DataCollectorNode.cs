@@ -287,7 +287,18 @@ namespace CDP4Reporting.DataCollection
         {
             foreach (var publicGetter in this.publicGetterProperties)
             {
-                table.Columns.Add(publicGetter.Name, publicGetter.GetMethod.ReturnType);
+                var type = publicGetter.GetMethod.ReturnType;
+                var underlyingType = Nullable.GetUnderlyingType(type);
+
+                if (underlyingType == null)
+                {
+                    table.Columns.Add(publicGetter.Name, type);
+                }
+                else
+                {
+                    var dataColumn = table.Columns.Add(publicGetter.Name, underlyingType);
+                    dataColumn.AllowDBNull = true;
+                }
             }
         }
 
@@ -533,9 +544,14 @@ namespace CDP4Reporting.DataCollection
         {
             foreach (var publicGetter in this.publicGetterProperties)
             {
-                row[publicGetter.Name] = publicGetter.GetMethod.Invoke(
+                var value = publicGetter.GetMethod.Invoke(
                     rowPresentation,
                     new object[] { });
+
+                if (value != null)
+                {
+                    row[publicGetter.Name] = value;
+                }
             }
         }
 

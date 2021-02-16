@@ -22,6 +22,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Permission;
+
+    using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
     using Moq;
     using NUnit.Framework;
@@ -43,6 +45,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private Uri uri;
         private Iteration iteration;
         private ModelReferenceDataLibrary modelReferenceDataLibrary;
+        private Mock<IObfuscationService> obfuscationService;
         private Assembler assembler;
 
         [SetUp]
@@ -52,6 +55,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://www.rheagroup.com");
             this.assembler = new Assembler(this.uri);
+            this.obfuscationService = new Mock<IObfuscationService>();
 
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -95,7 +99,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
             row.ThingCreator = this.thingCreator.Object;
             
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -117,7 +121,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
             row.ThingCreator = new TestThingCreatorThatThrowsExceptions();
             
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -142,7 +146,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             elementDefinition.Owner = domainOfExpertise;
             iteration.Element.Add(elementDefinition);
 
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
 
             var payload = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var dropInfo = new Mock<IDropInfo>();
@@ -163,7 +167,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
             this.iteration.Element.Add(elementDefinition);
 
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
             row.ThingCreator = this.thingCreator.Object;
 
             var payload = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -186,7 +190,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
             this.iteration.Element.Add(elementDefinition);
 
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
             row.ThingCreator = new TestThingCreatorThatThrowsExceptions();
 
             var payload = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -215,7 +219,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.iteration.Element.Add(elementDefinition);
 
             var browser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, null, this.dialogNavigationService.Object, null, null, null);
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, browser);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, browser, this.obfuscationService.Object);
 
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(category);
@@ -238,7 +242,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             category.PermissibleClass.Add(ClassKind.Parameter);
 
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
 
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(category);
@@ -263,7 +267,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.modelReferenceDataLibrary.DefinedCategory.Add(category);
 
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
 
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(category);
@@ -290,7 +294,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.iteration.Element.Add(elementDefinition);
             this.assembler.Cache.TryAdd(new CacheKey(group.Iid, this.iteration.Iid), new Lazy<Thing>(() => group));
 
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
 
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(group);

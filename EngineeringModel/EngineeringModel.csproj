@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{7B0F3699-960F-4A9C-BC32-6A5B73A5B895}</ProjectGuid>
-    <MinIMEVersion>7.0.0</MinIMEVersion>
+    <MinIMEVersion>7.0.1</MinIMEVersion>
     <RootNamespace>CDP4EngineeringModel</RootNamespace>
     <AssemblyName>CDP4EngineeringModel</AssemblyName>
     <TargetFramework>net452</TargetFramework>
@@ -11,8 +11,8 @@
     <Product>CDP4EngineeringModel</Product>
     <Description>CDP4 Engineering Model Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>7.0.0.8</AssemblyVersion>
-    <FileVersion>7.0.0.8</FileVersion>
+    <AssemblyVersion>7.0.1.1</AssemblyVersion>
+    <FileVersion>7.0.1.1</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -37,13 +37,13 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="6.3.0">
+    <PackageReference Include="CDP4Common-CE" Version="7.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="7.0.0">
+    <PackageReference Include="CDP4Dal-CE" Version="7.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.3.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">
@@ -237,6 +237,7 @@
     <Reference Include="System.Transactions">
       <Private>false</Private>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml">
       <Private>false</Private>
     </Reference>
@@ -501,6 +502,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\Items\SampledFunctionValueGridLayoutItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\OptionBrowser\OptionBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -621,6 +625,9 @@
     <Compile Remove="obj\x64\Debug\Views\RuleVerificationListBrowser\RuleVerificationListBrowser.g.i.cs" />
     <Compile Remove="obj\x64\Debug\Views\RuleVerificationListBrowser\RuleVerificationListRibbon.g.cs" />
     <Compile Remove="obj\x64\Debug\Views\RuleVerificationListBrowser\RuleVerificationListRibbon.g.i.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Views\Items\SampledFunctionValueGridLayoutItem.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Update="System">

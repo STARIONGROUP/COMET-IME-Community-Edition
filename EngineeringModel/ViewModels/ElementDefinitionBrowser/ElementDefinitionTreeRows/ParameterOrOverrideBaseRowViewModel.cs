@@ -278,6 +278,17 @@ namespace CDP4EngineeringModel.ViewModels
                 this.State = string.Empty;
                 this.Option = null;
             }
+            else if (this.Thing.ParameterType is SampledFunctionParameterType samplesFunctionParameterType)
+            {
+                var cols = samplesFunctionParameterType.NumberOfValues;
+
+                this.Computed = $"[{valueSet.Computed.Count / cols}x{cols}]";
+                this.Manual = $"[{valueSet.Manual.Count / cols}x{cols}]";
+                this.Reference = $"[{valueSet.Reference.Count / cols}x{cols}]";
+                this.Value = $"[{valueSet.ActualValue.Count / cols}x{cols}]";
+                this.Formula = $"[{valueSet.Formula.Count / cols}x{cols}]";
+                this.Published = $"[{valueSet.Published.Count / cols}x{cols}]";
+            }
             else
             {
                 this.Value = this.GetStringDisplayFromValueSet(valueSet.ActualValue, true);

@@ -152,6 +152,10 @@
                 <viewModels:CategoryListConverter x:Key="CategoryListConverter"/>
                 <DataTemplate x:Key="BinaryTemplate">
                     <dxlc:LayoutGroup Orientation="Vertical">
+                        <dxlc:LayoutItem Label="Name:" LabelPosition="Left">
+                            <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            </TextBox>
+                        </dxlc:LayoutItem>
                         <dxlc:LayoutGroup Orientation="Horizontal">
                             <TextBox DataContext="{Binding SourceViewModel}"
                                      Text="{Binding RelatedThingDenomination, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -199,6 +203,10 @@
                 </DataTemplate>
                 <DataTemplate x:Key="MultiTemplate">
                     <dxlc:LayoutGroup Orientation="Vertical">
+                        <dxlc:LayoutItem Label="Name:" LabelPosition="Left">
+                            <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            </TextBox>
+                        </dxlc:LayoutItem>
                         <dxlc:LayoutItem Label="Related Things:" LabelPosition="Top">
                             <dxg:GridControl ItemsSource="{Binding RelatedThings, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                                 <dxg:GridControl.View>

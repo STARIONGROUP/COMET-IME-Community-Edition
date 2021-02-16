@@ -13,6 +13,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.CommonData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -56,6 +58,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private string name;
 
+        /// <summary>
+        /// Backing field for <see cref="SelectedOrganizations"/>
+        /// </summary>
+        private ReactiveList<Organization> selectedOrganizations;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedDefaultOrganization"/>
+        /// </summary>
+        private Organization selectedDefaultOrganization;
+
         #endregion
 
         #region Constructors
@@ -98,7 +110,11 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.WhenAnyValue(x => x.SourceEngineeringModelSetup).Subscribe(v => this.IsOriginal = v == null || v.Iid == default(Guid));
             this.WhenAnyValue(x => x.ActiveDomain).Subscribe(_ => this.UpdateOkCanExecute());
+            this.WhenAnyValue(x => x.SelectedOrganizations).Subscribe(_ => this.UpdateOkCanExecute());
+            this.SelectedOrganizations.Changed.Subscribe(_ => this.UpdateDefaultOrganization());
+            this.WhenAnyValue(x => x.SelectedDefaultOrganization).Subscribe(_ => this.UpdateOkCanExecute());
         }
+
         #endregion
 
         #region Properties
@@ -123,6 +139,29 @@ namespace CDP4EngineeringModel.ViewModels
         public List<SiteReferenceDataLibrary> PossibleSiteReferenceDataLibraries { get; private set; }
 
         /// <summary>
+        /// Gets the possible <see cref="Organization"/> that may be selected.
+        /// </summary>
+        public List<Organization> PossibleOrganizations { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="Organization"/>s.
+        /// </summary>
+        public ReactiveList<Organization> SelectedOrganizations
+        {
+            get { return this.selectedOrganizations; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedOrganizations, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected default <see cref="Organization"/>.
+        /// </summary>
+        public Organization SelectedDefaultOrganization
+        {
+            get { return this.selectedDefaultOrganization; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedDefaultOrganization, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the selected <see cref="SiteReferenceDataLibrary"/>
         /// </summary>
         public SiteReferenceDataLibrary SelectedSiteReferenceDataLibrary
@@ -139,7 +178,7 @@ namespace CDP4EngineeringModel.ViewModels
             get { return this.isOriginal; }
             set { this.RaiseAndSetIfChanged(ref this.isOriginal, value); }
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether the Active Domain of Expertiese selection is possible
         /// </summary>
@@ -180,6 +219,10 @@ namespace CDP4EngineeringModel.ViewModels
             base.Initialize();
             this.PossibleSiteReferenceDataLibraries = new List<SiteReferenceDataLibrary>();
             this.PossibleSourceEngineeringModelSetup = new List<EngineeringModelSetup>();
+            this.PossibleOrganizations = new List<Organization>();
+
+            this.SelectedOrganizations = new ReactiveList<Organization>();
+            this.SelectedOrganizations.ChangeTrackingEnabled = true;
         }
 
         /// <summary>
@@ -205,6 +248,8 @@ namespace CDP4EngineeringModel.ViewModels
             var siteDirectory = this.Session.RetrieveSiteDirectory();
 
             this.PossibleSourceEngineeringModelSetup.AddRange(siteDirectory.Model);
+            this.PossibleOrganizations.AddRange(siteDirectory.Organization);
+
             this.SourceEngineeringModelSetup = siteDirectory.Model.SingleOrDefault(x => x.Iid == this.Thing.SourceEngineeringModelSetupIid);
             this.SourceEngineeringModelSetup = this.PossibleSourceEngineeringModelSetup.SingleOrDefault(x => x.Iid.Equals(this.Thing.SourceEngineeringModelSetupIid));
 
@@ -222,6 +267,18 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.SelectedSiteReferenceDataLibrary = modelRdl.RequiredRdl;
             }
+
+            // get organizational participation data
+            var organizationalParticipationOrganizations = this.Thing.OrganizationalParticipant?.Select(op => op.Organization);
+            this.SelectedOrganizations.Clear();
+            this.SelectedOrganizations.AddRange(organizationalParticipationOrganizations);
+
+            var thingDefaultOrganizationalParticipant = this.Thing.DefaultOrganizationalParticipant;
+
+            if (thingDefaultOrganizationalParticipant != null)
+            {
+                this.SelectedDefaultOrganization = this.SelectedOrganizations.Contains(thingDefaultOrganizationalParticipant.Organization) ? thingDefaultOrganizationalParticipant.Organization : null;
+            }
         }
 
         /// <summary>
@@ -230,6 +287,39 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void UpdateTransaction()
         {
             base.UpdateTransaction();
+
+            // organizational prticipation
+            if (this.SelectedOrganizations.Any() || this.Thing.OrganizationalParticipant.Any())
+            {
+                var existingOrganizations = this.Thing.OrganizationalParticipant.Select(op => op.Organization).ToList();
+
+                var newOrgs = this.SelectedOrganizations.Except(existingOrganizations);
+                var deletedOrgs = existingOrganizations.Except(this.SelectedOrganizations);
+
+                foreach (var organization in newOrgs)
+                {
+                    var orgParticipation = new OrganizationalParticipant
+                    {
+                        Organization = organization
+                    };
+
+                    this.Thing.OrganizationalParticipant.Add(orgParticipation);
+                    this.transaction.Create(orgParticipation);
+                }
+
+                foreach (var organization in deletedOrgs)
+                {
+                    var participantion = this.Thing.OrganizationalParticipant.FirstOrDefault(p => p.Organization.Equals(organization))?.Clone(false);
+
+                    if (participantion != null)
+                    {
+                        this.transaction.Delete(participantion, this.Thing);
+                    }
+                }
+            }
+
+            this.Thing.DefaultOrganizationalParticipant = this.Thing.OrganizationalParticipant.FirstOrDefault(p => p.Organization.Equals(this.SelectedDefaultOrganization));
+
             if (this.dialogKind.Equals(ThingDialogKind.Update))
             {
                 return;
@@ -253,10 +343,10 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 if (this.SourceEngineeringModelSetup != null)
                 {
-                    this.Thing.SourceEngineeringModelSetupIid = this.SourceEngineeringModelSetup.Iid;   
+                    this.Thing.SourceEngineeringModelSetupIid = this.SourceEngineeringModelSetup.Iid;
                 }
             }
-            
+
             this.Thing.EngineeringModelIid = Guid.NewGuid();
         }
 
@@ -266,7 +356,39 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
-            this.OkCanExecute = this.OkCanExecute && this.ActiveDomain.Count >= 0;
+            this.OkCanExecute = this.OkCanExecute && this.ActiveDomain.Count >= 0 && this.IsOrganizationalParticipationSetup();
+        }
+
+        /// <summary>
+        /// Checks whether organizational participation is correctly setup
+        /// </summary>
+        /// <returns>True if the selection is done correctly.</returns>
+        private bool IsOrganizationalParticipationSetup()
+        {
+            if (this.SelectedOrganizations == null || this.SelectedOrganizations.Count < 1)
+            {
+                return true;
+            }
+
+            if (this.SelectedDefaultOrganization != null && this.SelectedOrganizations.Contains(this.SelectedDefaultOrganization))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Updates the default <see cref="Organization"/> selection based on changes in the list of possible organizations.
+        /// </summary>
+        private void UpdateDefaultOrganization()
+        {
+            if (this.SelectedOrganizations == null || this.SelectedOrganizations.Count == 0 || !this.SelectedOrganizations.Contains(this.SelectedDefaultOrganization))
+            {
+                this.SelectedDefaultOrganization = null;
+            }
+
+            this.UpdateOkCanExecute();
         }
     }
 }

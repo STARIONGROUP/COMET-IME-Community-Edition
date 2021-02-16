@@ -96,17 +96,34 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            this.Value = valueset.ActualValue.Any() ? valueset.ActualValue.First() : "-";
             if (this.ContainedRows.Count == 0)
             {
                 this.ScaleShortName = this.Thing.Scale == null ? "-" : this.Thing.Scale.ShortName;
             }
+
+
+            if (this.Thing.ParameterType is SampledFunctionParameterType samplesFunctionParameterType)
+            {
+                var cols = samplesFunctionParameterType.NumberOfValues;
+
+                this.Computed = $"[{valueset.Computed.Count / cols}x{cols}]";
+                this.Manual = $"[{valueset.Manual.Count / cols}x{cols}]";
+                this.Reference = $"[{valueset.Reference.Count / cols}x{cols}]";
+                this.Value = $"[{valueset.ActualValue.Count / cols}x{cols}]";
+                this.Formula = $"[{valueset.Formula.Count / cols}x{cols}]";
+                this.Published = $"[{valueset.Computed.Count / cols}x{cols}]";
+            }
+            else
+            {
+                this.Computed = valueset.Computed.Any() ? valueset.Computed.First() : "-";
+                this.Value = valueset.ActualValue.Any() ? valueset.ActualValue.First() : "-";
+                this.Published = this.Computed;
+                this.Manual = valueset.Manual.Any() ? valueset.Manual.First().ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
+                this.Reference = valueset.Reference.Any() ? valueset.Reference.First().ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
+                this.Formula = valueset.SubscribedValueSet.Formula.Any() ? valueset.SubscribedValueSet.Formula.First() : "-";
+            }
+
             this.Switch = valueset.ValueSwitch;
-            this.Computed = valueset.Computed.Any() ? valueset.Computed.First() : "-";
-            this.Published = this.Computed;
-            this.Manual = valueset.Manual.Any() ? valueset.Manual.First().ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
-            this.Reference = valueset.Reference.Any() ? valueset.Reference.First().ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
-            this.Formula = valueset.SubscribedValueSet.Formula.Any() ? valueset.SubscribedValueSet.Formula.First() : "-";
 
             if (this.valueSetListener.Any())
             {
@@ -279,6 +296,11 @@ namespace CDP4EngineeringModel.ViewModels
         public override bool IsEditable(string propertyName = "")
         {
             if (propertyName == "Reference")
+            {
+                return false;
+            }
+
+            if (this.Thing.ParameterType is SampledFunctionParameterType)
             {
                 return false;
             }

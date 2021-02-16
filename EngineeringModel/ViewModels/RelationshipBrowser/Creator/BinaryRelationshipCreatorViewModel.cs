@@ -55,6 +55,11 @@ namespace CDP4EngineeringModel.ViewModels
         private ModelReferenceDataLibrary requiredRdl;
 
         /// <summary>
+        /// Backing field for <see cref="Name"/>
+        /// </summary>
+        private string name;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BinaryRelationshipCreatorViewModel"/> class
         /// </summary>
         /// <param name="iteration">The current <see cref="Iteration"/></param>
@@ -89,6 +94,15 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveList<Category> PossibleCategories { get; private set; }
 
         /// <summary>
+        /// Gets or sets the Name for the <see cref="BinaryRelationship"/> to create
+        /// </summary>
+        public string Name
+        {
+            get { return this.name; }
+            set { this.RaiseAndSetIfChanged(ref this.name, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the <see cref="Category"/>s for the <see cref="BinaryRelationship"/> to create
         /// </summary>
         public List<Category> AppliedCategories
@@ -119,6 +133,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public void ReInitializeControl()
         {
+            this.Name = string.Empty;
             this.SourceViewModel.ResetControl();
             this.TargetViewModel.ResetControl();
             this.AppliedCategories = null;
@@ -132,6 +147,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             var relationship = new BinaryRelationship
             {
+                Name = this.Name,
                 Source = this.SourceViewModel.RelatedThing,
                 Target = this.TargetViewModel.RelatedThing
             };

@@ -991,9 +991,11 @@ namespace CDP4Reporting.ViewModels
         /// <returns></returns>
         private Assembly AssemblyResolver(object sender, ResolveEventArgs args)
         {
-            if (args.Name == this.GetType().Assembly.FullName)
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().SingleOrDefault(x => x.FullName == args.Name);
+
+            if (assembly != null)
             {
-                return this.GetType().Assembly;
+                return assembly;
             }
 
             return null;

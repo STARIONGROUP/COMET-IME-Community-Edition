@@ -19,6 +19,7 @@ namespace CDP4EngineeringModel.Tests.Comparers
     using CDP4Dal;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.Comparers;
+    using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
     using Moq;
     using NUnit.Framework;
@@ -30,6 +31,7 @@ namespace CDP4EngineeringModel.Tests.Comparers
         private Mock<IPermissionService> permissionService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
+        private Mock<IObfuscationService> obfuscationService;
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://test.com");
 
@@ -57,6 +59,7 @@ namespace CDP4EngineeringModel.Tests.Comparers
             this.permissionService = new Mock<IPermissionService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
+            this.obfuscationService = new Mock<IObfuscationService>();
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
@@ -133,15 +136,15 @@ namespace CDP4EngineeringModel.Tests.Comparers
 
             var usage1 = this.elementUsage.Clone(false);
             usage1.Name = "def";
-            var usageRow1 = new ElementUsageRowViewModel(usage1, this.domain, this.session.Object, null);
+            var usageRow1 = new ElementUsageRowViewModel(usage1, this.domain, this.session.Object, null, this.obfuscationService.Object);
 
             var usage2 = this.elementUsage.Clone(false);
             usage2.Name = "abc";
-            var usageRow2 = new ElementUsageRowViewModel(usage2, this.domain, this.session.Object, null);
+            var usageRow2 = new ElementUsageRowViewModel(usage2, this.domain, this.session.Object, null, this.obfuscationService.Object);
 
             var usage3 = this.elementUsage.Clone(false);
             usage3.Name = "ghi";
-            var usageRow3 = new ElementUsageRowViewModel(usage3, this.domain, this.session.Object, null);
+            var usageRow3 = new ElementUsageRowViewModel(usage3, this.domain, this.session.Object, null, this.obfuscationService.Object);
 
             list.SortedInsert(usageRow1, comparer);
             list.SortedInsert(usageRow3, comparer);
@@ -196,7 +199,7 @@ namespace CDP4EngineeringModel.Tests.Comparers
             this.elementDef.Parameter.Add(parameter2);
             this.elementDef.Parameter.Add(parameter3);
 
-            var elementDefRow = new ElementDefinitionRowViewModel(this.elementDef, this.domain, this.session.Object, null);
+            var elementDefRow = new ElementDefinitionRowViewModel(this.elementDef, this.domain, this.session.Object, null, this.obfuscationService.Object);
 
             Assert.AreEqual(4, elementDefRow.ContainedRows.Count);
 

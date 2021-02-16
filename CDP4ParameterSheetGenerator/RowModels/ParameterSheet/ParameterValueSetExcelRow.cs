@@ -77,6 +77,10 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                 {
                     this.Type = ParameterSheetConstants.PVSCD;
                 }
+                else if (this.ParameterType is SampledFunctionParameterType)
+                {
+                    this.Type = ParameterSheetConstants.SFPVS;
+                }
                 else
                 {
                     this.Type = ParameterSheetConstants.PVS;
@@ -93,6 +97,25 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                 this.Switch = parameterValueSet.ValueSwitch.ToString();
 
                 this.ModelCode = parameterValueSet.ModelCode();
+
+                var sampledFunctionParameterType = this.ParameterType as SampledFunctionParameterType;
+                if (sampledFunctionParameterType != null)
+                {
+                    this.Id = parameterValueSet.Iid.ToString();
+                    this.Switch = parameterValueSet.ValueSwitch.ToString();
+                    this.ActualValue = "N/A";
+                    this.ComputedValue = "N/A";
+                    this.ManualValue = "N/A";
+                    this.ReferenceValue = "N/A";
+                    this.Formula = string.Empty;
+
+                    this.Format = NumberFormat.Format(this.ParameterType, null);
+
+                    this.ModelCode = parameterValueSet.ModelCode();
+
+                    // do not create sub rows, the parameter row represents the only valueset that exists
+                    return;
+                }
 
                 var compoundParameterType = parameter.ParameterType as CompoundParameterType;
                 if (compoundParameterType == null)

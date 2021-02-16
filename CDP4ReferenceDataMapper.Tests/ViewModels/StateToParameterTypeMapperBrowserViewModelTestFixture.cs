@@ -614,7 +614,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.True);
 
             this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Clear();
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.CanExecute(null), Is.False);
+            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.CanExecute(null), Is.True);
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.True);
             this.stateToParameterTypeMapperBrowserViewModel.SelectedSourceParameterType = null;
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.False);

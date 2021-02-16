@@ -78,6 +78,10 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                 {
                     this.Type = ParameterSheetConstants.PSVSCD;
                 }
+                else if (this.ParameterType is SampledFunctionParameterType)
+                {
+                    this.Type = ParameterSheetConstants.SFPSVS;
+                }
                 else
                 {
                     this.Type = ParameterSheetConstants.PSVS;
@@ -96,6 +100,25 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
                 this.Owner = string.Format("--{0}", PropertyHelper.ComputeContainerOwnerShortName(parameterSubscription));
 
                 this.ModelCode = parameterSubscriptionValueSet.ModelCode();
+
+                var sampledFunctionParameterType = this.ParameterType as SampledFunctionParameterType;
+                if (sampledFunctionParameterType != null)
+                {
+                    this.Id = parameterSubscriptionValueSet.Iid.ToString();
+                    this.Switch = parameterSubscriptionValueSet.ValueSwitch.ToString();
+                    this.ActualValue = "N/A";
+                    this.ComputedValue = "N/A";
+                    this.ManualValue = "N/A";
+                    this.ReferenceValue = "N/A";
+                    this.Formula = string.Empty;
+
+                    this.Format = NumberFormat.Format(this.ParameterType, null);
+
+                    this.ModelCode = parameterSubscriptionValueSet.ModelCode();
+
+                    // do not create sub rows, the parameter row represents the only valueset that exists
+                    return;
+                }
 
                 var compoundParameterType = parameterSubscription.ParameterType as CompoundParameterType;
                 if (compoundParameterType == null)

@@ -61,7 +61,7 @@ namespace CDP4Composition.Services.FilterEditorService
         /// <param name="session">The session this is attached to.</param>
         /// <param name="userPreferenceKey">The key of the <see cref="UserPreference"/></param>
         /// <returns>A <see cref="T"/> for a specific <see cref="UserPreference.ShortName"/>.</returns>
-        public T GetFilterEditorCollection<T>(ISession session, string userPreferenceKey) where T : class
+        public T GetUserPreference<T>(ISession session, string userPreferenceKey) where T : class
         {
             if (session == null)
             {
@@ -70,7 +70,7 @@ namespace CDP4Composition.Services.FilterEditorService
 
             var userPreference = this.GetUserPreference(session, userPreferenceKey);
 
-            return this.GetSavedUserPreferences<T>(userPreference);
+            return this.GetUserPreference<T>(userPreference);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace CDP4Composition.Services.FilterEditorService
                             return userPreference.Container == session.ActivePerson &&
                                    userPreference.ShortName == userPreferenceKey;
                         })
-                    .Select(o => this.GetSavedUserPreferences<T>((UserPreference)o.ChangedThing))
+                    .Select(o => this.GetUserPreference<T>((UserPreference)o.ChangedThing))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(subscriberAction);
         }
@@ -154,7 +154,7 @@ namespace CDP4Composition.Services.FilterEditorService
         private UserPreference GetUserPreference(ISession session, string preferenceKey)
         {
             var preference =
-                session.ActivePerson.UserPreference.FirstOrDefault(userPreference => userPreference.ShortName == preferenceKey);
+                session.ActivePerson?.UserPreference.FirstOrDefault(userPreference => userPreference.ShortName == preferenceKey);
 
             return preference;
         }
@@ -168,7 +168,7 @@ namespace CDP4Composition.Services.FilterEditorService
         /// <returns>
         /// If found <see cref="T"/> that was stored in the Value property of <see cref="UserPreference"/>, otherwise false.
         /// </returns>
-        private T GetSavedUserPreferences<T>(UserPreference userPreference) where T : class
+        private T GetUserPreference<T>(UserPreference userPreference) where T : class
         {
             if (userPreference == null)
             {

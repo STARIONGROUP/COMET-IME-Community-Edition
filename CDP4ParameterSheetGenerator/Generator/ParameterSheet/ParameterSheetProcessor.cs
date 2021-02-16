@@ -173,12 +173,12 @@ namespace CDP4ParameterSheetGenerator.Generator
                             || rowType == ParameterSheetConstants.PSVS || rowType == ParameterSheetConstants.PSVSCT))
                     {
                         rowIid = Convert.ToString(this.parameterContent[i, ParameterSheetConstants.IdColumn]);
-                        
+
                         var computedValue = this.QueryComputedValue(i);
                         var formulaValue = this.QueryFormulaValue(i);
                         var manualValue = this.QueryManualValue(i);
                         var referenceValue = this.QueryReferenceValue(i);
-                        var switchValue = this.QuerySwitchValue(i);                        
+                        var switchValue = this.QuerySwitchValue(i);
                         var actualValue = this.QueryActualValue(i);
 
                         var rowIidChar = rowIid.Split(':');
@@ -194,7 +194,7 @@ namespace CDP4ParameterSheetGenerator.Generator
                         if (lazyThing != null)
                         {
                             var thing = lazyThing.Value;
-                        
+
                             if (rowType == ParameterSheetConstants.PVS || rowType == ParameterSheetConstants.PVSCT)
                             {
                                 var parameterValueSet = (ParameterValueSet)thing;

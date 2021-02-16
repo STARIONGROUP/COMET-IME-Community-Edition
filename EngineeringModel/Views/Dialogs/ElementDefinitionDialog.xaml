@@ -8,6 +8,7 @@
              xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              Width="600"
              Height="450"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -17,6 +18,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/ErrorTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:NotConverter x:Key="NotConverter" />
+            <converters:ReactiveOrganizationToObjectListConverter x:Key="ReactiveOrganizationToObjectListConverter" />
         </ResourceDictionary>
     </dx:DXWindow.Resources>
     <lc:LayoutControl Margin="5"
@@ -45,6 +48,20 @@
                 </lc:LayoutItem>
             </lc:LayoutGroup>
             <items:CategoryLayoutGroup/>
+            <lc:LayoutGroup Header="Organizations" Orientation="Vertical" IsEnabled="{Binding AreOrganizationsVisible}">
+                <lc:LayoutItem Label="Visible To: " >
+                    <dxe:ComboBoxEdit Name="OrganizationParticipant"
+                                      DisplayMember="Name"
+                                      EditValue="{Binding Path=SelectedOrganizations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ReactiveOrganizationToObjectListConverter}}"
+                                      IsEnabled="{Binding IsReadOnly ,Converter={StaticResource NotConverter}}"
+                                      IsTextEditable="False"
+                                      ItemsSource="{Binding Path=PossibleOrganizations}">
+                        <dxe:ComboBoxEdit.StyleSettings>
+                            <dxe:CheckedTokenComboBoxStyleSettings />
+                        </dxe:ComboBoxEdit.StyleSettings>
+                    </dxe:ComboBoxEdit>
+                </lc:LayoutItem>
+            </lc:LayoutGroup>
             <items:AliasLayoutGroup />
             <items:DefinitionLayoutGroup />
             <items:HyperLinkLayoutGroup />

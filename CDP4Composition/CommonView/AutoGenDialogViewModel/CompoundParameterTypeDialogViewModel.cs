@@ -205,7 +205,6 @@ namespace CDP4CommonView
                     }
                 }
             }
-            
         }
 
         /// <summary>

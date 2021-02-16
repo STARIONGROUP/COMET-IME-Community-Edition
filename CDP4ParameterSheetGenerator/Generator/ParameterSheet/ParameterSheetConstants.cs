@@ -131,6 +131,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         internal const string PVS = "PVS";
 
         /// <summary>
+        /// The name of the <see cref="ParameterValueSet"/> row type for <see cref="SampledFunctionParameterType"/>
+        /// </summary>
+        internal const string SFPVS = "SFPVS";
+
+        /// <summary>
         /// The name of the compound <see cref="ParameterValueSet"/> row type
         /// </summary>
         internal const string PVSCD = "PVS:CD";
@@ -146,6 +151,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         internal const string POVS = "POVS";
 
         /// <summary>
+        /// The name of the <see cref="ParameterOverrideValueSet"/> row type for <see cref="SampledFunctionParameterType"/>
+        /// </summary>
+        internal const string SFPOVS = "SFPOVS";
+
+        /// <summary>
         /// The name of the compound <see cref="ParameterOverrideValueSet"/> row type
         /// </summary>
         internal const string POVSCD = "POVS:CD";
@@ -159,6 +169,11 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
         /// The name of the <see cref="ParameterSubscriptionValueSet"/> row type
         /// </summary>
         internal const string PSVS = "PSVS";
+
+        /// <summary>
+        /// The name of the <see cref="ParameterSubscriptionValueSet"/> row type for <see cref="SampledFunctionParameterType"/>
+        /// </summary>
+        internal const string SFPSVS = "SFPSVS";
 
         /// <summary>
         /// The name of the compound <see cref="ParameterSubscriptionValueSet"/> row type
