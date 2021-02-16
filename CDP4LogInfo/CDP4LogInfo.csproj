@@ -10,8 +10,8 @@
     <Product>CDP4LogInfo</Product>
     <Description>CDP4 Logging plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>7.0.1.1</AssemblyVersion>
-    <FileVersion>7.0.1.1</FileVersion>
+    <AssemblyVersion>7.0.1.2</AssemblyVersion>
+    <FileVersion>7.0.1.2</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
