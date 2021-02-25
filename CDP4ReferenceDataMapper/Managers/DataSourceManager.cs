@@ -353,7 +353,9 @@ namespace CDP4ReferenceDataMapper.Managers
                     }
 
                     var valueParameters =
-                        elementUsage.ParameterOverride.Cast<ParameterOrOverrideBase>();
+                        elementUsage.ParameterOverride.Cast<ParameterOrOverrideBase>()
+                            .Where(x => x.ParameterType == this.targetValueParameterType);
+
                     foreach (var valueParameter in valueParameters)
                     {
                         if (valueParameter.StateDependence == this.actualFiniteStateList)
