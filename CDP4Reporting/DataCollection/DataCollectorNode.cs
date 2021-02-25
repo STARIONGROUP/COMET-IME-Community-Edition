@@ -344,6 +344,7 @@ namespace CDP4Reporting.DataCollection
 
             var row = new T
             {
+                NestedElement = this.NestedElement,
                 ElementBase = this.ElementBase,
                 IsVisible = this.IsVisible
             };
@@ -520,8 +521,7 @@ namespace CDP4Reporting.DataCollection
             {
                 var column = rowField.Key.GetValue(rowPresentation) as DataCollectorColumn<T>;
 
-                if (this.categoryDecompositionHierarchy.Child != null 
-                    && column is IDataCollectorParameter dataCollectorColumn 
+                if (column is IDataCollectorParameter dataCollectorColumn 
                     && dataCollectorColumn.CollectParentValues)
                 {
                     dataCollectorColumn.ParentValuePrefix = $"{this.FieldName}_";
@@ -542,17 +542,59 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         private void FillPublicGetterColumns(T rowPresentation, DataRow row)
         {
+            this.parent?.FillPublicGetterColumns(this.parent.GetRowRepresentation(), row);
+
             foreach (var publicGetter in this.publicGetterProperties)
             {
-                var value = publicGetter.GetMethod.Invoke(
-                    rowPresentation,
-                    new object[] { });
-
-                if (value != null)
+                if (this.categoryDecompositionHierarchy.Child == null)
                 {
-                    row[publicGetter.Name] = value;
+                    var value = publicGetter.GetMethod.Invoke(
+                        rowPresentation,
+                        new object[] { });
+
+                    if (value != null)
+                    {
+                        row[publicGetter.Name] = value;
+                    }
+                }
+
+                if (this.GetCollectParentValuesAttribute(publicGetter) != null)
+                {
+                    var newFieldname = $"{publicGetter.Name}_{this.FieldName}";
+
+                    if (!row.Table.Columns.Contains(newFieldname))
+                    {
+                        row.Table.Columns.Add(newFieldname, row.Table.Columns[publicGetter.Name].DataType);
+                    }
+
+                    var value = publicGetter.GetMethod.Invoke(
+                        rowPresentation,
+                        new object[] { });
+
+                    if (value != null)
+                    {
+                        row[newFieldname] = value;
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="CollectParentValuesAttribute"/> decorating the property described by <paramref name="propertyType"/>.
+        /// </summary>
+        /// <param name="propertyType">
+        /// Describes the current property.
+        /// </param>
+        /// <returns>
+        /// The <see cref="CollectParentValuesAttribute"/> decorating the current parameter class.
+        /// </returns>
+        private CollectParentValuesAttribute GetCollectParentValuesAttribute(PropertyInfo propertyType)
+        {
+            var attr = Attribute
+                .GetCustomAttributes(propertyType)
+                .SingleOrDefault(attribute => attribute is CollectParentValuesAttribute);
+
+            return attr as CollectParentValuesAttribute;
         }
 
         /// <summary>

@@ -39,6 +39,11 @@ namespace CDP4Reporting.DataCollection
         protected internal ElementBase ElementBase { get; internal set; }
 
         /// <summary>
+        /// The associated <see cref="NestedElement"/>.
+        /// </summary>
+        protected internal NestedElement NestedElement { get; internal set; }
+
+        /// <summary>
         /// Flag indicating whether the row matches the filtered criteria defined in <see cref="CategoryDecompositionHierarchy"/>.
         /// Note that when this is false, all values will be null on the row.
         /// </summary>
