@@ -123,11 +123,6 @@ namespace CDP4Reporting.DataCollection
         public IReadOnlyList<Category> CategoriesInRequiredRdl { get; set; }
 
         /// <summary>
-        /// Boolean flag indicating whether the current <see cref="ElementBase"/> matches the <see cref="categoryDecompositionHierarchy"/>.
-        /// </summary>
-        private bool IsVisible => this.NestedElement.IsMemberOfCategory(this.categoryDecompositionHierarchy.Category) && !this.Children.Any(x => x.IsVisible);
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectorNode{T}"/> class.
         /// </summary>
         /// <param name="categoryDecompositionHierarchy">
@@ -346,7 +341,7 @@ namespace CDP4Reporting.DataCollection
             {
                 NestedElement = this.NestedElement,
                 ElementBase = this.ElementBase,
-                IsVisible = this.IsVisible
+                IsVisible = !this.Children.Any()
             };
 
             foreach (var rowField in this.allColumns)
@@ -415,7 +410,7 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         internal void AddDataRows(DataTable table, bool excludeMissingParameters)
         {
-            if (this.IsVisible 
+            if (!this.Children.Any() 
                 && (!excludeMissingParameters || this.ParameterColumnsHaveValueSets())
                 && this.categoryDecompositionHierarchy.Child == null)
             {
