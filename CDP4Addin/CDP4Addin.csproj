@@ -33,7 +33,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="7.3.0" />
+    <PackageReference Include="CDP4Common-CE" Version="7.3.1-541-PR172" />
     <PackageReference Include="CDP4Dal-CE" Version="7.3.0" />
     <PackageReference Include="CDP4JsonSerializer-CE" Version="7.3.0" />
     <PackageReference Include="CommonServiceLocator" Version="1.3" />

@@ -44,7 +44,7 @@
     <None Remove="Views\UserControls\ParameterThingSelector.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="7.3.0">
+    <PackageReference Include="CDP4Common-CE" Version="7.3.1-541-PR172">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CDP4Dal-CE" Version="7.3.0">
