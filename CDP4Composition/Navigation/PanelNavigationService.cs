@@ -203,6 +203,8 @@ namespace CDP4Composition.Navigation
         /// <param name="viewModel">The <see cref="IPanelViewModel"/></param>
         private void Open(IPanelViewModel viewModel)
         {
+            var sw = Stopwatch.StartNew();
+
             var lazyView = this.GetViewType(viewModel);
 
             var parameters = new object[] { true };
@@ -220,7 +222,7 @@ namespace CDP4Composition.Navigation
                 region.Add(view, view.ToString() + Guid.NewGuid());
             }
 
-            logger.Trace("Navigated to Panel {0}", viewModel);
+            logger.Trace("Navigated to Panel {0} in {1} [ms]", viewModel, sw.ElapsedMilliseconds);
         }
 
         /// <summary>
