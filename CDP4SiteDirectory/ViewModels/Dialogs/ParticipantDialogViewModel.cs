@@ -127,7 +127,7 @@ namespace CDP4SiteDirectory.ViewModels
 
             if (this.dialogKind == ThingDialogKind.Create)
             {
-                foreach (var person in sitedir.Person.Except(model.Participant.Select(p => p.Person)))
+                foreach (var person in sitedir.Person.OrderBy(x => x.Name).Except(model.Participant.Select(p => p.Person)))
                 {
                     this.PossiblePerson.Add(person);
                 }
@@ -146,7 +146,7 @@ namespace CDP4SiteDirectory.ViewModels
             base.PopulatePossibleRole();
 
             var sitedir = this.Session.RetrieveSiteDirectory();
-            foreach (var role in sitedir.ParticipantRole)
+            foreach (var role in sitedir.ParticipantRole.OrderBy(x => x.Name))
             {
                 this.PossibleRole.Add(role);
             }
@@ -164,7 +164,7 @@ namespace CDP4SiteDirectory.ViewModels
                 throw new InvalidOperationException("the container of this participant is not an EngineeringModelSetup.");
             }
 
-            foreach (var domain in model.ActiveDomain)
+            foreach (var domain in model.ActiveDomain.OrderBy(x => x.Name))
             {
                 this.PossibleDomain.Add(domain);
             }
