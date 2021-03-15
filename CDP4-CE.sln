@@ -98,8 +98,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 		CDP4-CE.sln.DotSettings = CDP4-CE.sln.DotSettings
 		cdp4ime-tests.nunit = cdp4ime-tests.nunit
+		COMET-Community-Edition.png = COMET-Community-Edition.png
 		Nuget.Config = Nuget.Config
 		PluginLicense.txt = PluginLicense.txt
+		README.md = README.md
 		Sdk.Plugin.target = Sdk.Plugin.target
 	EndProjectSection
 EndProject
@@ -133,9 +135,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDP4CrossViewEditor", "CDP4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDP4CrossViewEditor.Tests", "CDP4CrossViewEditor.Tests\CDP4CrossViewEditor.Tests.csproj", "{E4A54CC9-1E50-423B-914B-5278A514004A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDP4ReferenceDataMapper", "CDP4ReferenceDataMapper\CDP4ReferenceDataMapper.csproj", "{FC0997A4-F981-4002-9BDC-BC2FFA6DF552}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDP4ReferenceDataMapper", "CDP4ReferenceDataMapper\CDP4ReferenceDataMapper.csproj", "{FC0997A4-F981-4002-9BDC-BC2FFA6DF552}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDP4ReferenceDataMapper.Tests", "CDP4ReferenceDataMapper.Tests\CDP4ReferenceDataMapper.Tests.csproj", "{491CFF62-FA2B-4B9E-8B7B-D68F5A9AB8B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDP4ReferenceDataMapper.Tests", "CDP4ReferenceDataMapper.Tests\CDP4ReferenceDataMapper.Tests.csproj", "{491CFF62-FA2B-4B9E-8B7B-D68F5A9AB8B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

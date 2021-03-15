@@ -158,9 +158,9 @@ namespace CDP4Requirements.ReqIFDal
                 CreationTime = DateTime.UtcNow,
                 Title = model.EngineeringModelSetup.Name + " (" + model.EngineeringModelSetup.ShortName + ")",
                 Comment = model.EngineeringModelSetup.Definition.Any() ? model.EngineeringModelSetup.Definition.First().Content : string.Empty,
-                ReqIFToolId = "CDP4",
+                ReqIFToolId = "COMET",
                 RepositoryId = this.currentSession.DataSourceUri,
-                SourceToolId = "CDP4"
+                SourceToolId = "COMET"
             };
 
             this.reqIFBuilt.TheHeader.Add(reqifHeader);

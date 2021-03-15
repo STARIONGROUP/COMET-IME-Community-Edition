@@ -18,7 +18,7 @@
                     Title="{Binding Path=Title}"
                     Width="774.254"
                     Height="441.045"
-                    Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png">
+                    Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico">
 
     <dxr:DXRibbonWindow.Resources>
         <dxc:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -46,9 +46,9 @@
 
         <dxr:RibbonControl x:Name="Ribbon"
                            Grid.Row="0"
-                           ApplicationButtonLargeIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48p10.png"
-                           ApplicationButtonSmallIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_16x16.png"
-                           ApplicationButtonText="CDP4-CE"
+                           ApplicationButtonLargeIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo_48x48.png"
+                           ApplicationButtonSmallIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo_48x48.png"
+                           ApplicationButtonText="COMET-CE"
                            PageCategoryAlignment="Right"
                            RibbonStyle="Office2007"
                            regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.RibbonRegion}" Padding="0">
@@ -298,9 +298,9 @@
                         <dxb:BarButtonItem Name="AboutButton"
                                            Command="{Binding OpenAboutCommand}"
                                            Content="About"
-                                           Description="About CDP4"
+                                           Description="About COMET"
                                            Glyph="{dxc:DXImage Image=Info_16x16.png}"
-                                           Hint="About CDP4"
+                                           Hint="About COMET"
                                            LargeGlyph="{dxc:DXImage Image=Info_32x32.png}"
                                            RibbonStyle="Large" />
                     </dxr:RibbonPageGroup>
@@ -377,7 +377,7 @@
                               Visibility="{Binding IsBusy, Converter={dxc:BooleanToVisibilityConverter}}"/>
         <tb:TaskbarIcon Grid.Row="3"
                         Name="CdpTaskBarIcon"
-                        IconSource="cdplogo_48x48.ico">
+                        IconSource="comet.ico">
         </tb:TaskbarIcon>
     </Grid>
 </dxr:DXRibbonWindow>

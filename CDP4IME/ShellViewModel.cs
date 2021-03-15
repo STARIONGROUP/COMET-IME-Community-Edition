@@ -140,7 +140,7 @@ namespace CDP4IME
 
             this.dialogNavigationService = dialogNavigationService;
 
-            this.Title = "CDP4 IME - Community Edition";
+            this.Title = "COMET IME - Community Edition";
 
             this.logTarget = new MemoryEventTarget();
             this.logTarget.EventReceived += this.LogEventReceived;
@@ -205,7 +205,7 @@ namespace CDP4IME
             this.CheckForUpdateCommand = ReactiveCommand.Create();
             this.CheckForUpdateCommand.Subscribe(_ => this.ExecuteCheckForUpdateCommand());
 
-            logger.Info("Welcome in the CDP4 Application");
+            logger.Info("Welcome in the COMET Application");
         }
         
         /// <summary>

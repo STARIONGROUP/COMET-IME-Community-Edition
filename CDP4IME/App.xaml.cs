@@ -73,7 +73,7 @@ namespace CDP4IME
             }
 
             DXSplashScreen.Show<Views.SplashScreenView>();
-            DXSplashScreen.SetState("Starting CDP4");
+            DXSplashScreen.SetState("Starting COMET");
             
 #if (DEBUG)
             RunInDebugMode();

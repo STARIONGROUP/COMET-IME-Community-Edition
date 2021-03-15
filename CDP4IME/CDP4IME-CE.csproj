@@ -3,17 +3,17 @@
     <ProjectGuid>{E8A6C54E-80C1-42E3-A2C2-D698B97BE7C2}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>CDP4IME</RootNamespace>
-    <AssemblyName>CDP4IME</AssemblyName>
+    <AssemblyName>COMET</AssemblyName>
     <TargetFramework>net452</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <OutputPath>bin\$(Configuration)\net452\</OutputPath>
     <AssemblyTitle>CDP4IME</AssemblyTitle>
     <Company>RHEA System S.A</Company>
     <Product>CDP4IME</Product>
-    <Description>The CDP4 Integrated Modelling Environment</Description>
+    <Description>The COMET Integrated Modelling Environment</Description>
     <Copyright>Copyright © RHEA System S.A</Copyright>
-    <AssemblyVersion>7.0.1.2</AssemblyVersion>
-    <FileVersion>7.0.1.2</FileVersion>
+    <AssemblyVersion>8.0.0.0</AssemblyVersion>
+    <FileVersion>8.0.0.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
@@ -24,7 +24,7 @@
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>cdplogo_48x48.ico</ApplicationIcon>
+    <ApplicationIcon>comet.ico</ApplicationIcon>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -156,14 +156,11 @@
     <Resource Include="Icons\users.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\cdp4logo_brand_textonly.png" />
-    <Resource Include="cdplogo_48x48.ico" />
+    <Resource Include="comet.ico" />
     <Resource Include="markdown.xaml License.txt" />
-    <Resource Include="Resources\cdplogo3d_48x48.png" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" Exclude="App.xaml" />
-    <None Remove="Resources\cdplogo3d_48x48.png" />
     <None Remove="Views\About - Copy.xaml" />
     <None Remove="Views\ImeRow.xaml" />
     <None Remove="Views\PluginRow.xaml" />
@@ -188,5 +185,8 @@
     <Compile Update="Views\UpdateDownloaderInstaller.xaml.cs">
       <DependentUpon>UpdateDownloaderInstaller.xaml</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 </Project>

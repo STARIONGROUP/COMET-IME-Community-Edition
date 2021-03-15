@@ -136,7 +136,7 @@ namespace CDP4OfficeInfrastructure.Generator
             catch (Exception ex)
             {
                 logger.Error(ex);
-                this.excelApplication.StatusBar = string.Format("CDP4: The following error occured while rebuilding the Option sheets: {0}", ex.Message);
+                this.excelApplication.StatusBar = string.Format("COMET: The following error occured while rebuilding the Option sheets: {0}", ex.Message);
             }
             finally
             {

@@ -12,7 +12,7 @@
              SizeToContent="Height"
              dx:ThemeManager.ThemeName="Seven"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
-             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
+             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
              ShowTitle="True"
              mc:Ignorable="d" MinWidth="450" Width="450" MaxWidth="850" MaxHeight="550" d:DesignHeight="474">
 
@@ -32,7 +32,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Image Grid.Row="0" Name="logo" Stretch="Fill"
-                           Source="../Resources/cdp4logo_brand_textonly.png" Width="200" Margin="0,15,0,30" />
+                           Source="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo.png" Width="200" Margin="0,15,0,30" />
                     <dxlc:LayoutControl Grid.Row="1" Orientation="Vertical">
                         <dxlc:LayoutGroup Orientation="Vertical" ItemLabelsAlignment="Default" ItemSpace="10"
                                           HorizontalAlignment="Stretch" View="Group">
