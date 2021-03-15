@@ -89,6 +89,7 @@ namespace CDP4Reporting.Tests.DataCollection
 
         private class TestParameter2 : DataCollectorParameter<Row, string>
         {
+
             public override string Parse(string value)
             {
                 return value;
@@ -120,6 +121,19 @@ namespace CDP4Reporting.Tests.DataCollection
             public TestParameter2 parameter2 { get; set; }
 
             public ComputedTestParameter ComputedParameter { get; set; }
+        }
+
+        private class CollectParentValuesRow : DataCollectorRow
+        {
+            [DefinedThingShortName("type1")]
+            [CollectParentValues]
+            public TestParameter1 parameter1 { get; set; }
+
+            [DefinedThingShortName("type2")]
+            public TestParameter2 parameter2 { get; set; }
+
+            [CollectParentValues]
+            public string ComputedParameter => "ComputedValue";
         }
 
         [SetUp]
@@ -432,6 +446,27 @@ namespace CDP4Reporting.Tests.DataCollection
             Assert.AreEqual(1, node.GetColumns<TestParameter2>().Count());
             Assert.AreEqual(0, node.GetColumns<TestParameter3>().Count());
             Assert.AreEqual(1, node.GetColumns<ComputedTestParameter>().Count());
+        }
+
+        [Test]
+        public void VerifyThatNodeIdentifiesCollectParentValueParameters()
+        {
+            var hierarchy = new CategoryDecompositionHierarchy
+                    .Builder(this.iteration, this.cat1.ShortName)
+                .Build();
+
+            var dataSource = new DataCollectorNodesCreator<CollectParentValuesRow>();
+            var nestedElementTree = new NestedElementTreeGenerator().Generate(this.option).ToList();
+
+            var dataTable = dataSource.GetTable(
+                hierarchy,
+                nestedElementTree);
+
+            Assert.IsTrue(dataTable.Columns.Contains($"{nameof(CollectParentValuesRow.parameter1)}"));
+            Assert.IsTrue(dataTable.Columns.Contains($"{nameof(CollectParentValuesRow.parameter2)}"));
+            Assert.IsTrue(dataTable.Columns.Contains($"{nameof(CollectParentValuesRow.ComputedParameter)}"));
+            Assert.IsTrue(dataTable.Columns.Contains($"{nameof(CollectParentValuesRow.parameter1)}_{this.cat1.ShortName}"));
+            Assert.IsTrue(dataTable.Columns.Contains($"{nameof(CollectParentValuesRow.ComputedParameter)}_{this.cat1.ShortName}"));
         }
 
         [Test]

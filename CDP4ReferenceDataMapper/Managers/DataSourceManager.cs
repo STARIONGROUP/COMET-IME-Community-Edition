@@ -32,6 +32,7 @@ namespace CDP4ReferenceDataMapper.Managers
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
+    using CDP4Common.Comparers;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -278,7 +279,13 @@ namespace CDP4ReferenceDataMapper.Managers
                 this.DataTable.Columns.Add(TypeColumnName, typeof(string));
             }
 
-            var newActualFiniteStates = this.actualFiniteStateList.ActualState.Except(this.Columns.OfType<ActualStateDataGridColumn>().Select(x => x.ActualFiniteState)).ToList();
+            var newActualFiniteStates = 
+                this.actualFiniteStateList.ActualState
+                    .Except(this.Columns.OfType<ActualStateDataGridColumn>().Select(x => x.ActualFiniteState))
+                    .ToList();
+
+            newActualFiniteStates.Sort(new ActualFiniteStateComparer());
+            
             var oldActualFiniteStates = this.Columns.OfType<ActualStateDataGridColumn>().Select(x => x.ActualFiniteState).Except(this.actualFiniteStateList.ActualState).ToList();
 
             foreach (var actualFiniteState in newActualFiniteStates)
@@ -352,14 +359,8 @@ namespace CDP4ReferenceDataMapper.Managers
                         elementUsageRow[actualState.ShortName] = $"{actualState.ShortName}";
                     }
 
-                    var exceptParameterTypes = elementUsage.ParameterOverride
-                        .Select(y => y.ParameterType);
-
                     var valueParameters =
                         elementUsage.ParameterOverride.Cast<ParameterOrOverrideBase>()
-                            .Union(
-                                elementDefinition.Parameter
-                                    .Where(x => !exceptParameterTypes.Contains(x.ParameterType)))
                             .Where(x => x.ParameterType == this.targetValueParameterType);
 
                     foreach (var valueParameter in valueParameters)
