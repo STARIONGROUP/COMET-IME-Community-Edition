@@ -4,7 +4,7 @@
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -37,6 +37,7 @@ namespace CDP4AddinCE
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
+    using System.Windows.Threading;
 
     using CDP4AddinCE.Settings;
     using CDP4AddinCE.Utils;
@@ -65,6 +66,8 @@ namespace CDP4AddinCE
     using NLog;
 
     using ReactiveUI;
+
+    using ExceptionReporting;
 
     using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -158,7 +161,7 @@ namespace CDP4AddinCE
         /// The unique id of the Ribbon to be loaded
         /// </param>
         /// <returns>
-        /// the ribbon UI 
+        /// the ribbon UI
         /// </returns>
         public override string GetCustomUI(string ribbonID)
         {
@@ -204,7 +207,7 @@ namespace CDP4AddinCE
         /// The ribbon control that invokes the callback
         /// </param>
         /// <returns>
-        /// ribbon XML containing the controls 
+        /// ribbon XML containing the controls
         /// </returns>
         public string GetContent(IRibbonControl control)
         {
@@ -254,7 +257,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// Executes the GetEnabled callback that is invoked from a Toggle control on the <see cref="Office.IRibbonControl"/> 
+        /// Executes the GetEnabled callback that is invoked from a Toggle control on the <see cref="Office.IRibbonControl"/>
         /// </summary>
         /// <param name="control">
         /// The ribbon control that invokes the callback
@@ -269,7 +272,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// Executes the GetVisible callback that is invoked from the <see cref="Office.IRibbonControl"/> 
+        /// Executes the GetVisible callback that is invoked from the <see cref="Office.IRibbonControl"/>
         /// </summary>
         /// <param name="control">
         /// The ribbon control that invokes the callback
@@ -284,7 +287,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// Executes the GetImage callback that is invoked from the <see cref="Office.IRibbonControl"/> 
+        /// Executes the GetImage callback that is invoked from the <see cref="Office.IRibbonControl"/>
         /// </summary>
         /// <param name="control">
         /// The ribbon control that invokes the callback
@@ -365,8 +368,8 @@ namespace CDP4AddinCE
         /// </param>
         /// <param name="publicKeyToken">
         /// The public Key Token of the redirected assembly
-        /// </param>        
-        /// <see cref="http://blog.slaks.net/2013-12-25/redirecting-assembly-loads-at-runtime/"/>         
+        /// </param>
+        /// <see cref="http://blog.slaks.net/2013-12-25/redirecting-assembly-loads-at-runtime/"/>
         private void RedirectAssembly(string shortName, Version targetVersion, string publicKeyToken)
         {
             ResolveEventHandler handler = null;
@@ -607,6 +610,8 @@ namespace CDP4AddinCE
                 logger.Trace("set theme");
                 ThemeManager.ApplicationThemeName = Theme.SevenName;
                 AppliedTheme.ThemeName = Theme.SevenName;
+
+                Dispatcher.CurrentDispatcher.UnhandledException += UnhandledException;
             }
             catch (CompositionException compositionException)
             {
@@ -622,6 +627,42 @@ namespace CDP4AddinCE
                 logger.Fatal(ex, "Bootstrapper exception: ");
                 this.Utils.Dialog.ShowError(ex, "Unexpected state in CDP4-CE.Addin");
             }
+        }
+
+        /// <summary>
+        /// Exception handler for uncaught exceptions thrown from any of the WPF modules
+        /// </summary>
+        /// <param name="sender">
+        /// The source of the exception
+        /// </param>
+        /// <param name="unhandledExceptionEventArgs">
+        /// Event args containing the unhandled exception
+        /// </param>
+        private static void UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        {
+            HandleException(unhandledExceptionEventArgs.Exception);
+            unhandledExceptionEventArgs.Handled = true;
+        }
+
+        /// <summary>
+        /// Handles the provided exception by showing it to the end-user
+        /// </summary>
+        /// <param name="ex">
+        /// The exception that is being handled
+        /// </param>
+        private static void HandleException(Exception ex)
+        {
+            if (ex == null)
+            {
+                return;
+            }
+
+            logger.Error(ex);
+
+            var exceptionReporter = new ExceptionReporter();
+            exceptionReporter.Show(ex);
+
+            Environment.Exit(1);
         }
 
         /// <summary>
@@ -703,7 +744,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// Initializes the MEF instantiated services and managers        
+        /// Initializes the MEF instantiated services and managers
         /// </summary>
         private void InitializeMefImports()
         {
@@ -735,7 +776,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// The OnStartupComplete method is called when the Office application has completed starting up and has loaded all the COM add-ins 
+        /// The OnStartupComplete method is called when the Office application has completed starting up and has loaded all the COM add-ins
         /// that were registered to load on startup
         /// </summary>
         /// <param name="custom">
